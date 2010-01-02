@@ -530,6 +530,32 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        public void RegisterAll_AfterCallingGetInstance_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(new Tanto());
+            container.GetInstance<IWeapon>();
+
+            // Act
+            container.RegisterAll<IWeapon>(new IWeapon[0]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        public void RegisterAll_AfterCallingGetAllInstances_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            var weapons = container.GetAllInstances<IWeapon>();
+            var count = weapons.Count();
+
+            // Act
+            container.RegisterAll<IWeapon>(new IWeapon[0]);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAll_WithNullArgument_ThrowsException()
         {

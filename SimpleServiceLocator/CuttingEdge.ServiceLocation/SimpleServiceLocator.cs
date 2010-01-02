@@ -69,6 +69,10 @@ namespace CuttingEdge.ServiceLocation
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="T"/> has already been registered.
+        /// </exception>
         public void RegisterSingle<T>(T instance)
         {
             if (instance == null)
@@ -90,6 +94,10 @@ namespace CuttingEdge.ServiceLocation
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
         public void Register<T>(Func<T> instanceCreator)
         {
             if (instanceCreator == null)
@@ -112,6 +120,10 @@ namespace CuttingEdge.ServiceLocation
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
         public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator)
         {
             if (keyedInstanceCreator == null)
@@ -131,6 +143,11 @@ namespace CuttingEdge.ServiceLocation
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="key">The key that can be used to retrieve the instance.</param>
         /// <param name="instance">The instance to register.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an 
+        /// <paramref name="instance"/> with <paramref name="key"/> for <typeparamref name="T"/> has already
+        /// been registered.
+        /// </exception>
         public void RegisterSingleByKey<T>(string key, T instance)
         {
             if (key == null)
@@ -160,12 +177,18 @@ namespace CuttingEdge.ServiceLocation
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// for <typeparamref name="T"/> has already been registered.
+        /// </exception>
         public void RegisterAll<T>(IEnumerable<T> collection)
         {
             if (collection == null)
             {
                 throw new ArgumentNullException("collection");
             }
+
+            this.ThrowIfLocked();
 
             Type serviceType = typeof(T);
 
