@@ -265,10 +265,15 @@ namespace CuttingEdge.ServiceLocation
 
         private void ThrowIfLocked()
         {
-            if (this.locked)
+            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+            // immediately.
+            lock (this.locker)
             {
-                throw new InvalidOperationException(
-                    StringResources.SimpleServiceLocatorCanNotBeChangedAfterUse(this.GetType()));
+                if (this.locked)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.SimpleServiceLocatorCanNotBeChangedAfterUse(this.GetType()));
+                }
             }
         }
 
