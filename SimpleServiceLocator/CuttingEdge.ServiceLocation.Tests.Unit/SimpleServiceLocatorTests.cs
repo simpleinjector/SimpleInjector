@@ -575,7 +575,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var weapons = new IWeapon[] { new Tanto(), new Katana() };
             container.RegisterAll<IWeapon>(weapons);
 
-            // Acty
+            // Act
             container.RegisterAll<IWeapon>(weapons);
         }
 

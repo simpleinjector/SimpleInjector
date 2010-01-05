@@ -133,12 +133,12 @@
         </member>
         <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivateAllExceptionMessage">
             <summary>
-              Looks up a localized string similar to Activation error occured while trying to get all instances of type {0}.
+              Looks up a localized string similar to Activation error occurred while trying to get all instances of type {0}.
             </summary>
         </member>
         <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivationExceptionMessage">
             <summary>
-              Looks up a localized string similar to Activation error occured while trying to get instance of type {0}, key &quot;{1}&quot;.
+              Looks up a localized string similar to Activation error occurred while trying to get instance of type {0}, key &quot;{1}&quot;.
             </summary>
         </member>
         <member name="T:Microsoft.Practices.ServiceLocation.ServiceLocator">

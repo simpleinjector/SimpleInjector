@@ -123,7 +123,7 @@ namespace CuttingEdge.ServiceLocation
         internal static string TypeAlreadyRegisteredWithKey(Type serviceType, string key)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type type {0} has already been registered with key '{1}'.", serviceType, key);
+                "Type {0} has already been registered with key '{1}'.", serviceType, key);
         }
 
         internal static string KeyForTypeNotFound(Type serviceType, string key)
