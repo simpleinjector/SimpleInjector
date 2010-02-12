@@ -8,14 +8,13 @@ using Microsoft.Practices.ServiceLocation;
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>
-    /// Builds <see cref="Func{object}"/> delegates that can create a new instance of the supplied Type, where
+    /// Builds <see cref="Func{T}"/> delegates that can create a new instance of the supplied Type, where
     /// the supplied container will be used to locate the constructor arguments. The generated code of the
-    /// built <see cref="Func{object}"/> might look like this:
-    /// </summary>
-    /// <example><code><![CDATA[
+    /// built <see cref="Func{T}"/> might look like this.
+    /// <![CDATA[
     ///     Func<object> func = () => return new Samurai(container.GetInstance<IWeapon>());
-    /// ]]></code>
-    /// </example>
+    /// ]]>
+    /// </summary>
     internal sealed class DelegateBuilder
     {
         private static readonly MethodInfo GenericGetInstanceMethodDefinition =
@@ -25,10 +24,10 @@ namespace CuttingEdge.ServiceLocation
         private readonly Dictionary<Type, Func<object>> registrations;
         private readonly IServiceLocator container;
 
-        /// <summary>Initializes a new instance of the <see cref="InstanceCreatorBuilder"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="DelegateBuilder"/> class.</summary>
         /// <param name="serviceType">Type of the service.</param>
         /// <param name="registrations">The set of registrations.</param>
-        /// <param name="serviceLocator">The service locator.</param>
+        /// <param name="container">The service locator.</param>
         private DelegateBuilder(Type serviceType, Dictionary<Type, Func<object>> registrations,
             IServiceLocator container)
         {
@@ -41,7 +40,7 @@ namespace CuttingEdge.ServiceLocation
         /// <param name="serviceType">Type of the service.</param>
         /// <param name="registrations">The registrations.</param>
         /// <param name="serviceLocator">The service locator.</param>
-        /// <returns>A new <see cref="Func{object}"/>.</returns>
+        /// <returns>A new <see cref="Func{T}"/>.</returns>
         public static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
             IServiceLocator serviceLocator)
         {
@@ -53,7 +52,7 @@ namespace CuttingEdge.ServiceLocation
         {
             var constructor = this.GetOnlyPublicConstructor();
 
-            Expression[] constructorArgumentCalls = BuildGetInstanceCallsForConstructor(constructor);
+            Expression[] constructorArgumentCalls = this.BuildGetInstanceCallsForConstructor(constructor);
 
             var newServiceTypeMethod = Expression.Lambda<Func<object>>(
                 Expression.New(constructor, constructorArgumentCalls), new ParameterExpression[0]);
@@ -63,12 +62,12 @@ namespace CuttingEdge.ServiceLocation
 
         private ConstructorInfo GetOnlyPublicConstructor()
         {
-            var constructors = serviceType.GetConstructors();
+            var constructors = this.serviceType.GetConstructors();
 
             if (constructors.Length != 1)
             {
-                throw new ActivationException(
-                    StringResources.TypeMustHaveASinglePublicConstructor(serviceType, constructors.Length));
+                throw new ActivationException(StringResources.TypeMustHaveASinglePublicConstructor(
+                    this.serviceType, constructors.Length));
             }
 
             return constructors[0];
@@ -80,7 +79,7 @@ namespace CuttingEdge.ServiceLocation
 
             foreach (var parameter in constructor.GetParameters())
             {
-                var getInstanceCall = BuildGetInstanceCallForType(parameter.ParameterType);
+                var getInstanceCall = this.BuildGetInstanceCallForType(parameter.ParameterType);
 
                 getInstanceCalls.Add(getInstanceCall);
             }
@@ -93,7 +92,7 @@ namespace CuttingEdge.ServiceLocation
             if (!this.registrations.ContainsKey(parameterType))
             {
                 throw new ActivationException(
-                    StringResources.ParameterTypeMustBeRegistered(serviceType, parameterType));
+                    StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
             }
 
             var getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
