@@ -37,9 +37,9 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var container = new SimpleServiceLocator();
             container.RegisterSingle<IWeapon>(new Katana());
             container.Register<Warrior>(() =>
-                {
-                    return new Samurai(container.GetInstance<IWeapon>());
-                });
+            {
+                return new Samurai(container.GetInstance<IWeapon>());
+            });
 
             // Act
             var instance1 = container.GetInstance<Warrior>();
@@ -47,6 +47,118 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Assert
             Assert.AreNotEqual(instance1, instance2, "Values should reference different instances.");
+        }
+
+        [TestMethod]
+        public void GetInstance_UnregisteredConcreteType_CanStillBeCreated()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(new Katana());
+
+            // Act
+            // Samurai is a concrete class with a constructor with a single argument of type IWeapon.
+            var instance = container.GetInstance<Samurai>();
+
+            // Arrange
+            Assert.IsNotNull(instance);
+        }
+
+        [TestMethod]
+        public void GetInstance_UnregisteredType_AlwaysReturnsANewInstance()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(new Katana());
+
+            // Act
+            var instance1 = container.GetInstance<Samurai>();
+            var instance2 = container.GetInstance<Samurai>();
+
+            // Assert
+            Assert.AreNotEqual(instance1, instance2, "Values should reference different instances.");
+        }
+
+        [TestMethod]
+        public void GetInstance_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            try
+            {
+                // Act
+                container.GetInstance<ConcreteTypeWithMultiplePublicConstructors>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                string message = ex.Message;
+
+                Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
+                    "The exception message should contain the name of the type. Actual message: " + message);
+
+                Assert.IsTrue(message.Contains("type should contain exactly one public constructor"),
+                    "The exception message should describe the actual problem. Actual message: " + message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_UnregisteredConcreateTypeWithConstructorWithInvalidArguments_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            // Because we do not register the IWeapon interface here, Act should fail.
+
+            try
+            {
+                // Act
+                container.GetInstance<Samurai>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                string message = ex.Message;
+
+                Assert.IsTrue(message.Contains(typeof(Samurai).FullName),
+                    "The exception message should contain the name of the type. Actual message: " + message);
+
+                Assert.IsTrue(message.Contains(typeof(IWeapon).FullName),
+                    "The exception message should contain the missing constructor argument. " +
+                    "Actual message: " + message);
+
+                Assert.IsTrue(message.Contains("Please ensure IWeapon is registered in the container"),
+                    "(1) The exception message should give a solution to solve the problem. " +
+                    "Actual message: " + message);
+
+                Assert.IsTrue(message.Contains("register the type Samurai directly"),
+                    "(2) The exception message should give a solution to solve the problem. " +
+                    "Actual message: " + message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_WithUnregisteredGenericTypeDefinition_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(GenericType<>));
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(typeof(GenericType<>).Name));              
+            }
         }
 
         [TestMethod]
@@ -87,7 +199,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            
+
             // Act
             container.GetInstance<IWeapon>();
         }
@@ -126,16 +238,16 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
             container.RegisterByKey<IWeapon>(key =>
+            {
+                switch (key)
                 {
-                    switch (key)
-                    {
-                        case "Tanto":
-                            return new Tanto();
-                        default:
-                            // When name unknown, return null.
-                            return null;
-                    }
-                });
+                    case "Tanto":
+                        return new Tanto();
+                    default:
+                        // When name unknown, return null.
+                        return null;
+                }
+            });
 
             // Act
             container.GetInstance<IWeapon>("Katana");
@@ -232,7 +344,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            
+
             // Note that the key is not used: a new Tanto will be returned on every call.
             container.RegisterSingleByKey<IWeapon>("Tanto", new Tanto());
             container.Register<IWeapon>(() => new Katana());
@@ -310,7 +422,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            
+
             // Note that the key is not used: a new Tanto will be returned on every call.
             container.RegisterByKey<IWeapon>(key => new Tanto());
 
@@ -584,7 +696,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            
+
             // Act
             container.Validate();
         }
@@ -596,9 +708,9 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
             container.Register<IWeapon>(() =>
-                {
-                    throw new ArgumentNullException();
-                });
+            {
+                throw new ArgumentNullException();
+            });
 
             // Act
             container.Validate();
@@ -632,6 +744,84 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.Validate();
+        }
+
+        [TestMethod]
+        public void FormatActivationExceptionMessage_NullException_ReturnsDefaultMessage()
+        {
+            // Arrange
+            var simpleServiceLocator = new FakeSimpleServiceLocator();
+            var key = "key";
+            var expectedMessage = 
+                "Activation error occured while trying to get instance of type Int32, key \"key\".";
+
+            // Act
+            var actualMessage = simpleServiceLocator.FormatActivationExceptionMessage(null, typeof(int), key);
+
+            // Assert
+            Assert.AreEqual(expectedMessage, actualMessage);
+        }
+
+        [TestMethod]
+        public void FormatActivationExceptionMessage_ExceptionWithMessage_ReturnsDefaultMessage()
+        {
+            // Arrange
+            var simpleServiceLocator = new FakeSimpleServiceLocator();
+            var exception = new InvalidOperationException("Some message.");
+            var key = "key";
+            var expectedMessage = "Activation error occured while trying to get instance of type Int32, " +
+                "key \"key\". Some message.";
+
+            // Act
+            var actualMessage = 
+                simpleServiceLocator.FormatActivationExceptionMessage(exception, typeof(int), key);
+
+            // Assert
+            Assert.AreEqual(expectedMessage, actualMessage);
+        }
+
+        [TestMethod]
+        public void FormatActivateAllExceptionMessage_NullException_ReturnsDefaultMessage()
+        {
+            // Arrange
+            var simpleServiceLocator = new FakeSimpleServiceLocator();
+            var expectedMessage =
+                "Activation error occured while trying to get all instances of type Int32.";
+
+            // Act
+            var actualMessage = simpleServiceLocator.FormatActivateAllExceptionMessage(null, typeof(int));
+
+            // Assert
+            Assert.AreEqual(expectedMessage, actualMessage);
+        }
+
+        [TestMethod]
+        public void FormatActivateAllExceptionMessage_ExceptionWithMessage_ReturnsDefaultMessage()
+        {
+            // Arrange
+            var simpleServiceLocator = new FakeSimpleServiceLocator();
+            var exception = new InvalidOperationException("Some message.");
+            var expectedMessage =
+                "Activation error occured while trying to get all instances of type Int32. Some message.";
+
+            // Act
+            var actualMessage = simpleServiceLocator.FormatActivateAllExceptionMessage(exception, typeof(int));
+
+            // Assert
+            Assert.AreEqual(expectedMessage, actualMessage);
+        }
+
+        private sealed class FakeSimpleServiceLocator : SimpleServiceLocator
+        {
+            public new string FormatActivateAllExceptionMessage(Exception actualException, Type serviceType)
+            {
+                return base.FormatActivateAllExceptionMessage(actualException, serviceType);
+            }
+
+            public new string FormatActivationExceptionMessage(Exception actualException, Type serviceType, string key)
+            {
+                return base.FormatActivationExceptionMessage(actualException, serviceType, key);
+            }
         }
     }
 }

@@ -39,16 +39,16 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     public class SimpleServiceLocator : ServiceLocatorImplBase
     {
-        private readonly Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
-        
-        private readonly Dictionary<Type, IKeyedRegistrationLocator> keyedRegistrations = 
+        private Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
+
+        private readonly Dictionary<Type, IKeyedRegistrationLocator> keyedRegistrations =
             new Dictionary<Type, IKeyedRegistrationLocator>();
 
         private readonly Dictionary<Type, IEnumerable<object>> registeredCollections =
             new Dictionary<Type, IEnumerable<object>>();
 
         private readonly object locker = new object();
-        
+
         private bool locked;
 
         /// <summary>Initializes a new instance of the <see cref="SimpleServiceLocator"/> class.</summary>
@@ -73,6 +73,7 @@ namespace CuttingEdge.ServiceLocation
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
         /// for <typeparamref name="T"/> has already been registered.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.</exception>
         public void RegisterSingle<T>(T instance)
         {
             if (instance == null)
@@ -86,7 +87,10 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
 
-            this.registrations[serviceType] = () => instance;           
+            // Create a delegate that always returns this particular instance.
+            Func<object> instanceCreator = () => instance;
+
+            this.registrations[serviceType] = instanceCreator;
         }
 
         /// <summary>
@@ -98,6 +102,7 @@ namespace CuttingEdge.ServiceLocation
         /// Thrown when the instance is locked and can not be altered, or when a 
         /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<T>(Func<T> instanceCreator)
         {
             if (instanceCreator == null)
@@ -107,11 +112,12 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowIfLocked();
 
-            Type serviceType = typeof(T);
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+            // Create a delegate that calls the Func<T> delegate and returns T as object.
+            Func<object> objectInstanceCreator = () => instanceCreator();
 
-            this.registrations[serviceType] = () => instanceCreator();
+            this.registrations[typeof(T)] = objectInstanceCreator;
         }
 
         /// <summary>
@@ -124,6 +130,8 @@ namespace CuttingEdge.ServiceLocation
         /// Thrown when the instance is locked and can not be altered, or when a 
         /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="T"/> has already been registered.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyedInstanceCreator"/> is a
+        /// null reference.</exception>
         public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator)
         {
             if (keyedInstanceCreator == null)
@@ -148,6 +156,9 @@ namespace CuttingEdge.ServiceLocation
         /// <paramref name="instance"/> with <paramref name="key"/> for <typeparamref name="T"/> has already
         /// been registered.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or 
+        /// <paramref name="instance"/> are null references.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> is an empty string.</exception>
         public void RegisterSingleByKey<T>(string key, T instance)
         {
             if (key == null)
@@ -166,10 +177,17 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowIfLocked();
-            this.ThrowWhenRegistrationsAlreadyContainKeyFor<T>(key);
+            this.ThrowWhenRegistrationsAlreadyContainKeyFor(typeof(T), key);
 
-            var registrations = this.GetDictionaryWithKeyedSinglesFor<T>();
-            registrations.Add(key, instance);
+            var registrationDictionary = this.GetRegisteredDictionaryWithKeyedSinglesFor(typeof(T));
+
+            if (registrationDictionary == null)
+            {
+                registrationDictionary = new RegistrationDictionary(typeof(T));
+                RegisterDictionaryWithKeyedSinglesFor(typeof(T), registrationDictionary);
+            }
+
+            registrationDictionary.Add(key, instance);
         }
 
         /// <summary>
@@ -223,7 +241,7 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>The requested service instance.</returns>
         protected override object DoGetInstance(Type serviceType, string key)
         {
-            this.Lock();
+            this.LockContainer();
 
             if (key == null)
             {
@@ -243,14 +261,130 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>Sequence of service instance objects.</returns>
         protected override IEnumerable<object> DoGetAllInstances(Type serviceType)
         {
-            this.Lock();
+            this.LockContainer();
 
-            if (!this.registeredCollections.ContainsKey(serviceType))
+            // Create a copy. Not strictly needed, since we don't mutate this dictionary later on, but this
+            // saves us a bug when we do this in a later release :-).
+            var registeredCollections = this.registeredCollections;
+
+            if (!registeredCollections.ContainsKey(serviceType))
             {
                 return Enumerable.Empty<object>();
             }
 
-            return this.registeredCollections[serviceType];
+            return registeredCollections[serviceType];
+        }
+
+        /// <summary>
+        /// Format the exception message for use in an <see cref="ActivationException"/>
+        /// that occurs while resolving multiple service instances.
+        /// </summary>
+        /// <param name="actualException">The actual exception thrown by the implementation.</param>
+        /// <param name="serviceType">Type of service requested.</param>
+        /// <returns>The formatted exception message string.</returns>
+        protected override string FormatActivateAllExceptionMessage(Exception actualException,
+            Type serviceType)
+        {
+            // HACK: We add a period after the exception message, because the ServiceLocatorImplBase does
+            // not produce an exception message ending with a period (which is a bug).
+            const string Period = ".";
+
+            string message = base.FormatActivateAllExceptionMessage(actualException, serviceType);
+
+            if (actualException != null && !String.IsNullOrEmpty(actualException.Message))
+            {
+                return message + Period +" " + actualException.Message;
+            }
+
+            return message + Period;
+        }
+
+        /// <summary>
+        /// Format the exception message for use in an <see cref="ActivationException"/>
+        /// that occurs while resolving a single service.
+        /// </summary>
+        /// <param name="actualException">The actual exception thrown by the implementation.</param>
+        /// <param name="serviceType">Type of service requested.</param>
+        /// <param name="key">Name requested.</param>
+        /// <returns>The formatted exception message string.</returns>
+        protected override string FormatActivationExceptionMessage(Exception actualException,
+            Type serviceType, string key)
+        {
+            // HACK: We add a period after the exception message, because the ServiceLocatorImplBase does
+            // not produce an exception message ending with a period (which is a bug).
+            const string Period = ".";
+
+            string message = base.FormatActivationExceptionMessage(actualException, serviceType, key);
+
+            if (actualException != null && !String.IsNullOrEmpty(actualException.Message))
+            {
+                return message + Period + " " + actualException.Message;
+            }
+
+            return message + Period;
+        }
+
+        private object GetInstanceForType(Type serviceType)
+        {
+            // Create a copy, because the reference may change during this method call.
+            var localRegistrations = this.registrations;
+
+            object instance = GetInstanceForTypeFromRegistrations(localRegistrations, serviceType);
+
+            if (instance != null)
+            {
+                return instance;
+            }
+
+            if (serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
+            {
+                // Only delegates for concrete types can be generated.
+                throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+            }
+
+            var instanceCreator = RegisterDelegateForType(serviceType, localRegistrations);
+
+            return instanceCreator();
+        }
+
+        private static object GetInstanceForTypeFromRegistrations(Dictionary<Type, Func<object>> registrations,
+            Type serviceType)
+        {
+            Func<object> instanceCreator = null;
+
+            if (registrations.TryGetValue(serviceType, out instanceCreator))
+            {
+                object instance = instanceCreator();
+
+                if (instance != null)
+                {
+                    return instance;
+                }
+
+                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(serviceType));
+            }
+
+            return null;
+        }
+
+        // We're registering a service type after lock here and that means that the type is added to a copy of
+        // the registrations dictionary and the original replaced with a new one. This 'reference swapping' is
+        // thread-safe, but can result in types disappearing again from the registrations when multiple
+        // threads simultaneously add different types. This however, does not result in a consistency problem,
+        // because the missing type will be again added later. This type of swapping safes us from using locks.
+        private Func<object> RegisterDelegateForType(Type serviceType,
+            Dictionary<Type, Func<object>> registrations)
+        {
+            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrations, this);
+
+            var registrationsCopy = MakeCopyOf(registrations);
+
+            registrationsCopy.Add(serviceType, instanceCreator);
+
+            // Replace the original with the new version that includes the serviceType.
+            this.registrations = registrationsCopy;
+
+            return instanceCreator;
         }
 
         private object GetKeyedInstanceForType(Type serviceType, string key)
@@ -277,7 +411,8 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private void Lock()
+        /// <summary>Prevents any new registrations to be made to the container.</summary>
+        private void LockContainer()
         {
             if (!this.locked)
             {
@@ -290,43 +425,30 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private object GetInstanceForType(Type serviceType)
+        private RegistrationDictionary GetRegisteredDictionaryWithKeyedSinglesFor(Type serviceType)
         {
-            if (this.registrations.ContainsKey(serviceType))
+            IKeyedRegistrationLocator registrationLocator;
+
+            if (!this.keyedRegistrations.TryGetValue(serviceType, out registrationLocator))
             {
-                object instance = this.registrations[serviceType]();
-
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(serviceType));                    
+                return null;
             }
 
-            throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+            var registrationDictionary = registrationLocator as RegistrationDictionary;
+
+            if (registrationDictionary != null)
+            {
+                return registrationDictionary;
+            }
+
+            throw new InvalidOperationException(
+                StringResources.TypeAlreadyRegisteredForRegisterByKey(serviceType));
         }
 
-        private Dictionary<string, object> GetDictionaryWithKeyedSinglesFor<T>()
+        private void RegisterDictionaryWithKeyedSinglesFor(Type serviceType,
+            RegistrationDictionary registrationDictionary)
         {
-            Type type = typeof(T);
-
-            IKeyedRegistrationLocator registrations;
-
-            if (!this.keyedRegistrations.TryGetValue(type, out registrations))
-            {
-                registrations = new RegistrationDictionary(type);
-                this.keyedRegistrations.Add(type, registrations);
-            }
-
-            var dictionary = registrations as Dictionary<string, object>;
-
-            if (dictionary != null)
-            {
-                return dictionary;
-            }
-
-            throw new InvalidOperationException(StringResources.TypeAlreadyRegisteredForRegisterByKey(type));
+            this.keyedRegistrations.Add(serviceType, registrationDictionary);
         }
 
         private void ValidateRegistrations()
@@ -416,14 +538,14 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private void ThrowWhenRegistrationsAlreadyContainKeyFor<T>(string key)
+        private void ThrowWhenRegistrationsAlreadyContainKeyFor(Type serviceType, string key)
         {
-            var registrations = this.GetDictionaryWithKeyedSinglesFor<T>();
+            var registrationDictionary = this.GetRegisteredDictionaryWithKeyedSinglesFor(serviceType);
 
-            if (registrations.ContainsKey(key))
+            if (registrationDictionary != null && registrationDictionary.ContainsKey(key))
             {
                 throw new InvalidOperationException(
-                    StringResources.TypeAlreadyRegisteredWithKey(typeof(T), key));
+                    StringResources.TypeAlreadyRegisteredWithKey(serviceType, key));
             }
         }
 
@@ -436,11 +558,26 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
+        private static Dictionary<Type, Func<object>> MakeCopyOf(Dictionary<Type, Func<object>> source)
+        {
+            // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.
+            int initialCapacity = source.Count + 1;
+
+            var copy = new Dictionary<Type, Func<object>>(initialCapacity);
+
+            foreach (var pair in source)
+            {
+                copy.Add(pair.Key, pair.Value);
+            }
+
+            return copy;
+        }
+
         /// <summary>
         /// Represents a collection of string keys and object instances for a single interface or base type,
         /// registered with the <see cref="RegisterSingleByKey"/> method.
         /// </summary>
-        private sealed class RegistrationDictionary : Dictionary<string, object>, 
+        private sealed class RegistrationDictionary : Dictionary<string, object>,
             IKeyedRegistrationLocator
         {
             private readonly Type serviceType;
@@ -469,7 +606,7 @@ namespace CuttingEdge.ServiceLocation
                     return instance;
                 }
 
-                throw new ActivationException(StringResources.KeyForTypeNotFound(this.serviceType, key));                   
+                throw new ActivationException(StringResources.KeyForTypeNotFound(this.serviceType, key));
             }
         }
 

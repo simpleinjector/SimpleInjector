@@ -65,7 +65,7 @@ namespace CuttingEdge.ServiceLocation
         internal static string TypeAlreadyRegisteredForRegisterByKey(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered by calling RegisterByKey<T>. Once the type is " + 
+                "Type {0} has already been registered by calling RegisterByKey<T>. Once the type is " +
                 "registered by calling RegisterByKey<T>, registering it using RegisterSingleByKey<T> is " +
                 "invalid.", serviceType.FullName);
         }
@@ -137,5 +137,31 @@ namespace CuttingEdge.ServiceLocation
             return string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} returned null.", serviceType);
         }
+
+        internal static string ParameterTypeMustBeRegistered(Type serviceType, Type parameterType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                ImplicitRegistrationCouldNotBeMadeForType(serviceType) +
+                    "The constructor of the type contains the parameter of type {0} that is not registered. " +
+                    "Please ensure {1} is registered in the container, change the constructor of the " +
+                    "type or register the type {2} directly.",
+                    parameterType.FullName, parameterType.Name, serviceType.Name);
+        }
+
+        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType, int constructorCount)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                ImplicitRegistrationCouldNotBeMadeForType(serviceType) +
+                    "The type should contain exactly one public constructor, but it currently has {0}.",
+                    constructorCount);
+        }
+
+        private static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "No registration for type {0} could be found and an implicit registration could not be made. ",
+                serviceType.FullName);
+        }
+
     }
 }

@@ -58,4 +58,22 @@
             this.Weapon.Hit(target);
         }
     }
+
+    public class ConcreteTypeWithMultiplePublicConstructors
+    {
+        public ConcreteTypeWithMultiplePublicConstructors()
+        {
+        }
+
+        public ConcreteTypeWithMultiplePublicConstructors(IWeapon weapon)
+        {
+        }
+    }
+
+    public class GenericType<T>
+    {
+        public GenericType()
+        {
+        }
+    }
 }
