@@ -17,9 +17,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Assemblies", "Shared
 		Shared Assemblies\Microsoft.Practices.ServiceLocation.XML = Shared Assemblies\Microsoft.Practices.ServiceLocation.XML
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuttingEdge.ServiceLocation.Silverlight", "CuttingEdge.ServiceLocation.Silverlight\CuttingEdge.ServiceLocation.Silverlight.csproj", "{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Silverlight Assemblies", "Shared Silverlight Assemblies", "{AA66367E-86E6-4DED-BBC7-463B71F4B5DA}"
+	ProjectSection(SolutionItems) = preProject
+		Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.dll = Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.dll
+		Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.XML = Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.XML
+		Shared Silverlight Assemblies\Readme.txt = Shared Silverlight Assemblies\Readme.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs02.codeplex.com/
 		SccLocalPath0 = .
@@ -29,6 +38,9 @@ Global
 		SccProjectUniqueName2 = CuttingEdge.ServiceLocation\\CuttingEdge.ServiceLocation.csproj
 		SccProjectName2 = CuttingEdge.ServiceLocation
 		SccLocalPath2 = CuttingEdge.ServiceLocation
+		SccProjectUniqueName3 = CuttingEdge.ServiceLocation.Silverlight\\CuttingEdge.ServiceLocation.Silverlight.csproj
+		SccProjectName3 = CuttingEdge.ServiceLocation.Silverlight
+		SccLocalPath3 = CuttingEdge.ServiceLocation.Silverlight
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +55,10 @@ Global
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

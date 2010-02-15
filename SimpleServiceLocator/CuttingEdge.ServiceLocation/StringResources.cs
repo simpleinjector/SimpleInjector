@@ -162,6 +162,5 @@ namespace CuttingEdge.ServiceLocation
                 "No registration for type {0} could be found and an implicit registration could not be made. ",
                 serviceType.FullName);
         }
-
     }
 }

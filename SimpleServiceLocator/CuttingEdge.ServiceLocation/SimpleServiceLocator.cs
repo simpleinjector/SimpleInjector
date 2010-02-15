@@ -39,8 +39,6 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     public class SimpleServiceLocator : ServiceLocatorImplBase
     {
-        private Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
-
         private readonly Dictionary<Type, IKeyedRegistrationLocator> keyedRegistrations =
             new Dictionary<Type, IKeyedRegistrationLocator>();
 
@@ -48,6 +46,8 @@ namespace CuttingEdge.ServiceLocation
             new Dictionary<Type, IEnumerable<object>>();
 
         private readonly object locker = new object();
+
+        private Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
 
         private bool locked;
 
@@ -184,7 +184,7 @@ namespace CuttingEdge.ServiceLocation
             if (registrationDictionary == null)
             {
                 registrationDictionary = new RegistrationDictionary(typeof(T));
-                RegisterDictionaryWithKeyedSinglesFor(typeof(T), registrationDictionary);
+                this.RegisterDictionaryWithKeyedSinglesFor(typeof(T), registrationDictionary);
             }
 
             registrationDictionary.Add(key, instance);
@@ -222,7 +222,7 @@ namespace CuttingEdge.ServiceLocation
         /// <see cref="Register"/> and iterate collections registered with <see cref="RegisterAll"/> and
         /// throws an exception if there was an error.
         /// </summary>
-        /// <exception cref="ConfigurationErrorsException">Thrown when the registration of instances was
+        /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
         /// invalid.</exception>
         public void Validate()
         {
@@ -293,7 +293,7 @@ namespace CuttingEdge.ServiceLocation
 
             if (actualException != null && !String.IsNullOrEmpty(actualException.Message))
             {
-                return message + Period +" " + actualException.Message;
+                return message + Period + " " + actualException.Message;
             }
 
             return message + Period;
@@ -342,7 +342,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
             }
 
-            var instanceCreator = RegisterDelegateForType(serviceType, localRegistrations);
+            var instanceCreator = this.RegisterDelegateForType(serviceType, localRegistrations);
 
             return instanceCreator();
         }
@@ -464,7 +464,7 @@ namespace CuttingEdge.ServiceLocation
                 }
                 catch (Exception ex)
                 {
-                    throw new ConfigurationErrorsException(
+                    throw new InvalidOperationException(
                         StringResources.ConfigurationInvalidCreatingInstanceFailed(pair.Key, ex), ex);
                 }
             }
@@ -491,14 +491,14 @@ namespace CuttingEdge.ServiceLocation
                 }
                 catch (Exception ex)
                 {
-                    throw new ConfigurationErrorsException(
+                    throw new InvalidOperationException(
                         StringResources.ConfigurationInvalidIteratingCollectionFailed(pair.Key, ex), ex);
                 }
             }
 
             if (firstInvalidType != null)
             {
-                throw new ConfigurationErrorsException(
+                throw new InvalidOperationException(
                     StringResources.ConfigurationInvalidCollectionContainsNullElements(firstInvalidType));
             }
         }

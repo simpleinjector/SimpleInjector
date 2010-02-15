@@ -110,11 +110,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            // Because we do not register the IWeapon interface here, Act should fail.
 
             try
             {
                 // Act
+                // Because we did not register the IWeapon interface, GetInstance<Samurai> should fail.
                 container.GetInstance<Samurai>();
 
                 // Assert
