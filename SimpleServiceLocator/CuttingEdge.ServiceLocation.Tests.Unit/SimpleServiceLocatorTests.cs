@@ -702,7 +702,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ConfigurationErrorsException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Validate_WithFailingFunc_ThrowsException()
         {
             // Arrange
@@ -717,7 +717,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ConfigurationErrorsException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Validate_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
@@ -729,7 +729,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ConfigurationErrorsException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Validate_FailingCollection_ThrowsException()
         {
             // Arrange
