@@ -59,6 +59,13 @@
         }
     }
 
+    public class ConcreteTypeWithConcreteTypeConstructorArgument
+    {
+        public ConcreteTypeWithConcreteTypeConstructorArgument(Samurai samurai)
+        {
+        }
+    }
+    
     public class ConcreteTypeWithMultiplePublicConstructors
     {
         public ConcreteTypeWithMultiplePublicConstructors()

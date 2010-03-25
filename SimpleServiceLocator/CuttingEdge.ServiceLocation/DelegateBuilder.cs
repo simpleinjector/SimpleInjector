@@ -76,7 +76,7 @@ namespace CuttingEdge.ServiceLocation
 
         private Func<object> Build()
         {
-            var constructor = this.GetOnlyPublicConstructor();
+            var constructor = this.GetPublicConstructor();
 
             Expression[] constructorArgumentCalls = this.BuildGetInstanceCallsForConstructor(constructor);
 
@@ -86,7 +86,7 @@ namespace CuttingEdge.ServiceLocation
             return newServiceTypeMethod.Compile();
         }
 
-        private ConstructorInfo GetOnlyPublicConstructor()
+        private ConstructorInfo GetPublicConstructor()
         {
             var constructors = this.serviceType.GetConstructors();
 
@@ -117,8 +117,11 @@ namespace CuttingEdge.ServiceLocation
         {
             if (!this.registrations.ContainsKey(parameterType))
             {
-                throw new ActivationException(
-                    StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
+                if (!SimpleServiceLocator.IsConcreteType(parameterType))
+                {
+                    throw new ActivationException(
+                        StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
+                }
             }
 
             var getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
@@ -131,6 +134,11 @@ namespace CuttingEdge.ServiceLocation
         private static MethodInfo MakeGenericGetInstanceMethod(Type parameterType)
         {
             return GenericGetInstanceMethodDefinition.MakeGenericMethod(parameterType);
+        }
+
+        private static bool IsConcreteType(Type type)
+        {
+            return !type.IsAbstract && !type.IsGenericTypeDefinition;
         }
     }
 }

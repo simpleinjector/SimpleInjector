@@ -336,15 +336,20 @@ namespace CuttingEdge.ServiceLocation
                 return instance;
             }
 
-            if (serviceType.IsAbstract || serviceType.IsGenericTypeDefinition)
+            if (!IsConcreteType(serviceType))
             {
                 // Only delegates for concrete types can be generated.
                 throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
             }
 
-            var instanceCreator = this.RegisterDelegateForType(serviceType, localRegistrations);
+            var instanceCreator = this.RegisterDelegateForConcreteType(serviceType, localRegistrations);
 
             return instanceCreator();
+        }
+
+        internal static bool IsConcreteType(Type type)
+        {
+            return !type.IsAbstract && !type.IsGenericTypeDefinition;
         }
 
         private static object GetInstanceForTypeFromRegistrations(Dictionary<Type, Func<object>> registrations,
@@ -372,7 +377,7 @@ namespace CuttingEdge.ServiceLocation
         // thread-safe, but can result in types disappearing again from the registrations when multiple
         // threads simultaneously add different types. This however, does not result in a consistency problem,
         // because the missing type will be again added later. This type of swapping safes us from using locks.
-        private Func<object> RegisterDelegateForType(Type serviceType,
+        private Func<object> RegisterDelegateForConcreteType(Type serviceType,
             Dictionary<Type, Func<object>> registrations)
         {
             Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrations, this);
