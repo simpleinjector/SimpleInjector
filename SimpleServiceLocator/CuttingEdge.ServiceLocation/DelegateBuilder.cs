@@ -135,10 +135,5 @@ namespace CuttingEdge.ServiceLocation
         {
             return GenericGetInstanceMethodDefinition.MakeGenericMethod(parameterType);
         }
-
-        private static bool IsConcreteType(Type type)
-        {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition;
-        }
     }
 }

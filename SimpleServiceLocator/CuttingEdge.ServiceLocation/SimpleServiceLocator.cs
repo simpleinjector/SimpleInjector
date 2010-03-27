@@ -136,7 +136,7 @@ namespace CuttingEdge.ServiceLocation
         {
             if (keyedInstanceCreator == null)
             {
-                throw new ArgumentNullException("keydInstanceCreator");
+                throw new ArgumentNullException("keyedInstanceCreator");
             }
 
             this.ThrowIfLocked();
@@ -230,6 +230,11 @@ namespace CuttingEdge.ServiceLocation
             // arguments for the Func<string, object> delegates.
             this.ValidateRegistrations();
             this.ValidateRegisteredCollections();
+        }
+
+        internal static bool IsConcreteType(Type type)
+        {
+            return !type.IsAbstract && !type.IsGenericTypeDefinition;
         }
 
         /// <summary>
@@ -345,11 +350,6 @@ namespace CuttingEdge.ServiceLocation
             var instanceCreator = this.RegisterDelegateForConcreteType(serviceType, localRegistrations);
 
             return instanceCreator();
-        }
-
-        internal static bool IsConcreteType(Type type)
-        {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition;
         }
 
         private static object GetInstanceForTypeFromRegistrations(Dictionary<Type, Func<object>> registrations,
@@ -510,9 +510,12 @@ namespace CuttingEdge.ServiceLocation
 
         private static void VerifyIfListCanBeIterated(IEnumerable<object> registeredCollection)
         {
-            foreach (var item in registeredCollection)
+            using (var enumerator = registeredCollection.GetEnumerator())
             {
-                // Do nothing inside the loop, iterating the list is enough.
+                while (enumerator.MoveNext())
+                {
+                    // Do nothing inside the loop, iterating the list is enough.
+                }
             }
         }
 
