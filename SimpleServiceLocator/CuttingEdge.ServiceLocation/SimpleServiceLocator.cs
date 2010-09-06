@@ -94,6 +94,39 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>
+        /// Registers the specified delegate that allows constructing a single instance of 
+        /// <typeparamref name="T"/>. This delegate will be called at most once during the lifetime of the
+        /// application.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="singleInstanceCreator">The delegate that allows building or creating this sinlge
+        /// instance.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="singleInstanceCreator"/> is a 
+        /// null reference.</exception>
+        public void RegisterSingle<T>(Func<T> singleInstanceCreator) where T : class
+        {
+            if (singleInstanceCreator == null)
+            {
+                throw new ArgumentNullException("singleInstanceCreator");
+            }
+
+            this.ThrowIfLocked();
+
+            Type serviceType = typeof(T);
+
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+
+            // Create a delegate that always returns this particular instance.
+            Func<object> instanceCreator = new SingletonCreator<T>(singleInstanceCreator).GetInstance;
+
+            this.registrations[serviceType] = instanceCreator;
+        }
+
+        /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -649,6 +682,43 @@ namespace CuttingEdge.ServiceLocation
                 }
 
                 throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            }
+        }
+
+        /// <summary>
+        /// Ensures that the wrapped delegate will only be executed once.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        private sealed class SingletonCreator<T> where T : class
+        {
+            private readonly Func<T> singleInstanceCreator;
+            private bool instanceCreated;
+            private T instance;
+
+            internal SingletonCreator(Func<T> singleInstanceCreator)
+            {
+                this.singleInstanceCreator = singleInstanceCreator;
+            }
+
+            internal object GetInstance()
+            {
+                // We use a lock to prevent the delegate to be called more than once during the lifetime of
+                // the application. We use a double checked lock to prevent the lock statement from being 
+                // called again after the instance was created.
+                if (!this.instanceCreated)
+                {
+                    // We can take a lock on this, because this class is private.
+                    lock (this)
+                    {
+                        if (!this.instanceCreated)
+                        {
+                            this.instance = this.singleInstanceCreator();
+                            this.instanceCreated = true;
+                        }
+                    }
+                }
+
+                return this.instance;
             }
         }
     }

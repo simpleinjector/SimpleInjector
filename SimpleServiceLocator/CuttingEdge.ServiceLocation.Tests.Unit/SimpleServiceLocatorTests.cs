@@ -448,18 +448,19 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterSingle_WithNullArgument_ThrowsException()
+        public void RegisterSingleByInstance_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
+            IWeapon invalidInstance = null;
 
             // Act
-            container.RegisterSingle<IWeapon>(null);
+            container.RegisterSingle<IWeapon>(invalidInstance);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
-        public void RegisterSingle_CalledTwiceOnSameType_ThrowsException()
+        public void RegisterSingleByInstance_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -471,7 +472,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
-        public void RegisterSingle_CalledAfterRegisterOnSameType_ThrowsException()
+        public void RegisterSingleByInstance_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -479,6 +480,145 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.RegisterSingle<Warrior>(new Ninja(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        public void RegisterSingleByInstance_AfterCallingGetInstance_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(new Tanto());
+            container.GetInstance<IWeapon>();
+
+            // Act
+            container.RegisterSingle<Warrior>(new Samurai(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        public void RegisterSingleByInstance_AfterCallingGetAllInstances_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            var weapons = container.GetAllInstances<IWeapon>();
+
+            // Calling count will iterate the collections. 
+            // The container will only get locked when the first item is retrieved.
+            var count = weapons.Count();
+
+            // Act
+            container.RegisterSingle<Warrior>(new Samurai(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterSingleByDelegate_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            Func<IWeapon> invalidDelegate = null;
+
+            // Act
+            container.RegisterSingle<IWeapon>(invalidDelegate);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        public void RegisterSingleByDelegate_CalledTwiceOnSameType_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(() => new Katana());
+
+            // Act
+            container.RegisterSingle<IWeapon>(() => new Tanto());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        public void RegisterSingleByDelegate_CalledAfterRegisterOnSameType_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.Register<Warrior>(() => new Samurai(null));
+
+            // Act
+            container.RegisterSingle<Warrior>(() => new Ninja(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        public void RegisterSingleByDelegate_AfterCallingGetInstance_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(() => new Tanto());
+            container.GetInstance<IWeapon>();
+
+            // Act
+            container.RegisterSingle<Warrior>(() => new Samurai(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        public void RegisterSingleByDelegate_AfterCallingGetAllInstances_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            var weapons = container.GetAllInstances<IWeapon>();
+
+            // Calling count will iterate the collections. 
+            // The container will only get locked when the first item is retrieved.
+            var count = weapons.Count();
+
+            // Act
+            container.RegisterSingle<Warrior>(() => new Samurai(null));
+        }
+
+        [TestMethod]
+        public void RegisterSingleByDelegate_RegisteringDelegate_WillNotCallTheDelegate()
+        {
+            // Arrange
+            int numberOfTimesDelegateWasCalled = 0;
+
+            var container = new SimpleServiceLocator();
+
+            // Act
+            container.RegisterSingle<IWeapon>(() =>
+            {
+                numberOfTimesDelegateWasCalled++;
+                return new Katana();
+            });
+
+            // Assert
+            Assert.AreEqual(0, numberOfTimesDelegateWasCalled,
+                "The RegisterSingle method should not call the delegate, because users may need objects " +
+                "that are not yet registered. Users are allowed to register dependent objects in random order.");
+        }
+
+        [TestMethod]
+        public void RegisterSingleByDelegate_CallingGetInstanceMultipleTimes_WillOnlyCallDelegateOnce()
+        {
+            // Arrange
+            int numberOfTimesDelegateWasCalled = 0;
+
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(() =>
+            {
+                numberOfTimesDelegateWasCalled++;
+                return new Katana();
+            });
+
+            // Act
+            container.GetInstance<IWeapon>();
+            container.GetInstance<IWeapon>();
+            container.GetInstance<IWeapon>();
+
+            // Assert
+            Assert.AreEqual(1, numberOfTimesDelegateWasCalled,
+                "The RegisterSingle method should register the object in such a way that the delegate will " +
+                "only get called once during the lifetime of the application. Not more.");
         }
 
         [TestMethod]
@@ -577,32 +717,6 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.Register<Warrior>(() => new Samurai(null));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
-        public void RegisterSingle_AfterCallingGetInstance_ThrowsException()
-        {
-            // Arrange
-            var container = new SimpleServiceLocator();
-            container.RegisterSingle<IWeapon>(new Tanto());
-            container.GetInstance<IWeapon>();
-
-            // Act
-            container.RegisterSingle<Warrior>(new Samurai(null));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
-        public void RegisterSingle_AfterCallingGetAllInstances_ThrowsException()
-        {
-            // Arrange
-            var container = new SimpleServiceLocator();
-            var weapons = container.GetAllInstances<IWeapon>();
-            var count = weapons.Count();
-
-            // Act
-            container.RegisterSingle<Warrior>(new Samurai(null));
         }
 
         [TestMethod]
