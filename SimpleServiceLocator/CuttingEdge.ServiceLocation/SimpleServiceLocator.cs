@@ -365,9 +365,9 @@ namespace CuttingEdge.ServiceLocation
         private object GetInstanceForType(Type serviceType)
         {
             // Create a copy, because the reference may change during this method call.
-            var localRegistrations = this.registrations;
+            var snapshot = this.registrations;
 
-            object instance = GetInstanceForTypeFromRegistrations(localRegistrations, serviceType);
+            object instance = GetInstanceForTypeFromRegistrations(snapshot, serviceType);
 
             if (instance != null)
             {
@@ -380,7 +380,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
             }
 
-            var instanceCreator = this.RegisterDelegateForConcreteType(serviceType, localRegistrations);
+            var instanceCreator = this.RegisterDelegateForConcreteType(serviceType, snapshot);
 
             return instanceCreator();
         }
@@ -411,11 +411,11 @@ namespace CuttingEdge.ServiceLocation
         // threads simultaneously add different types. This however, does not result in a consistency problem,
         // because the missing type will be again added later. This type of swapping safes us from using locks.
         private Func<object> RegisterDelegateForConcreteType(Type serviceType,
-            Dictionary<Type, Func<object>> registrations)
+            Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrations, this);
+            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
 
-            var registrationsCopy = MakeCopyOf(registrations);
+            var registrationsCopy = MakeCopyOf(registrationsSnapshot);
 
             registrationsCopy.Add(serviceType, instanceCreator);
 
@@ -427,6 +427,8 @@ namespace CuttingEdge.ServiceLocation
 
         private object GetKeyedInstanceForType(Type serviceType, string key)
         {
+            // the keyedRegistrations will never change after the container is locked down; there is no need
+            // for making a local copy of its reference.
             if (this.keyedRegistrations.ContainsKey(serviceType))
             {
                 return this.keyedRegistrations[serviceType].Get(key);
