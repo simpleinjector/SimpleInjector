@@ -73,7 +73,8 @@ namespace CuttingEdge.ServiceLocation
         /// <typeparam name="T">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="T"/> has already been registered.
+        /// for <typeparamref name="T"/> has already been registered, or when the given 
+        /// <typeparamref name="T"/> is not a concrete type.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A design without a generic T would be unpractical, because the other " +
