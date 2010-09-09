@@ -26,8 +26,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.Practices.ServiceLocation;
@@ -64,6 +64,40 @@ namespace CuttingEdge.ServiceLocation
             /// <returns>Gets an instance by a given <paramref name="key"/>; never returns null.</returns>
             /// <exception cref="ActivationException">Thrown when something went wrong :-).</exception>
             object Get(string key);
+        }
+
+        /// <summary>
+        /// Registers a single concrete instance that will be constructed using constructor injection. 
+        /// This <typeparamref name="T"/> must be thread-safe.
+        /// </summary>
+        /// <typeparam name="T">The concrete type that will be registered.</typeparam>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "A design without a generic T would be unpractical, because the other " +
+            "overloads also take a generic T.")]
+        public void RegisterSingle<T>() where T : class
+        {
+            Type serviceType = typeof(T);
+
+            if (!IsConcreteType(serviceType))
+            {
+                throw new InvalidOperationException(
+                    StringResources.GenericTypeShouldBeConcreteToBeUsedOnRegisterSingle(typeof(T)));
+            }
+
+            this.ThrowIfLocked();
+
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+
+            // Create a delegate that always returns this particular instance.
+            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, this);
+
+            Func<object> singletonCreator = new SingletonCreator<object>(instanceCreator).GetInstance;
+
+            this.registrations[serviceType] = singletonCreator;
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>

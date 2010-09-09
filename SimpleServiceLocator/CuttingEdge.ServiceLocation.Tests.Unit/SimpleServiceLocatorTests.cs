@@ -622,6 +622,64 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        public void RegisterSingle_RegisteringAConcreteType_ReturnAnInstance()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.Register<IWeapon>(() => new Katana());
+
+            // Act
+            container.RegisterSingle<Samurai>();
+
+            // Assert
+            var samurai = container.GetInstance<Samurai>();
+
+            Assert.IsNotNull(samurai, "The container should not return null.");
+        }
+
+        [TestMethod]
+        public void RegisterSingle_RegisteringAConcreteType_AlwaysReturnsSameInstance()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.Register<IWeapon>(() => new Katana());
+
+            // Act
+            container.RegisterSingle<Samurai>();
+
+            // Assert
+            var s1 = container.GetInstance<Samurai>();
+            var s2 = container.GetInstance<Samurai>();
+
+            Assert.IsTrue(Object.ReferenceEquals(s1, s2), "Always the same instance was expected to be returned.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "The abstract type IWeapon was not expected to be registered succesfully.")]
+        public void RegisterSingle_RegisteringANonConcreteType_WillThrowAnArgumentException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Act
+            container.RegisterSingle<IWeapon>();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "An exception was expected because the configuration is unvalid without registering an IWeapon.")]
+        public void Validate_Scenario_Behavior()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            
+            // Samurai has a constructor that takes an IWeapon.
+            container.RegisterSingle<Samurai>();
+
+            // Act
+            container.Validate();
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once by key.")]
         public void RegisterByKey_CalledTwiceOnSameType_ThrowsException()
         {

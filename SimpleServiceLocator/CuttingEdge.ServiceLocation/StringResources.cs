@@ -156,6 +156,14 @@ namespace CuttingEdge.ServiceLocation
                     constructorCount);
         }
 
+        internal static string GenericTypeShouldBeConcreteToBeUsedOnRegisterSingle(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The given generic type {0} is not a concrete type. Please use one of the other " +
+                    "RegisterSingle<T> overloads to register this type.",
+                serviceType.FullName);
+        }
+
         private static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,

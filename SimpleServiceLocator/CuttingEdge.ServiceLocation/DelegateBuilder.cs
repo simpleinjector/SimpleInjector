@@ -50,10 +50,6 @@ namespace CuttingEdge.ServiceLocation
         private readonly Dictionary<Type, Func<object>> registrations;
         private readonly IServiceLocator container;
 
-        /// <summary>Initializes a new instance of the <see cref="DelegateBuilder"/> class.</summary>
-        /// <param name="serviceType">Type of the service.</param>
-        /// <param name="registrations">The set of registrations.</param>
-        /// <param name="container">The service locator.</param>
         private DelegateBuilder(Type serviceType, Dictionary<Type, Func<object>> registrations,
             IServiceLocator container)
         {
@@ -62,12 +58,13 @@ namespace CuttingEdge.ServiceLocation
             this.container = container;
         }
 
-        /// <summary>Builds the specified service type.</summary>
-        /// <param name="serviceType">Type of the service.</param>
-        /// <param name="registrations">The registrations.</param>
-        /// <param name="serviceLocator">The service locator.</param>
-        /// <returns>A new <see cref="Func{T}"/>.</returns>
-        public static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
+        internal static Func<object> Build(Type serviceType, IServiceLocator serviceLocator)
+        {
+            var builder = new DelegateBuilder(serviceType, null, serviceLocator);
+            return builder.Build();
+        }
+
+        internal static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
             IServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(serviceType, registrations, serviceLocator);
@@ -115,7 +112,7 @@ namespace CuttingEdge.ServiceLocation
 
         private Expression BuildGetInstanceCallForType(Type parameterType)
         {
-            if (!this.registrations.ContainsKey(parameterType))
+            if (this.registrations != null && !this.registrations.ContainsKey(parameterType))
             {
                 if (!SimpleServiceLocator.IsConcreteType(parameterType))
                 {
