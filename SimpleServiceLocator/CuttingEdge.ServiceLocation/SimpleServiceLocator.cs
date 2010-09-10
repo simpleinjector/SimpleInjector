@@ -35,7 +35,7 @@ using Microsoft.Practices.ServiceLocation;
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>
-    /// Simple service locator.
+    /// The Simple Service Locator container.
     /// </summary>
     public class SimpleServiceLocator : ServiceLocatorImplBase
     {
@@ -134,7 +134,7 @@ namespace CuttingEdge.ServiceLocation
         /// application.
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="singleInstanceCreator">The delegate that allows building or creating this sinlge
+        /// <param name="singleInstanceCreator">The delegate that allows building or creating this single
         /// instance.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
@@ -535,6 +535,10 @@ namespace CuttingEdge.ServiceLocation
                     Func<object> instanceCreator = pair.Value;
 
                     // Test the creator
+                    // NOTE: We've got our first quirk in the design here: The returned object could implement
+                    // IDisposable, but there is no way for us to know if we should actually dispose this 
+                    // instance or not :-(. Disposing it could make us prevent a singleton from ever being
+                    // used; not disposing it could make us leak resources :-(.
                     instanceCreator();
                 }
                 catch (Exception ex)
@@ -582,6 +586,7 @@ namespace CuttingEdge.ServiceLocation
         {
             using (var enumerator = registeredCollection.GetEnumerator())
             {
+                // Iterate the complete list: we need to make sure the complete list can be iterated.
                 while (enumerator.MoveNext())
                 {
                     // Do nothing inside the loop, iterating the list is enough.
@@ -660,11 +665,7 @@ namespace CuttingEdge.ServiceLocation
         {
             private readonly Type serviceType;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="RegistrationDictionary"/> class.
-            /// </summary>
-            /// <param name="serviceType">Type of the service.</param>
-            public RegistrationDictionary(Type serviceType)
+            internal RegistrationDictionary(Type serviceType)
             {
                 this.serviceType = serviceType;
             }
@@ -696,11 +697,7 @@ namespace CuttingEdge.ServiceLocation
         {
             private readonly Func<string, T> keyedCreator;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FuncRegistrationLocator{T}"/> class.
-            /// </summary>
-            /// <param name="keyedCreator">The keyed creator.</param>
-            public FuncRegistrationLocator(Func<string, T> keyedCreator)
+            internal FuncRegistrationLocator(Func<string, T> keyedCreator)
             {
                 this.keyedCreator = keyedCreator;
             }
