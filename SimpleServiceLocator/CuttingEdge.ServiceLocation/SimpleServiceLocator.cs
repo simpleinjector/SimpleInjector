@@ -728,7 +728,7 @@ namespace CuttingEdge.ServiceLocation
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
         private sealed class SingletonCreator<T> where T : class
         {
-            private readonly Func<T> singleInstanceCreator;
+            private Func<T> singleInstanceCreator;
             private bool instanceCreated;
             private T instance;
 
@@ -751,6 +751,9 @@ namespace CuttingEdge.ServiceLocation
                         {
                             this.instance = this.singleInstanceCreator();
                             this.instanceCreated = true;
+                            
+                            // Remove the reference to the delegate; it is not needed anymore.
+                            this.singleInstanceCreator = null;
                         }
                     }
                 }
