@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -35,7 +34,7 @@ using Microsoft.Practices.ServiceLocation;
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>
-    /// The Simple Service Locator container.
+    /// The Simple Service Locator container. Create an instance of this type for registration of dependencies.
     /// </summary>
     public class SimpleServiceLocator : ServiceLocatorImplBase
     {
@@ -56,14 +55,57 @@ namespace CuttingEdge.ServiceLocation
         {
         }
 
-        /// <summary>Defines an interface for retrieving instances by a key.</summary>
-        private interface IKeyedRegistrationLocator
+        /// <summary>
+        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
+        public void Register<T>(Func<T> instanceCreator)
         {
-            /// <summary>Gets the instance using the specified <paramref name="key"/>.</summary>
-            /// <param name="key">The key to get the instance with.</param>
-            /// <returns>Gets an instance by a given <paramref name="key"/>; never returns null.</returns>
-            /// <exception cref="ActivationException">Thrown when something went wrong :-).</exception>
-            object Get(string key);
+            if (instanceCreator == null)
+            {
+                throw new ArgumentNullException("instanceCreator");
+            }
+
+            this.ThrowIfLocked();
+
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
+
+            // Create a delegate that calls the Func<T> delegate and returns T as object.
+            Func<object> objectInstanceCreator = () => instanceCreator();
+
+            this.registrations[typeof(T)] = objectInstanceCreator;
+        }
+
+        /// <summary>
+        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/> by
+        /// a string key.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyedInstanceCreator"/> is a
+        /// null reference.</exception>
+        public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator)
+        {
+            if (keyedInstanceCreator == null)
+            {
+                throw new ArgumentNullException("keyedInstanceCreator");
+            }
+
+            this.ThrowIfLocked();
+            this.ThrowWhenKeyedTypeAlreadyRegistered<T>();
+
+            IKeyedRegistrationLocator locator = new FuncRegistrationLocator<T>(keyedInstanceCreator);
+            this.keyedRegistrations[typeof(T)] = locator;
         }
 
         /// <summary>
@@ -159,59 +201,6 @@ namespace CuttingEdge.ServiceLocation
             Func<object> instanceCreator = new SingletonCreator<T>(singleInstanceCreator).GetInstance;
 
             this.registrations[serviceType] = instanceCreator;
-        }
-
-        /// <summary>
-        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
-        public void Register<T>(Func<T> instanceCreator)
-        {
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
-
-            this.ThrowIfLocked();
-
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
-
-            // Create a delegate that calls the Func<T> delegate and returns T as object.
-            Func<object> objectInstanceCreator = () => instanceCreator();
-
-            this.registrations[typeof(T)] = objectInstanceCreator;
-        }
-
-        /// <summary>
-        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/> by
-        /// a string key.
-        /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="T"/> has already been registered.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyedInstanceCreator"/> is a
-        /// null reference.</exception>
-        public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator)
-        {
-            if (keyedInstanceCreator == null)
-            {
-                throw new ArgumentNullException("keyedInstanceCreator");
-            }
-
-            this.ThrowIfLocked();
-            this.ThrowWhenKeyedTypeAlreadyRegistered<T>();
-
-            IKeyedRegistrationLocator locator = new FuncRegistrationLocator<T>(keyedInstanceCreator);
-            this.keyedRegistrations[typeof(T)] = locator;
         }
 
         /// <summary>Registers a single instance by a given <paramref name="key"/>. 
@@ -654,109 +643,6 @@ namespace CuttingEdge.ServiceLocation
             }
 
             return copy;
-        }
-
-        /// <summary>
-        /// Represents a collection of string keys and object instances for a single interface or base type,
-        /// registered with the <see cref="RegisterSingleByKey"/> method.
-        /// </summary>
-        private sealed class RegistrationDictionary : Dictionary<string, object>,
-            IKeyedRegistrationLocator
-        {
-            private readonly Type serviceType;
-
-            internal RegistrationDictionary(Type serviceType)
-            {
-                this.serviceType = serviceType;
-            }
-
-            /// <summary>Gets the instance using the specified <paramref name="key"/>.</summary>
-            /// <param name="key">The key to get the instance with.</param>
-            /// <returns>Gets an instance by a given <paramref name="key"/>; never returns null.</returns>
-            /// <exception cref="ActivationException">Thrown when something went wrong.</exception>
-            object IKeyedRegistrationLocator.Get(string key)
-            {
-                if (this.ContainsKey(key))
-                {
-                    object instance = this[key];
-
-                    Debug.Assert(instance != null, "It should be impossible for null values to be registered.");
-
-                    return instance;
-                }
-
-                throw new ActivationException(StringResources.KeyForTypeNotFound(this.serviceType, key));
-            }
-        }
-
-        /// <summary>
-        /// Locates instances based on the supplied <see cref="Func{T, TResult}"/> delegate.
-        /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        private sealed class FuncRegistrationLocator<T> : IKeyedRegistrationLocator
-        {
-            private readonly Func<string, T> keyedCreator;
-
-            internal FuncRegistrationLocator(Func<string, T> keyedCreator)
-            {
-                this.keyedCreator = keyedCreator;
-            }
-
-            /// <summary>Gets the instance using the specified <paramref name="key"/>.</summary>
-            /// <param name="key">The key to get the instance with.</param>
-            /// <returns>Gets an instance by a given <paramref name="key"/>; never returns null.</returns>
-            /// <exception cref="ActivationException">Thrown when something went wrong.</exception>
-            object IKeyedRegistrationLocator.Get(string key)
-            {
-                object instance = this.keyedCreator(key);
-
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
-            }
-        }
-
-        /// <summary>
-        /// Ensures that the wrapped delegate will only be executed once.
-        /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        private sealed class SingletonCreator<T> where T : class
-        {
-            private Func<T> singleInstanceCreator;
-            private bool instanceCreated;
-            private T instance;
-
-            internal SingletonCreator(Func<T> singleInstanceCreator)
-            {
-                this.singleInstanceCreator = singleInstanceCreator;
-            }
-
-            internal object GetInstance()
-            {
-                // We use a lock to prevent the delegate to be called more than once during the lifetime of
-                // the application. We use a double checked lock to prevent the lock statement from being 
-                // called again after the instance was created.
-                if (!this.instanceCreated)
-                {
-                    // We can take a lock on this, because this class is private.
-                    lock (this)
-                    {
-                        if (!this.instanceCreated)
-                        {
-                            this.instance = this.singleInstanceCreator();
-                            this.instanceCreated = true;
-                            
-                            // Remove the reference to the delegate; it is not needed anymore.
-                            this.singleInstanceCreator = null;
-                        }
-                    }
-                }
-
-                return this.instance;
-            }
         }
     }
 }

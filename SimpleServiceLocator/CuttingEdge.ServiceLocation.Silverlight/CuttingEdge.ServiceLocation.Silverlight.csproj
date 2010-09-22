@@ -63,8 +63,20 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\FuncRegistrationLocator.cs">
+      <Link>FuncRegistrationLocator.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\IKeyedRegistrationLocator.cs">
+      <Link>IKeyedRegistrationLocator.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\RegistrationDictionary.cs">
+      <Link>RegistrationDictionary.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.cs">
       <Link>SimpleServiceLocator.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\SingletonCreator.cs">
+      <Link>SingletonCreator.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\StringResources.cs">
       <Link>StringResources.cs</Link>

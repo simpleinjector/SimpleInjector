@@ -54,8 +54,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DelegateBuilder.cs" />
+    <Compile Include="FuncRegistrationLocator.cs" />
+    <Compile Include="IKeyedRegistrationLocator.cs" />
+    <Compile Include="RegistrationDictionary.cs" />
     <Compile Include="SimpleServiceLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SingletonCreator.cs" />
     <Compile Include="StringResources.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
