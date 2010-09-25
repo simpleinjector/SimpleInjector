@@ -219,7 +219,7 @@ namespace CuttingEdge.ServiceLocation
         /// application.
         /// </summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="singleInstanceCreator">The delegate that allows building or creating this single
+        /// <param name="instanceCreator">The delegate that allows building or creating this single
         /// instance.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
@@ -227,23 +227,22 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="singleInstanceCreator"/> is a 
         /// null reference.</exception>
-        public void RegisterSingle<T>(Func<T> singleInstanceCreator) where T : class
+        public void RegisterSingle<T>(Func<T> instanceCreator) where T : class
         {
-            if (singleInstanceCreator == null)
+            if (instanceCreator == null)
             {
-                throw new ArgumentNullException("singleInstanceCreator");
+                throw new ArgumentNullException("instanceCreator");
             }
 
             this.ThrowIfLocked();
 
-            Type serviceType = typeof(T);
-
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
             // Create a delegate that always returns this particular instance.
-            Func<object> instanceCreator = new FuncSingletonInstanceProducer<T>(singleInstanceCreator).GetInstance;
+            Func<object> singleInstanceCreator = 
+                new FuncSingletonInstanceProducer<T>(instanceCreator).GetInstance;
 
-            this.registrations[serviceType] = instanceCreator;
+            this.registrations[typeof(T)] = singleInstanceCreator;
         }
 
         /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
@@ -643,46 +642,44 @@ namespace CuttingEdge.ServiceLocation
 
         private void ValidateRegisteredCollections()
         {
-            Type firstInvalidType = null;
-
             foreach (var pair in this.registeredCollections)
             {
-                try
-                {
-                    IEnumerable<object> registeredCollection = pair.Value;
+                Type serviceType = pair.Key;
+                IEnumerable<object> collection = pair.Value;
 
-                    VerifyIfListCanBeIterated(registeredCollection);
+                CheckIfCollectionCanBeIterated(collection, serviceType);
 
-                    bool collectionContainsNullItems = registeredCollection.Where(i => i == null).Count() > 0;
-
-                    if (collectionContainsNullItems && firstInvalidType == null)
-                    {
-                        firstInvalidType = pair.Key;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ConfigurationInvalidIteratingCollectionFailed(pair.Key, ex), ex);
-                }
-            }
-
-            if (firstInvalidType != null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidCollectionContainsNullElements(firstInvalidType));
+                CheckIfCollectionForNullElements(collection, serviceType);
             }
         }
 
-        private static void VerifyIfListCanBeIterated(IEnumerable<object> registeredCollection)
+        private static void CheckIfCollectionCanBeIterated(IEnumerable<object> collection, Type serviceType)
         {
-            using (var enumerator = registeredCollection.GetEnumerator())
+            try
             {
-                // Iterate the complete list: we need to make sure the complete list can be iterated.
-                while (enumerator.MoveNext())
+                using (var enumerator = collection.GetEnumerator())
                 {
-                    // Do nothing inside the loop, iterating the list is enough.
+                    // Just iterate the collection.
+                    while (enumerator.MoveNext())
+                    {
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidIteratingCollectionFailed(serviceType, ex), ex);
+            }
+        }
+
+        private static void CheckIfCollectionForNullElements(IEnumerable<object> collection, Type serviceType)
+        {
+            bool collectionContainsNullItems = collection.Any(c => c == null);
+
+            if (collectionContainsNullItems)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
             }
         }
 
