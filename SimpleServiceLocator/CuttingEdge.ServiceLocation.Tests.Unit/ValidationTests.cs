@@ -6,9 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
-    /// <summary>
-    /// Tests for validating the <see cref="SimpleServiceLocator"/>.
-    /// </summary>
     [TestClass]
     public class ValidationTests
     {

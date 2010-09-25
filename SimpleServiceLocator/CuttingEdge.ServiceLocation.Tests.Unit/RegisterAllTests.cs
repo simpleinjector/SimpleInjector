@@ -5,11 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
-    /// <summary>
-    /// Tests for using collections of objects with the <see cref="SimpleServiceLocator"/>.
-    /// </summary>
     [TestClass]
-    public class CollectionTests
+    public class RegisterAllTests
     {
         [TestMethod]
         public void GetAllInstances_WithRegisteredList_ReturnsExpectedList()
