@@ -26,6 +26,7 @@
 
 using System;
 using System.Globalization;
+using System.Reflection;
 
 namespace CuttingEdge.ServiceLocation
 {
@@ -62,19 +63,19 @@ namespace CuttingEdge.ServiceLocation
                 "No registration for type {0} could be found.", serviceType.FullName);
         }
 
-        internal static string TypeAlreadyRegisteredForRegisterByKey(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered by calling RegisterByKey<T>. Once the type is " +
-                "registered by calling RegisterByKey<T>, registering it using RegisterSingleByKey<T> is " +
-                "invalid.", serviceType.FullName);
-        }
-
         internal static string ConfigurationInvalidCreatingInstanceFailed(Type type, Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. Creating the instance for type {0} failed. {1}",
                 type, exception.Message);
+        }
+
+        internal static string ConfigurationInvalidCreatingKeyedInstanceFailed(Type type, string key,
+            Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The configuration is invalid. Creating the instance for type {0} with key '{1}' failed. {2}",
+                type, key, exception.Message);
         }
 
         internal static string ConfigurationInvalidIteratingCollectionFailed(Type type, Exception exception)
@@ -94,8 +95,7 @@ namespace CuttingEdge.ServiceLocation
         internal static string UnkeyedTypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered. Using Register<T> or RegisterOnce<T>, a type can " +
-                "only be registered once.", serviceType);
+                "Type {0} has already been registered.", serviceType);
         }
 
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
@@ -103,27 +103,6 @@ namespace CuttingEdge.ServiceLocation
             return string.Format(CultureInfo.InvariantCulture,
                 "Collection of items for type {0} has already been registered. A collection of items can " +
                 "only be registered once per type.", serviceType);
-        }
-
-        internal static string TypeAlreadyRegisteredRegisterByKeyAlreadyCalled(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered. " +
-                "A type can only be registered once using RegisterByKey<T>.", serviceType);
-        }
-
-        internal static string TypeAlreadyRegisteredRegisterSingleByKeyAlreadyCalled(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered using RegisterSingleByKey<T>. A type can be " +
-                "registered multiple times with different keys using RegisterSingleByKey<T>, but it can " +
-                "only be registered once using RegisterByKey<T>.", serviceType);
-        }
-
-        internal static string TypeAlreadyRegisteredWithKey(Type serviceType, string key)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered with key '{1}'.", serviceType, key);
         }
 
         internal static string KeyForTypeNotFound(Type serviceType, string key)
@@ -156,12 +135,60 @@ namespace CuttingEdge.ServiceLocation
                     constructorCount);
         }
 
-        internal static string GenericTypeShouldBeConcreteToBeUsedOnRegisterSingle(Type serviceType)
+        internal static string TypeShouldBeConcreteToBeUsedOnRegisterSingle(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The given generic type {0} is not a concrete type. Please use one of the other " +
+                "The given type {0} is not a concrete type. Please use one of the other " +
                     "RegisterSingle<T> overloads to register this type.",
                 serviceType.FullName);
+        }
+
+        internal static string TypeAlreadyRegisteredUsingByKeyString(Type serviceType,
+            string methodUsedForRegistration)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Type {0} has already been registered using {1}. A type can be " +
+                "registered multiple times with different keys using RegisterSingleByKey<T>, but it can't " +
+                "be mixed with methods that take an Func<string, T> delegate.", serviceType, 
+                methodUsedForRegistration);
+        }
+
+        internal static string TypeAlreadyRegisteredWithKey(Type serviceType, string key)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Type {0} has already been registered with key '{1}'.", serviceType, key);
+        }
+
+        internal static string TypeAlreadyRegisteredUsingRegisterByKeyFuncStringT(Type serviceType)
+        {
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "Type {0} has already been registered using RegisterByKey<T>(Func<string, T>). " +
+                "A Func<string, T> can only be registered once for each type.", serviceType);
+        }
+
+        internal static string ForKeyTypeAlreadyRegisteredUsingRegisterByKeyFuncStringT(Type serviceType)
+        {
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "Type {0} has already been registered using RegisterByKey<T>(Func<string, T>). " +
+                "A registration with this method for a type can't be mixed with methods that register the " +
+                "type using a string key.", serviceType);
+        }
+
+        internal static string TypeAlreadyRegisteredUsingRegisterSingleByKeyFuncStringT(
+            Type serviceType)
+        {
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "Type {0} has already been registered using RegisterSingleByKey<T>(Func<string, T>). " +
+                "A Func<string, T> can only be registered once for each type.", serviceType);
+        }
+
+        internal static string ForKeyTypeAlreadyRegisteredUsingRegisterSingleByKeyFuncStringT(
+            Type serviceType)
+        {
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "Type {0} has already been registered using RegisterSingleByKey<T>(Func<string, T>). " +
+                "A registration with this method for a type can't be mixed with methods that register the " +
+                "type using a string key.", serviceType);
         }
 
         private static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)

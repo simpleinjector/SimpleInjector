@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -38,8 +39,10 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     public class SimpleServiceLocator : ServiceLocatorImplBase
     {
-        private readonly Dictionary<Type, IKeyedRegistrationLocator> keyedRegistrations =
-            new Dictionary<Type, IKeyedRegistrationLocator>();
+        internal static readonly StringComparer StringComparer = StringComparer.Ordinal;
+
+        private readonly Dictionary<Type, IKeyedInstanceProducer> keyedInstanceProducers =
+            new Dictionary<Type, IKeyedInstanceProducer>();
 
         private readonly Dictionary<Type, IEnumerable<object>> registeredCollections =
             new Dictionary<Type, IEnumerable<object>>();
@@ -65,7 +68,7 @@ namespace CuttingEdge.ServiceLocation
         /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
-        public void Register<T>(Func<T> instanceCreator)
+        public void Register<T>(Func<T> instanceCreator) where T : class
         {
             if (instanceCreator == null)
             {
@@ -94,7 +97,7 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyedInstanceCreator"/> is a
         /// null reference.</exception>
-        public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator)
+        public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator) where T : class
         {
             if (keyedInstanceCreator == null)
             {
@@ -102,10 +105,50 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowIfLocked();
-            this.ThrowWhenKeyedTypeAlreadyRegistered<T>();
+            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
 
-            IKeyedRegistrationLocator locator = new FuncRegistrationLocator<T>(keyedInstanceCreator);
-            this.keyedRegistrations[typeof(T)] = locator;
+            IKeyedInstanceProducer locator = new KeyedFuncTransientInstanceProducer<T>(keyedInstanceCreator);
+            this.keyedInstanceProducers[typeof(T)] = locator;
+        }
+
+        /// <summary>
+        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/> for
+        /// the specified (ordinal) case-sensitive <paramref name="key"/>.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// <paramref name="key"/> for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
+        /// <paramref name="instanceCreator"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.</exception>
+        public void RegisterByKey<T>(string key, Func<T> instanceCreator) where T : class
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException("key");
+            }
+
+            if (key.Length == 0)
+            {
+                throw new ArgumentException(StringResources.KeyCanNotBeAnEmptyString, "key");
+            }
+
+            if (instanceCreator == null)
+            {
+                throw new ArgumentNullException("instanceCreator");
+            }
+
+            this.ThrowIfLocked();
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
+
+            KeyedInstanceProducer dictionary = 
+                this.GetRegistrationDictionaryFor<T>("RegisterByKey<T>(string, Func<T>)");
+
+            dictionary.Add(key, new TransientInstanceProducer<T>(instanceCreator));
         }
 
         /// <summary>
@@ -128,7 +171,7 @@ namespace CuttingEdge.ServiceLocation
             if (!IsConcreteType(serviceType))
             {
                 throw new InvalidOperationException(
-                    StringResources.GenericTypeShouldBeConcreteToBeUsedOnRegisterSingle(typeof(T)));
+                    StringResources.TypeShouldBeConcreteToBeUsedOnRegisterSingle(typeof(T)));
             }
 
             this.ThrowIfLocked();
@@ -138,7 +181,7 @@ namespace CuttingEdge.ServiceLocation
             // Create a delegate that always returns this particular instance.
             Func<object> instanceCreator = DelegateBuilder.Build(serviceType, this);
 
-            Func<object> singletonCreator = new SingletonCreator<object>(instanceCreator).GetInstance;
+            Func<object> singletonCreator = new FuncSingletonInstanceProducer<object>(instanceCreator).GetInstance;
 
             this.registrations[serviceType] = singletonCreator;
         }
@@ -198,15 +241,15 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
 
             // Create a delegate that always returns this particular instance.
-            Func<object> instanceCreator = new SingletonCreator<T>(singleInstanceCreator).GetInstance;
+            Func<object> instanceCreator = new FuncSingletonInstanceProducer<T>(singleInstanceCreator).GetInstance;
 
             this.registrations[serviceType] = instanceCreator;
         }
 
-        /// <summary>Registers a single instance by a given <paramref name="key"/>. 
+        /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
         /// This <paramref name="instance"/> must be thread-safe.</summary>
         /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="key">The key that can be used to retrieve the instance.</param>
+        /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an 
@@ -216,7 +259,7 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or 
         /// <paramref name="instance"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> is an empty string.</exception>
-        public void RegisterSingleByKey<T>(string key, T instance)
+        public void RegisterSingleByKey<T>(string key, T instance) where T : class
         {
             if (key == null)
             {
@@ -234,17 +277,83 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowIfLocked();
-            this.ThrowWhenRegistrationsAlreadyContainKeyFor(typeof(T), key);
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
 
-            var registrationDictionary = this.GetRegisteredDictionaryWithKeyedSinglesFor(typeof(T));
+            KeyedInstanceProducer dictionary =
+                this.GetRegistrationDictionaryFor<T>("RegisterSingleByKey<T>(string, T)");
 
-            if (registrationDictionary == null)
+            dictionary.Add(key, new SingletonInstanceProducer(instance));
+        }
+
+        /// <summary>
+        /// Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/> by 
+        /// specifying a delegate.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, when a 
+        /// <paramref name="key"/> for <typeparamref name="T"/> has already been registered or when 
+        /// <typeparamref name="T"/> has already been registered using one of the overloads that take an
+        /// <b>Func&lt;string, T&gt;</b>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
+        /// <paramref name="instanceCreator"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.
+        /// </exception>
+        public void RegisterSingleByKey<T>(string key, Func<T> instanceCreator) where T : class
+        {
+            if (key == null)
             {
-                registrationDictionary = new RegistrationDictionary(typeof(T));
-                this.RegisterDictionaryWithKeyedSinglesFor(typeof(T), registrationDictionary);
+                throw new ArgumentNullException("key");
             }
 
-            registrationDictionary.Add(key, instance);
+            if (key.Length == 0)
+            {
+                throw new ArgumentException(StringResources.KeyCanNotBeAnEmptyString, "key");
+            }
+
+            if (instanceCreator == null)
+            {
+                throw new ArgumentNullException("instanceCreator");
+            }
+
+            this.ThrowIfLocked();
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
+
+            KeyedInstanceProducer dictionary =
+                this.GetRegistrationDictionaryFor<T>("RegisterSingleByKey<T>(string, Func<T>)");
+
+            dictionary.Add(key, new FuncSingletonInstanceProducer<T>(instanceCreator));
+        }
+
+        /// <summary>
+        /// Registers the specified delegate that allows returning singletons of <typeparamref name="T"/> by
+        /// a string key. The delegate will get called at most once per given (ordinal) case-sensitive key.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when the <typeparamref name="T"/> 
+        /// already been registered using one of the overloads that take a <b>string</b> key.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
+        /// <paramref name="instanceCreator"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.</exception>
+        public void RegisterSingleByKey<T>(Func<string, T> keyedInstanceCreator) where T : class
+        {
+            if (keyedInstanceCreator == null)
+            {
+                throw new ArgumentNullException("keyedInstanceCreator");
+            }
+
+            this.ThrowIfLocked();
+            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
+
+            IKeyedInstanceProducer locator = new KeyedFuncSingletonInstanceProducer<T>(keyedInstanceCreator);
+            
+            this.keyedInstanceProducers[typeof(T)] = locator;
         }
 
         /// <summary>
@@ -256,7 +365,7 @@ namespace CuttingEdge.ServiceLocation
         /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
         /// for <typeparamref name="T"/> has already been registered.
         /// </exception>
-        public void RegisterAll<T>(IEnumerable<T> collection)
+        public void RegisterAll<T>(IEnumerable<T> collection) where T : class
         {
             if (collection == null)
             {
@@ -265,13 +374,11 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowIfLocked();
 
-            Type serviceType = typeof(T);
-
-            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor(serviceType);
+            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor(typeof(T));
 
             var collectionOfObjects = collection.Cast<object>();
 
-            this.registeredCollections[serviceType] = collectionOfObjects;
+            this.registeredCollections[typeof(T)] = collectionOfObjects;
         }
 
         /// <summary>
@@ -283,9 +390,12 @@ namespace CuttingEdge.ServiceLocation
         /// invalid.</exception>
         public void Validate()
         {
+            this.LockContainer();
+
             // Note: keyed registrations can not be checked, because we don't know what are valid string
             // arguments for the Func<string, object> delegates.
             this.ValidateRegistrations();
+            this.ValidateKeyedRegistrations();
             this.ValidateRegisteredCollections();
         }
 
@@ -347,18 +457,9 @@ namespace CuttingEdge.ServiceLocation
         protected override string FormatActivateAllExceptionMessage(Exception actualException,
             Type serviceType)
         {
-            // HACK: We add a period after the exception message, because the ServiceLocatorImplBase does
-            // not produce an exception message ending with a period (which is a bug).
-            const string Period = ".";
-
             string message = base.FormatActivateAllExceptionMessage(actualException, serviceType);
 
-            if (actualException != null && !String.IsNullOrEmpty(actualException.Message))
-            {
-                return message + Period + " " + actualException.Message;
-            }
-
-            return message + Period;
+            return ReformatActivateAllExceptionMessage(message, actualException);
         }
 
         /// <summary>
@@ -372,18 +473,24 @@ namespace CuttingEdge.ServiceLocation
         protected override string FormatActivationExceptionMessage(Exception actualException,
             Type serviceType, string key)
         {
-            // HACK: We add a period after the exception message, because the ServiceLocatorImplBase does
-            // not produce an exception message ending with a period (which is a bug).
-            const string Period = ".";
-
             string message = base.FormatActivationExceptionMessage(actualException, serviceType, key);
+
+            return ReformatActivateAllExceptionMessage(message, actualException);
+        }
+
+        private static string ReformatActivateAllExceptionMessage(string message, Exception actualException)
+        {
+            // HACK: The ServiceLocatorImplBase contains a spelling error. We fix it here.
+            message = message.Replace("occured", "occurred");
 
             if (actualException != null && !String.IsNullOrEmpty(actualException.Message))
             {
-                return message + Period + " " + actualException.Message;
+                return message + ". " + actualException.Message;
             }
 
-            return message + Period;
+            // HACK: We add a period after the exception message, because the ServiceLocatorImplBase does
+            // not produce an exception message ending with a period (which is a bug).
+            return message + ".";
         }
 
         private object GetInstanceForType(Type serviceType)
@@ -453,9 +560,9 @@ namespace CuttingEdge.ServiceLocation
         {
             // the keyedRegistrations will never change after the container is locked down; there is no need
             // for making a local copy of its reference.
-            if (this.keyedRegistrations.ContainsKey(serviceType))
+            if (this.keyedInstanceProducers.ContainsKey(serviceType))
             {
-                return this.keyedRegistrations[serviceType].Get(key);
+                return this.keyedInstanceProducers[serviceType].GetInstance(key);
             }
 
             throw new ActivationException(StringResources.NoRegistrationFoundForType(serviceType));
@@ -489,30 +596,20 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private RegistrationDictionary GetRegisteredDictionaryWithKeyedSinglesFor(Type serviceType)
+        private KeyedInstanceProducer GetRegistrationDictionaryFor<T>(string methodName)
         {
-            IKeyedRegistrationLocator registrationLocator;
+            IKeyedInstanceProducer producer;
 
-            if (!this.keyedRegistrations.TryGetValue(serviceType, out registrationLocator))
+            this.keyedInstanceProducers.TryGetValue(typeof(T), out producer);
+
+            if (producer == null)
             {
-                return null;
+                producer = new KeyedInstanceProducer(typeof(T), methodName);
+
+                this.keyedInstanceProducers[typeof(T)] = producer;
             }
 
-            var registrationDictionary = registrationLocator as RegistrationDictionary;
-
-            if (registrationDictionary != null)
-            {
-                return registrationDictionary;
-            }
-
-            throw new InvalidOperationException(
-                StringResources.TypeAlreadyRegisteredForRegisterByKey(serviceType));
-        }
-
-        private void RegisterDictionaryWithKeyedSinglesFor(Type serviceType,
-            RegistrationDictionary registrationDictionary)
-        {
-            this.keyedRegistrations.Add(serviceType, registrationDictionary);
+            return (KeyedInstanceProducer)producer;
         }
 
         private void ValidateRegistrations()
@@ -521,20 +618,26 @@ namespace CuttingEdge.ServiceLocation
             {
                 try
                 {
-                    Func<object> instanceCreator = pair.Value;
-
                     // Test the creator
                     // NOTE: We've got our first quirk in the design here: The returned object could implement
                     // IDisposable, but there is no way for us to know if we should actually dispose this 
                     // instance or not :-(. Disposing it could make us prevent a singleton from ever being
                     // used; not disposing it could make us leak resources :-(.
-                    instanceCreator();
+                    this.GetInstance(pair.Key);
                 }
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(
                         StringResources.ConfigurationInvalidCreatingInstanceFailed(pair.Key, ex), ex);
                 }
+            }
+        }
+
+        private void ValidateKeyedRegistrations()
+        {
+            foreach (var pair in this.keyedInstanceProducers)
+            {
+                pair.Value.Validate();
             }
         }
 
@@ -592,32 +695,21 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private void ThrowWhenKeyedTypeAlreadyRegistered<T>()
+        private void ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>()
         {
-            // This check is only performed within RegisterByKey.
-            if (this.keyedRegistrations.ContainsKey(typeof(T)))
+            if (this.keyedInstanceProducers.ContainsKey(typeof(T)))
             {
-                if (this.keyedRegistrations[typeof(T)] is FuncRegistrationLocator<T>)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.TypeAlreadyRegisteredRegisterByKeyAlreadyCalled(typeof(T)));
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        StringResources.TypeAlreadyRegisteredRegisterSingleByKeyAlreadyCalled(typeof(T)));
-                }
+                this.keyedInstanceProducers[typeof(T)].ThrowTypeAlreadyRegisteredException();
             }
         }
 
-        private void ThrowWhenRegistrationsAlreadyContainKeyFor(Type serviceType, string key)
+        private void ThrowWhenKeyIsAlreadyRegisteredFor<T>(string key)
         {
-            var registrationDictionary = this.GetRegisteredDictionaryWithKeyedSinglesFor(serviceType);
+            IKeyedInstanceProducer locator;
 
-            if (registrationDictionary != null && registrationDictionary.ContainsKey(key))
+            if (this.keyedInstanceProducers.TryGetValue(typeof(T), out locator))
             {
-                throw new InvalidOperationException(
-                    StringResources.TypeAlreadyRegisteredWithKey(serviceType, key));
+                locator.CheckIfKeyIsAlreadyRegistered(key);
             }
         }
 

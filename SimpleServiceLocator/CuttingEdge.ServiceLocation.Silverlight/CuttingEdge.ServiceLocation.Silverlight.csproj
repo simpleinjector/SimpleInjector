@@ -63,23 +63,35 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\FuncRegistrationLocator.cs">
-      <Link>FuncRegistrationLocator.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\FuncSingletonInstanceProducer.cs">
+      <Link>FuncSingletonInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\IKeyedRegistrationLocator.cs">
-      <Link>IKeyedRegistrationLocator.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\IInstanceProducer.cs">
+      <Link>IInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\RegistrationDictionary.cs">
-      <Link>RegistrationDictionary.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\IKeyedInstanceProducer.cs">
+      <Link>IKeyedInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncSingletonInstanceProducer.cs">
+      <Link>KeyedFuncSingletonInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncTransientInstanceProducer.cs">
+      <Link>KeyedFuncTransientInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\KeyedInstanceProducer.cs">
+      <Link>KeyedInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.cs">
       <Link>SimpleServiceLocator.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\SingletonCreator.cs">
-      <Link>SingletonCreator.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\SingletonInstanceProducer.cs">
+      <Link>SingletonInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\StringResources.cs">
       <Link>StringResources.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\TransientInstanceProducer.cs">
+      <Link>TransientInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

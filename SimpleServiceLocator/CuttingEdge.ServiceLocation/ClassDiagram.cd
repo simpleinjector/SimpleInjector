@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CuttingEdge.ServiceLocation.FuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="2" Y="14.25" Width="3" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAACAAAAABABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FuncSingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.KeyedFuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="9" Y="9.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACCAAAACAAAAAAAAQBAAAgAAAAAAAAAAIA=</HashCode>
+      <FileName>KeyedFuncSingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.KeyedFuncTransientInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="2" Y="9.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAACAAAAAAAAQAAAAgAAAAAAAAAAIA=</HashCode>
+      <FileName>KeyedFuncTransientInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.KeyedInstanceProducer" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="9.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAACAAAAACAAAAAAAAQAAAAAAAAAAAAAACMA=</HashCode>
+      <FileName>KeyedInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="instanceProducers" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.SimpleServiceLocator">
+    <Position X="5.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>gIAoIAgAAACAYBUoAEEBAEAIAAABAgAQAwBAAAQARAA=</HashCode>
+      <FileName>SimpleServiceLocator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="keyedInstanceProducers" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.SingletonInstanceProducer" BaseTypeListCollapsed="true">
+    <Position X="9" Y="14.25" Width="3" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.TransientInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="14.25" Width="3" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>TransientInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.DelegateBuilder">
+    <Position X="9.25" Y="2.75" Width="2.5" />
+    <Members>
+      <Field Name="container" Hidden="true" />
+      <Field Name="GenericGetInstanceMethodDefinition" Hidden="true" />
+      <Field Name="registrations" Hidden="true" />
+      <Field Name="serviceType" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>hEIEAAAAAAAEAAAAAAAAAAAAAAAAgAAAAAAAAAQACAA=</HashCode>
+      <FileName>DelegateBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="CuttingEdge.ServiceLocation.IInstanceProducer">
+    <Position X="6" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CuttingEdge.ServiceLocation.IKeyedInstanceProducer">
+    <Position X="6" Y="7.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAABQAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>IKeyedInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

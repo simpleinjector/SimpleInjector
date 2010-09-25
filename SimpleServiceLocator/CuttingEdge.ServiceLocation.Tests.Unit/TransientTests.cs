@@ -308,7 +308,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterByKey_WithNullArgument_ThrowsException()
+        public void RegisterByKeyedFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -319,26 +319,28 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterByKey_WithNullString_ThrowsException()
+        public void RegisterByKeyedFunc_WithNullString_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
             string invalidKey = null;
+            Func<IWeapon> validInstanceCreator = () => new Katana();
 
             // Act
-            container.RegisterSingleByKey<IWeapon>(invalidKey, new Katana());
+            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void RegisterByKey_WithEmptyString_ThrowsException()
+        public void RegisterByKeyedFunc_WithEmptyString_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
             var invalidKey = string.Empty;
+            Func<IWeapon> validInstanceCreator = () => new Katana();
 
             // Act
-            container.RegisterSingleByKey<IWeapon>(invalidKey, new Katana());
+            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
         }
 
         [TestMethod]
@@ -381,7 +383,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once by key.")]
-        public void RegisterByKey_CalledTwiceOnSameType_ThrowsException()
+        public void RegisterByKeyedFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -393,7 +395,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once by key.")]
-        public void RegisterByKey_CalledAfterRegisterSingleByKey_ThrowsException()
+        public void RegisterByKeyedFunc_CalledAfterRegisterSingleByKey_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -433,7 +435,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
-        public void RegisterByKey_AfterCallingGetInstance_ThrowsException()
+        public void RegisterByKeyedFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -446,7 +448,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
-        public void RegisterByKey_AfterCallingGetAllInstances_ThrowsException()
+        public void RegisterByKeyedFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -458,13 +460,124 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        public void RegisterFuncByKey_WithValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            string validKey = "katana";
+            Func<IWeapon> validInstanceCreator = () => new Katana();
+
+            // Act
+            container.RegisterByKey<IWeapon>(validKey, validInstanceCreator);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterFuncByKey_WithNullKey_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            string invalidKey = null;
+            Func<IWeapon> validInstanceCreator = () => new Katana();
+
+            // Act
+            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterFuncByKey_WithNullFunc_ThrowException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            string validKey = "katana";
+            Func<IWeapon> invalidInstanceCreator = null;
+
+            // Act
+            container.RegisterByKey<IWeapon>(validKey, invalidInstanceCreator);
+        }
+
+        [TestMethod]
+        public void RegisterFuncByKey_ValidRegistration_ContainerCallsDelegateOnEachRequest()
+        {
+            // Arrange
+            const int ExpectedNumberOfCalls = 2;
+            int actualNumberOfCalls = 0;
+            var container = new SimpleServiceLocator();
+
+            Func<IWeapon> instanceCreator = () =>
+            {
+                actualNumberOfCalls++;
+                return new Katana();
+            };
+
+            container.RegisterByKey<IWeapon>("katana", instanceCreator);
+
+            // Act
+            container.GetInstance<IWeapon>("katana");
+            container.GetInstance<IWeapon>("katana");
+
+            // Assert
+            Assert.AreEqual(ExpectedNumberOfCalls, actualNumberOfCalls, 
+                "The container is expected to call the delegate on each call to GetInstance.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void RegisterFuncByKey_RequestingAnUnregisteredKey_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterByKey<IWeapon>("katana", () => new Katana());
+
+            // Act
+            // This call is expected to fail.
+            container.GetInstance<IWeapon>("tanto");
+        }
+
+        [TestMethod]
+        public void RegisterFuncByKey_CalledAfterRegisterFunc_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.Register<IWeapon>(() => new Katana());
+
+            // Act
+            // Registration of keyed instance of a specific service type can be mixed with a key-less 
+            // registrations.
+            container.RegisterByKey<IWeapon>("tanto", () => new Tanto());
+
+            // Assert
+            Assert.IsInstanceOfType(container.GetInstance<IWeapon>(), typeof(Katana));
+            Assert.IsInstanceOfType(container.GetInstance<IWeapon>("tanto"), typeof(Tanto));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "Calling RegisterByKey<T>(string, Func<T>) " +
+            "should fail when RegisterByKey<T>(Func<string, T>) is already called for the same T.")]
+        public void RegisterFuncByKey_CalledAfterRegisterKeyedFunc_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterByKey<IWeapon>(key => new Katana());
+
+            // Act
+            // This call is expected to fail, because allowing this behavior would make the API less
+            // transparent. These methods are mutually exclusive.
+            container.RegisterByKey<IWeapon>("tanto", () => new Tanto());
+        }
+
+        [TestMethod]
         public void FormatActivationExceptionMessage_NullException_ReturnsDefaultMessage()
         {
             // Arrange
             var simpleServiceLocator = new FakeSimpleServiceLocator();
             var key = "key";
-            var expectedMessage = 
-                "Activation error occured while trying to get instance of type Int32, key \"key\".";
+            var expectedMessage =
+                "Activation error occurred while trying to get instance of type Int32, key \"key\".";
 
             // Act
             var actualMessage = simpleServiceLocator.FormatActivationExceptionMessage(null, typeof(int), key);
@@ -480,7 +593,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var simpleServiceLocator = new FakeSimpleServiceLocator();
             var exception = new InvalidOperationException("Some message.");
             var key = "key";
-            var expectedMessage = "Activation error occured while trying to get instance of type Int32, " +
+            var expectedMessage = "Activation error occurred while trying to get instance of type Int32, " +
                 "key \"key\". Some message.";
 
             // Act
@@ -497,7 +610,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var simpleServiceLocator = new FakeSimpleServiceLocator();
             var expectedMessage =
-                "Activation error occured while trying to get all instances of type Int32.";
+                "Activation error occurred while trying to get all instances of type Int32.";
 
             // Act
             var actualMessage = simpleServiceLocator.FormatActivateAllExceptionMessage(null, typeof(int));
@@ -513,7 +626,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var simpleServiceLocator = new FakeSimpleServiceLocator();
             var exception = new InvalidOperationException("Some message.");
             var expectedMessage =
-                "Activation error occured while trying to get all instances of type Int32. Some message.";
+                "Activation error occurred while trying to get all instances of type Int32. Some message.";
 
             // Act
             var actualMessage = simpleServiceLocator.FormatActivateAllExceptionMessage(exception, typeof(int));
