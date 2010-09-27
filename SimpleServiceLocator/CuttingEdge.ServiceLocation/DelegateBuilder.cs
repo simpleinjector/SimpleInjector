@@ -64,6 +64,12 @@ namespace CuttingEdge.ServiceLocation
             return builder.Build();
         }
 
+        internal static Func<TConcrete> Build<TConcrete>(IServiceLocator serviceLocator)
+        {
+            var builder = new DelegateBuilder(typeof(TConcrete), null, serviceLocator);
+            return builder.Build<TConcrete>();
+        }
+
         internal static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
             IServiceLocator serviceLocator)
         {
@@ -73,11 +79,16 @@ namespace CuttingEdge.ServiceLocation
 
         private Func<object> Build()
         {
+            return this.Build<object>();
+        }
+
+        private Func<TConcrete> Build<TConcrete>()
+        {
             var constructor = this.GetPublicConstructor();
 
             Expression[] constructorArgumentCalls = this.BuildGetInstanceCallsForConstructor(constructor);
 
-            var newServiceTypeMethod = Expression.Lambda<Func<object>>(
+            var newServiceTypeMethod = Expression.Lambda<Func<TConcrete>>(
                 Expression.New(constructor, constructorArgumentCalls), new ParameterExpression[0]);
 
             return newServiceTypeMethod.Compile();

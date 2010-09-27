@@ -75,6 +75,17 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        public void Validate_RegisteredCollectionWithValidElements_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterAll<IWeapon>(new IWeapon[] { new Katana(), new Tanto() });
+
+            // Act
+            container.Validate();
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Validate_RegisteredCollectionWithNullElements_ThrowsException()
         {

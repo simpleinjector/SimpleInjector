@@ -51,9 +51,11 @@
   <ItemGroup>
     <Compile Include="RegisterAllTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegisterByActionTests.cs" />
     <Compile Include="RegisterByFuncTests.cs" />
     <Compile Include="RegisterByKeyedFuncTests.cs" />
     <Compile Include="RegisterFuncByKeyTests.cs" />
+    <Compile Include="RegisterSingleByActionTests.cs" />
     <Compile Include="RegisterSingleByDelegateTests.cs" />
     <Compile Include="RegisterSingleByInstanceTests.cs" />
     <Compile Include="RegisterSingleFuncByKeyTests.cs" />

@@ -75,7 +75,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
@@ -83,6 +83,49 @@ namespace CuttingEdge.ServiceLocation
             Func<object> objectInstanceCreator = () => instanceCreator();
 
             this.registrations[typeof(T)] = objectInstanceCreator;
+        }
+
+        /// <summary>
+        /// Registers a concrete instance that will be constructed using constructor injection, and that will
+        /// be initialized using the <paramref name="instanceInitializer"/> delegate.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="instanceInitializer">The delegate that will be called after the instance has been
+        /// constructed and before it is returned.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="instanceInitializer"/> is a null reference.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
+        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// </exception>
+        public void Register<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
+        {
+            ThrowWhenTypeIsAbstract(typeof(TConcrete));
+
+            if (instanceInitializer == null)
+            {
+                throw new ArgumentNullException("instanceInitializer");
+            }
+
+            this.ThrowWhenContainerIsLocked();
+
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
+
+            // Create a delegate that always returns this particular instance.
+            Func<TConcrete> constructorInvoker = DelegateBuilder.Build<TConcrete>(this);
+
+            Func<object> instanceCreator = () =>
+            {
+                TConcrete instance = constructorInvoker();
+
+                instanceInitializer(instance);
+
+                return instance;
+            };
+
+            this.registrations[typeof(TConcrete)] = instanceCreator;
         }
 
         /// <summary>
@@ -104,7 +147,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("keyedInstanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
 
             IKeyedInstanceProducer locator = new KeyedFuncTransientInstanceProducer<T>(keyedInstanceCreator);
@@ -142,7 +185,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
 
             KeyedInstanceProducer dictionary = 
@@ -153,37 +196,32 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>
         /// Registers a single concrete instance that will be constructed using constructor injection. 
-        /// This <typeparamref name="T"/> must be thread-safe.
+        /// This <typeparamref name="TConcrete"/> must be thread-safe.
         /// </summary>
-        /// <typeparam name="T">The concrete type that will be registered.</typeparam>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="T"/> has already been registered, or when the given 
-        /// <typeparamref name="T"/> is not a concrete type.
+        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
+        /// <typeparamref name="TConcrete"/> is not a concrete type.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A design without a generic T would be unpractical, because the other " +
             "overloads also take a generic T.")]
-        public void RegisterSingle<T>() where T : class
+        public void RegisterSingle<TConcrete>() where TConcrete : class
         {
-            Type serviceType = typeof(T);
+            ThrowWhenTypeIsAbstract(typeof(TConcrete));
 
-            if (!IsConcreteType(serviceType))
-            {
-                throw new InvalidOperationException(
-                    StringResources.TypeShouldBeConcreteToBeUsedOnRegisterSingle(typeof(T)));
-            }
+            this.ThrowWhenContainerIsLocked();
 
-            this.ThrowIfLocked();
-
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
             // Create a delegate that always returns this particular instance.
-            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, this);
+            Func<object> instanceCreator = DelegateBuilder.Build(typeof(TConcrete), this);
 
-            Func<object> singletonCreator = new FuncSingletonInstanceProducer<object>(instanceCreator).GetInstance;
+            Func<object> singletonCreator = 
+                new FuncSingletonInstanceProducer<object>(instanceCreator).GetInstance;
 
-            this.registrations[serviceType] = singletonCreator;
+            this.registrations[typeof(TConcrete)] = singletonCreator;
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -201,16 +239,14 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instance");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
 
-            Type serviceType = typeof(T);
-
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(serviceType);
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
             // Create a delegate that always returns this particular instance.
             Func<object> instanceCreator = () => instance;
 
-            this.registrations[serviceType] = instanceCreator;
+            this.registrations[typeof(T)] = instanceCreator;
         }
 
         /// <summary>
@@ -234,7 +270,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
@@ -243,6 +279,49 @@ namespace CuttingEdge.ServiceLocation
                 new FuncSingletonInstanceProducer<T>(instanceCreator).GetInstance;
 
             this.registrations[typeof(T)] = singleInstanceCreator;
+        }
+
+        /// <summary>
+        /// Registers a single concrete instance that will be constructed using constructor injection, and 
+        /// that will be initialized using the <paramref name="instanceInitializer"/> delegate. 
+        /// This <typeparamref name="TConcrete"/> must be thread-safe.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="instanceInitializer">The delegate that will be called once after the instance has been
+        /// constructed and before it is returned.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="instanceInitializer"/> is a null reference.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
+        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// </exception>
+        public void RegisterSingle<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
+        {
+            ThrowWhenTypeIsAbstract(typeof(TConcrete));
+
+            if (instanceInitializer == null)
+            {
+                throw new ArgumentNullException("instanceInitializer");
+            }
+
+            this.ThrowWhenContainerIsLocked();
+
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
+
+            Func<TConcrete> constructorInvoker = DelegateBuilder.Build<TConcrete>(this);
+
+            Func<TConcrete> instanceCreator = () =>
+            {
+                TConcrete instance = constructorInvoker();
+
+                instanceInitializer(instance);
+
+                return instance;
+            };
+
+            this.RegisterSingle<TConcrete>(instanceCreator);
         }
 
         /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
@@ -275,7 +354,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instance");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
 
             KeyedInstanceProducer dictionary =
@@ -318,7 +397,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
 
             KeyedInstanceProducer dictionary =
@@ -347,7 +426,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("keyedInstanceCreator");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
 
             IKeyedInstanceProducer locator = new KeyedFuncSingletonInstanceProducer<T>(keyedInstanceCreator);
@@ -371,7 +450,7 @@ namespace CuttingEdge.ServiceLocation
                 throw new ArgumentNullException("collection");
             }
 
-            this.ThrowIfLocked();
+            this.ThrowWhenContainerIsLocked();
 
             this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor(typeof(T));
 
@@ -567,7 +646,7 @@ namespace CuttingEdge.ServiceLocation
             throw new ActivationException(StringResources.NoRegistrationFoundForType(serviceType));
         }
 
-        private void ThrowIfLocked()
+        private void ThrowWhenContainerIsLocked()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
             // immediately.
@@ -732,6 +811,15 @@ namespace CuttingEdge.ServiceLocation
             }
 
             return copy;
+        }
+
+        private static void ThrowWhenTypeIsAbstract(Type serviceType)
+        {
+            if (!IsConcreteType(serviceType))
+            {
+                throw new InvalidOperationException(
+                    StringResources.TypeShouldBeConcreteToBeUsedOnRegisterSingle(serviceType));
+            }
         }
     }
 }
