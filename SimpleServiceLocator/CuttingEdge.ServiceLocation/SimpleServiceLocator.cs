@@ -461,7 +461,7 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>
         /// Validates the <b>SimpleServiceLocator</b>. Validate will call all delegates registered with
-        /// <see cref="Register"/> and iterate collections registered with <see cref="RegisterAll"/> and
+        /// <b>Register</b> and iterate collections registered with <see cref="RegisterAll"/> and
         /// throws an exception if there was an error.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
