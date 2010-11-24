@@ -123,20 +123,41 @@ namespace CuttingEdge.ServiceLocation
 
         private Expression BuildGetInstanceCallForType(Type parameterType)
         {
-            if (this.registrations != null && !this.registrations.ContainsKey(parameterType))
-            {
-                if (!SimpleServiceLocator.IsConcreteType(parameterType))
-                {
-                    throw new ActivationException(
-                        StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
-                }
-            }
+            this.ValidateParameterType(parameterType);
 
             var getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
 
             // Build the call "serviceLocator.GetInstance<[ParameterType]>()"
             return Expression.Call(Expression.Constant(this.container), getInstanceMethod,
                 new Expression[0]);
+        }
+
+        private void ValidateParameterType(Type parameterType)
+        {
+            if (this.registrations == null)
+            {
+                // Only validate when the registrations collection is supplied. When it is missing, this means
+                // that the delegate is constructed in the configuration phase, and registrations may be done
+                // in random order. Therefore, we simply assume that all registrations are valid.
+                return;
+            }
+
+            if (this.registrations.ContainsKey(parameterType))
+            {
+                // The registrations contains the type: we are valid.
+                return;
+            }
+
+            if (SimpleServiceLocator.IsConcreteType(parameterType))
+            {
+                // The type to construct is not registered, but is a concrete type. Concrete types can be
+                // created. We pospone validation untill the moment that the delegate for this concrete type
+                // is generated.
+                return;
+            }
+
+            throw new ActivationException(
+                StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
         }
 
         private static MethodInfo MakeGenericGetInstanceMethod(Type parameterType)

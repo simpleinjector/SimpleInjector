@@ -25,8 +25,8 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -44,14 +44,15 @@ namespace CuttingEdge.ServiceLocation
         private readonly Dictionary<Type, IKeyedInstanceProducer> keyedInstanceProducers =
             new Dictionary<Type, IKeyedInstanceProducer>();
 
-        private readonly Dictionary<Type, IEnumerable<object>> registeredCollections =
-            new Dictionary<Type, IEnumerable<object>>();
-
         private readonly object locker = new object();
 
         private Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
 
+        // This dictionary is only used for validation. After validation is gets erased.
+        private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
+
         private bool locked;
+        private bool validated;
 
         /// <summary>Initializes a new instance of the <see cref="SimpleServiceLocator"/> class.</summary>
         public SimpleServiceLocator()
@@ -443,6 +444,8 @@ namespace CuttingEdge.ServiceLocation
         /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
         /// for <typeparamref name="T"/> has already been registered.
         /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
+        /// reference.</exception>
         public void RegisterAll<T>(IEnumerable<T> collection) where T : class
         {
             if (collection == null)
@@ -452,11 +455,27 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenContainerIsLocked();
 
-            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor(typeof(T));
+            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>();
 
-            var collectionOfObjects = collection.Cast<object>();
+            this.collectionsToValidate[typeof(T)] = collection;
 
-            this.registeredCollections[typeof(T)] = collectionOfObjects;
+            this.registrations[typeof(IEnumerable<T>)] = () => collection;
+        }
+
+        /// <summary>
+        /// Registers a collection of elements of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="collection">The collection to register.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// for <typeparamref name="T"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
+        /// reference.</exception>
+        public void RegisterAll<T>(params T[] collection) where T : class
+        {
+            this.RegisterAll<T>((IEnumerable<T>)collection);
         }
 
         /// <summary>
@@ -470,11 +489,16 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            // Note: keyed registrations can not be checked, because we don't know what are valid string
-            // arguments for the Func<string, object> delegates.
-            this.ValidateRegistrations();
-            this.ValidateKeyedRegistrations();
-            this.ValidateRegisteredCollections();
+            if (!this.validated)
+            {
+                // Note: keyed registrations can not be checked, because we don't know what are valid string
+                // arguments for the Func<string, object> delegates.
+                this.ValidateRegistrations();
+                this.ValidateKeyedRegistrations();
+                this.ValidateRegisteredCollections();
+
+                this.validated = true;
+            }
         }
 
         internal static bool IsConcreteType(Type type)
@@ -513,16 +537,21 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            // Create a copy. Not strictly needed, since we don't mutate this dictionary later on, but this
-            // saves us a bug when we do this in a later release :-).
-            var registeredCollections = this.registeredCollections;
+            Func<object> getCollection;
 
-            if (!registeredCollections.ContainsKey(serviceType))
+            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            // Create a copy, because the reference may change during this method call.
+            var snapshot = this.registrations;
+
+            if (!snapshot.TryGetValue(collectionType, out getCollection))
             {
                 return Enumerable.Empty<object>();
             }
 
-            return registeredCollections[serviceType];
+            IEnumerable registeredCollection = (IEnumerable)getCollection();
+
+            return registeredCollection.Cast<object>();
         }
 
         /// <summary>
@@ -622,7 +651,8 @@ namespace CuttingEdge.ServiceLocation
         private Func<object> RegisterDelegateForConcreteType(Type serviceType,
             Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
+            Func<object> instanceCreator =
+                DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
 
             var registrationsCopy = MakeCopyOf(registrationsSnapshot);
 
@@ -721,26 +751,38 @@ namespace CuttingEdge.ServiceLocation
 
         private void ValidateRegisteredCollections()
         {
-            foreach (var pair in this.registeredCollections)
+            foreach (var pair in this.collectionsToValidate)
             {
                 Type serviceType = pair.Key;
-                IEnumerable<object> collection = pair.Value;
-
+                IEnumerable collection = pair.Value;
+                
                 CheckIfCollectionCanBeIterated(collection, serviceType);
 
                 CheckIfCollectionForNullElements(collection, serviceType);
             }
+
+            this.collectionsToValidate = null;
         }
 
-        private static void CheckIfCollectionCanBeIterated(IEnumerable<object> collection, Type serviceType)
+        private static void CheckIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
         {
             try
             {
-                using (var enumerator = collection.GetEnumerator())
+                var enumerator = collection.GetEnumerator();
+                try
                 {
                     // Just iterate the collection.
                     while (enumerator.MoveNext())
                     {
+                    }
+                }
+                finally
+                {
+                    IDisposable disposable = enumerator as IDisposable;
+
+                    if (disposable != null)
+                    {
+                        disposable.Dispose();
                     }
                 }
             }
@@ -751,9 +793,9 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private static void CheckIfCollectionForNullElements(IEnumerable<object> collection, Type serviceType)
+        private static void CheckIfCollectionForNullElements(IEnumerable collection, Type serviceType)
         {
-            bool collectionContainsNullItems = collection.Any(c => c == null);
+            bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
 
             if (collectionContainsNullItems)
             {
@@ -789,12 +831,12 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private void ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor(Type serviceType)
+        private void ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>()
         {
-            if (this.registeredCollections.ContainsKey(serviceType))
+            if (this.registrations.ContainsKey(typeof(IEnumerable<T>)))
             {
                 throw new InvalidOperationException(
-                    StringResources.CollectionTypeAlreadyRegistered(serviceType));
+                    StringResources.CollectionTypeAlreadyRegistered(typeof(T)));
             }
         }
 

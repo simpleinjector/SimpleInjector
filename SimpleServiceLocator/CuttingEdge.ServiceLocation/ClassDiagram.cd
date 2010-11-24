@@ -6,7 +6,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAAAAAAAACAAAAABABAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>FuncSingletonInstanceProducer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -30,7 +30,7 @@
   <Class Name="CuttingEdge.ServiceLocation.KeyedInstanceProducer" BaseTypeListCollapsed="true">
     <Position X="5.5" Y="9.75" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAIAAAAAAACAAAAACAAAAAAAAQAAAAAAAAAAAAAACMA=</HashCode>
+      <HashCode>ABIAAAAAAACAAAAACAAAAAAAAQAAAAAAAAAAAAAACMA=</HashCode>
       <FileName>KeyedInstanceProducer.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -40,8 +40,11 @@
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.SimpleServiceLocator">
     <Position X="5.5" Y="0.5" Width="3" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>gIAoIAgAAACAYBUoAEEBAEAIAAABAgAQAwBAAAQARAA=</HashCode>
+      <HashCode>gIAoIIAAAAGAYBUoAEEAAUAZAAABAgAYAwBAAAQBRAA=</HashCode>
       <FileName>SimpleServiceLocator.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -91,7 +94,7 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="CuttingEdge.ServiceLocation.IKeyedInstanceProducer">
-    <Position X="6" Y="7.75" Width="2" />
+    <Position X="6" Y="7.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAABQAAAAAAAAAAAAAAAIA=</HashCode>
       <FileName>IKeyedInstanceProducer.cs</FileName>

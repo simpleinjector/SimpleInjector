@@ -1,5 +1,12 @@
-﻿namespace CuttingEdge.ServiceLocation.Tests.Unit
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
+    public interface IPlugin
+    {
+    }
+    
     public interface IWeapon
     {
         void Hit(string target);
@@ -82,5 +89,19 @@
         public GenericType()
         {
         }
+    }
+
+    public class PluginImpl : IPlugin
+    {
+    }
+
+    public class PluginManager
+    {
+        public PluginManager(IEnumerable<IPlugin> plugins)
+        {
+            this.Plugins = plugins.ToArray();
+        }
+
+        public IPlugin[] Plugins { get; private set; }
     }
 }
