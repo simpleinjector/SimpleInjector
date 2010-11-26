@@ -20,8 +20,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_Always_LocksContainer()
+        public void Validate_Never_LocksContainer()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -30,6 +29,22 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.RegisterSingle<IWeapon>(new Katana());
+        }
+
+        [TestMethod]
+        public void Validate_CalledMultipleTimes_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterSingle<IWeapon>(new Katana());
+
+            // Act
+            container.Validate();
+
+            container.Register<Warrior>(() => container.GetInstance<Samurai>());
+
+            container.Validate();
         }
 
         [TestMethod]

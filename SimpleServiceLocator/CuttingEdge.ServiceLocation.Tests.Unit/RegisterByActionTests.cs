@@ -81,7 +81,8 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            container.Validate();
+            container.Register<IWeapon>(() => new Katana());
+            container.GetInstance<IWeapon>();
 
             Action<Samurai> validInstanceInitializer = _ => { };
 

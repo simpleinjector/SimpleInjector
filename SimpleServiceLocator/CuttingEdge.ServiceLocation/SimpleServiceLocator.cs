@@ -52,7 +52,6 @@ namespace CuttingEdge.ServiceLocation
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
 
         private bool locked;
-        private bool validated;
 
         /// <summary>Initializes a new instance of the <see cref="SimpleServiceLocator"/> class.</summary>
         public SimpleServiceLocator()
@@ -488,18 +487,11 @@ namespace CuttingEdge.ServiceLocation
         /// invalid.</exception>
         public void Validate()
         {
-            this.LockContainer();
-
-            if (!this.validated)
-            {
-                // Note: keyed registrations can not be checked, because we don't know what are valid string
-                // arguments for the Func<string, object> delegates.
-                this.ValidateRegistrations();
-                this.ValidateKeyedRegistrations();
-                this.ValidateRegisteredCollections();
-
-                this.validated = true;
-            }
+            // Note: keyed registrations can not be checked, because we don't know what are valid string
+            // arguments for the Func<string, object> delegates.
+            this.ValidateRegistrations();
+            this.ValidateKeyedRegistrations();
+            this.ValidateRegisteredCollections();
         }
 
         internal static bool IsConcreteType(Type type)
@@ -518,14 +510,7 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            if (key == null)
-            {
-                return this.GetInstanceForType(serviceType);
-            }
-            else
-            {
-                return this.GetKeyedInstanceForType(serviceType, key);
-            }
+            return this.DoGetInstanceWithoutLocking(serviceType, key);
         }
 
         /// <summary>
@@ -538,21 +523,7 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            Func<object> getCollection;
-
-            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            // Create a copy, because the reference may change during this method call.
-            var snapshot = this.registrations;
-
-            if (!snapshot.TryGetValue(collectionType, out getCollection))
-            {
-                return Enumerable.Empty<object>();
-            }
-
-            IEnumerable registeredCollection = (IEnumerable)getCollection();
-
-            return registeredCollection.Cast<object>();
+            return DoGetAllInstancesWithoutLocking(serviceType);
         }
 
         /// <summary>
@@ -584,6 +555,37 @@ namespace CuttingEdge.ServiceLocation
             string message = base.FormatActivationExceptionMessage(actualException, serviceType, key);
 
             return ReformatActivateAllExceptionMessage(message, actualException);
+        }
+
+        private object DoGetInstanceWithoutLocking(Type serviceType, string key)
+        {
+            if (key == null)
+            {
+                return this.GetInstanceForType(serviceType);
+            }
+            else
+            {
+                return this.GetKeyedInstanceForType(serviceType, key);
+            }
+        }
+
+        private IEnumerable<object> DoGetAllInstancesWithoutLocking(Type serviceType)
+        {
+            Func<object> getCollection;
+
+            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            // Create a copy, because the reference may change during this method call.
+            var snapshot = this.registrations;
+
+            if (!snapshot.TryGetValue(collectionType, out getCollection))
+            {
+                return Enumerable.Empty<object>();
+            }
+
+            IEnumerable registeredCollection = (IEnumerable)getCollection();
+
+            return registeredCollection.Cast<object>();
         }
 
         private static string ReformatActivateAllExceptionMessage(string message, Exception actualException)
@@ -732,7 +734,7 @@ namespace CuttingEdge.ServiceLocation
                     // IDisposable, but there is no way for us to know if we should actually dispose this 
                     // instance or not :-(. Disposing it could make us prevent a singleton from ever being
                     // used; not disposing it could make us leak resources :-(.
-                    this.GetInstance(pair.Key);
+                    this.DoGetInstanceWithoutLocking(pair.Key, null);
                 }
                 catch (Exception ex)
                 {
@@ -761,8 +763,6 @@ namespace CuttingEdge.ServiceLocation
 
                 CheckIfCollectionForNullElements(collection, serviceType);
             }
-
-            this.collectionsToValidate = null;
         }
 
         private static void CheckIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
