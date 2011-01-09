@@ -53,9 +53,32 @@ namespace CuttingEdge.ServiceLocation
 
         private bool locked;
 
+        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
+        
         /// <summary>Initializes a new instance of the <see cref="SimpleServiceLocator"/> class.</summary>
         public SimpleServiceLocator()
         {
+        }
+
+        /// <summary>
+        /// Occurs when an instance of a type is requested that has not been registered, allowing resolution
+        /// of unregistered types.
+        /// </summary>
+        public event EventHandler<UnregisteredTypeEventArgs> ResolveUnregisteredType
+        {
+            add
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.resolveUnregisteredType += value;
+            }
+
+            remove
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.resolveUnregisteredType -= value;
+            }
         }
 
         /// <summary>
@@ -523,7 +546,7 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            return DoGetAllInstancesWithoutLocking(serviceType);
+            return this.DoGetAllInstancesWithoutLocking(serviceType);
         }
 
         /// <summary>
@@ -615,15 +638,23 @@ namespace CuttingEdge.ServiceLocation
                 return instance;
             }
 
-            if (!IsConcreteType(serviceType))
+            try
             {
-                // Only delegates for concrete types can be generated.
-                throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+                return this.GetConcreteInstance(serviceType, snapshot);
             }
+            catch
+            {
+                // Only do unregistered type resolution when creating a concrete type failed.
+                instance = this.GetInstanceFromUnhandledTypeEvent(serviceType, snapshot);
 
-            var instanceCreator = this.RegisterDelegateForConcreteType(serviceType, snapshot);
+                if (instance != null)
+                {
+                    return instance;
+                }
 
-            return instanceCreator();
+                // When no resolution exists, we throw the original exception thrown by GetConcreteInstance.
+                throw;
+            }
         }
 
         private static object GetInstanceForTypeFromRegistrations(Dictionary<Type, Func<object>> registrations,
@@ -651,32 +682,108 @@ namespace CuttingEdge.ServiceLocation
         // thread-safe, but can result in types disappearing again from the registrations when multiple
         // threads simultaneously add different types. This however, does not result in a consistency problem,
         // because the missing type will be again added later. This type of swapping safes us from using locks.
-        private Func<object> RegisterDelegateForConcreteType(Type serviceType,
+        private object GetConcreteInstance(Type serviceType,
             Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            Func<object> instanceCreator =
-                DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
+            if (!IsConcreteType(serviceType))
+            {
+                // Only delegates for concrete types can be generated.
+                throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+            }
 
+            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
+
+            object instance = instanceCreator();
+
+            this.RegisterDelegateForServiceType(instanceCreator, serviceType, registrationsSnapshot);
+
+            return instance;
+        }
+
+        private object GetInstanceFromUnhandledTypeEvent(Type serviceType,
+            Dictionary<Type, Func<object>> registrationsSnapshot)
+        {
+            var handler = this.resolveUnregisteredType;
+
+            if (handler == null)
+            {
+                return null;
+            }
+
+            var e = new UnregisteredTypeEventArgs(serviceType);
+
+            handler(this, e);
+
+            if (e.Handled)
+            {
+                object instance;
+
+                instance = GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
+
+                this.RegisterDelegateForServiceType(e.InstanceCreator, serviceType, registrationsSnapshot);
+
+                return instance;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static object GetInstanceFromUnhandledTypeDelegate(Type serviceType, 
+            Func<object> instanceCreator)
+        {
+            object instance;
+
+            try
+            {
+                instance = instanceCreator();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources
+                    .HandlerReturnedADelegateThatThrewAnException(serviceType, ex.Message), ex);
+            }
+
+            if (instance == null)
+            {
+                throw new InvalidOperationException(
+                    StringResources.HandlerReturnedADelegateThatReturnedNull(serviceType));
+            }
+
+            if (!serviceType.IsAssignableFrom(instance.GetType()))
+            {
+                throw new InvalidOperationException(
+                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(serviceType,
+                    instance.GetType()));
+            }
+
+            return instance;
+        }
+
+        private void RegisterDelegateForServiceType(Func<object> instanceCreator, Type serviceType,
+            Dictionary<Type, Func<object>> registrationsSnapshot)
+        {
             var registrationsCopy = MakeCopyOf(registrationsSnapshot);
 
             registrationsCopy.Add(serviceType, instanceCreator);
 
             // Replace the original with the new version that includes the serviceType.
             this.registrations = registrationsCopy;
-
-            return instanceCreator;
         }
 
         private object GetKeyedInstanceForType(Type serviceType, string key)
         {
+            IKeyedInstanceProducer keyedInstanceProducer;
+
             // the keyedRegistrations will never change after the container is locked down; there is no need
             // for making a local copy of its reference.
-            if (this.keyedInstanceProducers.ContainsKey(serviceType))
+            if (this.keyedInstanceProducers.TryGetValue(serviceType, out keyedInstanceProducer))
             {
-                return this.keyedInstanceProducers[serviceType].GetInstance(key);
+                return keyedInstanceProducer.GetInstance(key);
             }
 
-            throw new ActivationException(StringResources.NoRegistrationFoundForType(serviceType));
+            throw new ActivationException(StringResources.NoRegistrationFoundForKeyedType(serviceType));
         }
 
         private void ThrowWhenContainerIsLocked()

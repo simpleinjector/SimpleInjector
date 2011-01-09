@@ -52,7 +52,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Samurai is a concrete class with a constructor with a single argument of type IWeapon.
             var instance = container.GetInstance<Samurai>();
 
-            // Arrange
+            // Assert
             Assert.IsNotNull(instance);
         }
 

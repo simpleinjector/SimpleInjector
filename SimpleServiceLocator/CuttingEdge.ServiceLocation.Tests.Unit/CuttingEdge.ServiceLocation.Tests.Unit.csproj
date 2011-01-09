@@ -63,7 +63,9 @@
     <Compile Include="RegisterSingleKeyedFuncTests.cs" />
     <Compile Include="FormattingTests.cs" />
     <Compile Include="RegisterSingleTests.cs" />
+    <Compile Include="ResolveUnregisteredTypeEventTests.cs" />
     <Compile Include="TestClasses.cs" />
+    <Compile Include="UnregisteredTypeEventArgsTests.cs" />
     <Compile Include="UnregisteredTypeTests.cs" />
     <Compile Include="ValidationTests.cs" />
   </ItemGroup>

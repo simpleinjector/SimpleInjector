@@ -93,6 +93,9 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\TransientInstanceProducer.cs">
       <Link>TransientInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\UnregisteredTypeEventArgs.cs">
+      <Link>UnregisteredTypeEventArgs.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />

@@ -38,10 +38,10 @@ namespace CuttingEdge.ServiceLocation
             get { return "key can not be an empty string."; }
         }
 
-        internal static string NoRegistrationFoundForType(Type serviceType)
+        internal static string NoRegistrationFoundForKeyedType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.", serviceType.FullName);
+                "No keyed registration for type {0} could be found.", serviceType.FullName);
         }
 
         internal static string SimpleServiceLocatorCanNotBeChangedAfterUse(Type simpleServiceLocatorType)
@@ -189,6 +189,40 @@ namespace CuttingEdge.ServiceLocation
                 "Type {0} has already been registered using RegisterSingleByKey<T>(Func<string, T>). " +
                 "A registration with this method for a type can't be mixed with methods that register the " +
                 "type using a string key.", serviceType);
+        }
+
+        internal static string MultipleObserversRegisteredTheSameType(Type unregisteredServiceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Multiple observers of the ResolveUnregisteredType event are registering a delegate for " +
+                "the same service type: {0}. Make sure only one of the registered handlers calls the " +
+                "ResolveUnregisteredType.Register(Func<object>) method for a given service type.",
+                unregisteredServiceType);
+        }
+
+        internal static string HandlerReturnedADelegateThatThrewAnException(Type serviceType, 
+            string innerExceptionMessage)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
+                "to the {0} service type, registered a delegate that threw an exception. {1}",
+                serviceType, innerExceptionMessage);
+        }
+        
+        internal static string HandlerReturnedADelegateThatReturnedNull(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The delegate that that was hooked to the ResolveUnregisteredType event and responded " +
+                "to the {0} service type, registered a delegate that returned a null reference.", serviceType);
+        }
+
+        internal static string HandlerReturnedDelegateThatReturnedAnUnassignableFrom(Type serviceType,
+            Type actualType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The delegate that that was hooked to the ResolveUnregisteredType event and responded " +
+                "to the {0} service type, registered a delegate that created an instance of type {1} that " +
+                "can not be casted to the specified service type.", serviceType, actualType);
         }
 
         private static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
