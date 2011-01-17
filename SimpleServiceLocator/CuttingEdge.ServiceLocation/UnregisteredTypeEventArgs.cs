@@ -12,7 +12,9 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     public class UnregisteredTypeEventArgs : EventArgs
     {
-        internal UnregisteredTypeEventArgs(Type unregisteredServiceType)
+        /// <summary>Initializes a new instance of the UnregisteredTypeEventArgs class.</summary>
+        /// <param name="unregisteredServiceType">The unregistered service type.</param>
+        public UnregisteredTypeEventArgs(Type unregisteredServiceType)
         {
             this.UnregisteredServiceType = unregisteredServiceType;
         }

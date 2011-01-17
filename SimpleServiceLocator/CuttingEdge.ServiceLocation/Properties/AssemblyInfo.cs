@@ -72,5 +72,3 @@ using System.Security;
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", 
     Target = "CuttingEdge.ServiceLocation")]
-
-[assembly: InternalsVisibleTo("CuttingEdge.ServiceLocation.Tests.Unit")]
