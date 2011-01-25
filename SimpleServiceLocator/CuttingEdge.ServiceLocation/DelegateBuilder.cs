@@ -46,6 +46,9 @@ namespace CuttingEdge.ServiceLocation
         private static readonly MethodInfo GenericGetInstanceMethodDefinition =
             typeof(IServiceLocator).GetMethod("GetInstance", Type.EmptyTypes);
 
+        private static readonly MethodInfo GenericGetAllInstancesMethodDefinition =
+            typeof(IServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
+
         private readonly Type serviceType;
         private readonly Dictionary<Type, Func<object>> registrations;
         private readonly IServiceLocator container;
@@ -125,9 +128,19 @@ namespace CuttingEdge.ServiceLocation
         {
             this.ValidateParameterType(parameterType);
 
-            var getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
+            MethodInfo getInstanceMethod;
 
-            // Build the call "serviceLocator.GetInstance<[ParameterType]>()"
+            if (IsGenericEnumerable(parameterType))
+            {
+                getInstanceMethod = 
+                    MakeGenericGetAllInstancesMethodDefinition(parameterType.GetGenericArguments()[0]);
+            }
+            else
+            {
+                getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
+            }
+
+            // Build the call "container.GetInstance<[ParameterType]>()"
             return Expression.Call(Expression.Constant(this.container), getInstanceMethod,
                 new Expression[0]);
         }
@@ -148,6 +161,13 @@ namespace CuttingEdge.ServiceLocation
                 return;
             }
 
+            if (IsGenericEnumerable(parameterType))
+            {
+                // The type is a IEnumerable<T>. Such a type is always valid, because when missing, an empty
+                // list is returned.
+                return;
+            }
+
             if (SimpleServiceLocator.IsConcreteType(parameterType))
             {
                 // The type to construct is not registered, but is a concrete type. Concrete types can be
@@ -160,9 +180,19 @@ namespace CuttingEdge.ServiceLocation
                 StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
         }
 
+        private static bool IsGenericEnumerable(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+        }
+
         private static MethodInfo MakeGenericGetInstanceMethod(Type parameterType)
         {
             return GenericGetInstanceMethodDefinition.MakeGenericMethod(parameterType);
+        }
+
+        private static MethodInfo MakeGenericGetAllInstancesMethodDefinition(Type elementType)
+        {
+            return GenericGetAllInstancesMethodDefinition.MakeGenericMethod(elementType);
         }
     }
 }

@@ -45,6 +45,21 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        public void GetInstance_ConcreteTypeWithEnumerableArgumentOfUnregisteredType_InjectsZeroInstances()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Act
+            // PluginManager has a ctor with an IEnumerable<IPlugin> argument.
+            // We expect this call to succeed, even while no IPlugin implementations are registered.
+            var manager = container.GetInstance<PluginManager>();
+
+            // Assert
+            Assert.AreEqual(0, manager.Plugins.Length);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingle_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
