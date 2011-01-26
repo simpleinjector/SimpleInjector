@@ -12,7 +12,7 @@ namespace CuttingEdge.ServiceLocator.Extensions
     /// <summary>
     /// Extension methods with non-generic method overloads.
     /// </summary>
-    public static partial class SslNonGenericRegistrationsExtensions
+    public static class SslNonGenericRegistrationsExtensions
     {
         private const object Obj = null;
         private const Func<object> Func = null;

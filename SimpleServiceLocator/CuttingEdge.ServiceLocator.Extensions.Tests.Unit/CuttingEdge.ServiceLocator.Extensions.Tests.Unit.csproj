@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SslCollectionRegistrationExtensionsTests.cs" />
     <Compile Include="SslNonGenericRegistrationsExtensionsTests.cs" />
     <Compile Include="SslBatchRegistrationExtensionsTests.cs" />
     <Compile Include="SslOpenGenericRegistrationExtensionsTests.cs" />

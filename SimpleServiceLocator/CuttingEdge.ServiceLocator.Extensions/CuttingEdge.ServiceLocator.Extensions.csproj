@@ -56,7 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SslBatchRegistrationExtensions.cs" />
+    <Compile Include="SslOpenGenericBatchRegistrationExtensions.cs" />
+    <Compile Include="SslCollectionRegistrationExtensions.cs" />
     <Compile Include="SslNonGenericRegistrationsExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SslPerThreadRegistrationsExtensions.cs" />

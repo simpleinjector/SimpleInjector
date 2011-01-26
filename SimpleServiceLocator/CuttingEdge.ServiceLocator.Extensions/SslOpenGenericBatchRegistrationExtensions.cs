@@ -12,11 +12,10 @@ namespace CuttingEdge.ServiceLocator.Extensions
     /// <summary>
     /// Extension methods for registering open generic types.
     /// </summary>
-    public static partial class SslBatchRegistrationExtensions
+    public static partial class SslOpenGenericBatchRegistrationExtensions
     {
         private static readonly MethodInfo registerMethodByFunc = GetMethod("Register", typeof(Func<>));
 
-        // Automatic registration / batch registration
         public static void RegisterManyForOpenGeneric(this SimpleServiceLocator container, 
             Type openGenericServiceType, params Assembly[] assemblies)
         {
