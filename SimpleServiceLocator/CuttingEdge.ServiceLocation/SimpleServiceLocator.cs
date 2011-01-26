@@ -125,7 +125,7 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         public void Register<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
-            ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
 
             if (instanceInitializer == null)
             {
@@ -232,7 +232,7 @@ namespace CuttingEdge.ServiceLocation
             "overloads also take a generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
-            ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
 
             this.ThrowWhenContainerIsLocked();
 
@@ -322,7 +322,7 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         public void RegisterSingle<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
-            ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
 
             if (instanceInitializer == null)
             {
@@ -541,11 +541,6 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        internal static bool IsConcreteType(Type type)
-        {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
-        }
-
         internal bool ContainsUnregisteredTypeResolutionFor(Type serviceType)
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
@@ -681,7 +676,7 @@ namespace CuttingEdge.ServiceLocation
             // Create a copy, because the reference may change during this method call.
             var snapshot = this.registrations;
 
-            object instance = GetInstanceForTypeFromRegistrations(snapshot, serviceType);
+            object instance = Helpers.GetInstanceForTypeFromRegistrations(snapshot, serviceType);
 
             if (instance != null)
             {
@@ -707,26 +702,6 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private static object GetInstanceForTypeFromRegistrations(Dictionary<Type, Func<object>> registrations,
-            Type serviceType)
-        {
-            Func<object> instanceCreator = null;
-
-            if (registrations.TryGetValue(serviceType, out instanceCreator))
-            {
-                object instance = instanceCreator();
-
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(serviceType));
-            }
-
-            return null;
-        }
-
         // We're registering a service type after lock here and that means that the type is added to a copy of
         // the registrations dictionary and the original replaced with a new one. This 'reference swapping' is
         // thread-safe, but can result in types disappearing again from the registrations when multiple
@@ -735,7 +710,7 @@ namespace CuttingEdge.ServiceLocation
         private object GetConcreteInstance(Type serviceType,
             Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            if (!IsConcreteType(serviceType))
+            if (!Helpers.IsConcreteType(serviceType))
             {
                 // Only delegates for concrete types can be generated.
                 throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
@@ -761,7 +736,7 @@ namespace CuttingEdge.ServiceLocation
             {
                 object instance;
 
-                instance = GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
+                instance = Helpers.GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
 
                 this.RegisterDelegateForServiceType(e.InstanceCreator, serviceType, registrationsSnapshot);
 
@@ -785,41 +760,10 @@ namespace CuttingEdge.ServiceLocation
             handler(this, e);
         }
 
-        private static object GetInstanceFromUnhandledTypeDelegate(Type serviceType, 
-            Func<object> instanceCreator)
-        {
-            object instance;
-
-            try
-            {
-                instance = instanceCreator();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(StringResources
-                    .HandlerReturnedADelegateThatThrewAnException(serviceType, ex.Message), ex);
-            }
-
-            if (instance == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.HandlerReturnedADelegateThatReturnedNull(serviceType));
-            }
-
-            if (!serviceType.IsAssignableFrom(instance.GetType()))
-            {
-                throw new InvalidOperationException(
-                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(serviceType,
-                    instance.GetType()));
-            }
-
-            return instance;
-        }
-
         private void RegisterDelegateForServiceType(Func<object> instanceCreator, Type serviceType,
             Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            var registrationsCopy = MakeCopyOf(registrationsSnapshot);
+            var registrationsCopy = Helpers.MakeCopyOf(registrationsSnapshot);
 
             registrationsCopy.Add(serviceType, instanceCreator);
 
@@ -920,50 +864,10 @@ namespace CuttingEdge.ServiceLocation
             {
                 Type serviceType = pair.Key;
                 IEnumerable collection = pair.Value;
-                
-                CheckIfCollectionCanBeIterated(collection, serviceType);
 
-                CheckIfCollectionForNullElements(collection, serviceType);
-            }
-        }
+                Helpers.CheckIfCollectionCanBeIterated(collection, serviceType);
 
-        private static void CheckIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
-        {
-            try
-            {
-                var enumerator = collection.GetEnumerator();
-                try
-                {
-                    // Just iterate the collection.
-                    while (enumerator.MoveNext())
-                    {
-                    }
-                }
-                finally
-                {
-                    IDisposable disposable = enumerator as IDisposable;
-
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidIteratingCollectionFailed(serviceType, ex), ex);
-            }
-        }
-
-        private static void CheckIfCollectionForNullElements(IEnumerable collection, Type serviceType)
-        {
-            bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
-
-            if (collectionContainsNullItems)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
+                Helpers.CheckIfCollectionForNullElements(collection, serviceType);
             }
         }
 
@@ -1000,30 +904,6 @@ namespace CuttingEdge.ServiceLocation
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(typeof(T)));
-            }
-        }
-
-        private static Dictionary<Type, Func<object>> MakeCopyOf(Dictionary<Type, Func<object>> source)
-        {
-            // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.
-            int initialCapacity = source.Count + 1;
-
-            var copy = new Dictionary<Type, Func<object>>(initialCapacity);
-
-            foreach (var pair in source)
-            {
-                copy.Add(pair.Key, pair.Value);
-            }
-
-            return copy;
-        }
-
-        private static void ThrowWhenTypeIsAbstract(Type serviceType)
-        {
-            if (!IsConcreteType(serviceType))
-            {
-                throw new InvalidOperationException(
-                    StringResources.TypeShouldBeConcreteToBeUsedOnRegisterSingle(serviceType));
             }
         }
     }

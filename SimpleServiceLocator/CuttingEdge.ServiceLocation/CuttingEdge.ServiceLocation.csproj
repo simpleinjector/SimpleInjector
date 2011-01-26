@@ -53,6 +53,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers.cs" />
     <Compile Include="DelegateBuilder.cs" />
     <Compile Include="FuncSingletonInstanceProducer.cs" />
     <Compile Include="IInstanceProducer.cs" />

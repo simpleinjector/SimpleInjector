@@ -66,6 +66,9 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\FuncSingletonInstanceProducer.cs">
       <Link>FuncSingletonInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\Helpers.cs">
+      <Link>Helpers.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\IInstanceProducer.cs">
       <Link>IInstanceProducer.cs</Link>
     </Compile>

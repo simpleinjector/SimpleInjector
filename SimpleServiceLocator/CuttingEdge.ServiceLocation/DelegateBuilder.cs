@@ -168,7 +168,7 @@ namespace CuttingEdge.ServiceLocation
                 return;
             }
 
-            if (SimpleServiceLocator.IsConcreteType(parameterType))
+            if (Helpers.IsConcreteType(parameterType))
             {
                 // The type to construct is not registered, but is a concrete type. Concrete types can be
                 // created. We pospone validation untill the moment that the delegate for this concrete type
