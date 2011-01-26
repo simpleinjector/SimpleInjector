@@ -517,6 +517,30 @@ namespace CuttingEdge.ServiceLocation
             this.ValidateRegisteredCollections();
         }
 
+        /// <summary>Get all instances of the given TService currently registered in the container.</summary>
+        /// <typeparam name="TService">Type of object requested.</typeparam>
+        /// <returns>A sequence of instances of the requested TService.</returns>
+        /// <exception cref="ActivationException">
+        /// Thrown when there is an error resolving the service instances.
+        /// </exception>
+        public override IEnumerable<TService> GetAllInstances<TService>()
+        {
+            // This method is overridden to improve performance. The base method resolves collections in a
+            // non-generic way, which caused us to use reflection to retrieve the correct type. Because this
+            // overload is also used during automatic constructor injection (through the DelegateBuilder) the
+            // performance improvements can be quite significant.
+            this.LockContainer();
+
+            try
+            {
+                return DoGetAllInstancesWithoutLocking<TService>();
+            }
+            catch (Exception ex)
+            {
+                throw new ActivationException(this.FormatActivateAllExceptionMessage(ex, typeof(TService)), ex);
+            }
+        }
+
         internal static bool IsConcreteType(Type type)
         {
             return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
@@ -599,6 +623,23 @@ namespace CuttingEdge.ServiceLocation
             {
                 return this.GetKeyedInstanceForType(serviceType, key);
             }
+        }
+
+        private IEnumerable<TService> DoGetAllInstancesWithoutLocking<TService>()
+        {
+            Func<object> getCollection;
+
+            Type collectionType = typeof(IEnumerable<TService>);
+
+            // Create a copy, because the reference may change during this method call.
+            var snapshot = this.registrations;
+
+            if (!snapshot.TryGetValue(collectionType, out getCollection))
+            {
+                return Enumerable.Empty<TService>();
+            }
+
+            return (IEnumerable<TService>)getCollection();
         }
 
         private IEnumerable<object> DoGetAllInstancesWithoutLocking(Type serviceType)
