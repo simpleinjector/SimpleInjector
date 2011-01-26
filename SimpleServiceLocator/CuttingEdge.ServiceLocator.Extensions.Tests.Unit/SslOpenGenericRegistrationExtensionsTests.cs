@@ -14,6 +14,11 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
         {
         }
 
+        private interface IValidate<T>
+        {
+            IService<T, int> Service { get; }
+        }
+
         [TestMethod]
         public void RegisterOpenGeneric_WithValidArguments_ReturnsExpectedTypeOnGetInstance()
         {
@@ -60,10 +65,40 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
 
             // Act
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+
+            container.GetInstance<IService<int, string>>();
+        }
+
+        [TestMethod]
+        public void GetInstance_WithDependedRegisterOpenGenericRegistrations_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
+            container.RegisterOpenGeneric(typeof(IValidate<>), typeof(DefaultValidator<>));
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+
+            // Act
+            var validator = container.GetInstance<IValidate<string>>();
+
+            // Assert
+            Assert.IsInstanceOfType(validator, typeof(DefaultValidator<string>));
+            Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
         }
 
         private class ServiceImpl<TA, TB> : IService<TA, TB>
         {
+        }
+
+        private class DefaultValidator<T> : IValidate<T>
+        {
+            public DefaultValidator(IService<T, int> service)
+            {
+                this.Service = service;
+            }
+
+            public IService<T, int> Service { get; private set; }
         }
     }
 }
