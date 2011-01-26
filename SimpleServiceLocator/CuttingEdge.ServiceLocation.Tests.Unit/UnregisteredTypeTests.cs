@@ -168,5 +168,24 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 Assert.IsTrue(ex.Message.Contains(typeof(GenericType<>).Name));
             }
         }
+
+        [TestMethod]
+        public void GetInstance_OnConcreteTypeWithConstructorArgumentOfResolvableType_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IWeapon))
+                {
+                    e.Register(() => new Katana());
+                }
+            };
+
+            // Act
+            // Samurai contains an constructor argument of IWeapon
+            var samurai = container.GetInstance<Samurai>();
+        }
     }
 }

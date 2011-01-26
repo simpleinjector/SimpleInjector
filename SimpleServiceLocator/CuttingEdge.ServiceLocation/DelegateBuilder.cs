@@ -51,30 +51,30 @@ namespace CuttingEdge.ServiceLocation
 
         private readonly Type serviceType;
         private readonly Dictionary<Type, Func<object>> registrations;
-        private readonly IServiceLocator container;
+        private readonly SimpleServiceLocator container;
 
         private DelegateBuilder(Type serviceType, Dictionary<Type, Func<object>> registrations,
-            IServiceLocator container)
+            SimpleServiceLocator container)
         {
             this.serviceType = serviceType;
             this.registrations = registrations;
             this.container = container;
         }
 
-        internal static Func<object> Build(Type serviceType, IServiceLocator serviceLocator)
+        internal static Func<object> Build(Type serviceType, SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(serviceType, null, serviceLocator);
             return builder.Build();
         }
 
-        internal static Func<TConcrete> Build<TConcrete>(IServiceLocator serviceLocator)
+        internal static Func<TConcrete> Build<TConcrete>(SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(typeof(TConcrete), null, serviceLocator);
             return builder.Build<TConcrete>();
         }
 
         internal static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
-            IServiceLocator serviceLocator)
+            SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(serviceType, registrations, serviceLocator);
             return builder.Build();
@@ -173,6 +173,13 @@ namespace CuttingEdge.ServiceLocation
                 // The type to construct is not registered, but is a concrete type. Concrete types can be
                 // created. We pospone validation untill the moment that the delegate for this concrete type
                 // is generated.
+                return;
+            }
+
+            if (this.container.ContainsUnregisteredTypeResolutionFor(parameterType))
+            {
+                // There is an handler registered to the ResolveUnregisteredType event that is able to resolve
+                // the given parameterType.
                 return;
             }
 

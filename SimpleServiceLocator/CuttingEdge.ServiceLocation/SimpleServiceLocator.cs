@@ -519,7 +519,16 @@ namespace CuttingEdge.ServiceLocation
 
         internal static bool IsConcreteType(Type type)
         {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition;
+            return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
+        }
+
+        internal bool ContainsUnregisteredTypeResolutionFor(Type serviceType)
+        {
+            var e = new UnregisteredTypeEventArgs(serviceType);
+
+            this.OnResolveUnregisteredType(e);
+
+            return e.Handled;
         }
 
         /// <summary>
@@ -645,7 +654,7 @@ namespace CuttingEdge.ServiceLocation
             catch
             {
                 // Only do unregistered type resolution when creating a concrete type failed.
-                instance = this.GetInstanceFromUnhandledTypeEvent(serviceType, snapshot);
+                instance = this.GetInstanceThroughUnregisteredTypeResolution(serviceType, snapshot);
 
                 if (instance != null)
                 {
@@ -700,19 +709,12 @@ namespace CuttingEdge.ServiceLocation
             return instance;
         }
 
-        private object GetInstanceFromUnhandledTypeEvent(Type serviceType,
+        private object GetInstanceThroughUnregisteredTypeResolution(Type serviceType,
             Dictionary<Type, Func<object>> registrationsSnapshot)
         {
-            var handler = this.resolveUnregisteredType;
-
-            if (handler == null)
-            {
-                return null;
-            }
-
             var e = new UnregisteredTypeEventArgs(serviceType);
 
-            handler(this, e);
+            this.OnResolveUnregisteredType(e);
 
             if (e.Handled)
             {
@@ -728,6 +730,18 @@ namespace CuttingEdge.ServiceLocation
             {
                 return null;
             }
+        }
+
+        private void OnResolveUnregisteredType(UnregisteredTypeEventArgs e)
+        {
+            var handler = this.resolveUnregisteredType;
+
+            if (handler == null)
+            {
+                return;
+            }
+
+            handler(this, e);
         }
 
         private static object GetInstanceFromUnhandledTypeDelegate(Type serviceType, 
