@@ -58,6 +58,7 @@
     <Compile Include="FuncSingletonInstanceProducer.cs" />
     <Compile Include="IInstanceProducer.cs" />
     <Compile Include="IKeyedInstanceProducer.cs" />
+    <Compile Include="InstanceProducerExtensions.cs" />
     <Compile Include="KeyedFuncTransientInstanceProducer.cs" />
     <Compile Include="SingletonInstanceProducer.cs" />
     <Compile Include="TransientInstanceProducer.cs" />

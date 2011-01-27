@@ -75,6 +75,9 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\IKeyedInstanceProducer.cs">
       <Link>IKeyedInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\InstanceProducerExtensions.cs">
+      <Link>InstanceProducerExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncSingletonInstanceProducer.cs">
       <Link>KeyedFuncSingletonInstanceProducer.cs</Link>
     </Compile>

@@ -24,13 +24,20 @@
 */
 #endregion
 
+using System;
+
+using Microsoft.Practices.ServiceLocation;
+
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>Contract for types the produce instances.</summary>
     internal interface IInstanceProducer
     {
+        Type ServiceType { get; }
+
         /// <summary>Produces an instance.</summary>
-        /// <returns>An instance.</returns>
+        /// <returns>An instance. Will never return null.</returns>
+        /// <exception cref="ActivationException">When the instance could not be retrieved.</exception>
         object GetInstance();
     }
 }

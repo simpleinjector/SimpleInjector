@@ -69,23 +69,9 @@ namespace CuttingEdge.ServiceLocation
         {
             foreach (var pair in this.instanceProducers)
             {
-                try
-                {
-                    var instanceProducer = pair.Value;
+                IInstanceProducer instanceProducer = pair.Value;
 
-                    // Test the producer
-                    // NOTE: We've got our first quirk in the design here: The returned object could implement
-                    // IDisposable, but there is no way for us to know if we should actually dispose this 
-                    // instance or not :-(. Disposing it could make us prevent a singleton from ever being
-                    // used; not disposing it could make us leak resources :-(.
-                    instanceProducer.GetInstance();
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ConfigurationInvalidCreatingKeyedInstanceFailed(
-                            this.serviceType, pair.Key, ex), ex);
-                }
+                instanceProducer.Validate();
             }
         }
 

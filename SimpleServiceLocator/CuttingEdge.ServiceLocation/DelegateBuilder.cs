@@ -50,10 +50,10 @@ namespace CuttingEdge.ServiceLocation
             typeof(IServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
 
         private readonly Type serviceType;
-        private readonly Dictionary<Type, Func<object>> registrations;
+        private readonly Dictionary<Type, IInstanceProducer> registrations;
         private readonly SimpleServiceLocator container;
 
-        private DelegateBuilder(Type serviceType, Dictionary<Type, Func<object>> registrations,
+        private DelegateBuilder(Type serviceType, Dictionary<Type, IInstanceProducer> registrations,
             SimpleServiceLocator container)
         {
             this.serviceType = serviceType;
@@ -73,7 +73,7 @@ namespace CuttingEdge.ServiceLocation
             return builder.Build<TConcrete>();
         }
 
-        internal static Func<object> Build(Type serviceType, Dictionary<Type, Func<object>> registrations,
+        internal static Func<object> Build(Type serviceType, Dictionary<Type, IInstanceProducer> registrations,
             SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(serviceType, registrations, serviceLocator);

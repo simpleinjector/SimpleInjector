@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region Copyright (c) 2010 S. van Deursen
+/* The SimpleServiceLocator library is a simple but complete implementation of the CommonServiceLocator 
+ * interface.
+ * 
+ * Copyright (C) 2010 S. van Deursen
+ * 
+ * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
+ * cuttingedge.it.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial 
+ * portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+ * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +44,13 @@ namespace CuttingEdge.ServiceLocation
         }
 
         internal static object GetInstanceForTypeFromRegistrations(
-            Dictionary<Type, Func<object>> registrations, Type serviceType)
+            Dictionary<Type, IInstanceProducer> registrations, Type serviceType)
         {
-            Func<object> instanceCreator = null;
+            IInstanceProducer instanceProducer;
 
-            if (registrations.TryGetValue(serviceType, out instanceCreator))
+            if (registrations.TryGetValue(serviceType, out instanceProducer))
             {
-                object instance = instanceCreator();
+                object instance = instanceProducer.GetInstance();
 
                 if (instance != null)
                 {
@@ -68,12 +94,12 @@ namespace CuttingEdge.ServiceLocation
             return instance;
         }
 
-        internal static Dictionary<Type, Func<object>> MakeCopyOf(Dictionary<Type, Func<object>> source)
+        internal static Dictionary<Type, IInstanceProducer> MakeCopyOf(Dictionary<Type, IInstanceProducer> source)
         {
             // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.
             int initialCapacity = source.Count + 1;
 
-            var copy = new Dictionary<Type, Func<object>>(initialCapacity);
+            var copy = new Dictionary<Type, IInstanceProducer>(initialCapacity);
 
             foreach (var pair in source)
             {

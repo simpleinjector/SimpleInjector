@@ -24,20 +24,31 @@
 */
 #endregion
 
+using System;
+
+using Microsoft.Practices.ServiceLocation;
+
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>Wraps an instance and returns that single instance every time.</summary>
-    internal sealed class SingletonInstanceProducer : IInstanceProducer
+    /// <typeparam name="T">The type, what else.</typeparam>
+    internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
-        private readonly object instance;
+        private readonly T instance;
 
-        internal SingletonInstanceProducer(object instance)
+        internal SingletonInstanceProducer(T instance)
         {
             this.instance = instance;
         }
 
+        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
+        public Type ServiceType
+        {
+            get { return typeof(T); }
+        }
+
         /// <summary>Produces an instance.</summary>
-        /// <returns>An instance.</returns>
+        /// <returns>An instance. Will never return null.</returns>
         public object GetInstance()
         {
             return this.instance;

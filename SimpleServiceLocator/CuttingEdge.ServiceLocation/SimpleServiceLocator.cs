@@ -46,7 +46,7 @@ namespace CuttingEdge.ServiceLocation
 
         private readonly object locker = new object();
 
-        private Dictionary<Type, Func<object>> registrations = new Dictionary<Type, Func<object>>();
+        private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>();
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
@@ -102,10 +102,7 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
-            // Create a delegate that calls the Func<T> delegate and returns T as object.
-            Func<object> objectInstanceCreator = () => instanceCreator();
-
-            this.registrations[typeof(T)] = objectInstanceCreator;
+            this.registrations[typeof(T)] = new TransientInstanceProducer<T>(instanceCreator);
         }
 
         /// <summary>
@@ -139,7 +136,7 @@ namespace CuttingEdge.ServiceLocation
             // Create a delegate that always returns this particular instance.
             Func<TConcrete> constructorInvoker = DelegateBuilder.Build<TConcrete>(this);
 
-            Func<object> instanceCreator = () =>
+            Func<TConcrete> instanceCreator = () =>
             {
                 TConcrete instance = constructorInvoker();
 
@@ -148,7 +145,7 @@ namespace CuttingEdge.ServiceLocation
                 return instance;
             };
 
-            this.registrations[typeof(TConcrete)] = instanceCreator;
+            this.registrations[typeof(TConcrete)] = new TransientInstanceProducer<TConcrete>(instanceCreator);
         }
 
         /// <summary>
@@ -238,13 +235,11 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            // Create a delegate that always returns this particular instance.
-            Func<object> instanceCreator = DelegateBuilder.Build(typeof(TConcrete), this);
+            Func<TConcrete> instanceCreator = DelegateBuilder.Build<TConcrete>(this);
 
-            Func<object> singletonCreator = 
-                new FuncSingletonInstanceProducer<object>(instanceCreator).GetInstance;
+            var producer = new FuncSingletonInstanceProducer<TConcrete>(instanceCreator);
 
-            this.registrations[typeof(TConcrete)] = singletonCreator;
+            this.registrations[typeof(TConcrete)] = producer;
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -255,7 +250,7 @@ namespace CuttingEdge.ServiceLocation
         /// for <typeparamref name="T"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.</exception>
-        public void RegisterSingle<T>(T instance)
+        public void RegisterSingle<T>(T instance) where T : class
         {
             if (instance == null)
             {
@@ -266,10 +261,7 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
-            // Create a delegate that always returns this particular instance.
-            Func<object> instanceCreator = () => instance;
-
-            this.registrations[typeof(T)] = instanceCreator;
+            this.registrations[typeof(T)] = new SingletonInstanceProducer<T>(instance);
         }
 
         /// <summary>
@@ -297,11 +289,7 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
-            // Create a delegate that always returns this particular instance.
-            Func<object> singleInstanceCreator = 
-                new FuncSingletonInstanceProducer<T>(instanceCreator).GetInstance;
-
-            this.registrations[typeof(T)] = singleInstanceCreator;
+            this.registrations[typeof(T)] = new FuncSingletonInstanceProducer<T>(instanceCreator);
         }
 
         /// <summary>
@@ -383,7 +371,7 @@ namespace CuttingEdge.ServiceLocation
             KeyedInstanceProducer dictionary =
                 this.GetRegistrationDictionaryFor<T>("RegisterSingleByKey<T>(string, T)");
 
-            dictionary.Add(key, new SingletonInstanceProducer(instance));
+            dictionary.Add(key, new SingletonInstanceProducer<T>(instance));
         }
 
         /// <summary>
@@ -481,7 +469,8 @@ namespace CuttingEdge.ServiceLocation
 
             this.collectionsToValidate[typeof(T)] = collection;
 
-            this.registrations[typeof(IEnumerable<T>)] = () => collection;
+            this.registrations[typeof(IEnumerable<T>)] = 
+                new SingletonInstanceProducer<IEnumerable<T>>(collection);
         }
 
         /// <summary>
@@ -622,36 +611,31 @@ namespace CuttingEdge.ServiceLocation
 
         private IEnumerable<TService> DoGetAllInstancesWithoutLocking<TService>()
         {
-            Func<object> getCollection;
+            IInstanceProducer instanceProducer;
 
-            Type collectionType = typeof(IEnumerable<TService>);
-
-            // Create a copy, because the reference may change during this method call.
-            var snapshot = this.registrations;
-
-            if (!snapshot.TryGetValue(collectionType, out getCollection))
+            if (!this.registrations.TryGetValue(typeof(IEnumerable<TService>), out instanceProducer))
             {
                 return Enumerable.Empty<TService>();
             }
 
-            return (IEnumerable<TService>)getCollection();
+            return (IEnumerable<TService>)instanceProducer.GetInstance();
         }
 
         private IEnumerable<object> DoGetAllInstancesWithoutLocking(Type serviceType)
         {
-            Func<object> getCollection;
+            IInstanceProducer instanceProducer;
 
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
             // Create a copy, because the reference may change during this method call.
             var snapshot = this.registrations;
 
-            if (!snapshot.TryGetValue(collectionType, out getCollection))
+            if (!snapshot.TryGetValue(collectionType, out instanceProducer))
             {
                 return Enumerable.Empty<object>();
             }
 
-            IEnumerable registeredCollection = (IEnumerable)getCollection();
+            IEnumerable registeredCollection = (IEnumerable)instanceProducer.GetInstance();
 
             return registeredCollection.Cast<object>();
         }
@@ -708,7 +692,7 @@ namespace CuttingEdge.ServiceLocation
         // threads simultaneously add different types. This however, does not result in a consistency problem,
         // because the missing type will be again added later. This type of swapping safes us from using locks.
         private object GetConcreteInstance(Type serviceType,
-            Dictionary<Type, Func<object>> registrationsSnapshot)
+            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
         {
             if (!Helpers.IsConcreteType(serviceType))
             {
@@ -718,15 +702,18 @@ namespace CuttingEdge.ServiceLocation
 
             Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
 
+            // Test the creator before 'poluting' the registrations dictionary with that delegate.
             object instance = instanceCreator();
 
-            this.RegisterDelegateForServiceType(instanceCreator, serviceType, registrationsSnapshot);
+            IInstanceProducer instanceProducer = new TransientInstanceProducer<object>(instanceCreator);
+
+            this.RegisterDelegateForServiceType(instanceProducer, serviceType, registrationsSnapshot);
 
             return instance;
         }
 
         private object GetInstanceThroughUnregisteredTypeResolution(Type serviceType,
-            Dictionary<Type, Func<object>> registrationsSnapshot)
+            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
 
@@ -738,7 +725,9 @@ namespace CuttingEdge.ServiceLocation
 
                 instance = Helpers.GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
 
-                this.RegisterDelegateForServiceType(e.InstanceCreator, serviceType, registrationsSnapshot);
+                IInstanceProducer instanceProducer = new TransientInstanceProducer<object>(e.InstanceCreator);
+
+                this.RegisterDelegateForServiceType(instanceProducer, serviceType, registrationsSnapshot);
 
                 return instance;
             }
@@ -760,12 +749,12 @@ namespace CuttingEdge.ServiceLocation
             handler(this, e);
         }
 
-        private void RegisterDelegateForServiceType(Func<object> instanceCreator, Type serviceType,
-            Dictionary<Type, Func<object>> registrationsSnapshot)
+        private void RegisterDelegateForServiceType(IInstanceProducer instanceProducer, Type serviceType,
+            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
         {
             var registrationsCopy = Helpers.MakeCopyOf(registrationsSnapshot);
 
-            registrationsCopy.Add(serviceType, instanceCreator);
+            registrationsCopy.Add(serviceType, instanceProducer);
 
             // Replace the original with the new version that includes the serviceType.
             this.registrations = registrationsCopy;
@@ -833,20 +822,9 @@ namespace CuttingEdge.ServiceLocation
         {
             foreach (var pair in this.registrations)
             {
-                try
-                {
-                    // Test the creator
-                    // NOTE: We've got our first quirk in the design here: The returned object could implement
-                    // IDisposable, but there is no way for us to know if we should actually dispose this 
-                    // instance or not :-(. Disposing it could make us prevent a singleton from ever being
-                    // used; not disposing it could make us leak resources :-(.
-                    this.DoGetInstanceWithoutLocking(pair.Key, null);
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ConfigurationInvalidCreatingInstanceFailed(pair.Key, ex), ex);
-                }
+                IInstanceProducer instanceProducer = pair.Value;
+
+                instanceProducer.Validate();
             }
         }
 
@@ -854,7 +832,9 @@ namespace CuttingEdge.ServiceLocation
         {
             foreach (var pair in this.keyedInstanceProducers)
             {
-                pair.Value.Validate();
+                IKeyedInstanceProducer keyedInstanceProducer = pair.Value;
+
+                keyedInstanceProducer.Validate();
             }
         }
 

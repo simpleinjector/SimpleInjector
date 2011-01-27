@@ -31,36 +31,26 @@ using Microsoft.Practices.ServiceLocation;
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>
-    /// Allows producing instances based on a supplied Func{T} delegate.
+    /// Extension methods for the IInstanceProducer interface.
     /// </summary>
-    /// <typeparam name="T">Type service type.</typeparam>
-    internal sealed class TransientInstanceProducer<T> : IInstanceProducer
+    internal static class InstanceProducerExtensions
     {
-        private readonly Func<T> instanceCreator;
-
-        internal TransientInstanceProducer(Func<T> instanceCreator)
+        internal static void Validate(this IInstanceProducer instanceProducer)
         {
-            this.instanceCreator = instanceCreator;
-        }
-
-        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
-        public Type ServiceType
-        {
-            get { return typeof(T); }
-        }
-
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance.</returns>
-        public object GetInstance()
-        {
-            var instance = this.instanceCreator();
-
-            if (instance != null)
+            try
             {
-                return instance;
+                // Test the creator
+                // NOTE: We've got our first quirk in the design here: The returned object could implement
+                // IDisposable, but there is no way for us to know if we should actually dispose this 
+                // instance or not :-(. Disposing it could make us prevent a singleton from ever being
+                // used; not disposing it could make us leak resources :-(.
+                instanceProducer.GetInstance();
             }
-
-            throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    instanceProducer.ServiceType, ex), ex);
+            }
         }
     }
 }

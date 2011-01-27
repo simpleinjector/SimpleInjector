@@ -43,6 +43,12 @@ namespace CuttingEdge.ServiceLocation
             this.instanceCreator = instanceCreator;
         }
 
+        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
+        public Type ServiceType
+        {
+            get { return typeof(T); }
+        }
+
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance.</returns>
         public object GetInstance()
@@ -58,6 +64,12 @@ namespace CuttingEdge.ServiceLocation
                     if (!this.instanceCreated)
                     {
                         this.instance = this.instanceCreator();
+
+                        if (this.instance == null)
+                        {
+                            throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
+                        }
+
                         this.instanceCreated = true;
 
                         // Remove the reference to the delegate; it is not needed anymore.
