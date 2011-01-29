@@ -7,11 +7,22 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
     [TestClass]
-    public class RegisterSingleByDelegateTests
+    public class RegisterSingleByFuncTests
     {
         [TestMethod]
+        public void RegisterSingleByFun_WithValidArgument_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            Func<IWeapon> validDelegate = () => new Katana();
+
+            // Act
+            container.RegisterSingle<IWeapon>(validDelegate);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterSingleByDelegate_WithNullArgument_ThrowsException()
+        public void RegisterSingleByFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -22,8 +33,45 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        public void Validate_ValidRegisterSingleByFuncRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            Func<IWeapon> validDelegate = () => new Katana();
+            container.RegisterSingle<IWeapon>(validDelegate);
+
+            // Act
+            container.Validate();
+        }
+
+        [TestMethod]
+        public void Validate_InValidRegisterSingleByFuncRegistration_ThrowsExpectedExceptionMessage()
+        {
+            // Arrange
+            string expectedMessage = "The registered delegate for type " +
+                "CuttingEdge.ServiceLocation.Tests.Unit.IWeapon returned null";
+
+            var container = new SimpleServiceLocator();
+            Func<IWeapon> invalidDelegate = () => null;
+            container.RegisterSingle<IWeapon>(invalidDelegate);
+
+            try
+            {
+                // Act
+                container.Validate();
+
+                // Arrange
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
-        public void RegisterSingleByDelegate_CalledTwiceOnSameType_ThrowsException()
+        public void RegisterSingleByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -35,7 +83,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
-        public void RegisterSingleByDelegate_CalledAfterRegisterOnSameType_ThrowsException()
+        public void RegisterSingleByFunc_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -47,7 +95,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
-        public void RegisterSingleByDelegate_AfterCallingGetInstance_ThrowsException()
+        public void RegisterSingleByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -60,7 +108,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
-        public void RegisterSingleByDelegate_AfterCallingGetAllInstances_ThrowsException()
+        public void RegisterSingleByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -75,7 +123,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleByDelegate_RegisteringDelegate_WillNotCallTheDelegate()
+        public void RegisterSingleByFunc_RegisteringDelegate_WillNotCallTheDelegate()
         {
             // Arrange
             int numberOfTimesDelegateWasCalled = 0;
@@ -96,7 +144,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleByDelegate_CallingGetInstanceMultipleTimes_WillOnlyCallDelegateOnce()
+        public void RegisterSingleByFunc_CallingGetInstanceMultipleTimes_WillOnlyCallDelegateOnce()
         {
             // Arrange
             const int ExpectedNumberOfCalles = 1;

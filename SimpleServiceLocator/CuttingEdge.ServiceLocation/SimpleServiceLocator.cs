@@ -102,7 +102,7 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
 
-            this.registrations[typeof(T)] = new TransientInstanceProducer<T>(instanceCreator);
+            this.registrations[typeof(T)] = new FuncInstanceProducer<T>(instanceCreator);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace CuttingEdge.ServiceLocation
                 return instance;
             };
 
-            this.registrations[typeof(TConcrete)] = new TransientInstanceProducer<TConcrete>(instanceCreator);
+            this.registrations[typeof(TConcrete)] = new FuncInstanceProducer<TConcrete>(instanceCreator);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
 
-            IKeyedInstanceProducer locator = new KeyedFuncTransientInstanceProducer<T>(keyedInstanceCreator);
+            IKeyedInstanceProducer locator = new KeyedFuncInstanceProducer<T>(keyedInstanceCreator);
             this.keyedInstanceProducers[typeof(T)] = locator;
         }
 
@@ -211,7 +211,7 @@ namespace CuttingEdge.ServiceLocation
             KeyedInstanceProducer dictionary = 
                 this.GetRegistrationDictionaryFor<T>("RegisterByKey<T>(string, Func<T>)");
 
-            dictionary.Add(key, new TransientInstanceProducer<T>(instanceCreator));
+            dictionary.Add(key, new FuncInstanceProducer<T>(instanceCreator));
         }
 
         /// <summary>
@@ -512,6 +512,9 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">
         /// Thrown when there is an error resolving the service instances.
         /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "A design without a generic TService is not possible, because this method is " +
+            "overridden from the base class.")]
         public override IEnumerable<TService> GetAllInstances<TService>()
         {
             // This method is overridden to improve performance. The base method resolves collections in a
@@ -660,39 +663,24 @@ namespace CuttingEdge.ServiceLocation
             // Create a copy, because the reference may change during this method call.
             var snapshot = this.registrations;
 
-            object instance = Helpers.GetInstanceForTypeFromRegistrations(snapshot, serviceType);
+            IInstanceProducer instanceProducer;
+
+            if (snapshot.TryGetValue(serviceType, out instanceProducer))
+            {
+                return instanceProducer.GetInstance();
+            }
+
+            object instance = this.GetInstanceThroughUnregisteredTypeResolution(serviceType, snapshot);
 
             if (instance != null)
             {
                 return instance;
             }
 
-            try
-            {
-                return this.GetConcreteInstance(serviceType, snapshot);
-            }
-            catch
-            {
-                // Only do unregistered type resolution when creating a concrete type failed.
-                instance = this.GetInstanceThroughUnregisteredTypeResolution(serviceType, snapshot);
-
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                // When no resolution exists, we throw the original exception thrown by GetConcreteInstance.
-                throw;
-            }
+            return this.GetConcreteTypeInstance(serviceType, snapshot);
         }
 
-        // We're registering a service type after lock here and that means that the type is added to a copy of
-        // the registrations dictionary and the original replaced with a new one. This 'reference swapping' is
-        // thread-safe, but can result in types disappearing again from the registrations when multiple
-        // threads simultaneously add different types. This however, does not result in a consistency problem,
-        // because the missing type will be again added later. This type of swapping safes us from using locks.
-        private object GetConcreteInstance(Type serviceType,
-            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
+        private object GetConcreteTypeInstance(Type serviceType, Dictionary<Type, IInstanceProducer> snapshot)
         {
             if (!Helpers.IsConcreteType(serviceType))
             {
@@ -700,14 +688,13 @@ namespace CuttingEdge.ServiceLocation
                 throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
             }
 
-            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, registrationsSnapshot, this);
+            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, snapshot, this);
 
-            // Test the creator before 'poluting' the registrations dictionary with that delegate.
             object instance = instanceCreator();
 
-            IInstanceProducer instanceProducer = new TransientInstanceProducer<object>(instanceCreator);
+            IInstanceProducer instanceProducer = new FuncInstanceProducer<object>(instanceCreator);
 
-            this.RegisterDelegateForServiceType(instanceProducer, serviceType, registrationsSnapshot);
+            this.RegisterInstanceProcuder(instanceProducer, serviceType, snapshot);
 
             return instance;
         }
@@ -725,9 +712,9 @@ namespace CuttingEdge.ServiceLocation
 
                 instance = Helpers.GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
 
-                IInstanceProducer instanceProducer = new TransientInstanceProducer<object>(e.InstanceCreator);
+                IInstanceProducer instanceProducer = new FuncInstanceProducer<object>(e.InstanceCreator);
 
-                this.RegisterDelegateForServiceType(instanceProducer, serviceType, registrationsSnapshot);
+                this.RegisterInstanceProcuder(instanceProducer, serviceType, registrationsSnapshot);
 
                 return instance;
             }
@@ -749,15 +736,21 @@ namespace CuttingEdge.ServiceLocation
             handler(this, e);
         }
 
-        private void RegisterDelegateForServiceType(IInstanceProducer instanceProducer, Type serviceType,
-            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
+        // We're registering a service type after 'locking down' the container here and that means that the
+        // type is added to a copy of the registrations dictionary and the original replaced with a new one.
+        // This 'reference swapping' is thread-safe, but can result in types disappearing again from the 
+        // registrations when multiple threads simultaneously add different types. This however, does not
+        // result in a consistency problem, because the missing type will be again added later. This type of
+        // swapping safes us from using locks.
+        private void RegisterInstanceProcuder(IInstanceProducer instanceProducer, Type serviceType,
+            Dictionary<Type, IInstanceProducer> snapshot)
         {
-            var registrationsCopy = Helpers.MakeCopyOf(registrationsSnapshot);
+            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
 
-            registrationsCopy.Add(serviceType, instanceProducer);
+            snapshotCopy.Add(serviceType, instanceProducer);
 
             // Replace the original with the new version that includes the serviceType.
-            this.registrations = registrationsCopy;
+            this.registrations = snapshotCopy;
         }
 
         private object GetKeyedInstanceForType(Type serviceType, string key)
@@ -822,9 +815,10 @@ namespace CuttingEdge.ServiceLocation
         {
             foreach (var pair in this.registrations)
             {
+                Type serviceType = pair.Key;
                 IInstanceProducer instanceProducer = pair.Value;
 
-                instanceProducer.Validate();
+                instanceProducer.Validate(serviceType);
             }
         }
 
@@ -845,9 +839,8 @@ namespace CuttingEdge.ServiceLocation
                 Type serviceType = pair.Key;
                 IEnumerable collection = pair.Value;
 
-                Helpers.CheckIfCollectionCanBeIterated(collection, serviceType);
-
-                Helpers.CheckIfCollectionForNullElements(collection, serviceType);
+                Helpers.ValidateIfCollectionCanBeIterated(collection, serviceType);
+                Helpers.ValidateIfCollectionForNullElements(collection, serviceType);
             }
         }
 

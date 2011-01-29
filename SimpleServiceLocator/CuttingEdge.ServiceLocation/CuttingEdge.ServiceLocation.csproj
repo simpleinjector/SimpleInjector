@@ -58,10 +58,9 @@
     <Compile Include="FuncSingletonInstanceProducer.cs" />
     <Compile Include="IInstanceProducer.cs" />
     <Compile Include="IKeyedInstanceProducer.cs" />
-    <Compile Include="InstanceProducerExtensions.cs" />
-    <Compile Include="KeyedFuncTransientInstanceProducer.cs" />
+    <Compile Include="KeyedFuncInstanceProducer.cs" />
     <Compile Include="SingletonInstanceProducer.cs" />
-    <Compile Include="TransientInstanceProducer.cs" />
+    <Compile Include="FuncInstanceProducer.cs" />
     <Compile Include="KeyedInstanceProducer.cs" />
     <Compile Include="SimpleServiceLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

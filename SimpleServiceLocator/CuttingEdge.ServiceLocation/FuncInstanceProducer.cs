@@ -34,33 +34,40 @@ namespace CuttingEdge.ServiceLocation
     /// Allows producing instances based on a supplied Func{T} delegate.
     /// </summary>
     /// <typeparam name="T">Type service type.</typeparam>
-    internal sealed class TransientInstanceProducer<T> : IInstanceProducer
+    internal sealed class FuncInstanceProducer<T> : IInstanceProducer
     {
+        // The key of the producer if it is part of a IKeyedInstanceProducer, or null if not.
         private readonly Func<T> instanceCreator;
 
-        internal TransientInstanceProducer(Func<T> instanceCreator)
+        internal FuncInstanceProducer(Func<T> instanceCreator)
         {
             this.instanceCreator = instanceCreator;
         }
 
-        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
-        public Type ServiceType
-        {
-            get { return typeof(T); }
-        }
-
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance.</returns>
-        public object GetInstance()
+        object IInstanceProducer.GetInstance()
         {
-            var instance = this.instanceCreator();
+            object instance;
 
-            if (instance != null)
+            try
             {
-                return instance;
+                instance = this.instanceCreator();
+            }
+            catch (Exception ex)
+            {
+                // TODO: This catch might cost us some performance. Find out if it does.
+                throw new ActivationException(
+                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
             }
 
-            throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            if (instance == null)
+            {
+                throw new ActivationException(
+                    StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            }
+
+            return instance;
         }
     }
 }

@@ -38,29 +38,30 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     internal static class Helpers
     {
-        internal static bool IsConcreteType(Type type)
+        // Throws an InvalidOperationException on failure.
+        internal static void Validate(this IInstanceProducer instanceProducer, Type serviceType)
         {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
+            try
+            {
+                // Test the creator
+                // NOTE: We've got our first quirk in the design here: The returned object could implement
+                // IDisposable, but there is no way for us to know if we should actually dispose this 
+                // instance or not :-(. Disposing it could make us prevent a singleton from ever being
+                // used; not disposing it could make us leak resources :-(.
+                instanceProducer.GetInstance();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(serviceType, ex), ex);
+            }
         }
 
-        internal static object GetInstanceForTypeFromRegistrations(
-            Dictionary<Type, IInstanceProducer> registrations, Type serviceType)
+        internal static bool IsConcreteType(Type type)
         {
-            IInstanceProducer instanceProducer;
-
-            if (registrations.TryGetValue(serviceType, out instanceProducer))
-            {
-                object instance = instanceProducer.GetInstance();
-
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(serviceType));
-            }
-
-            return null;
+            // While array types are in fact concrete, we can not create them and creating them would be
+            // pretty useless.
+            return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
         }
 
         internal static object GetInstanceFromUnhandledTypeDelegate(Type serviceType,
@@ -94,12 +95,12 @@ namespace CuttingEdge.ServiceLocation
             return instance;
         }
 
-        internal static Dictionary<Type, IInstanceProducer> MakeCopyOf(Dictionary<Type, IInstanceProducer> source)
+        internal static Dictionary<TKey, TValue> MakeCopyOf<TKey, TValue>(Dictionary<TKey, TValue> source)
         {
             // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.
             int initialCapacity = source.Count + 1;
 
-            var copy = new Dictionary<Type, IInstanceProducer>(initialCapacity);
+            var copy = new Dictionary<TKey, TValue>(initialCapacity);
 
             foreach (var pair in source)
             {
@@ -118,7 +119,7 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        internal static void CheckIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
+        internal static void ValidateIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
         {
             try
             {
@@ -147,7 +148,7 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        internal static void CheckIfCollectionForNullElements(IEnumerable collection, Type serviceType)
+        internal static void ValidateIfCollectionForNullElements(IEnumerable collection, Type serviceType)
         {
             bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
 

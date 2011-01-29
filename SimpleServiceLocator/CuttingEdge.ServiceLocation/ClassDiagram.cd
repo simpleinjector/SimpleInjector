@@ -6,7 +6,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAEAAA=</HashCode>
+      <HashCode>AIEAAAAAAAAAAAAAAAAEAAAAAABAAAAAACAAAAAEAEA=</HashCode>
       <FileName>FuncSingletonInstanceProducer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -14,23 +14,15 @@
   <Class Name="CuttingEdge.ServiceLocation.KeyedFuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
     <Position X="9" Y="9.75" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAACCAAAACAAAAAAAAQBAAAgAAAAAAAAAAIA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAABBAAAgQAgABAAAAAAA=</HashCode>
       <FileName>KeyedFuncSingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.KeyedFuncTransientInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="2" Y="9.75" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAACAAAAACAAAAAAAAQAAAAgAAAAAAAAAAIA=</HashCode>
-      <FileName>KeyedFuncTransientInstanceProducer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.KeyedInstanceProducer" BaseTypeListCollapsed="true">
     <Position X="5.5" Y="9.75" Width="3" />
     <TypeIdentifier>
-      <HashCode>ABIAAAAAAACAAAAACAAAAAAAAQAAAAAAAAAAAAAACMA=</HashCode>
+      <HashCode>ABIAAAAAAAAAAAAACAAAAAAAAABAAAAQAgAAAAAACEA=</HashCode>
       <FileName>KeyedInstanceProducer.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -44,34 +36,12 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>gIAoIIAAAAGAYBUoAEEAAUAZAAABAgAYAwBAAAQBRAA=</HashCode>
+      <HashCode>gKAoIAAoAACAYDUoAEEAAUAQAAABAAAYAgBAACQBREE=</HashCode>
       <FileName>SimpleServiceLocator.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Field Name="keyedInstanceProducers" />
     </ShowAsCollectionAssociation>
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.SingletonInstanceProducer" BaseTypeListCollapsed="true">
-    <Position X="9" Y="14.25" Width="3" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABABAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>SingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.TransientInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="5.5" Y="14.25" Width="3" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAA=</HashCode>
-      <FileName>TransientInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.DelegateBuilder">
     <Position X="9.25" Y="2.75" Width="2.5" />
@@ -82,19 +52,43 @@
       <Field Name="serviceType" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>hEIEAAAAAAAEAAAAAAAAAAAAAAAAgAAAAAAAAAQACAA=</HashCode>
+      <HashCode>hEIEAAAAAAQEgAAAAAABAAAAAAAAgAAAAAAAAAQACAA=</HashCode>
       <FileName>DelegateBuilder.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.KeyedFuncInstanceProducer&lt;T&gt;">
+    <Position X="2" Y="9.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAABAAAgQAgAAAAAAAAA=</HashCode>
+      <FileName>KeyedFuncInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.FuncInstanceProducer&lt;T&gt;">
+    <Position X="5.5" Y="14.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAEAEA=</HashCode>
+      <FileName>FuncInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.SingletonInstanceProducer&lt;T&gt;">
+    <Position X="9" Y="14.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>SingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Interface Name="CuttingEdge.ServiceLocation.IInstanceProducer">
     <Position X="6" Y="12.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IInstanceProducer.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="CuttingEdge.ServiceLocation.IKeyedInstanceProducer">
-    <Position X="6" Y="7.5" Width="2" />
+    <Position X="6" Y="7.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAABQAAAAAAAAAAAAAAAIA=</HashCode>
       <FileName>IKeyedInstanceProducer.cs</FileName>

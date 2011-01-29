@@ -35,17 +35,29 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_MultipleDelegatesHookedUpToEvent_FailsWhenBothDelegatesRegisterSameServiceType()
         {
             // Arrange
+            string expectedMessage = "Multiple observers of the ResolveUnregisteredType event are " + 
+                "registering a delegate for the same service type";
+
             var container = new SimpleServiceLocator();
 
             container.ResolveUnregisteredType += (s, e) => e.Register(() => new Katana());
             container.ResolveUnregisteredType += (s, e) => e.Register(() => new Tanto());
 
-            // Act
-            container.GetInstance<IWeapon>();
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + expectedMessage);                
+            }
         }
 
         [TestMethod]
@@ -74,7 +86,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_WithConcreteType_ReturnsInstanceWithoutInvokingEvent()
+        public void GetInstance_WithConcreteType_InvokesEventsBeforeTryingToCreateTheConcreteType()
         {
             // Arrange
             bool eventCalled = false;
@@ -90,14 +102,17 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.GetInstance<Samurai>();
 
             // Assert
-            Assert.IsFalse(eventCalled, "The container should try to create concrete types before " +
-                "reverting to unregistered type resolution.");
+            Assert.IsTrue(eventCalled, "The container should first try unregistered type resolution before " +
+                "trying to create a concrete type.");
         }
 
         [TestMethod]
         public void GetInstance_UnregisteredConcreteTypeWithUnregistedDependencies_ThrowsExpectedException()
         {
             // Arrange
+            string expectedMessage = "No registration for type CuttingEdge.ServiceLocation." +
+                "Tests.Unit.Samurai could be found and an implicit registration could not be made.";
+
             // We don't register the required IWeapon dependency.
             var container = new SimpleServiceLocator();
 
@@ -112,10 +127,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             }
             catch (Exception ex)
             {
-                const string ExpectedMessage = "No registration for type CuttingEdge.ServiceLocation." +
-                    "Tests.Unit.Samurai could be found and an implicit registration could not be made.";
-
-                Assert.IsTrue(ex.Message.Contains(ExpectedMessage), "Expected message not found. Actual: " +
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Expected message not found. Actual: " +
                     ex.Message);
             }
         }
@@ -141,7 +153,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var actualInstance = container.GetInstance<Samurai>();
 
             // Assert
-            Assert.IsTrue(eventCalled, "The type is expected be be resolved by the registered delegate.");
+            Assert.IsTrue(eventCalled, "The type is expected be resolved by the registered delegate.");
             Assert.AreEqual(expectedInstance, actualInstance);
         }
 

@@ -43,32 +43,21 @@ namespace CuttingEdge.ServiceLocation
             this.instanceCreator = instanceCreator;
         }
 
-        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
-        public Type ServiceType
-        {
-            get { return typeof(T); }
-        }
-
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance.</returns>
-        public object GetInstance()
+        object IInstanceProducer.GetInstance()
         {
             // We use a lock to prevent the delegate to be called more than once during the lifetime of
             // the application. We use a double checked lock to prevent the lock statement from being 
             // called again after the instance was created.
             if (!this.instanceCreated)
             {
-                // We can take a lock on this, because this class is private.
+                // We can take a lock on this, because instances of this type are never publicly exposed.
                 lock (this)
                 {
                     if (!this.instanceCreated)
                     {
-                        this.instance = this.instanceCreator();
-
-                        if (this.instance == null)
-                        {
-                            throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
-                        }
+                        this.instance = this.GetInstanceFromCreator();
 
                         this.instanceCreated = true;
 
@@ -79,6 +68,28 @@ namespace CuttingEdge.ServiceLocation
             }
 
             return this.instance;
+        }
+
+        private T GetInstanceFromCreator()
+        {
+            T instance;
+
+            try
+            {
+                instance = this.instanceCreator();
+            }
+            catch (Exception ex)
+            {
+                throw new ActivationException(
+                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
+            }
+
+            if (instance == null)
+            {
+                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
+            }
+
+            return instance;
         }
     }
 }

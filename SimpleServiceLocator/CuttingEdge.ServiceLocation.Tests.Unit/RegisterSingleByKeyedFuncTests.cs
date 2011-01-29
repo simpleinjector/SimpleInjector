@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
     [TestClass]
-    public class RegisterSingleKeyedFuncTests
+    public class RegisterSingleByKeyedFuncTests
     {
         [TestMethod]
-        public void RegisterSingleKeyedFunc_RequestingAnInstance_ContainerReturnsInstanceSuccesfully()
+        public void RegisterSingleByKeyedFunc_RequestingAnInstance_ContainerReturnsInstanceSuccesfully()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -24,7 +24,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleKeyedFunc_RequestingMultipleInstances_ContainerAlwaysReturnsSameInstance()
+        public void RegisterSingleByKeyedFunc_RequestingMultipleInstances_ContainerAlwaysReturnsSameInstance()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -41,7 +41,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleKeyedFunc_RequestingMultipleInstances_ContainerCallDelegateOnlyOnce()
+        public void RegisterSingleByKeyedFunc_RequestingMultipleInstances_ContainerCallDelegateOnlyOnce()
         {
             // Arrange
             int expectedNumberOfCalls = 1;
@@ -65,7 +65,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleKeyedFunc_RequestingMultipleKeys_ContainerCallDelegateOnlyPerKey()
+        public void RegisterSingleByKeyedFunc_RequestingMultipleKeys_ContainerCallDelegateOnlyPerKey()
         {
             // Arrange
             int expectedNumberOfCalls = 2;
@@ -90,7 +90,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterSingleKeyedFunc_WithNullFunc_ThrowsException()
+        public void RegisterSingleByKeyedFunc_WithNullFunc_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -103,7 +103,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
-        public void RegisterSingleKeyedFunc_CalledTwiceOnSameTypeAndKey_ThrowsException()
+        public void RegisterSingleByKeyedFunc_CalledTwiceOnSameTypeAndKey_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -116,7 +116,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "A certain keyed type should only be able to be registered once.")]
-        public void RegisterSingleKeyedFunc_CalledAfterRegisterByKey_ThrowsException()
+        public void RegisterSingleByKeyedFunc_CalledAfterRegisterByKey_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -129,7 +129,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "The container should get locked after a call to GetInstance.")]
-        public void RegisterSingleKeyedFunc_AfterCallingGetInstance_ThrowsException()
+        public void RegisterSingleByKeyedFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -143,7 +143,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "The container should get locked after a call to GetAllInstances.")]
-        public void RegisterSingleKeyedFunc_AfterCallingGetAllInstances_ThrowsException()
+        public void RegisterSingleByKeyedFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -155,7 +155,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleKeyedFunc_TypeRegisteredUsingRegisterSingleInstance_Succeeds()
+        public void RegisterSingleByKeyedFunc_TypeRegisteredUsingRegisterSingleInstance_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -173,11 +173,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "Registration of Func<string, T> should fail after a (string, T) was registered.")]
-        public void RegisterSingleKeyedFunc_TypeRegisteredUsingRegisterSingleInstanceByKey_ThrowsException()
+        public void RegisterSingleByKeyedFunc_TypeRegisteredUsingRegisterSingleInstanceByKey_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            container.RegisterSingleByKey<IWeapon>("Katana", new Katana());
+            container.RegisterSingleByKey<IWeapon>("sword", new Katana());
 
             // Act
             // This is invalid behavior, because this would make the user's configuration hard to follow and
@@ -188,16 +188,43 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "Registration of Func<string, T> should fail after a (string, Func<T>) was registered.")]
-        public void RegisterSingleKeyedFunc_TypeRegisteredUsingRegisterSingleFuncByKey_ThrowsException()
+        public void RegisterSingleByKeyedFunc_TypeRegisteredUsingRegisterSingleFuncByKey_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            container.RegisterSingleByKey<IWeapon>("Katana", () => new Katana());
+            container.RegisterSingleByKey<IWeapon>("sword", () => new Katana());
 
             // Act
             // This is invalid behavior, because this would make the user's configuration hard to follow and
             // it won't be clear to the users which of these registrations should go before the other.
             container.RegisterSingleByKey<IWeapon>(key => new Tanto());
+        }
+
+        [TestMethod]
+        public void GetInstance_ContainerRegisteredWithThrowingDelegate_ThrowsExpectedExceptionMessage()
+        {
+            // Arrange
+            string expectedMessage = "The registered delegate for type " +
+                "CuttingEdge.ServiceLocation.Tests.Unit.IWeapon threw an exception.";
+
+            var container = new SimpleServiceLocator();
+
+            Func<string, IWeapon> invalidDelegate = key => { throw new NullReferenceException(); };
+
+            container.RegisterSingleByKey<IWeapon>(invalidDelegate);
+
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>("any key");
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
         }
     }
 }

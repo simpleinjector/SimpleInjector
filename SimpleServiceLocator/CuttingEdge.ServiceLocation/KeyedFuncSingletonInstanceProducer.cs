@@ -35,7 +35,7 @@ namespace CuttingEdge.ServiceLocation
     /// Caches instances by key as they get created by the supplied delegate.
     /// </summary>
     /// <typeparam name="T">The service type.</typeparam>
-    internal sealed class KeyedFuncSingletonInstanceProducer<T> : IKeyedInstanceProducer
+    internal sealed class KeyedFuncSingletonInstanceProducer<T> : IKeyedInstanceProducer where T : class
     {
         private readonly Func<string, T> keyedCreator;
 
@@ -53,33 +53,37 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>An produced instance.</returns>
         object IKeyedInstanceProducer.GetInstance(string key)
         {
-            // Create a copy to the reference.
-            var snapshot = this.instances;
-
             object instance;
 
-            if (!snapshot.TryGetValue(key, out instance))
+            // We use a lock to prevent the delegate to be called more than once per type during the lifetime
+            // of the application. We use a double checked lock to prevent the lock statement from being 
+            // called again after a keyed instance was created.
+            if (!this.instances.TryGetValue(key, out instance))
             {
-                instance = this.GetInternal(key);
-            }
-
-            if (instance == null)
-            {
-                throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+                // We can take a lock on this, because instances of this type are never publicly exposed.
+                lock (this)
+                {
+                    if (!this.instances.TryGetValue(key, out instance))
+                    {
+                        instance = this.GetInstanceInternal(key);
+                            
+                        this.CacheInstance(key, instance);
+                    }
+                }
             }
 
             return instance;
         }
 
         /// <summary>Does nothing.</summary>
-        public void Validate()
+        void IKeyedInstanceProducer.Validate()
         {
             // Validation is not possible, because there is no way to determine with what keyed the
-            // keyedCreator should be called. We assume the registration is value.
+            // keyedCreator should be called. We assume the registration is valid.
         }
 
         /// <summary>Throws an expressive exception.</summary>
-        public void ThrowTypeAlreadyRegisteredException()
+        void IKeyedInstanceProducer.ThrowTypeAlreadyRegisteredException()
         {
             throw new InvalidOperationException(
                 StringResources.TypeAlreadyRegisteredUsingRegisterSingleByKeyFuncStringT(typeof(T)));
@@ -87,41 +91,46 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>Throws an expressive exception.</summary>
         /// <param name="key">The key that is used for the registration.</param>
-        public void CheckIfKeyIsAlreadyRegistered(string key)
+        void IKeyedInstanceProducer.CheckIfKeyIsAlreadyRegistered(string key)
         {
-            // When this method is called, the type is registered using a Func<string, T>. Registring the
+            // When this method is called, the type is registered using a Func<string, T>. Registering the
             // same type using Func<string, T> and (string, Func<T>) is not allowed: We throw.
             throw new InvalidOperationException(
                 StringResources.ForKeyTypeAlreadyRegisteredUsingRegisterSingleByKeyFuncStringT(typeof(T)));
         }
 
-        private object GetInternal(string key)
+        private object GetInstanceInternal(string key)
         {
-            object instance;
+            object instance = null;
 
-            // We have to have a lock here, because we must guarantee that the keyedCreator is at most called
-            // once per key.
-            // We can lock on this, because instances of this type are never publicly exposed.
-            lock (this)
+            try
             {
-                // Check again, because the cache could have been replaced by now.
-                if (!this.instances.TryGetValue(key, out instance))
-                {
-                    instance = this.keyedCreator(key);
+                instance = this.keyedCreator(key);
+            }
+            catch (Exception ex)
+            {
+                throw new ActivationException(
+                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
+            }
 
-                    // Create a copy of the original instance cache.
-                    var copy = new Dictionary<string, object>(this.instances);
-
-                    // Add the new instance to the copy. We must do this even when instance == null, because
-                    // not adding would allow the keyedCreator to be called again with that same key.
-                    copy[key] = instance;
-
-                    // Replace the original instance cache with the copy.
-                    this.instances = copy;
-                }
+            if (instance == null)
+            {
+                throw new ActivationException(
+                    StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
             }
 
             return instance;
+        }
+
+        private void CacheInstance(string key, object instance)
+        {
+            // Create a copy of the original instance cache. We don't change the original for thread-safety.
+            var copy = Helpers.MakeCopyOf(this.instances);
+
+            copy.Add(key, instance);
+
+            // Replace the original instance cache with the copy.
+            this.instances = copy;
         }
     }
 }

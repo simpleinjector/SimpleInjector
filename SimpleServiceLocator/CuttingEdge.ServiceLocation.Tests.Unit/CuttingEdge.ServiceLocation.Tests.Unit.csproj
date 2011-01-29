@@ -56,11 +56,11 @@
     <Compile Include="RegisterByKeyedFuncTests.cs" />
     <Compile Include="RegisterFuncByKeyTests.cs" />
     <Compile Include="RegisterSingleByActionTests.cs" />
-    <Compile Include="RegisterSingleByDelegateTests.cs" />
+    <Compile Include="RegisterSingleByFuncTests.cs" />
     <Compile Include="RegisterSingleByInstanceTests.cs" />
     <Compile Include="RegisterSingleFuncByKeyTests.cs" />
     <Compile Include="RegisterSingleInstanceByKeyTests.cs" />
-    <Compile Include="RegisterSingleKeyedFuncTests.cs" />
+    <Compile Include="RegisterSingleByKeyedFuncTests.cs" />
     <Compile Include="FormattingTests.cs" />
     <Compile Include="RegisterSingleTests.cs" />
     <Compile Include="ResolveUnregisteredTypeEventTests.cs" />

@@ -25,7 +25,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var container = new SimpleServiceLocator();
 
             // Act
-            container.GetInstance<IWeapon>("Tanto");
+            container.GetInstance<IWeapon>("knife");
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.Register<IWeapon>(() => new Katana());
 
             // Act
-            container.GetInstance<ConcreteTypeWithConcreteTypeConstructorArgument>("Tanto");
+            container.GetInstance<ConcreteTypeWithConcreteTypeConstructorArgument>("knife");
         }
 
         [TestMethod]

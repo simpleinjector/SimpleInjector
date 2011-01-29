@@ -54,29 +54,42 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">Thrown when something went wrong.</exception>
         object IKeyedInstanceProducer.GetInstance(string key)
         {
-            IInstanceProducer instanceCreator = null;
+            IInstanceProducer instanceCreator;
 
-            if (this.instanceProducers.TryGetValue(key, out instanceCreator))
+            if (!this.instanceProducers.TryGetValue(key, out instanceCreator))
             {
-                return instanceCreator.GetInstance();
+                throw new ActivationException(StringResources.KeyForTypeNotFound(this.serviceType, key));
             }
 
-            throw new ActivationException(StringResources.KeyForTypeNotFound(this.serviceType, key));
+            return instanceCreator.GetInstance();
         }
 
         /// <summary>Validates the registered instance producers.</summary>
-        public void Validate()
+        void IKeyedInstanceProducer.Validate()
         {
             foreach (var pair in this.instanceProducers)
             {
                 IInstanceProducer instanceProducer = pair.Value;
 
-                instanceProducer.Validate();
+                try
+                {
+                    // Test the creator
+                    // NOTE: We've got our first quirk in the design here: The returned object could implement
+                    // IDisposable, but there is no way for us to know if we should actually dispose this 
+                    // instance or not :-(. Disposing it could make us prevent a singleton from ever being
+                    // used; not disposing it could make us leak resources :-(.
+                    instanceProducer.GetInstance();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.ConfigurationInvalidCreatingInstanceFailed(this.serviceType, ex));
+                }
             }
         }
 
         /// <summary>Throws an expressive exception.</summary>
-        public void ThrowTypeAlreadyRegisteredException()
+        void IKeyedInstanceProducer.ThrowTypeAlreadyRegisteredException()
         {
             throw new InvalidOperationException(
                 StringResources.TypeAlreadyRegisteredUsingByKeyString(this.serviceType,
@@ -85,7 +98,7 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>Throws an expressive exception in case the key has already been registered.</summary>
         /// <param name="key">The key that is used for the registration.</param>
-        public void CheckIfKeyIsAlreadyRegistered(string key)
+        void IKeyedInstanceProducer.CheckIfKeyIsAlreadyRegistered(string key)
         {
             if (this.instanceProducers.ContainsKey(key))
             {

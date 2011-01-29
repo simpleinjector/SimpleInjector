@@ -63,6 +63,9 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\FuncInstanceProducer.cs">
+      <Link>FuncInstanceProducer.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\FuncSingletonInstanceProducer.cs">
       <Link>FuncSingletonInstanceProducer.cs</Link>
     </Compile>
@@ -75,14 +78,11 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\IKeyedInstanceProducer.cs">
       <Link>IKeyedInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\InstanceProducerExtensions.cs">
-      <Link>InstanceProducerExtensions.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncInstanceProducer.cs">
+      <Link>KeyedFuncInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncSingletonInstanceProducer.cs">
       <Link>KeyedFuncSingletonInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\KeyedFuncTransientInstanceProducer.cs">
-      <Link>KeyedFuncTransientInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedInstanceProducer.cs">
       <Link>KeyedInstanceProducer.cs</Link>
@@ -95,9 +95,6 @@
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\StringResources.cs">
       <Link>StringResources.cs</Link>
-    </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\TransientInstanceProducer.cs">
-      <Link>TransientInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>

@@ -165,10 +165,10 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // This is valid behavior, because this allows the user to register a default (key-less) instance
             // and multiple keyed instances.
-            container.RegisterSingleByKey<IWeapon>("Tanto", () => new Tanto());
+            container.RegisterSingleByKey<IWeapon>("knife", () => new Tanto());
 
             // Assert
-            Assert.IsNotNull(container.GetInstance<IWeapon>("Tanto"));
+            Assert.IsNotNull(container.GetInstance<IWeapon>("knife"));
         }
 
         [TestMethod]
@@ -176,16 +176,16 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            container.RegisterSingleByKey<IWeapon>("Katana", new Katana());
+            container.RegisterSingleByKey<IWeapon>("sword", new Katana());
 
             // Act
             // This is valid behavior, because this allows the user to register keyed instance of the same
             // type in multiple ways.
-            container.RegisterSingleByKey<IWeapon>("Tanto", () => new Tanto());
+            container.RegisterSingleByKey<IWeapon>("knife", () => new Tanto());
 
             // Assert
-            Assert.IsNotNull(container.GetInstance<IWeapon>("Katana"));
-            Assert.IsNotNull(container.GetInstance<IWeapon>("Tanto"));
+            Assert.IsNotNull(container.GetInstance<IWeapon>("sword"));
+            Assert.IsNotNull(container.GetInstance<IWeapon>("knife"));
         }
 
         [TestMethod]
@@ -200,7 +200,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // This is invalid behavior, because this would make the user's configuration hard to follow and
             // it won't be clear to the users which of these registrations should go before the other.
-            container.RegisterSingleByKey<IWeapon>("Katana", () => new Katana());
+            container.RegisterSingleByKey<IWeapon>("sword", () => new Katana());
         }
         
         [TestMethod]
@@ -209,10 +209,39 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            container.RegisterSingleByKey<IWeapon>("Tanto", new Tanto());
+            container.RegisterSingleByKey<IWeapon>("knife", new Tanto());
 
             // Act
-            container.GetInstance<IWeapon>("Katana");
+            container.GetInstance<IWeapon>("sword");
+        }
+
+        [TestMethod]
+        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByKey_ThrowsExpectedMessage()
+        {
+            // Arrange
+            string someKey = "any key";
+
+            string expectedMessage = "The registered delegate for type " + 
+                "CuttingEdge.ServiceLocation.Tests.Unit.IWeapon threw an exception.";
+            
+            var container = new SimpleServiceLocator();
+
+            Func<IWeapon> invalidDelegate = () => { throw new NullReferenceException(); };
+
+            container.RegisterSingleByKey<IWeapon>(someKey, invalidDelegate);
+
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>(someKey);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
         }
     }
 }

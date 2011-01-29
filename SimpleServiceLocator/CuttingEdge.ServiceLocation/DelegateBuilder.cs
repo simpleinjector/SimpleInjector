@@ -44,10 +44,10 @@ namespace CuttingEdge.ServiceLocation
     internal sealed class DelegateBuilder
     {
         private static readonly MethodInfo GenericGetInstanceMethodDefinition =
-            typeof(IServiceLocator).GetMethod("GetInstance", Type.EmptyTypes);
+            typeof(SimpleServiceLocator).GetMethod("GetInstance", Type.EmptyTypes);
 
         private static readonly MethodInfo GenericGetAllInstancesMethodDefinition =
-            typeof(IServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
+            typeof(SimpleServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
 
         private readonly Type serviceType;
         private readonly Dictionary<Type, IInstanceProducer> registrations;
@@ -61,12 +61,6 @@ namespace CuttingEdge.ServiceLocation
             this.container = container;
         }
 
-        internal static Func<object> Build(Type serviceType, SimpleServiceLocator serviceLocator)
-        {
-            var builder = new DelegateBuilder(serviceType, null, serviceLocator);
-            return builder.Build();
-        }
-
         internal static Func<TConcrete> Build<TConcrete>(SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(typeof(TConcrete), null, serviceLocator);
@@ -77,12 +71,7 @@ namespace CuttingEdge.ServiceLocation
             SimpleServiceLocator serviceLocator)
         {
             var builder = new DelegateBuilder(serviceType, registrations, serviceLocator);
-            return builder.Build();
-        }
-
-        private Func<object> Build()
-        {
-            return this.Build<object>();
+            return builder.Build<object>();
         }
 
         private Func<TConcrete> Build<TConcrete>()
@@ -171,7 +160,7 @@ namespace CuttingEdge.ServiceLocation
             if (Helpers.IsConcreteType(parameterType))
             {
                 // The type to construct is not registered, but is a concrete type. Concrete types can be
-                // created. We pospone validation untill the moment that the delegate for this concrete type
+                // created. We postpone validation until the moment that the delegate for this concrete type
                 // is generated.
                 return;
             }

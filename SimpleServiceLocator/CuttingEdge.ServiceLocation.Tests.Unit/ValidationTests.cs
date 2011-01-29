@@ -137,7 +137,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterSingleByKey<IWeapon>("katana", () =>
+            container.RegisterSingleByKey<IWeapon>("sword", () =>
             {
                 throw new NullReferenceException();
             });
@@ -183,7 +183,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterByKey<IWeapon>("katana", () => null);
+            container.RegisterByKey<IWeapon>("sword", () => null);
 
             // Act
             container.Validate();
@@ -195,7 +195,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterByKey<IWeapon>("katana", () => new Katana());
+            container.RegisterByKey<IWeapon>("sword", () => new Katana());
 
             // Act
             container.Validate();

@@ -34,22 +34,22 @@ namespace CuttingEdge.ServiceLocation
     /// <typeparam name="T">The type, what else.</typeparam>
     internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
+        // Storing a key is not needed, because the Validate method will never throw.
         private readonly T instance;
 
         internal SingletonInstanceProducer(T instance)
         {
-            this.instance = instance;
-        }
+            if (instance == null)
+            {
+                throw new ArgumentNullException("instance");
+            }
 
-        /// <summary>Gets the <see cref="Type"/> represented by this instance producer.</summary>
-        public Type ServiceType
-        {
-            get { return typeof(T); }
+            this.instance = instance;
         }
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
-        public object GetInstance()
+        object IInstanceProducer.GetInstance()
         {
             return this.instance;
         }

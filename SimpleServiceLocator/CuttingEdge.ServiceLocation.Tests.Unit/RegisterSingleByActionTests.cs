@@ -148,7 +148,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterByKey<Samurai>("sammy_the_samurai", () => new Samurai(null));
+            container.RegisterByKey<Samurai>("Sammy the Samurai", () => new Samurai(null));
 
             // Act
             container.RegisterSingle<Samurai>(_ => { });
@@ -172,7 +172,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterSingleByKey<Samurai>("sammy", new Samurai(null));
+            container.RegisterSingleByKey<Samurai>("Sammy the Samurai", new Samurai(null));
 
             // Act
             container.RegisterSingle<Samurai>(_ => { });
@@ -184,7 +184,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterSingleByKey<Samurai>("sammy", () => new Samurai(null));
+            container.RegisterSingleByKey<Samurai>("Sammy the Samurai", () => new Samurai(null));
 
             // Act
             container.RegisterSingle<Samurai>(_ => { });

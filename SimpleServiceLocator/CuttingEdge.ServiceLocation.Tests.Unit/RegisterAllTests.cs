@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
@@ -18,7 +19,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterAll<IPlugin>(new PluginImpl(), new PluginImpl(), new PluginImpl());
             
             // Act
-            // PluginManager has a ctor with an IEnumerable<IPlugin> argument.
+            // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
             var manager = container.GetInstance<PluginManager>();
 
             // Assert
@@ -37,7 +38,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterSingle<IEnumerable<IPlugin>>(plugins);
 
             // Act
-            // PluginManager has a ctor with an IEnumerable<IPlugin> argument.
+            // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
             var manager = container.GetInstance<PluginManager>();
 
             // Assert
@@ -51,7 +52,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var container = new SimpleServiceLocator();
 
             // Act
-            // PluginManager has a ctor with an IEnumerable<IPlugin> argument.
+            // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
             // We expect this call to succeed, even while no IPlugin implementations are registered.
             var manager = container.GetInstance<PluginManager>();
 
@@ -207,6 +208,63 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.RegisterAll<IWeapon>(weapons);
+        }
+
+        [TestMethod]
+        public void GetAllInstancesNonGeneric_WithoutAnRegistration_ReturnsAnEmptyCollection()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Act
+            var weapons = container.GetAllInstances(typeof(IWeapon));
+
+            // Asserty
+            Assert.AreEqual(0, weapons.Count());
+        }
+
+        [TestMethod]
+        public void GetAllInstancesNonGeneric_WithValidRegistration_ReturnsCollectionWithExpectedElements()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterAll<IWeapon>(new Tanto(), new Katana());
+
+            // Act
+            var weapons = container.GetAllInstances(typeof(IWeapon)).ToArray();
+
+            // Asserty
+            Assert.AreEqual(2, weapons.Length);
+            Assert.IsInstanceOfType(weapons[0], typeof(Tanto));
+            Assert.IsInstanceOfType(weapons[1], typeof(Katana));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_InvalidDelegateRegistered_ThrowsExceptionWithExpectedMessage()
+        {
+            // Arrange
+            string expectedMessage = 
+                "Activation error occurred while trying to get all instances of type IWeapon.";
+
+            var container = new SimpleServiceLocator();
+
+            Func<IEnumerable<IWeapon>> invalidDelegate = () => null;
+
+            container.Register<IEnumerable<IWeapon>>(invalidDelegate);
+
+            try
+            {
+                // Act
+                container.GetAllInstances<IWeapon>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);                
+            }
         }
     }
 }

@@ -34,8 +34,8 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            // Note that the key is not used: a new Tanto will be returned on every call.
-            container.RegisterSingleByKey<IWeapon>("Tanto", new Tanto());
+            // Note that the key is not used: a new knife will be returned on every call.
+            container.RegisterSingleByKey<IWeapon>("knife", new Tanto());
             container.Register<IWeapon>(() => new Katana());
 
             // Act
@@ -91,8 +91,8 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             var container = new SimpleServiceLocator();
             var weapons = container.GetAllInstances<IWeapon>();
 
-            // Only during iterating the collection, will the underlying container be called. This is a CSL
-            // thing.
+            // Only during iterating the collection, will the underlying container be called. This is a
+            // Common Service Locator thing.
             var count = weapons.Count();
 
             // Act
@@ -109,7 +109,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             {
                 switch (key)
                 {
-                    case "Tanto":
+                    case "knife":
                         return new Tanto();
                     default:
                         // When name unknown, return null.
@@ -118,7 +118,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             });
 
             // Act
-            container.GetInstance<IWeapon>("Katana");
+            container.GetInstance<IWeapon>("sword");
         }
 
         [TestMethod]

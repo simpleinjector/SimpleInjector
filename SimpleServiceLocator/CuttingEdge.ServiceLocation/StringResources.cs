@@ -57,6 +57,13 @@ namespace CuttingEdge.ServiceLocation
                 "The registered delegate for type {0} returned null.", serviceType.FullName);
         }
 
+        internal static string DelegateForTypeThrewAnException(Type serviceType, Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The registered delegate for type {0} threw an exception. {1}",
+                serviceType.FullName, exception.Message);
+        }
+
         internal static string NoRegistrationForTypeFound(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -68,14 +75,6 @@ namespace CuttingEdge.ServiceLocation
             return string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. Creating the instance for type {0} failed. {1}",
                 type, exception.Message);
-        }
-
-        internal static string ConfigurationInvalidCreatingKeyedInstanceFailed(Type type, string key,
-            Exception exception)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The configuration is invalid. Creating the instance for type {0} with key '{1}' failed. {2}",
-                type, key, exception.Message);
         }
 
         internal static string ConfigurationInvalidIteratingCollectionFailed(Type type, Exception exception)
@@ -212,7 +211,7 @@ namespace CuttingEdge.ServiceLocation
         internal static string HandlerReturnedADelegateThatReturnedNull(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The delegate that that was hooked to the ResolveUnregisteredType event and responded " +
+                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
                 "to the {0} service type, registered a delegate that returned a null reference.", serviceType);
         }
 
@@ -220,7 +219,7 @@ namespace CuttingEdge.ServiceLocation
             Type actualType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The delegate that that was hooked to the ResolveUnregisteredType event and responded " +
+                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
                 "to the {0} service type, registered a delegate that created an instance of type {1} that " +
                 "can not be casted to the specified service type.", serviceType, actualType);
         }

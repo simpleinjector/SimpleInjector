@@ -36,32 +36,6 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterByKeyedFunc_WithNullString_ThrowsException()
-        {
-            // Arrange
-            var container = new SimpleServiceLocator();
-            string invalidKey = null;
-            Func<IWeapon> validInstanceCreator = () => new Katana();
-
-            // Act
-            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void RegisterByKeyedFunc_WithEmptyString_ThrowsException()
-        {
-            // Arrange
-            var container = new SimpleServiceLocator();
-            var invalidKey = string.Empty;
-            Func<IWeapon> validInstanceCreator = () => new Katana();
-
-            // Act
-            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once by key.")]
         public void RegisterByKeyedFunc_CalledTwiceOnSameType_ThrowsException()
         {
@@ -123,6 +97,33 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             var instance = container.GetInstance<IWeapon>(null);
+        }
+
+        [TestMethod]
+        public void GetInstance_ContainerRegisteredWithThrowingDelegate_ThrowsExpectedExceptionMessage()
+        {
+            // Arrange
+            string expectedMessage = "The registered delegate for type " +
+                "CuttingEdge.ServiceLocation.Tests.Unit.IWeapon threw an exception.";
+
+            var container = new SimpleServiceLocator();
+
+            Func<string, IWeapon> invalidDelegate = key => { throw new NullReferenceException(); };
+
+            container.RegisterByKey<IWeapon>(invalidDelegate);
+
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>("any key");
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
         }
     }
 }

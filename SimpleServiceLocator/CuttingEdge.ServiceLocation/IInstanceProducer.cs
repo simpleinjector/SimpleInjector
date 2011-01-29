@@ -33,11 +33,11 @@ namespace CuttingEdge.ServiceLocation
     /// <summary>Contract for types the produce instances.</summary>
     internal interface IInstanceProducer
     {
-        Type ServiceType { get; }
-
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved.</exception>
+        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         object GetInstance();
+
+        // void Validate();
     }
 }

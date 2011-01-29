@@ -13,7 +13,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            string validKey = "katana";
+            string validKey = "sword";
             Func<IWeapon> validInstanceCreator = () => new Katana();
 
             // Act
@@ -34,12 +34,25 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisterFuncByKey_WithEmptyKey_ThrowsException()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            string invalidKey = string.Empty;
+            Func<IWeapon> validInstanceCreator = () => new Katana();
+
+            // Act
+            container.RegisterByKey<IWeapon>(invalidKey, validInstanceCreator);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterFuncByKey_WithNullFunc_ThrowException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
-            string validKey = "katana";
+            string validKey = "sword";
             Func<IWeapon> invalidInstanceCreator = null;
 
             // Act
@@ -60,11 +73,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 return new Katana();
             };
 
-            container.RegisterByKey<IWeapon>("katana", instanceCreator);
+            container.RegisterByKey<IWeapon>("sword", instanceCreator);
 
             // Act
-            container.GetInstance<IWeapon>("katana");
-            container.GetInstance<IWeapon>("katana");
+            container.GetInstance<IWeapon>("sword");
+            container.GetInstance<IWeapon>("sword");
 
             // Assert
             Assert.AreEqual(ExpectedNumberOfCalls, actualNumberOfCalls,
@@ -78,11 +91,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.RegisterByKey<IWeapon>("katana", () => new Katana());
+            container.RegisterByKey<IWeapon>("sword", () => new Katana());
 
             // Act
             // This call is expected to fail.
-            container.GetInstance<IWeapon>("tanto");
+            container.GetInstance<IWeapon>("knife");
         }
 
         [TestMethod]
@@ -96,11 +109,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // Registration of keyed instance of a specific service type can be mixed with a key-less 
             // registrations.
-            container.RegisterByKey<IWeapon>("tanto", () => new Tanto());
+            container.RegisterByKey<IWeapon>("knife", () => new Tanto());
 
             // Assert
             Assert.IsInstanceOfType(container.GetInstance<IWeapon>(), typeof(Katana));
-            Assert.IsInstanceOfType(container.GetInstance<IWeapon>("tanto"), typeof(Tanto));
+            Assert.IsInstanceOfType(container.GetInstance<IWeapon>("knife"), typeof(Tanto));
         }
 
         [TestMethod]
@@ -116,7 +129,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // This call is expected to fail, because allowing this behavior would make the API less
             // transparent. These methods are mutually exclusive.
-            container.RegisterByKey<IWeapon>("tanto", () => new Tanto());
+            container.RegisterByKey<IWeapon>("knife", () => new Tanto());
         }
     }
 }

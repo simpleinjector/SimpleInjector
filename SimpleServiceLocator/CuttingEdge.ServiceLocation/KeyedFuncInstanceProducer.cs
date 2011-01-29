@@ -35,11 +35,11 @@ namespace CuttingEdge.ServiceLocation
     /// Locates instances based on the supplied <see cref="Func{T, TResult}"/> delegate.
     /// </summary>
     /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
-    internal sealed class KeyedFuncTransientInstanceProducer<T> : IKeyedInstanceProducer
+    internal sealed class KeyedFuncInstanceProducer<T> : IKeyedInstanceProducer
     {
         private readonly Func<string, T> keyedCreator;
 
-        internal KeyedFuncTransientInstanceProducer(Func<string, T> keyedCreator)
+        internal KeyedFuncInstanceProducer(Func<string, T> keyedCreator)
         {
             this.keyedCreator = keyedCreator;
         }
@@ -50,25 +50,36 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">Thrown when something went wrong.</exception>
         object IKeyedInstanceProducer.GetInstance(string key)
         {
-            object instance = this.keyedCreator(key);
+            object instance;
 
-            if (instance != null)
+            try
             {
-                return instance;
+                instance = this.keyedCreator(key);
+            }
+            catch (Exception ex)
+            {
+                throw new ActivationException(
+                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
             }
 
-            throw new ActivationException(StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            if (instance == null)
+            {
+                throw new ActivationException(
+                    StringResources.RegisteredDelegateForTypeReturnedNull(typeof(T)));
+            }
+
+            return instance;            
         }
 
         /// <summary>Does nothing.</summary>
-        public void Validate()
+        void IKeyedInstanceProducer.Validate()
         {
             // Validation is not possible, because there is no way to determine with what keyed the
-            // keyedCreator should be called. We assume the registration is value.
+            // keyedCreator should be called. We assume the registration is valid.
         }
 
         /// <summary>Throws an expressive exception.</summary>
-        public void ThrowTypeAlreadyRegisteredException()
+        void IKeyedInstanceProducer.ThrowTypeAlreadyRegisteredException()
         {
             throw new InvalidOperationException(
                 StringResources.TypeAlreadyRegisteredUsingRegisterByKeyFuncStringT(typeof(T)));
@@ -76,9 +87,9 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>Throws an expressive exception.</summary>
         /// <param name="key">The key to register the type with.</param>
-        public void CheckIfKeyIsAlreadyRegistered(string key)
+        void IKeyedInstanceProducer.CheckIfKeyIsAlreadyRegistered(string key)
         {
-            // When this method is called, the type is registered using a Func<string, T>. Registring the
+            // When this method is called, the type is registered using a Func<string, T>. Registering the
             // same type using Func<string, T> and (string, Func<T>) is not allowed: We throw.
             throw new InvalidOperationException(
                 StringResources.ForKeyTypeAlreadyRegisteredUsingRegisterByKeyFuncStringT(typeof(T)));

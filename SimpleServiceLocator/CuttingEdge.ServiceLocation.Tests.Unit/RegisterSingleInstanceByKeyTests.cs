@@ -135,7 +135,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // This is valid behavior, because this allows the user to register a default (key-less) instance
             // and multiple keyed instances.
-            container.RegisterSingleByKey<IWeapon>("Tanto", new Tanto());
+            container.RegisterSingleByKey<IWeapon>("knife", new Tanto());
         }
 
         [TestMethod]
