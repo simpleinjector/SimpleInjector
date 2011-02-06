@@ -145,5 +145,19 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             container.GetInstance<IWeapon>();
         }
+
+        [TestMethod]
+        public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegister_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // This registration will make the DelegateBuilder call the 
+            // SingletonInstanceProducer.BuildExpression method.
+            container.Register<IWeapon>(() => new Katana());
+
+            // Act
+            container.GetInstance<Samurai>();
+        }
     }
 }

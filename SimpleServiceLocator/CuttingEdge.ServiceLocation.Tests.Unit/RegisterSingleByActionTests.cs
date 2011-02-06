@@ -62,17 +62,32 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingleByAction_WithAbstractType_ThrowsException()
         {
             // Arrange
+            string expectedParameterName = "TConcrete";
+            string expectedMessage = "IWeapon is not a concrete type.";
+
             var container = new SimpleServiceLocator();
 
             Action<IWeapon> validInstanceInitializer = _ => { };
 
-            // Act
-            // IWeapon is not an concrete type.
-            container.RegisterSingle<IWeapon>(validInstanceInitializer);
+            try
+            {
+                // Act
+                container.RegisterSingle<IWeapon>(validInstanceInitializer);
+
+                // Assert
+                Assert.Fail("The registration was expected to fail, because IWeapon is not a concrete type.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No sub type should be thrown.");
+
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+
+                Assert.AreEqual(expectedParameterName, ex.ParamName);
+            }
         }
 
         [TestMethod]
@@ -212,6 +227,24 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.RegisterSingle<Samurai>(_ => { });
+        }
+
+        [TestMethod]
+        public void RegisterSingleByAction_WithIncompleteSingletonRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Samurai is dependant on IWeapon.
+            container.RegisterSingle<Warrior>(() => container.GetInstance<Samurai>());
+
+            // Act
+            // Kingdom is dependant on Warrior. Registration should succeed even though IWeapon is not 
+            // registered yet.
+            container.RegisterSingle<Kingdom>(k =>
+            {
+                k.Karma = 5;
+            });
         }
     }
 }

@@ -66,6 +66,15 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
     }
 
+    public class Kingdom
+    {
+        public Kingdom(Warrior warrior)
+        {
+        }
+
+        public int Karma { get; set; }
+    }
+
     public class ConcreteTypeWithConcreteTypeConstructorArgument
     {
         public ConcreteTypeWithConcreteTypeConstructorArgument(Samurai samurai)
@@ -103,5 +112,19 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         public IPlugin[] Plugins { get; private set; }
+    }
+
+    public class ConcreteTypeWithValueTypeConstructorArgument
+    {
+        public ConcreteTypeWithValueTypeConstructorArgument(int intParam)
+        {
+        }
+    }
+
+    public class ConcreteTypeWithStringConstructorArgument
+    {
+        public ConcreteTypeWithStringConstructorArgument(string stringParam)
+        {
+        }
     }
 }

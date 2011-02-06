@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using CuttingEdge.ServiceLocation;
-
-namespace CuttingEdge.ServiceLocator.Extensions
+﻿namespace CuttingEdge.ServiceLocator.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+
+    using CuttingEdge.ServiceLocation;
+
     public static class SslOpenGenericRegistrationExtensions
     {
         public static void RegisterOpenGeneric(this SimpleServiceLocator container,

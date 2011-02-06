@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using System.Linq.Expressions;
 
 using Microsoft.Practices.ServiceLocation;
 
@@ -70,6 +71,13 @@ namespace CuttingEdge.ServiceLocation
             return this.instance;
         }
 
+        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
+        /// <returns>An Expression.</returns>
+        Expression IInstanceProducer.BuildExpression()
+        {
+            return Expression.Constant(((IInstanceProducer)this).GetInstance());
+        }
+
         private T GetInstanceFromCreator()
         {
             T instance;
@@ -77,6 +85,10 @@ namespace CuttingEdge.ServiceLocation
             try
             {
                 instance = this.instanceCreator();
+            }
+            catch (ActivationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

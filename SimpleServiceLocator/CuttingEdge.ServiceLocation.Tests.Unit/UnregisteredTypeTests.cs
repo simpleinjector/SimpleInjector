@@ -1,4 +1,6 @@
-﻿using Microsoft.Practices.ServiceLocation;
+﻿using System;
+
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
@@ -108,7 +110,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
                     "The exception message should contain the name of the type. Actual message: " + message);
 
-                Assert.IsTrue(message.Contains("type should contain exactly one public constructor"),
+                Assert.IsTrue(message.Contains("should contain exactly one public constructor, but it has 2."),
                     "The exception message should describe the actual problem. Actual message: " + message);
             }
         }
@@ -186,6 +188,76 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // Samurai contains an constructor argument of IWeapon
             var samurai = container.GetInstance<Samurai>();
+        }
+
+        [TestMethod]
+        public void GetInstance_OnConcreteTypeWithValueTypeConstructorArgument_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = typeof(ConcreteTypeWithValueTypeConstructorArgument).Name + " contains" +
+                " parameter 'intParam' of type System.Int32 which can not be used for constructor injection.";
+
+            var container = new SimpleServiceLocator();
+
+            try
+            {
+                // Act
+                // This type contains constructor with parameter "int intParam".
+                container.GetInstance<ConcreteTypeWithValueTypeConstructorArgument>();
+
+                // Assert
+                Assert.Fail("The call was expected to fail.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_OnConcreteTypeWithStringConstructorArgument_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = typeof(ConcreteTypeWithStringConstructorArgument).Name + " contains pa" +
+                "rameter 'stringParam' of type System.String which can not be used for constructor injection.";
+
+            var container = new SimpleServiceLocator();
+
+            try
+            {
+                // Act
+                container.GetInstance<ConcreteTypeWithStringConstructorArgument>();
+
+                // Assert
+                Assert.Fail("The call was expected to fail.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_WithErrorInNestedDependency_ThrowsExceptionThatContainsAllTypes()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.Register<IWeapon>(() => { throw new InvalidOperationException("Bla."); });
+
+            try
+            {
+                // Act
+                container.GetInstance<Samurai>();
+
+                Assert.Fail("This call is expected to fail, because Samurai has a dependency on IWeapon.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("Samurai"), "Message should contain 'Samurai': " + ex.Message);
+                Assert.IsTrue(ex.Message.Contains("IWeapon"), "Message should contain 'IWeapon': " + ex.Message);
+                Assert.IsTrue(ex.Message.Contains("Bla"), "Message should contain 'Bla': " + ex.Message);
+            }            
         }
     }
 }

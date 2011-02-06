@@ -24,13 +24,13 @@
 */
 #endregion
 
-using System;
+using System.Linq.Expressions;
 
 using Microsoft.Practices.ServiceLocation;
 
 namespace CuttingEdge.ServiceLocation
 {
-    /// <summary>Contract for types the produce instances.</summary>
+    /// <summary>Contract for types that produce instances.</summary>
     internal interface IInstanceProducer
     {
         /// <summary>Produces an instance.</summary>
@@ -38,6 +38,8 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         object GetInstance();
 
-        // void Validate();
+        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
+        /// <returns>An Expression.</returns>
+        Expression BuildExpression();
     }
 }

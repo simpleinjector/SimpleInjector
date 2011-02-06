@@ -81,6 +81,11 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
+        internal Dictionary<Type, IInstanceProducer> Registrations
+        {
+            get { return this.registrations; }
+        }
+
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
         /// </summary>
@@ -122,7 +127,7 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         public void Register<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
-            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             if (instanceInitializer == null)
             {
@@ -133,19 +138,9 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            // Create a delegate that always returns this particular instance.
-            Func<TConcrete> constructorInvoker = DelegateBuilder.Build<TConcrete>(this);
+            var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
 
-            Func<TConcrete> instanceCreator = () =>
-            {
-                TConcrete instance = constructorInvoker();
-
-                instanceInitializer(instance);
-
-                return instance;
-            };
-
-            this.registrations[typeof(TConcrete)] = new FuncInstanceProducer<TConcrete>(instanceCreator);
+            this.registrations[typeof(TConcrete)] = instanceProducer;
         }
 
         /// <summary>
@@ -229,17 +224,17 @@ namespace CuttingEdge.ServiceLocation
             "overloads also take a generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
-            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             this.ThrowWhenContainerIsLocked();
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            Func<TConcrete> instanceCreator = DelegateBuilder.Build<TConcrete>(this);
+            var instanceProducer = new TransientInstanceProducer<TConcrete>(this);
 
-            var producer = new FuncSingletonInstanceProducer<TConcrete>(instanceCreator);
+            var singletonProducer = new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);
 
-            this.registrations[typeof(TConcrete)] = producer;
+            this.registrations[typeof(TConcrete)] = singletonProducer;
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -310,7 +305,7 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         public void RegisterSingle<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
-            Helpers.ThrowWhenTypeIsAbstract(typeof(TConcrete));
+            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             if (instanceInitializer == null)
             {
@@ -321,18 +316,9 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            Func<TConcrete> constructorInvoker = DelegateBuilder.Build<TConcrete>(this);
+            var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
 
-            Func<TConcrete> instanceCreator = () =>
-            {
-                TConcrete instance = constructorInvoker();
-
-                instanceInitializer(instance);
-
-                return instance;
-            };
-
-            this.RegisterSingle<TConcrete>(instanceCreator);
+            this.RegisterSingle<TConcrete>(instanceProducer.GetInstance);
         }
 
         /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
@@ -542,6 +528,24 @@ namespace CuttingEdge.ServiceLocation
             return e.Handled;
         }
 
+        internal IInstanceProducer GetInstanceProducerForType(Type serviceType,
+            Dictionary<Type, IInstanceProducer> snapshot)
+        {
+            IInstanceProducer instanceProducer;
+
+            if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
+            {
+                instanceProducer = this.BuildInstanceProducerForType(serviceType);
+
+                if (instanceProducer != null)
+                {
+                    this.RegisterInstanceProducer(instanceProducer, serviceType, snapshot);
+                }
+            }
+
+            return instanceProducer;
+        }
+
         /// <summary>
         /// When implemented by inheriting classes, this method will do the actual work of resolving
         /// the requested service instance.
@@ -663,44 +667,32 @@ namespace CuttingEdge.ServiceLocation
             // Create a copy, because the reference may change during this method call.
             var snapshot = this.registrations;
 
-            IInstanceProducer instanceProducer;
+            IInstanceProducer instanceProducer = this.GetInstanceProducerForType(serviceType, snapshot);
 
-            if (snapshot.TryGetValue(serviceType, out instanceProducer))
+            if (instanceProducer != null)
             {
+                // We create the instance AFTER registering the instance producer. Calling registration
+                // after creating it, could make us loose all registrations that are done by GetInstance.
                 return instanceProducer.GetInstance();
             }
 
-            object instance = this.GetInstanceThroughUnregisteredTypeResolution(serviceType, snapshot);
-
-            if (instance != null)
-            {
-                return instance;
-            }
-
-            return this.GetConcreteTypeInstance(serviceType, snapshot);
+            throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
         }
 
-        private object GetConcreteTypeInstance(Type serviceType, Dictionary<Type, IInstanceProducer> snapshot)
+        private IInstanceProducer BuildInstanceProducerForType(Type serviceType)
         {
-            if (!Helpers.IsConcreteType(serviceType))
+            var instanceProducer =
+                this.BuildInstanceProducerThroughUnregisteredTypeResolution(serviceType);
+
+            if (instanceProducer == null)
             {
-                // Only delegates for concrete types can be generated.
-                throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+                instanceProducer = this.BuildInstanceProducerForConcreteInstance(serviceType);
             }
 
-            Func<object> instanceCreator = DelegateBuilder.Build(serviceType, snapshot, this);
-
-            object instance = instanceCreator();
-
-            IInstanceProducer instanceProducer = new FuncInstanceProducer<object>(instanceCreator);
-
-            this.RegisterInstanceProcuder(instanceProducer, serviceType, snapshot);
-
-            return instance;
+            return instanceProducer;
         }
 
-        private object GetInstanceThroughUnregisteredTypeResolution(Type serviceType,
-            Dictionary<Type, IInstanceProducer> registrationsSnapshot)
+        private IInstanceProducer BuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
 
@@ -708,15 +700,25 @@ namespace CuttingEdge.ServiceLocation
 
             if (e.Handled)
             {
-                object instance;
+                var instanceProducerType = typeof(ResolutionInstanceProducer<>).MakeGenericType(serviceType);
 
-                instance = Helpers.GetInstanceFromUnhandledTypeDelegate(serviceType, e.InstanceCreator);
+                return (IInstanceProducer)
+                    Activator.CreateInstance(instanceProducerType, serviceType, e.InstanceCreator);
+            }
+            else
+            {
+                return null;
+            }
+        }
 
-                IInstanceProducer instanceProducer = new FuncInstanceProducer<object>(e.InstanceCreator);
-
-                this.RegisterInstanceProcuder(instanceProducer, serviceType, registrationsSnapshot);
-
-                return instance;
+        private IInstanceProducer BuildInstanceProducerForConcreteInstance(Type serviceType)
+        {
+            // NOTE: We don't check if the type is actually constructable. The TransientInstanceProducer will
+            // do that by the time GetInstance is called for the first time on it.
+            if (Helpers.IsConcreteType(serviceType))
+            {
+                return (IInstanceProducer)Activator.CreateInstance(
+                    typeof(TransientInstanceProducer<>).MakeGenericType(serviceType), this);
             }
             else
             {
@@ -742,7 +744,7 @@ namespace CuttingEdge.ServiceLocation
         // registrations when multiple threads simultaneously add different types. This however, does not
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.
-        private void RegisterInstanceProcuder(IInstanceProducer instanceProducer, Type serviceType,
+        private void RegisterInstanceProducer(IInstanceProducer instanceProducer, Type serviceType,
             Dictionary<Type, IInstanceProducer> snapshot)
         {
             var snapshotCopy = Helpers.MakeCopyOf(snapshot);
@@ -818,7 +820,7 @@ namespace CuttingEdge.ServiceLocation
                 Type serviceType = pair.Key;
                 IInstanceProducer instanceProducer = pair.Value;
 
-                instanceProducer.Validate(serviceType);
+                instanceProducer.Verify(serviceType);
             }
         }
 

@@ -381,12 +381,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             }
             catch (Exception ex)
             {
-                const string AssertMessage = "Exception message was not descriptive. Actual message: ";
+                const string AssertMessage = "Exception message was not descriptive enough. Actual message: ";
 
                 Assert.IsTrue(ex.Message.Contains("ResolveUnregisteredType"), AssertMessage + ex.Message);
                 Assert.IsTrue(ex.Message.Contains("registered a delegate that created an instance of type "),
                     AssertMessage + ex.Message);
-                Assert.IsTrue(ex.Message.Contains("that can not be casted to the specified service type"),
+                Assert.IsTrue(ex.Message.Contains("that can not be cast to the specified service type"),
                     AssertMessage + ex.Message);
             }
         }

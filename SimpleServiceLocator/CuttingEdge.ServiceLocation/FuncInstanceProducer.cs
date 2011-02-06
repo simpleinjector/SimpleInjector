@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using System.Linq.Expressions;
 
 using Microsoft.Practices.ServiceLocation;
 
@@ -48,7 +49,25 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>An instance.</returns>
         object IInstanceProducer.GetInstance()
         {
-            object instance;
+            return this.GetInstance();
+        }
+
+        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
+        /// <returns>An Expression.</returns>
+        Expression IInstanceProducer.BuildExpression()
+        {
+            // Create an expression that directly calls the this.GetInstance() method.
+            // We could further optimize it by directly calling the Func<T> instanceCreator, but this will
+            // make us loose some error checking.
+            return Expression.Call(Expression.Constant(this),
+                typeof(FuncInstanceProducer<T>).GetMethod("GetInstance"), new Expression[0]);
+        }
+
+        /// <summary>Produces an instance.</summary>
+        /// <returns>An instance.</returns>
+        public T GetInstance()
+        {
+            T instance;
 
             try
             {

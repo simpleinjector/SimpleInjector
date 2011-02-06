@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
 
 namespace CuttingEdge.ServiceLocation
@@ -39,7 +40,7 @@ namespace CuttingEdge.ServiceLocation
     internal static class Helpers
     {
         // Throws an InvalidOperationException on failure.
-        internal static void Validate(this IInstanceProducer instanceProducer, Type serviceType)
+        internal static void Verify(this IInstanceProducer instanceProducer, Type serviceType)
         {
             try
             {
@@ -57,44 +58,6 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        internal static bool IsConcreteType(Type type)
-        {
-            // While array types are in fact concrete, we can not create them and creating them would be
-            // pretty useless.
-            return !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsArray;
-        }
-
-        internal static object GetInstanceFromUnhandledTypeDelegate(Type serviceType,
-            Func<object> instanceCreator)
-        {
-            object instance;
-
-            try
-            {
-                instance = instanceCreator();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(StringResources
-                    .HandlerReturnedADelegateThatThrewAnException(serviceType, ex.Message), ex);
-            }
-
-            if (instance == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.HandlerReturnedADelegateThatReturnedNull(serviceType));
-            }
-
-            if (!serviceType.IsAssignableFrom(instance.GetType()))
-            {
-                throw new InvalidOperationException(
-                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(serviceType,
-                    instance.GetType()));
-            }
-
-            return instance;
-        }
-
         internal static Dictionary<TKey, TValue> MakeCopyOf<TKey, TValue>(Dictionary<TKey, TValue> source)
         {
             // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.
@@ -110,12 +73,29 @@ namespace CuttingEdge.ServiceLocation
             return copy;
         }
 
-        internal static void ThrowWhenTypeIsAbstract(Type serviceType)
+        internal static void ThrowActivationExceptionWhenTypeIsNotConstructable(Type serviceType)
         {
-            if (!IsConcreteType(serviceType))
+            string exceptionMessage;
+
+            if (!IsConcreteConstructableType(serviceType, out exceptionMessage))
             {
-                throw new InvalidOperationException(
-                    StringResources.TypeShouldBeConcreteToBeUsedOnRegisterSingle(serviceType));
+                throw new ActivationException(
+                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(serviceType) + exceptionMessage);
+            }
+        }
+
+        internal static void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType, 
+            string parameterName)
+        {
+            string exceptionMessage;
+
+            if (!IsConcreteConstructableType(serviceType, out exceptionMessage))
+            {
+                // After some doubt (and even after reading http://bit.ly/1CPDv9) I decided to throw an
+                // ArgumentException when the given generic type argument was invalid. Mainly because a
+                // generic type argument is just an argument, and ArgumentException even allows us to supply 
+                // the name of the argument. No developer will be surprise to see an ArgEx in this case.
+                throw new ArgumentException(exceptionMessage, parameterName);
             }
         }
 
@@ -148,6 +128,13 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
+        internal static bool IsConcreteType(Type serviceType)
+        {
+            // While array types are in fact concrete, we can not create them and creating them would be
+            // pretty useless.
+            return !serviceType.IsAbstract && !serviceType.IsGenericTypeDefinition && !serviceType.IsArray;
+        }
+
         internal static void ValidateIfCollectionForNullElements(IEnumerable collection, Type serviceType)
         {
             bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
@@ -157,6 +144,55 @@ namespace CuttingEdge.ServiceLocation
                 throw new InvalidOperationException(
                     StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
             }
+        }
+
+        private static bool HasSinglePublicConstructor(Type serviceType)
+        {
+            return serviceType.GetConstructors().Length == 1;
+        }
+
+        private static bool HasConstructorWithOnlyValidParameters(Type serviceType)
+        {
+            return GetFirstInvalidConstructorParameter(serviceType) == null;
+        }
+
+        private static ParameterInfo GetFirstInvalidConstructorParameter(Type serviceType)
+        {
+            return (
+                from constructor in serviceType.GetConstructors()
+                from parameter in constructor.GetParameters()
+                let type = parameter.ParameterType
+                where type.IsValueType || type == typeof(string)
+                select parameter).FirstOrDefault();
+        }
+
+        private static bool IsConcreteConstructableType(Type serviceType, out string errorMessage)
+        {
+            errorMessage = null;
+
+            if (!IsConcreteType(serviceType))
+            {
+                errorMessage = StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(serviceType);
+                return false;
+            }
+
+            if (!HasSinglePublicConstructor(serviceType))
+            {
+                errorMessage = StringResources.TypeMustHaveASinglePublicConstructor(serviceType);
+                return false;
+            }
+
+            if (!HasConstructorWithOnlyValidParameters(serviceType))
+            {
+                var invalidParameter = Helpers.GetFirstInvalidConstructorParameter(serviceType);
+
+                errorMessage =
+                    StringResources.ConstructorMustNotContainInvalidParameter(serviceType, invalidParameter);
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

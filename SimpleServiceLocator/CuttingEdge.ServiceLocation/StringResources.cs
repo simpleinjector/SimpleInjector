@@ -57,6 +57,13 @@ namespace CuttingEdge.ServiceLocation
                 "The registered delegate for type {0} returned null.", serviceType.FullName);
         }
 
+        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "error occurred while trying to get instance of type {0}. {1}",
+                serviceType.FullName, exception.Message);
+        }
+           
         internal static string DelegateForTypeThrewAnException(Type serviceType, Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -126,20 +133,27 @@ namespace CuttingEdge.ServiceLocation
                     parameterType.FullName, parameterType.Name, serviceType.Name);
         }
 
-        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType, int constructorCount)
+        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                ImplicitRegistrationCouldNotBeMadeForType(serviceType) +
-                    "The type should contain exactly one public constructor, but it currently has {0}.",
-                    constructorCount);
+                "The type {0} should contain exactly one public constructor, but it has {1}.",
+                serviceType, serviceType.GetConstructors().Length);
         }
 
-        internal static string TypeShouldBeConcreteToBeUsedOnRegisterSingle(Type serviceType)
+        internal static string ConstructorMustNotContainInvalidParameter(Type serviceType, 
+            ParameterInfo invalidParameter)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The given type {0} is not a concrete type. Please use one of the other " +
-                    "RegisterSingle<T> overloads to register this type.",
-                serviceType.FullName);
+                "The constructor of type {0} contains parameter '{1}' of type {2} which can not be used " +
+                "for constructor injection.", serviceType, invalidParameter.Name, 
+                invalidParameter.ParameterType);
+        }
+
+        internal static string TypeShouldBeConcreteToBeUsedOnThisMethod(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The given type {0} is not a concrete type. Please use one of the other overloads to " +
+                "register this type.", serviceType.FullName);
         }
 
         internal static string TypeAlreadyRegisteredUsingByKeyString(Type serviceType,
@@ -221,10 +235,10 @@ namespace CuttingEdge.ServiceLocation
             return string.Format(CultureInfo.InvariantCulture,
                 "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
                 "to the {0} service type, registered a delegate that created an instance of type {1} that " +
-                "can not be casted to the specified service type.", serviceType, actualType);
+                "can not be cast to the specified service type.", serviceType, actualType);
         }
 
-        private static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
+        internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found and an implicit registration could not be made. ",

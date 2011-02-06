@@ -25,6 +25,7 @@
 #endregion
 
 using System;
+using System.Linq.Expressions;
 
 using Microsoft.Practices.ServiceLocation;
 
@@ -52,6 +53,13 @@ namespace CuttingEdge.ServiceLocation
         object IInstanceProducer.GetInstance()
         {
             return this.instance;
+        }
+
+        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
+        /// <returns>An Expression.</returns>
+        Expression IInstanceProducer.BuildExpression()
+        {
+            return Expression.Constant(this.instance);
         }
     }
 }

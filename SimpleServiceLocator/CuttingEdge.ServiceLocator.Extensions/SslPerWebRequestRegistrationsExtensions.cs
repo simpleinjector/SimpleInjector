@@ -1,10 +1,10 @@
-﻿using System;
-using System.Web;
-
-using CuttingEdge.ServiceLocation;
-
-namespace CuttingEdge.ServiceLocator.Extensions
+﻿namespace CuttingEdge.ServiceLocator.Extensions
 {
+    using System;
+    using System.Web;
+
+    using CuttingEdge.ServiceLocation;
+
     /// <summary>
     /// Extension methods for registering types on a per web request basis.
     /// </summary>

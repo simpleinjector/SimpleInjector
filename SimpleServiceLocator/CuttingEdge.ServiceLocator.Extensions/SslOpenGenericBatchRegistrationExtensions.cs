@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-
-using CuttingEdge.ServiceLocation;
-
-namespace CuttingEdge.ServiceLocator.Extensions
+﻿namespace CuttingEdge.ServiceLocator.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+
+    using CuttingEdge.ServiceLocation;
+
     /// <summary>
     /// Extension methods for registering open generic types.
     /// </summary>

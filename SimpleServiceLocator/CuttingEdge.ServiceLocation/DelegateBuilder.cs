@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -43,9 +44,6 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     internal sealed class DelegateBuilder
     {
-        private static readonly MethodInfo GenericGetInstanceMethodDefinition =
-            typeof(SimpleServiceLocator).GetMethod("GetInstance", Type.EmptyTypes);
-
         private static readonly MethodInfo GenericGetAllInstancesMethodDefinition =
             typeof(SimpleServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
 
@@ -61,22 +59,18 @@ namespace CuttingEdge.ServiceLocation
             this.container = container;
         }
 
-        internal static Func<TConcrete> Build<TConcrete>(SimpleServiceLocator serviceLocator)
-        {
-            var builder = new DelegateBuilder(typeof(TConcrete), null, serviceLocator);
-            return builder.Build<TConcrete>();
-        }
-
-        internal static Func<object> Build(Type serviceType, Dictionary<Type, IInstanceProducer> registrations,
+        internal static Func<T> Build<T>(Dictionary<Type, IInstanceProducer> registrations,
             SimpleServiceLocator serviceLocator)
         {
-            var builder = new DelegateBuilder(serviceType, registrations, serviceLocator);
-            return builder.Build<object>();
+            var builder = new DelegateBuilder(typeof(T), registrations, serviceLocator);
+            return builder.Build<T>();
         }
 
         private Func<TConcrete> Build<TConcrete>()
         {
-            var constructor = this.GetPublicConstructor();
+            Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(this.serviceType);
+
+            var constructor = this.serviceType.GetConstructors().First();
 
             Expression[] constructorArgumentCalls = this.BuildGetInstanceCallsForConstructor(constructor);
 
@@ -86,71 +80,61 @@ namespace CuttingEdge.ServiceLocation
             return newServiceTypeMethod.Compile();
         }
 
-        private ConstructorInfo GetPublicConstructor()
-        {
-            var constructors = this.serviceType.GetConstructors();
-
-            if (constructors.Length != 1)
-            {
-                throw new ActivationException(StringResources.TypeMustHaveASinglePublicConstructor(
-                    this.serviceType, constructors.Length));
-            }
-
-            return constructors[0];
-        }
-
         private Expression[] BuildGetInstanceCallsForConstructor(ConstructorInfo constructor)
         {
-            List<Expression> getInstanceCalls = new List<Expression>();
+            List<Expression> parameterExpressions = new List<Expression>();
 
             foreach (var parameter in constructor.GetParameters())
             {
-                var getInstanceCall = this.BuildGetInstanceCallForType(parameter.ParameterType);
+                var parameterExpression = this.BuildParameterExpression(parameter.ParameterType);
 
-                getInstanceCalls.Add(getInstanceCall);
+                parameterExpressions.Add(parameterExpression);
             }
 
-            return getInstanceCalls.ToArray();
+            return parameterExpressions.ToArray();
         }
 
-        private Expression BuildGetInstanceCallForType(Type parameterType)
+        private Expression BuildParameterExpression(Type parameterType)
         {
             this.ValidateParameterType(parameterType);
 
-            MethodInfo getInstanceMethod;
-
-            if (IsGenericEnumerable(parameterType))
+            if (IsEnumerableOfT(parameterType))
             {
-                getInstanceMethod = 
-                    MakeGenericGetAllInstancesMethodDefinition(parameterType.GetGenericArguments()[0]);
+                return this.BuildExpressionForGenericEnumerable(parameterType);
             }
             else
             {
-                getInstanceMethod = MakeGenericGetInstanceMethod(parameterType);
+                return this.BuildExpressionForNormalType(parameterType);
             }
+        }
 
-            // Build the call "container.GetInstance<[ParameterType]>()"
+        private Expression BuildExpressionForGenericEnumerable(Type parameterType)
+        {
+            MethodInfo getInstanceMethod =
+                MakeGenericGetAllInstancesMethodDefinition(parameterType.GetGenericArguments()[0]);
+
+            // Build the following call: "container.GetAllInstances<[ParameterType]>()".
             return Expression.Call(Expression.Constant(this.container), getInstanceMethod,
                 new Expression[0]);
         }
 
+        private Expression BuildExpressionForNormalType(Type parameterType)
+        {
+            var instanceProducer = 
+                this.container.GetInstanceProducerForType(parameterType, this.registrations);
+
+            return instanceProducer.BuildExpression();
+        }
+
         private void ValidateParameterType(Type parameterType)
         {
-            if (this.registrations == null)
-            {
-                // Only validate when the registrations collection is supplied. When it is missing, this means
-                // that the delegate is constructed in the configuration phase, and registrations may be done
-                // in random order. Therefore, we simply assume that all registrations are valid.
-                return;
-            }
-
             if (this.registrations.ContainsKey(parameterType))
             {
                 // The registrations contains the type: we are valid.
                 return;
             }
 
-            if (IsGenericEnumerable(parameterType))
+            if (IsEnumerableOfT(parameterType))
             {
                 // The type is a IEnumerable<T>. Such a type is always valid, because when missing, an empty
                 // list is returned.
@@ -160,8 +144,8 @@ namespace CuttingEdge.ServiceLocation
             if (Helpers.IsConcreteType(parameterType))
             {
                 // The type to construct is not registered, but is a concrete type. Concrete types can be
-                // created. We postpone validation until the moment that the delegate for this concrete type
-                // is generated.
+                // created. Note that we don't check here if the type is actually constructable. By
+                // postponing this validation, we get better error information at that moment.
                 return;
             }
 
@@ -176,14 +160,9 @@ namespace CuttingEdge.ServiceLocation
                 StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
         }
 
-        private static bool IsGenericEnumerable(Type type)
+        private static bool IsEnumerableOfT(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-        }
-
-        private static MethodInfo MakeGenericGetInstanceMethod(Type parameterType)
-        {
-            return GenericGetInstanceMethodDefinition.MakeGenericMethod(parameterType);
         }
 
         private static MethodInfo MakeGenericGetAllInstancesMethodDefinition(Type elementType)

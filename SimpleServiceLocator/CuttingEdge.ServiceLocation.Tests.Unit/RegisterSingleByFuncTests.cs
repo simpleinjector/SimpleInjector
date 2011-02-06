@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
@@ -166,6 +167,20 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             Assert.AreEqual(ExpectedNumberOfCalles, actualNumberOfCalls,
                 "The RegisterSingle method should register the object in such a way that the delegate will " +
                 "only get called once during the lifetime of the application. Not more.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingleFunc_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // This registration will make the DelegateBuilder call the 
+            // FuncSingletonInstanceProducer.BuildExpression method.
+            container.RegisterSingle<IWeapon>(() => new Katana());
+
+            // Act
+            container.GetInstance<Samurai>();
         }
     }
 }

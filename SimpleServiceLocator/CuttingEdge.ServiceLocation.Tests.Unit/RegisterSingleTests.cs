@@ -43,14 +43,27 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The abstract type IWeapon was not expected to be registered successfully.")]
-        public void RegisterSingle_RegisteringANonConcreteType_WillThrowAnArgumentException()
+        public void RegisterSingle_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedMessage()
         {
             // Arrange
+            string expectedParameterName = "TConcrete";
+            string expectedMessage = "IWeapon is not a concrete type.";
+
             var container = new SimpleServiceLocator();
 
-            // Act
-            container.RegisterSingle<IWeapon>();
+            try
+            {
+                // Act
+                container.RegisterSingle<IWeapon>();
+
+                Assert.Fail("The abstract type IWeapon was not expected to be registered successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No subtype was expected.");
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+                Assert.AreEqual(expectedParameterName, ex.ParamName);
+            }
         }
 
         [TestMethod]
@@ -63,6 +76,21 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.GetInstance<IWeapon>("any key");
+        }
+
+        [TestMethod]
+        public void RegisterSingle_WithIncompleteSingletonRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Samurai is dependant on IWeapon.
+            container.RegisterSingle<Warrior>(() => container.GetInstance<Samurai>());
+
+            // Act
+            // Kingdom is dependant on Warrior. Registration should succeed even though IWeapon is not 
+            // registered yet.
+            container.RegisterSingle<Kingdom>();
         }
     }
 }

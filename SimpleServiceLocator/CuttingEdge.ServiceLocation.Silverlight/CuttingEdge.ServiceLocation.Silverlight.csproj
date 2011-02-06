@@ -87,6 +87,9 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedInstanceProducer.cs">
       <Link>KeyedInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\ResolutionInstanceProducer.cs">
+      <Link>ResolutionInstanceProducer.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.cs">
       <Link>SimpleServiceLocator.cs</Link>
     </Compile>
@@ -95,6 +98,9 @@
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\StringResources.cs">
       <Link>StringResources.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\TransientInstanceProducer.cs">
+      <Link>TransientInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
