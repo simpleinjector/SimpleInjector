@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ResolutionInstanceProducer.cs" />
+    <Compile Include="SimpleServiceLocator.Registration.cs" />
+    <Compile Include="SimpleServiceLocator.Resolving.cs" />
+    <Compile Include="SimpleServiceLocator.Common.cs" />
     <Compile Include="TransientInstanceProducer.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="DelegateBuilder.cs" />
@@ -68,7 +71,6 @@
     <Compile Include="SingletonInstanceProducer.cs" />
     <Compile Include="FuncInstanceProducer.cs" />
     <Compile Include="KeyedInstanceProducer.cs" />
-    <Compile Include="SimpleServiceLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeyedFuncSingletonInstanceProducer.cs" />
     <Compile Include="StringResources.cs" />

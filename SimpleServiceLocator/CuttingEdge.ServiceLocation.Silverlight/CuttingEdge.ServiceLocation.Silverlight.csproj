@@ -90,8 +90,14 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\ResolutionInstanceProducer.cs">
       <Link>ResolutionInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.cs">
-      <Link>SimpleServiceLocator.cs</Link>
+    <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.Common.cs">
+      <Link>SimpleServiceLocator.Common.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.Registration.cs">
+      <Link>SimpleServiceLocator.Registration.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\SimpleServiceLocator.Resolving.cs">
+      <Link>SimpleServiceLocator.Resolving.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\SingletonInstanceProducer.cs">
       <Link>SingletonInstanceProducer.cs</Link>
