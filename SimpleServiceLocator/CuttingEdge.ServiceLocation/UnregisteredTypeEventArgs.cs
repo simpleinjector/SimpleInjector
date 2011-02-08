@@ -26,6 +26,8 @@
 
 using System;
 
+using Microsoft.Practices.ServiceLocation;
+
 namespace CuttingEdge.ServiceLocation
 {
     /// <summary>
@@ -77,7 +79,7 @@ namespace CuttingEdge.ServiceLocation
 
             if (this.Handled)
             {
-                throw new InvalidOperationException(StringResources.MultipleObserversRegisteredTheSameType(
+                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameType(
                     this.UnregisteredServiceType));
             }
 

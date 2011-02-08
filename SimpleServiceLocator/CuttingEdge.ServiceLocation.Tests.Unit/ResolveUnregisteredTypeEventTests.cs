@@ -323,10 +323,8 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             }
             catch (ActivationException ex)
             {
-                Exception exception = ex.InnerException;
-
-                Assert.IsNotNull(exception.InnerException, "No inner exception was supplied.");
-                Assert.AreEqual(expectedInnerException, exception.InnerException,
+                Assert.IsNotNull(ex.InnerException, "No inner exception was supplied.");
+                Assert.AreEqual(expectedInnerException, ex.InnerException,
                     "The supplied inner exception was not the expected inner exception");
             }
         }

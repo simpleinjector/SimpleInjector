@@ -219,7 +219,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             var weapons = container.GetAllInstances(typeof(IWeapon));
 
-            // Asserty
+            // Assert
             Assert.AreEqual(0, weapons.Count());
         }
 
@@ -234,7 +234,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             var weapons = container.GetAllInstances(typeof(IWeapon)).ToArray();
 
-            // Asserty
+            // Assert
             Assert.AreEqual(2, weapons.Length);
             Assert.IsInstanceOfType(weapons[0], typeof(Tanto));
             Assert.IsInstanceOfType(weapons[1], typeof(Katana));
@@ -244,9 +244,10 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         public void GetAllInstances_InvalidDelegateRegistered_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage = 
-                "Activation error occurred while trying to get all instances of type IWeapon.";
-
+            string expectedMessage =
+                "The registered delegate for type System.Collections.Generic.IEnumerable`1[" +
+                    "CuttingEdge.ServiceLocation.Tests.Unit.IWeapon] returned null.";
+            
             var container = new SimpleServiceLocator();
 
             Func<IEnumerable<IWeapon>> invalidDelegate = () => null;
