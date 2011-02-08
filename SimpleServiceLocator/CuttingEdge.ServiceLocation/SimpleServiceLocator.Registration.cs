@@ -424,10 +424,12 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>();
 
-            this.collectionsToValidate[typeof(T)] = collection;
+            var immutableCollection = Helpers.CreateImmutableCollection(collection);
+
+            this.collectionsToValidate[typeof(T)] = immutableCollection;
 
             this.registrations[typeof(IEnumerable<T>)] =
-                new SingletonInstanceProducer<IEnumerable<T>>(collection);
+                new SingletonInstanceProducer<IEnumerable<T>>(immutableCollection);
         }
 
         /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Microsoft.Practices.ServiceLocation;
@@ -266,6 +268,78 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             {
                 Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);                
             }
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithArrayRegistered_DoesNotReturnAnArray()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterAll<IWeapon>(new IWeapon[] { new Katana(), new Tanto() });
+
+            // Act
+            var collection = container.GetAllInstances<IWeapon>();
+
+            // Assert
+            Assert_IsNotAMutableCollection(collection);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithListRegistered_DoesNotReturnAnArray()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterAll<IWeapon>(new List<IWeapon> { new Katana(), new Tanto() });
+
+            // Act
+            var collection = container.GetAllInstances<IWeapon>();
+
+            // Assert
+            Assert_IsNotAMutableCollection(collection);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithCollectionRegistered_DoesNotReturnAnArray()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterAll<IWeapon>(new Collection<IWeapon> { new Katana(), new Tanto() });
+
+            // Act
+            var collection = container.GetAllInstances<IWeapon>();
+
+            // Assert
+            Assert_IsNotAMutableCollection(collection);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithArray_ReturnsSameInstanceOnEachCall()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            container.RegisterAll<IWeapon>(new IWeapon[] { new Katana(), new Tanto() });
+
+            // Act
+            var collection1 = container.GetAllInstances<IWeapon>();
+            var collection2 = container.GetAllInstances<IWeapon>();
+
+            // Assert
+            Assert.AreEqual(collection1, collection2,
+                "For performance reasons, GetAllInstances<T> should always return the same instance.");
+        }
+
+        private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
+        {
+            string assertMessage = "The container should wrap mutable types to make it impossible for " +
+                "users to change the collection.";
+
+            Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
+            Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);
+            Assert.IsNotInstanceOfType(collection, typeof(ICollection<T>), assertMessage);
         }
     }
 }

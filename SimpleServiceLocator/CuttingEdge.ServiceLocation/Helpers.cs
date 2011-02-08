@@ -27,9 +27,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-
 using System.Reflection;
+
 using Microsoft.Practices.ServiceLocation;
 
 namespace CuttingEdge.ServiceLocation
@@ -39,6 +40,22 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     internal static class Helpers
     {
+        internal static IEnumerable<T> CreateImmutableCollection<T>(IEnumerable<T> collection)
+        {
+            bool typeIsReadOnlyCollection = collection is ReadOnlyCollection<T>;
+
+            bool typeIsMutable = collection is T[] || collection is IList || collection is ICollection<T>;
+
+            if (typeIsReadOnlyCollection || !typeIsMutable)
+            {
+                return collection;
+            }
+            else
+            {
+                return RegisterAllEnumerable(collection);
+            }
+        }
+
         // Throws an InvalidOperationException on failure.
         internal static void Verify(this IInstanceProducer instanceProducer, Type serviceType)
         {
@@ -193,6 +210,22 @@ namespace CuttingEdge.ServiceLocation
             }
 
             return true;
+        }
+
+        private static IEnumerable<T> WrapInEnumerable<T>(IEnumerable<T> collection)
+        {
+            return RegisterAllEnumerable(collection);
+        }
+
+        // This method name does not describe what it does, but since the C# compiler will create a iterator
+        // type named after this method, it allows us to return a type that has a nice name that will show up
+        // during debugging.
+        private static IEnumerable<T> RegisterAllEnumerable<T>(IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+            {
+                yield return item;
+            }
         }
     }
 }
