@@ -38,7 +38,9 @@ namespace CuttingEdge.ServiceLocation
         // Storing a key is not needed, because the Validate method will never throw.
         private readonly T instance;
 
-        internal SingletonInstanceProducer(T instance)
+        /// <summary>Initializes a new instance of the <see cref="SingletonInstanceProducer{T}"/> class.</summary>
+        /// <param name="instance">The single instance.</param>
+        public SingletonInstanceProducer(T instance)
         {
             if (instance == null)
             {

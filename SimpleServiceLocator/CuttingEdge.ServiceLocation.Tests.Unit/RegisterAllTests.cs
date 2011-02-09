@@ -332,6 +332,51 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 "For performance reasons, GetAllInstances<T> should always return the same instance.");
         }
 
+        [TestMethod]
+        public void GetInstance_OnATypeThatDependsOnACollectionThatIsRegisteredWithRegisterByFunc_CollectionShouldNotBeTreatedAsASingleton()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            IEnumerable<IPlugin> left = new LeftEnumerable<IPlugin>();
+            IEnumerable<IPlugin> right = new RightEnumerable<IPlugin>();
+            bool returnLeft = true;
+
+            container.Register<IEnumerable<IPlugin>>(() => returnLeft ? left : right);
+
+            // This call will compile the delegate for the PluginContainer
+            var firstContainer = container.GetInstance<PluginContainer>();
+
+            Assert.AreEqual(firstContainer.Plugins, left, "Test setup failed.");
+
+            returnLeft = false;
+
+            // Act
+            var secondContainer = container.GetInstance<PluginContainer>();
+
+            // Assert
+            Assert.AreEqual(secondContainer.Plugins, right, 
+                "When using Register<T> to register collections, the collection should not be treated as a " +
+                "singleton.");
+        }
+        
+        [TestMethod]
+        public void GetInstance_OnATypeThatDependsOnACollectionThatIsNotRegistered_SameInstanceInjectedEachTime()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+
+            // Act
+            // PluginContainer depends on IEnumerable<IPlugin>
+            var firstContainer = container.GetInstance<PluginContainer>();
+            var secondContainer = container.GetInstance<PluginContainer>();
+
+            // Assert
+            Assert.AreEqual(firstContainer.Plugins, secondContainer.Plugins, "When a collection is not " +
+                "registered, the container should register a single empty instance that can be returned " +
+                "every time. This saves performance.");
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -340,6 +385,42 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
             Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);
             Assert.IsNotInstanceOfType(collection, typeof(ICollection<T>), assertMessage);
+        }
+
+        private sealed class LeftEnumerable<T> : IEnumerable<T>
+        {
+            public IEnumerator<T> GetEnumerator()
+            {
+                yield break;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+        }
+
+        private sealed class RightEnumerable<T> : IEnumerable<T>
+        {
+            public IEnumerator<T> GetEnumerator()
+            {
+                yield break;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+        }
+
+        private sealed class PluginContainer
+        {
+            public PluginContainer(IEnumerable<IPlugin> plugins)
+            {
+                this.Plugins = plugins;
+            }
+
+            public IEnumerable<IPlugin> Plugins { get; private set; }
         }
     }
 }

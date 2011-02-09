@@ -96,78 +96,16 @@ namespace CuttingEdge.ServiceLocation
 
         private Expression BuildParameterExpression(Type parameterType)
         {
-            this.ValidateParameterType(parameterType);
-
-            if (IsEnumerableOfT(parameterType))
-            {
-                return this.BuildExpressionForGenericEnumerable(parameterType);
-            }
-            else
-            {
-                return this.BuildExpressionForNormalType(parameterType);
-            }
-        }
-
-        private Expression BuildExpressionForGenericEnumerable(Type parameterType)
-        {
-            MethodInfo getInstanceMethod =
-                MakeGenericGetAllInstancesMethodDefinition(parameterType.GetGenericArguments()[0]);
-
-            // Build the following call: "container.GetAllInstances<[ParameterType]>()".
-            return Expression.Call(Expression.Constant(this.container), getInstanceMethod,
-                new Expression[0]);
-        }
-
-        private Expression BuildExpressionForNormalType(Type parameterType)
-        {
-            var instanceProducer = 
+            var instanceProducer =
                 this.container.GetInstanceProducerForType(parameterType, this.registrations);
 
+            if (instanceProducer == null)
+            {
+                throw new ActivationException(
+                    StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
+            }
+
             return instanceProducer.BuildExpression();
-        }
-
-        private void ValidateParameterType(Type parameterType)
-        {
-            if (this.registrations.ContainsKey(parameterType))
-            {
-                // The registrations contains the type: we are valid.
-                return;
-            }
-
-            if (IsEnumerableOfT(parameterType))
-            {
-                // The type is a IEnumerable<T>. Such a type is always valid, because when missing, an empty
-                // list is returned.
-                return;
-            }
-
-            if (Helpers.IsConcreteType(parameterType))
-            {
-                // The type to construct is not registered, but is a concrete type. Concrete types can be
-                // created. Note that we don't check here if the type is actually constructable. By
-                // postponing this validation, we get better error information at that moment.
-                return;
-            }
-
-            if (this.container.ContainsUnregisteredTypeResolutionFor(parameterType))
-            {
-                // There is an handler registered to the ResolveUnregisteredType event that is able to resolve
-                // the given parameterType.
-                return;
-            }
-
-            throw new ActivationException(
-                StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
-        }
-
-        private static bool IsEnumerableOfT(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-        }
-
-        private static MethodInfo MakeGenericGetAllInstancesMethodDefinition(Type elementType)
-        {
-            return GenericGetAllInstancesMethodDefinition.MakeGenericMethod(elementType);
         }
     }
 }

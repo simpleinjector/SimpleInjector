@@ -38,7 +38,7 @@ namespace CuttingEdge.ServiceLocation
     /// will be registered by that time.
     /// </summary>
     /// <typeparam name="TConcrete">The concrete type to create.</typeparam>
-    internal sealed class TransientInstanceProducer<TConcrete> : IInstanceProducer
+    internal sealed class TransientInstanceProducer<TConcrete> : IInstanceProducer where TConcrete : class
     {
         private readonly SimpleServiceLocator container;
 

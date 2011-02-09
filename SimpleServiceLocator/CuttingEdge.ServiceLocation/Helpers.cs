@@ -40,7 +40,7 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     internal static class Helpers
     {
-        internal static IEnumerable<T> CreateImmutableCollection<T>(IEnumerable<T> collection)
+        internal static IEnumerable<T> MakeImmutable<T>(this IEnumerable<T> collection)
         {
             bool typeIsReadOnlyCollection = collection is ReadOnlyCollection<T>;
 
@@ -52,7 +52,7 @@ namespace CuttingEdge.ServiceLocation
             }
             else
             {
-                return RegisterAllEnumerable(collection);
+                return CreateImmutableCollection(collection);
             }
         }
 
@@ -212,7 +212,7 @@ namespace CuttingEdge.ServiceLocation
             return true;
         }
 
-        private static IEnumerable<T> WrapInEnumerable<T>(IEnumerable<T> collection)
+        private static IEnumerable<T> CreateImmutableCollection<T>(IEnumerable<T> collection)
         {
             return RegisterAllEnumerable(collection);
         }

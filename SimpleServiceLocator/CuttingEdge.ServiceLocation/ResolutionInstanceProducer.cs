@@ -36,7 +36,7 @@ namespace CuttingEdge.ServiceLocation
     /// type resolution.
     /// </summary>
     /// <typeparam name="T">The service type.</typeparam>
-    internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer
+    internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Type serviceType;
         private readonly Func<object> instanceCreator;

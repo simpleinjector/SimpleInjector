@@ -162,15 +162,6 @@ namespace CuttingEdge.ServiceLocation
             return null;
         }
 
-        internal bool ContainsUnregisteredTypeResolutionFor(Type serviceType)
-        {
-            var e = new UnregisteredTypeEventArgs(serviceType);
-
-            this.OnResolveUnregisteredType(e);
-
-            return e.Handled;
-        }
-
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
         internal IInstanceProducer GetInstanceProducerForType(Type serviceType,
@@ -253,6 +244,11 @@ namespace CuttingEdge.ServiceLocation
 
             if (instanceProducer == null)
             {
+                instanceProducer = this.BuildInstanceProducerForCollection(serviceType);
+            }
+
+            if (instanceProducer == null)
+            {
                 instanceProducer = this.BuildInstanceProducerForConcreteInstance(serviceType);
             }
 
@@ -271,6 +267,31 @@ namespace CuttingEdge.ServiceLocation
 
                 return (IInstanceProducer)
                     Activator.CreateInstance(instanceProducerType, serviceType, e.InstanceCreator);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private IInstanceProducer BuildInstanceProducerForCollection(Type serviceType)
+        {
+            bool typeIsGenericEnumerable =
+                serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+
+            if (typeIsGenericEnumerable)
+            {
+                // During the time that this method is called we are after the registration phase and there is
+                // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
+                // it up). This means that we will must always return an empty set and we will do this by
+                // registering a SingletonInstanceProducer with an empty array of that type.
+                Type elementType = serviceType.GetGenericArguments()[0];
+
+                var emptyArray = Array.CreateInstance(elementType, 0);
+
+                var instanceProducerType = typeof(SingletonInstanceProducer<>).MakeGenericType(serviceType);
+
+                return (IInstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
             }
             else
             {

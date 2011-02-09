@@ -110,8 +110,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
         public void GetInstance_UnregisteredConcreteTypeWithUnregistedDependencies_ThrowsExpectedException()
         {
             // Arrange
-            string expectedMessage = "No registration for type CuttingEdge.ServiceLocation." +
-                "Tests.Unit.Samurai could be found and an implicit registration could not be made.";
+            string expectedMessage = 
+                "No registration for type CuttingEdge.ServiceLocation.Tests.Unit.Samurai could be found " + 
+                "and an implicit registration could not be made. The constructor of the type contains the " +
+                "parameter of type CuttingEdge.ServiceLocation.Tests.Unit.IWeapon that is not registered. " +
+                "Please ensure IWeapon is registered in the container, change the constructor of the type " +
+                "or register the type Samurai directly.";
 
             // We don't register the required IWeapon dependency.
             var container = new SimpleServiceLocator();

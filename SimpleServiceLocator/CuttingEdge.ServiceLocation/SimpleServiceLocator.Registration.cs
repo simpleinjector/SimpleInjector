@@ -424,7 +424,7 @@ namespace CuttingEdge.ServiceLocation
 
             this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>();
 
-            var immutableCollection = Helpers.CreateImmutableCollection(collection);
+            var immutableCollection = collection.MakeImmutable();
 
             this.collectionsToValidate[typeof(T)] = immutableCollection;
 
