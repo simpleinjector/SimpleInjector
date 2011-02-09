@@ -60,14 +60,17 @@ namespace CuttingEdge.ServiceLocation
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// <paramref name="instanceCreator"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
-        public void Register<T>(Func<T> instanceCreator) where T : class
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TService"/> has already been registered.</exception>
+        public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             if (instanceCreator == null)
             {
@@ -75,10 +78,9 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
 
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
-
-            this.registrations[typeof(T)] = new FuncInstanceProducer<T>(instanceCreator);
+            this.registrations[typeof(TService)] = new FuncInstanceProducer<TService>(instanceCreator);
         }
 
         /// <summary>
@@ -93,8 +95,9 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
-        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// for <typeparamref name="TConcrete"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TConcrete"/> type
+        /// is not a type that can be created by the container.
         /// </exception>
         public void Register<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
@@ -106,7 +109,6 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
             var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
@@ -115,18 +117,18 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/> by
-        /// a string key.
+        /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
+        /// by a string key.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// <paramref name="keyedInstanceCreator"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyedInstanceCreator"/> is a
         /// null reference.</exception>
-        public void RegisterByKey<T>(Func<string, T> keyedInstanceCreator) where T : class
+        public void RegisterByKey<TService>(Func<string, TService> keyedInstanceCreator) where TService : class
         {
             if (keyedInstanceCreator == null)
             {
@@ -134,27 +136,27 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
+            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<TService>();
 
-            IKeyedInstanceProducer locator = new KeyedFuncInstanceProducer<T>(keyedInstanceCreator);
-            this.keyedInstanceProducers[typeof(T)] = locator;
+            IKeyedInstanceProducer locator = new KeyedFuncInstanceProducer<TService>(keyedInstanceCreator);
+            this.keyedInstanceProducers[typeof(TService)] = locator;
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/> for
-        /// the specified (ordinal) case-sensitive <paramref name="key"/>.
+        /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
+        /// for the specified (ordinal) case-sensitive <paramref name="key"/>.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="key"/> for <typeparamref name="T"/> has already been registered.
+        /// <paramref name="key"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
         /// <paramref name="instanceCreator"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.</exception>
-        public void RegisterByKey<T>(string key, Func<T> instanceCreator) where T : class
+        public void RegisterByKey<TService>(string key, Func<TService> instanceCreator) where TService : class
         {
             if (key == null)
             {
@@ -172,12 +174,12 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<TService>(key);
 
             KeyedInstanceProducer dictionary =
-                this.GetRegistrationDictionaryFor<T>("RegisterByKey<T>(string, Func<T>)");
+                this.GetRegistrationDictionaryFor<TService>("RegisterByKey<T>(string, Func<T>)");
 
-            dictionary.Add(key, new FuncInstanceProducer<T>(instanceCreator));
+            dictionary.Add(key, new FuncInstanceProducer<TService>(instanceCreator));
         }
 
         /// <summary>
@@ -190,6 +192,8 @@ namespace CuttingEdge.ServiceLocation
         /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
         /// <typeparamref name="TConcrete"/> is not a concrete type.
         /// </exception>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
+        /// that can not be created by the container.</exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A design without a generic T would be unpractical, because the other " +
             "overloads also take a generic T.")]
@@ -198,7 +202,6 @@ namespace CuttingEdge.ServiceLocation
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             this.ThrowWhenContainerIsLocked();
-
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
             var instanceProducer = new TransientInstanceProducer<TConcrete>(this);
@@ -209,14 +212,17 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve the instance.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="T"/> has already been registered.
+        /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.</exception>
-        public void RegisterSingle<T>(T instance) where T : class
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TService"/> has already been registered.</exception>
+        public void RegisterSingle<TService>(TService instance) where TService : class
         {
             if (instance == null)
             {
@@ -224,27 +230,26 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
 
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
-
-            this.registrations[typeof(T)] = new SingletonInstanceProducer<T>(instance);
+            this.registrations[typeof(TService)] = new SingletonInstanceProducer<TService>(instance);
         }
 
         /// <summary>
         /// Registers the specified delegate that allows constructing a single instance of 
-        /// <typeparamref name="T"/>. This delegate will be called at most once during the lifetime of the
+        /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of the
         /// application.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating this single
         /// instance.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="instanceCreator"/> for <typeparamref name="T"/> has already been registered.
+        /// <paramref name="instanceCreator"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="singleInstanceCreator"/> is a 
         /// null reference.</exception>
-        public void RegisterSingle<T>(Func<T> instanceCreator) where T : class
+        public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
             if (instanceCreator == null)
             {
@@ -252,10 +257,9 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
 
-            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(T));
-
-            this.registrations[typeof(T)] = new FuncSingletonInstanceProducer<T>(instanceCreator);
+            this.registrations[typeof(TService)] = new FuncSingletonInstanceProducer<TService>(instanceCreator);
         }
 
         /// <summary>
@@ -271,9 +275,10 @@ namespace CuttingEdge.ServiceLocation
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
-        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// for <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
+        /// that can not be created by the container.</exception>
         public void RegisterSingle<TConcrete>(Action<TConcrete> instanceInitializer) where TConcrete : class
         {
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
@@ -284,7 +289,6 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
             var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
@@ -294,18 +298,22 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
         /// This <paramref name="instance"/> must be thread-safe.</summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when an 
-        /// <paramref name="instance"/> with <paramref name="key"/> for <typeparamref name="T"/> has already
+        /// <paramref name="instance"/> with <paramref name="key"/> for <typeparamref name="TService"/> has already
         /// been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or 
         /// <paramref name="instance"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> is an empty string.</exception>
-        public void RegisterSingleByKey<T>(string key, T instance) where T : class
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TConcrete"/> has already been registered with that <paramref name="key"/>.
+        /// </exception>
+        public void RegisterSingleByKey<TService>(string key, TService instance) where TService : class
         {
             if (key == null)
             {
@@ -323,32 +331,33 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<TService>(key);
 
             KeyedInstanceProducer dictionary =
-                this.GetRegistrationDictionaryFor<T>("RegisterSingleByKey<T>(string, T)");
+                this.GetRegistrationDictionaryFor<TService>("RegisterSingleByKey<T>(string, T)");
 
-            dictionary.Add(key, new SingletonInstanceProducer<T>(instance));
+            dictionary.Add(key, new SingletonInstanceProducer<TService>(instance));
         }
 
         /// <summary>
         /// Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/> by 
         /// specifying a delegate.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="key">The (ordinal) case-sensitive key that can be used to retrieve the instance.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, when a 
-        /// <paramref name="key"/> for <typeparamref name="T"/> has already been registered or when 
-        /// <typeparamref name="T"/> has already been registered using one of the overloads that take an
+        /// <paramref name="key"/> for <typeparamref name="TService"/> has already been registered or when 
+        /// <typeparamref name="TService"/> has already been registered using one of the overloads that take an
         /// <b>Func&lt;string, T&gt;</b>.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
         /// <paramref name="instanceCreator"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.
         /// </exception>
-        public void RegisterSingleByKey<T>(string key, Func<T> instanceCreator) where T : class
+        public void RegisterSingleByKey<TService>(string key, Func<TService> instanceCreator) 
+            where TService : class
         {
             if (key == null)
             {
@@ -366,28 +375,29 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenKeyIsAlreadyRegisteredFor<T>(key);
+            this.ThrowWhenKeyIsAlreadyRegisteredFor<TService>(key);
 
             KeyedInstanceProducer dictionary =
-                this.GetRegistrationDictionaryFor<T>("RegisterSingleByKey<T>(string, Func<T>)");
+                this.GetRegistrationDictionaryFor<TService>("RegisterSingleByKey<T>(string, Func<T>)");
 
-            dictionary.Add(key, new FuncSingletonInstanceProducer<T>(instanceCreator));
+            dictionary.Add(key, new FuncSingletonInstanceProducer<TService>(instanceCreator));
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning singletons of <typeparamref name="T"/> by
-        /// a string key. The delegate will get called at most once per given (ordinal) case-sensitive key.
+        /// Registers the specified delegate that allows returning singletons of <typeparamref name="TService"/>
+        /// by a string key. The delegate will get called at most once per given (ordinal) case-sensitive key.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="keyedInstanceCreator">The keyed instance creator.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when the <typeparamref name="T"/> 
+        /// Thrown when the instance is locked and can not be altered, or when the <typeparamref name="TService"/> 
         /// already been registered using one of the overloads that take a <b>string</b> key.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="key"/> or the
         /// <paramref name="instanceCreator"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="key"/> contains an empty string.</exception>
-        public void RegisterSingleByKey<T>(Func<string, T> keyedInstanceCreator) where T : class
+        public void RegisterSingleByKey<TService>(Func<string, TService> keyedInstanceCreator) 
+            where TService : class
         {
             if (keyedInstanceCreator == null)
             {
@@ -395,25 +405,26 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<T>();
+            this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<TService>();
 
-            IKeyedInstanceProducer locator = new KeyedFuncSingletonInstanceProducer<T>(keyedInstanceCreator);
+            IKeyedInstanceProducer locator = 
+                new KeyedFuncSingletonInstanceProducer<TService>(keyedInstanceCreator);
 
-            this.keyedInstanceProducers[typeof(T)] = locator;
+            this.keyedInstanceProducers[typeof(TService)] = locator;
         }
 
         /// <summary>
-        /// Registers a collection of elements of <typeparamref name="T"/>.
+        /// Registers a collection of elements of <typeparamref name="TService"/>.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
-        /// for <typeparamref name="T"/> has already been registered.
+        /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
         /// reference.</exception>
-        public void RegisterAll<T>(IEnumerable<T> collection) where T : class
+        public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
         {
             if (collection == null)
             {
@@ -421,37 +432,36 @@ namespace CuttingEdge.ServiceLocation
             }
 
             this.ThrowWhenContainerIsLocked();
-
-            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>();
+            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<TService>();
 
             var immutableCollection = collection.MakeImmutable();
 
-            this.collectionsToValidate[typeof(T)] = immutableCollection;
+            this.collectionsToValidate[typeof(TService)] = immutableCollection;
 
-            this.registrations[typeof(IEnumerable<T>)] =
-                new SingletonInstanceProducer<IEnumerable<T>>(immutableCollection);
+            this.registrations[typeof(IEnumerable<TService>)] =
+                new SingletonInstanceProducer<IEnumerable<TService>>(immutableCollection);
         }
 
         /// <summary>
-        /// Registers a collection of elements of <typeparamref name="T"/>.
+        /// Registers a collection of elements of <typeparamref name="TService"/>.
         /// </summary>
-        /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
-        /// for <typeparamref name="T"/> has already been registered.
+        /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
         /// reference.</exception>
-        public void RegisterAll<T>(params T[] collection) where T : class
+        public void RegisterAll<TService>(params TService[] collection) where TService : class
         {
-            this.RegisterAll<T>((IEnumerable<T>)collection);
+            this.RegisterAll<TService>((IEnumerable<TService>)collection);
         }
 
         /// <summary>
         /// Validates the <b>SimpleServiceLocator</b>. Validate will call all delegates registered with
         /// <b>Register</b> and iterate collections registered with 
-        /// <see cref="RegisterAll{T}(IEnumerable{T})"/> and
+        /// <see cref="RegisterAll{TService}(IEnumerable{TService})"/> and
         /// throws an exception if there was an error.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was

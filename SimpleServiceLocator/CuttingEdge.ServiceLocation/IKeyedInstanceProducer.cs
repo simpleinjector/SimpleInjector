@@ -41,6 +41,7 @@ namespace CuttingEdge.ServiceLocation
 
         void ThrowTypeAlreadyRegisteredException();
 
+        // Throws an InvalidOperationException on failure.
         void CheckIfKeyIsAlreadyRegistered(string key);
     }
 }
