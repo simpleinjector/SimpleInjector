@@ -58,6 +58,34 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>
+        /// Registers that a new instance of <typeparamref name="TImplementation"/> will be returned every time a
+        /// <typeparamref name="TService"/> is requested.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TImplementation"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TService"/> type
+        /// is not a type that can be created by the container.
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Any other design would be inappropriate.")]
+        public void Register<TService, TImplementation>()
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+
+            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
+
+            var instanceProducer = new TransientInstanceProducer<TImplementation>(this);
+
+            this.registrations[typeof(TService)] = instanceProducer;
+        }
+
+        /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -180,6 +208,36 @@ namespace CuttingEdge.ServiceLocation
                 this.GetRegistrationDictionaryFor<TService>("RegisterByKey<T>(string, Func<T>)");
 
             dictionary.Add(key, new FuncInstanceProducer<TService>(instanceCreator));
+        }
+
+        /// <summary>
+        /// Registers that the same instance of <typeparamref name="TImplementation"/> will be returned every time a
+        /// <typeparamref name="TService"/> is requested.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
+        /// for <typeparamref name="TImplementation"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TService"/> type
+        /// is not a type that can be created by the container.
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Any other design would be inappropriate.")]
+        public void RegisterSingle<TService, TImplementation>()
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+
+            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
+
+            var instanceProducer = new TransientInstanceProducer<TImplementation>(this);
+
+            var singletonProducer = new FuncSingletonInstanceProducer<TService>(instanceProducer.GetInstance);
+
+            this.registrations[typeof(TService)] = singletonProducer;
         }
 
         /// <summary>

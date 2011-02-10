@@ -244,7 +244,7 @@ namespace CuttingEdge.ServiceLocation
 
             if (instanceProducer == null)
             {
-                instanceProducer = this.BuildInstanceProducerForCollection(serviceType);
+                instanceProducer = BuildInstanceProducerForCollection(serviceType);
             }
 
             if (instanceProducer == null)
@@ -274,7 +274,7 @@ namespace CuttingEdge.ServiceLocation
             }
         }
 
-        private IInstanceProducer BuildInstanceProducerForCollection(Type serviceType)
+        private static IInstanceProducer BuildInstanceProducerForCollection(Type serviceType)
         {
             bool typeIsGenericEnumerable =
                 serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);

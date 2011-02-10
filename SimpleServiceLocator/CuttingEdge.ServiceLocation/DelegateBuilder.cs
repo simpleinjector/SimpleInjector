@@ -44,9 +44,6 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     internal sealed class DelegateBuilder
     {
-        private static readonly MethodInfo GenericGetAllInstancesMethodDefinition =
-            typeof(SimpleServiceLocator).GetMethod("GetAllInstances", Type.EmptyTypes);
-
         private readonly Type serviceType;
         private readonly Dictionary<Type, IInstanceProducer> registrations;
         private readonly SimpleServiceLocator container;
