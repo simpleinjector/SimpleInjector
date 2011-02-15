@@ -39,6 +39,31 @@ namespace CuttingEdge.ServiceLocation
     /// </summary>
     public partial class SimpleServiceLocator : IServiceLocator
     {
+        /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
+        /// <typeparam name="TService">Type of object requested.</typeparam>
+        /// <returns>The requested service instance.</returns>
+        /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "This class already contains an overload that takes a Type.")]
+        public TService GetInstance<TService>()
+        {
+            // Performance optimization: This if check is a duplicate to save a call to LockContainer.
+            if (!this.locked)
+            {
+                this.LockContainer();
+            }
+
+            IInstanceProducer instanceProducer;
+
+            // Performance optimization: This if check is a duplicate to save a call to GetInstanceForType.
+            if (!this.registrations.TryGetValue(typeof(TService), out instanceProducer))
+            {
+                return (TService)this.GetInstanceForType(typeof(TService));
+            }
+
+            return (TService)instanceProducer.GetInstance();
+        }
+
         /// <summary>
         /// Gets all instances of the given <typeparamref name="TService"/> currently registered in the container.
         /// </summary>
@@ -49,10 +74,7 @@ namespace CuttingEdge.ServiceLocation
             Justification = "This class already contains an overload that takes a Type.")]
         public IEnumerable<TService> GetAllInstances<TService>()
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             return GetAllInstancesInternal<TService>();
         }
@@ -65,10 +87,7 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             return this.GetAllInstancesInternal(serviceType);
         }
@@ -82,28 +101,9 @@ namespace CuttingEdge.ServiceLocation
             Justification = "This class already contains an overload that takes a Type.")]
         public TService GetInstance<TService>(string key)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             return (TService)this.GetInstanceInternal(typeof(TService), key);
-        }
-
-        /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
-        /// <typeparam name="TService">Type of object requested.</typeparam>
-        /// <returns>The requested service instance.</returns>
-        /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "This class already contains an overload that takes a Type.")]
-        public TService GetInstance<TService>()
-        {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
-
-            return (TService)this.GetInstanceForType(typeof(TService));
         }
 
         /// <summary>Gets an instance of the given named <paramref name="serviceType"/>.</summary>
@@ -113,10 +113,7 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public object GetInstance(Type serviceType, string key)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             return this.GetInstanceInternal(serviceType, key);
         }
@@ -143,10 +140,7 @@ namespace CuttingEdge.ServiceLocation
             Justification = "Users are not expected to inherit from this class and override this implemention.")]
         object IServiceProvider.GetService(Type serviceType)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             IInstanceProducer instanceProducer = 
                 this.GetInstanceProducerForType(serviceType, this.registrations);
@@ -265,8 +259,7 @@ namespace CuttingEdge.ServiceLocation
             {
                 var instanceProducerType = typeof(ResolutionInstanceProducer<>).MakeGenericType(serviceType);
 
-                return (IInstanceProducer)
-                    Activator.CreateInstance(instanceProducerType, serviceType, e.InstanceCreator);
+                return (IInstanceProducer)Activator.CreateInstance(instanceProducerType, e.InstanceCreator);
             }
             else
             {
@@ -361,12 +354,13 @@ namespace CuttingEdge.ServiceLocation
         private void LockContainer()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-            // immediately. The outer 'if (!this.locked)' check performed by the calling methods. This saves
-            // an extra method call and wins us a bit of performance (because methods with a lock can not be
-            // inlined).
-            lock (this.locker)
+            // immediately.
+            if (!this.locked)
             {
-                this.locked = true;
+                lock (this.locker)
+                {
+                    this.locked = true;
+                }
             }
         }
 

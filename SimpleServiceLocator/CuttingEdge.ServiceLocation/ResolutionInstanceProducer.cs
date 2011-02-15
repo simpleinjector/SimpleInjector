@@ -38,17 +38,14 @@ namespace CuttingEdge.ServiceLocation
     /// <typeparam name="T">The service type.</typeparam>
     internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
-        private readonly Type serviceType;
         private readonly Func<object> instanceCreator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResolutionInstanceProducer{T}"/> class.
         /// </summary>
-        /// <param name="serviceType">The type of object to create.</param>
         /// <param name="instanceCreator">The delegate that knows how to create that type.</param>
-        public ResolutionInstanceProducer(Type serviceType, Func<object> instanceCreator)
+        public ResolutionInstanceProducer(Func<object> instanceCreator)
         {
-            this.serviceType = serviceType;
             this.instanceCreator = instanceCreator;
         }
 
@@ -83,13 +80,13 @@ namespace CuttingEdge.ServiceLocation
             catch (Exception ex)
             {
                 throw new ActivationException(StringResources
-                    .HandlerReturnedADelegateThatThrewAnException(this.serviceType, ex.Message), ex);
+                    .HandlerReturnedADelegateThatThrewAnException(typeof(T), ex.Message), ex);
             }
 
             if (instance == null)
             {
                 throw new ActivationException(
-                    StringResources.HandlerReturnedADelegateThatReturnedNull(this.serviceType));
+                    StringResources.HandlerReturnedADelegateThatReturnedNull(typeof(T)));
             }
 
             try
@@ -99,7 +96,7 @@ namespace CuttingEdge.ServiceLocation
             catch (Exception ex)
             {
                 throw new ActivationException(
-                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(this.serviceType,
+                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(typeof(T),
                     instance.GetType()), ex);
             }
         }
