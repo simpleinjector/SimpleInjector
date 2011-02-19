@@ -63,6 +63,7 @@
     <Compile Include="SslPerThreadRegistrationsExtensions.cs" />
     <Compile Include="SslPerWebRequestRegistrationsExtensions.cs" />
     <Compile Include="SslOpenGenericRegistrationExtensions.cs" />
+    <Compile Include="SslResolvingExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CuttingEdge.ServiceLocation\CuttingEdge.ServiceLocation.csproj">
