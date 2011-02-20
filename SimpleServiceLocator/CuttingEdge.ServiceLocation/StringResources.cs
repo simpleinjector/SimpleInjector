@@ -244,5 +244,12 @@ namespace CuttingEdge.ServiceLocation
                 "No registration for type {0} could be found and an implicit registration could not be made. ",
                 serviceType.FullName);
         }
+
+        internal static string TypeDependsOnItself(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The configuration is invalid. The type {0} is directly or indirectly depending on itself.",
+                serviceType.FullName);
+        }
     }
 }

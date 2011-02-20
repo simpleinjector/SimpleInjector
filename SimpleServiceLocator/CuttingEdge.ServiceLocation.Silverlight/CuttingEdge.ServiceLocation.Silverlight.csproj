@@ -87,6 +87,12 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedInstanceProducer.cs">
       <Link>KeyedInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\RecursiveDependencyValidator.cs">
+      <Link>RecursiveDependencyValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\RecursiveDependencyValidatorExtensions.cs">
+      <Link>RecursiveDependencyValidatorExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\ResolutionInstanceProducer.cs">
       <Link>ResolutionInstanceProducer.cs</Link>
     </Compile>

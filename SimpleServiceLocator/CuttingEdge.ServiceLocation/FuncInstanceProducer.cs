@@ -39,6 +39,7 @@ namespace CuttingEdge.ServiceLocation
     {
         // The key of the producer if it is part of a IKeyedInstanceProducer, or null if not.
         private readonly Func<T> instanceCreator;
+        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
 
         internal FuncInstanceProducer(Func<T> instanceCreator)
         {
@@ -67,15 +68,20 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>An instance.</returns>
         public T GetInstance()
         {
+            this.validator.Prevent();
+
             T instance;
 
             try
             {
                 instance = this.instanceCreator();
+
+                this.RemoveValidator();
             }
             catch (Exception ex)
             {
-                // TODO: This catch might cost us some performance. Find out if it does.
+                this.validator.Reset();
+
                 throw new ActivationException(
                     StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
             }
@@ -87,6 +93,18 @@ namespace CuttingEdge.ServiceLocation
             }
 
             return instance;
+        }
+
+        // This method will be inlined by the JIT.
+        private void RemoveValidator()
+        {
+            // No recursive calls detected, we can remove the recursion validator to increase performance.
+            // We first check for null, because this is faster. Every time we write, the CPU has to send
+            // the new value to all the other CPUs.
+            if (this.validator != null)
+            {
+                this.validator = null;
+            }
         }
     }
 }

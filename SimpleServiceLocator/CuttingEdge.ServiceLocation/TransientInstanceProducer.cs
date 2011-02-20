@@ -44,6 +44,7 @@ namespace CuttingEdge.ServiceLocation
 
         private readonly Action<TConcrete> instanceInitializer;
         private Func<TConcrete> instanceCreator;
+        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(TConcrete));
 
         /// <summary>Initializes a new instance of the <see cref="TransientInstanceProducer{TConcrete}"/> class.</summary>
         /// <param name="container">The parent container.</param>
@@ -82,6 +83,8 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>An instance.</returns>
         public TConcrete GetInstance()
         {
+            this.validator.Prevent();
+
             if (this.instanceCreator == null)
             {
                 this.CreateInstanceCreator();
@@ -90,10 +93,16 @@ namespace CuttingEdge.ServiceLocation
             try
             {
                 // instanceCreator can never return null.
-                return this.instanceCreator();
+                var instance = this.instanceCreator();
+
+                this.RemoveValidator();
+
+                return instance;
             }
             catch (Exception ex)
             {
+                this.validator.Reset();
+
                 throw new ActivationException(
                     StringResources.ErrorWhileTryingToGetInstanceOfType(typeof(TConcrete), ex));
             }
@@ -113,22 +122,39 @@ namespace CuttingEdge.ServiceLocation
                     // Adding the snapshot will improve the quality of the created delegate.
                     var instanceProducer = DelegateBuilder.Build<TConcrete>(snapshot, this.container);
 
-                    if (this.instanceInitializer != null)
-                    {
-                        this.instanceCreator = () =>
-                        {
-                            TConcrete instance = instanceProducer();
-
-                            this.instanceInitializer(instance);
-
-                            return instance;
-                        };
-                    }
-                    else
-                    {
-                        this.instanceCreator = instanceProducer;
-                    }
+                    this.instanceCreator = this.AddInstanceInitializer(instanceProducer);
                 }
+            }
+        }
+
+        private Func<TConcrete> AddInstanceInitializer(Func<TConcrete> instanceProducer)
+        {
+            if (this.instanceInitializer != null)
+            {
+                return () =>
+                {
+                    TConcrete instance = instanceProducer();
+
+                    this.instanceInitializer(instance);
+
+                    return instance;
+                };
+            }
+            else
+            {
+                return instanceProducer;
+            }
+        }
+
+        // This method will be inlined by the JIT.
+        private void RemoveValidator()
+        {
+            // No recursive calls detected, we can remove the recursion validator to increase performance.
+            // We first check for null, because this is faster. Every time we write, the CPU has to send
+            // the new value to all the other CPUs.
+            if (this.validator != null)
+            {
+                this.validator = null;
             }
         }
     }

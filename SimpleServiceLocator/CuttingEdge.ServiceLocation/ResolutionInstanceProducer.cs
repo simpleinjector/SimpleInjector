@@ -39,6 +39,7 @@ namespace CuttingEdge.ServiceLocation
     internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Func<object> instanceCreator;
+        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResolutionInstanceProducer{T}"/> class.
@@ -73,12 +74,18 @@ namespace CuttingEdge.ServiceLocation
         {
             object instance;
 
+            this.validator.Prevent();
+
             try
             {
                 instance = this.instanceCreator();
+
+                this.RemoveValidator();
             }
             catch (Exception ex)
             {
+                this.validator.Reset();
+
                 throw new ActivationException(StringResources
                     .HandlerReturnedADelegateThatThrewAnException(typeof(T), ex.Message), ex);
             }
@@ -98,6 +105,18 @@ namespace CuttingEdge.ServiceLocation
                 throw new ActivationException(
                     StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(typeof(T),
                     instance.GetType()), ex);
+            }
+        }
+
+        // This method will be inlined by the JIT.
+        private void RemoveValidator()
+        {
+            // No recursive calls detected, we can remove the recursion validator to increase performance.
+            // We first check for null, because this is faster. Every time we write, the CPU has to send
+            // the new value to all the other CPUs.
+            if (this.validator != null)
+            {
+                this.validator = null;
             }
         }
     }

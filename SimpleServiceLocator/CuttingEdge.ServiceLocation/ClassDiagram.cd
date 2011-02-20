@@ -1,15 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="CuttingEdge.ServiceLocation.FuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="4" Y="15" Width="3" />
+    <Position X="4" Y="11.25" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAABAAAAAACAAAgAEAEA=</HashCode>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAABAAAAAACAAAoAEAFA=</HashCode>
       <FileName>FuncSingletonInstanceProducer.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="validator" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.KeyedFuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="11" Y="10.25" Width="3" />
+    <Position X="11" Y="8.25" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAACAAAAAAAABBAAAgQAgABAAAAAAA=</HashCode>
       <FileName>KeyedFuncSingletonInstanceProducer.cs</FileName>
@@ -17,7 +20,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.KeyedInstanceProducer" BaseTypeListCollapsed="true">
-    <Position X="7.5" Y="10.25" Width="3" />
+    <Position X="4" Y="8.25" Width="3" />
     <TypeIdentifier>
       <HashCode>ABIAAAAAAAAAAAAACAAAAAAAAABAAAAQAgAAAAAACEA=</HashCode>
       <FileName>KeyedInstanceProducer.cs</FileName>
@@ -54,7 +57,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.KeyedFuncInstanceProducer&lt;T&gt;">
-    <Position X="4" Y="10.25" Width="3" />
+    <Position X="7.5" Y="8.25" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAABAAAgQAgAAAAAAAAA=</HashCode>
       <FileName>KeyedFuncInstanceProducer.cs</FileName>
@@ -62,15 +65,18 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.FuncInstanceProducer&lt;T&gt;">
-    <Position X="7.5" Y="15" Width="3" />
+    <Position X="7.5" Y="11.25" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAgAEAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAAoAEAEA=</HashCode>
       <FileName>FuncInstanceProducer.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="validator" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.SingletonInstanceProducer&lt;T&gt;">
-    <Position X="11" Y="15" Width="3" />
+    <Position X="5.75" Y="15.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAgAAAEA=</HashCode>
       <FileName>SingletonInstanceProducer.cs</FileName>
@@ -78,23 +84,29 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.TransientInstanceProducer&lt;TConcrete&gt;">
-    <Position X="5.75" Y="17.5" Width="3" />
+    <Position X="11" Y="11.25" Width="3" />
     <TypeIdentifier>
-      <HashCode>BAAAAAAAAAAAAAAAAEAAAAAABAAAAAAAAAAAAwAEAEA=</HashCode>
+      <HashCode>BAAAAAAAAAAAAAAAAEAAAAAABAAKAAAAAAAAA4AEAEA=</HashCode>
       <FileName>TransientInstanceProducer.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="validator" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.ResolutionInstanceProducer&lt;T&gt;">
-    <Position X="9.25" Y="17.5" Width="3" />
+    <Position X="9.25" Y="15.5" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAgAECEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAAoAEAEA=</HashCode>
       <FileName>ResolutionInstanceProducer.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="validator" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="CuttingEdge.ServiceLocation.UnregisteredTypeEventArgs">
-    <Position X="4.5" Y="0.5" Width="2.5" />
+    <Position X="4" Y="0.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAAAAAAAABAAAAABAAAAAAQAAAAAAAA=</HashCode>
       <FileName>UnregisteredTypeEventArgs.cs</FileName>
@@ -103,7 +115,7 @@
   <Class Name="CuttingEdge.ServiceLocation.StringResources" Collapsed="true">
     <Position X="11.25" Y="5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AgAICCgBAEEEAACAAECBBAcAAIYAECFAAAAABEIAJAA=</HashCode>
+      <HashCode>AgAICCgBAEEEAACIAECBBAcAAIYAECFAAAAABEIAJAA=</HashCode>
       <FileName>StringResources.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -114,15 +126,29 @@
       <FileName>Helpers.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="CuttingEdge.ServiceLocation.RecursiveDependencyValidator" Collapsed="true">
+    <Position X="7.5" Y="14.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RecursiveDependencyValidator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CuttingEdge.ServiceLocation.RecursiveDependencyValidatorExtensions" Collapsed="true">
+    <Position X="11.25" Y="3" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>RecursiveDependencyValidatorExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Interface Name="CuttingEdge.ServiceLocation.IInstanceProducer">
-    <Position X="8" Y="13.25" Width="2" />
+    <Position X="4.5" Y="6" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>IInstanceProducer.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="CuttingEdge.ServiceLocation.IKeyedInstanceProducer">
-    <Position X="8" Y="8.25" Width="2" />
+    <Position X="4.5" Y="3.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAABQAAAAAAAAAAAAAAAIA=</HashCode>
       <FileName>IKeyedInstanceProducer.cs</FileName>

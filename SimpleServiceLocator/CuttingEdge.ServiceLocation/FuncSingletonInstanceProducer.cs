@@ -38,6 +38,7 @@ namespace CuttingEdge.ServiceLocation
         private Func<T> instanceCreator;
         private bool instanceCreated;
         private T instance;
+        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
 
         internal FuncSingletonInstanceProducer(Func<T> instanceCreator)
         {
@@ -58,12 +59,9 @@ namespace CuttingEdge.ServiceLocation
                 {
                     if (!this.instanceCreated)
                     {
-                        this.instance = this.GetInstanceFromCreator();
+                        this.instance = this.GetInstanceFromCreatorWithRecursiveCheck();
 
                         this.instanceCreated = true;
-
-                        // Remove the reference to the delegate; it is not needed anymore.
-                        this.instanceCreator = null;
                     }
                 }
             }
@@ -76,6 +74,18 @@ namespace CuttingEdge.ServiceLocation
         Expression IInstanceProducer.BuildExpression()
         {
             return Expression.Constant(((IInstanceProducer)this).GetInstance());
+        }
+
+        private T GetInstanceFromCreatorWithRecursiveCheck()
+        {
+            this.validator.Prevent();
+
+            T instance = this.GetInstanceFromCreator();
+
+            // Remove the reference to the preventer; it is not needed anymore.
+            this.validator = null;
+
+            return instance;
         }
 
         private T GetInstanceFromCreator()
@@ -100,6 +110,9 @@ namespace CuttingEdge.ServiceLocation
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
             }
+
+            // Remove the reference to the delegate; it is not needed anymore.
+            this.instanceCreator = null;
 
             return instance;
         }

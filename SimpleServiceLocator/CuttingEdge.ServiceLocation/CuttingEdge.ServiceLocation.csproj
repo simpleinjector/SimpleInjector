@@ -12,8 +12,7 @@
     <AssemblyName>CuttingEdge.ServiceLocation</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkSubset>
-    </TargetFrameworkSubset>
+    <TargetFrameworkSubset>Client</TargetFrameworkSubset>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -57,6 +56,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RecursiveDependencyValidator.cs" />
+    <Compile Include="RecursiveDependencyValidatorExtensions.cs" />
     <Compile Include="ResolutionInstanceProducer.cs" />
     <Compile Include="SimpleServiceLocator.Registration.cs" />
     <Compile Include="SimpleServiceLocator.Resolving.cs" />
