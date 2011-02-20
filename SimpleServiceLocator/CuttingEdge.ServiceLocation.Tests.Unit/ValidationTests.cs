@@ -10,29 +10,29 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
     public class ValidationTests
     {
         [TestMethod]
-        public void Validate_WithEmptyConfiguration_Succeeds()
+        public void Verify_WithEmptyConfiguration_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
-        public void Validate_Never_LocksContainer()
+        public void Verify_Never_LocksContainer()
         {
             // Arrange
             var container = new SimpleServiceLocator();
 
-            container.Validate();
+            container.Verify();
 
             // Act
             container.RegisterSingle<IWeapon>(new Katana());
         }
 
         [TestMethod]
-        public void Validate_CalledMultipleTimes_Succeeds()
+        public void Verify_CalledMultipleTimes_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -40,21 +40,21 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterSingle<IWeapon>(new Katana());
 
             // Act
-            container.Validate();
+            container.Verify();
 
             container.Register<Warrior>(() => container.GetInstance<Samurai>());
 
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Registration of a type after validation should fail, because the container should be locked down.")]
-        public void Validate_WithEmptyConfiguration_ThrowsException()
+        public void Verify_WithEmptyConfiguration_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
             container.RegisterSingle<Samurai>();
-            container.Validate();
+            container.Verify();
 
             // Act
             container.Register<Warrior>(() => container.GetInstance<Samurai>());
@@ -62,7 +62,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "An exception was expected because the configuration is invalid without registering an IWeapon.")]
-        public void Validate_WithDependantTypeNotRegistered_ThrowsException()
+        public void Verify_WithDependantTypeNotRegistered_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -71,12 +71,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterSingle<Samurai>();
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_WithFailingFunc_ThrowsException()
+        public void Verify_WithFailingFunc_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -86,35 +86,35 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             });
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
-        public void Validate_RegisteredCollectionWithValidElements_Succeeds()
+        public void Verify_RegisteredCollectionWithValidElements_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
             container.RegisterAll<IWeapon>(new IWeapon[] { new Katana(), new Tanto() });
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_RegisteredCollectionWithNullElements_ThrowsException()
+        public void Verify_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
             container.RegisterAll<IWeapon>(new IWeapon[] { null });
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_FailingCollection_ThrowsException()
+        public void Verify_FailingCollection_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -127,12 +127,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterAll<IWeapon>(weapons);
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_FailingKeyedSingleton_ThrowsException()
+        public void Verify_FailingKeyedSingleton_ThrowsException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -143,11 +143,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             });
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
-        public void Validate_FailingKeyedFuncSingleton_Succeeds()
+        public void Verify_FailingKeyedFuncSingleton_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -160,12 +160,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             // Act
             // This call will succeed, because there is no way for the container to know by which keys
             // the delegate can be called for testing.
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_RegisterCalledWithFuncReturningNullInstances_ThrowsExpectedException()
+        public void Verify_RegisterCalledWithFuncReturningNullInstances_ThrowsExpectedException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -173,12 +173,12 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.Register<IWeapon>(() => null);
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Validate_RegisterByKeyCalledWithFuncReturningNullInstances_ThrowsExpectedException()
+        public void Verify_RegisterByKeyCalledWithFuncReturningNullInstances_ThrowsExpectedException()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -186,11 +186,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterByKey<IWeapon>("sword", () => null);
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
-        public void Validate_RegisterByKeyCalledWithValidFunc_Succeeds()
+        public void Verify_RegisterByKeyCalledWithValidFunc_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -198,11 +198,11 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterByKey<IWeapon>("sword", () => new Katana());
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
-        public void Validate_RegisterByKeyKeyedFuncWithInvalidFunc_StillSucceeds()
+        public void Verify_RegisterByKeyKeyedFuncWithInvalidFunc_StillSucceeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -219,7 +219,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             // This call will still succeed, because there is no way to validate that delegate.
-            container.Validate();
+            container.Verify();
         }
     }
 }

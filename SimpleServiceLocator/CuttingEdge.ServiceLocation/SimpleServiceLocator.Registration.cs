@@ -524,7 +524,19 @@ namespace CuttingEdge.ServiceLocation
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
         /// invalid.</exception>
+        [Obsolete("This method will be removed in the next release. Please use the 'Verify()' method instead.", true)]
         public void Validate()
+        {
+            this.Verify();
+        }
+
+        /// <summary>
+        /// Verifies the <b>SimpleServiceLocator</b>. This method will call all registered delegates, 
+        /// iterate registered collections and throws an exception if there was an error.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
+        /// invalid.</exception>
+        public void Verify()
         {
             // Note: keyed registrations can not be checked, because we don't know what are valid string
             // arguments for the Func<string, object> delegates.

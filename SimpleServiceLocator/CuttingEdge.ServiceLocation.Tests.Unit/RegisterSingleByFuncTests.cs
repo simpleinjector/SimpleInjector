@@ -42,7 +42,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterSingle<IWeapon>(validDelegate);
 
             // Act
-            container.Validate();
+            container.Verify();
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             try
             {
                 // Act
-                container.Validate();
+                container.Verify();
 
                 // Arrange
                 Assert.Fail("Exception expected.");
