@@ -22,8 +22,21 @@
             RegisterManyForOpenGeneric(container, openGenericServiceType, (IEnumerable<Assembly>)assemblies);
         }
 
-        public static void RegisterManyForOpenGeneric(this SimpleServiceLocator container, 
+        public static void RegisterManyForOpenGeneric(this SimpleServiceLocator container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
+        {
+            RegisterManyForOpenGeneric(container, openGenericServiceType, false, assemblies);
+        }
+
+        public static void RegisterManyForOpenGeneric(this SimpleServiceLocator container,
+            Type openGenericServiceType, bool includeInternalTypes, params Assembly[] assemblies)
+        {
+            RegisterManyForOpenGeneric(container, openGenericServiceType, includeInternalTypes,
+                (IEnumerable<Assembly>)assemblies);
+        }
+
+        public static void RegisterManyForOpenGeneric(this SimpleServiceLocator container, 
+            Type openGenericServiceType, bool includeInternalTypes, IEnumerable<Assembly> assemblies)
         {
             if (assemblies == null)
             {
@@ -32,7 +45,7 @@
 
             var typesToRegister =
                 from assembly in assemblies
-                from type in assembly.GetTypes()
+                from type in GetTypesFromAssembly(assembly, includeInternalTypes)
                 where IsConcreteType(type)
                 where TypeImplementsOpenGenericType(type, openGenericServiceType)
                 select type;
@@ -206,6 +219,18 @@
                 where parameter.IsGenericType
                 where parameter.GetGenericTypeDefinition() == parameterType
                 select method).Single();
+        }
+
+        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly, bool includeInternalTypes)
+        {
+            if (includeInternalTypes)
+            {
+                return assembly.GetTypes();
+            }
+            else
+            {
+                return assembly.GetExportedTypes();
+            }
         }
     }
 }

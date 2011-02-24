@@ -6,6 +6,7 @@ using System.Reflection;
 using CuttingEdge.ServiceLocation;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Practices.ServiceLocation;
 
 namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
 {
@@ -13,16 +14,16 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
     public class SslBatchRegistrationExtensionsTests
     {
         // This is the open generic interface that will be used as service type.
-        private interface IService<TA, TB>
+        public interface IService<TA, TB>
         {
         }
 
         // An non-generic interface that inherits from the closed generic IGenericService.
-        private interface INonGeneric : IService<float, double>
+        public interface INonGeneric : IService<float, double>
         {
         }
 
-        private interface IInvalid<TA, TB>
+        public interface IInvalid<TA, TB>
         {
         }
 
@@ -75,6 +76,33 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
             // Assert
             Assert.IsInstanceOfType(impl, typeof(Concrete2),
                 "Concrete2 implements OpenGenericBase<int> which implements IService<int, string>.");
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_IncludingInternalTypes_ReturnsExpectedType()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), true, Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(Concrete4),
+                "Internal type Concrete4 should be found.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void RegisterManyForOpenGeneric_ExcludingInternalTypes_ReturnsExpectedType()
+        {
+            // Arrange
+            var container = new SimpleServiceLocator();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), false, Assembly.GetExecutingAssembly());
+
+            // Act
+            container.GetInstance<IService<decimal, decimal>>();
         }
 
         [TestMethod]
@@ -245,40 +273,46 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
             // Act
             container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
         }
+
         #region IService
 
-        private class ServiceImpl<TA, TB> : IService<TA, TB>
+        public class ServiceImpl<TA, TB> : IService<TA, TB>
         {
         }
 
         // An generic abstract class. Should not be used by the registration.
-        private abstract class OpenGenericBase<T> : IService<T, string>
+        public abstract class OpenGenericBase<T> : IService<T, string>
         {
         }
 
         // A non-generic abstract class. Should not be used by the registration.
-        private abstract class ClosedGenericBase : IService<int, object>
+        public abstract class ClosedGenericBase : IService<int, object>
         {
         }
 
         // A non-abstract generic type. Should not be used by the registration.
-        private class OpenGeneric<T> : OpenGenericBase<T>
+        public class OpenGeneric<T> : OpenGenericBase<T>
         {
         }
 
         // Instance of this type should be returned on container.GetInstance<IService<int, string>>()
-        private class Concrete1 : IService<string, object>
+        public class Concrete1 : IService<string, object>
         {
         }
 
         // Instance of this type should be returned on container.GetInstance<IService<string, object>>()
-        private class Concrete2 : OpenGenericBase<int>
+        public class Concrete2 : OpenGenericBase<int>
         {
         }
 
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and
         // on container.GetInstance<IService<Type, Type>>()
-        private class Concrete3 : INonGeneric, IService<Type, Type>
+        public class Concrete3 : INonGeneric, IService<Type, Type>
+        {
+        }
+
+        // Internal type.
+        private class Concrete4 : IService<decimal, decimal>
         {
         }
 
@@ -287,11 +321,11 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
         #region IInvalid
 
         // Both Invalid1 and Invalid2 implement the same closed generic type.
-        private class Invalid1 : IInvalid<int, double>
+        public class Invalid1 : IInvalid<int, double>
         {
         }
 
-        private class Invalid2 : IInvalid<int, double>
+        public class Invalid2 : IInvalid<int, double>
         {
         }
 
