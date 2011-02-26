@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocation.Tests.Unit
@@ -11,7 +10,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
     public class RegisterSingleByFuncTests
     {
         [TestMethod]
-        public void RegisterSingleByFun_WithValidArgument_Succeeds()
+        public void RegisterSingleByFunc_WithValidArgument_Succeeds()
         {
             // Arrange
             var container = new SimpleServiceLocator();
@@ -181,6 +180,31 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
 
             // Act
             container.GetInstance<Samurai>();
+        }
+
+        [TestMethod]
+        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFunc_ThrowsActivationExceptionWithExpectedInnerException()
+        {
+            // Arrange
+            var expectedInnerException = new InvalidOperationException();
+
+            var container = new SimpleServiceLocator();
+            container.RegisterSingle<IWeapon>(() => { throw expectedInnerException; });
+
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>();
+
+                // Assert
+                Assert.Fail("The GetInstance method was expected to fail, because of the faulty registration.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.AreEqual(expectedInnerException, ex.InnerException,
+                    "The exception thrown by the registered delegate is expected to be wrapped in the " +
+                    "thrown ActivationException.");
+            }
         }
     }
 }

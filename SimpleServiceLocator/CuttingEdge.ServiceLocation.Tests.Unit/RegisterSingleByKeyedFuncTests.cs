@@ -226,5 +226,30 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
             }
         }
+
+        [TestMethod]
+        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByKeyedFunc_ThrowsActivationExceptionWithExpectedInnerException()
+        {
+            // Arrange
+            var expectedInnerException = new InvalidOperationException();
+
+            var container = new SimpleServiceLocator();
+            container.RegisterSingleByKey<IWeapon>(key => { throw expectedInnerException; });
+
+            try
+            {
+                // Act
+                container.GetInstance<IWeapon>("any key :-)");
+
+                // Assert
+                Assert.Fail("The GetInstance method was expected to fail, because of the faulty registration.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.AreEqual(expectedInnerException, ex.InnerException,
+                    "The exception thrown by the registered delegate is expected to be wrapped in the " +
+                    "thrown ActivationException.");
+            }
+        }
     }
 }

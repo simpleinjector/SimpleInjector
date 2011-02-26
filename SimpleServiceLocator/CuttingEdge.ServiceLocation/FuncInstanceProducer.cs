@@ -83,7 +83,7 @@ namespace CuttingEdge.ServiceLocation
                 this.validator.Reset();
 
                 throw new ActivationException(
-                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex));
+                    StringResources.DelegateForTypeThrewAnException(typeof(T), ex), ex);
             }
 
             if (instance == null)
