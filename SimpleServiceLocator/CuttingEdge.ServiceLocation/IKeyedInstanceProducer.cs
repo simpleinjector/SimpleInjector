@@ -37,7 +37,7 @@ namespace CuttingEdge.ServiceLocation
         /// <exception cref="ActivationException">Thrown when something went wrong :-).</exception>
         object GetInstance(string key);
         
-        void Validate();
+        void Verify();
 
         void ThrowTypeAlreadyRegisteredException();
 

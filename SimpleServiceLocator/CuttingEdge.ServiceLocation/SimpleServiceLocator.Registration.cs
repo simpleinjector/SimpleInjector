@@ -80,9 +80,7 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TService));
 
-            var instanceProducer = new TransientInstanceProducer<TImplementation>(this);
-
-            this.registrations[typeof(TService)] = instanceProducer;
+            this.registrations[typeof(TService)] = new TransientInstanceProducer<TImplementation>(this);
         }
 
         /// <summary>
@@ -139,9 +137,8 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
-
-            this.registrations[typeof(TConcrete)] = instanceProducer;
+            this.registrations[typeof(TConcrete)] = 
+                new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
         }
 
         /// <summary>
@@ -166,8 +163,8 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<TService>();
 
-            IKeyedInstanceProducer locator = new KeyedFuncInstanceProducer<TService>(keyedInstanceCreator);
-            this.keyedInstanceProducers[typeof(TService)] = locator;
+            this.keyedInstanceProducers[typeof(TService)] = 
+                new KeyedFuncInstanceProducer<TService>(keyedInstanceCreator);
         }
 
         /// <summary>
@@ -235,9 +232,8 @@ namespace CuttingEdge.ServiceLocation
 
             var instanceProducer = new TransientInstanceProducer<TImplementation>(this);
 
-            var singletonProducer = new FuncSingletonInstanceProducer<TService>(instanceProducer.GetInstance);
-
-            this.registrations[typeof(TService)] = singletonProducer;
+            this.registrations[typeof(TService)] = 
+                new FuncSingletonInstanceProducer<TService>(instanceProducer.GetInstance);
         }
 
         /// <summary>
@@ -264,9 +260,8 @@ namespace CuttingEdge.ServiceLocation
 
             var instanceProducer = new TransientInstanceProducer<TConcrete>(this);
 
-            var singletonProducer = new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);
-
-            this.registrations[typeof(TConcrete)] = singletonProducer;
+            this.registrations[typeof(TConcrete)] = 
+                new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -351,7 +346,8 @@ namespace CuttingEdge.ServiceLocation
 
             var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
 
-            this.RegisterSingle<TConcrete>(instanceProducer.GetInstance);
+            this.registrations[typeof(TConcrete)] = 
+                new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);
         }
 
         /// <summary>Registers a single instance by a given (ordinal) case-sensitive <paramref name="key"/>. 
@@ -465,10 +461,8 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenKeyedFuncIsAlreadyRegisteredFor<TService>();
 
-            IKeyedInstanceProducer locator = 
+            this.keyedInstanceProducers[typeof(TService)] = 
                 new KeyedFuncSingletonInstanceProducer<TService>(keyedInstanceCreator);
-
-            this.keyedInstanceProducers[typeof(TService)] = locator;
         }
 
         /// <summary>
@@ -562,7 +556,7 @@ namespace CuttingEdge.ServiceLocation
             {
                 IKeyedInstanceProducer keyedInstanceProducer = pair.Value;
 
-                keyedInstanceProducer.Validate();
+                keyedInstanceProducer.Verify();
             }
         }
 

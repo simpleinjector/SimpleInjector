@@ -67,9 +67,9 @@ namespace CuttingEdge.ServiceLocation
         {
             Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(this.serviceType);
 
-            var constructor = this.serviceType.GetConstructors().First();
+            var constructor = this.serviceType.GetConstructors().Single();
 
-            Expression[] constructorArgumentCalls = this.BuildGetInstanceCallsForConstructor(constructor);
+            Expression[] constructorArgumentCalls = this.BuildArgumentCallsForConstructor(constructor);
 
             var newServiceTypeMethod = Expression.Lambda<Func<TConcrete>>(
                 Expression.New(constructor, constructorArgumentCalls), new ParameterExpression[0]);
@@ -77,7 +77,7 @@ namespace CuttingEdge.ServiceLocation
             return newServiceTypeMethod.Compile();
         }
 
-        private Expression[] BuildGetInstanceCallsForConstructor(ConstructorInfo constructor)
+        private Expression[] BuildArgumentCallsForConstructor(ConstructorInfo constructor)
         {
             List<Expression> parameterExpressions = new List<Expression>();
 

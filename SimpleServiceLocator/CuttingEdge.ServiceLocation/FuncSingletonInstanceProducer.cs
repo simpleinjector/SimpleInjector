@@ -47,7 +47,7 @@ namespace CuttingEdge.ServiceLocation
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance.</returns>
-        object IInstanceProducer.GetInstance()
+        public object GetInstance()
         {
             // We use a lock to prevent the delegate to be called more than once during the lifetime of
             // the application. We use a double checked lock to prevent the lock statement from being 
@@ -73,7 +73,7 @@ namespace CuttingEdge.ServiceLocation
         /// <returns>An Expression.</returns>
         Expression IInstanceProducer.BuildExpression()
         {
-            return Expression.Constant(((IInstanceProducer)this).GetInstance());
+            return Expression.Constant(this.GetInstance());
         }
 
         private T GetInstanceFromCreatorWithRecursiveCheck()

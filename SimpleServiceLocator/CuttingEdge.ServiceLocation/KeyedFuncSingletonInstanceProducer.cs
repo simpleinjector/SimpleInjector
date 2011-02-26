@@ -76,7 +76,7 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>Does nothing.</summary>
-        void IKeyedInstanceProducer.Validate()
+        void IKeyedInstanceProducer.Verify()
         {
             // Validation is not possible, because there is no way to determine with what keyed the
             // keyedCreator should be called. We assume the registration is valid.

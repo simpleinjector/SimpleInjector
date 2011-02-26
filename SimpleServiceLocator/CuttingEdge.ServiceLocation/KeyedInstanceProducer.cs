@@ -65,7 +65,7 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>Validates the registered instance producers.</summary>
-        void IKeyedInstanceProducer.Validate()
+        void IKeyedInstanceProducer.Verify()
         {
             foreach (var pair in this.instanceProducers)
             {

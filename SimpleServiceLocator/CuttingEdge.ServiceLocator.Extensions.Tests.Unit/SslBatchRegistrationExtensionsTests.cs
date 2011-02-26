@@ -5,8 +5,8 @@ using System.Reflection;
 
 using CuttingEdge.ServiceLocation;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Practices.ServiceLocation;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
 {
@@ -274,6 +274,19 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
             container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
         }
 
+        #region IInvalid
+
+        // Both Invalid1 and Invalid2 implement the same closed generic type.
+        public class Invalid1 : IInvalid<int, double>
+        {
+        }
+
+        public class Invalid2 : IInvalid<int, double>
+        {
+        }
+
+        #endregion
+
         #region IService
 
         public class ServiceImpl<TA, TB> : IService<TA, TB>
@@ -313,19 +326,6 @@ namespace CuttingEdge.ServiceLocator.Extensions.Tests.Unit
 
         // Internal type.
         private class Concrete4 : IService<decimal, decimal>
-        {
-        }
-
-        #endregion
-
-        #region IInvalid
-
-        // Both Invalid1 and Invalid2 implement the same closed generic type.
-        public class Invalid1 : IInvalid<int, double>
-        {
-        }
-
-        public class Invalid2 : IInvalid<int, double>
         {
         }
 
