@@ -45,21 +45,21 @@ namespace CuttingEdge.ServiceLocation
     internal sealed class DelegateBuilder
     {
         private readonly Type serviceType;
-        private readonly Dictionary<Type, IInstanceProducer> registrations;
+        private readonly Dictionary<Type, IInstanceProducer> snapshot;
         private readonly SimpleServiceLocator container;
 
-        private DelegateBuilder(Type serviceType, Dictionary<Type, IInstanceProducer> registrations,
+        private DelegateBuilder(Type serviceType, Dictionary<Type, IInstanceProducer> snapshot,
             SimpleServiceLocator container)
         {
             this.serviceType = serviceType;
-            this.registrations = registrations;
+            this.snapshot = snapshot;
             this.container = container;
         }
 
-        internal static Func<T> Build<T>(Dictionary<Type, IInstanceProducer> registrations,
-            SimpleServiceLocator serviceLocator)
+        internal static Func<T> Build<T>(Dictionary<Type, IInstanceProducer> snapshot,
+            SimpleServiceLocator container)
         {
-            var builder = new DelegateBuilder(typeof(T), registrations, serviceLocator);
+            var builder = new DelegateBuilder(typeof(T), snapshot, container);
             return builder.Build<T>();
         }
 
@@ -69,7 +69,9 @@ namespace CuttingEdge.ServiceLocation
 
             var constructor = this.serviceType.GetConstructors().Single();
 
-            Expression[] constructorArgumentCalls = this.BuildArgumentCallsForConstructor(constructor);
+            Expression[] constructorArgumentCalls = (
+                from parameter in constructor.GetParameters()
+                select this.BuildParameterExpression(parameter.ParameterType)).ToArray();
 
             var newServiceTypeMethod = Expression.Lambda<Func<TConcrete>>(
                 Expression.New(constructor, constructorArgumentCalls), new ParameterExpression[0]);
@@ -77,24 +79,10 @@ namespace CuttingEdge.ServiceLocation
             return newServiceTypeMethod.Compile();
         }
 
-        private Expression[] BuildArgumentCallsForConstructor(ConstructorInfo constructor)
-        {
-            List<Expression> parameterExpressions = new List<Expression>();
-
-            foreach (var parameter in constructor.GetParameters())
-            {
-                var parameterExpression = this.BuildParameterExpression(parameter.ParameterType);
-
-                parameterExpressions.Add(parameterExpression);
-            }
-
-            return parameterExpressions.ToArray();
-        }
-
         private Expression BuildParameterExpression(Type parameterType)
         {
             var instanceProducer =
-                this.container.GetInstanceProducerForType(parameterType, this.registrations);
+                this.container.GetInstanceProducerForType(parameterType, this.snapshot);
 
             if (instanceProducer == null)
             {
