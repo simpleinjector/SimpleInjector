@@ -82,7 +82,7 @@ namespace CuttingEdge.ServiceLocation
 
             T instance = this.GetInstanceFromCreator();
 
-            // Remove the reference to the preventer; it is not needed anymore.
+            // Remove the reference to the validator; it is not needed anymore.
             this.validator = null;
 
             return instance;
@@ -98,6 +98,10 @@ namespace CuttingEdge.ServiceLocation
             }
             catch (ActivationException)
             {
+                // This extra catch statement prevents ActivationExceptions from being wrapped in a new
+                // ActivationException. This FuncSingletonInstanceProducer is used as wrapper around
+                // TransientInstanceProducer instances that can throw ActivationException on their own.
+                // Wrapping these again in a ActivationException would obfuscate the real error.
                 throw;
             }
             catch (Exception ex)
