@@ -41,7 +41,7 @@ namespace CuttingEdge.ServiceLocation
         internal static string NoRegistrationFoundForKeyedType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No keyed registration for type {0} could be found.", serviceType.FullName);
+                "No keyed registration for type {0} could be found.", serviceType);
         }
 
         internal static string SimpleServiceLocatorCanNotBeChangedAfterUse(Type simpleServiceLocatorType)
@@ -54,27 +54,27 @@ namespace CuttingEdge.ServiceLocation
         internal static string DelegateForTypeReturnedNull(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The registered delegate for type {0} returned null.", serviceType.FullName);
+                "The registered delegate for type {0} returned null.", serviceType);
         }
 
         internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "error occurred while trying to get instance of type {0}. {1}",
-                serviceType.FullName, exception.Message);
+                "Error occurred while trying to get instance of type {0}. {1}",
+                serviceType, exception.Message);
         }
            
         internal static string DelegateForTypeThrewAnException(Type serviceType, Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} threw an exception. {1}",
-                serviceType.FullName, exception.Message);
+                serviceType, exception.Message);
         }
 
         internal static string NoRegistrationForTypeFound(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.", serviceType.FullName);
+                "No registration for type {0} could be found.", serviceType);
         }
 
         internal static string ConfigurationInvalidCreatingInstanceFailed(Type type, Exception exception)
@@ -130,7 +130,7 @@ namespace CuttingEdge.ServiceLocation
                     "The constructor of the type contains the parameter of type {0} that is not registered. " +
                     "Please ensure {1} is registered in the container, change the constructor of the " +
                     "type or register the type {2} directly.",
-                    parameterType.FullName, parameterType.Name, serviceType.Name);
+                    parameterType, parameterType.Name, serviceType.Name);
         }
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
@@ -153,7 +153,7 @@ namespace CuttingEdge.ServiceLocation
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The given type {0} is not a concrete type. Please use one of the other overloads to " +
-                "register this type.", serviceType.FullName);
+                "register this type.", serviceType);
         }
 
         internal static string TypeAlreadyRegisteredUsingByKeyString(Type serviceType,
@@ -242,14 +242,14 @@ namespace CuttingEdge.ServiceLocation
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found and an implicit registration could not be made. ",
-                serviceType.FullName);
+                serviceType);
         }
 
         internal static string TypeDependsOnItself(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. The type {0} is directly or indirectly depending on itself.",
-                serviceType.FullName);
+                serviceType);
         }
     }
 }
