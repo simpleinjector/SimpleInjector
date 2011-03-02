@@ -104,7 +104,7 @@ namespace CuttingEdge.ServiceLocation
                 this.validator.Reset();
 
                 throw new ActivationException(
-                    StringResources.ErrorWhileTryingToGetInstanceOfType(typeof(TConcrete), ex));
+                    StringResources.ErrorWhileTryingToGetInstanceOfType(typeof(TConcrete), ex), ex);
             }
         }
 
