@@ -38,7 +38,7 @@ namespace CuttingEdge.ServiceLocation
         private Func<T> instanceCreator;
         private bool instanceCreated;
         private T instance;
-        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
+        private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(T));
 
         internal FuncSingletonInstanceProducer(Func<T> instanceCreator)
         {

@@ -31,32 +31,49 @@ using Microsoft.Practices.ServiceLocation;
 
 namespace CuttingEdge.ServiceLocation
 {
-    /// <summary>Wraps an instance and returns that single instance every time.</summary>
-    /// <typeparam name="T">The type, what else.</typeparam>
-    internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
+    /// <summary>
+    /// Allows retrieval of concrete transient instances of type <typeparamref name="TConcrete"/> with will
+    /// after creation be initialized by calling the supplied Action delegate..
+    /// </summary>
+    /// <typeparam name="TConcrete">The concrete type to create.</typeparam>
+    internal sealed class TransientInitializerInstanceProducer<TConcrete> 
+        : TransientInstanceProducer<TConcrete>
+        where TConcrete : class
     {
-        // Storing a key is not needed, because the Validate method will never throw.
-        private readonly T instance;
+        private readonly Action<TConcrete> instanceInitializer;
 
-        /// <summary>Initializes a new instance of the <see cref="SingletonInstanceProducer{T}"/> class.</summary>
-        /// <param name="instance">The single instance.</param>
-        public SingletonInstanceProducer(T instance)
+        internal TransientInitializerInstanceProducer(SimpleServiceLocator container,
+            Action<TConcrete> instanceInitializer) : base(container)
         {
-            this.instance = instance;
-        }
-
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance. Will never return null.</returns>
-        object IInstanceProducer.GetInstance()
-        {
-            return this.instance;
+            this.instanceInitializer = instanceInitializer;
         }
 
         /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
         /// <returns>An Expression.</returns>
-        Expression IInstanceProducer.BuildExpression()
+        public override Expression BuildExpression()
         {
-            return Expression.Constant(this.instance);
+            // It's not possible to return a Expression that is as heavily optimized as the 
+            // TransientInstanceProducer can do, because we the instanceInitializer must be called as well.
+            return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"),
+                new Expression[0]);           
         }
-    }
+
+        /// <summary>
+        /// Builds the delegate that allows the creation of instances of type TConcrete.
+        /// </summary>
+        /// <returns>Returns a new delegate.</returns>
+        protected override Func<TConcrete> BuildInstanceCreator()
+        {
+            var creator = base.BuildInstanceCreator();
+
+            return () =>
+            {
+                TConcrete instance = creator();
+
+                this.instanceInitializer(instance);
+
+                return instance;
+            };
+        }
+    }   
 }

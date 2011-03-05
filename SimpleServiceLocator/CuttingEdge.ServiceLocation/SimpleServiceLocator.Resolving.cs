@@ -142,8 +142,7 @@ namespace CuttingEdge.ServiceLocation
         {
             this.LockContainer();
 
-            IInstanceProducer instanceProducer = 
-                this.GetInstanceProducerForType(serviceType, this.registrations);
+            IInstanceProducer instanceProducer = this.GetInstanceProducerForType(serviceType);
 
             if (instanceProducer != null)
             {
@@ -158,10 +157,11 @@ namespace CuttingEdge.ServiceLocation
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        internal IInstanceProducer GetInstanceProducerForType(Type serviceType,
-            Dictionary<Type, IInstanceProducer> snapshot)
+        internal IInstanceProducer GetInstanceProducerForType(Type serviceType)
         {
             IInstanceProducer instanceProducer;
+
+            var snapshot = this.Registrations;
 
             if (!snapshot.TryGetValue(serviceType, out instanceProducer))
             {
@@ -218,8 +218,7 @@ namespace CuttingEdge.ServiceLocation
 
         private object GetInstanceForType(Type serviceType)
         {
-            IInstanceProducer instanceProducer = 
-                this.GetInstanceProducerForType(serviceType, this.registrations);
+            IInstanceProducer instanceProducer = this.GetInstanceProducerForType(serviceType);
 
             if (instanceProducer != null)
             {

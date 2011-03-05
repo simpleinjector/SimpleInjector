@@ -137,8 +137,8 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            this.registrations[typeof(TConcrete)] = 
-                new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
+            this.registrations[typeof(TConcrete)] =
+                new TransientInitializerInstanceProducer<TConcrete>(this, instanceInitializer);
         }
 
         /// <summary>
@@ -344,7 +344,8 @@ namespace CuttingEdge.ServiceLocation
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenUnkeyedTypeAlreadyRegistered(typeof(TConcrete));
 
-            var instanceProducer = new TransientInstanceProducer<TConcrete>(this, instanceInitializer);
+            var instanceProducer = 
+                new TransientInitializerInstanceProducer<TConcrete>(this, instanceInitializer);
 
             this.registrations[typeof(TConcrete)] = 
                 new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);

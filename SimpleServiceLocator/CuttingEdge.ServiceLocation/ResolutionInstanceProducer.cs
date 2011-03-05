@@ -39,7 +39,7 @@ namespace CuttingEdge.ServiceLocation
     internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Func<object> instanceCreator;
-        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
+        private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(T));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResolutionInstanceProducer{T}"/> class.

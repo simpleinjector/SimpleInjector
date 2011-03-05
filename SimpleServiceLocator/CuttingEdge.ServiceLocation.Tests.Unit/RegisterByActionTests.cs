@@ -259,5 +259,40 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                 k.Karma = 5;
             });
         }
+
+        [TestMethod]
+        public void GetInstance_ForTypeDependingOnTransientType_ContainerWillRunInitializerOnType()
+        {
+            // Arrange
+            int expectedValue = 10;
+
+            var container = new SimpleServiceLocator();
+
+            container.Register<Service>(createdService =>
+            {
+                createdService.Value = expectedValue;
+            });
+
+            // Act
+            var consumer = container.GetInstance<Consumer>();
+
+            // Assert
+            Assert.AreEqual(expectedValue, consumer.Service.Value, "The Service initializer was not called.");
+        }
+
+        private sealed class Service
+        {
+            public int Value { get; set; }
+        }
+
+        private sealed class Consumer
+        {
+            public Consumer(Service service)
+            {
+                this.Service = service;
+            }
+
+            public Service Service { get; private set; }
+        }
     }
 }

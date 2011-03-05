@@ -60,6 +60,12 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CuttingEdge.ServiceLocation\CyclicDependencyValidator.cs">
+      <Link>CyclicDependencyValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\CyclicDependencyValidatorExtensions.cs">
+      <Link>CyclicDependencyValidatorExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
@@ -87,12 +93,6 @@
     <Compile Include="..\CuttingEdge.ServiceLocation\KeyedInstanceProducer.cs">
       <Link>KeyedInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\RecursiveDependencyValidator.cs">
-      <Link>RecursiveDependencyValidator.cs</Link>
-    </Compile>
-    <Compile Include="..\CuttingEdge.ServiceLocation\RecursiveDependencyValidatorExtensions.cs">
-      <Link>RecursiveDependencyValidatorExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\ResolutionInstanceProducer.cs">
       <Link>ResolutionInstanceProducer.cs</Link>
     </Compile>
@@ -110,6 +110,9 @@
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\StringResources.cs">
       <Link>StringResources.cs</Link>
+    </Compile>
+    <Compile Include="..\CuttingEdge.ServiceLocation\TransientInitializerInstanceProducer.cs">
+      <Link>TransientInitializerInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\CuttingEdge.ServiceLocation\TransientInstanceProducer.cs">
       <Link>TransientInstanceProducer.cs</Link>

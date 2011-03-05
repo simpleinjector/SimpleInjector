@@ -56,12 +56,13 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RecursiveDependencyValidator.cs" />
-    <Compile Include="RecursiveDependencyValidatorExtensions.cs" />
+    <Compile Include="CyclicDependencyValidator.cs" />
+    <Compile Include="CyclicDependencyValidatorExtensions.cs" />
     <Compile Include="ResolutionInstanceProducer.cs" />
     <Compile Include="SimpleServiceLocator.Registration.cs" />
     <Compile Include="SimpleServiceLocator.Resolving.cs" />
     <Compile Include="SimpleServiceLocator.Common.cs" />
+    <Compile Include="TransientInitializerInstanceProducer.cs" />
     <Compile Include="TransientInstanceProducer.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="DelegateBuilder.cs" />

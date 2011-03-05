@@ -42,52 +42,40 @@ namespace CuttingEdge.ServiceLocation
     ///     Func<object> func = () => return new Samurai(container.GetInstance<IWeapon>());
     /// ]]>
     /// </summary>
-    internal sealed class DelegateBuilder
+    internal static class DelegateBuilder
     {
-        private readonly Type serviceType;
-        private readonly Dictionary<Type, IInstanceProducer> snapshot;
-        private readonly SimpleServiceLocator container;
-
-        private DelegateBuilder(Type serviceType, Dictionary<Type, IInstanceProducer> snapshot,
-            SimpleServiceLocator container)
+        internal static Func<TConcrete> Build<TConcrete>(SimpleServiceLocator container)
         {
-            this.serviceType = serviceType;
-            this.snapshot = snapshot;
-            this.container = container;
-        }
-
-        internal static Func<T> Build<T>(Dictionary<Type, IInstanceProducer> snapshot,
-            SimpleServiceLocator container)
-        {
-            var builder = new DelegateBuilder(typeof(T), snapshot, container);
-            return builder.Build<T>();
-        }
-
-        private Func<TConcrete> Build<TConcrete>()
-        {
-            Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(this.serviceType);
-
-            var constructor = this.serviceType.GetConstructors().Single();
-
-            Expression[] constructorArgumentCalls = (
-                from parameter in constructor.GetParameters()
-                select this.BuildParameterExpression(parameter.ParameterType)).ToArray();
+            var newExpression = BuildExpression<TConcrete>(container);
 
             var newServiceTypeMethod = Expression.Lambda<Func<TConcrete>>(
-                Expression.New(constructor, constructorArgumentCalls), new ParameterExpression[0]);
+                newExpression, new ParameterExpression[0]);
 
             return newServiceTypeMethod.Compile();
         }
 
-        private Expression BuildParameterExpression(Type parameterType)
+        internal static Expression BuildExpression<TConcrete>(SimpleServiceLocator container)
         {
-            var instanceProducer =
-                this.container.GetInstanceProducerForType(parameterType, this.snapshot);
+            Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(typeof(TConcrete));
+
+            var constructor = typeof(TConcrete).GetConstructors().Single();
+
+            var constructorArgumentCalls =
+                from parameter in constructor.GetParameters()
+                select BuildParameterExpression<TConcrete>(container, parameter.ParameterType);
+
+            return Expression.New(constructor, constructorArgumentCalls.ToArray());
+        }
+        
+        private static Expression BuildParameterExpression<TConcrete>(SimpleServiceLocator container, 
+            Type parameterType)
+        {
+            var instanceProducer = container.GetInstanceProducerForType(parameterType);
 
             if (instanceProducer == null)
             {
                 throw new ActivationException(
-                    StringResources.ParameterTypeMustBeRegistered(this.serviceType, parameterType));
+                    StringResources.ParameterTypeMustBeRegistered(typeof(TConcrete), parameterType));
             }
 
             return instanceProducer.BuildExpression();

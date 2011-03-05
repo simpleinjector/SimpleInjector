@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
     [TestClass]
-    public class RecursiveDependencyValidatorTests
+    public class CyclicDependencyValidatorTests
     {
         private interface IOne
         {
@@ -313,6 +313,37 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
                     "to always fail with the same exception. When this is not the case, this indicates " +
                     "that recursion detection went off. Actual message: " + ex.Message);
             }            
+        }
+
+        [TestMethod]
+        public void GetInstance_RecursiveDependencyInTransientInitializer_ThrowsMeaningfulError()
+        {
+            // Arrange
+            string expectedMessage = "The configuration is invalid. The type " + typeof(Samurai).FullName +
+                " is directly or indirectly depending on itself.";
+
+            var container = new SimpleServiceLocator();
+
+            container.Register<IWeapon, Katana>();
+
+            container.Register<Samurai>(createdSamurai =>
+            {
+                container.GetInstance<Samurai>();
+            });
+
+            try
+            {
+                // Act
+                container.GetInstance<Samurai>();
+
+                // Assert
+                Assert.Fail("Verify is expected to throw an exception.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), "The actual message did not contain " +
+                    "the expected message. Actual: " + ex.Message);
+            }
         }
 
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)

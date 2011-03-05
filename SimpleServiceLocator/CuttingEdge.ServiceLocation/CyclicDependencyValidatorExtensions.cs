@@ -3,11 +3,11 @@
     /// <summary>
     /// Extension methods for the RecursiveDependencyValidator class.
     /// </summary>
-    internal static class RecursiveDependencyValidatorExtensions
+    internal static class CyclicDependencyValidatorExtensions
     {
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
-        internal static void Prevent(this RecursiveDependencyValidator validator)
+        internal static void Prevent(this CyclicDependencyValidator validator)
         {
             if (validator != null)
             {
@@ -20,7 +20,7 @@
         // exception, because a new call to that provider would otherwise make the validator think it is a
         // recursive call and throw an exception, and this would hide the exception that would otherwise be
         // thrown by the provider itself.
-        internal static void Reset(this RecursiveDependencyValidator validator)
+        internal static void Reset(this CyclicDependencyValidator validator)
         {
             if (validator != null)
             {

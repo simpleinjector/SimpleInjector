@@ -12,12 +12,12 @@ namespace CuttingEdge.ServiceLocation
     /// instance of a IInstanceProvider. A RecursiveDependencyValidator instance checks a single 
     /// IInstanceProvider and therefore a single service type.
     /// </summary>
-    internal sealed class RecursiveDependencyValidator
+    internal sealed class CyclicDependencyValidator
     {
         private readonly Type typeToValidate;
         private readonly List<Thread> threads = new List<Thread>();
 
-        internal RecursiveDependencyValidator(Type typeToValidate)
+        internal CyclicDependencyValidator(Type typeToValidate)
         {
             this.typeToValidate = typeToValidate;
         }

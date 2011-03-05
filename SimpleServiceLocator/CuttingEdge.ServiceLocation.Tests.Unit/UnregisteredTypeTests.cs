@@ -81,8 +81,7 @@ namespace CuttingEdge.ServiceLocation.Tests.Unit
             container.RegisterSingle<IWeapon>(new Katana());
 
             // Act
-            // SamuraiWrapper is a concrete class with a constructor with a single argument of concrete type 
-            // Samurai.
+            // Get the concrete class with a constructor with a single argument of concrete type Samurai.
             var instance = container.GetInstance<ConcreteTypeWithConcreteTypeConstructorArgument>();
 
             // Assert

@@ -39,7 +39,7 @@ namespace CuttingEdge.ServiceLocation
     {
         // The key of the producer if it is part of a IKeyedInstanceProducer, or null if not.
         private readonly Func<T> instanceCreator;
-        private RecursiveDependencyValidator validator = new RecursiveDependencyValidator(typeof(T));
+        private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(T));
 
         internal FuncInstanceProducer(Func<T> instanceCreator)
         {

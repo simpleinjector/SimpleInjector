@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CuttingEdge.ServiceLocation.Tests.Unit
 {
     [TestClass]
-    public class ValidationTests
+    public class VerifyTests
     {
         [TestMethod]
         public void Verify_WithEmptyConfiguration_Succeeds()
