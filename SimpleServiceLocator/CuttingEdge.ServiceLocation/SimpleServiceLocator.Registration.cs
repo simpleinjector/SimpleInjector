@@ -512,20 +512,6 @@ namespace CuttingEdge.ServiceLocation
         }
 
         /// <summary>
-        /// Validates the <b>SimpleServiceLocator</b>. Validate will call all delegates registered with
-        /// <b>Register</b> and iterate collections registered with 
-        /// <see cref="RegisterAll{TService}(IEnumerable{TService})"/> and
-        /// throws an exception if there was an error.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
-        /// invalid.</exception>
-        [Obsolete("This method will be removed in the next release. Please use the 'Verify()' method instead.", true)]
-        public void Validate()
-        {
-            this.Verify();
-        }
-
-        /// <summary>
         /// Verifies the <b>SimpleServiceLocator</b>. This method will call all registered delegates, 
         /// iterate registered collections and throws an exception if there was an error.
         /// </summary>
