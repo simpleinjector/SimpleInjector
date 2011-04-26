@@ -5,10 +5,11 @@ Version vNext
 	Code Changes:
 	Bug Fixes:
 
-Version 1.0.0.? (v1.0 RTM) ????-??-??
+Version 1.0.0.11115 (v1.0 RTM) 2011-04-26
 	General description:
+	    First release of the Simple Injector.
 		
-	Code Changes:
+	Code Changes compared to the Simple Service Locator v1.0:
 	    -Generic type constraint 'where T : class' added to the GetInstance<T> and GetAllInstances<T> methods.
 	    -Register<TConcrete>() method added for better Silverlight support.
 	    -Register<TConcrete>(Action<TConcrete>) and RegisterSingle<TConcrete>(Action<TConcrete>) methods
@@ -22,3 +23,4 @@ Version 1.0.0.? (v1.0 RTM) ????-??-??
 	
 	Bug Fixes:
 	    -Silverlight support fixed. The container did not work properly in Silverlight.
+	    -Performance problems with the IServiceProvider.GetService(Type) method solved.
