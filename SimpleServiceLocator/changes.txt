@@ -1,0 +1,24 @@
+﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
+
+Version vNext
+	General description:
+	Code Changes:
+	Bug Fixes:
+
+Version 1.0.0.? (v1.0 RTM) ????-??-??
+	General description:
+		
+	Code Changes:
+	    -Generic type constraint 'where T : class' added to the GetInstance<T> and GetAllInstances<T> methods.
+	    -Register<TConcrete>() method added for better Silverlight support.
+	    -Register<TConcrete>(Action<TConcrete>) and RegisterSingle<TConcrete>(Action<TConcrete>) methods
+	     removed.
+	    -RegisterInitializer<TService>(Action<TService>) method added.
+	    -The SimpleServiceLocator class is renamed to Container.
+	    -Extensions project is now a fully supported addition.
+	    -Silverlight unit test project added.
+	    -CSL Adapter project added: contains an adapter from the Simple Injector to the Common Service Locator.
+	    -Dependency on the Common Service Locator removed.
+	
+	Bug Fixes:
+	    -Silverlight support fixed. The container did not work properly in Silverlight.
