@@ -54,7 +54,7 @@
     <Compile Include="TestClasses.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CuttingEdge.ServiceLocation.CodeSamples\SimpleInjector.CodeSamples.csproj">
+    <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj">
       <Project>{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}</Project>
       <Name>SimpleInjector.CodeSamples</Name>
     </ProjectReference>

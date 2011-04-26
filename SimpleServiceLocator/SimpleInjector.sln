@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		changes.txt = changes.txt
 		licence.txt = licence.txt
-		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 		Settings.StyleCop = Settings.StyleCop
 		SimpleInjector.FxCop = SimpleInjector.FxCop
 	EndProjectSection
@@ -43,11 +42,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServiceLocator.Simple
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServiceLocator.SimpleInjectorAdapter.Silverlight", "CommonServiceLocator.SimpleInjectorAdapter.Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.csproj", "{E9C71D7E-26BA-48E4-B7FD-67240A663A19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Silverlight.Tests.Unit", "CuttingEdge.ServiceLocation.Silverlight.Tests.Unit\SimpleInjector.Silverlight.Tests.Unit.csproj", "{0BED122A-82F0-4A05-925E-84551DF595CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Silverlight.Tests.Unit", "SimpleInjector.Silverlight.Tests.Unit\SimpleInjector.Silverlight.Tests.Unit.csproj", "{0BED122A-82F0-4A05-925E-84551DF595CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples", "CuttingEdge.ServiceLocation.CodeSamples\SimpleInjector.CodeSamples.csproj", "{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples", "SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj", "{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples.Tests.Unit", "CuttingEdge.ServiceLocation.CodeSamples.Tests.Unit\SimpleInjector.CodeSamples.Tests.Unit.csproj", "{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples.Tests.Unit", "SimpleInjector.CodeSamples.Tests.Unit\SimpleInjector.CodeSamples.Tests.Unit.csproj", "{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -73,21 +72,21 @@ Global
 		SccProjectUniqueName6 = SimpleInjector.Silverlight\\SimpleInjector.Silverlight.csproj
 		SccProjectName6 = SimpleInjector.Silverlight
 		SccLocalPath6 = SimpleInjector.Silverlight
-		SccProjectUniqueName7 = CuttingEdge.ServiceLocation.Silverlight.Tests.Unit\\SimpleInjector.Silverlight.Tests.Unit.csproj
-		SccProjectName7 = CuttingEdge.ServiceLocation.Silverlight.Tests.Unit
-		SccLocalPath7 = CuttingEdge.ServiceLocation.Silverlight.Tests.Unit
+		SccProjectUniqueName7 = SimpleInjector.Silverlight.Tests.Unit\\SimpleInjector.Silverlight.Tests.Unit.csproj
+		SccProjectName7 = SimpleInjector.Silverlight.Tests.Unit
+		SccLocalPath7 = SimpleInjector.Silverlight.Tests.Unit
 		SccProjectUniqueName8 = SimpleInjector.Extensions\\SimpleInjector.Extensions.csproj
 		SccProjectName8 = SimpleInjector.Extensions
 		SccLocalPath8 = SimpleInjector.Extensions
 		SccProjectUniqueName9 = SimpleInjector.Extensions.Tests.Unit\\SimpleInjector.Extensions.Tests.Unit.csproj
 		SccProjectName9 = SimpleInjector.Extensions.Tests.Unit
 		SccLocalPath9 = SimpleInjector.Extensions.Tests.Unit
-		SccProjectUniqueName10 = CuttingEdge.ServiceLocation.CodeSamples\\SimpleInjector.CodeSamples.csproj
-		SccProjectName10 = CuttingEdge.ServiceLocation.CodeSamples
-		SccLocalPath10 = CuttingEdge.ServiceLocation.CodeSamples
-		SccProjectUniqueName11 = CuttingEdge.ServiceLocation.CodeSamples.Tests.Unit\\SimpleInjector.CodeSamples.Tests.Unit.csproj
-		SccProjectName11 = CuttingEdge.ServiceLocation.CodeSamples.Tests.Unit
-		SccLocalPath11 = CuttingEdge.ServiceLocation.CodeSamples.Tests.Unit
+		SccProjectUniqueName10 = SimpleInjector.CodeSamples\\SimpleInjector.CodeSamples.csproj
+		SccProjectName10 = SimpleInjector.CodeSamples
+		SccLocalPath10 = SimpleInjector.CodeSamples
+		SccProjectUniqueName11 = SimpleInjector.CodeSamples.Tests.Unit\\SimpleInjector.CodeSamples.Tests.Unit.csproj
+		SccProjectName11 = SimpleInjector.CodeSamples.Tests.Unit
+		SccLocalPath11 = SimpleInjector.CodeSamples.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

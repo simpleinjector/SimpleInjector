@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CuttingEdge.ServiceLocation.Silverlight.Tests.Unit")]
+[assembly: AssemblyTitle("SimpleInjector.Silverlight.Tests.Unit")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CuttingEdge.ServiceLocation.Silverlight.Tests.Unit")]
-[assembly: AssemblyCopyright("Copyright ©  2008")]
+[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyProduct("SimpleInjector.Silverlight.Tests.Unit")]
+[assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

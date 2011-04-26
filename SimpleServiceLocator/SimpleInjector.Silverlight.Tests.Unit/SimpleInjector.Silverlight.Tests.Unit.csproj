@@ -14,9 +14,9 @@
     <SilverlightApplication>true</SilverlightApplication>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
-    <XapFilename>CuttingEdge.ServiceLocation.Silverlight.Tests.Unit.xap</XapFilename>
+    <XapFilename>SimpleInjector.Silverlight.Tests.Unit.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>CuttingEdge.ServiceLocation.Silverlight.Tests.Unit.App</SilverlightAppEntry>
+    <SilverlightAppEntry>SimpleInjector.Silverlight.Tests.Unit.App</SilverlightAppEntry>
     <TestPageFileName>TestPage.html</TestPageFileName>
     <CreateTestPage>true</CreateTestPage>
     <SccProjectName>SAK</SccProjectName>
