@@ -21,43 +21,12 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
-        public void GetInstance_WithoutLifetimeScope2_ThrowsException()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => container.GetInstance<ConcreteCommand>());
-
-            // Act
-            container.GetInstance<ICommand>();
-        }
-
-        [TestMethod]
         public void GetInstance_WithinLifetimeScope_ReturnsInstanceOfExpectedType()
         {
             // Arrange
             var container = new Container();
 
             container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var actualInstance = container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsInstanceOfType(actualInstance, typeof(ConcreteCommand));
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_WithinLifetimeScope2_ReturnsInstanceOfExpectedType()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
 
             using (container.BeginLifetimeScope())
             {
@@ -89,54 +58,12 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesWithinSingleLifetimeScope2_ReturnsASingleInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var firstInstance = container.GetInstance<ICommand>();
-                var secondInstance = container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.AreEqual(firstInstance, secondInstance);
-            }
-        }
-
-        [TestMethod]
         public void GetInstance_CalledWithinNestedSingleLifetimeScopes_ReturnsAnInstancePerScope()
         {
             // Arrange
             var container = new Container();
 
             container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var firstInstance = container.GetInstance<ICommand>();
-
-                using (container.BeginLifetimeScope())
-                {
-                    var secondInstance = container.GetInstance<ICommand>();
-
-                    // Assert
-                    Assert.AreNotEqual(firstInstance, secondInstance);
-                }
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_CalledWithinNestedSingleLifetimeScopes2_ReturnsAnInstancePerScope()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
 
             using (container.BeginLifetimeScope())
             {
@@ -179,37 +106,12 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_CalledWithinSameLifetimeScopeWithOtherScopesInBetween2_ReturnsASingleInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var firstInstance = container.GetInstance<ICommand>();
-
-                using (container.BeginLifetimeScope())
-                {
-                    container.GetInstance<ICommand>();
-                }
-
-                var secondInstance = container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.AreEqual(firstInstance, secondInstance);
-            }
-        }
-
-        [TestMethod]
         public void MarkAsDisposable_OnTransientObject_EnsuresInstanceGetDisposedAfterLifetimeScope()
         {
             // Arrange
             var container = new Container();
 
-            container.MarkAsDisposable<DisposableCommand>();
+            container.DisposeWhenLifetimeScopeEnds<DisposableCommand>();
 
             DisposableCommand command;
 
@@ -231,7 +133,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.RegisterLifetimeScope<ICommand, DisposableCommand>();
 
-            container.MarkAsDisposable<DisposableCommand>();
+            container.DisposeWhenLifetimeScopeEnds<DisposableCommand>();
 
             DisposableCommand command;
 
@@ -242,7 +144,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             }
 
             // Assert
-            Assert.IsTrue(command.HasBeenDisposed, "The transient instance was expected to be disposed.");
+            Assert.IsTrue(command.HasBeenDisposed, "The lifetime scoped instance was expected to be disposed.");
         }
         
         [TestMethod]
@@ -251,7 +153,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.MarkAsDisposable<DisposableCommand>();
+            container.DisposeWhenLifetimeScopeEnds<DisposableCommand>();
 
             // Act
             using (container.BeginLifetimeScope())
@@ -271,7 +173,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.Register<ICommand, DisposableCommand>();
 
-            container.MarkAsDisposable<DisposableCommand>();
+            container.DisposeWhenLifetimeScopeEnds<DisposableCommand>();
 
             DisposableCommand command;
 
@@ -286,27 +188,71 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_CalledOutsideBeginLifetimeScopeRequestingAnInstanceMarkedAsDisposable_ThrowsExpectedException()
+        public void GetInstance_CalledOutsideBeginLifetimeScopeRequestingAnInstanceMarkedAsDisposable_Succeeds()
         {
             // Arrange
-            string expectedMessage = "instance is requested outside the context of a BeginLifetimeScope";
-            
             var container = new Container();
 
-            container.MarkAsDisposable<DisposableCommand>();
+            container.DisposeWhenLifetimeScopeEnds<DisposableCommand>();
 
-            try
-            {
-                // Act
-                container.GetInstance<DisposableCommand>();
+            // Act
+            // We expect this call to succeed. While this could hide configuration errors, throwing an
+            // exception would disallow scenario's where all IDisposable objects, created inside the scope,
+            // would be disposed.
+            container.GetInstance<DisposableCommand>();
+        }
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
+        [TestMethod]
+        public void GetInstance_WithinALifetimeScope_NeverDisposesASingleton()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<DisposableCommand>();
+
+            // This triggers disposal of all IDisposable objects.
+            container.DisposeWhenLifetimeScopeEnds<IDisposable>();
+
+            // Verify must be called for this to succeed, 
+            // because this triggers the Action<IDisposable> on DisposableCommand.
+            container.Verify();
+
+            DisposableCommand singleton;
+
+            // Act
+            using (container.BeginLifetimeScope())
             {
-                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+                singleton = container.GetInstance<DisposableCommand>();
             }
+
+            // Assert
+            Assert.IsFalse(singleton.HasBeenDisposed, "Singletons should not be disposed.");
+        }
+
+        [TestMethod]
+        public void GetInstance_WithinALifetimeScope_AlwaysDisposesLifetimeScoped()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, DisposableCommand>();
+
+            // This triggers disposal of all IDisposable objects.
+            container.DisposeWhenLifetimeScopeEnds<IDisposable>();
+
+            // The assert should be true, even if we call Verify.
+            container.Verify();
+
+            DisposableCommand lifetimeScopedObject;
+
+            // Act
+            using (container.BeginLifetimeScope())
+            {
+                lifetimeScopedObject = container.GetInstance<DisposableCommand>();
+            }
+
+            // Assert
+            Assert.IsTrue(lifetimeScopedObject.HasBeenDisposed, "Lifetime scope object should be disposed.");
         }
 
         private class DisposableCommand : ICommand, IDisposable

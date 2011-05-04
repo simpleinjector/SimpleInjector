@@ -3,12 +3,12 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
     using SimpleInjector;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Extension methods with non-generic method overloads.

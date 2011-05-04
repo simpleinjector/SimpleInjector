@@ -7,24 +7,20 @@
 
     using SimpleInjector;
 
-    // 36 lines of code
     // Differences with Autofac:
     // 1. In Autofac you call scope.Resolve while here you should just call container.Resolve. In other words, 
     //    this implementation works much like the TransactionScope.
     // 2. In Autofac the container acts like a scope as well, resolving 'per lifetime scoped' objects is the
     //    same as resolving singletons in the container. This implementation throws an exception when
     //    resolving 'per lifetime scoped' outside the context of a lifetime scope.
-    // 3. In Autofac there are many advanced scenario's possible.
+    // 3. By default, Autofac will track all types that implement IDisposable. We can mimic this behavior
+    //    by calling container.MarkAsDisposable<IDisposable>();
+    // 4. In Autofac there are many advanced scenario's possible.
     public static class LifetimeScopeExtensions
     {
-        private const string NoLifetimeScopeMessage = "The type {0} is registered as " +
-            "'lifetime scope' and can't be resolved outside the context of a " +
-            "BeginLifetimeScope call.";
-
-        private const string NeverDisposedMessage = "The type {0} could not be " +
-            "created. {1} implementations are marked to be disposed when the lifetime " +
-            "scope ends, but an instance is requested outside the context of a " +
-            "BeginLifetimeScope call, which mean the instance would never be disposed.";
+        private const string NoLifetimeScopeMessage = "The type {0} is " +
+            "registered as 'lifetime scope' and can't be resolved " +
+            "outside the context of a BeginLifetimeScope call.";
 
         [ThreadStatic]
         private static Stack<LifetimeScope> scopes;
@@ -49,59 +45,48 @@
             where TImplementation : class, TService
             where TService : class
         {
-            container.Register<TService>(() =>
+            // We must use the ResolveUnregisteredType to prevent the registered
+            // delegate from firing during Verify().
+            container.ResolveUnregisteredType += (sender, e) =>
             {
-                var scope = CurrentScope;
-
-                if (scope == null)
+                if (e.UnregisteredServiceType == typeof(TService))
                 {
-                    throw new ActivationException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        NoLifetimeScopeMessage, typeof(TService)));
-                }
+                    e.Register(() =>
+                    {
+                        var scope = CurrentScope;
 
-                return scope.GetInstance<TImplementation>(container);
-            });
+                        if (scope == null)
+                        {
+                            throw new ActivationException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                NoLifetimeScopeMessage, typeof(TService)));
+                        }
+
+                        return scope.GetInstance<TImplementation>(container);
+                    });
+                }
+            };
         }
 
-        public static void RegisterLifetimeScope<TService>(
-            this Container container,
-            Func<TService> instanceCreator) where TService : class
-        {
-            container.Register<TService>(() =>
-            {
-                var scope = CurrentScope;
-
-                if (scope == null)
-                {
-                    throw new ActivationException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        NoLifetimeScopeMessage, typeof(TService)));
-                }
-
-                return scope.GetInstance(container, instanceCreator);
-            });
-        }
-
-        public static void MarkAsDisposable<TImplementation>(
+        public static void DisposeWhenLifetimeScopeEnds<TDisposable>(
             this Container container)
-            where TImplementation : class, IDisposable
+            where TDisposable : class, IDisposable
         {
-            container.RegisterInitializer<TImplementation>(disposable =>
+            container.RegisterInitializer<TDisposable>(disposable =>
             {
                 var scope = CurrentScope;
 
-                if (scope == null)
+                if (scope != null)
                 {
-                    disposable.Dispose();
-
-                    throw new ActivationException(string.Format(
-                        CultureInfo.InvariantCulture,
-                        NeverDisposedMessage, disposable.GetType(), 
-                        typeof(TImplementation)));
+                    scope.RegisterForDisposal(disposable);
                 }
-
-                scope.RegisterForDisposal(disposable);
+                else
+                {
+                    // Instances that are created outside the scope of a lifetime
+                    // scope will most likely be singletons or transients created 
+                    // during the call to Verify(). We have no way of knowing
+                    // whether we can dispose it. Therefore, we simply continue.
+                }
             });
         }
 
@@ -150,19 +135,6 @@
                 {
                     this.instances[typeof(TService)] = 
                         instance = container.GetInstance<TService>();
-                }
-
-                return (TService)instance;
-            }
-
-            internal TService GetInstance<TService>(Container container,
-                Func<TService> instanceCreator) where TService : class
-            {
-                object instance;
-
-                if (!this.instances.TryGetValue(typeof(TService), out instance))
-                {
-                    this.instances[typeof(TService)] = instance = instanceCreator();
                 }
 
                 return (TService)instance;
