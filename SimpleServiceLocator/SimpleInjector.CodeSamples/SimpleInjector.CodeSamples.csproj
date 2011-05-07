@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpirationExtensions.cs" />
     <Compile Include="InterceptorExtensions.cs" />
     <Compile Include="LifetimeScopeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

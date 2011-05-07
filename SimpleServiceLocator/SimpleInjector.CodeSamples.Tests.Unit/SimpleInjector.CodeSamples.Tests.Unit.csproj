@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpirationExtensionsTests.cs" />
     <Compile Include="InterceptorExtensionsTests.cs" />
     <Compile Include="LifetimeScopeExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
