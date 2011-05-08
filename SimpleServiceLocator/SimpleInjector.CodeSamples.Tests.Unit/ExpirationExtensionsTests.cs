@@ -8,8 +8,9 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
     [TestClass]
     public class ExpirationExtensionsTests
     {
-        // DateTime.UtcNow and DateTime.Now only have a precision up to about 15 ms (on my pc).
-        private static readonly TimeSpan oneTimeUnit = TimeSpan.FromMilliseconds(15);
+        // DateTime.UtcNow and DateTime.Now only have a precision up to about 15 ms. But since it
+        // depends on the machine, we take 30 ms. Just to make the tests trustworthy.
+        private static readonly TimeSpan oneTimeUnit = TimeSpan.FromMilliseconds(30);
         private static readonly TimeSpan twoTimeUnits = new TimeSpan(oneTimeUnit.Ticks * 2);
         private static readonly TimeSpan threeTimeUnits = new TimeSpan(oneTimeUnit.Ticks * 3);
 
