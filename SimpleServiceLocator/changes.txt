@@ -3,7 +3,10 @@
 Version vNext
 	General description:
 	Code Changes:
+
 	Bug Fixes:
+		-Container.GetService method failed on concrete unregistered types, that could not be resolved using
+		 auto-wiring, such as System.String and System.Int32. (work item 15843).
 
 Version 1.0.0.11115 (v1.0 RTM) 2011-04-26
 	General description:

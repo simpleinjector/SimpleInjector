@@ -135,14 +135,43 @@ namespace SimpleInjector
             {
                 return null;
             }
-            
-            IInstanceProducer instanceProducer = this.GetInstanceProducerForType(serviceType);
+
+            IInstanceProducer instanceProducer;
+
+            if (this.registrations.TryGetValue(serviceType, out instanceProducer))
+            {
+                return instanceProducer.GetInstance();
+            }
+
+            if (!serviceType.IsValueType)
+            {
+                instanceProducer = this.GetInstanceProducerForType(serviceType);
+            }
 
             if (instanceProducer != null)
             {
                 // We create the instance AFTER registering the instance producer. Calling registration
                 // after creating it, could make us loose all registrations that are done by GetInstance.
-                return instanceProducer.GetInstance();
+                try
+                {
+                    return instanceProducer.GetInstance();
+                }
+                catch (ActivationException)
+                {
+                    if (instanceProducer.GetType().Name == "TransientInstanceProducer`1")
+                    {
+                        // When we get here, the user requested an (unregistered) concrete and onconstructable
+                        // type (i.e. System.String). In that case this method should not fail, but return
+                        // null.
+                    }
+                    else
+                    {
+                        // When we get here, the user requested an (unregistered) type and it has been
+                        // resolved by unregistered type resolution, but the registered creation delegate
+                        // failed. In that case we should not suppress the error, and let it bubble up.
+                        throw;
+                    }
+                }
             }
 
             // Register the current serviceType as unavailable type to prevent a major performance issue.
@@ -336,7 +365,7 @@ namespace SimpleInjector
         {
             // NOTE: We don't check if the type is actually constructable. The TransientInstanceProducer will
             // do that by the time GetInstance is called for the first time on it.
-            if (Helpers.IsConcreteType(serviceType))
+            if (Helpers.IsConcreteType(serviceType) && !serviceType.IsValueType)
             {
                 return Helpers.CreateTransientInstanceProducerFor(serviceType, this);
             }

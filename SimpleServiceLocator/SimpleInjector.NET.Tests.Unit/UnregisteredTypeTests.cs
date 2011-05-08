@@ -19,6 +19,17 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void GetInstance_UnregisteredValueType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.GetInstance(typeof(int));
+        }
+
+        [TestMethod]
         public void GetInstance_UnregisteredConcreteType_CanStillBeCreated()
         {
             // Arrange
@@ -73,6 +84,32 @@ namespace SimpleInjector.Tests.Unit
             {
                 // Act
                 container.GetInstance<ConcreteTypeWithMultiplePublicConstructors>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                string message = ex.Message;
+
+                Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
+                    "The exception message should contain the name of the type. Actual message: " + message);
+
+                Assert.IsTrue(message.Contains("should contain exactly one public constructor, but it has 2."),
+                    "The exception message should describe the actual problem. Actual message: " + message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(ConcreteTypeWithMultiplePublicConstructors));
 
                 // Assert
                 Assert.Fail("Exception was expected.");
