@@ -2,7 +2,10 @@
 
 Version vNext
 	General description:
+	
 	Code Changes:
+		-The RegisterInitializer<T> method now allows multiple Action<T> delegates to be registered for a
+		 single T. (work item 15842).
 
 	Bug Fixes:
 		-Container.GetService method failed on concrete unregistered types, that could not be resolved using

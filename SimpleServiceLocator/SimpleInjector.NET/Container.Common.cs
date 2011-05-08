@@ -36,8 +36,7 @@ namespace SimpleInjector
     {
         private readonly object locker = new object();
 
-        private readonly Dictionary<Type, InstanceInitializer> instanceInitializers =
-            new Dictionary<Type, InstanceInitializer>();
+        private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
         private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
         private Dictionary<Type, bool> unavailableTypes = new Dictionary<Type, bool>();
@@ -62,7 +61,7 @@ namespace SimpleInjector
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
         private sealed class InstanceInitializer
         {
-            internal int SequenceNumber { get; set; }
+            internal Type ServiceType { get; set; }
 
             internal object Action { get; set; }
         }

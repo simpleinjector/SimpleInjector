@@ -92,12 +92,6 @@ namespace SimpleInjector
                 "Type {0} has already been registered.", serviceType);
         }
 
-        internal static string InitializerForTypeAlreadyRegistered(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "An instance initializer for type {0} has already been registered.", serviceType);
-        }
-
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,

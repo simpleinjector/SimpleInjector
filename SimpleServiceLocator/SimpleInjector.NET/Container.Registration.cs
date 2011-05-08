@@ -464,13 +464,12 @@ namespace SimpleInjector
             }
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenInitializerAlreadyRegistered(typeof(TService));
 
-            this.instanceInitializers[typeof(TService)] = new InstanceInitializer
+            this.instanceInitializers.Add(new InstanceInitializer
             {
+                ServiceType = typeof(TService),
                 Action = instanceInitializer,
-                SequenceNumber = this.instanceInitializers.Count
-            };
+            });
         }
 
         /// <summary>
@@ -573,14 +572,6 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowWhenInitializerAlreadyRegistered(Type type)
-        {
-            if (this.instanceInitializers.ContainsKey(type))
-            {
-                throw new InvalidOperationException(StringResources.InitializerForTypeAlreadyRegistered(type));
-            }
-        }
-
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
             if (this.registrations.ContainsKey(type))
@@ -617,16 +608,10 @@ namespace SimpleInjector
         {
             var typeHierarchy = Helpers.GetTypeHierarchyFor<T>();
 
-            // The list is sorted by sequence number to ensure the delegates are executed in the order they
-            // are registered. While ordering seems reduntant in .NET 3.5, the MSDN documentation explicitly
-            // says: "The order in which the items are returned is undefined." (http://bit.ly/h7euog).
             return (
-                from pair in this.instanceInitializers
-                let serviceType = pair.Key
-                let initializer = pair.Value
-                where typeHierarchy.Contains(serviceType)
-                orderby initializer.SequenceNumber
-                select Helpers.CreateAction<T>(initializer.Action))
+                from instanceInitializer in this.instanceInitializers
+                where typeHierarchy.Contains(instanceInitializer.ServiceType)
+                select Helpers.CreateAction<T>(instanceInitializer.Action))
                 .ToArray();
         }
     }

@@ -37,29 +37,23 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterInitializer_CalledTwiceForTheSameServiceType_ThrowsExpectedException()
+        public void RegisterInitializer_CalledTwiceForTheSameServiceType_Succeeds()
         {
             // Arrange
-            string expectedBeginMessage = "An instance initializer for type ";
-            string expectedEndMessage = " has already been registered.";
+            bool action1Called = false;
+            bool action2Called = false;
 
             var container = new Container();
 
-            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { });
+            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { action1Called = true; });
+            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { action2Called = true; });
 
-            try
-            {
-                // Act
-                container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { });
+            // Act
+            container.GetInstance<SqlUserRepository>();
 
-                // Assert
-                Assert.Fail("RegisterInitializer was expected to fail.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.StringContains(expectedBeginMessage, ex.Message, "Message not descriptive enough.");
-                AssertThat.StringContains(expectedEndMessage, ex.Message, "Message not descriptive enough.");
-            }
+            // Assert
+            Assert.IsTrue(action1Called);
+            Assert.IsTrue(action2Called);
         }
 
         [TestMethod]
