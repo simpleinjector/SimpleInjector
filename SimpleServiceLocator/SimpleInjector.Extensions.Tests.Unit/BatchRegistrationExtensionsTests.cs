@@ -325,6 +325,69 @@ namespace SimpleInjector.Extensions.Tests.Unit
             container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void RegisterManyForOpenGeneric_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
+        {
+            // Arrange
+            var container = new Container();
+
+            RegistrationCallback callback = (closedServiceType, implementations) =>
+            {
+                // Do nothing.
+            };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
+                callback, new[] { Assembly.GetExecutingAssembly() });
+
+            // Assert
+            // This call should fail, because by supplying a delegate, the extension method does not do any
+            // registration itself.
+            container.GetInstance<IService<string, object>>();
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithCallback_IsCalledTheExpectedAmountOfTimes()
+        {
+            // Arrange
+            List<Type> expectedClosedServiceTypes = new List<Type>
+            {
+                typeof(IService<float, double>), 
+                typeof(IService<Type, Type>) 
+            };
+
+            List<Type> actualClosedServiceTypes = new List<Type>();
+
+            var container = new Container();
+            
+            RegistrationCallback callback = (closedServiceType, implementations) =>
+            {
+                actualClosedServiceTypes.Add(closedServiceType);
+            };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, new[] { typeof(Concrete3) });
+
+            // Assert
+            Assert_AreEqual(expectedClosedServiceTypes, actualClosedServiceTypes);
+        }
+
+        private void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
+        {
+            Assert.IsNotNull(actualList);
+
+            Assert.AreEqual(expectedList.Count, actualList.Count);
+
+            for (int i = 0; i < expectedList.Count; i++)
+            {
+                T expected = expectedList[i];
+                T actual = actualList[i];
+
+                Assert.AreEqual(expected, actual, "Items at index " + i + " of list were expected to be the same.");
+            }
+        }
+
         #region IInvalid
 
         // Both Invalid1 and Invalid2 implement the same closed generic type.

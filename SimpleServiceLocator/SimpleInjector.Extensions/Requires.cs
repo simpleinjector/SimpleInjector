@@ -87,27 +87,6 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void NoDuplicateRegistrations(Type serviceType, IEnumerable<Type> typesToRegister)
-        {
-            var invalidTypes = (
-                from type in typesToRegister
-                from service in type.GetBaseTypesAndInterfaces(serviceType)
-                group type by service into g
-                where g.Count() > 1
-                select new { ClosedType = g.Key, Duplicates = g.ToArray() }).FirstOrDefault();
-
-            if (invalidTypes != null)
-            {
-                var typeDescription = string.Join(", ", (
-                    from type in invalidTypes.Duplicates
-                    select string.Format(CultureInfo.InvariantCulture, "'{0}'", type)).ToArray());
-
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "There are {0} types that represent the closed generic type '{1}'. Types: {2}.",
-                    invalidTypes.Duplicates.Length, invalidTypes.ClosedType, typeDescription));
-            }
-        }
-
         internal static void ServiceTypeDiffersFromImplementationType(Type serviceType, Type implementation, 
             string paramName, string implementationParamName)
         {

@@ -1,15 +1,13 @@
-﻿namespace SimpleInjector.Extensions
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace SimpleInjector.Extensions
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    using SimpleInjector;
-
     /// <summary>
     /// Extension methods with non-generic method overloads.
     /// </summary>

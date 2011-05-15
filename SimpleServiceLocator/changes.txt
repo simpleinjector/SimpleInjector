@@ -4,6 +4,9 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-New RegisterManyForOpenGeneric overloads added in the Extensions library that allow users to supply
+		 a callback delegate that does the actual registration. This allows alternative scenario's such as 
+		 registration of multiple implementations of a closed generic service type. (work item 15878).
 		-The RegisterInitializer<T> method now allows multiple Action<T> delegates to be registered for a
 		 single T. (work item 15842).
 
