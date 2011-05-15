@@ -4,6 +4,11 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-Performance optimization for non-generic RegisterAll methods in Extensions library. The optimization
+		 prevents the container.GetInstance method from being called on each service type in the collection,
+		 but now directly calls into the IInstanceProducer interfaces. For this the SimpleInjector.dll now
+		 marks the Extensions library as InternalsVisibleTo, because IInstanceProducer is an implementation
+		 detail.
 		-New RegisterManyForOpenGeneric overloads added in the Extensions library that allow users to supply
 		 a callback delegate that does the actual registration. This allows alternative scenario's such as 
 		 registration of multiple implementations of a closed generic service type. (work item 15878).

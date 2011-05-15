@@ -71,3 +71,5 @@ using System.Security;
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", 
     Target = "SimpleInjector")]
+
+[assembly: InternalsVisibleTo("SimpleInjector.Extensions")]

@@ -312,12 +312,13 @@ namespace SimpleInjector.Extensions
         public static void RegisterAll(this Container container, Type serviceType,
             IEnumerable<Type> serviceTypes)
         {
+            // Make a copy for correctness and performance.
             serviceTypes = serviceTypes != null ? serviceTypes.ToArray() : null;
 
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(serviceTypes, "implementationTypes");
-            Requires.DoesNotContainNullValues(serviceTypes, "implementationTypes");
+            Requires.IsNotNull(serviceTypes, "serviceTypes");
+            Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
             Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes");
 
             IEnumerable<object> instances = GetInstanceIterator(container, serviceTypes);
@@ -326,11 +327,53 @@ namespace SimpleInjector.Extensions
         }
 
         private static IEnumerable<object> GetInstanceIterator(Container container,
-            IEnumerable<Type> implementationTypes)
+            IEnumerable<Type> serviceTypes)
         {
-            foreach (var implementationType in implementationTypes)
+            return new AllIterator(container, serviceTypes);
+        }
+
+        /// <summary>Allows iterating a set of services.</summary>
+        private sealed class AllIterator : IEnumerable<object>
+        {
+            private readonly Container container;
+            private readonly IEnumerable<Type> serviceTypes;
+
+            private IInstanceProducer[] instanceProducers;
+
+            internal AllIterator(Container container, IEnumerable<Type> serviceTypes)
             {
-                yield return container.GetInstance(implementationType);
+                this.container = container;
+                this.serviceTypes = serviceTypes;
+            }
+
+            /// <summary>Returns an enumerator that iterates through the collection.</summary>
+            /// <returns>A IEnumerator that can be used to iterate through the collection.</returns>
+            public IEnumerator<object> GetEnumerator()
+            {
+                if (this.instanceProducers == null)
+                {
+                    this.instanceProducers =
+                        this.serviceTypes.Select(t => this.container.GetInstanceProducerForType(t)).ToArray();
+                }
+
+                return this.GetIterator();
+            }
+
+            /// <summary>Returns an enumerator that iterates through a collection.</summary>
+            /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+
+            private IEnumerator<object> GetIterator()
+            {
+                var producers = this.instanceProducers;
+
+                for (int i = 0; i < producers.Length; i++)
+                {
+                    yield return producers[i].GetInstance();
+                }
             }
         }
     }
