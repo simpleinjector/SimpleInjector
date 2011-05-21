@@ -32,9 +32,11 @@ using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
+#if DEBUG
     /// <summary>
     /// Methods for registration.
     /// </summary>
+#endif
     public partial class Container
     {
         /// <summary>
@@ -163,7 +165,8 @@ namespace SimpleInjector
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(typeof(TConcrete));
 
-            this.registrations[typeof(TConcrete)] = TransientInstanceProducer<TConcrete>.Create(this);
+            this.registrations[typeof(TConcrete)] = 
+                TransientInstanceProducer<TConcrete>.Create(this, typeof(TConcrete));
         }
 
         /// <summary>
@@ -189,7 +192,8 @@ namespace SimpleInjector
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
 
-            this.registrations[typeof(TService)] = TransientInstanceProducer<TImplementation>.Create(this);
+            this.registrations[typeof(TService)] = 
+                TransientInstanceProducer<TImplementation>.Create(this, typeof(TService));
         }
 
         /// <summary>
@@ -240,7 +244,7 @@ namespace SimpleInjector
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(typeof(TConcrete));
 
-            var instanceProducer = TransientInstanceProducer<TConcrete>.Create(this);
+            var instanceProducer = TransientInstanceProducer<TConcrete>.Create(this, typeof(TConcrete));
 
             this.registrations[typeof(TConcrete)] = 
                 new FuncSingletonInstanceProducer<TConcrete>(instanceProducer.GetInstance);
@@ -269,7 +273,7 @@ namespace SimpleInjector
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
 
-            var instanceProducer = TransientInstanceProducer<TImplementation>.Create(this);
+            var instanceProducer = TransientInstanceProducer<TImplementation>.Create(this, typeof(TService));
 
             this.registrations[typeof(TService)] =
                 new FuncSingletonInstanceProducer<TService>(instanceProducer.GetInstance);

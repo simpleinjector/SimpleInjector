@@ -13,6 +13,10 @@ namespace SimpleInjector.Extensions.Tests.Unit
         {
         }
 
+        private interface IServiceEx : IService
+        {
+        }
+
         [TestMethod]
         public void RegisterSingleByInstance_ValidRegistration_GetInstanceReturnsExpectedInstance()
         {
@@ -423,6 +427,68 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             // Act
             container.Register(validServiceType, invalidInstanceCreator);
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidListOfTypes_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IServiceEx) });
+        }
+
+        [TestMethod]
+        public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedException = "No registration for type IServiceEx could be found.";
+
+            var container = new Container();
+
+            container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IServiceEx) });
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Expected expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                string actualMessage =
+                    ex.Message.Replace(typeof(IServiceEx).FullName, typeof(IServiceEx).Name);
+
+                Assert.IsTrue(actualMessage.Contains(expectedException), 
+                    string.Format("Expected: <{0}>. Actual: <{1}>.", expectedException, actualMessage));
+            }
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
+        {
+            // Arrange
+            string expectedMessage = 
+                "The supplied type 'IService' does not implement 'IService'.\r\nParameternaam: serviceTypes";
+
+            var container = new Container();
+
+            try
+            {
+                // Act
+                // Cannot register a IService, because this would cause a recursive dependency.
+                container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IService) });
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                string actualMessage = ex.Message.Replace(typeof(IService).FullName, typeof(IService).Name);
+
+                Assert.AreEqual(expectedMessage, actualMessage);
+            }
         }
 
         private sealed class ServiceImpl : IService

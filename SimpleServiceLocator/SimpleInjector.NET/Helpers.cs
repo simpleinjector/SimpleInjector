@@ -56,7 +56,7 @@ namespace SimpleInjector
 
             try
             {
-                // Here we call: "factory.GetInstance<TransientInstanceProducer<[ServiceType]>>()".
+                // Here we call: "factory.GetInstance<TransientInstanceProducer<[ServiceType], [Implementation]>>()".
                 // We don't use the incoming container, because we don't want to polute the actual container. 
                 instanceProducer = genericGetInstanceMethod.Invoke(factory, null);    
             }

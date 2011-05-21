@@ -31,9 +31,11 @@ using System.Linq;
 
 namespace SimpleInjector
 {
+#if DEBUG
     /// <summary>
     /// Methods for resolving instances.
     /// </summary>
+#endif
     public partial class Container : IServiceProvider
     {
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
@@ -145,7 +147,7 @@ namespace SimpleInjector
 
             if (!serviceType.IsValueType)
             {
-                instanceProducer = this.GetInstanceProducerForType(serviceType);
+                instanceProducer = this.GetRegistration(serviceType);
             }
 
             if (instanceProducer != null)
@@ -182,7 +184,16 @@ namespace SimpleInjector
             return null;
         }
 
-        internal IInstanceProducer GetInstanceProducerForType(Type serviceType)
+        /// <summary>
+        /// Gets the <see cref="IInstanceProducer"/> for the given <paramref name="serviceType"/>. When no
+        /// registration exists, the container will try creating a new producer. A producer can be created
+        /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
+        /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
+        /// Otherwise <b>null</b> (Nothing in VB) is returned.
+        /// </summary>
+        /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
+        /// <returns>An <see cref="IInstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        public IInstanceProducer GetRegistration(Type serviceType)
         {
             Func<IInstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
             return this.GetInstanceProducerForType(serviceType, buildProducer);
@@ -196,7 +207,7 @@ namespace SimpleInjector
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        private IInstanceProducer GetInstanceProducerForType(Type serviceType, 
+        private IInstanceProducer GetInstanceProducerForType(Type serviceType,
             Func<IInstanceProducer> buildInstanceProducer)
         {
             IInstanceProducer instanceProducer;
@@ -252,7 +263,7 @@ namespace SimpleInjector
 
         private object GetInstanceForType(Type serviceType)
         {
-            IInstanceProducer producer = this.GetInstanceProducerForType(serviceType);
+            IInstanceProducer producer = this.GetRegistration(serviceType);
             return GetInstanceFromProducer(producer, serviceType);
         }
 
@@ -333,18 +344,23 @@ namespace SimpleInjector
                 // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
                 // it up). This means that we will must always return an empty set and we will do this by
                 // registering a SingletonInstanceProducer with an empty array of that type.
-                Type elementType = serviceType.GetGenericArguments()[0];
-
-                var emptyArray = Array.CreateInstance(elementType, 0);
-
-                var instanceProducerType = typeof(SingletonInstanceProducer<>).MakeGenericType(serviceType);
-
-                return (IInstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
+                return BuildEmptyCollectionInstanceProducer(serviceType);
             }
             else
             {
                 return null;
             }
+        }
+
+        private static IInstanceProducer BuildEmptyCollectionInstanceProducer(Type enumerableType)
+        {
+            Type elementType = enumerableType.GetGenericArguments()[0];
+
+            var emptyArray = Array.CreateInstance(elementType, 0);
+
+            var instanceProducerType = typeof(SingletonInstanceProducer<>).MakeGenericType(enumerableType);
+
+            return (IInstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
         private IInstanceProducer BuildInstanceProducerForConcreteType<TService>() where TService : class
@@ -353,7 +369,7 @@ namespace SimpleInjector
             // do that by the time GetInstance is called for the first time on it.
             if (Helpers.IsConcreteType(typeof(TService)))
             {
-                return TransientInstanceProducer<TService>.Create(this);
+                return TransientInstanceProducer<TService>.Create(this, typeof(TService));
             }
             else
             {

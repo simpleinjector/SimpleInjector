@@ -26,6 +26,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleInjector
 {
@@ -56,6 +57,23 @@ namespace SimpleInjector
         internal Dictionary<Type, IInstanceProducer> Registrations
         {
             get { return this.registrations; }
+        }
+
+        /// <summary>
+        /// Returns an array with the current registrations. This list contains all explicitly registered
+        /// types, and all implictly registered instances. Implicit registrations are  all concrete 
+        /// unregistered types that have been requested, all types that have been resolved using
+        /// unregistered type resolution (using the <see cref="ResolveUnregisteredType"/> event), and
+        /// requested unregistered collections. Note that the result of this method may change over time, 
+        /// because of these implicit registrations. Because of this, users should not depend on this method
+        /// as a reliable source of resolving instances. This method is provided for debugging purposes.
+        /// </summary>
+        /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
+        public IInstanceProducer[] GetCurrentRegistrations()
+        {
+            var snapshot = this.registrations;
+
+            return snapshot.Values.ToArray();
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>

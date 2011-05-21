@@ -47,6 +47,12 @@ namespace SimpleInjector
             this.instanceCreator = instanceCreator;
         }
 
+        /// <summary>Gets the <see cref="Type"/> for which this producer produces instances.</summary>
+        Type IInstanceProducer.ServiceType
+        {
+            get { return typeof(T); }
+        }
+
         /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
         /// <returns>An Expression.</returns>
         Expression IInstanceProducer.BuildExpression()

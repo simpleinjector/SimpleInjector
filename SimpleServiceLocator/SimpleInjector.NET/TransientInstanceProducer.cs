@@ -34,6 +34,8 @@ namespace SimpleInjector
     internal interface ITransientInstanceProducer
     {
         Container Container { set; }
+
+        Type ServiceType { get; set; }
     }
 
     /// <summary>
@@ -54,6 +56,13 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="TransientInstanceProducer{TConcrete}"/> class.</summary>
         public TransientInstanceProducer()
         {
+            this.ServiceType = typeof(TConcrete);
+        }
+
+        /// <summary>Gets the <see cref="Type"/> for which this producer produces instances.</summary>
+        Type IInstanceProducer.ServiceType
+        {
+            get { return this.ServiceType; }
         }
 
         /// <summary>Sets the container.</summary>
@@ -61,6 +70,8 @@ namespace SimpleInjector
         { 
             set { this.container = value; } 
         }
+
+        public Type ServiceType { get; set; }
 
         /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
         /// <returns>An Expression.</returns>
@@ -130,11 +141,12 @@ namespace SimpleInjector
             }
         }
 
-        internal static TransientInstanceProducer<TConcrete> Create(Container container)
+        internal static TransientInstanceProducer<TConcrete> Create(Container container, Type serviceType)
         {
             return new TransientInstanceProducer<TConcrete>()
             {
-                container = container
+                container = container,
+                ServiceType = serviceType
             };
         }
 

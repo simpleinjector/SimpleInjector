@@ -67,7 +67,7 @@ namespace SimpleInjector
         private static Expression BuildParameterExpression(Container container, Type concreteType,
             Type parameterType)
         {
-            var instanceProducer = container.GetInstanceProducerForType(parameterType);
+            var instanceProducer = container.GetRegistration(parameterType);
 
             if (instanceProducer == null)
             {

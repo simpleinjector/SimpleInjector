@@ -321,15 +321,9 @@ namespace SimpleInjector.Extensions
             Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
             Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes");
 
-            IEnumerable<object> instances = GetInstanceIterator(container, serviceTypes);
+            IEnumerable<object> instances = new AllIterator(container, serviceTypes);
 
             container.RegisterAll(serviceType, instances);
-        }
-
-        private static IEnumerable<object> GetInstanceIterator(Container container,
-            IEnumerable<Type> serviceTypes)
-        {
-            return new AllIterator(container, serviceTypes);
         }
 
         /// <summary>Allows iterating a set of services.</summary>
@@ -352,8 +346,7 @@ namespace SimpleInjector.Extensions
             {
                 if (this.instanceProducers == null)
                 {
-                    this.instanceProducers =
-                        this.serviceTypes.Select(t => this.container.GetInstanceProducerForType(t)).ToArray();
+                    this.instanceProducers = this.serviceTypes.Select(t => this.GetRegistration(t)).ToArray();
                 }
 
                 return this.GetIterator();
@@ -374,6 +367,20 @@ namespace SimpleInjector.Extensions
                 {
                     yield return producers[i].GetInstance();
                 }
+            }
+
+            private IInstanceProducer GetRegistration(Type serviceType)
+            {
+                var producer = this.container.GetRegistration(serviceType);
+
+                if (producer == null)
+                {
+                    // This will throw an exception, because there is no registration for the service type.
+                    // By calling GetInstnce we reuse the descriptive exception messages of the container.
+                    this.container.GetInstance(serviceType);
+                }
+
+                return producer;
             }
         }
     }

@@ -23,19 +23,29 @@
 */
 #endregion
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
     /// <summary>Contract for types that produce instances.</summary>
-    internal interface IInstanceProducer
+    public interface IInstanceProducer
     {
+        /// <summary>Gets the <see cref="Type"/> for which this producer produces instances.</summary>
+        /// <value>A <see cref="Type"/> instance.</value>
+        Type ServiceType { get; }
+
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = 
+            "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         object GetInstance();
 
-        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
+        /// <summary>
+        /// Builds an expression that expresses the intent to get an instance by the current producer.
+        /// </summary>
         /// <returns>An Expression.</returns>
         Expression BuildExpression();
     }
