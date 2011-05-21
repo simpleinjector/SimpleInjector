@@ -76,6 +76,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetRegistrationTests.cs">
+      <Link>GetRegistrationTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetServiceTests.cs">
       <Link>GetServiceTests.cs</Link>
     </Compile>

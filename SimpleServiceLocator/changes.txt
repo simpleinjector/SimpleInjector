@@ -2,6 +2,10 @@
 
 Version vNext
 	General description:
+		This release fixes a small bug and adds a small feature to the core that allows the retrieval of
+		IInstanceProvider types. The SimpleInjector.Extensions.dll builds upon this feature to improve 
+		performance of the registrations made using the RegisterAll extension method. The extensions project
+		also adds new RegisterManyForOpenGeneric that allow many more advanced scenario's.
 	
 	Code Changes:
 		-Performance optimization for non-generic RegisterAll methods in Extensions library. The optimization

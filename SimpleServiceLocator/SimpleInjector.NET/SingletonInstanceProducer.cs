@@ -24,12 +24,14 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
     /// <summary>Wraps an instance and returns that single instance every time.</summary>
     /// <typeparam name="T">The type, what else.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
         // Storing a key is not needed, because the Validate method will never throw.

@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
@@ -32,6 +33,7 @@ namespace SimpleInjector
     /// Allows producing instances based on a supplied Func{T} delegate.
     /// </summary>
     /// <typeparam name="T">Type service type.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class FuncInstanceProducer<T> : IInstanceProducer
     {
         // The key of the producer if it is part of a IKeyedInstanceProducer, or null if not.

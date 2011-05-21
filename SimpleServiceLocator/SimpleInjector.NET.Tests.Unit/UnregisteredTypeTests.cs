@@ -20,6 +20,33 @@ namespace SimpleInjector.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ActivationException))]
+        public void GetInstance_UnregisteredAbstractType2_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // This call forces a different code path through the container.
+            container.GetRegistration(typeof(IUserRepository));
+
+            // Act
+            container.GetInstance<IUserRepository>();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void GetInstance_UnregisteredAbstractType3_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetRegistration(typeof(IUserRepository));
+
+            // Act
+            container.GetInstance(typeof(IUserRepository));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredValueType_ThrowsException()
         {
             // Arrange
@@ -101,7 +128,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsException()
+        public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithNameOfType()
         {
             // Arrange
             var container = new Container();
@@ -120,9 +147,32 @@ namespace SimpleInjector.Tests.Unit
 
                 Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
                     "The exception message should contain the name of the type. Actual message: " + message);
+            }
+        }
 
-                Assert.IsTrue(message.Contains("should contain exactly one public constructor, but it has 2."),
-                    "The exception message should describe the actual problem. Actual message: " + message);
+        [TestMethod]
+        public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithExpectedMessage()
+        {
+            // Arrange
+            string expectedMessage = "should contain exactly one public constructor, but it has 2.";
+
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(ConcreteTypeWithMultiplePublicConstructors));
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                string actualMessage = ex.Message;
+
+                Assert.IsTrue(actualMessage.Contains(expectedMessage),
+                    "The exception message should describe the actual problem. Actual message: " + 
+                    actualMessage);
             }
         }
 

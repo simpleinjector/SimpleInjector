@@ -40,7 +40,6 @@ namespace SimpleInjector
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
         private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
-        private Dictionary<Type, bool> unavailableTypes = new Dictionary<Type, bool>();
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();

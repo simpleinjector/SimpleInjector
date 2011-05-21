@@ -49,6 +49,7 @@
     <Compile Include="ActivationExceptionTests.cs" />
     <Compile Include="AssertThat.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
+    <Compile Include="GetRegistrationTests.cs" />
     <Compile Include="GetServiceTests.cs" />
     <Compile Include="CyclicDependencyValidatorTests.cs" />
     <Compile Include="ConsistencyTests.cs" />

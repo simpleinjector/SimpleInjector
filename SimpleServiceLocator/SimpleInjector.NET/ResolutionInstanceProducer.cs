@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
@@ -33,6 +34,7 @@ namespace SimpleInjector
     /// type resolution.
     /// </summary>
     /// <typeparam name="T">The service type.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Func<object> instanceCreator;

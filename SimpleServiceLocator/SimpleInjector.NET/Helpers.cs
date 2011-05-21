@@ -38,6 +38,9 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
+        internal const string InstanceProviderDebuggerDisplayString =
+            "ServiceType: {((IInstanceProducer)this).ServiceType}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
+
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
         internal static IInstanceProducer CreateTransientInstanceProducerFor(Type serviceType, 
@@ -222,6 +225,13 @@ namespace SimpleInjector
                 new ParameterExpression[] { objParameter });
 
             return instanceInitializer.Compile();
+        }
+
+        internal static bool IsConcreteConstructableType(Type serviceType)
+        {
+            string errorMesssage;
+
+            return IsConcreteConstructableType(serviceType, out errorMesssage);
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)

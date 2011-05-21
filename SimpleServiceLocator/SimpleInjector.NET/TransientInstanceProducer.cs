@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
@@ -35,6 +36,8 @@ namespace SimpleInjector
     {
         Container Container { set; }
 
+        /// <summary>Gets or sets the <see cref="Type"/> for which this producer produces instances.</summary>
+        /// <value>A <see cref="Type"/> instance.</value>
         Type ServiceType { get; set; }
     }
 
@@ -45,6 +48,7 @@ namespace SimpleInjector
     /// will be registered by that time.
     /// </summary>
     /// <typeparam name="TConcrete">The concrete type to create.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal class TransientInstanceProducer<TConcrete> : IInstanceProducer, ITransientInstanceProducer
         where TConcrete : class
     {
@@ -71,6 +75,7 @@ namespace SimpleInjector
             set { this.container = value; } 
         }
 
+        /// <summary>Gets or sets the <see cref="Type"/> for which this producer produces instances.</summary>
         public Type ServiceType { get; set; }
 
         /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>

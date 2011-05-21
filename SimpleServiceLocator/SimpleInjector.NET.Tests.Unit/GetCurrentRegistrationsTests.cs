@@ -137,7 +137,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.ResolveUnregisteredType += (sender, e) =>
             {
-                e.Register(() => new RealTimeProvider());   
+                e.Register(() => new RealTimeProvider());
             };
 
             container.GetInstance<ITimeProvider>();
@@ -148,6 +148,5 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
-
     }
 }

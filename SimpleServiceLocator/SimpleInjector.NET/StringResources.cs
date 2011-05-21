@@ -118,7 +118,8 @@ namespace SimpleInjector
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The type {0} should contain exactly one public constructor, but it has {1}.",
+                "For the container to be able to create {0}, it should contain exactly one public " + 
+                "constructor, but it has {1}.",
                 serviceType, serviceType.GetConstructors().Length);
         }
 

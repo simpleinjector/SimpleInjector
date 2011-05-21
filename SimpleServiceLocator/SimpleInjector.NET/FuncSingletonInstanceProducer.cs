@@ -24,12 +24,14 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
     /// <summary>Ensures that the wrapped delegate will only be executed once.</summary>
     /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class FuncSingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
         private Func<T> instanceCreator;
