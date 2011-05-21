@@ -1,7 +1,5 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // Do not include this extension method in the release. It will be put on the project's wiki page. This
-    // way we can still unit test this code example.
     using System;
 
     using SimpleInjector;
@@ -11,6 +9,16 @@
     /// </summary>
     public static class ResolvingExtensions
     {
+        public static bool CanGetInstance<T>(this Container container)
+        {
+            return container.GetRegistration(typeof(T)) != null;
+        }
+
+        public static bool CanGetInstance(this Container container, Type serviceType)
+        {
+            return container.GetRegistration(serviceType) != null;
+        }
+
         public static bool TryGetInstance<T>(this Container container, out T instance)
         {
             IServiceProvider provider = container;
@@ -20,11 +28,11 @@
             return instance != null;
         }
 
-        public static bool TryGetInstance(this Container container, Type type, out object instance)
+        public static bool TryGetInstance(this Container container, Type serviceType, out object instance)
         {
             IServiceProvider provider = container;
 
-            instance = provider.GetService(type);
+            instance = provider.GetService(serviceType);
 
             return instance != null;
         }

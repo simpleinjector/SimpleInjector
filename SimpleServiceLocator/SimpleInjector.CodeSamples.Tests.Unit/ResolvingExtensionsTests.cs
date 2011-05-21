@@ -6,6 +6,122 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
     public class ResolvingExtensionsTests
     {
         [TestMethod]
+        public void CanGetInstanceGeneric_OnRegisteredType_ReturnsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>();
+
+            // Act
+            bool result = container.CanGetInstance<ICommand>();
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceNonGeneric_OnRegisteredType_ReturnsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>();
+
+            // Act
+            bool result = container.CanGetInstance(typeof(ICommand));
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceGeneric_OnOnregisteredAbstractType_ReturnsFalse()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            bool result = container.CanGetInstance<ICommand>();
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceNonGeneric_OnOnregisteredAbstractType_ReturnsFalse()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            bool result = container.CanGetInstance(typeof(ICommand));
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceGeneric_OnOnregisteredString_ReturnsFalse()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            bool result = container.CanGetInstance<string>();
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceGeneric_OnValueType_ReturnsFalse()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            bool result = container.CanGetInstance<int>();
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceGeneric_OnOnregisteredConcreteType_ReturnsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            bool result = container.CanGetInstance<ConcreteCommand>();
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void CanGetInstanceGeneric_TypeResolvedByUnregisteredTypeResolution_ReturnsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (sender, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(ICommand))
+                {
+                    e.Register(() => new ConcreteCommand());
+                }
+            };
+
+            // Act
+            bool result = container.CanGetInstance<ICommand>();
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
         public void TryGetInstanceOfT_ServiceTypeRegistered_ReturnsTrue()
         {
             // Arrange
