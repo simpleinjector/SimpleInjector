@@ -92,7 +92,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleManyForOpenGeneric_WithValidTypeDefinitions_ReturnsTransientInstances()
+        public void RegisterSingleManyForOpenGeneric_WithValidTypeDefinitions_ReturnsSingletonInstances()
         {
             // Arrange
             var container = new Container();
@@ -103,7 +103,26 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var impl2 = container.GetInstance<IService<int, string>>();
 
             // Assert
-            Assert.AreEqual(impl1, impl2, "The types should be registered as singleton.");
+            Assert.IsTrue(Object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
+        }
+
+        [TestMethod]
+        public void RegisterSingleManyForOpenGeneric_WithValidTypeDefinitions2_ReturnsSingletonInstances()
+        {
+            // Arrange
+            // Concrete1 implements IService<string, object>
+            IEnumerable<Type> typesToRegister = new[] { typeof(Concrete1) };
+
+            var container = new Container();
+
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), typesToRegister);
+
+            // Act
+            var impl1 = container.GetInstance<IService<string, object>>();
+            var impl2 = container.GetInstance<IService<string, object>>();
+
+            // Assert
+            Assert.IsTrue(Object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
         }
 
         [TestMethod]
@@ -174,7 +193,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             // Assert
             Assert.IsInstanceOfType(impl, typeof(Concrete3),
-                "Concrete3 implements implements IService<Type, Type>.");
+                "Concrete3 implements IService<Type, Type>.");
         }
 
         [TestMethod]
@@ -213,9 +232,9 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var imp2 = container.GetInstance<IService<int, string>>();
 
             Assert.IsInstanceOfType(impl, typeof(Concrete1),
-                "Concrete1 implements implements IService<string, object>.");
+                "Concrete1 implements IService<string, object>.");
             Assert.IsInstanceOfType(impl, typeof(Concrete1),
-                "Concrete2 implements implements IService<int, string>.");
+                "Concrete2 implements IService<int, string>.");
         }
 
         [TestMethod]
@@ -332,7 +351,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            RegistrationCallback callback = (closedServiceType, implementations) =>
+            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
                 // Do nothing.
             };
@@ -361,7 +380,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             var container = new Container();
             
-            RegistrationCallback callback = (closedServiceType, implementations) =>
+            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
                 actualClosedServiceTypes.Add(closedServiceType);
             };

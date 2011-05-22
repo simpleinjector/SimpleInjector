@@ -16,7 +16,7 @@ namespace SimpleInjector.Extensions
     /// <param name="closedServiceType">The service type that needs to be registered.</param>
     /// <param name="implementations">One or more concrete types that implement the given 
     /// <paramref name="closedServiceType"/>.</param>
-    public delegate void RegistrationCallback(Type closedServiceType, Type[] implementations);
+    public delegate void BatchRegistrationCallback(Type closedServiceType, Type[] implementations);
 
     /// <summary>
     /// Defines the accessibility of the types to search.
@@ -136,7 +136,7 @@ namespace SimpleInjector.Extensions
         /// Allows registration of all concrete, non-generic types with the given 
         /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
         /// the given <paramref name="openGenericServiceType"/>, by supplying a 
-        /// <see cref="RegistrationCallback"/> delegate, that will be called for each found closed generic 
+        /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -156,7 +156,7 @@ namespace SimpleInjector.Extensions
             Justification = "By using the 'this Container' argument, we allow this extension method to " +
             "show when using Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
-            Type openGenericServiceType, AccessibilityOption accessibility, RegistrationCallback callback, 
+            Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback, 
             IEnumerable<Assembly> assemblies)
         {
             RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility, callback);
@@ -307,7 +307,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> typesToRegister)
         {
-            RegistrationCallback callback = (closedServiceType, types) =>
+            BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
                 container.Register(closedServiceType, types.Single());
@@ -319,7 +319,7 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Allows registration of all supplied <paramref name="typesToRegister"/> by a closed generic 
         /// definition of the given <paramref name="openGenericServiceType"/>, by supplying a 
-        /// <see cref="RegistrationCallback"/> delegate, that will be called for each found closed generic 
+        /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -340,7 +340,7 @@ namespace SimpleInjector.Extensions
             Justification = "By using the 'this Container' argument, we allow this extension method to " +
             "show when using Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
-            Type openGenericServiceType, RegistrationCallback callback, IEnumerable<Type> typesToRegister)
+            Type openGenericServiceType, BatchRegistrationCallback callback, IEnumerable<Type> typesToRegister)
         {
             RegisterManyForOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
         }
@@ -395,7 +395,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> typesToRegister)
         {
-            RegistrationCallback callback = (closedServiceType, types) =>
+            BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
                 container.RegisterSingle(closedServiceType, types.Single());
@@ -407,7 +407,7 @@ namespace SimpleInjector.Extensions
         private static void RegisterManyForOpenGenericInternal(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
         {
-            RegistrationCallback callback = (closedServiceType, types) =>
+            BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
                 container.Register(closedServiceType, types.Single());
@@ -419,7 +419,7 @@ namespace SimpleInjector.Extensions
         private static void RegisterManySinglesForOpenGenericInternal(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, AccessibilityOption loadOptions)
         {
-            RegistrationCallback callback = (closedServiceType, types) =>
+            BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
                 container.RegisterSingle(closedServiceType, types.Single());
@@ -430,7 +430,7 @@ namespace SimpleInjector.Extensions
 
         private static void RegisterManyForOpenGenericInternal(Type openGenericServiceType, 
             IEnumerable<Assembly> assemblies, AccessibilityOption accessibility,
-            RegistrationCallback callback)
+            BatchRegistrationCallback callback)
         {
             Requires.IsNotNull(assemblies, "assemblies");
             Requires.IsValidValue(accessibility, "accessibility");
@@ -446,7 +446,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static void RegisterManyForOpenGenericInternal(Type openGenericServiceType, 
-            IEnumerable<Type> typesToRegister, RegistrationCallback callback)
+            IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
         {
             // Make a copy of the collection for performance and correctness.
             typesToRegister = typesToRegister != null ? typesToRegister.ToArray() : null;
@@ -462,7 +462,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static void RegisterOpenGenericInternal(Type openGenericType, 
-            IEnumerable<Type> typesToRegister, RegistrationCallback callback)
+            IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
         {
             // A single type to register can implement multiple closed versions of a open generic type, so
             // we can end up with multiple registrations per type.

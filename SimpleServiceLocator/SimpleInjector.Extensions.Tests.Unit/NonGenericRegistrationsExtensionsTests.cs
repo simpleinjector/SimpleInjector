@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -14,6 +16,10 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         private interface IServiceEx : IService
+        {
+        }
+
+        private interface IGenericDictionary<T> : IDictionary
         {
         }
 
@@ -258,6 +264,47 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
+        public void RegisterSingle_OpenGenericServiceType_ThrowsExcpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterSingle(typeof(IDictionary<,>), typeof(Dictionary<,>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The supplied type ") &&
+                    ex.Message.Contains(" is an open generic type."), "Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithOpenGenericType_FailsWithExpectedExceptionMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterAll<IDictionary>(new[] { typeof(IGenericDictionary<>) });
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("open generic type"), "Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void RegisterAll_WithValidCollectionOfServices_Succeeds()
         {
             // Arrange
@@ -436,7 +483,50 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // Act
+            // IServiceEx is a valid registration, because it could be registered.
             container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IServiceEx) });
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidEnumeableOfTypes_Succeeds()
+        {
+            // Arrange
+            IEnumerable<Type> types = new[] { typeof(ServiceImpl) };
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IService>(types);
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidParamListOfTypes_Succeeds()
+        {
+            // Arrange
+            Type[] types = new[] { typeof(ServiceImpl) };
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IService>(types);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegisterAllWithValidListOfTypes_ReturnsExpectedList()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IService>(new[] { typeof(ServiceImpl) });
+
+            // Act
+            container.Verify();
+
+            var list = container.GetAllInstances<IService>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, list.Length);
+            Assert.IsInstanceOfType(list[0], typeof(ServiceImpl));
         }
 
         [TestMethod]
@@ -454,7 +544,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
                 // Act
                 container.Verify();
 
-                Assert.Fail("Expected expected.");
+                Assert.Fail("Exception expected.");
             }
             catch (InvalidOperationException ex)
             {

@@ -53,8 +53,17 @@ namespace SimpleInjector.Extensions
             if (type.IsGenericTypeDefinition)
             {
                 throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' is an open generic type.", type),
+                    "The supplied type '{0}' is an open generic type. Use the RegisterOpenGeneric or " +
+                    "RegisterManyForOpenGeneric extension method for registering open generic types.", type),
                     paramName);
+            }
+        }
+
+        internal static void DoesNotContainOpenGenericTypes(IEnumerable<Type> serviceTypes, string paramName)
+        {
+            foreach (var type in serviceTypes)
+            {
+                TypeIsNotOpenGeneric(type, paramName);
             }
         }
 

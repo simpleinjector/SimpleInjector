@@ -42,13 +42,16 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/> or <paramref name="implementation"/> are null references (Nothing in
         /// VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
-        /// <paramref name="implementation"/> represent the same type or <paramref name="implementation"/> is
-        /// no sub type from <paramref name="serviceType"/>.</exception>
+        /// <paramref name="implementation"/> represent the same type, or <paramref name="implementation"/> is
+        /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
+        /// type.</exception>
         public static void RegisterSingle(this Container container, Type serviceType, Type implementation)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(implementation, "implementation");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+            Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
@@ -64,6 +67,8 @@ namespace SimpleInjector.Extensions
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating that single instance.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
+        /// generic type.</exception>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> or null references (Nothing in
         /// VB).</exception>
@@ -102,6 +107,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instance, "instance");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
             registerSingleByT.MakeGenericMethod(serviceType).Invoke(container, new[] { instance });
@@ -118,13 +124,16 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/> or <paramref name="implementation"/> or null references (Nothing in
         /// VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
-        /// <paramref name="implementation"/> represent the same type or <paramref name="implementation"/> is
-        /// no sub type from <paramref name="serviceType"/>.</exception>
+        /// <paramref name="implementation"/> represent the same type, or <paramref name="implementation"/> is
+        /// no sub type from <paramref name="serviceType"/>, or one of them represents an open generic type.
+        /// </exception>
         public static void Register(this Container container, Type serviceType, Type implementation)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(implementation, "implementation");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+            Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
@@ -141,11 +150,14 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> or null references (Nothing in
         /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
         public static void Register(this Container container, Type serviceType, Func<object> instanceCreator)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
             // Build the following delegate: () => (T)instanceCreator();
             object creator = Expression.Lambda(
@@ -167,11 +179,14 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
         /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
         public static void RegisterAll(this Container container, Type serviceType, IEnumerable collection)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(collection, "collection");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
             object castedCollection;
 
@@ -207,9 +222,7 @@ namespace SimpleInjector.Extensions
         /// (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="typesToRegister"/> contains a null
-        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
-        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
-        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// (Nothing in VB) element.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A method without the type parameter already exists. This extension method " +
@@ -297,6 +310,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(serviceTypes, "serviceTypes");
             Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
+            Requires.DoesNotContainOpenGenericTypes(serviceTypes, "serviceTypes");
             Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes");
 
             IEnumerable<object> instances = new AllIterator(container, serviceTypes);
