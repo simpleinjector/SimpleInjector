@@ -96,14 +96,5 @@ namespace SimpleInjector.Extensions
                     " must be different types.", paramName);
             }
         }
-
-        internal static void IsConcreteType(Type concreteType, string paramName)
-        {
-            if (!Helpers.IsConcreteType(concreteType))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.InstalledUICulture,
-                    "{0} is not a concrete type.", concreteType), paramName);
-            }
-        }
     }
 }

@@ -19,9 +19,6 @@ namespace SimpleInjector.Extensions
         private static readonly MethodInfo registerSingle = 
             Helpers.GetGenericMethod(c => c.RegisterSingle<object, object>());
 
-        private static readonly MethodInfo registerSingleConcrete =
-            Helpers.GetGenericMethod(c => c.RegisterSingle<object>());
-
         private static readonly MethodInfo registerByFunc = 
             Helpers.GetGenericMethod(c => c.Register<object>((Func<object>)null));
 
@@ -33,25 +30,6 @@ namespace SimpleInjector.Extensions
 
         private static readonly MethodInfo registerSingleByT = 
             Helpers.GetGenericMethod(c => c.RegisterSingle<object>((object)null));
-
-        /// <summary>
-        /// Registers that the same instance of type <paramref name="concreteType"/> will be returned every 
-        /// time it is requested.
-        /// </summary>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="concreteType">The concrete type that will be registered.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
-        /// <paramref name="concreteType"/> are null references (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> does not represent
-        /// a concrete type.</exception>
-        public static void RegisterSingle(this Container container, Type concreteType)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(concreteType, "concreteType");
-            Requires.IsConcreteType(concreteType, "concreteType");
-
-            registerSingleConcrete.MakeGenericMethod(concreteType).Invoke(container, null);
-        }
 
         /// <summary>
         /// Registers that the same instance of type <paramref name="implementation"/> will be returned every 

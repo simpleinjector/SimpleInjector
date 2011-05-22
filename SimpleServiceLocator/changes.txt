@@ -8,6 +8,11 @@ Version vNext
 		also adds new RegisterManyForOpenGeneric that allow many more advanced scenario's.
 	
 	Code Changes:
+		-RegisterSingle(Container, Type) method removed from NonGenericRegistrationsExtensions class in 
+		 SimpleInjector.Extensions. Because of the C# overload resolution rules, the C# compiler never picked 
+		 that method, but would always pick Container.RegisterSingle<Type>(Type), which would not yield the 
+		 correct configuration. Removing this method is a breaking change of the SimpleInjector.Extensions 
+		 library, but users will unlikely be affected by this.
 		-Performance optimization for non-generic RegisterAll methods in Extensions library. The optimization
 		 prevents the container.GetInstance method from being called on each service type in the collection,
 		 but now directly calls into the IInstanceProducer interfaces.

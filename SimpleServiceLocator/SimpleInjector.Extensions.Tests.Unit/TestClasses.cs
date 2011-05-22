@@ -11,4 +11,15 @@
         {
         }
     }
+
+    public class ConcreteTypeWithMultiplePublicConstructors
+    {
+        public ConcreteTypeWithMultiplePublicConstructors(ICommand command)
+        {
+        }
+
+        public ConcreteTypeWithMultiplePublicConstructors(ICommand command1, ICommand command2)
+        {
+        }
+    }
 }
