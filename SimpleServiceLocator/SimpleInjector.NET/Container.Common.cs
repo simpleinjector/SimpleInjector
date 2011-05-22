@@ -67,10 +67,15 @@ namespace SimpleInjector
         /// because of these implicit registrations. Because of this, users should not depend on this method
         /// as a reliable source of resolving instances. This method is provided for debugging purposes.
         /// </summary>
+        /// <remarks>A call to this method locks the container. No new registrations can be made after a call
+        /// to this method.</remarks>
         /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
         public IInstanceProducer[] GetCurrentRegistrations()
         {
             var snapshot = this.registrations;
+
+            // We must lock, because not locking could lead to race conditions.
+            this.LockContainer();
 
             return snapshot.Values.ToArray();
         }

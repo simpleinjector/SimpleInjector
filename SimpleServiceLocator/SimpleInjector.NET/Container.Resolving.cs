@@ -172,6 +172,7 @@ namespace SimpleInjector
             // Performance optimization: This if check is a duplicate to save a call to LockContainer.
             if (!this.locked)
             {
+                // We must lock, because not locking could lead to race conditions.
                 this.LockContainer();
             }
 

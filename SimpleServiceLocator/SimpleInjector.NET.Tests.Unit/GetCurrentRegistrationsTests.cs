@@ -10,6 +10,19 @@ namespace SimpleInjector.Tests.Unit
     public class GetCurrentRegistrationsTests
     {
         [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void GetCurrentRegistrations_Always_LocksTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetCurrentRegistrations();
+
+            // Act
+            container.Register<ITimeProvider, RealTimeProvider>();
+        }
+
+        [TestMethod]
         public void GetCurrentRegistrations_TransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
