@@ -342,13 +342,11 @@ namespace SimpleInjector
         /// Thrown when the <paramref name="instanceInitializer"/> is a null reference.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an 
-        /// <paramref name="instanceInitializer"/> for <typeparamref name="TService"/> has already been 
-        /// registered.</exception>
+        /// Thrown when the instance is locked and can not be altered.</exception>
         /// <remarks>
         /// <para>
-        /// Although only one <paramref name="instanceInitializer"/> can be registered per 
-        /// <typeparamref name="TService"/>, multiple initializers can be applied on a created instance,
+        /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per 
+        /// <typeparamref name="TService"/> and multiple initializers can be applied on a created instance,
         /// before it is returned. For instance, when registering a <paramref name="instanceInitializer"/>
         /// for type <see cref="System.Object"/>, the delegate will be called for every instance created by
         /// the container, which can be nice for debugging purposes.
