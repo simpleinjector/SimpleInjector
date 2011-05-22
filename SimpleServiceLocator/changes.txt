@@ -1,6 +1,8 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 Version vNext
+
+Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 	General description:
 		This release fixes a small bug and adds a small feature to the core that allows the retrieval of
 		IInstanceProvider types. The SimpleInjector.Extensions.dll builds upon this feature to improve 
