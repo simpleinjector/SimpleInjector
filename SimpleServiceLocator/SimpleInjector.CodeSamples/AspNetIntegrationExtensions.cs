@@ -10,8 +10,6 @@
     public static class AspNetIntegrationExtensions
     {
         private static Container Container;
-        private static Dictionary<Type, PropertyInfo[]> Types = 
-            new Dictionary<Type, PropertyInfo[]>();
 
         // Don't forget to call this method during app_start.
         public static void SetContainer(Container container)
@@ -42,48 +40,19 @@
                     "to call SetContainer first.");
             }
 
-            var properties = GetInjectableProperties(instance.GetType());
+            var properties =
+                from property in instance.GetType().GetProperties()
+                where property.CanWrite
+                where property.DeclaringType.Namespace != "System.Web.UI"
+                let type = property.PropertyType
+                let producer = Container.GetRegistration(type)
+                where producer != null
+                select new { property, producer };
 
-            foreach (var property in properties)
+            foreach (var p in properties)
             {
-                InjectProperty(instance, property);
-            }
-        }
-
-        private static IEnumerable<PropertyInfo> GetInjectableProperties(
-            Type type)
-        {
-            var snapshot = Types;
-
-            PropertyInfo[] properties;
-
-            if (!snapshot.TryGetValue(type, out properties))
-            {
-                properties = (
-                    from property in type.GetProperties()
-                    where property.CanWrite
-                    where property.DeclaringType.Namespace != "System.Web.UI"
-                    let propertyType = property.PropertyType
-                    where Container.GetRegistration(propertyType) != null
-                    select property)
-                    .ToArray();
-
-                var copy = new Dictionary<Type, PropertyInfo[]>(snapshot);
-                copy[type] = properties;
-                Types = copy;
-            }
-
-            return properties;
-        }
-
-        private static void InjectProperty(object instance,
-            PropertyInfo property)
-        {
-            var value = Container.GetInstance(property.PropertyType);
-
-            if (value != null)
-            {
-                property.SetValue(instance, value, null);
+                object value = p.producer.GetInstance();
+                p.property.SetValue(instance, value, null);
             }
         }
     }
