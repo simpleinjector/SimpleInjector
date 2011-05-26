@@ -116,10 +116,10 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String"/> that represents the <see cref="ConditionValidator{T}"/>.
+        /// Returns a <see cref="System.String"/> that represents the <see cref="Container"/>.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String"/> that represents the <see cref="ConditionValidator{T}"/>.
+        /// A <see cref="System.String"/> that represents the <see cref="Container"/>.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override string ToString()
