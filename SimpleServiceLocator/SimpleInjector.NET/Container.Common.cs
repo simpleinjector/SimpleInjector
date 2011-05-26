@@ -26,6 +26,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SimpleInjector
@@ -90,6 +92,53 @@ namespace SimpleInjector
             this.LockContainer();
 
             return snapshot.Values.ToArray();
+        }
+
+        /// <summary>
+        /// Determines whether the specified System.Object is equal to the current System.Object.
+        /// </summary>
+        /// <param name="obj">The System.Object to compare with the current System.Object.</param>
+        /// <returns>
+        /// True if the specified System.Object is equal to the current System.Object; otherwise, false.
+        /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        /// <summary>Returns the hash code of the current instance.</summary>
+        /// <returns>The hash code of the current instance.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents the <see cref="ConditionValidator{T}"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String"/> that represents the <see cref="ConditionValidator{T}"/>.
+        /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
+        /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime 
+        /// type of the current instance.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)] // see top of page for note on this attribute.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
+            "This FxCop warning is valid, but this method is used to be able to attach an " +
+            "EditorBrowsableAttribute to the GetType method, which will hide the method when the user " +
+            "browses the methods of the Container class with IntelliSense. The GetType method has " +
+            "no value for the user who will only use this class for registration.")]
+        public new Type GetType()
+        {
+            return base.GetType();
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
