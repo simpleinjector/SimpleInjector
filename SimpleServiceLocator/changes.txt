@@ -1,6 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 Version vNext
+	General description:
+	
+	Code Changes:
+	
+	Bug Fixes:
+		-Bug fix in the RegisterSingleOpenGeneric extension method in the SimpleInjector.Extensions.dll. Due 
+		to a race condition, it was possible for this method to new up more instances of the same type.
 
 Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 	General description:

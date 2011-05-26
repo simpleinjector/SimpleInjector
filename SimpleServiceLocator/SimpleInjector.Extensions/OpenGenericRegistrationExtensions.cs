@@ -165,6 +165,9 @@
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
                 "openGenericServiceType");
+            
+            object locker = new object();
+            Dictionary<Type, object> singletons = new Dictionary<Type, object>();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -174,7 +177,16 @@
                     var closedGenericImplementation = openGenericImplementation.MakeGenericType(
                         e.UnregisteredServiceType.GetGenericArguments());
 
-                    object singleton = container.GetInstance(closedGenericImplementation);
+                    object singleton;
+
+                    lock (locker)
+                    {
+                        if (!singletons.TryGetValue(closedGenericImplementation, out singleton))
+                        {
+                            singleton = container.GetInstance(closedGenericImplementation);
+                            singletons[closedGenericImplementation] = singleton;
+                        }
+                    }
 
                     e.Register(() => singleton);
                 }

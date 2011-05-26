@@ -14,6 +14,11 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
         private interface IValidate<T>
         {
+            void Validate(T instance);
+        }
+
+        private interface IDoStuff<T>
+        {
             IService<T, int> Service { get; }
         }
 
@@ -90,14 +95,14 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterOpenGeneric(typeof(IValidate<>), typeof(DefaultValidator<>));
+            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuff<>));
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
-            var validator = container.GetInstance<IValidate<string>>();
+            var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultValidator<string>));
+            Assert.IsInstanceOfType(validator, typeof(DefaultStuff<string>));
             Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
         }
 
@@ -172,29 +177,50 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(DefaultValidator<>));
+            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuff<>));
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
-            var validator = container.GetInstance<IValidate<string>>();
+            var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultValidator<string>));
+            Assert.IsInstanceOfType(validator, typeof(DefaultStuff<string>));
             Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
         }
 
-        private class ServiceImpl<TA, TB> : IService<TA, TB>
+        [TestMethod]
+        public void GetInstance_CalledOnMultipleClosedImplementationsOfTypeRegisteredWithRegisterSingleOpenGeneric_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
+
+            // Act
+            container.GetInstance<IValidate<int>>();
+            container.GetInstance<IValidate<double>>();
+        }
+
+        private sealed class ServiceImpl<TA, TB> : IService<TA, TB>
         {
         }
 
-        private class DefaultValidator<T> : IValidate<T>
+        private sealed class DefaultStuff<T> : IDoStuff<T>
         {
-            public DefaultValidator(IService<T, int> service)
+            public DefaultStuff(IService<T, int> service)
             {
                 this.Service = service;
             }
 
             public IService<T, int> Service { get; private set; }
+        }
+
+        private sealed class NullValidator<T> : IValidate<T>
+        {
+            public void Validate(T instance)
+            {
+                // Do nothing.
+            }
         }
     }
 }
