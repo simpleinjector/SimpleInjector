@@ -163,8 +163,17 @@ namespace SimpleInjector
         /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
         /// Otherwise <b>null</b> (Nothing in VB) is returned.
         /// </summary>
-        /// <remarks>A call to this method locks the container. No new registrations can be made after a call
-        /// to this method.</remarks>
+        /// <remarks>
+        /// <para>
+        /// A call to this method locks the container. No new registrations can be made after a call to this 
+        /// method.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same <b>IInstanceProducer</b>
+        /// instance for a given <see cref="Type"/>. It will however either always return <b>null</b> or
+        /// always return a producer that is able to return the expected instance.
+        /// </para>
+        /// </remarks>
         /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
         /// <returns>An <see cref="IInstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public IInstanceProducer GetRegistration(Type serviceType)

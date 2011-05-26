@@ -67,8 +67,20 @@ namespace SimpleInjector
         /// because of these implicit registrations. Because of this, users should not depend on this method
         /// as a reliable source of resolving instances. This method is provided for debugging purposes.
         /// </summary>
-        /// <remarks>A call to this method locks the container. No new registrations can be made after a call
-        /// to this method.</remarks>
+        /// <remarks>
+        /// <para>
+        /// A call to this method locks the container. No new registrations can be made after a call to this 
+        /// method.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same <b>IInstanceProducer</b>
+        /// instance for a given <see cref="Type"/>. It will however either always return <b>null</b> or
+        /// always return a producer that is able to return the expected instance. Because of this, do not
+        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations"/>
+        /// by reference. The way of comparing lists is by the actual type. The type of each instance is
+        /// guaranteed to be unique in the returned list.
+        /// </para>
+        /// </remarks>
         /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
         public IInstanceProducer[] GetCurrentRegistrations()
         {
