@@ -43,8 +43,9 @@
             var properties =
                 from property in instance.GetType().GetProperties()
                 where property.CanWrite
-                where property.DeclaringType.Namespace != "System.Web.UI"
                 let type = property.PropertyType
+                where !type.IsValueType
+                where type.Namespace != "System.Web.UI"
                 let producer = Container.GetRegistration(type)
                 where producer != null
                 select new { property, producer };
