@@ -9,12 +9,12 @@
 
     public static class AspNetIntegrationExtensions
     {
-        private static Container Container;
+        private static Container container;
 
         // Don't forget to call this method during app_start.
         public static void SetContainer(Container container)
         {
-            Container = container;
+            AspNetIntegrationExtensions.container = container;
         }
 
         public static void BuildUp(this Page page)
@@ -34,7 +34,7 @@
 
         private static void InjectProperties(object instance)
         {
-            if (Container == null)
+            if (container == null)
             {
                 throw new InvalidOperationException("Don't forget " +
                     "to call SetContainer first.");
@@ -46,7 +46,7 @@
                 let type = property.PropertyType
                 where !type.IsValueType
                 where type.Namespace != "System.Web.UI"
-                let producer = Container.GetRegistration(type)
+                let producer = container.GetRegistration(type)
                 where producer != null
                 select new { property, producer };
 
