@@ -14,7 +14,7 @@
             where TService : class
             where TImplementation : class, TService
         {
-            container.RegisterPerWebRequest(() => container.GetInstance<TImplementation>());
+            container.RegisterPerWebRequest<TService>(() => container.GetInstance<TImplementation>());
         }
 
         public static void RegisterPerWebRequest<TService>(this Container container,
