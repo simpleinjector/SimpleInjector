@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspNetIntegrationExtensions.cs" />
+    <Compile Include="ConstructorRegistrationExtensions.cs" />
     <Compile Include="ExpirationExtensions.cs" />
     <Compile Include="InterceptorExtensions.cs" />
     <Compile Include="LifetimeScopeExtensions.cs" />
