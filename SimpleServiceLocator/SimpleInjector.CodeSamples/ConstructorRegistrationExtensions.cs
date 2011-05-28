@@ -14,17 +14,9 @@
         {
             var ctor = ((NewExpression)constructorCall.Body).Constructor;
 
-            Func<TService> instanceCreator = null;
+            var producer = new Transient<TService>(container, ctor);
 
-            container.Register<TService>(() =>
-            {
-                if (instanceCreator == null)
-                {
-                    instanceCreator = Build<TService>(container, ctor);
-                }
-
-                return instanceCreator();
-            });
+            container.Register<TService>(producer.GetInstance);
         }
 
         [DebuggerStepThrough]
@@ -54,6 +46,31 @@
             }
 
             return instanceProducer.BuildExpression();
+        }
+
+        private sealed class Transient<TService>
+        {
+            private readonly Container container;
+            private readonly ConstructorInfo ctor;
+
+            private Func<TService> instanceCreator;
+
+            public Transient(Container container, ConstructorInfo ctor)
+            {
+                this.container = container;
+                this.ctor = ctor;
+            }
+
+            [DebuggerStepThrough]
+            public TService GetInstance()
+            {
+                if (this.instanceCreator == null)
+                {
+                    this.instanceCreator = Build<TService>(this.container, this.ctor);
+                }
+
+                return this.instanceCreator();
+            }
         }
     }
 }
