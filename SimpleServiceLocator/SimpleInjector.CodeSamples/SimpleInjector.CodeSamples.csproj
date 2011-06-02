@@ -41,6 +41,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -61,6 +62,7 @@
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
     <Compile Include="PerWebRequestRegistrationsExtensions.cs" />
     <Compile Include="ResolvingExtensions.cs" />
+    <Compile Include="WinFormsIntegrationExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
