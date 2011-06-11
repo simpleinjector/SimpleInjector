@@ -90,9 +90,9 @@
                     var closedGenericImplementation = openGenericImplementation.MakeGenericType(
                         e.UnregisteredServiceType.GetGenericArguments());
 
-                    Func<object> instanceCreator = () => container.GetInstance(closedGenericImplementation);
+                    IInstanceProducer producter = container.GetRegistration(closedGenericImplementation);
 
-                    e.Register(instanceCreator);
+                    e.Register(producter.GetInstance);
                 }
             };
         }
