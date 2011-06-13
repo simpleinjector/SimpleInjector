@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
 
     using SimpleInjector;
 
@@ -82,19 +80,14 @@
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
                 "openGenericServiceType");
 
-            container.ResolveUnregisteredType += (s, e) =>
+            var transientResolver = new TransientOpenGenericResolver
             {
-                if (e.UnregisteredServiceType.IsGenericType &&
-                    e.UnregisteredServiceType.GetGenericTypeDefinition() == openGenericServiceType)
-                {
-                    var closedGenericImplementation = openGenericImplementation.MakeGenericType(
-                        e.UnregisteredServiceType.GetGenericArguments());
-
-                    IInstanceProducer producter = container.GetRegistration(closedGenericImplementation);
-
-                    e.Register(producter.GetInstance);
-                }
+                OpenGenericServiceType = openGenericServiceType,
+                OpenGenericImplementation = openGenericImplementation,
+                Container = container
             };
+
+            container.ResolveUnregisteredType += transientResolver.ResolveOpenGeneric;
         }
 
         /// <summary>
@@ -165,32 +158,88 @@
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
                 "openGenericServiceType");
-            
-            object locker = new object();
-            Dictionary<Type, object> singletons = new Dictionary<Type, object>();
 
-            container.ResolveUnregisteredType += (s, e) =>
+            var singletonResolver = new SingleOpenGenericResolver
             {
-                if (e.UnregisteredServiceType.IsGenericType &&
-                    e.UnregisteredServiceType.GetGenericTypeDefinition() == openGenericServiceType)
-                {
-                    var closedGenericImplementation = openGenericImplementation.MakeGenericType(
-                        e.UnregisteredServiceType.GetGenericArguments());
-
-                    object singleton;
-
-                    lock (locker)
-                    {
-                        if (!singletons.TryGetValue(closedGenericImplementation, out singleton))
-                        {
-                            singleton = container.GetInstance(closedGenericImplementation);
-                            singletons[closedGenericImplementation] = singleton;
-                        }
-                    }
-
-                    e.Register(() => singleton);
-                }
+                OpenGenericServiceType = openGenericServiceType,
+                OpenGenericImplementation = openGenericImplementation,
+                Container = container
             };
+
+            container.ResolveUnregisteredType += singletonResolver.ResolveOpenGeneric;
+        }
+
+        /// <summary>Resolves a given open generic type as transient.</summary>
+        private sealed class TransientOpenGenericResolver : OpenGenericResolver
+        {
+            internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
+            {
+                IInstanceProducer producter = this.Container.GetRegistration(closedGenericImplementation);
+
+                e.Register(producter.GetInstance);
+            }
+        }
+
+        /// <summary>Resolves a given open generic type as singleton.</summary>
+        private sealed class SingleOpenGenericResolver : OpenGenericResolver
+        {
+            private readonly Dictionary<Type, object> singletons = new Dictionary<Type, object>();
+
+            internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
+            {
+                object singleton = this.GetSingleton(closedGenericImplementation);
+
+                e.Register(() => singleton);
+            }
+
+            private object GetSingleton(Type closedGenericImplementation)
+            {
+                object singleton;
+
+                lock (this)
+                {
+                    if (!this.singletons.TryGetValue(closedGenericImplementation, out singleton))
+                    {
+                        singleton = this.Container.GetInstance(closedGenericImplementation);
+                        this.singletons[closedGenericImplementation] = singleton;
+                    }
+                }
+
+                return singleton;
+            }
+        }
+
+        /// <summary>Resolves a given open generic type.</summary>
+        private abstract class OpenGenericResolver
+        {
+            internal Type OpenGenericServiceType { get; set; }
+
+            internal Type OpenGenericImplementation { get; set; }
+
+            internal Container Container { get; set; }
+
+            internal void ResolveOpenGeneric(object sender, UnregisteredTypeEventArgs e)
+            {
+                if (!this.OpenGenericServiceType.IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
+                {
+                    return;
+                }
+
+                var builder = new GenericTypeBuilder
+                {
+                    ClosedGenericBaseType = e.UnregisteredServiceType,
+                    OpenGenericImplementation = this.OpenGenericImplementation
+                };
+
+                var results = builder.BuildClosedGenericImplementation();
+
+                if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
+                {
+                    this.Register(results.ClosedGenericImplementation, e);
+                }
+            }
+
+            internal abstract void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e);
         }
     }
 }

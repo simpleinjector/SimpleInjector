@@ -6,6 +6,11 @@ Version vNext
 	Code Changes:
 	
 	Bug Fixes:
+		-Bug fix in both the RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods of the
+		 Extensions.dll. The methods did not take generic type constraints into consideration. (work item 
+		 16053).
+		-Performance optimization in the RegisterOpenGeneric extension method in the Extensions.dll. Types
+		 can now be resolved as quickly as types that are registered using a Func<T> delegate.
 		-Bug fix in the RegisterSingleOpenGeneric extension method in the SimpleInjector.Extensions.dll. Due 
 		to a race condition, it was possible for this method to new up more instances of the same type.
 

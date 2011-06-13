@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,6 +21,19 @@ namespace SimpleInjector.Extensions.Tests.Unit
         private interface IDoStuff<T>
         {
             IService<T, int> Service { get; }
+        }
+
+        private interface IEventHandler<TEvent> 
+        {
+            void Handle(TEvent @event);
+        }
+
+        private interface IAuditableEvent 
+        { 
+        }
+
+        private interface IProducer<T>
+        {
         }
 
         [TestMethod]
@@ -95,14 +109,14 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuff<>));
+            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
             var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultStuff<string>));
+            Assert.IsInstanceOfType(validator, typeof(DefaultStuffDoer<string>));
             Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
         }
 
@@ -177,14 +191,14 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuff<>));
+            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
             var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultStuff<string>));
+            Assert.IsInstanceOfType(validator, typeof(DefaultStuffDoer<string>));
             Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
         }
 
@@ -201,13 +215,380 @@ namespace SimpleInjector.Extensions.Tests.Unit
             container.GetInstance<IValidate<double>>();
         }
 
+        [TestMethod]
+        public void GetInstance_OnUnregisteredNonGenericConcreteTypeWithRegisterOpenGenericRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // RegisterOpenGeneric registers the ResolveUnregisteredType and this event will get raised before
+            // trying to resolve an unregistered concrete type. Therefore it is important to check whether
+            // the registered delegate will not fail when it is called with an non-generic type.
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+
+            // Act
+            // Resolve an unregisterd concrete non-generic type.
+            container.GetInstance<ConcreteCommand>();
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingGenericWhereConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<AuditableEvent>));
+
+            // Assert
+            Assert.IsNotNull(producer);
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(WhereConstraintEventHandler<AuditableEvent>),
+                "if we resolve IEventHandler<AuditableEvent> then WhereConstraintEventHandler<AuditableEvent> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingGenericWhereConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<DefaultConstructorEvent>));
+
+            // Act
+            Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
+                "registered  event handler and the container should return null.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatistyingGenericWhereConstraintWithStruct_ReturnsExpectedProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
+
+            // Assert
+            Assert.IsNotNull(producer,
+                "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
+                "should be activated");
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(WhereConstraintEventHandler<StructEvent>),
+                "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
+                "should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingGenericNewConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<DefaultConstructorEvent>));
+
+            // Assert
+            Assert.IsNotNull(producer);
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(NewConstraintEventHandler<DefaultConstructorEvent>),
+                "if we resolve IEventHandler<DefaultConstructorEvent> then NewConstraintEventHandler<DefaultConstructorEvent> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingGenericNewConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<NoDefaultConstructorEvent>));
+
+            // Act
+            Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
+                "registered  event handler and the container should return null.");
+        }
+          
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingGenericClassConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<ClassEvent>));
+
+            // Assert
+            Assert.IsNotNull(producer);
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(ClassConstraintEventHandler<ClassEvent>),
+                "if we resolve IEventHandler<ClassEvent> then ClassConstraintEventHandler<ClassEvent> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingGenericClassConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
+
+            // Act
+            Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
+                "registered  event handler and the container should return null.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingGenericStructConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
+
+            // Assert
+            Assert.IsNotNull(producer);
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(StructConstraintEventHandler<StructEvent>),
+                "if we resolve IEventHandler<StructEvent> then StructConstraintEventHandler<StructEvent> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingGenericStructConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IEventHandler<ClassEvent>));
+
+            // Act
+            Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
+                "registered  event handler and the container should return null.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingGenericStructConstraint2_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            // Act
+            // Although Nullable<T> is a value type, the actual C# 'struct' constraint is the CLR 
+            // 'not nullable value type' constraint.
+            var producer = container.GetRegistration(typeof(IEventHandler<Nullable<StructEvent>>));
+
+            // Act
+            Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
+                "registered  event handler and the container should return null.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingTrickyGenericConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IDictionary<int, int>));
+
+            // Assert
+            Assert.IsNotNull(producer);
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(MonoDictionary<int>),
+                "if we resolve IDictionary<int, int> then MonoDictionary<int> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingTrickyGenericConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IDictionary<int, double>));
+
+            // Assert
+            Assert.IsNull(producer);
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeSatisfyingNastyGenericConstraint_ReturnsInstanceProducer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IProducer<int?>));
+
+            // Assert
+            Assert.IsNotNull(producer, 
+                "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
+
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(NullableProducer<int>),
+                "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
+        }
+
+        [TestMethod]
+        public void GetRegistration_TypeNotSatisfyingNastyGenericConstraint_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IProducer<int>));
+
+            // Assert
+            Assert.IsNull(producer, "resolving IProducer<int> should ignore NullableProducer<T>");
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericWithImplementationWithTypeArgumentsSwapped_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithTypesArgsSwapped<,>));
+
+            // Act
+            var impl = container.GetInstance<IService<object, int>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(ServiceImplWithTypesArgsSwapped<int, object>));
+        }
+
+        [TestMethod]
+        public void MethodUnderTest_Scenario_Behavior()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
+
+            // Act
+            var producer = container.GetRegistration(typeof(IDictionary<int, object>));
+
+            // Assert
+            Assert.IsNull(producer, "resolving IDictionary<int, object> should ignore " +
+                "SneakyMonoDictionary<T, Unused> because there is no mapping to Unused.");
+        }
+
+        private struct StructEvent : IAuditableEvent
+        {
+        }
+
+        private class DefaultConstructorEvent
+        {
+            public DefaultConstructorEvent()
+            {
+            }
+        }
+
+        private class NoDefaultConstructorEvent
+        {
+            public NoDefaultConstructorEvent(IValidate<int> dependency)
+            {
+            }
+        }
+
+        private class ClassEvent
+        {
+        }
+
+        private class AuditableEvent : IAuditableEvent
+        {
+        }
+
+        private class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent> 
+            where TEvent : IAuditableEvent
+        {
+            public void Handle(TEvent @event)
+            {
+            }
+        }
+
+        private class NewConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : new()
+        {
+            public void Handle(TEvent @event)
+            {
+            }
+        }
+
+        private class StructConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : struct
+        {
+            public void Handle(TEvent @event)
+            {
+            }
+        }
+
+        private class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent> 
+            where TClassEvent : class
+        {
+            public void Handle(TClassEvent @event)
+            {
+            }
+        }
+
+        private class MonoDictionary<T> : Dictionary<T, T> 
+        {
+        }
+
+        private class SneakyMonoDictionary<T, TUnused> : Dictionary<T, T>
+        {
+        }
+
+        // Note: This class deliberately implements a second IProducer. This will verify wether the code can
+        // handle types with multiple versions of the same interface.
+        private class NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double>
+            where T : struct 
+        { 
+        }
+
         private sealed class ServiceImpl<TA, TB> : IService<TA, TB>
         {
         }
 
-        private sealed class DefaultStuff<T> : IDoStuff<T>
+        // The type constraint will prevent the type from being created when the arguments are ordered
+        // incorrectly.
+        private sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
+            where B : struct where A : class
         {
-            public DefaultStuff(IService<T, int> service)
+        }
+
+        private sealed class DefaultStuffDoer<T> : IDoStuff<T>
+        {
+            public DefaultStuffDoer(IService<T, int> service)
             {
                 this.Service = service;
             }

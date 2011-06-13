@@ -52,6 +52,27 @@ namespace SimpleInjector.Extensions
                 return assembly.GetExportedTypes();
             }
         }
+        
+        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition,
+            Type typeToCheck)
+        {
+            if (!typeToCheck.IsGenericType)
+            {
+                return false;
+            }
+
+            if (typeToCheck.GetGenericTypeDefinition() != genericTypeDefinition)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static bool IsGenericArgument(this Type type)
+        {
+            return type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
+        }
 
         internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
         {

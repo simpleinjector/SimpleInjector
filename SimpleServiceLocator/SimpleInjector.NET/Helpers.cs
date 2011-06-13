@@ -39,7 +39,7 @@ namespace SimpleInjector
     internal static class Helpers
     {
         internal const string InstanceProviderDebuggerDisplayString =
-            "ServiceType: {((IInstanceProducer)this).ServiceType}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
+            "ServiceType: {((IInstanceProducer)this).ServiceType.Name}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
 
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
