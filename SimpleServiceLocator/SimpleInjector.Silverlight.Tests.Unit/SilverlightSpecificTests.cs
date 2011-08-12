@@ -47,9 +47,8 @@ namespace SimpleInjector.Tests.Unit
         public void GetInstance_ResolvingAnInternalTypeWithUnregisteredConcreteDependency_FailsWithExpectedExceptionMessage()
         {
             // Arrange
-            string expectedMessage = 
-                "Explicitly register the type using 'container.Register<InternalType>()' or consider " + 
-                "making it public.";
+            string expectedMessage = "Explicitly register the type using one of the generic 'Register' " + 
+                "overloads or consider making it public.";
 
             var container = new Container();
 

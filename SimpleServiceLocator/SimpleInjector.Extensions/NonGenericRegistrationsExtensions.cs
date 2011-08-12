@@ -1,4 +1,29 @@
-﻿using System;
+﻿#region Copyright (c) 2010 S. van Deursen
+/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
+ * 
+ * Copyright (C) 2010 S. van Deursen
+ * 
+ * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
+ * cuttingedge.it.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial 
+ * portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+ * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -56,7 +81,17 @@ namespace SimpleInjector.Extensions
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
 
-            registerSingle.MakeGenericMethod(serviceType, implementation).Invoke(container, null);
+            var method = registerSingle.MakeGenericMethod(serviceType, implementation);
+
+            try
+            {
+                method.Invoke(container, null);
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, implementation, ex);
+            }
         }
 
         /// <summary>
@@ -79,16 +114,21 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+            
+            try
+            {
+                // Build the following delegate: () => (ServiceType)instanceCreator();
+                var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
 
-            // Build the following delegate: () => (ServiceType)instanceCreator();
-            object creator = Expression.Lambda(
-                Expression.Convert(
-                    Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]),
-                    serviceType),
-                new ParameterExpression[0])
-                .Compile();
+                var method = registerSingleByFunc.MakeGenericMethod(serviceType);
 
-            registerSingleByFunc.MakeGenericMethod(serviceType).Invoke(container, new[] { creator });
+                method.Invoke(container, new[] { typeSafeInstanceCreator });
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
+            }
         }
 
         /// <summary>
@@ -110,7 +150,17 @@ namespace SimpleInjector.Extensions
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
-            registerSingleByT.MakeGenericMethod(serviceType).Invoke(container, new[] { instance });
+            var method = registerSingleByT.MakeGenericMethod(serviceType);
+
+            try
+            {
+                method.Invoke(container, new[] { instance });
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
+            }
         }
 
         /// <summary>
@@ -138,7 +188,17 @@ namespace SimpleInjector.Extensions
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
 
-            register.MakeGenericMethod(serviceType, implementation).Invoke(container, null);
+            var method = register.MakeGenericMethod(serviceType, implementation);
+
+            try
+            {
+                method.Invoke(container, null);
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
+            }
         }
 
         /// <summary>
@@ -158,54 +218,21 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-
-            // Build the following delegate: () => (T)instanceCreator();
-            object creator = Expression.Lambda(
-                Expression.Convert(
-                    Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]),
-                    serviceType),
-                new ParameterExpression[0])
-                .Compile();
-
-            registerByFunc.MakeGenericMethod(serviceType).Invoke(container, new[] { creator });
-        }
-
-        /// <summary>
-        /// Registers a <paramref name="collection"/> of elements of type <paramref name="serviceType"/>.
-        /// </summary>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="collection">The collection of items to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
-        /// VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
-        /// open generic type.</exception>
-        public static void RegisterAll(this Container container, Type serviceType, IEnumerable collection)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(collection, "collection");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-
-            object castedCollection;
-
-            if (typeof(IEnumerable<>).MakeGenericType(serviceType).IsAssignableFrom(collection.GetType()))
+            
+            try
             {
-                // The collection is a IEnumerable<[ServiceType]>. We can simply cast it. 
-                // Better for performance
-                castedCollection = collection;
+                // Build the following delegate: () => (ServiceType)instanceCreator();
+                var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
+
+                var method = registerByFunc.MakeGenericMethod(serviceType);
+
+                method.Invoke(container, new[] { typeSafeInstanceCreator });
             }
-            else
+            catch (MemberAccessException ex)
             {
-                // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
-                // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
-                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(serviceType);
-
-                castedCollection = castMethod.Invoke(null, new[] { collection });
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
             }
-
-            registerAll.MakeGenericMethod(serviceType).Invoke(container, new[] { castedCollection });
         }
 
         /// <summary>
@@ -315,7 +342,104 @@ namespace SimpleInjector.Extensions
 
             IEnumerable<object> instances = new AllIterator(container, serviceTypes);
 
-            container.RegisterAll(serviceType, instances);
+            RegisterAll(container, serviceType, instances);
+        }
+
+        /// <summary>
+        /// Registers a <paramref name="collection"/> of elements of type <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="collection">The collection of items to register.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
+        /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
+        public static void RegisterAll(this Container container, Type serviceType, IEnumerable collection)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(collection, "collection");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+
+            RegisterAllInternal(container, serviceType, collection);
+        }
+
+        private static void RegisterAllInternal(Container container, Type serviceType, IEnumerable collection)
+        {
+            object castedCollection;
+
+            if (typeof(IEnumerable<>).MakeGenericType(serviceType).IsAssignableFrom(collection.GetType()))
+            {
+                // The collection is a IEnumerable<[ServiceType]>. We can simply cast it. 
+                // Better for performance
+                castedCollection = collection;
+            }
+            else
+            {
+                // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
+                // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
+                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(serviceType);
+
+                castedCollection = castMethod.Invoke(null, new[] { collection });
+            }
+
+            var method = registerAll.MakeGenericMethod(serviceType);
+
+            try
+            {
+                method.Invoke(container, new[] { castedCollection });
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
+            }
+        }
+
+        // Gets called when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
+            MemberAccessException innerException, string paramName)
+        {
+            string exceptionMessage =
+                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType);
+
+#if SILVERLIGHT
+            throw new ArgumentException(exceptionMessage, paramName);
+#else
+            throw new ArgumentException(exceptionMessage, paramName, innerException);
+#endif
+        }
+
+        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
+            Type implementation, MemberAccessException innerException)
+        {
+            if (!serviceType.IsPublic)
+            {
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, innerException,
+                     "serviceType");
+            }
+            else
+            {
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(implementation, innerException,
+                     "implementation");
+            }
+        }
+
+        private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
+        {
+            // Build the following delegate: () => (ServiceType)instanceCreator();
+            var invocationExpression =
+                Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]);
+
+            var convertExpression = Expression.Convert(invocationExpression, serviceType);
+
+            var parameters = new ParameterExpression[0];
+
+            // This might throw an MemberAccessException when serviceType is internal while we're running in
+            // a Silverlight sandbox.
+            return Expression.Lambda(convertExpression, parameters).Compile();
         }
 
         /// <summary>Allows iterating a set of services.</summary>

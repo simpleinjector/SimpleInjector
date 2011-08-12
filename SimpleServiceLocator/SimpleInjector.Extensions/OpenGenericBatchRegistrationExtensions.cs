@@ -1,4 +1,29 @@
-﻿using System;
+﻿#region Copyright (c) 2010 S. van Deursen
+/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
+ * 
+ * Copyright (C) 2010 S. van Deursen
+ * 
+ * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
+ * cuttingedge.it.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial 
+ * portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+ * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -18,10 +43,12 @@ namespace SimpleInjector.Extensions
     /// <paramref name="closedServiceType"/>.</param>
     public delegate void BatchRegistrationCallback(Type closedServiceType, Type[] implementations);
 
-    /// <summary>
-    /// Defines the accessibility of the types to search.
-    /// </summary>
+#if !SILVERLIGHT
+    /// <summary>Defines the accessibility of the types to search.</summary>
     public enum AccessibilityOption
+#else
+    internal enum AccessibilityOption
+#endif
     {
         /// <summary>Load both public as internal types from the given assemblies.</summary>
         AllTypes = 0,
@@ -82,6 +109,7 @@ namespace SimpleInjector.Extensions
                 AccessibilityOption.PublicTypesOnly);
         }
 
+#if !SILVERLIGHT
         /// <summary>
         /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
         /// given <paramref name="assemblies"/> that implement the given 
@@ -131,7 +159,37 @@ namespace SimpleInjector.Extensions
         {
             container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
         }
+#endif
 
+        /// <summary>
+        /// Allows registration of all concrete, non-generic types with the given 
+        /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
+        /// the given <paramref name="openGenericServiceType"/>, by supplying a 
+        /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
+        /// implementation of the given <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="callback">The delegate that will be called for each found closed generic version of
+        /// the given open generic <paramref name="openGenericServiceType"/> to do the actual registration.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="callback"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "By using the 'this Container' argument, we allow this extension method to " +
+            "show when using Intellisense over the Container.")]
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, BatchRegistrationCallback callback,
+            IEnumerable<Assembly> assemblies)
+        {
+            RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, 
+                AccessibilityOption.PublicTypesOnly, callback);
+        }
+
+#if !SILVERLIGHT
         /// <summary>
         /// Allows registration of all concrete, non-generic types with the given 
         /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
@@ -161,6 +219,7 @@ namespace SimpleInjector.Extensions
         {
             RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility, callback);
         }
+#endif
 
         /// <summary>
         /// Registers all concrete, non-generic, publicly exposed types in the given 
@@ -208,6 +267,7 @@ namespace SimpleInjector.Extensions
                 AccessibilityOption.PublicTypesOnly);
         }
 
+#if !SILVERLIGHT
         /// <summary>
         /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
         /// given <paramref name="assemblies"/> that implement the given 
@@ -257,7 +317,8 @@ namespace SimpleInjector.Extensions
         {
             container.RegisterManySinglesForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
         }
-        
+#endif
+
         /// <summary>
         /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
         /// given <paramref name="openGenericServiceType"/> with a transient lifetime.

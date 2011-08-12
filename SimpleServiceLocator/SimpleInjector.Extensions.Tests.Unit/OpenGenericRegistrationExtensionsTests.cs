@@ -9,30 +9,30 @@ namespace SimpleInjector.Extensions.Tests.Unit
     public class OpenGenericRegistrationExtensionsTests
     {
         // This is the open generic interface that will be used as service type.
-        private interface IService<TA, TB>
+        public interface IService<TA, TB>
         {
         }
 
-        private interface IValidate<T>
+        public interface IValidate<T>
         {
             void Validate(T instance);
         }
 
-        private interface IDoStuff<T>
+        public interface IDoStuff<T>
         {
             IService<T, int> Service { get; }
         }
 
-        private interface IEventHandler<TEvent> 
+        public interface IEventHandler<TEvent> 
         {
             void Handle(TEvent @event);
         }
 
-        private interface IAuditableEvent 
+        public interface IAuditableEvent 
         { 
         }
 
-        private interface IProducer<T>
+        public interface IProducer<T>
         {
         }
 
@@ -504,33 +504,33 @@ namespace SimpleInjector.Extensions.Tests.Unit
                 "SneakyMonoDictionary<T, Unused> because there is no mapping to Unused.");
         }
 
-        private struct StructEvent : IAuditableEvent
+        public struct StructEvent : IAuditableEvent
         {
         }
 
-        private class DefaultConstructorEvent
+        public class DefaultConstructorEvent
         {
             public DefaultConstructorEvent()
             {
             }
         }
 
-        private class NoDefaultConstructorEvent
+        public class NoDefaultConstructorEvent
         {
             public NoDefaultConstructorEvent(IValidate<int> dependency)
             {
             }
         }
 
-        private class ClassEvent
+        public class ClassEvent
         {
         }
 
-        private class AuditableEvent : IAuditableEvent
+        public class AuditableEvent : IAuditableEvent
         {
         }
 
-        private class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent> 
+        public class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent> 
             where TEvent : IAuditableEvent
         {
             public void Handle(TEvent @event)
@@ -538,21 +538,21 @@ namespace SimpleInjector.Extensions.Tests.Unit
             }
         }
 
-        private class NewConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : new()
+        public class NewConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : new()
         {
             public void Handle(TEvent @event)
             {
             }
         }
 
-        private class StructConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : struct
+        public class StructConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : struct
         {
             public void Handle(TEvent @event)
             {
             }
         }
 
-        private class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent> 
+        public class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent> 
             where TClassEvent : class
         {
             public void Handle(TClassEvent @event)
@@ -560,33 +560,33 @@ namespace SimpleInjector.Extensions.Tests.Unit
             }
         }
 
-        private class MonoDictionary<T> : Dictionary<T, T> 
+        public class MonoDictionary<T> : Dictionary<T, T> 
         {
         }
 
-        private class SneakyMonoDictionary<T, TUnused> : Dictionary<T, T>
+        public class SneakyMonoDictionary<T, TUnused> : Dictionary<T, T>
         {
         }
 
         // Note: This class deliberately implements a second IProducer. This will verify wether the code can
         // handle types with multiple versions of the same interface.
-        private class NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double>
+        public class NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double>
             where T : struct 
         { 
         }
 
-        private sealed class ServiceImpl<TA, TB> : IService<TA, TB>
+        public sealed class ServiceImpl<TA, TB> : IService<TA, TB>
         {
         }
 
         // The type constraint will prevent the type from being created when the arguments are ordered
         // incorrectly.
-        private sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
+        public sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
             where B : struct where A : class
         {
         }
 
-        private sealed class DefaultStuffDoer<T> : IDoStuff<T>
+        public sealed class DefaultStuffDoer<T> : IDoStuff<T>
         {
             public DefaultStuffDoer(IService<T, int> service)
             {
@@ -596,7 +596,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             public IService<T, int> Service { get; private set; }
         }
 
-        private sealed class NullValidator<T> : IValidate<T>
+        public sealed class NullValidator<T> : IValidate<T>
         {
             public void Validate(T instance)
             {

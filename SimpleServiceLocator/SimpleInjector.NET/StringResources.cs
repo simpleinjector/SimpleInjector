@@ -191,8 +191,8 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to resolve type {0}. The security restrictions of your application's sandbox do " +
-                "not permit the creation of this type. Explicitly register the type using " + 
-                "'container.Register<{1}>()' or consider making it public.", serviceType, serviceType.Name);
+                "not permit the creation of this type. Explicitly register the type using one of the " +
+                "generic 'Register' overloads or consider making it public.", serviceType);
         }
     }
 }

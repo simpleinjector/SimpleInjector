@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SimpleInjector.Extensions.Tests.Unit
 {
+    /// <content>
+    /// Tests for the NonGenericRegistrationsExtensions class.
+    /// </content>
     [TestClass]
-    public class NonGenericRegistrationsExtensionsTests
+    public partial class NonGenericRegistrationsExtensionsTests
     {
-        private interface IService
+        public interface IPublicService
         {
         }
 
-        private interface IServiceEx : IService
+        private interface IPublicServiceEx : IPublicService
+        {
+        }
+
+        private interface IInternalService
         {
         }
 
@@ -29,13 +35,13 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            object impl = new ServiceImpl(null);
+            object impl = new InternalImplOfPublicService(null);
 
             // Act
-            container.RegisterSingle(typeof(IService), impl);
+            container.RegisterSingle(typeof(IPublicService), impl);
 
             // Assert
-            Assert.AreEqual(impl, container.GetInstance<IService>(),
+            Assert.AreEqual(impl, container.GetInstance<IPublicService>(),
                 "GetInstance should return the instance registered using RegisterSingle.");
         }
 
@@ -45,13 +51,13 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            object impl = new ServiceImpl(null);
+            object impl = new InternalImplOfPublicService(null);
 
             // Act
-            container.RegisterSingle(typeof(IService), impl);
+            container.RegisterSingle(typeof(IPublicService), impl);
 
-            var instance1 = container.GetInstance<IService>();
-            var instance2 = container.GetInstance<IService>();
+            var instance1 = container.GetInstance<IPublicService>();
+            var instance2 = container.GetInstance<IPublicService>();
 
             // Assert
             Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
@@ -64,10 +70,10 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            object impl = new SqlConnection();
+            object impl = new List<int>();
 
             // Act
-            container.RegisterSingle(typeof(IService), impl);
+            container.RegisterSingle(typeof(IPublicService), impl);
         }
 
         [TestMethod]
@@ -76,7 +82,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            object impl = new SqlConnection();
+            object impl = new List<int>();
 
             // Act
             container.RegisterSingle(impl.GetType(), impl);
@@ -89,8 +95,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             Container invalidContainer = null;
 
-            Type validServiceType = typeof(IService);
-            object validInstance = new ServiceImpl(null);
+            Type validServiceType = typeof(IPublicService);
+            object validInstance = new InternalImplOfPublicService(null);
 
             // Act
             invalidContainer.RegisterSingle(validServiceType, validInstance);
@@ -104,7 +110,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             Type invalidServiceType = null;
-            object validInstance = new ServiceImpl(null);
+            object validInstance = new InternalImplOfPublicService(null);
 
             // Act
             container.RegisterSingle(invalidServiceType, validInstance);
@@ -117,7 +123,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
+            Type validServiceType = typeof(IPublicService);
             object invalidInstance = null;
 
             // Act
@@ -131,10 +137,10 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // Act
-            container.RegisterSingle(typeof(IService), typeof(ServiceImpl));
+            container.RegisterSingle(typeof(IPublicService), typeof(PublicServiceImpl));
 
             // Assert
-            Assert.IsInstanceOfType(container.GetInstance<IService>(), typeof(ServiceImpl));
+            Assert.IsInstanceOfType(container.GetInstance<IPublicService>(), typeof(PublicServiceImpl));
         }
 
         [TestMethod]
@@ -147,7 +153,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             Type invalidServiceType = null;
 
             // Act
-            container.RegisterSingle(invalidServiceType, typeof(ServiceImpl));
+            container.RegisterSingle(invalidServiceType, typeof(InternalImplOfPublicService));
         }
 
         [TestMethod]
@@ -160,7 +166,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             Type invalidImplementationType = null;
 
             // Act
-            container.RegisterSingle(typeof(IService), invalidImplementationType);
+            container.RegisterSingle(typeof(IPublicService), invalidImplementationType);
         }
 
         [TestMethod]
@@ -169,13 +175,13 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            object impl = new ServiceImpl(null);
+            object impl = new InternalImplOfPublicService(null);
 
             // Act
-            container.RegisterSingle(typeof(IService), typeof(ServiceImpl));
+            container.RegisterSingle(typeof(IPublicService), typeof(PublicServiceImpl));
             
-            var instance1 = container.GetInstance<IService>();
-            var instance2 = container.GetInstance<IService>();
+            var instance1 = container.GetInstance<IPublicService>();
+            var instance2 = container.GetInstance<IPublicService>();
 
             // Assert
             Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
@@ -189,7 +195,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // Act
-            container.RegisterSingle(typeof(IService), typeof(object));
+            container.RegisterSingle(typeof(IPublicService), typeof(object));
         }
 
         [TestMethod]
@@ -200,7 +206,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             // Act
-            container.RegisterSingle(typeof(ServiceImpl), typeof(ServiceImpl));
+            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
         }
 
         [TestMethod]
@@ -209,13 +215,13 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Func<object> instanceCreator = () => new ServiceImpl(null);
+            Func<object> instanceCreator = () => new InternalImplOfPublicService(null);
 
             // Act
-            container.RegisterSingle(typeof(IService), instanceCreator);
+            container.RegisterSingle(typeof(IPublicService), instanceCreator);
 
-            var instance1 = container.GetInstance<IService>();
-            var instance2 = container.GetInstance<IService>();
+            var instance1 = container.GetInstance<IPublicService>();
+            var instance2 = container.GetInstance<IPublicService>();
 
             // Assert
             Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
@@ -228,8 +234,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             Container invalidContainer = null;
 
-            Type validServiceType = typeof(IService);
-            Func<object> validInstanceCreator = () => new ServiceImpl(null);
+            Type validServiceType = typeof(IPublicService);
+            Func<object> validInstanceCreator = () => new InternalImplOfPublicService(null);
 
             // Act
             invalidContainer.RegisterSingle(validServiceType, validInstanceCreator);
@@ -243,7 +249,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             Type invalidServiceType = null;
-            Func<object> validInstanceCreator = () => new ServiceImpl(null);
+            Func<object> validInstanceCreator = () => new InternalImplOfPublicService(null);
 
             // Act
             container.RegisterSingle(invalidServiceType, validInstanceCreator);
@@ -256,7 +262,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
+            Type validServiceType = typeof(IPublicService);
             Func<object> invalidInstanceCreator = null;
 
             // Act
@@ -308,15 +314,15 @@ namespace SimpleInjector.Extensions.Tests.Unit
         public void RegisterAll_WithValidCollectionOfServices_Succeeds()
         {
             // Arrange
-            var instance = new ServiceImpl(null);
+            var instance = new InternalImplOfPublicService(null);
 
             var container = new Container();
 
             // Act
-            container.RegisterAll(typeof(IService), new IService[] { instance });
+            container.RegisterAll(typeof(IPublicService), new IPublicService[] { instance });
 
             // Assert
-            var instances = container.GetAllInstances<IService>();
+            var instances = container.GetAllInstances<IPublicService>();
 
             Assert.AreEqual(1, instances.Count());
             Assert.AreEqual(instance, instances.First());
@@ -326,15 +332,15 @@ namespace SimpleInjector.Extensions.Tests.Unit
         public void RegisterAll_WithValidObjectCollectionOfServices_Succeeds()
         {
             // Arrange
-            var instance = new ServiceImpl(null);
+            var instance = new InternalImplOfPublicService(null);
 
             var container = new Container();
 
             // Act
-            container.RegisterAll(typeof(IService), new object[] { instance });
+            container.RegisterAll(typeof(IPublicService), new object[] { instance });
 
             // Assert
-            var instances = container.GetAllInstances<IService>();
+            var instances = container.GetAllInstances<IPublicService>();
 
             Assert.AreEqual(1, instances.Count());
             Assert.AreEqual(instance, instances.First());
@@ -345,27 +351,27 @@ namespace SimpleInjector.Extensions.Tests.Unit
         public void RegisterAll_NullContainer_ThrowsException()
         {
             // Arrange
-            var instance = new ServiceImpl(null);
+            var instance = new InternalImplOfPublicService(null);
 
             Container invalidContainer = null;
 
             // Act
-            invalidContainer.RegisterAll(typeof(IService), new IService[] { instance });
+            invalidContainer.RegisterAll(typeof(IPublicService), new IPublicService[] { instance });
         }
 
         [TestMethod]
         public void RegisterAll_WithValidCollectionOfImplementations_Succeeds()
         {
             // Arrange
-            var instance = new ServiceImpl(null);
+            var instance = new InternalImplOfPublicService(null);
 
             var container = new Container();
 
             // Act
-            container.RegisterAll(typeof(IService), new ServiceImpl[] { instance });
+            container.RegisterAll(typeof(IPublicService), new InternalImplOfPublicService[] { instance });
 
             // Assert
-            var instances = container.GetAllInstances<IService>();
+            var instances = container.GetAllInstances<IPublicService>();
 
             Assert.AreEqual(1, instances.Count());
             Assert.AreEqual(instance, instances.First());
@@ -377,8 +383,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
-            Type validImplementation = typeof(ServiceImpl);
+            Type validServiceType = typeof(IPublicService);
+            Type validImplementation = typeof(PublicServiceImpl);
 
             // Act
             container.Register(validServiceType, validImplementation);
@@ -396,8 +402,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             Container invalidContainer = null;
 
-            Type validServiceType = typeof(IService);
-            Type validImplementation = typeof(ServiceImpl);
+            Type validServiceType = typeof(IPublicService);
+            Type validImplementation = typeof(InternalImplOfPublicService);
 
             // Act
             invalidContainer.Register(validServiceType, validImplementation);
@@ -411,7 +417,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var container = new Container();
 
             Type invalidServiceType = null;
-            Type validImplementation = typeof(ServiceImpl);
+            Type validImplementation = typeof(InternalImplOfPublicService);
 
             // Act
             container.Register(invalidServiceType, validImplementation);
@@ -424,7 +430,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
+            Type validServiceType = typeof(IPublicService);
             Type invalidImplementation = null;
 
             // Act
@@ -438,7 +444,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type implementation = typeof(ServiceImpl);
+            Type implementation = typeof(InternalImplOfPublicService);
 
             // Act
             container.Register(implementation, implementation);
@@ -450,8 +456,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
-            Func<object> instanceCreator = () => new ServiceImpl(null);
+            Type validServiceType = typeof(IPublicService);
+            Func<object> instanceCreator = () => new InternalImplOfPublicService(null);
 
             // Act
             container.Register(validServiceType, instanceCreator);
@@ -459,7 +465,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Assert
             var instance = container.GetInstance(validServiceType);
 
-            Assert.IsInstanceOfType(instance, typeof(ServiceImpl));
+            Assert.IsInstanceOfType(instance, typeof(InternalImplOfPublicService));
         }
 
         [TestMethod]
@@ -469,7 +475,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Arrange
             var container = new Container();
 
-            Type validServiceType = typeof(IService);
+            Type validServiceType = typeof(IPublicService);
             Func<object> invalidInstanceCreator = null;
 
             // Act
@@ -484,60 +490,63 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             // Act
             // IServiceEx is a valid registration, because it could be registered.
-            container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IServiceEx) });
+            container.RegisterAll<IPublicService>(new[] { typeof(InternalImplOfPublicService), typeof(IPublicServiceEx) });
         }
 
         [TestMethod]
         public void RegisterAll_WithValidEnumeableOfTypes_Succeeds()
         {
             // Arrange
-            IEnumerable<Type> types = new[] { typeof(ServiceImpl) };
+            IEnumerable<Type> types = new[] { typeof(InternalImplOfPublicService) };
 
             var container = new Container();
 
             // Act
-            container.RegisterAll<IService>(types);
+            container.RegisterAll<IPublicService>(types);
         }
 
         [TestMethod]
         public void RegisterAll_WithValidParamListOfTypes_Succeeds()
         {
             // Arrange
-            Type[] types = new[] { typeof(ServiceImpl) };
+            Type[] types = new[] { typeof(InternalImplOfPublicService) };
 
             var container = new Container();
 
             // Act
-            container.RegisterAll<IService>(types);
+            container.RegisterAll<IPublicService>(types);
         }
 
         [TestMethod]
-        public void GetAllInstances_RegisterAllWithValidListOfTypes_ReturnsExpectedList()
+        public void GetAllInstances_RegisteringValidListOfTypesWithRegisterAll_ReturnsExpectedList()
         {
             // Arrange
             var container = new Container();
 
-            container.RegisterAll<IService>(new[] { typeof(ServiceImpl) });
+            container.RegisterAll<IPublicService>(new[] { typeof(PublicServiceImpl) });
 
             // Act
             container.Verify();
 
-            var list = container.GetAllInstances<IService>().ToArray();
+            var list = container.GetAllInstances<IPublicService>().ToArray();
 
             // Assert
             Assert.AreEqual(1, list.Length);
-            Assert.IsInstanceOfType(list[0], typeof(ServiceImpl));
+            Assert.IsInstanceOfType(list[0], typeof(PublicServiceImpl));
         }
 
         [TestMethod]
         public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedException = "No registration for type IServiceEx could be found.";
+            string expectedException = 
+                string.Format("No registration for type {0} could be found.", typeof(IPublicServiceEx).Name);
 
             var container = new Container();
 
-            container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IServiceEx) });
+            var types = new[] { typeof(PublicServiceImpl), typeof(IPublicServiceEx) };
+
+            container.RegisterAll<IPublicService>(types);
 
             try
             {
@@ -548,11 +557,9 @@ namespace SimpleInjector.Extensions.Tests.Unit
             }
             catch (InvalidOperationException ex)
             {
-                string actualMessage =
-                    ex.Message.Replace(typeof(IServiceEx).FullName, typeof(IServiceEx).Name);
+                string actualMessage = ex.Message.Replace(typeof(IPublicServiceEx).FullName, typeof(IPublicServiceEx).Name);
 
-                Assert.IsTrue(actualMessage.Contains(expectedException), 
-                    string.Format("Expected: <{0}>. Actual: <{1}>.", expectedException, actualMessage));
+                AssertThat.StringContains(expectedException, actualMessage);
             }
         }
 
@@ -560,8 +567,9 @@ namespace SimpleInjector.Extensions.Tests.Unit
         public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage = 
-                "The supplied type 'IService' does not implement 'IService'.\r\nParameternaam: serviceTypes";
+            string expectedMessage = string.Format(
+                "The supplied type '{0}' does not implement '{0}'.\r\nParameternaam: serviceTypes", 
+                typeof(IPublicService).Name);
 
             var container = new Container();
 
@@ -569,27 +577,41 @@ namespace SimpleInjector.Extensions.Tests.Unit
             {
                 // Act
                 // Cannot register a IService, because this would cause a recursive dependency.
-                container.RegisterAll<IService>(new[] { typeof(ServiceImpl), typeof(IService) });
+                container.RegisterAll<IPublicService>(new[] { typeof(InternalImplOfPublicService), typeof(IPublicService) });
 
                 Assert.Fail("Exception expected.");
             }
             catch (ArgumentException ex)
             {
-                string actualMessage = ex.Message.Replace(typeof(IService).FullName, typeof(IService).Name);
+                string actualMessage = ex.Message.Replace(typeof(IPublicService).FullName, typeof(IPublicService).Name);
 
                 Assert.AreEqual(expectedMessage, actualMessage);
             }
         }
 
-        private sealed class ServiceImpl : IService
+        public sealed class Dependency
         {
-            public ServiceImpl(Dependency dependency)
+        }
+
+        public sealed class PublicServiceImpl : IPublicService
+        {
+            public PublicServiceImpl(Dependency dependency)
             {
             }
         }
 
-        private sealed class Dependency
+        private sealed class InternalImplOfPublicService : IPublicService
         {
+            public InternalImplOfPublicService(Dependency dependency)
+            {
+            }
+        }
+
+        private sealed class InternalServiceImpl : IInternalService
+        {
+            public InternalServiceImpl(Dependency dependency)
+            {
+            }
         }
     }
 }

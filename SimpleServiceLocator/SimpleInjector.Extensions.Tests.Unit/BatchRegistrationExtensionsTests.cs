@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.SqlClient;
 using System.Reflection;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -27,7 +26,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void RegisterOpenGeneric_WithClosedGenericType_Fails()
+        public void RegisterManyForOpenGeneric_WithClosedGenericType_Fails()
         {
             // Arrange
             var container = new Container();
@@ -37,7 +36,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterOpenGeneric_WithValidTypeDefinitions_Succeeds()
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -45,6 +44,33 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
         }
+
+#if !SILVERLIGHT
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericAccessibilityOptionAndParams_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly, 
+                Assembly.GetExecutingAssembly());
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericAccessibilityOptionAndEnumerable_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
+                assemblies);
+        }
+#endif
 
         [TestMethod]
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType1()
@@ -92,7 +118,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleManyForOpenGeneric_WithValidTypeDefinitions_ReturnsSingletonInstances()
+        public void RegisterManySinglesForOpenGeneric_WithValidTypeDefinitions_ReturnsSingletonInstances()
         {
             // Arrange
             var container = new Container();
@@ -107,7 +133,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleManyForOpenGeneric_WithValidTypeDefinitions2_ReturnsSingletonInstances()
+        public void RegisterManySinglesForOpenGeneric_WithValidTypeDefinitions2_ReturnsSingletonInstances()
         {
             // Arrange
             // Concrete1 implements IService<string, object>
@@ -123,6 +149,58 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             // Assert
             Assert.IsTrue(Object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericEnumerable_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+            
+            // Act
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), assemblies);
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericTypeParams_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type[] typesToRegister = new[] { typeof(Concrete1) };
+
+            // Act
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), typesToRegister);
+        }
+
+#if !SILVERLIGHT
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericAccessibilityOptionEnumerable_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, 
+                assemblies);
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericAccessibilityOptionParams_WithValidTypeDefinitions_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            Assembly[] assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
+                assemblies);
         }
 
         [TestMethod]
@@ -142,7 +220,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidEnumArgumentException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void RegisterManyForOpenGeneric_WithInvalidAccessibilityOption_ThrowsExpectedException()
         {
             // Arrange
@@ -165,6 +243,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Act
             container.GetInstance<IService<decimal, decimal>>();
         }
+#endif
 
         [TestMethod]
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType3()
@@ -245,7 +324,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             var serviceType = typeof(IService<,>);
             var validType = typeof(ServiceImpl<object, string>);
-            var invalidType = typeof(SqlConnection);
+            var invalidType = typeof(List<int>);
 
             try
             {
@@ -345,7 +424,6 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterManyForOpenGeneric_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
         {
             // Arrange
@@ -356,15 +434,48 @@ namespace SimpleInjector.Extensions.Tests.Unit
                 // Do nothing.
             };
 
+            var assemblies = new[] { Assembly.GetExecutingAssembly() };
+
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
-                callback, new[] { Assembly.GetExecutingAssembly() });
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, assemblies);
 
             // Assert
-            // This call should fail, because by supplying a delegate, the extension method does not do any
-            // registration itself.
-            container.GetInstance<IService<string, object>>();
+            var registration = container.GetRegistration(typeof(IService<string, object>));
+
+            Assert.IsNull(registration, "This call should fail, because by supplying a delegate, the " +
+                "extension method does not do any registration itself.");
         }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericEnumerable_WithValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            BatchRegistrationCallback callback = (closedServiceType, implementations) => { };
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), assemblies);
+        }
+
+#if !SILVERLIGHT
+        [TestMethod]
+        public void RegisterManyForOpenGenericAccessibilityOptionCallbackEnum_WithValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            BatchRegistrationCallback callback = (closedServiceType, implementations) => { };
+
+            var assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, callback, 
+                assemblies);
+        }
+#endif
 
         [TestMethod]
         public void RegisterManyForOpenGeneric_WithCallback_IsCalledTheExpectedAmountOfTimes()

@@ -1,22 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Tests.Unit
+namespace SimpleInjector.Extensions.Tests.Unit
 {
     internal static class AssertThat
     {
-        internal static void ExceptionContainsParamName(ArgumentException exception, string expectedParamName)
-        {
-            string assertMessage = "Exception does not contain parameter with name: " + expectedParamName;
-
-#if !SILVERLIGHT
-            Assert.AreEqual(exception.ParamName, expectedParamName, assertMessage);
-#else
-            Assert.IsTrue(exception.Message.Contains(expectedParamName), assertMessage);
-#endif
-        }
-
         internal static void StringContains(string expectedMessage, string actualMessage, string assertMessage)
         {
             if (expectedMessage == null)

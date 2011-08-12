@@ -4,6 +4,7 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
 	Bug Fixes:
 		-Bug fix in both the RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods of the
@@ -12,7 +13,8 @@ Version vNext
 		-Performance optimization in the RegisterOpenGeneric extension method in the Extensions.dll. Types
 		 can now be resolved as quickly as types that are registered using a Func<T> delegate.
 		-Bug fix in the RegisterSingleOpenGeneric extension method in the SimpleInjector.Extensions.dll. Due 
-		to a race condition, it was possible for this method to new up more instances of the same type.
+		 to a race condition, it was possible for this method to new up more instances of the same type.
+
 
 Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 	General description:
@@ -44,6 +46,7 @@ Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 	Bug Fixes:
 		-Container.GetService method failed on concrete unregistered types, that could not be resolved using
 		 auto-wiring, such as System.String and System.Int32. (work item 15843).
+
 
 Version 1.0.0.11115 (v1.0 RTM) 2011-04-26
 	General description:

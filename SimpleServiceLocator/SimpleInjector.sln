@@ -48,9 +48,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CodeSamples.Tests.Unit", "SimpleInjector.CodeSamples.Tests.Unit\SimpleInjector.CodeSamples.Tests.Unit.csproj", "{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.Silverlight", "SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj", "{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.Silverlight.Tests.Unit", "SimpleInjector.Extensions.Silverlight.Tests.Unit\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj", "{8487C652-EF01-4D52-BE56-AC2ADE51C030}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 12
+		SccNumberOfProjects = 14
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS02
 		SccLocalPath0 = .
@@ -87,6 +91,12 @@ Global
 		SccProjectUniqueName11 = SimpleInjector.CodeSamples.Tests.Unit\\SimpleInjector.CodeSamples.Tests.Unit.csproj
 		SccProjectName11 = SimpleInjector.CodeSamples.Tests.Unit
 		SccLocalPath11 = SimpleInjector.CodeSamples.Tests.Unit
+		SccProjectUniqueName12 = SimpleInjector.Extensions.Silverlight\\SimpleInjector.Extensions.Silverlight.csproj
+		SccProjectName12 = SimpleInjector.Extensions.Silverlight
+		SccLocalPath12 = SimpleInjector.Extensions.Silverlight
+		SccProjectUniqueName13 = SimpleInjector.Extensions.Silverlight.Tests.Unit\\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj
+		SccProjectName13 = SimpleInjector.Extensions.Silverlight.Tests.Unit
+		SccLocalPath13 = SimpleInjector.Extensions.Silverlight.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +147,14 @@ Global
 		{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A0789DC-817E-45DC-BA49-D7B0DFD4B373}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
