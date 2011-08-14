@@ -47,13 +47,18 @@ namespace SimpleInjector
         /// <summary>Gets the unregistered service type that is currently requested.</summary>
         /// <value>The unregistered service type that is currently requested.</value>
         public Type UnregisteredServiceType { get; private set; }
-        
-        internal Func<object> InstanceCreator { get; private set; }
 
-        internal bool Handled
+        /// <summary>
+        /// Gets a value indicating whether the event represented by this instance has been handled.
+        /// This property will return <b>true</b> when <see cref="Register"/> has been called on this instance.
+        /// </summary>
+        /// <value>The indication whether the event has been handled.</value>
+        public bool Handled
         {
             get { return this.InstanceCreator != null; }
         }
+        
+        internal Func<object> InstanceCreator { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type

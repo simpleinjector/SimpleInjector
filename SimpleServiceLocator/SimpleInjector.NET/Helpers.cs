@@ -39,13 +39,10 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
-        private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
+        internal const string InstanceProviderDebuggerDisplayString =
+            "ServiceType: {((IInstanceProducer)this).ServiceType}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
 
-        internal static string GetDescription(this IInstanceProducer producer)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "ServiceType: {0}, Expression: {1}",
-                producer.ServiceType, producer.BuildExpression());
-        }
+        private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
         internal static IInstanceProducer CreateTransientInstanceProducerFor(Type serviceType, 
             Container container)

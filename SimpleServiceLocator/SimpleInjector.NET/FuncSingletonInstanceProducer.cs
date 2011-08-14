@@ -31,6 +31,7 @@ namespace SimpleInjector
 {
     /// <summary>Ensures that the wrapped delegate will only be executed once.</summary>
     /// <typeparam name="T">The interface or base type that can be used to retrieve instances.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class FuncSingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
         private Func<T> instanceCreator;
@@ -78,13 +79,6 @@ namespace SimpleInjector
         Expression IInstanceProducer.BuildExpression()
         {
             return Expression.Constant(this.GetInstance());
-        }
-
-        /// <summary>Returns a string that represents the current instance.</summary>
-        /// <returns>A string that represents the current instance.</returns>
-        public override string ToString()
-        {
-            return this.GetDescription();
         }
 
         private T GetInstanceFromCreatorWithRecursiveCheck()

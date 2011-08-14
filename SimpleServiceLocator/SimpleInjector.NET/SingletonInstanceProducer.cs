@@ -31,6 +31,7 @@ namespace SimpleInjector
 {
     /// <summary>Wraps an instance and returns that single instance every time.</summary>
     /// <typeparam name="T">The type, what else.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
         // Storing a key is not needed, because the Validate method will never throw.
@@ -61,13 +62,6 @@ namespace SimpleInjector
         Expression IInstanceProducer.BuildExpression()
         {
             return Expression.Constant(this.instance);
-        }
-
-        /// <summary>Returns a string that represents the current instance.</summary>
-        /// <returns>A string that represents the current instance.</returns>
-        public override string ToString()
-        {
-            return this.GetDescription();
         }
     }
 }

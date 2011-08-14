@@ -33,6 +33,7 @@ namespace SimpleInjector
     /// Allows producing instances based on a supplied Func{T} delegate.
     /// </summary>
     /// <typeparam name="T">Type service type.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class FuncInstanceProducer<T> : IInstanceProducer
     {
         // The key of the producer if it is part of a IKeyedInstanceProducer, or null if not.
@@ -97,13 +98,6 @@ namespace SimpleInjector
             }
 
             return instance;
-        }
-
-        /// <summary>Returns a string that represents the current instance.</summary>
-        /// <returns>A string that represents the current instance.</returns>
-        public override string ToString()
-        {
-            return this.GetDescription();
         }
 
         // This method will be inlined by the JIT.

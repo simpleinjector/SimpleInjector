@@ -48,6 +48,7 @@ namespace SimpleInjector
     /// will be registered by that time.
     /// </summary>
     /// <typeparam name="TConcrete">The concrete type to create.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal class TransientInstanceProducer<TConcrete> : IInstanceProducer, ITransientInstanceProducer
         where TConcrete : class
     {
@@ -143,13 +144,6 @@ namespace SimpleInjector
                 throw new ActivationException(
                     StringResources.ErrorWhileTryingToGetInstanceOfType(typeof(TConcrete), ex), ex);
             }
-        }
-
-        /// <summary>Returns a string that represents the current instance.</summary>
-        /// <returns>A string that represents the current instance.</returns>
-        public override string ToString()
-        {
-            return this.GetDescription();
         }
 
         internal static TransientInstanceProducer<TConcrete> Create(Container container, Type serviceType)

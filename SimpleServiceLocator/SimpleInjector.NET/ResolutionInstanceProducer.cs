@@ -34,6 +34,7 @@ namespace SimpleInjector
     /// type resolution.
     /// </summary>
     /// <typeparam name="T">The service type.</typeparam>
+    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Func<object> instanceCreator;
@@ -110,13 +111,6 @@ namespace SimpleInjector
                     StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(typeof(T),
                     instance.GetType()), ex);
             }
-        }
-
-        /// <summary>Returns a string that represents the current instance.</summary>
-        /// <returns>A string that represents the current instance.</returns>
-        public override string ToString()
-        {
-            return this.GetDescription();
         }
 
         // This method will be inlined by the JIT.
