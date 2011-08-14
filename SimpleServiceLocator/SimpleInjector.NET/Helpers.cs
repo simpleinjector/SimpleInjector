@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -38,10 +39,13 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
-        internal const string InstanceProviderDebuggerDisplayString =
-            "ServiceType: {((IInstanceProducer)this).ServiceType.Name}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
-
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
+
+        internal static string GetDescription(this IInstanceProducer producer)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "ServiceType: {0}, Expression: {1}",
+                producer.ServiceType, producer.BuildExpression());
+        }
 
         internal static IInstanceProducer CreateTransientInstanceProducerFor(Type serviceType, 
             Container container)
