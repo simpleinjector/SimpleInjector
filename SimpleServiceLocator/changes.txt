@@ -4,6 +4,10 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-The 'Handled' property of the UnregisteredTypeEventArgs is made public. This enables some rare but
+		 interesting scenario's were users want to prevent an ActivationException from being thrown when 
+		 multiple delegates respond to the same ResolveUnregisteredType event. Publication of the property
+		 allows users skip and continue when another delegate already registered that type.
 		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
 	Bug Fixes:

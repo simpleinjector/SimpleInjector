@@ -49,7 +49,7 @@ namespace SimpleInjector
         public Type UnregisteredServiceType { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the event represented by this instance has been handled.
+        /// Gets a value indicating whether the event represented by this instance has been handled. 
         /// This property will return <b>true</b> when <see cref="Register"/> has been called on this instance.
         /// </summary>
         /// <value>The indication whether the event has been handled.</value>
