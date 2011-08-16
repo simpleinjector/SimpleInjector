@@ -4,6 +4,7 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-The Container now registers itself upon creation. This makes some integration scenario's easier.
 		-A InjectProperties(object) extension method has been added to a new class of the new 
 		 "SimpleInjector.Extensions" namespace of the core library. This method enables injecting public 
 		 properties to a given type. By adding it to the core library the method can be optimized for 

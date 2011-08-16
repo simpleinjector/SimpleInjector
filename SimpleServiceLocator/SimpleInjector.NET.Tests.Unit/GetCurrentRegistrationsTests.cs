@@ -31,10 +31,11 @@ namespace SimpleInjector.Tests.Unit
             container.Register<ITimeProvider, RealTimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registations.Count());
         }
 
         [TestMethod]
@@ -46,10 +47,11 @@ namespace SimpleInjector.Tests.Unit
             container.Register<RealTimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(RealTimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -61,10 +63,11 @@ namespace SimpleInjector.Tests.Unit
             container.Register<ITimeProvider>(() => new RealTimeProvider());
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -76,10 +79,11 @@ namespace SimpleInjector.Tests.Unit
             container.GetInstance<RealTimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(RealTimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -91,10 +95,11 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -106,10 +111,11 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterSingle<RealTimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(RealTimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -121,10 +127,11 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterSingle<ITimeProvider>(() => new RealTimeProvider());
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -136,10 +143,11 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterSingle<ITimeProvider>(new RealTimeProvider());
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
 
         [TestMethod]
@@ -156,10 +164,11 @@ namespace SimpleInjector.Tests.Unit
             container.GetInstance<ITimeProvider>();
 
             // Act
-            var provider = container.GetCurrentRegistrations().Single();
+            var registrations = container.GetCurrentRegistrations()
+                .Where(r => r.ServiceType == typeof(ITimeProvider));
 
             // Assert
-            Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
+            Assert.AreEqual(1, registrations.Count());
         }
     }
 }

@@ -58,6 +58,7 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
         {
+            this.RegisterSingle<Container>(this);
         }
 
         internal Dictionary<Type, PropertyProducerPair[]> PropertyInjectionCache
