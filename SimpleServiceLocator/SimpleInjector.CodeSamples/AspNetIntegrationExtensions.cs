@@ -5,7 +5,6 @@
     using System.Web.UI;
 
     using SimpleInjector;
-    using SimpleInjector.Extensions;
 
     public static class AspNetIntegrationExtensions
     {

@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using SimpleInjector;
-    using SimpleInjector.Extensions;
 
     public static class ImplicitPropertyInjectionExtensions
     {

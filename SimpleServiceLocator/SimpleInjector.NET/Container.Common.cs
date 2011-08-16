@@ -29,8 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
-using SimpleInjector.Extensions;
+using System.Reflection;
 
 namespace SimpleInjector
 {
@@ -59,11 +58,6 @@ namespace SimpleInjector
         public Container()
         {
             this.RegisterSingle<Container>(this);
-        }
-
-        internal Dictionary<Type, PropertyProducerPair[]> PropertyInjectionCache
-        {
-            get { return this.propertyInjectionCache; }
         }
 
         /// <summary>
@@ -147,23 +141,30 @@ namespace SimpleInjector
             return base.GetType();
         }
 
-        internal void RegisterPropertyProducerPairs(Type serviceType, PropertyProducerPair[] pairs,
-            Dictionary<Type, PropertyProducerPair[]> snapshot)
-        {
-            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
-
-            snapshotCopy.Add(serviceType, pairs);
-
-            // Replace the original with the new version that includes the serviceType.
-            this.propertyInjectionCache = snapshotCopy;
-        }
-
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
         private sealed class InstanceInitializer
         {
             internal Type ServiceType { get; set; }
 
             internal object Action { get; set; }
+        }
+
+        /// <summary>A <see cref="PropertyInfo"/> - <see cref="IInstanceProducer"/> pair.</summary>
+        private sealed class PropertyProducerPair
+        {
+            private readonly PropertyInfo property;
+            private readonly IInstanceProducer producer;
+
+            internal PropertyProducerPair(PropertyInfo property, IInstanceProducer producer)
+            {
+                this.property = property;
+                this.producer = producer;
+            }
+
+            internal void InjectProperty(object instance)
+            {
+                this.property.SetValue(instance, this.producer.GetInstance(), null);
+            }
         }
     }
 }

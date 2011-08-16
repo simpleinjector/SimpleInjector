@@ -54,6 +54,7 @@
     <Compile Include="GetServiceTests.cs" />
     <Compile Include="CyclicDependencyValidatorTests.cs" />
     <Compile Include="ConsistencyTests.cs" />
+    <Compile Include="InjectPropertiesTests.cs" />
     <Compile Include="RegisterAllTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterByFuncTests.cs" />

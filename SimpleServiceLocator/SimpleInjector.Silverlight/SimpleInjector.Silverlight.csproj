@@ -73,12 +73,6 @@
     <Compile Include="..\SimpleInjector.NET\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\ContainerExtensions.cs">
-      <Link>Extensions\ContainerExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\PropertyProducerPair.cs">
-      <Link>Extensions\PropertyProducerPair.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\FuncInstanceProducer.cs">
       <Link>FuncInstanceProducer.cs</Link>
     </Compile>
@@ -107,6 +101,9 @@
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

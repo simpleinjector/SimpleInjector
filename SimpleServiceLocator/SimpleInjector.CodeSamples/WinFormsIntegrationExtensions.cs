@@ -4,7 +4,6 @@
     using System.Windows.Forms;
 
     using SimpleInjector;
-    using SimpleInjector.Extensions;
 
     public static class WinFormsIntegrationExtensions
     {

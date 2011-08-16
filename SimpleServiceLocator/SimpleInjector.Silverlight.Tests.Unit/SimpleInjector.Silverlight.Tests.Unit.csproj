@@ -73,9 +73,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\CyclicDependencyValidatorTests.cs">
       <Link>CyclicDependencyValidatorTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\ContainerExtensionTests.cs">
-      <Link>Extensions\ContainerExtensionTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
     </Compile>
@@ -84,6 +81,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetServiceTests.cs">
       <Link>GetServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\InjectPropertiesTests.cs">
+      <Link>InjectPropertiesTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterAllTests.cs">
       <Link>RegisterAllTests.cs</Link>
@@ -148,6 +148,9 @@
       <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
       <Name>SimpleInjector.Silverlight</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

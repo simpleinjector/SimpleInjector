@@ -191,6 +191,67 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(serviceType, buildProducer);
         }
 
+        /// <summary>
+        /// Injects all public writable properties of the given <paramref name="instance"/> that have a type
+        /// that can be resolved by the <paramref name="container"/>.
+        /// </summary>
+        /// <param name="instance">The instance whos properties will be injected.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="instance"/> is null (Nothing in VB).</exception>
+        public void InjectProperties(object instance)
+        {
+            if (instance == null)
+            {
+                throw new ArgumentNullException("instance");
+            }
+            
+            var snapshot = this.propertyInjectionCache;
+
+            PropertyProducerPair[] pairs;
+
+            if (!snapshot.TryGetValue(instance.GetType(), out pairs))
+            {
+                pairs = this.CreatePropertyProducerPairs(instance.GetType());
+
+                this.RegisterPropertyProducerPairs(instance.GetType(), pairs, snapshot);
+            }
+
+            if (pairs != null)
+            {
+                for (int i = 0; i < pairs.Length; i++)
+                {
+                    pairs[i].InjectProperty(instance);
+                }
+            }
+        }
+
+        // Returns null when the type has no injectable properties.
+        private PropertyProducerPair[] CreatePropertyProducerPairs(Type type)
+        {
+            var pairs = (
+                from property in type.GetProperties()
+                where property.CanWrite
+                where property.GetSetMethod() != null
+                where !property.PropertyType.IsValueType
+                let producer = this.GetRegistration(property.PropertyType)
+                where producer != null
+                select new PropertyProducerPair(property, producer))
+                .ToArray();
+
+            return pairs.Length == 0 ? null : pairs;
+        }
+
+        private void RegisterPropertyProducerPairs(Type serviceType, PropertyProducerPair[] pairs,
+            Dictionary<Type, PropertyProducerPair[]> snapshot)
+        {
+            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
+
+            snapshotCopy.Add(serviceType, pairs);
+
+            // Replace the original with the new version that includes the serviceType.
+            this.propertyInjectionCache = snapshotCopy;
+        }
+
         private IInstanceProducer GetInstanceProducerForType<TService>() where TService : class
         {
             Func<IInstanceProducer> buildProducer = () => this.BuildInstanceProducerForType<TService>();
