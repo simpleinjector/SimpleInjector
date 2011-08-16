@@ -4,6 +4,11 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-A InjectProperties(object) extension method has been added to a new class of the new 
+		 "SimpleInjector.Extensions" namespace of the core library. This method enables injecting public 
+		 properties to a given type. By adding it to the core library the method can be optimized for 
+		 performance and used in integration scenario's without the need for adding the Extensions.dll. 
+		 By putting it in a separate namespace it keeps the main Container API clean and simple.
 		-The 'Handled' property of the UnregisteredTypeEventArgs is made public. This enables some rare but
 		 interesting scenario's were users want to prevent an ActivationException from being thrown when 
 		 multiple delegates respond to the same ResolveUnregisteredType event. Publication of the property

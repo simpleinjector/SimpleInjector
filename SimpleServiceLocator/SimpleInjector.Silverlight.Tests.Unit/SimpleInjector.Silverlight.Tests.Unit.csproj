@@ -73,6 +73,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\CyclicDependencyValidatorTests.cs">
       <Link>CyclicDependencyValidatorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\ContainerExtensionTests.cs">
+      <Link>Extensions\ContainerExtensionTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
     </Compile>

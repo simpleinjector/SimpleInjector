@@ -1,9 +1,10 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Linq;
     using System.Windows.Forms;
+
     using SimpleInjector;
+    using SimpleInjector.Extensions;
 
     public static class WinFormsIntegrationExtensions
     {
@@ -29,25 +30,12 @@
         {
             if (container == null)
             {
-                throw new InvalidOperationException("Don't forget " +
-                    "to call SetContainer first.");
+                throw new InvalidOperationException("Don't forget to call " +
+                    "WinFormsIntegrationExtensions.SetContainer first in " +
+                    "the program's Main method.");
             }
 
-            var properties =
-                from property in instance.GetType().GetProperties()
-                where property.CanWrite
-                where !property.PropertyType.IsValueType
-                where property.DeclaringType.Namespace != "System.Windows.Forms"
-                let type = property.PropertyType
-                let producer = container.GetRegistration(type)
-                where producer != null
-                select new { property, producer };
-
-            foreach (var p in properties)
-            {
-                object value = p.producer.GetInstance();
-                p.property.SetValue(instance, value, null);
-            }
+            container.InjectProperties(instance);
         }
     }
 }

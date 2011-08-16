@@ -30,6 +30,8 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+using SimpleInjector.Extensions;
+
 namespace SimpleInjector
 {
     /// <summary>
@@ -50,14 +52,17 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
 
+        private Dictionary<Type, PropertyProducerPair[]> propertyInjectionCache =
+            new Dictionary<Type, PropertyProducerPair[]>();
+
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
         {
         }
 
-        internal Dictionary<Type, IInstanceProducer> Registrations
+        internal Dictionary<Type, PropertyProducerPair[]> PropertyInjectionCache
         {
-            get { return this.registrations; }
+            get { return this.propertyInjectionCache; }
         }
 
         /// <summary>
@@ -139,6 +144,17 @@ namespace SimpleInjector
         public new Type GetType()
         {
             return base.GetType();
+        }
+
+        internal void RegisterPropertyProducerPairs(Type serviceType, PropertyProducerPair[] pairs,
+            Dictionary<Type, PropertyProducerPair[]> snapshot)
+        {
+            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
+
+            snapshotCopy.Add(serviceType, pairs);
+
+            // Replace the original with the new version that includes the serviceType.
+            this.propertyInjectionCache = snapshotCopy;
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>

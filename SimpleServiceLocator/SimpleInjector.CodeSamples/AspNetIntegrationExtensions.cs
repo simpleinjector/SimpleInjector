@@ -1,11 +1,11 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
     using System.Web;
     using System.Web.UI;
+
+    using SimpleInjector;
+    using SimpleInjector.Extensions;
 
     public static class AspNetIntegrationExtensions
     {
@@ -36,25 +36,12 @@
         {
             if (container == null)
             {
-                throw new InvalidOperationException("Don't forget " +
-                    "to call SetContainer first.");
+                throw new InvalidOperationException("Don't forget to call " +
+                    "AspNetIntegrationExtensions.SetContainer first in " +
+                    "the Application_Start method of the Global.asax.");
             }
 
-            var properties =
-                from property in instance.GetType().GetProperties()
-                where property.CanWrite
-                let type = property.PropertyType
-                where !type.IsValueType
-                where type.Namespace != "System.Web.UI"
-                let producer = container.GetRegistration(type)
-                where producer != null
-                select new { property, producer };
-
-            foreach (var p in properties)
-            {
-                object value = p.producer.GetInstance();
-                p.property.SetValue(instance, value, null);
-            }
+            container.InjectProperties(instance);
         }
     }
 }

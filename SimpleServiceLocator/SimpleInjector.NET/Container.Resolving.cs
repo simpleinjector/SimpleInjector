@@ -204,7 +204,7 @@ namespace SimpleInjector
         {
             IInstanceProducer instanceProducer;
 
-            var snapshot = this.Registrations;
+            var snapshot = this.registrations;
 
             if (!snapshot.TryGetValue(serviceType, out instanceProducer))
             {
