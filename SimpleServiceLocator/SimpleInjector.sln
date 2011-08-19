@@ -1,10 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET", "SimpleInjector.NET\SimpleInjector.NET.csproj", "{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET.Tests.Unit", "SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj", "{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
 		changes.txt = changes.txt
@@ -19,8 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Assemblies", "Shared
 		Shared Assemblies\Microsoft.Practices.ServiceLocation.XML = Shared Assemblies\Microsoft.Practices.ServiceLocation.XML
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Silverlight", "SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj", "{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Silverlight Assemblies", "Shared Silverlight Assemblies", "{AA66367E-86E6-4DED-BBC7-463B71F4B5DA}"
 	ProjectSection(SolutionItems) = preProject
 		Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.dll = Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.dll
@@ -31,6 +25,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Silverlight Assembli
 		Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml = Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml
 		Shared Silverlight Assemblies\Readme.txt = Shared Silverlight Assemblies\Readme.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET", "SimpleInjector.NET\SimpleInjector.NET.csproj", "{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET.Tests.Unit", "SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj", "{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Silverlight", "SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj", "{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions", "SimpleInjector.Extensions\SimpleInjector.Extensions.csproj", "{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}"
 EndProject
@@ -56,7 +56,7 @@ Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 13
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/TFS02
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = CommonServiceLocator.SimpleInjectorAdapter\\CommonServiceLocator.SimpleInjectorAdapter.csproj
 		SccProjectName1 = CommonServiceLocator.SimpleInjectorAdapter

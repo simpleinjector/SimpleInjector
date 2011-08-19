@@ -4,6 +4,8 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-The solution and projects are converted to Visual Studio 2010. The library is still compatible with
+		 .NET 3.5 though.
 		-The Container now registers itself upon creation. This makes some integration scenario's easier.
 		-A InjectProperties(object) method has been added to the Container. This method enables injecting 
 		 public properties to a given type. By adding it to the core library the method can be optimized for 

@@ -568,7 +568,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         {
             // Arrange
             string expectedMessage = string.Format(
-                "The supplied type '{0}' does not implement '{0}'.\r\nParameternaam: serviceTypes", 
+                "The supplied type '{0}' does not implement '{0}'.", 
                 typeof(IPublicService).Name);
 
             var container = new Container();
@@ -585,7 +585,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             {
                 string actualMessage = ex.Message.Replace(typeof(IPublicService).FullName, typeof(IPublicService).Name);
 
-                Assert.AreEqual(expectedMessage, actualMessage);
+                AssertThat.StringContains(expectedMessage, actualMessage);
             }
         }
 
