@@ -21,7 +21,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsTrue(Object.ReferenceEquals(instance1, instance2),
+            Assert.IsTrue(object.ReferenceEquals(instance1, instance2),
                 "GetInstance should result in same instance being returned for a single thread.");
         }
 
@@ -54,7 +54,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             thread2.Join();
 
             // Assert
-            Assert.IsFalse(Object.ReferenceEquals(instance1, instance2),
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
                 "GetInstance should result in different instances being returned for each thread.");
         }
     }

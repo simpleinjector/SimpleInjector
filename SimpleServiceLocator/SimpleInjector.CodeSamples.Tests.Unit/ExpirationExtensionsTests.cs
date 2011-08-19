@@ -94,7 +94,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(Object.ReferenceEquals(instance1, instance2), 
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2), 
                 "A new instance was expected to be returned when it is requested after it timed out.");
         }
 
@@ -119,7 +119,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(Object.ReferenceEquals(instance1, instance2),
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
                 "The new instance is expected to be returned, because of the absolute timeout period. ");
         }
 
@@ -203,7 +203,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(Object.ReferenceEquals(instance1, instance2),
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
                 "A new instance was expected to be returned when it is requested after it timed out.");
         }
 
@@ -227,7 +227,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
                 var instance2 = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsTrue(Object.ReferenceEquals(instance1, instance2),
+                Assert.IsTrue(object.ReferenceEquals(instance1, instance2),
                     "The same instance is expected to be returned, because of the sliding period. " + i);
             }
         }

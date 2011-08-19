@@ -60,7 +60,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// registered in the container.
         /// </summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is are errors resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>A sequence of instances of the requested <typeparamref name="TService" />.</returns>
         public IEnumerable<TService> GetAllInstances<TService>()
@@ -80,7 +80,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// registered in the container.
         /// </summary>
         /// <param name="serviceType">Type of object requested.</param>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is are errors resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>A sequence of instances of the requested <paramref name="serviceType" />.</returns>
         public IEnumerable<object> GetAllInstances(Type serviceType)
@@ -100,7 +100,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// </summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <param name="key">Name the object was registered with.</param>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is are errors resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <exception cref="NotSupportedException">Thrown when a non-null key is requested. Keyed 
         /// registration is not supported by the Simple Injector.</exception>
@@ -121,7 +121,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// Get an instance of the given <typeparamref name="TService" />.
         /// </summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is are errors resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>The requested service instance.</returns>
         public TService GetInstance<TService>()
@@ -141,7 +141,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// </summary>
         /// <param name="serviceType">Type of object requested.</param>
         /// <param name="key">Name the object was registered with.</param>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is an error resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is an error resolving
         /// the service instance.</exception>
         /// <exception cref="NotSupportedException">Thrown when a non-null key is requested. Keyed 
         /// registration is not supported by the Simple Injector.</exception>
@@ -162,7 +162,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// Get an instance of the given <paramref name="serviceType" />.
         /// </summary>
         /// <param name="serviceType">Type of object requested.</param>
-        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is an error resolving
+        /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is an error resolving
         /// the service instance.</exception>
         /// <returns>The requested service instance.</returns>
         public object GetInstance(Type serviceType)

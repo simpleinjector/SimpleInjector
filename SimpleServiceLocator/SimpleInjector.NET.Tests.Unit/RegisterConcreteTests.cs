@@ -37,7 +37,7 @@ namespace SimpleInjector.Tests.Unit
             var s1 = container.GetInstance<RealUserService>();
             var s2 = container.GetInstance<RealUserService>();
 
-            Assert.IsFalse(Object.ReferenceEquals(s1, s2), "Always a new instance was expected to be returned.");
+            Assert.IsFalse(object.ReferenceEquals(s1, s2), "Always a new instance was expected to be returned.");
         }
 
         [TestMethod]

@@ -129,7 +129,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var impl2 = container.GetInstance<IService<int, string>>();
 
             // Assert
-            Assert.IsTrue(Object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
+            Assert.IsTrue(object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
         }
 
         [TestMethod]
@@ -148,7 +148,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var impl2 = container.GetInstance<IService<string, object>>();
 
             // Assert
-            Assert.IsTrue(Object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
+            Assert.IsTrue(object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
         }
 
         [TestMethod]
@@ -503,7 +503,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             Assert_AreEqual(expectedClosedServiceTypes, actualClosedServiceTypes);
         }
 
-        private void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
+        private static void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
         {
             Assert.IsNotNull(actualList);
 

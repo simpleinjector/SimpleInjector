@@ -399,7 +399,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
             // Act
             // Although Nullable<T> is a value type, the actual C# 'struct' constraint is the CLR 
             // 'not nullable value type' constraint.
-            var producer = container.GetRegistration(typeof(IEventHandler<Nullable<StructEvent>>));
+            var producer = container.GetRegistration(typeof(IEventHandler<StructEvent?>));
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
@@ -570,7 +570,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
         // Note: This class deliberately implements a second IProducer. This will verify wether the code can
         // handle types with multiple versions of the same interface.
-        public class NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double>
+        public class NullableProducer<T> : IProducer<T?>, IProducer<IValidate<T>>, IProducer<double>
             where T : struct 
         { 
         }
