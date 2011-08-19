@@ -403,7 +403,7 @@ namespace SimpleInjector.Extensions
             MemberAccessException innerException, string paramName)
         {
             string exceptionMessage =
-                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType);
+                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, innerException);
 
 #if SILVERLIGHT
             throw new ArgumentException(exceptionMessage, paramName);

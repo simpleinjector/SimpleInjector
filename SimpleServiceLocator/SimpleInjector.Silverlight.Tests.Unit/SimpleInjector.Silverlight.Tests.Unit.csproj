@@ -130,6 +130,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InjectPropertiesTests.Silverlight.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilverlightSpecificTests.cs" />
   </ItemGroup>

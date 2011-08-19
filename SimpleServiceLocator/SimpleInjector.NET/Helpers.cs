@@ -68,7 +68,7 @@ namespace SimpleInjector
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ActivationException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType), ex);
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex), ex);
             }
 
             ((ITransientInstanceProducer)instanceProducer).Container = container;

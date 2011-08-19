@@ -51,7 +51,7 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
 
-        private Dictionary<Type, PropertyProducerPair[]> propertyInjectionCache =
+        private Dictionary<Type, PropertyProducerPair[]> propertyInjectorCache =
             new Dictionary<Type, PropertyProducerPair[]>();
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>

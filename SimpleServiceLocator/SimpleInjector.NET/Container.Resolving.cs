@@ -205,23 +205,37 @@ namespace SimpleInjector
                 throw new ArgumentNullException("instance");
             }
             
-            var snapshot = this.propertyInjectionCache;
+            var snapshot = this.propertyInjectorCache;
 
-            PropertyProducerPair[] pairs;
+            PropertyProducerPair[] propertyInjectors;
 
-            if (!snapshot.TryGetValue(instance.GetType(), out pairs))
+            if (!snapshot.TryGetValue(instance.GetType(), out propertyInjectors))
             {
-                pairs = this.CreatePropertyProducerPairs(instance.GetType());
+                propertyInjectors = this.CreatePropertyProducerPairs(instance.GetType());
 
-                this.RegisterPropertyProducerPairs(instance.GetType(), pairs, snapshot);
+                this.RegisterPropertyProducerPairs(instance.GetType(), propertyInjectors, snapshot);
             }
 
-            if (pairs != null)
+            if (propertyInjectors != null)
+            {
+                InjectProperties(instance, propertyInjectors);
+            }
+        }
+
+        private static void InjectProperties(object instance, PropertyProducerPair[] pairs)
+        {
+            try
             {
                 for (int i = 0; i < pairs.Length; i++)
                 {
                     pairs[i].InjectProperty(instance);
                 }
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                throw new ActivationException(
+                    StringResources.UnableToInjectPropertiesDueToSecurityConfiguration(instance.GetType(), ex), ex);
             }
         }
 
@@ -249,7 +263,7 @@ namespace SimpleInjector
             snapshotCopy.Add(serviceType, pairs);
 
             // Replace the original with the new version that includes the serviceType.
-            this.propertyInjectionCache = snapshotCopy;
+            this.propertyInjectorCache = snapshotCopy;
         }
 
         private IInstanceProducer GetInstanceProducerForType<TService>() where TService : class

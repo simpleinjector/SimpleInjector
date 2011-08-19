@@ -31,12 +31,14 @@ namespace SimpleInjector.Extensions
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType)
+        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType, 
+            Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to register type {0}. The security restrictions of your application's sandbox do " +
                 "not permit the creation of this type. Explicitly register the type using one of the " +
-                "generic Register overloads or consider making it public.", serviceType);
+                "generic Register overloads or consider making it public. {1}", serviceType, 
+                innerException.Message);
         }
     }
 }

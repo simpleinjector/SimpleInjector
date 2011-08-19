@@ -187,12 +187,23 @@ namespace SimpleInjector
                 serviceType);
         }
 
-        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType)
+        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType, 
+            Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to resolve type {0}. The security restrictions of your application's sandbox do " +
                 "not permit the creation of this type. Explicitly register the type using one of the " +
-                "generic 'Register' overloads or consider making it public.", serviceType);
+                "generic 'Register' overloads or consider making it public. {1}", serviceType, 
+                innerException.Message);
+        }
+
+        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type serviceType,
+            Exception innerException)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Unable to inject properties into type {0}. The security restrictions of your " +
+                "application's sandbox do not permit the injection of properties into this type. Consider " +
+                "making it public. {1}", serviceType, innerException.Message);
         }
     }
 }

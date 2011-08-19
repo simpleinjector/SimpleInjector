@@ -4,8 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SimpleInjector.Tests.Unit
 {
+    /// <content>Tests for injecting properties.</content>
     [TestClass]
-    public class InjectPropertiesTests
+    public partial class InjectPropertiesTests
     {
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -40,7 +41,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void InjectProperties_ContainerWithPartialRegistration_DoesInjectSingleProperty()
+        public void InjectProperties_ContainerWithRegistrationForASingleProperty_DoesInjectSingleProperty()
         {
             // Arrange
             var container = new Container();
@@ -107,7 +108,7 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             Assert.IsNull(instance.InternalUserService, "UserService property expected to be null.");
         }
-
+       
         public class Service
         {
             public ITimeProvider TimeProvider { get; set; }
