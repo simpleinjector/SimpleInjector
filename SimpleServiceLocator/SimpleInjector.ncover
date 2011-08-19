@@ -4,7 +4,7 @@
     <WorkingDirectory>.\</WorkingDirectory>
     <BuildId />
     <CommandLineArgs>/testcontainer:"SimpleInjector.NET.Tests.Unit\bin\Debug\SimpleInjector.Tests.Unit.dll" /testcontainer:"SimpleInjector.Extensions.Tests.Unit\bin\Debug\SimpleInjector.Extensions.Tests.Unit.dll" /testcontainer:"SimpleInjector.CodeSamples.Tests.Unit\bin\Debug\SimpleInjector.CodeSamples.Tests.Unit.dll"</CommandLineArgs>
-    <CommandLineExe>C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\MSTest.exe</CommandLineExe>
+    <CommandLineExe>C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\MSTest.exe</CommandLineExe>
     <CoverageTrend>trend.xml</CoverageTrend>
     <CoverageMetrics>Symbol, Branch, CyclomaticComplexity, MethodVisits</CoverageMetrics>
     <CoverageFile>coverage.xml</CoverageFile>
