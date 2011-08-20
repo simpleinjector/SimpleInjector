@@ -17,6 +17,10 @@ Version vNext
 		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
 	Bug Fixes:
+		-The RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods in the
+		 Extensions project that take an IEnumerable<Assembly> or Assembly[] failed when a Anonymously 
+		 Hosted DynamicMethods Assembly was supplied, which would typically happen when the method was called
+		 with 'AppDomain.CurrentDomain.GetAssemblies()'.
 		-Bug fix in both the RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods of the
 		 Extensions.dll. The methods did not take generic type constraints into consideration. (work item 
 		 16053).

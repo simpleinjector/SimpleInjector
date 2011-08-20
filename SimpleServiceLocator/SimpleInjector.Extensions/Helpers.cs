@@ -68,13 +68,22 @@ namespace SimpleInjector.Extensions
         internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly,
             AccessibilityOption accessibility)
         {
-            if (accessibility == AccessibilityOption.AllTypes)
+            try
             {
-                return assembly.GetTypes();
+                if (accessibility == AccessibilityOption.AllTypes)
+                {
+                    return assembly.GetTypes();
+                }
+                else
+                {
+                    return assembly.GetExportedTypes();
+                }
             }
-            else
+            catch (NotSupportedException)
             {
-                return assembly.GetExportedTypes();
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // Assembly and it would be safe to skip this exception.
+                return Enumerable.Empty<Type>();
             }
         }
         
