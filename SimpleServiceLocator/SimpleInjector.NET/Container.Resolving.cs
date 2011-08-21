@@ -104,12 +104,7 @@ namespace SimpleInjector
             Justification = "This class already contains an overload that takes a Type.")]
         public IEnumerable<TService> GetAllInstances<TService>()
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
-
-            return GetAllInstancesInternal<TService>();
+            return this.GetInstance<IEnumerable<TService>>();
         }
 
         /// <summary>
@@ -120,12 +115,11 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            return this.GetAllInstancesInternal(serviceType);
+            var collection = (IEnumerable)this.GetInstance(collectionType);
+
+            return collection.Cast<object>();
         }
 
         /// <summary>Gets the service object of the specified type.</summary>
@@ -291,34 +285,6 @@ namespace SimpleInjector
             }
 
             return instanceProducer;
-        }
-
-        private IEnumerable<TService> GetAllInstancesInternal<TService>()
-        {
-            IInstanceProducer instanceProducer;
-
-            if (!this.registrations.TryGetValue(typeof(IEnumerable<TService>), out instanceProducer))
-            {
-                return Enumerable.Empty<TService>();
-            }
-
-            return (IEnumerable<TService>)instanceProducer.GetInstance();
-        }
-
-        private IEnumerable<object> GetAllInstancesInternal(Type serviceType)
-        {
-            IInstanceProducer instanceProducer;
-
-            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            if (!this.registrations.TryGetValue(collectionType, out instanceProducer))
-            {
-                return Enumerable.Empty<object>();
-            }
-
-            IEnumerable registeredCollection = (IEnumerable)instanceProducer.GetInstance();
-
-            return registeredCollection.Cast<object>();
         }
 
         private object GetInstanceForType<TService>() where TService : class

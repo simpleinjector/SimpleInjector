@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -77,7 +78,7 @@ namespace SimpleInjector.Tests.Unit
                 // Assert
                 Assert.Fail("Exception was expected.");
             }
-            catch
+            catch (ActivationException)
             {
                 Assert.IsTrue(eventCalled, "Before throwing an exception, the container must try to resolve " +
                     "a missing type by calling the ResolveUnregisteredType event.");
@@ -390,6 +391,105 @@ namespace SimpleInjector.Tests.Unit
                     AssertMessage + ex.Message);
                 Assert.IsTrue(ex.Message.Contains("that can not be cast to the specified service type"),
                     AssertMessage + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetAllInstances_OnUnregisteredType_TriggersUnregisteredTypeResolution()
+        {
+            // Arrange
+            bool resolveUnregisteredTypeWasTriggered = false;
+
+            var container = new Container();
+            
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
+                {
+                    resolveUnregisteredTypeWasTriggered = true;
+                }
+            };
+
+            // Act
+            container.GetAllInstances<Exception>();
+
+            // Assert
+            Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
+        }
+
+        [TestMethod]
+        public void GetAllInstancesByType_OnUnregisteredType_TriggersUnregisteredTypeResolution()
+        {
+            // Arrange
+            bool resolveUnregisteredTypeWasTriggered = false;
+
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
+                {
+                    resolveUnregisteredTypeWasTriggered = true;
+                }
+            };
+
+            // Act
+            container.GetAllInstances(typeof(Exception));
+
+            // Assert
+            Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnUnregisteredCollection_TriggersUnregisteredTypeResolution()
+        {
+            // Arrange
+            bool resolveUnregisteredTypeWasTriggered = false;
+
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
+                {
+                    resolveUnregisteredTypeWasTriggered = true;
+                }
+            };
+
+            // Act
+            container.GetInstance<IEnumerable<Exception>>();
+
+            // Assert
+            Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnInstanceDependingOnAnUnregisteredCollection_TriggersUnregisteredTypeResolution()
+        {
+            // Arrange
+            bool resolveUnregisteredTypeWasTriggered = false;
+
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
+                {
+                    resolveUnregisteredTypeWasTriggered = true;
+                }
+            };
+
+            // Act
+            container.GetInstance<Wrapper<Exception>>();
+
+            // Assert
+            Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
+        }
+
+        private sealed class Wrapper<T>
+        {
+            public Wrapper(IEnumerable<T> wrappedCollection)
+            {
             }
         }
 
