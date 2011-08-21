@@ -34,6 +34,8 @@ namespace SimpleInjector
     [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal sealed class FuncSingletonInstanceProducer<T> : IInstanceProducer where T : class
     {
+        private readonly object instanceCreationLock = new object();
+
         private Func<T> instanceCreator;
         private bool instanceCreated;
         private T instance;
@@ -59,8 +61,7 @@ namespace SimpleInjector
             // called again after the instance was created.
             if (!this.instanceCreated)
             {
-                // We can take a lock on this, because instances of this type are never publicly exposed.
-                lock (this)
+                lock (this.instanceCreationLock)
                 {
                     if (!this.instanceCreated)
                     {

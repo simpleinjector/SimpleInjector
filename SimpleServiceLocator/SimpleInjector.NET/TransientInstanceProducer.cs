@@ -52,6 +52,7 @@ namespace SimpleInjector
     internal class TransientInstanceProducer<TConcrete> : IInstanceProducer, ITransientInstanceProducer
         where TConcrete : class
     {
+        private readonly object instanceCreationLock = new object();
         private Container container;
 
         private Func<TConcrete> instanceCreator;
@@ -159,8 +160,7 @@ namespace SimpleInjector
         {
             // We use a lock to prevent the delegate to be created more than once. Not strictly needed, but
             // it won't harm us either.
-            // We can take a lock on this, because instances of this type are never publicly exposed.
-            lock (this)
+            lock (this.instanceCreationLock)
             {
                 if (this.instanceCreator == null)
                 {
