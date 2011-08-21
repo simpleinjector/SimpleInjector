@@ -79,7 +79,7 @@ namespace SimpleInjector
         {
             object instance;
 
-            this.validator.Prevent();
+            this.validator.CheckForRecursiveCalls();
 
             try
             {

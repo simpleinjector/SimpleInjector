@@ -83,7 +83,7 @@ namespace SimpleInjector
         /// <returns>An Expression.</returns>
         public Expression BuildExpression()
         {
-            this.validator.Prevent();
+            this.validator.CheckForRecursiveCalls();
 
             try
             {
@@ -122,7 +122,7 @@ namespace SimpleInjector
         /// <returns>An instance.</returns>
         public TConcrete GetInstance()
         {
-            this.validator.Prevent();
+            this.validator.CheckForRecursiveCalls();
 
             if (this.instanceCreator == null)
             {

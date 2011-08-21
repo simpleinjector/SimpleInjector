@@ -45,6 +45,7 @@ namespace SimpleInjector
             this.typeToValidate = typeToValidate;
         }
 
+        // Checks whether this is a recursive call (and thus a cyclic dependency) and throw in that case.
         internal void Check()
         {
             // We can lock on this, because RecursiveDependencyValidator is an internal type.
@@ -65,6 +66,7 @@ namespace SimpleInjector
             }
         }
 
+        // Removes the curent thread from the list of threads.
         internal void RollBack()
         {
             // We can lock on this, because RecursiveDependencyValidator is an internal type.

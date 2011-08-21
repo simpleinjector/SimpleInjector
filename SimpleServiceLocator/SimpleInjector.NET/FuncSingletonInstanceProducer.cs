@@ -84,14 +84,23 @@ namespace SimpleInjector
 
         private T GetInstanceFromCreatorWithRecursiveCheck()
         {
-            this.validator.Prevent();
+            this.validator.CheckForRecursiveCalls();
 
-            T instance = this.GetInstanceFromCreator();
+            try
+            {
+                T instance = this.GetInstanceFromCreator();
 
-            // Remove the reference to the validator; it is not needed anymore.
-            this.validator = null;
+                // Remove the reference to the validator; it is not needed anymore.
+                this.validator = null;
 
-            return instance;
+                return instance;
+            }
+            catch
+            {
+                this.validator.Reset();
+
+                throw;
+            }
         }
 
         private T GetInstanceFromCreator()

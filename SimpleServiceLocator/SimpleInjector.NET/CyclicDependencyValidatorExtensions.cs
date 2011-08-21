@@ -32,7 +32,7 @@ namespace SimpleInjector
     {
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
-        internal static void Prevent(this CyclicDependencyValidator validator)
+        internal static void CheckForRecursiveCalls(this CyclicDependencyValidator validator)
         {
             if (validator != null)
             {

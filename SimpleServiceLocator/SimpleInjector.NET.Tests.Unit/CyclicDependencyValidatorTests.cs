@@ -343,6 +343,45 @@ namespace SimpleInjector.Tests.Unit
             }
         }
 
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnAnInvalidRegistrationOfSingletonFunc_ShouldNeverTriggerACyclicDependencyError()
+        {
+            // Arrange
+            string expectedMessage = string.Format(
+                "The registered delegate for type {0} threw an exception.", typeof(ITimeProvider).FullName);
+
+            var container = new Container();
+
+            // This registration will use a FuncSingletonInstanceProducer under the covers.
+            container.RegisterSingle<ITimeProvider>(() => { throw new NullReferenceException(); });
+
+            try
+            {
+                container.GetInstance<ITimeProvider>();
+
+                Assert.Fail("Test setup failed: Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(expectedMessage, ex.Message, "Test setup failed.");
+            }
+
+            try
+            {
+                // Act
+                container.GetInstance<ITimeProvider>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(expectedMessage, ex.Message, 
+                    "Repeating calls to a failing FuncSingletonInstanceProducer should result in the same " +
+                    "exception being thrown every time.");
+            }
+        }
+
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();

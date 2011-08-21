@@ -23,6 +23,9 @@ Version vNext
 		 be resolved as quickly as types that are registered using a Func<T> delegate.
 	
 	Bug Fixes:
+		-[Core] FuncSingletonInstanceProducer<T> did not reset the CyclicDependencyValidator in case of an
+		 exception, which causes the CyclicDependencyValidator to go of when that failing producer was called
+		 multiple times, hiding the real cause of failure.
 		-[Core] The TransientInstanceProducer<T> and FuncSingletonInstanceProducer<T> incorrectly called 
 		 "lock (this)". This behavior was correct in v1.0 were those types were not publicly exposed, but 
 		 since the IInstanceProducer interface has gone public in v1.1 this is now incorrect. We could now 

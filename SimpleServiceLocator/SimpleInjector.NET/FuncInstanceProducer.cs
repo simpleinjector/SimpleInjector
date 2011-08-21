@@ -73,7 +73,7 @@ namespace SimpleInjector
         /// <returns>An instance.</returns>
         public T GetInstance()
         {
-            this.validator.Prevent();
+            this.validator.CheckForRecursiveCalls();
 
             T instance;
 
