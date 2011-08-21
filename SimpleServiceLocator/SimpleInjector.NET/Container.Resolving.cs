@@ -192,6 +192,9 @@ namespace SimpleInjector
         /// <param name="instance">The instance whos properties will be injected.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="instance"/> is null (Nothing in VB).</exception>
+        /// <exception cref="ActivationException">Throw when injecting properties on the given instance
+        /// failed due to security constraints of the sandbox. This can happen when injecting properties
+        /// on an internal type in a Silverlight sandbox, or when running in partial trust.</exception>
         public void InjectProperties(object instance)
         {
             if (instance == null)
