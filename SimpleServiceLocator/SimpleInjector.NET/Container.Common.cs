@@ -130,7 +130,7 @@ namespace SimpleInjector
         /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
         /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime 
         /// type of the current instance.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)] // see top of page for note on this attribute.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
             "This FxCop warning is valid, but this method is used to be able to attach an " +
             "EditorBrowsableAttribute to the GetType method, which will hide the method when the user " +
