@@ -187,7 +187,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Injects all public writable properties of the given <paramref name="instance"/> that have a type
-        /// that can be resolved by the <paramref name="container"/>.
+        /// that can be resolved by this container instance.
         /// </summary>
         /// <param name="instance">The instance whos properties will be injected.</param>
         /// <exception cref="ArgumentNullException">

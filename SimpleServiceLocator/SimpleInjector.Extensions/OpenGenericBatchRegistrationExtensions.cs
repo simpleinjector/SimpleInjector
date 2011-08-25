@@ -162,11 +162,10 @@ namespace SimpleInjector.Extensions
 #endif
 
         /// <summary>
-        /// Allows registration of all concrete, non-generic types with the given 
-        /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
-        /// the given <paramref name="openGenericServiceType"/>, by supplying a 
-        /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
-        /// implementation of the given <paramref name="openGenericServiceType"/>.
+        /// Allows registration of all concrete, public, non-generic types in the given set of 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
+        /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
+        /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>

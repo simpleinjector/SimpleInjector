@@ -96,7 +96,7 @@ namespace SimpleInjector.Extensions
         /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
         /// used to retrieve instances..</param>
         /// <param name="openGenericImplementation">The definition of the open generic implementation type
-        /// that will be returned when a <typeparamref name="openGenericServiceType"/> is requested.</param>
+        /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
@@ -175,7 +175,7 @@ namespace SimpleInjector.Extensions
         /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
         /// used to retrieve instances..</param>
         /// <param name="openGenericImplementation">The definition of the open generic implementation type
-        /// that will be returned when a <typeparamref name="openGenericServiceType"/> is requested.</param>
+        /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
         public static void RegisterSingleOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {

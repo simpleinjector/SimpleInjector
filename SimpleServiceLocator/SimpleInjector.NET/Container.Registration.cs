@@ -149,9 +149,8 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
-        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
@@ -176,10 +175,10 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TImplementation"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TService"/> type
-        /// is not a type that can be created by the container.
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// type is not a type that can be created by the container.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Any other design would be inappropriate.")]
@@ -202,13 +201,10 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a 
-        /// <paramref name="instanceCreator"/> for <typeparamref name="TService"/> has already been registered.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TService"/> has already been registered.</exception>
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             if (instanceCreator == null)
@@ -228,9 +224,8 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TConcrete"/> has already been registered, or when the given 
-        /// <typeparamref name="TConcrete"/> is not a concrete type.
+        /// Thrown when this container instance is locked and can not be altered, or when 
+        /// <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
@@ -251,16 +246,18 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that the same instance of <typeparamref name="TImplementation"/> will be returned every time a
-        /// <typeparamref name="TService"/> is requested.
+        /// Registers that the same instance of <typeparamref name="TImplementation"/> will be returned every 
+        /// time a <typeparamref name="TService"/> is requested.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TService">
+        /// The interface or base type that can be used to retrieve the instances.
+        /// </typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TImplementation"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TService"/> type
-        /// is not a type that can be created by the container.
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// type is not a type that can be created by the container.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Any other design would be inappropriate.")]
@@ -283,13 +280,11 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TService"/> has already been registered.
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when an <paramref name="instance"/>
-        /// for <typeparamref name="TService"/> has already been registered.</exception>
         public void RegisterSingle<TService>(TService instance) where TService : class
         {
             if (instance == null)
@@ -312,10 +307,10 @@ namespace SimpleInjector
         /// <param name="instanceCreator">The delegate that allows building or creating this single
         /// instance.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a 
+        /// Thrown when this container instance is locked and can not be altered, or when a 
         /// <paramref name="instanceCreator"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="singleInstanceCreator"/> is a 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a 
         /// null reference.</exception>
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
@@ -342,7 +337,7 @@ namespace SimpleInjector
         /// Thrown when the <paramref name="instanceInitializer"/> is a null reference.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered.</exception>
+        /// Thrown when this container instance is locked and can not be altered.</exception>
         /// <remarks>
         /// <para>
         /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per 
@@ -480,7 +475,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="collection"/>
         /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
@@ -509,7 +504,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="collection"/>
         /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null

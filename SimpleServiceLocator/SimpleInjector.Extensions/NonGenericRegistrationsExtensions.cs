@@ -95,9 +95,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows constructing a single instance of 
-        /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of 
-        /// the application.
+        /// Registers the specified delegate that allows constructing a single <paramref name="serviceType"/> 
+        /// instance. The container will call this delegate at most once during the lifetime of the application.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The base type or interface to register.</param>
@@ -237,19 +236,19 @@ namespace SimpleInjector.Extensions
 
         /// <summary>
         /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
+        /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
         /// requested. On enumeration the container is called for each type in the list.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="implementationTypes"/> are null references
-        /// (Nothing in VB).
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
+        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
         /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="typesToRegister"/> contains a null
-        /// (Nothing in VB) element.
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A method without the type parameter already exists. This extension method " +
@@ -260,29 +259,27 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers a collection of instances of <paramref name="implementationTypes"/> to be returned when
-        /// a collection of <paramref name="serviceType"/> objects is requested.
+        /// Registers a collection of instances of <paramref name="serviceTypes"/> to be returned when
+        /// a collection of <typeparamref name="TService"/> objects is requested.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="implementationTypes">The collection of <see cref="Type"/> objects whose instances
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="implementationTypes"/> are null references
-        /// (Nothing in VB).
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
+        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
-        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
-        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "A method without the type parameter already exists. This extension method " +
                 "is more intuitive to developers.")]
-        public static void RegisterAll<TService>(this Container container, 
-            IEnumerable<Type> implementationTypes)
+        public static void RegisterAll<TService>(this Container container,
+            IEnumerable<Type> serviceTypes)
         {
-            RegisterAll(container, typeof(TService), implementationTypes);
+            RegisterAll(container, typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -295,13 +292,12 @@ namespace SimpleInjector.Extensions
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="implementationTypes"/> are null references
+        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
         /// (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
-        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
-        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public static void RegisterAll(this Container container, Type serviceType,
             params Type[] serviceTypes)
@@ -319,13 +315,12 @@ namespace SimpleInjector.Extensions
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="implementationTypes"/> are null references
+        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
         /// (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
-        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
-        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public static void RegisterAll(this Container container, Type serviceType,
             IEnumerable<Type> serviceTypes)
