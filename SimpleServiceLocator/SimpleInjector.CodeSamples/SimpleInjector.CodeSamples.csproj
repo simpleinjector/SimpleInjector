@@ -85,6 +85,7 @@
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
     <Compile Include="PerWebRequestRegistrationsExtensions.cs" />
     <Compile Include="ResolvingExtensions.cs" />
+    <Compile Include="VarianceExtensions.cs" />
     <Compile Include="WinFormsIntegrationExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

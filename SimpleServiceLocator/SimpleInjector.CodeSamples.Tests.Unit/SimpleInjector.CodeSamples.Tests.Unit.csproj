@@ -76,6 +76,9 @@
     <Compile Include="PerThreadRegistrationsExtensionsTests.cs" />
     <Compile Include="ResolvingExtensionsTests.cs" />
     <Compile Include="TestClasses.cs" />
+    <Compile Include="VarianceExtensions_AllowToResolveVariantCollectionsTests.cs" />
+    <Compile Include="VarianceExtensions_AllowToResolveVariantTypesTests.cs" />
+    <Compile Include="VarianceExtensions_RegisteringMultipleRegistrationsAndResolvingCollections.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj">
