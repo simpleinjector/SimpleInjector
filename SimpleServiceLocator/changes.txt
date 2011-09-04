@@ -23,6 +23,8 @@ Version vNext
 		 be resolved as quickly as types that are registered using a Func<T> delegate.
 	
 	Bug Fixes:
+		-[Extensions] NonGenericRegistrationsExtensions.RegisterAll(Container, Type, params Type[]) method was
+		 removed, because it was never picked by C# compiler when doing overload resolution.
 		-[Core] FuncSingletonInstanceProducer<T> did not reset the CyclicDependencyValidator in case of an
 		 exception, which causes the CyclicDependencyValidator to go of when that failing producer was called
 		 multiple times, hiding the real cause of failure.
