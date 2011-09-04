@@ -154,12 +154,5 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             {
             }
         }
-
-        public class NotifyStaffWhenCustomerMovedEventHandler : IEventHandler<CustomerMovedEvent>
-        {
-            public void Handle(CustomerMovedEvent e)
-            {
-            }
-        }
     }
 }
