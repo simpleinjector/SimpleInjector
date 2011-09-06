@@ -19,7 +19,7 @@ namespace SimpleInjector.CodeSamples
             {
                 Type serviceType = e.UnregisteredServiceType;
 
-                if (!IsGenericInterfaceOrGenericDelegate(serviceType))
+                if (!serviceType.IsGenericType)
                 {
                     return;
                 }
@@ -67,7 +67,7 @@ namespace SimpleInjector.CodeSamples
 
                 Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
-                if (!IsGenericInterfaceOrGenericDelegate(serviceType))
+                if (!serviceType.IsGenericType)
                 {
                     return;
                 }
@@ -102,15 +102,6 @@ namespace SimpleInjector.CodeSamples
                 where serviceType.IsAssignableFrom(registration.ServiceType)
                 select registration)
                 .ToArray();
-        }
-        
-        private static bool IsGenericInterfaceOrGenericDelegate(Type serviceType)
-        {
-            bool isGenericInterface = serviceType.IsInterface && serviceType.IsGenericType;
-            bool isGenericDelegate = serviceType.BaseType == typeof(MulticastDelegate) &&
-                serviceType.IsGenericType;
-
-            return isGenericInterface || isGenericDelegate;
         }
 
         private static bool IsGenericEnumerable(Type serviceType)
