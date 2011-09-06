@@ -164,11 +164,14 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             public MultipleDispatchEventHandler(Container container)
             {
+                var enumType = typeof(IEnumerable<IEventHandler<TEvent>>);
+
                 // Calling ToArray() ensures that GetCurrentRegistrations() will only get called once.
                 var handlersCollection = (
                     from registration in container.GetCurrentRegistrations()
-                    where typeof(IEnumerable<IEventHandler<TEvent>>).IsAssignableFrom(registration.ServiceType)
-                    select (IEnumerable<IEventHandler<TEvent>>)registration.GetInstance())
+                    where enumType.IsAssignableFrom(registration.ServiceType)
+                    select registration.GetInstance())
+                    .Cast<IEnumerable<IEventHandler<TEvent>>>()
                     .ToArray();
 
                 this.Handlers =
