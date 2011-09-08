@@ -85,6 +85,16 @@ namespace SimpleInjector.Extensions
             }
         }
 
+        internal static void TypeIsReferenceType(Type type, string paramName)
+        {
+            if (!type.IsClass && !type.IsInterface)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
+                    "The supplied type '{0}' is not a reference type. Only reference types are supported.", type),
+                    paramName);
+            }
+        }
+
         internal static void DoesNotContainOpenGenericTypes(IEnumerable<Type> serviceTypes, string paramName)
         {
             foreach (var type in serviceTypes)

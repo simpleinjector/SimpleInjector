@@ -291,6 +291,27 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
+        public void RegisterSingle_ValueTypeImplementation_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+            try
+            {
+                // Act
+                container.RegisterSingle(typeof(object), typeof(int));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The supplied type ") &&
+                    ex.Message.Contains("is not a reference type. Only reference types are supported."), 
+                    "Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
         public void RegisterAll_WithOpenGenericType_FailsWithExpectedExceptionMessage()
         {
             // Arrange

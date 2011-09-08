@@ -78,6 +78,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(implementation, "implementation");
+            Requires.TypeIsReferenceType(serviceType, "serviceType");
+            Requires.TypeIsReferenceType(implementation, "implementation");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
@@ -107,6 +109,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.TypeIsReferenceType(serviceType, "serviceType");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
             SafeInvoke(serviceType, "serviceType", () =>
@@ -136,6 +139,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instance, "instance");
+            Requires.TypeIsReferenceType(serviceType, "serviceType");
+            Requires.TypeIsReferenceType(instance.GetType(), "instance");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
@@ -159,6 +164,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(concreteType, "concreteType");
+            Requires.TypeIsReferenceType(concreteType, "serviceType");
             Requires.TypeIsNotOpenGeneric(concreteType, "concreteType");
 
             var method = registerConcrete.MakeGenericMethod(concreteType);
@@ -185,6 +191,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(implementation, "implementation");
+            Requires.TypeIsReferenceType(serviceType, "serviceType");
+            Requires.TypeIsReferenceType(implementation, "implementation");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
@@ -212,6 +220,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.TypeIsReferenceType(serviceType, "serviceType");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
             SafeInvoke(serviceType, "serviceType", () =>
