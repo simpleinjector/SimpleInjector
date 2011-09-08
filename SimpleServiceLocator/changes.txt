@@ -9,6 +9,8 @@ Version vNext
 		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
 	Code Changes:
+		-[Extensions] Register(Container, Type) method added to the NonGenericRegistrationsExtensions class
+		 to allow registration of concrete transient types.
 		-[Core] The Container now registers itself upon creation. This makes some integration scenario's 
 		 easier.
 		-[Core] A InjectProperties(object) method has been added to the Container. This method enables 

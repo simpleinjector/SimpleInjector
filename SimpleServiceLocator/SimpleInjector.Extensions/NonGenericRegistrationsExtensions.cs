@@ -41,6 +41,9 @@ namespace SimpleInjector.Extensions
         private static readonly MethodInfo register = 
             Helpers.GetGenericMethod(c => c.Register<object, object>());
 
+        private static readonly MethodInfo registerConcrete =
+            Helpers.GetGenericMethod(c => c.Register<object>());
+
         private static readonly MethodInfo registerSingle = 
             Helpers.GetGenericMethod(c => c.RegisterSingle<object, object>());
 
@@ -83,15 +86,7 @@ namespace SimpleInjector.Extensions
 
             var method = registerSingle.MakeGenericMethod(serviceType, implementation);
 
-            try
-            {
-                method.Invoke(container, null);
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, implementation, ex);
-            }
+            SafeInvoke(serviceType, implementation, () => method.Invoke(container, null));
         }
 
         /// <summary>
@@ -104,7 +99,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
         /// generic type.</exception>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> or null references (Nothing in
+        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> are null references (Nothing in
         /// VB).</exception>
         public static void RegisterSingle(this Container container, Type serviceType,
             Func<object> instanceCreator)
@@ -113,8 +108,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-            
-            try
+
+            SafeInvoke(serviceType, "serviceType", () =>
             {
                 // Build the following delegate: () => (ServiceType)instanceCreator();
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
@@ -122,12 +117,7 @@ namespace SimpleInjector.Extensions
                 var method = registerSingleByFunc.MakeGenericMethod(serviceType);
 
                 method.Invoke(container, new[] { typeSafeInstanceCreator });
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
-            }
+            });
         }
 
         /// <summary>
@@ -137,7 +127,7 @@ namespace SimpleInjector.Extensions
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="instance"/> or null references (Nothing in
+        /// <paramref name="serviceType"/> or <paramref name="instance"/> are null references (Nothing in
         /// VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
@@ -151,15 +141,29 @@ namespace SimpleInjector.Extensions
 
             var method = registerSingleByT.MakeGenericMethod(serviceType);
 
-            try
-            {
-                method.Invoke(container, new[] { instance });
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
-            }
+            SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { instance }));
+        }
+
+        /// <summary>
+        /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it 
+        /// is requested (transient).
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="concreteType">The concrete type that will be registered.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
+        /// <paramref name="concreteType"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents an 
+        /// open generic type or is a type that can not be created by the container.
+        /// </exception>
+        public static void Register(this Container container, Type concreteType)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(concreteType, "concreteType");
+            Requires.TypeIsNotOpenGeneric(concreteType, "concreteType");
+
+            var method = registerConcrete.MakeGenericMethod(concreteType);
+
+            SafeInvoke(concreteType, "concreteType", () => method.Invoke(container, null));
         }
 
         /// <summary>
@@ -170,7 +174,7 @@ namespace SimpleInjector.Extensions
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="implementation">The actual type that will be returned when requested.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="implementation"/> or null references (Nothing in
+        /// <paramref name="serviceType"/> or <paramref name="implementation"/> are null references (Nothing in
         /// VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
         /// <paramref name="implementation"/> represent the same type, or <paramref name="implementation"/> is
@@ -189,15 +193,7 @@ namespace SimpleInjector.Extensions
 
             var method = register.MakeGenericMethod(serviceType, implementation);
 
-            try
-            {
-                method.Invoke(container, null);
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
-            }
+            SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, null));
         }
 
         /// <summary>
@@ -207,7 +203,7 @@ namespace SimpleInjector.Extensions
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> or null references (Nothing in
+        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> are null references (Nothing in
         /// VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
@@ -217,8 +213,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-            
-            try
+
+            SafeInvoke(serviceType, "serviceType", () =>
             {
                 // Build the following delegate: () => (ServiceType)instanceCreator();
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
@@ -226,12 +222,7 @@ namespace SimpleInjector.Extensions
                 var method = registerByFunc.MakeGenericMethod(serviceType);
 
                 method.Invoke(container, new[] { typeSafeInstanceCreator });
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
-            }
+            });
         }
 
         /// <summary>
@@ -358,29 +349,29 @@ namespace SimpleInjector.Extensions
 
             var method = registerAll.MakeGenericMethod(serviceType);
 
+            SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { castedCollection }));
+        }
+
+        private static void SafeInvoke(Type serviceType, Type implementation, Action action)
+        {
             try
             {
-                method.Invoke(container, new[] { castedCollection });
+                action();
             }
             catch (MemberAccessException ex)
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, "serviceType");
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, implementation, ex);
             }
-        }
+            catch (TargetInvocationException tiex)
+            {
+                if (tiex.InnerException != null)
+                {
+                    throw tiex.InnerException;
+                }
 
-        // Gets called when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
-            MemberAccessException innerException, string paramName)
-        {
-            string exceptionMessage =
-                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, innerException);
-
-#if SILVERLIGHT
-            throw new ArgumentException(exceptionMessage, paramName);
-#else
-            throw new ArgumentException(exceptionMessage, paramName, innerException);
-#endif
+                throw;
+            }
         }
 
         private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
@@ -396,6 +387,42 @@ namespace SimpleInjector.Extensions
                 ThrowUnableToResolveTypeDueToSecurityConfigurationException(implementation, innerException,
                      "implementation");
             }
+        }
+
+        private static void SafeInvoke(Type serviceType, string paramName, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, paramName);
+            }
+            catch (TargetInvocationException tiex)
+            {
+                if (tiex.InnerException != null)
+                {
+                    throw tiex.InnerException;
+                }
+
+                throw;
+            }
+        }
+
+        // Gets called when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
+            MemberAccessException innerException, string paramName)
+        {
+            string exceptionMessage =
+                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, innerException);
+
+#if SILVERLIGHT
+            throw new ArgumentException(exceptionMessage, paramName);
+#else
+            throw new ArgumentException(exceptionMessage, paramName, innerException);
+#endif
         }
 
         private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)

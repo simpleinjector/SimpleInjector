@@ -270,7 +270,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingle_OpenGenericServiceType_ThrowsExcpectedException()
+        public void RegisterSingle_OpenGenericServiceType_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
@@ -375,6 +375,64 @@ namespace SimpleInjector.Extensions.Tests.Unit
 
             Assert.AreEqual(1, instances.Count());
             Assert.AreEqual(instance, instances.First());
+        }
+
+        [TestMethod]
+        public void RegisterConcrete_ValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register(typeof(PublicServiceImpl));
+
+            // Assert
+            var instance = container.GetInstance(typeof(PublicServiceImpl));
+
+            Assert.IsInstanceOfType(instance, typeof(PublicServiceImpl));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterConcrete_NullContainer_ThrowsException()
+        {
+            // Arrange
+            Container invalidContainer = null;
+
+            // Act
+            invalidContainer.Register(typeof(PublicServiceImpl));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterConcrete_NullConcrete_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidConcrete = null;
+
+            // Act
+            container.Register(invalidConcrete);
+        }
+        
+        [TestMethod]
+        public void RegisterConcrete_ConcreteIsNotAConstructableType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidConcrete = typeof(ServiceImplWithTwoConstructors);
+
+            try
+            {
+                // Act
+                container.Register(invalidConcrete);
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("it should contain exactly one public constructor"));
+            }
         }
 
         [TestMethod]
@@ -596,6 +654,17 @@ namespace SimpleInjector.Extensions.Tests.Unit
         public sealed class PublicServiceImpl : IPublicService
         {
             public PublicServiceImpl(Dependency dependency)
+            {
+            }
+        }
+
+        public sealed class ServiceImplWithTwoConstructors : IPublicService
+        {
+            public ServiceImplWithTwoConstructors()
+            {
+            }
+
+            public ServiceImplWithTwoConstructors(Dependency dependency)
             {
             }
         }
