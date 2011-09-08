@@ -26,7 +26,7 @@ namespace SimpleInjector.CodeSamples
 
                 var registrations = FindAssignableRegistrations(container, serviceType);
 
-                if (registrations.Length == 0)
+                if (!registrations.Any())
                 {
                     // No registration found. We're done.
                 }
@@ -36,7 +36,7 @@ namespace SimpleInjector.CodeSamples
                     var registration = registrations[0];
                     e.Register(() => registration.GetInstance());
                 }
-                else if (registrations.Length > 1)
+                else
                 {
                     var names =
                         string.Join(", ", registrations.Select(r => string.Format("{0}", r.ServiceType)));
@@ -74,11 +74,7 @@ namespace SimpleInjector.CodeSamples
 
                 var registrations = FindAssignableRegistrations(container, serviceType);
 
-                if (registrations.Length == 0)
-                {
-                    // No registration found. We're done.
-                }
-                else
+                if (registrations.Any())
                 {
                     var instances = registrations.Select(r => r.GetInstance());
 
