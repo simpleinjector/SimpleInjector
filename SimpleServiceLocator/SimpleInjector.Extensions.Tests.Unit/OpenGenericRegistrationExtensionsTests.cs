@@ -8,6 +8,14 @@ namespace SimpleInjector.Extensions.Tests.Unit
     [TestClass]
     public class OpenGenericRegistrationExtensionsTests
     {
+        public interface IFoo<T>
+        {
+        }
+
+        public interface IBar<T>
+        {
+        }
+
         // This is the open generic interface that will be used as service type.
         public interface IService<TA, TB>
         {
@@ -470,7 +478,8 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var producer = container.GetRegistration(typeof(IProducer<int>));
 
             // Assert
-            Assert.IsNull(producer, "resolving IProducer<int> should ignore NullableProducer<T>");
+            Assert.IsNull(producer, "resolving IProducer<int> should ignore NullableProducer<T>. Type: " +
+                (producer ?? new object()).GetType().FullName);
         }
 
         [TestMethod]
@@ -489,7 +498,7 @@ namespace SimpleInjector.Extensions.Tests.Unit
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void GetRegistration_RegisterOpenGenericWithImplementationWithTypeArgumentThatHasNoMapping_ReturnsNull()
         {
             // Arrange
             var container = new Container();
@@ -500,8 +509,25 @@ namespace SimpleInjector.Extensions.Tests.Unit
             var producer = container.GetRegistration(typeof(IDictionary<int, object>));
 
             // Assert
-            Assert.IsNull(producer, "resolving IDictionary<int, object> should ignore " +
+            Assert.IsNull(producer, "Resolving IDictionary<int, object> should ignore " +
                 "SneakyMonoDictionary<T, Unused> because there is no mapping to Unused.");
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericWithImplementationThatContainsTypeArgumentInConstraint_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // NOTE: Foo<T1, T2> contains the constraint 'where T1 : IBar<T2>'.
+            container.RegisterOpenGeneric(typeof(IFoo<>), typeof(Foo<,>));
+
+            // Act
+            var instance = container.GetInstance<IFoo<Baz>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(Foo<Baz, Bar>), 
+                "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
         }
 
         public struct StructEvent : IAuditableEvent
@@ -602,6 +628,18 @@ namespace SimpleInjector.Extensions.Tests.Unit
             {
                 // Do nothing.
             }
+        }
+
+        public class Bar
+        {
+        }
+
+        public class Baz : IBar<Bar>
+        {
+        }
+
+        public class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
+        {
         }
     }
 }

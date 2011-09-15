@@ -54,7 +54,7 @@ namespace SimpleInjector.Extensions
                 .ToArray();
         }
 
-        private IEnumerable<ArgumentMapping> FindArgumentMappings()
+        private ArgumentMapping[] FindArgumentMappings()
         {
             // An Argument mapping is a mapping between a generic type argument and a concrete type. For
             // instance: { Argument = T, ConcreteType = Int32 } is the mapping from generic type argument T
@@ -67,38 +67,7 @@ namespace SimpleInjector.Extensions
 
             RemoveDuplicateTypeArguments(ref argumentMappings);
 
-            return argumentMappings;
-        }
-
-        private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
-            ref IEnumerable<ArgumentMapping> mappings)
-        {
-            mappings =
-                from mapping in mappings
-                where mapping.TypeConstraintsAreSatisfied
-                select mapping;
-        }
-
-        private void ConvertToOpenImplementationArgumentMappings(ref IEnumerable<ArgumentMapping> mappings)
-        {
-            mappings = (
-                from mapping in mappings
-                from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping)
-                select newMapping)
-                .Distinct();
-        }
-
-        private static void RemoveDuplicateTypeArguments(ref IEnumerable<ArgumentMapping> mappings)
-        {
-            // When a single type argument satisfies multiple concrete types (i.e. an TKey that can both be an
-            // Int32 and Double), it is impossible to resolve it. Those duplicates will be removed. This means
-            // that the open generic implementation is incompatible with the given arguments and will later on
-            // prevent a closed generic implementation to be returned.
-            mappings =
-                from mapping in mappings
-                group mapping by mapping.Argument into mappingGroup
-                where mappingGroup.Count() == 1
-                select mappingGroup.First();
+            return argumentMappings.ToArray();
         }
 
         private IEnumerable<ArgumentMapping> GetOpenServiceArgumentToConcreteTypeMappings()
@@ -118,6 +87,37 @@ namespace SimpleInjector.Extensions
             }
         }
 
+        private void ConvertToOpenImplementationArgumentMappings(ref IEnumerable<ArgumentMapping> mappings)
+        {
+            mappings = (
+                from mapping in mappings
+                from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping)
+                select newMapping)
+                .Distinct();
+        }
+
+        private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
+            ref IEnumerable<ArgumentMapping> mappings)
+        {
+            mappings =
+                from mapping in mappings
+                where mapping.TypeConstraintsAreSatisfied
+                select mapping;
+        }
+        
+        private static void RemoveDuplicateTypeArguments(ref IEnumerable<ArgumentMapping> mappings)
+        {
+            // When a single type argument satisfies multiple concrete types (i.e. an TKey that can both be an
+            // Int32 and Double), it is impossible to resolve it. Those duplicates will be removed. This means
+            // that the open generic implementation is incompatible with the given arguments and will later on
+            // prevent a closed generic implementation to be returned.
+            mappings =
+                from mapping in mappings
+                group mapping by mapping.Argument into mappingGroup
+                where mappingGroup.Count() == 1
+                select mappingGroup.First();
+        }
+
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(
             ArgumentMapping mapping)
         {
@@ -128,6 +128,11 @@ namespace SimpleInjector.Extensions
                 {
                     // The argument is one of the type's generic arguments. We can directly return it.
                     yield return mapping;
+
+                    foreach (var arg in this.GetTypeConstraintArgumentMappingsRecursive(mapping))
+                    {
+                        yield return arg;
+                    }
                 }
                 else
                 {
@@ -142,29 +147,49 @@ namespace SimpleInjector.Extensions
             }
         }
 
+        private IEnumerable<ArgumentMapping> GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping)
+        {
+            foreach (var constraint in mapping.Argument.GetGenericParameterConstraints())
+            {
+                var constraintMapping = new ArgumentMapping(constraint, mapping.ConcreteType);
+
+                foreach (var arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping))
+                {
+                    yield return arg;
+                }
+            }
+        }
+
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappingsRecursive(
             ArgumentMapping mapping)
         {
+            var argumentTypeDefinition = mapping.Argument.GetGenericTypeDefinition();
             var arguments = mapping.Argument.GetGenericArguments();
-            var concreteTypes = mapping.ConcreteType.GetGenericArguments();
 
-            if (concreteTypes.Length == arguments.Length)
+            var types = mapping.ConcreteType.GetTypeBaseTypesAndInterfaces(argumentTypeDefinition);
+
+            foreach (var type in types)
             {
-                for (int index = 0; index < arguments.Length; index++)
-                {
-                    var subMapping = new ArgumentMapping(arguments[index], concreteTypes[index]);
+                var concreteTypes = type.GetGenericArguments();
 
-                    foreach (var item in this.ConvertToOpenImplementationArgumentMappings(subMapping))
+                if (concreteTypes.Length == arguments.Length)
+                {
+                    for (int index = 0; index < arguments.Length; index++)
                     {
-                        yield return item;
+                        var subMapping = new ArgumentMapping(arguments[index], concreteTypes[index]);
+
+                        foreach (var item in this.ConvertToOpenImplementationArgumentMappings(subMapping))
+                        {
+                            yield return item;
+                        }
                     }
                 }
-            }
-            else
-            {
-                // The length of the concrete list and the generic argument list does not match. This normally
-                // means that the generic argument contains a argument that is not generic (so Int32 instead
-                // of T). In that case we can ignore everything, because the type will be unusable.
+                else
+                {
+                    // The length of the concrete list and the generic argument list does not match. This normally
+                    // means that the generic argument contains a argument that is not generic (so Int32 instead
+                    // of T). In that case we can ignore everything, because the type will be unusable.
+                }
             }
         }
 

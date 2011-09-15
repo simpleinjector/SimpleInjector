@@ -53,11 +53,12 @@ namespace SimpleInjector.Extensions
         // typeof(IComparable<>).
         internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type, Type serviceType)
         {
-            return
-                from parent in type.GetBaseTypesAndInterfaces()
-                where parent == serviceType || 
-                    (parent.IsGenericType && parent.GetGenericTypeDefinition() == serviceType)
-                select parent;
+            return GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
+        }
+
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type, Type serviceType)
+        {
+            return GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
         }
 
         internal static bool IsConcreteType(Type type)
@@ -113,6 +114,12 @@ namespace SimpleInjector.Extensions
             return type.GetInterfaces().Concat(type.GetBaseTypes());
         }
 
+        private static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
+        {
+            var thisType = new[] { type };
+            return thisType.Concat(type.GetBaseTypesAndInterfaces());
+        }
+
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type baseType = type.BaseType;
@@ -123,6 +130,15 @@ namespace SimpleInjector.Extensions
 
                 baseType = baseType.BaseType;
             }
+        }
+
+        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType)
+        {
+            return
+                from type in types
+                where type == serviceType ||
+                    (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
+                select type;
         }
     }
 }
