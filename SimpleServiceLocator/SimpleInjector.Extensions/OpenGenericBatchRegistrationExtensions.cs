@@ -529,7 +529,7 @@ namespace SimpleInjector.Extensions
             // Example: class StrangeValidator : IValidator<Person>, IValidator<Customer> { }
             var registrations =
                 from implementation in typesToRegister
-                from service in implementation.GetBaseTypesAndInterfaces(openGenericType)
+                from service in implementation.GetBaseTypesAndInterfacesFor(openGenericType)
                 let registration = new { service, implementation }
                 group registration by registration.service into g
                 select new

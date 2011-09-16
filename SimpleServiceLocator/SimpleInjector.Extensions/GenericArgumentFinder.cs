@@ -149,48 +149,43 @@ namespace SimpleInjector.Extensions
 
         private IEnumerable<ArgumentMapping> GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping)
         {
-            foreach (var constraint in mapping.Argument.GetGenericParameterConstraints())
-            {
-                var constraintMapping = new ArgumentMapping(constraint, mapping.ConcreteType);
-
-                foreach (var arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping))
-                {
-                    yield return arg;
-                }
-            }
+            return
+                from constraint in mapping.Argument.GetGenericParameterConstraints()
+                let constraintMapping = new ArgumentMapping(constraint, mapping.ConcreteType)
+                from arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping)
+                select arg;
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappingsRecursive(
             ArgumentMapping mapping)
         {
             var argumentTypeDefinition = mapping.Argument.GetGenericTypeDefinition();
+
+            // Try to get mappings for each type in the type hierarchy that is compatible to the  argument.
+            return
+                from type in mapping.ConcreteType.GetTypeBaseTypesAndInterfacesFor(argumentTypeDefinition)
+                from arg in this.ConvertToOpenImplementationArgumentMappingsForType(mapping, type)
+                select arg;
+        }
+
+        private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappingsForType(
+           ArgumentMapping mapping, Type type)
+        {
             var arguments = mapping.Argument.GetGenericArguments();
+            var concreteTypes = type.GetGenericArguments();
 
-            var types = mapping.ConcreteType.GetTypeBaseTypesAndInterfaces(argumentTypeDefinition);
-
-            foreach (var type in types)
+            if (concreteTypes.Length != arguments.Length)
             {
-                var concreteTypes = type.GetGenericArguments();
-
-                if (concreteTypes.Length == arguments.Length)
-                {
-                    for (int index = 0; index < arguments.Length; index++)
-                    {
-                        var subMapping = new ArgumentMapping(arguments[index], concreteTypes[index]);
-
-                        foreach (var item in this.ConvertToOpenImplementationArgumentMappings(subMapping))
-                        {
-                            yield return item;
-                        }
-                    }
-                }
-                else
-                {
-                    // The length of the concrete list and the generic argument list does not match. This normally
-                    // means that the generic argument contains a argument that is not generic (so Int32 instead
-                    // of T). In that case we can ignore everything, because the type will be unusable.
-                }
+                // The length of the concrete list and the generic argument list does not match. This normally
+                // means that the generic argument contains a argument that is not generic (so Int32 instead
+                // of T). In that case we can ignore everything, because the type will be unusable.
+                return Enumerable.Empty<ArgumentMapping>();        
             }
+
+            return
+                from subMapping in ArgumentMapping.Zip(arguments, concreteTypes)
+                from arg in this.ConvertToOpenImplementationArgumentMappings(subMapping)
+                select arg;
         }
 
         /// <summary>
@@ -227,6 +222,14 @@ namespace SimpleInjector.Extensions
             public override int GetHashCode()
             {
                 return this.Argument.GetHashCode() ^ this.ConcreteType.GetHashCode();
+            }
+
+            internal static IEnumerable<ArgumentMapping> Zip(Type[] arguments, Type[] concreteTypes)
+            {
+                for (int index = 0; index < arguments.Length; index++)
+                {
+                    yield return new ArgumentMapping(arguments[index], concreteTypes[index]);
+                }
             }
         }
 

@@ -45,18 +45,18 @@ namespace SimpleInjector.Extensions
 
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            return implementation.GetBaseTypesAndInterfaces(service).Any();
+            return implementation.GetBaseTypesAndInterfacesFor(service).Any();
         }
 
         // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
         // return typeof(IComparable<int>) and typeof(IComparable<double>) when serviceType is
         // typeof(IComparable<>).
-        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type, Type serviceType)
+        internal static IEnumerable<Type> GetBaseTypesAndInterfacesFor(this Type type, Type serviceType)
         {
             return GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
         }
 
-        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type, Type serviceType)
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType)
         {
             return GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
         }
