@@ -112,6 +112,9 @@
     <Compile Include="..\SimpleInjector.NET\IInstanceProducer.cs">
       <Link>IInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
+      <Link>PropertyInjector.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\ResolutionInstanceProducer.cs">
       <Link>ResolutionInstanceProducer.cs</Link>
     </Compile>

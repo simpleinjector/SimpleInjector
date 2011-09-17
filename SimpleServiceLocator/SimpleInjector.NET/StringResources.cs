@@ -197,13 +197,15 @@ namespace SimpleInjector
                 innerException.Message);
         }
 
-        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type serviceType,
+        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type injectee,
             Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Unable to inject properties into type {0}. The security restrictions of your " +
-                "application's sandbox do not permit the injection of properties into this type. Consider " +
-                "making it public. {1}", serviceType, innerException.Message);
+                "Unable to inject properties into type {0}. The security restrictions of your application's " +
+                "sandbox do not permit the creation of one of its dependencies. Explicitly register that " +
+                "dependency using one of the generic 'Register' overloads or consider making it public. " +
+                "Please see the inner exception for more details about which type caused this failure. {1}",
+                injectee, innerException.Message);
         }
     }
 }

@@ -75,6 +75,7 @@
     <Compile Include="ActivationException.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
+    <Compile Include="PropertyInjector.cs" />
     <Compile Include="ResolutionInstanceProducer.cs" />
     <Compile Include="Container.Registration.cs" />
     <Compile Include="Container.Resolving.cs" />

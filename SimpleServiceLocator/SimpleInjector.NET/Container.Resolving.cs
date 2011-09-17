@@ -204,60 +204,24 @@ namespace SimpleInjector
             
             var snapshot = this.propertyInjectorCache;
 
-            PropertyProducerPair[] propertyInjectors;
+            PropertyInjector propertyInjector;
 
-            if (!snapshot.TryGetValue(instance.GetType(), out propertyInjectors))
+            if (!snapshot.TryGetValue(instance.GetType(), out propertyInjector))
             {
-                propertyInjectors = this.CreatePropertyProducerPairs(instance.GetType());
+                propertyInjector = new PropertyInjector(this, instance.GetType());
 
-                this.RegisterPropertyProducerPairs(instance.GetType(), propertyInjectors, snapshot);
+                this.RegisterPropertyInjector(instance.GetType(), propertyInjector, snapshot);
             }
 
-            if (propertyInjectors != null)
-            {
-                InjectProperties(instance, propertyInjectors);
-            }
+            propertyInjector.Inject(instance);
         }
 
-        private static void InjectProperties(object instance, PropertyProducerPair[] pairs)
-        {
-            try
-            {
-                for (int i = 0; i < pairs.Length; i++)
-                {
-                    pairs[i].InjectProperty(instance);
-                }
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ActivationException(
-                    StringResources.UnableToInjectPropertiesDueToSecurityConfiguration(instance.GetType(), ex), ex);
-            }
-        }
-
-        // Returns null when the type has no injectable properties.
-        private PropertyProducerPair[] CreatePropertyProducerPairs(Type type)
-        {
-            var pairs = (
-                from property in type.GetProperties()
-                where property.CanWrite
-                where property.GetSetMethod() != null
-                where !property.PropertyType.IsValueType
-                let producer = this.GetRegistration(property.PropertyType)
-                where producer != null
-                select new PropertyProducerPair(property, producer))
-                .ToArray();
-
-            return pairs.Length == 0 ? null : pairs;
-        }
-
-        private void RegisterPropertyProducerPairs(Type serviceType, PropertyProducerPair[] pairs,
-            Dictionary<Type, PropertyProducerPair[]> snapshot)
+        private void RegisterPropertyInjector(Type serviceType, PropertyInjector injector,
+            Dictionary<Type, PropertyInjector> snapshot)
         {
             var snapshotCopy = Helpers.MakeCopyOf(snapshot);
 
-            snapshotCopy.Add(serviceType, pairs);
+            snapshotCopy.Add(serviceType, injector);
 
             // Replace the original with the new version that includes the serviceType.
             this.propertyInjectorCache = snapshotCopy;

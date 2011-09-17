@@ -51,8 +51,8 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
 
-        private Dictionary<Type, PropertyProducerPair[]> propertyInjectorCache =
-            new Dictionary<Type, PropertyProducerPair[]>();
+        private Dictionary<Type, PropertyInjector> propertyInjectorCache =
+            new Dictionary<Type, PropertyInjector>();
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -147,24 +147,6 @@ namespace SimpleInjector
             internal Type ServiceType { get; set; }
 
             internal object Action { get; set; }
-        }
-
-        /// <summary>A <see cref="PropertyInfo"/> - <see cref="IInstanceProducer"/> pair.</summary>
-        private sealed class PropertyProducerPair
-        {
-            private readonly PropertyInfo property;
-            private readonly IInstanceProducer producer;
-
-            internal PropertyProducerPair(PropertyInfo property, IInstanceProducer producer)
-            {
-                this.property = property;
-                this.producer = producer;
-            }
-
-            internal void InjectProperty(object instance)
-            {
-                this.property.SetValue(instance, this.producer.GetInstance(), null);
-            }
         }
     }
 }
