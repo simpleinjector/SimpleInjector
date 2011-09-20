@@ -37,7 +37,6 @@ namespace SimpleInjector
         private readonly object instanceCreationLock = new object();
 
         private Func<T> instanceCreator;
-        private bool instanceCreated;
         private T instance;
         private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(T));
 
@@ -59,15 +58,13 @@ namespace SimpleInjector
             // We use a lock to prevent the delegate to be called more than once during the lifetime of
             // the application. We use a double checked lock to prevent the lock statement from being 
             // called again after the instance was created.
-            if (!this.instanceCreated)
+            if (this.instance == null)
             {
                 lock (this.instanceCreationLock)
                 {
-                    if (!this.instanceCreated)
+                    if (this.instance == null)
                     {
                         this.instance = this.GetInstanceFromCreatorWithRecursiveCheck();
-
-                        this.instanceCreated = true;
                     }
                 }
             }
