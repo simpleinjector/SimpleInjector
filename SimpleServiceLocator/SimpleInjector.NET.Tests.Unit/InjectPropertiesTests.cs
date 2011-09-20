@@ -118,7 +118,7 @@ namespace SimpleInjector.Tests.Unit
                 select property.Name;
 
             Assert.IsFalse(uninjectedProperties.Any(), "All properties were expected to be injected. " +
-                "Uninjected properties: " + string.Join(", ", uninjectedProperties));
+                "Uninjected properties: " + string.Join(", ", uninjectedProperties.ToArray()));
         }
 
         [TestMethod]
