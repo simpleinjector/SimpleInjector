@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -95,6 +96,8 @@ namespace SimpleInjector.Tests.Unit
             Assert.IsNotNull(instance.TimeProvider, "TimeProvider property was expected to be set.");
         }
 
+        // This test is important, because the PropertyInjector class splits the injection of a class with
+        // many properties into multiple delegates.
         [TestMethod]
         public void InjectProperties_TypeWithManyMappableProperties_Succeeds()
         {
@@ -103,21 +106,19 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IPlugin, PluginImpl>();
 
-            var instance = new NinePropertiesService();
+            var instance = new ManyPropertiesService();
 
             // Act
             container.InjectProperties(instance);
 
             // Assert
-            Assert.IsNotNull(instance.Plugin1, "Plugin1 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin2, "Plugin2 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin3, "Plugin3 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin4, "Plugin4 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin5, "Plugin5 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin6, "Plugin6 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin7, "Plugin7 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin8, "Plugin8 property was expected to be set.");
-            Assert.IsNotNull(instance.Plugin9, "Plugin9 property was expected to be set.");
+            var uninjectedProperties =
+                from property in instance.GetType().GetProperties()
+                where property.GetValue(instance, null) == null
+                select property.Name;
+
+            Assert.IsFalse(uninjectedProperties.Any(), "All properties were expected to be injected. " +
+                "Uninjected properties: " + string.Join(", ", uninjectedProperties));
         }
 
         [TestMethod]
@@ -153,6 +154,33 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             Assert.IsNull(instance.InternalUserService, "UserService property was expected to be null.");
         }
+
+        [TestMethod]
+        public void InjectProperties_TypeRegisteredWithUnregisteredTypeResolution_InjectsThatType()
+        {
+            // Arrange
+            var expectedInstance = new PluginImpl();
+
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (sender, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IPlugin))
+                {
+                    e.Register(() => expectedInstance);
+                }
+            };
+
+            var instance = new Service();
+
+            // Act
+            container.InjectProperties(instance);
+
+            // Assert
+            Assert.AreEqual(expectedInstance, instance.Plugin1,
+                "Although IPlugin wasn't registered explicitly, it is expected to get resolved, because " +
+                "of the registered unregistered type resolution event.");
+        }
        
         public class Service
         {
@@ -166,26 +194,48 @@ namespace SimpleInjector.Tests.Unit
 
             internal UserServiceBase InternalUserService { get; set; }
         }
-
-        public class NinePropertiesService
+        
+        public class ManyPropertiesService
         {
-            public IPlugin Plugin1 { get; set; }
+            public IPlugin Plugin01 { get; set; }
 
-            public IPlugin Plugin2 { get; set; }
+            public IPlugin Plugin02 { get; set; }
 
-            public IPlugin Plugin3 { get; set; }
+            public IPlugin Plugin03 { get; set; }
 
-            public IPlugin Plugin4 { get; set; }
+            public IPlugin Plugin04 { get; set; }
 
-            public IPlugin Plugin5 { get; set; }
+            public IPlugin Plugin05 { get; set; }
 
-            public IPlugin Plugin6 { get; set; }
+            public IPlugin Plugin06 { get; set; }
 
-            public IPlugin Plugin7 { get; set; }
+            public IPlugin Plugin07 { get; set; }
 
-            public IPlugin Plugin8 { get; set; }
+            public IPlugin Plugin08 { get; set; }
 
-            public IPlugin Plugin9 { get; set; }
+            public IPlugin Plugin09 { get; set; }
+
+            public IPlugin Plugin10 { get; set; }
+
+            public IPlugin Plugin11 { get; set; }
+
+            public IPlugin Plugin12 { get; set; }
+
+            public IPlugin Plugin13 { get; set; }
+
+            public IPlugin Plugin14 { get; set; }
+
+            public IPlugin Plugin15 { get; set; }
+
+            public IPlugin Plugin16 { get; set; }
+
+            public IPlugin Plugin17 { get; set; }
+
+            public IPlugin Plugin18 { get; set; }
+
+            public IPlugin Plugin19 { get; set; }
+
+            public IPlugin Plugin20 { get; set; }
         }
     }
 }
