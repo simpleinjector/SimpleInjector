@@ -75,7 +75,7 @@
     <Compile Include="CollectionRegistrationExtensionsTests.cs" />
     <Compile Include="PerThreadRegistrationsExtensionsTests.cs" />
     <Compile Include="ResolvingExtensionsTests.cs" />
-    <Compile Include="ResolvingFuncFactoriesExtensionsTests.cs" />
+    <Compile Include="ResolvingFactoriesExtensionsTests.cs" />
     <Compile Include="TestClasses.cs" />
     <Compile Include="VarianceExtensions_AllowToResolveVariantCollectionsTests.cs" />
     <Compile Include="VarianceExtensions_AllowToResolveVariantTypesTests.cs" />
