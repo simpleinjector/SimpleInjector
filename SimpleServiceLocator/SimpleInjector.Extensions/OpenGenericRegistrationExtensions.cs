@@ -27,6 +27,7 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
 
     using SimpleInjector;
 
@@ -199,9 +200,9 @@ namespace SimpleInjector.Extensions
         {
             internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
             {
-                IInstanceProducer producter = this.Container.GetRegistration(closedGenericImplementation);
+                IInstanceProducer producer = this.Container.GetRegistration(closedGenericImplementation);
 
-                e.Register(producter.GetInstance);
+                e.Register(producer.BuildExpression());
             }
         }
 
@@ -210,13 +211,22 @@ namespace SimpleInjector.Extensions
         {
             private readonly Dictionary<Type, object> singletons = new Dictionary<Type, object>();
 
+            public static Func<T> BuildFunc<T>(object instance)
+            {
+                var constant = Expression.Constant(instance, typeof(T));
+
+                return Expression.Lambda<Func<T>>(constant, new ParameterExpression[0]).Compile();
+            }
+
             internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
             {
                 object singleton = this.GetSingleton(closedGenericImplementation);
 
-                e.Register(() => singleton);
-            }
+                Expression expression = Expression.Constant(singleton, e.UnregisteredServiceType);
 
+                e.Register(expression);
+            }
+            
             private object GetSingleton(Type closedGenericImplementation)
             {
                 object singleton;
@@ -231,6 +241,13 @@ namespace SimpleInjector.Extensions
                 }
 
                 return singleton;
+            }
+
+            private static Delegate BuildDelegate(object instance, Type serviceType)
+            {
+                return typeof(SingleOpenGenericResolver).GetMethod("BuildFunc")
+                    .MakeGenericMethod(serviceType)
+                    .Invoke(null, new[] { instance }) as Delegate;
             }
         }
 

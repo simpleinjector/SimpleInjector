@@ -35,16 +35,16 @@ namespace SimpleInjector
     /// </summary>
     /// <typeparam name="T">The service type.</typeparam>
     [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
-    internal sealed class ResolutionInstanceProducer<T> : IInstanceProducer where T : class
+    internal sealed class FuncResolutionInstanceProducer<T> : IInstanceProducer where T : class
     {
         private readonly Func<object> instanceCreator;
         private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(T));
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ResolutionInstanceProducer{T}"/> class.
+        /// Initializes a new instance of the <see cref="FuncResolutionInstanceProducer{T}"/> class.
         /// </summary>
         /// <param name="instanceCreator">The delegate that knows how to create that type.</param>
-        public ResolutionInstanceProducer(Func<object> instanceCreator)
+        public FuncResolutionInstanceProducer(Func<object> instanceCreator)
         {
             this.instanceCreator = instanceCreator;
         }
@@ -63,7 +63,7 @@ namespace SimpleInjector
             // We could further optimize it by directly calling the Func<T> instanceCreator, but this will
             // make us loose some error checking.
             return Expression.Call(Expression.Constant(this),
-                typeof(ResolutionInstanceProducer<T>).GetMethod("GetInstance"), new Expression[0]);
+                typeof(FuncResolutionInstanceProducer<T>).GetMethod("GetInstance"), new Expression[0]);
         }
 
         /// <summary>Produces an instance.</summary>

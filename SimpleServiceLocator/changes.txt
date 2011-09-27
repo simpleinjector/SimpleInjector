@@ -9,6 +9,12 @@ Version vNext
 		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
 	Code Changes:
+		-[Extensions] Performance optimization in the RegisterOpenGeneric en RegisterSingleOpenGeneric 
+		 extension methods. Types can now be resolved as quickly as types that are registered using 
+		 container.Register<TService, TImplementation>() and container.RegisterSingle<T>(T), which are the
+		 fasted type of registrations.
+		-[Core] New UnregisteredTypeEventArgs.Register(Expression) method was added to allow improving
+		 performance of unregistered type resolution scenario's. (work item 16641).
 		-[Extensions] Register(Container, Type) method added to the NonGenericRegistrationsExtensions class
 		 to allow registration of concrete transient types.
 		-[Core] The Container now registers itself upon creation. This makes some integration scenario's 
@@ -21,8 +27,6 @@ Version vNext
 		 rare but interesting scenario's were users want to prevent an ActivationException from being thrown 
 		 when multiple delegates respond to the same ResolveUnregisteredType event. Publication of the 
 		 property allows users skip and continue when another delegate already registered that type.
-		-[Extensions] Performance optimization in the RegisterOpenGeneric extension method. Types can now 
-		 be resolved as quickly as types that are registered using a Func<T> delegate.
 	
 	Bug Fixes:
 		-[Extensions] NonGenericRegistrationsExtensions.RegisterAll(Container, Type, params Type[]) method was

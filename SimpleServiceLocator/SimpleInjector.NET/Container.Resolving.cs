@@ -332,9 +332,20 @@ namespace SimpleInjector
 
             if (e.Handled)
             {
-                var instanceProducerType = typeof(ResolutionInstanceProducer<>).MakeGenericType(serviceType);
+                Type instanceProducerType;
 
-                return (IInstanceProducer)Activator.CreateInstance(instanceProducerType, e.InstanceCreator);
+                // Either the client registered a Func<object> or a Func<{ServiceType}>.
+                if (e.InstanceCreator is Func<object>)
+                {
+                    instanceProducerType = typeof(FuncResolutionInstanceProducer<>);
+                }
+                else
+                {
+                    instanceProducerType = typeof(ExpressionResolutionInstanceProducer<>);
+                }
+
+                return (IInstanceProducer)Activator.CreateInstance(
+                    instanceProducerType.MakeGenericType(serviceType), e.InstanceCreator);
             }
             else
             {

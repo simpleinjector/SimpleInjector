@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -302,6 +303,40 @@ namespace SimpleInjector.Tests.Unit
                 AssertThat.StringContains("ResolveUnregisteredType", ex.Message, AssertMessage);
                 AssertThat.StringContains("registered a delegate that threw an exception", ex.Message, 
                     AssertMessage);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_EventRegisteredWithInvalidExpression_ThrowsAnDescriptiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                var invalidExpression = Expression.GreaterThan(Expression.Constant(1), Expression.Constant(1));
+
+                e.Register(invalidExpression);
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance<IUserRepository>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (Exception ex)
+            {
+                const string AssertMessage = "Exception message was not descriptive.";
+
+                AssertThat.StringContains("Error occurred while trying to build a delegate for type", 
+                    ex.Message, AssertMessage);
+                AssertThat.StringContains("UnregisteredTypeEventArgs.Register(Expression)", ex.Message,
+                    AssertMessage);
+                AssertThat.StringContains("Expression of type 'System.Boolean' cannot be used for return type", 
+                    ex.Message, AssertMessage);
             }
         }
 

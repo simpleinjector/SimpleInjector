@@ -100,8 +100,14 @@
     <Compile Include="..\SimpleInjector.NET\DelegateBuilder.cs">
       <Link>DelegateBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\ExpressionResolutionInstanceProducer.cs">
+      <Link>ExpressionResolutionInstanceProducer.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\FuncInstanceProducer.cs">
       <Link>FuncInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\FuncResolutionInstanceProducer.cs">
+      <Link>FuncResolutionInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\FuncSingletonInstanceProducer.cs">
       <Link>FuncSingletonInstanceProducer.cs</Link>
@@ -114,9 +120,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\ResolutionInstanceProducer.cs">
-      <Link>ResolutionInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\SingletonInstanceProducer.cs">
       <Link>SingletonInstanceProducer.cs</Link>

@@ -74,7 +74,7 @@
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
     <Compile Include="PropertyInjector.cs" />
-    <Compile Include="ResolutionInstanceProducer.cs" />
+    <Compile Include="FuncResolutionInstanceProducer.cs" />
     <Compile Include="Container.Registration.cs" />
     <Compile Include="Container.Resolving.cs" />
     <Compile Include="Container.Common.cs" />
@@ -87,6 +87,7 @@
     <Compile Include="FuncInstanceProducer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringResources.cs" />
+    <Compile Include="ExpressionResolutionInstanceProducer.cs" />
     <Compile Include="UnregisteredTypeEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

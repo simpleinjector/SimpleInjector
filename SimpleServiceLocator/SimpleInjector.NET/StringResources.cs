@@ -25,6 +25,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace SimpleInjector
@@ -50,6 +51,15 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "Error occurred while trying to get instance of type {0}. {1}",
                 serviceType, exception.Message);
+        }
+
+        internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType, 
+            Expression expression, Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Error occurred while trying to build a delegate for type {0} using the expression \"{1}\" " +
+                "that was supplied by calling the UnregisteredTypeEventArgs.Register(Expression) method. {2}",
+                serviceType, expression, exception.Message);
         }
            
         internal static string DelegateForTypeThrewAnException(Type serviceType, Exception exception)

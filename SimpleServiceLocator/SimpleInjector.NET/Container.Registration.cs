@@ -47,7 +47,7 @@ namespace SimpleInjector
         /// <para>
         /// The <see cref="ResolveUnregisteredType"/> event is called by the container every time an 
         /// unregistered type is requested, allowing a developer to do unregistered type resolution. By calling the 
-        /// <see cref="UnregisteredTypeEventArgs.Register">Register</see> method on the
+        /// <see cref="UnregisteredTypeEventArgs.Register(Func{object})">Register</see> method on the
         /// <see cref="UnregisteredTypeEventArgs"/>, a delegate can be hooked to the container allowing the
         /// container to retrieve instances of the requested type, and preventing the 
         /// <see cref="ResolveUnregisteredType"/> event from being called again for the same type.

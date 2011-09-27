@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
@@ -32,8 +33,8 @@ namespace SimpleInjector
     /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of 
     /// the <see cref="Container"/>. An observer can check the 
     /// <see cref="UnregisteredServiceType"/> to see whether the unregistered type can be handled. The
-    /// <see cref="Register"/> method can be called to register a <see cref="Func{T}"/> delegate that
-    /// allows creation of instances of the unregistered for this and future requests.
+    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate 
+    /// that allows creation of instances of the unregistered for this and future requests.
     /// </summary>
     public class UnregisteredTypeEventArgs : EventArgs
     {
@@ -50,7 +51,8 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets a value indicating whether the event represented by this instance has been handled. 
-        /// This property will return <b>true</b> when <see cref="Register"/> has been called on this instance.
+        /// This property will return <b>true</b> when <see cref="Register(Func{object})"/> has been called on
+        /// this instance.
         /// </summary>
         /// <value>The indication whether the event has been handled.</value>
         public bool Handled
@@ -58,7 +60,7 @@ namespace SimpleInjector
             get { return this.InstanceCreator != null; }
         }
         
-        internal Func<object> InstanceCreator { get; private set; }
+        internal object InstanceCreator { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type
@@ -69,7 +71,7 @@ namespace SimpleInjector
         /// expressed by the <see cref="UnregisteredServiceType"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="instanceCreator"/> is a
         /// null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when multiple observers that have registered to
+        /// <exception cref="ActivationException">Thrown when multiple observers that have registered to
         /// the <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event
         /// called this method for the same type.</exception>
         public void Register(Func<object> instanceCreator)
@@ -86,6 +88,37 @@ namespace SimpleInjector
             }
 
             this.InstanceCreator = instanceCreator;
+        }
+
+        /// <summary>
+        /// Registers an <see cref="Expression"/> that describes the creation of instances of the type
+        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The delegate
+        /// will be caches and future requests will directly call that expression.
+        /// </summary>
+        /// <param name="expression">The expression that describes the creation of instances of the type
+        /// expressed by the <see cref="UnregisteredServiceType"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="expression"/> is a
+        /// null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="expression"/> is a
+        /// not exactly of type <see cref="Func{T}"/> where T equals the <see cref="UnregisteredServiceType"/>.
+        /// </exception>
+        /// <exception cref="ActivationException">Thrown when multiple observers that have registered to
+        /// the <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event
+        /// called this method for the same type.</exception>
+        public void Register(Expression expression)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            if (this.Handled)
+            {
+                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameType(
+                    this.UnregisteredServiceType));
+            }
+
+            this.InstanceCreator = expression;
         }
     }
 }
