@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	ProjectSection(SolutionItems) = preProject
 		changes.txt = changes.txt
 		licence.txt = licence.txt
+		Documentation\SimpleInjector.chm = Documentation\SimpleInjector.chm
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation Genaration", "Documentation Genaration", "{59B27DFA-E74B-4A06-8DF2-7DFBBE6B7C5D}"
