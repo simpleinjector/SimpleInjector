@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=Windows%20Forms%20Integration
     using System;
     using System.Windows.Forms;
 

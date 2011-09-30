@@ -1,12 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-
-    using SimpleInjector;
-
+    // http://simpleinjector.codeplex.com/wikipage?title=LifetimeScopeExtensions
     // Differences with Autofac:
     // 1. In Autofac you call scope.Resolve while here you should just call container.Resolve. In other words, 
     //    this implementation works much like the TransactionScope.
@@ -16,6 +10,13 @@
     // 3. By default, Autofac will track all types that implement IDisposable. We can mimic this behavior
     //    by calling container.MarkAsDisposable<IDisposable>();
     // 4. In Autofac there are many advanced scenario's possible.
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using SimpleInjector;
+
+    // Note: Lifetime scoping depends on thread local storage.
     public static class LifetimeScopeExtensions
     {
         private const string NoLifetimeScopeMessage = "The type {0} is " +
@@ -133,8 +134,8 @@
 
                 if (!this.instances.TryGetValue(typeof(TService), out instance))
                 {
-                    this.instances[typeof(TService)] = 
-                        instance = container.GetInstance<TService>();
+                    instance = container.GetInstance<TService>();
+                    this.instances[typeof(TService)] = instance;                        
                 }
 
                 return (TService)instance;

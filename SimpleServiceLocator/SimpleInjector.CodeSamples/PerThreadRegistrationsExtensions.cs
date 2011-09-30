@@ -1,7 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=PerThreadExtensionMethod
     using System;
-
     using SimpleInjector;
 
     /// <summary>
@@ -29,10 +29,10 @@
 
         private sealed class PerThreadInstanceCreator<T> where T : class
         {
+            private readonly Func<T> instanceCreator;
+
             [ThreadStatic]
             private static T instance;
-
-            private Func<T> instanceCreator;
 
             internal PerThreadInstanceCreator(Func<T> instanceCreator)
             {
@@ -41,12 +41,14 @@
 
             internal T GetInstance()
             {
-                if (instance == null)
+                T value = instance;
+
+                if (value == null)
                 {
-                    instance = this.instanceCreator();
+                    value = instance = this.instanceCreator();
                 }
 
-                return instance;
+                return value;
             }
         }
     }

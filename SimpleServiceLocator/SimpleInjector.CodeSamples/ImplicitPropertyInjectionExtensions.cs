@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=ImplicitPropertyInjectionExtensions
     using SimpleInjector;
 
     public static class ImplicitPropertyInjectionExtensions
@@ -12,7 +13,8 @@
         public static void AllowImplicitPropertyInjectionOn<TService>(
             this Container container) where TService : class
         {
-            container.RegisterInitializer<TService>(service => container.InjectProperties(service));
+            container.RegisterInitializer<TService>(
+                service => container.InjectProperties(service));
         }
     }
 }

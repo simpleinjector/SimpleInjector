@@ -13,7 +13,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             // Act
             var deposite = container.GetInstance<CompositeCommand>();
@@ -27,7 +27,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.RegisterAll<ICommand>(new ConcreteCommand());
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             // Act
             var composite = container.GetInstance<CompositeCommand>();
@@ -47,7 +47,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.RegisterAll<ICommand>(expectedCommand);
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             // Act
             var composite = container.GetInstance<CompositeCommand>();
@@ -64,7 +64,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.RegisterAll<ICommand>(new ConcreteCommand());
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             // Act
             var composite = container.GetInstance<CompositeCommand>();
@@ -92,7 +92,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
             container.RegisterAll<ICommand>(commands);
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             container.GetInstance<CompositeCommand>();
 
@@ -114,7 +114,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.AllowToResolveArrays();
+            container.AllowToResolveArraysAndLists();
 
             // Act
             var collection = container.GetInstance<CommandCollection>();

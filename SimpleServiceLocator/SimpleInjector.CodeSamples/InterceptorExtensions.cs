@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=InterceptionExtensions
     using System;
     using System.Reflection;
     using System.Runtime.Remoting.Messaging;

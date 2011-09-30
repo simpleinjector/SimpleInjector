@@ -1,9 +1,9 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=Web%20Forms%20Integration
     using System;
     using System.Web;
     using System.Web.UI;
-
     using SimpleInjector;
 
     public static class AspNetIntegrationExtensions

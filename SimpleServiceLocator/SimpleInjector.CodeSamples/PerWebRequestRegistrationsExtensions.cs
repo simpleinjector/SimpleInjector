@@ -1,8 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=PerWebRequestExtensionMethod
     using System;
     using System.Web;
-
     using SimpleInjector;
 
     /// <summary>
@@ -10,11 +10,13 @@
     /// </summary>
     public static partial class PerWebRequestRegistrationsExtensions
     {
-        public static void RegisterPerWebRequest<TService, TImplementation>(this Container container)
+        public static void RegisterPerWebRequest<TService, TImplementation>(
+            this Container container)
             where TService : class
             where TImplementation : class, TService
         {
-            container.RegisterPerWebRequest<TService>(() => container.GetInstance<TImplementation>());
+            Func<TService> instanceCreator = () => container.GetInstance<TImplementation>();
+            container.RegisterPerWebRequest<TService>(instanceCreator);
         }
 
         public static void RegisterPerWebRequest<TService>(this Container container,
@@ -27,7 +29,7 @@
         private sealed class PerWebRequestInstanceCreator<T> where T : class
         {
             private static readonly string key = "SimpleInjector_" + typeof(T).FullName;
-            private Func<T> instanceCreator;
+            private readonly Func<T> instanceCreator;
 
             internal PerWebRequestInstanceCreator(Func<T> instanceCreator)
             {

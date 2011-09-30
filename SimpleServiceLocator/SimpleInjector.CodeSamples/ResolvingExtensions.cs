@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-
     using SimpleInjector;
 
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=ExpirationExtensionMethod
     using System;
-    using System.Diagnostics;
 
     public static class ExpirationExtensions
     {
