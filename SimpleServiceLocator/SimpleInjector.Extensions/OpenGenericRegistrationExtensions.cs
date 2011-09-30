@@ -42,12 +42,12 @@ namespace SimpleInjector.Extensions
         /// every time a <paramref name="openGenericServiceType"/> is requested.
         /// </summary>
         /// <example>
-        /// The following example shows the definition of a generic <code>IValidator&lt;T&gt;</code> interface
-        /// and, a <code>NullValidator&lt;T&gt;</code> implementation and a specific validator for Orders.
-        /// The registration ensures a <code>OrderValidator</code> is returned when a 
-        /// <code>IValidator&lt;Order&gt;</code> is requested. For all requests for a 
-        /// <code>IValidator&lt;T&gt;</code> other than a <code>IValidator&lt;Order&gt;</code>, an 
-        /// implementation of <code>NullValidator&lt;T&gt;</code> will be returned.
+        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
+        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
+        /// The registration ensures a <b>OrderValidator</b> is returned when a 
+        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
+        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
+        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
         /// <code lang="cs"><![CDATA[
         /// public interface IValidator<T>
         /// { 
@@ -121,12 +121,12 @@ namespace SimpleInjector.Extensions
         /// every time a <paramref name="openGenericServiceType"/> is requested.
         /// </summary>
         /// <example>
-        /// The following example shows the definition of a generic <code>IValidator&lt;T&gt;</code> interface
-        /// and, a <code>NullValidator&lt;T&gt;</code> implementation and a specific validator for Orders.
-        /// The registration ensures a <code>OrderValidator</code> is returned when a 
-        /// <code>IValidator&lt;Order&gt;</code> is requested. For all requests for a 
-        /// <code>IValidator&lt;T&gt;</code> other than a <code>IValidator&lt;Order&gt;</code>, an 
-        /// implementation of <code>NullValidator&lt;T&gt;</code> will be returned.
+        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
+        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
+        /// The registration ensures a <b>OrderValidator</b> is returned when a 
+        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
+        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
+        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
         /// <code lang="cs"><![CDATA[
         /// public interface IValidator<T>
         /// { 

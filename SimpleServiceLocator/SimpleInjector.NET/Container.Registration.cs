@@ -114,12 +114,12 @@ namespace SimpleInjector
         /// ]]></code>
         /// The example above registers a delegate that is fired every time an unregistered type is requested
         /// from the container. The delegate checks whether the requested type is a closed generic
-        /// implementation of the <code>IValidator&lt;T&gt;</code> interface (such as 
-        /// <code>IValidator&lt;Order&gt;</code> or <code>IValidator&lt;Customer&gt;</code>). In that case it
-        /// will request the container for a concrete <code>EmptyValidator&lt;T&gt;</code> implementation that
+        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
+        /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
+        /// will request the container for a concrete <b>EmptyValidator&lt;T&gt;</b> implementation that
         /// implements the given 
         /// <see cref="UnregisteredTypeEventArgs.UnregisteredServiceType">UnregisteredServiceType</see>, and
-        /// registers a delegate that will return this created instance. The <code>e.Register</code> call
+        /// registers a delegate that will return this created instance. The <b>e.Register</b> call
         /// registers the method in the container, preventing the <see cref="ResolveUnregisteredType"/> from
         /// being called again for the exact same service type, preventing any performance penalties.
         /// </example>
