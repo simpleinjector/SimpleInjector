@@ -33,8 +33,7 @@ namespace SimpleInjector.CodeSamples
                 else if (registrations.Length == 1)
                 {
                     // Exactly one registration. Let's map the registration to the unregistered service type.
-                    var registration = registrations[0];
-                    e.Register(() => registration.GetInstance());
+                    e.Register(registrations[0].BuildExpression());
                 }
                 else
                 {
