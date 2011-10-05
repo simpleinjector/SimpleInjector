@@ -2,6 +2,7 @@
 {
     // http://simpleinjector.codeplex.com/wikipage?title=PerWebRequestExtensionMethod
     using System;
+    using System.Diagnostics;
     using System.Web;
     using SimpleInjector;
 
@@ -28,7 +29,7 @@
 
         private sealed class PerWebRequestInstanceCreator<T> where T : class
         {
-            private static readonly string key = "SimpleInjector_" + typeof(T).FullName;
+            private static readonly string key = "PerWebRequestInstanceCreator_" + typeof(T).FullName;
             private readonly Func<T> instanceCreator;
 
             internal PerWebRequestInstanceCreator(Func<T> instanceCreator)
@@ -36,6 +37,7 @@
                 this.instanceCreator = instanceCreator;
             }
 
+            [DebuggerStepThrough]
             internal T GetInstance()
             {
                 if (HttpContext.Current == null)
