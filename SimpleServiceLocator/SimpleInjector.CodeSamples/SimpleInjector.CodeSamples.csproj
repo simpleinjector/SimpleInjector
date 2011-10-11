@@ -63,6 +63,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -85,6 +86,7 @@
     <Compile Include="CollectionRegistrationExtensions.cs" />
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
     <Compile Include="PerWebRequestRegistrationsExtensions.cs" />
+    <Compile Include="RegisterAttributeFilterProvider.cs" />
     <Compile Include="ResolvingExtensions.cs" />
     <Compile Include="ResolvingFactoriesExtensions.cs" />
     <Compile Include="VarianceExtensions.cs" />
