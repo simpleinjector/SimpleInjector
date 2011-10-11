@@ -13,7 +13,7 @@
     {
         public static void RegisterAsMvcDependencyResolver(this Container container)
         {
-            DependencyResolver.SetResolver(new SimpleResolver { Container = container });
+            DependencyResolver.SetResolver(new SimpleInjectionDependencyResolver { Container = container });
         }
 
         /// <summary>Registers a <see cref="IFilterProvider"/>. Use this method in conjunction with the
@@ -26,17 +26,14 @@
                 throw new ArgumentNullException("container");
             }
 
-            var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToArray();
+            var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToList();
 
-            foreach (var provider in providers)
-            {
-                FilterProviders.Providers.Remove(provider);
-            }
+            providers.ForEach(provider => FilterProviders.Providers.Remove(provider));
 
             container.RegisterSingle<IFilterProvider, SimpleInjectorFilterAttributeFilterProvider>();
         }
 
-        private sealed class SimpleResolver : IDependencyResolver
+        private sealed class SimpleInjectionDependencyResolver : IDependencyResolver
         {
             public Container Container { get; set; }
 
@@ -55,8 +52,7 @@
         {
             private readonly Container container;
 
-            public SimpleInjectorFilterAttributeFilterProvider(Container container)
-                : base(false)
+            public SimpleInjectorFilterAttributeFilterProvider(Container container) : base(false)
             {
                 this.container = container;
             }
@@ -64,12 +60,9 @@
             public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext, 
                 ActionDescriptor actionDescriptor)
             {
-                var filters = base.GetFilters(controllerContext, actionDescriptor).ToArray();
+                var filters = base.GetFilters(controllerContext, actionDescriptor).ToList();
 
-                foreach (var filter in filters)
-                {
-                    this.container.InjectProperties(filter.Instance);
-                }
+                filters.ForEach(filter => this.container.InjectProperties(filter.Instance));
 
                 return filters;
             }
