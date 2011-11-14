@@ -27,10 +27,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
+using SimpleInjector.InstanceProducers;
 
 namespace SimpleInjector
 {
@@ -40,40 +41,37 @@ namespace SimpleInjector
     internal static class Helpers
     {
         internal const string InstanceProviderDebuggerDisplayString =
-            "ServiceType: {((IInstanceProducer)this).ServiceType}, Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
+            "Producer: {this.GetType().Name}, " +
+            "ServiceType: {((IInstanceProducer)this).ServiceType}, " + 
+            "Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
 
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
-        internal static IInstanceProducer CreateTransientInstanceProducerFor(Type serviceType, 
+        internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType, 
             Container container)
         {
-            Type instanceProducerType = typeof(TransientInstanceProducer<>).MakeGenericType(serviceType);
-
-            // HACK: Because of the security level of Silverlight applications, we can't create an transient
-            // instance producer using reflection; it is an internal type. We can however, abuse the 
-            // container.GetInstance<T> method to create a new instance, because GetInstance<T> is public :-).
-            var factory = new Container();
+            Type instanceProducerType = 
+                typeof(ConcreteTransientInstanceProducer<>).MakeGenericType(concreteType);
 
             var genericGetInstanceMethod = GetInstanceOfT.MakeGenericMethod(instanceProducerType);
 
-            object instanceProducer;
-
             try
             {
-                // Here we call: "factory.GetInstance<TransientInstanceProducer<[ServiceType], [Implementation]>>()".
-                // We don't use the incoming container, because we don't want to polute the actual container. 
-                instanceProducer = genericGetInstanceMethod.Invoke(factory, null);    
+                // HACK: Because of the security level of Silverlight applications, we can't create an
+                // transient instance producer using reflection; it is an internal type. We can however, abuse
+                // the container.GetInstance<T> method to create a new instance, because GetInstance<T> is 
+                // public :-). 
+                // Here we call: "container.GetInstance<ConcreteTransientInstanceProducer<[TConcrete]>>()".
+                // We use the current container as factory, because we need that container into the
+                // TransientInstanceProducer.
+                return (InstanceProducer)genericGetInstanceMethod.Invoke(container, null);    
             }
             catch (MemberAccessException ex)
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ActivationException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex), ex);
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(concreteType, ex), ex);
             }
-
-            ((ITransientInstanceProducer)instanceProducer).Container = container;
-
-            return (IInstanceProducer)instanceProducer;
         }
 
         internal static IEnumerable<T> MakeImmutable<T>(this IEnumerable<T> collection)
@@ -93,7 +91,7 @@ namespace SimpleInjector
         }
 
         // Throws an InvalidOperationException on failure.
-        internal static void Verify(this IInstanceProducer instanceProducer, Type serviceType)
+        internal static void Verify(this InstanceProducer instanceProducer, Type serviceType)
         {
             try
             {

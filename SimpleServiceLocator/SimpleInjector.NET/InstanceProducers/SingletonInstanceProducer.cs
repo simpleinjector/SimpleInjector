@@ -27,41 +27,23 @@ using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
-namespace SimpleInjector
+namespace SimpleInjector.InstanceProducers
 {
-    /// <summary>Wraps an instance and returns that single instance every time.</summary>
-    /// <typeparam name="T">The type, what else.</typeparam>
-    [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
-    internal sealed class SingletonInstanceProducer<T> : IInstanceProducer where T : class
+    internal sealed class SingletonInstanceProducer<TService> : InstanceProducer where TService : class
     {
-        // Storing a key is not needed, because the Validate method will never throw.
-        private readonly T instance;
+        private readonly TService instance;
 
-        /// <summary>Initializes a new instance of the <see cref="SingletonInstanceProducer{T}"/> class.</summary>
-        /// <param name="instance">The single instance.</param>
-        public SingletonInstanceProducer(T instance)
+        public SingletonInstanceProducer(TService instance) : base(typeof(TService))
         {
             this.instance = instance;
         }
 
-        /// <summary>Gets the <see cref="Type"/> for which this producer produces instances.</summary>
-        Type IInstanceProducer.ServiceType
+        protected override Expression BuildExpressionCore()
         {
-            get { return typeof(T); }
-        }
-
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance. Will never return null.</returns>
-        object IInstanceProducer.GetInstance()
-        {
-            return this.instance;
-        }
-
-        /// <summary>Builds an expression that expresses the intent to get an instance by the current producer.</summary>
-        /// <returns>An Expression.</returns>
-        Expression IInstanceProducer.BuildExpression()
-        {
-            return Expression.Constant(this.instance);
+            // HACK: The Type of the ConstantExpression must be of type 'ServiceType' and not of
+            // 'ImplementationType', because compiling the delegate could fail in the Silverlight sandbox
+            // when that type is some private .NET type (such as the type returned from Enumerable.Cast<T>()).
+            return Expression.Constant(this.instance, this.ServiceType);
         }
     }
 }

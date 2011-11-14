@@ -213,7 +213,7 @@ namespace SimpleInjector
         private Action<object> CompileInjectionDelegateWithProducers(Delegate injectionDelegate,
             PropertyInfo[] properties)
         {
-            IEnumerable<IInstanceProducer> producers =
+            IEnumerable<InstanceProducer> producers =
                 from property in properties
                 select this.container.GetRegistration(property.PropertyType);
 

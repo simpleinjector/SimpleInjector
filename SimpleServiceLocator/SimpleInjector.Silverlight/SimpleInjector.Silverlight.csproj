@@ -70,7 +70,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>Bin\Release\SimpleInjector.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
@@ -97,20 +97,8 @@
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\DelegateBuilder.cs">
-      <Link>DelegateBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\ExpressionResolutionInstanceProducer.cs">
-      <Link>ExpressionResolutionInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\FuncInstanceProducer.cs">
-      <Link>FuncInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\FuncResolutionInstanceProducer.cs">
-      <Link>FuncResolutionInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\FuncSingletonInstanceProducer.cs">
-      <Link>FuncSingletonInstanceProducer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\ExpressionBuilder.cs">
+      <Link>ExpressionBuilder.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
@@ -118,17 +106,38 @@
     <Compile Include="..\SimpleInjector.NET\IInstanceProducer.cs">
       <Link>IInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducer.cs">
+      <Link>InstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\ConcreteTransientInstanceProducer.cs">
+      <Link>InstanceProducers\ConcreteTransientInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\ExpressionResolutionInstanceProducer.cs">
+      <Link>InstanceProducers\ExpressionResolutionInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncInstanceProducer.cs">
+      <Link>InstanceProducers\FuncInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncResolutionInstanceProducer.cs">
+      <Link>InstanceProducers\FuncResolutionInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncSingletonInstanceProducer.cs">
+      <Link>InstanceProducers\FuncSingletonInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\InstanceCreatorWrapper.cs">
+      <Link>InstanceProducers\InstanceCreatorWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\SingletonInstanceProducer.cs">
+      <Link>InstanceProducers\SingletonInstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\TransientInstanceProducer.cs">
+      <Link>InstanceProducers\TransientInstanceProducer.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\SingletonInstanceProducer.cs">
-      <Link>SingletonInstanceProducer.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\StringResources.cs">
       <Link>StringResources.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\TransientInstanceProducer.cs">
-      <Link>TransientInstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
@@ -136,7 +145,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Extensions\" />
+    <Folder Include="Advanced\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

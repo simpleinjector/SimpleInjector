@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
+using System.Linq.Expressions;
 
 namespace SimpleInjector
 {
@@ -39,18 +39,17 @@ namespace SimpleInjector
     public partial class Container
     {
         private readonly object locker = new object();
-
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
-        private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
+        private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
-
+        
         private bool locked;
-
+        
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
-
+        
         private Dictionary<Type, PropertyInjector> propertyInjectorCache =
             new Dictionary<Type, PropertyInjector>();
 
@@ -58,8 +57,12 @@ namespace SimpleInjector
         public Container()
         {
             this.RegisterSingle<Container>(this);
+
+            this.ExpressionBuilder = new ExpressionBuilder(this);
         }
 
+        internal ExpressionBuilder ExpressionBuilder { get; set; }
+        
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
         /// types, and all implictly registered instances. Implicit registrations are  all concrete 
@@ -84,7 +87,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
-        public IInstanceProducer[] GetCurrentRegistrations()
+        public InstanceProducer[] GetCurrentRegistrations()
         {
             var snapshot = this.registrations;
 

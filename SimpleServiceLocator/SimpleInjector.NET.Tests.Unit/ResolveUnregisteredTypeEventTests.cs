@@ -307,6 +307,37 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
+        public void GetInstance_EventRegisteredForNonRootTypeThatThrowsException_ThrowsAnDescriptiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<UserServiceBase, RealUserService>();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                e.Register(() => { throw new Exception(); });
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance<UserServiceBase>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (Exception ex)
+            {
+                const string AssertMessage = "Exception message was not descriptive.";
+
+                AssertThat.StringContains("ResolveUnregisteredType", ex.Message, AssertMessage);
+                AssertThat.StringContains("registered a delegate that threw an exception", ex.Message,
+                    AssertMessage);
+            }
+        }
+
+        [TestMethod]
         public void GetInstance_EventRegisteredWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange
@@ -406,13 +437,17 @@ namespace SimpleInjector.Tests.Unit
 
             container.ResolveUnregisteredType += (s, e) =>
             {
-                e.Register(() => new RealUserService(null));
+                if (e.UnregisteredServiceType == typeof(IUserRepository))
+                {
+                    // RealUserService does not implement IUserRepository
+                    e.Register(() => new RealUserService(null));
+                }
             };
 
             try
             {
                 // Act
-                container.GetInstance<IUserRepository>();
+                container.GetInstance<RealUserService>();
 
                 // Assert
                 Assert.Fail("Exception was expected.");

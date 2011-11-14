@@ -200,7 +200,7 @@ namespace SimpleInjector.Extensions
         {
             internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
             {
-                IInstanceProducer producer = this.Container.GetRegistration(closedGenericImplementation);
+                InstanceProducer producer = this.Container.GetRegistration(closedGenericImplementation);
 
                 e.Register(producer.BuildExpression());
             }

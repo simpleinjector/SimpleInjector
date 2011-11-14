@@ -24,32 +24,26 @@
 #endregion
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace SimpleInjector
+namespace SimpleInjector.InstanceProducers
 {
-    /// <summary>Contract for types that produce instances.</summary>
-#if !DEBUG
-    [Obsolete("Use SimpleInjector.InstanceProducer instead.")]
-#endif
-    public interface IInstanceProducer
+    internal class ExpressionResolutionInstanceProducer<TService> : InstanceProducer where TService : class
     {
-        /// <summary>Gets the service type for which this producer produces instances.</summary>
-        /// <value>A <see cref="Type"/> instance.</value>
-        Type ServiceType { get; }
-
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = 
-            "A property is not appropriate, because get instance could possibly be a heavy ")]
-        object GetInstance();
+        private readonly Expression expression;
 
         /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer.
+        /// Initializes a new instance of the <see cref="ExpressionResolutionInstanceProducer{TService}"/> class.
         /// </summary>
-        /// <returns>An Expression.</returns>
-        Expression BuildExpression();
+        /// <param name="expression">The expression.</param>
+        public ExpressionResolutionInstanceProducer(Expression expression) : base(typeof(TService))
+        {
+            this.expression = expression;
+        }
+
+        protected override Expression BuildExpressionCore()
+        {
+            return this.expression;
+        }
     }
 }

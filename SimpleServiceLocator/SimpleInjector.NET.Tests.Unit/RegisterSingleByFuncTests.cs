@@ -182,7 +182,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFunc_ThrowsActivationExceptionWithExpectedInnerException()
+        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFuncOfRootType_ThrowsActivationExceptionWithExpectedInnerException()
         {
             // Arrange
             var expectedInnerException = new InvalidOperationException();
@@ -200,9 +200,61 @@ namespace SimpleInjector.Tests.Unit
             }
             catch (ActivationException ex)
             {
-                Assert.AreEqual(expectedInnerException, ex.InnerException,
-                    "The exception thrown by the registered delegate is expected to be wrapped in the " +
-                    "thrown ActivationException.");
+                Assert.IsNotNull(ex.InnerException);
+                Assert.IsTrue(object.ReferenceEquals(expectedInnerException, ex.InnerException),
+                    "The exception thrown by the registered delegate is expected to be available in the " +
+                    "InnerException property of the thrown ActivationException. The actual InnerException " +
+                    "type is " + ex.InnerException.GetType().Name);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(() => { throw new Exception("Bla."); });
+
+            try
+            {
+                // Act
+                container.GetInstance<RealUserService>();
+
+                // Assert
+                Assert.Fail("The GetInstance method was expected to fail, because of the faulty registration.");
+            }
+            catch (ActivationException ex)
+            {
+                string expectedMessage = "The registered delegate for type " + 
+                    typeof(IUserRepository).FullName + " threw an exception. Bla.";
+
+                AssertThat.StringContains(expectedMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void G2etInstance_DelegateReturningNullRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(() => null);
+
+            try
+            {
+                // Act
+                container.GetInstance<RealUserService>();
+
+                // Assert
+                Assert.Fail("The GetInstance method was expected to fail, because of the faulty registration.");
+            }
+            catch (ActivationException ex)
+            {
+                string expectedMessage = "The registered delegate for type " +
+                    typeof(IUserRepository).FullName + " returned null.";
+
+                AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
     }

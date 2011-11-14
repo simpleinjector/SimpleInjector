@@ -636,9 +636,24 @@ namespace SimpleInjector.Extensions.Tests.Unit
             }
             catch (InvalidOperationException ex)
             {
-                string actualMessage = ex.Message.Replace(typeof(IPublicServiceEx).FullName, typeof(IPublicServiceEx).Name);
+                string actualMessage = 
+                    ex.Message.Replace(typeof(IPublicServiceEx).FullName, typeof(IPublicServiceEx).Name);
 
-                AssertThat.StringContains(expectedException, actualMessage);
+                string exceptionInfo = string.Empty;
+
+                Exception exception = ex;
+
+                while (exception != null)
+                {
+                    exceptionInfo += 
+                        exception.GetType().FullName + Environment.NewLine +
+                        exception.Message + Environment.NewLine +
+                        exception.StackTrace + Environment.NewLine + Environment.NewLine;
+
+                    exception = exception.InnerException;
+                }
+
+                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);                               
             }
         }
 

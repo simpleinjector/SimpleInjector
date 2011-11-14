@@ -1,5 +1,5 @@
 ﻿#region Copyright (c) 2010 S. van Deursen
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
+/* The Simple Injector is an easy-to-use Inversion of Control library for .NET.
  * 
  * Copyright (C) 2010 S. van Deursen
  * 
@@ -24,34 +24,29 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SimpleInjector
 {
     /// <summary>
-    /// Builds <see cref="Func{T}"/> delegates that can create a new instance of the supplied Type, where
+    /// Builds <see cref="Expression"/> objects that can create a new instance of the supplied Type, where
     /// the supplied container will be used to locate the constructor arguments. The generated code of the
     /// built <see cref="Func{T}"/> might look like this.
     /// <![CDATA[
     ///     Func<object> func = () => return new RealUserService(container.GetInstance<IUserRepository>());
     /// ]]>
     /// </summary>
-    internal static class DelegateBuilder
+    internal class ExpressionBuilder
     {
-        internal static Func<TConcrete> Build<TConcrete>(Container container)
+        private readonly Container container;
+
+        internal ExpressionBuilder(Container container)
         {
-            var newExpression = BuildExpression(container, typeof(TConcrete));
-
-            var newServiceTypeMethod = Expression.Lambda<Func<TConcrete>>(
-                newExpression, new ParameterExpression[0]);
-
-            return newServiceTypeMethod.Compile();
+            this.container = container;
         }
 
-        internal static Expression BuildExpression(Container container, Type concreteType)
+        internal Expression BuildExpression(Type concreteType)
         {
             Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(concreteType);
 
@@ -59,15 +54,14 @@ namespace SimpleInjector
 
             var constructorArgumentCalls =
                 from parameter in constructor.GetParameters()
-                select BuildParameterExpression(container, concreteType, parameter.ParameterType);
+                select this.BuildParameterExpression(concreteType, parameter.ParameterType);
 
             return Expression.New(constructor, constructorArgumentCalls.ToArray());
         }
-        
-        private static Expression BuildParameterExpression(Container container, Type concreteType,
-            Type parameterType)
+
+        private Expression BuildParameterExpression(Type concreteType, Type parameterType)
         {
-            var instanceProducer = container.GetRegistration(parameterType);
+            var instanceProducer = this.container.GetRegistration(parameterType);
 
             if (instanceProducer == null)
             {

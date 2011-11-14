@@ -35,5 +35,18 @@ namespace SimpleInjector.Tests.Unit
         {
             StringContains(expectedMessage, actualMessage, null);
         }
+
+        internal static void WriteToConsole(this Exception exception)
+        {
+            while (exception != null)
+            {
+                Console.WriteLine(exception.GetType().FullName);
+                Console.WriteLine(exception.Message);
+                Console.WriteLine(exception.StackTrace);
+                Console.WriteLine();
+
+                exception = exception.InnerException;
+            }
+        }
     }
 }

@@ -2,6 +2,18 @@
 
 Version vNext
 	General description:
+	
+	Code Changes:
+		-[Core] IInstanceProducer interface made obsolete.
+		-[Core] API methods now return an InstanceProducer base class instead of IInstanceProducer interface.
+		-[Core] InstanceProducers are now allowed to return types that can not be casted to the given service 
+		 type. This allows them to be retrieved using the non-generic Container.GetInstance(Type) and is
+		 useful for interception scenario's.
+		-[Core] Large internal refactoring of the InstanceProducer model. A lot of duplicate code is removed.
+
+
+Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
+	General description:
 
 	Project Changes:
 		-The solution and projects are converted to Visual Studio 2010. The library is still compatible with

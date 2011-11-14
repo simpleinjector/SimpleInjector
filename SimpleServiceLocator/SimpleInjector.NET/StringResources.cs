@@ -109,12 +109,6 @@ namespace SimpleInjector
                 "only be registered once per type.", serviceType);
         }
 
-        internal static string RegisteredDelegateForTypeReturnedNull(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The registered delegate for type {0} returned null.", serviceType);
-        }
-
         internal static string ParameterTypeMustBeRegistered(Type serviceType, Type parameterType)
         {
             return string.Format(CultureInfo.InvariantCulture,

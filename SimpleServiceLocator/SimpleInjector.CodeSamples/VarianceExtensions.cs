@@ -86,7 +86,7 @@ namespace SimpleInjector.CodeSamples
             };
         }
 
-        private static IInstanceProducer[] FindAssignableRegistrations(Container container, Type serviceType)
+        private static InstanceProducer[] FindAssignableRegistrations(Container container, Type serviceType)
         {
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 
