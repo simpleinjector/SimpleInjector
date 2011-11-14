@@ -64,12 +64,12 @@
             };
         }
 
-        public static Lazy<T> BuildLazy<T>(InstanceProducer producer)
+        public static Lazy<T> BuildLazy<T>(IInstanceProducer producer)
         {
             return new Lazy<T>(BuildFactory<T>(producer));
         }
 
-        public static Func<T> BuildFactory<T>(InstanceProducer producer)
+        public static Func<T> BuildFactory<T>(IInstanceProducer producer)
         {
             var factoryExpression = Expression.Lambda<Func<T>>(producer.BuildExpression(),
                 new ParameterExpression[0]);
@@ -81,7 +81,7 @@
         {
             private readonly Func<T> producer;
 
-            public LazyBuilder(InstanceProducer producer)
+            public LazyBuilder(IInstanceProducer producer)
             {
                 this.producer = BuildFactory<T>(producer);
             }

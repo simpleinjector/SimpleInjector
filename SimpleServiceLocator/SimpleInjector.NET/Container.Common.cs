@@ -29,7 +29,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Linq.Expressions;
+
+using SimpleInjector.InstanceProducers;
 
 namespace SimpleInjector
 {
@@ -45,7 +46,7 @@ namespace SimpleInjector
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
-        
+
         private bool locked;
         
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
@@ -57,12 +58,8 @@ namespace SimpleInjector
         public Container()
         {
             this.RegisterSingle<Container>(this);
-
-            this.ExpressionBuilder = new ExpressionBuilder(this);
         }
 
-        internal ExpressionBuilder ExpressionBuilder { get; set; }
-        
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
         /// types, and all implictly registered instances. Implicit registrations are  all concrete 
@@ -87,14 +84,14 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
-        public InstanceProducer[] GetCurrentRegistrations()
+        public IInstanceProducer[] GetCurrentRegistrations()
         {
             var snapshot = this.registrations;
 
             // We must lock, because not locking could lead to race conditions.
             this.LockContainer();
 
-            return snapshot.Values.ToArray();
+            return snapshot.Values.Cast<IInstanceProducer>().ToArray();
         }
 
         /// <summary>

@@ -156,7 +156,7 @@ namespace SimpleInjector
 
             if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
-                instanceProducer = this.GetRegistration(serviceType);
+                instanceProducer = (InstanceProducer)this.GetRegistration(serviceType);
             }
 
             if (instanceProducer != null)
@@ -187,7 +187,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
         /// <returns>An <see cref="IInstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
-        public InstanceProducer GetRegistration(Type serviceType)
+        public IInstanceProducer GetRegistration(Type serviceType)
         {
             // Performance optimization: This if check is a duplicate to save a call to LockContainer.
             if (!this.locked)
@@ -279,11 +279,11 @@ namespace SimpleInjector
 
         private object GetInstanceForType(Type serviceType)
         {
-            InstanceProducer producer = this.GetRegistration(serviceType);
+            IInstanceProducer producer = this.GetRegistration(serviceType);
             return GetInstanceFromProducer(producer, serviceType);
         }
 
-        private static object GetInstanceFromProducer(InstanceProducer instanceProducer, Type serviceType)
+        private static object GetInstanceFromProducer(IInstanceProducer instanceProducer, Type serviceType)
         {
             if (instanceProducer == null)
             {

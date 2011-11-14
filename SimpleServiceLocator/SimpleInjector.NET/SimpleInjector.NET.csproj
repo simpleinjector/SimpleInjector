@@ -59,7 +59,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\SimpleInjector.xml</DocumentationFile>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -73,13 +73,13 @@
     <Compile Include="ActivationException.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
-    <Compile Include="InstanceProducer.cs" />
     <Compile Include="InstanceProducers\ConcreteTransientInstanceProducer.cs" />
     <Compile Include="InstanceProducers\ExpressionResolutionInstanceProducer.cs" />
     <Compile Include="InstanceProducers\FuncInstanceProducer.cs" />
     <Compile Include="InstanceProducers\FuncResolutionInstanceProducer.cs" />
     <Compile Include="InstanceProducers\FuncSingletonInstanceProducer.cs" />
     <Compile Include="InstanceProducers\InstanceCreatorWrapper.cs" />
+    <Compile Include="InstanceProducers\InstanceProducer.cs" />
     <Compile Include="InstanceProducers\SingletonInstanceProducer.cs" />
     <Compile Include="InstanceProducers\TransientInstanceProducer.cs" />
     <Compile Include="PropertyInjector.cs" />
@@ -87,7 +87,6 @@
     <Compile Include="Container.Resolving.cs" />
     <Compile Include="Container.Common.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="ExpressionBuilder.cs" />
     <Compile Include="IInstanceProducer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringResources.cs" />

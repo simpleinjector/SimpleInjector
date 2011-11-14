@@ -30,9 +30,6 @@ using System.Linq.Expressions;
 namespace SimpleInjector
 {
     /// <summary>Contract for types that produce instances.</summary>
-#if !DEBUG
-    [Obsolete("Use SimpleInjector.InstanceProducer instead.")]
-#endif
     public interface IInstanceProducer
     {
         /// <summary>Gets the service type for which this producer produces instances.</summary>

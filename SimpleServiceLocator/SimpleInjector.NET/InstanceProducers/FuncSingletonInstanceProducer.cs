@@ -33,8 +33,7 @@ namespace SimpleInjector.InstanceProducers
     {
         private Func<TService> instanceCreator;
 
-        internal FuncSingletonInstanceProducer(Func<TService> instanceCreator)
-            : base(typeof(TService))
+        internal FuncSingletonInstanceProducer(Func<TService> instanceCreator) : base(typeof(TService))
         {
             this.instanceCreator = instanceCreator;
         }

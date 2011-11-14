@@ -28,11 +28,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace SimpleInjector
+namespace SimpleInjector.InstanceProducers
 {
     /// <summary>Base class for producing instances.</summary>
     [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
-    public abstract class InstanceProducer : IInstanceProducer
+    internal abstract class InstanceProducer : IInstanceProducer
     {
         private readonly object instanceCreationLock = new object();
 
@@ -107,7 +107,7 @@ namespace SimpleInjector
         internal virtual Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
-            var expression = this.BuildExpressionWithoutCheckForRecursiveCalls();
+            var expression = this.BuildExpressionCore();
 
             try
             {
@@ -157,17 +157,12 @@ namespace SimpleInjector
 
             try
             {
-                return this.BuildExpressionWithoutCheckForRecursiveCalls();
+                return this.BuildExpressionCore();
             }
             finally
             {
                 this.validator.Reset();
             }
-        }
-
-        private Expression BuildExpressionWithoutCheckForRecursiveCalls()
-        {
-            return this.BuildExpressionCore();
         }
 
         // This method will be inlined by the JIT.

@@ -162,9 +162,6 @@ namespace SimpleInjector
         {
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TConcrete));
-
             this.AddRegistration(new ConcreteTransientInstanceProducer<TConcrete>());
         }
 
@@ -188,9 +185,6 @@ namespace SimpleInjector
         {
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
 
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
-
             this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>());
         }
 
@@ -210,9 +204,6 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("instanceCreator");
             }
-
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
 
             this.AddRegistration(new FuncInstanceProducer<TService>(instanceCreator));
         }
@@ -234,9 +225,6 @@ namespace SimpleInjector
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
-
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TConcrete));
 
             var instanceProducer = new ConcreteTransientInstanceProducer<TConcrete> { Container = this };
 
@@ -267,9 +255,6 @@ namespace SimpleInjector
         {
             Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
 
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
-
             var producer = new TransientInstanceProducer<TService, TImplementation> { Container = this };
 
             Func<TService> instanceCreator = () => (TService)producer.GetInstance();
@@ -292,9 +277,6 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("instance");
             }
-
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
 
             this.AddRegistration(new SingletonInstanceProducer<TService>(instance));
         }
@@ -319,9 +301,6 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("instanceCreator");
             }
-
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(typeof(TService));
 
             this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator));
         }
@@ -488,14 +467,13 @@ namespace SimpleInjector
                 throw new ArgumentNullException("collection");
             }
 
-            this.ThrowWhenContainerIsLocked();
             this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<TService>();
 
             var immutableCollection = collection.MakeImmutable();
 
-            this.collectionsToValidate[typeof(TService)] = immutableCollection;
-
             this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(immutableCollection));
+
+            this.collectionsToValidate[typeof(TService)] = immutableCollection;
         }
 
         /// <summary>
@@ -525,14 +503,7 @@ namespace SimpleInjector
             this.ValidateRegistrations();
             this.ValidateRegisteredCollections();
         }
-
-        internal void AddRegistration(InstanceProducer registration)
-        {
-            registration.Container = this;
-
-            this.registrations[registration.ServiceType] = registration;
-        }
-
+        
         internal Action<T> GetInitializerFor<T>()
         {
             var initializersForType = this.GetInstanceInitializersFor<T>();
@@ -553,7 +524,17 @@ namespace SimpleInjector
             }
         }
 
-        internal void ThrowWhenTypeAlreadyRegistered(Type type)
+        private void AddRegistration(InstanceProducer registration)
+        {
+            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenTypeAlreadyRegistered(registration.ServiceType);
+
+            registration.Container = this;
+
+            this.registrations[registration.ServiceType] = registration;
+        }
+
+        private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
             if (this.registrations.ContainsKey(type))
             {
@@ -562,7 +543,7 @@ namespace SimpleInjector
             }
         }
 
-        internal void ThrowWhenContainerIsLocked()
+        private void ThrowWhenContainerIsLocked()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
             // immediately.
@@ -581,9 +562,9 @@ namespace SimpleInjector
             foreach (var pair in this.registrations)
             {
                 Type serviceType = pair.Key;
-                InstanceProducer instanceProducer = pair.Value;
+                InstanceProducer producer = pair.Value;
 
-                instanceProducer.Verify(serviceType);
+                producer.Verify(serviceType);
             }
         }
 
@@ -603,8 +584,7 @@ namespace SimpleInjector
         {
             if (this.registrations.ContainsKey(typeof(IEnumerable<T>)))
             {
-                throw new InvalidOperationException(
-                    StringResources.CollectionTypeAlreadyRegistered(typeof(T)));
+                throw new InvalidOperationException(StringResources.CollectionTypeAlreadyRegistered(typeof(T)));
             }
         }
 

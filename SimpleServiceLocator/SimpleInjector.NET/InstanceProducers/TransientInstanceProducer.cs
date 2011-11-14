@@ -25,6 +25,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SimpleInjector.InstanceProducers
@@ -45,8 +46,7 @@ namespace SimpleInjector.InstanceProducers
 
         protected override Expression BuildExpressionCore()
         {
-            Expression newExpression = 
-                this.Container.ExpressionBuilder.BuildExpression(typeof(TImplementation));
+            NewExpression newExpression = this.BuildNewExpression();
 
             Action<TImplementation> instanceInitializer = this.Container.GetInitializerFor<TImplementation>();
 
@@ -78,6 +78,32 @@ namespace SimpleInjector.InstanceProducers
             var wrapper = new InstanceCreatorWrapper<TImplementation>(instanceCreatorWithInitializer);
 
             return wrapper.GetInvocationExpression();
+        }
+
+        private NewExpression BuildNewExpression()
+        {
+            Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(typeof(TImplementation));
+
+            var constructor = typeof(TImplementation).GetConstructors().Single();
+
+            var constructorArgumentCalls =
+                from parameter in constructor.GetParameters()
+                select this.BuildParameterExpression(parameter.ParameterType);
+
+            return Expression.New(constructor, constructorArgumentCalls.ToArray());
+        }
+
+        private Expression BuildParameterExpression(Type parameterType)
+        {
+            var instanceProducer = this.Container.GetRegistration(parameterType);
+
+            if (instanceProducer != null)
+            {
+                return instanceProducer.BuildExpression();
+            }
+
+            throw new ActivationException(
+                StringResources.ParameterTypeMustBeRegistered(typeof(TImplementation), parameterType));
         }
     }
 }

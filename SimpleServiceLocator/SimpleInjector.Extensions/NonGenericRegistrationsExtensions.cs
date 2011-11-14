@@ -455,7 +455,7 @@ namespace SimpleInjector.Extensions
             private readonly Container container;
             private readonly IEnumerable<Type> serviceTypes;
 
-            private InstanceProducer[] instanceProducers;
+            private IInstanceProducer[] instanceProducers;
 
             internal AllIterator(Container container, IEnumerable<Type> serviceTypes)
             {
@@ -492,7 +492,7 @@ namespace SimpleInjector.Extensions
                 }
             }
 
-            private InstanceProducer GetRegistration(Type serviceType)
+            private IInstanceProducer GetRegistration(Type serviceType)
             {
                 var producer = this.container.GetRegistration(serviceType);
 

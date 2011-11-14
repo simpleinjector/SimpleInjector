@@ -213,7 +213,7 @@ namespace SimpleInjector
         private Action<object> CompileInjectionDelegateWithProducers(Delegate injectionDelegate,
             PropertyInfo[] properties)
         {
-            IEnumerable<InstanceProducer> producers =
+            IEnumerable<IInstanceProducer> producers =
                 from property in properties
                 select this.container.GetRegistration(property.PropertyType);
 
@@ -223,7 +223,7 @@ namespace SimpleInjector
 
             // We build up the delegate using the instance producers BuildExpression method, making the
             // delegate as efficient as technically possible.
-            arguments.AddRange(producers.Select(p => p.BuildExpression()));
+            arguments.AddRange(producers.Select(producer => producer.BuildExpression()));
 
             int numberOfEmptySlots = 
                 injectionDelegate.GetType().GetGenericArguments().Length - properties.Length - 1;

@@ -4,8 +4,6 @@ Version vNext
 	General description:
 	
 	Code Changes:
-		-[Core] IInstanceProducer interface made obsolete.
-		-[Core] API methods now return an InstanceProducer base class instead of IInstanceProducer interface.
 		-[Core] InstanceProducers are now allowed to return types that can not be casted to the given service 
 		 type. This allows them to be retrieved using the non-generic Container.GetInstance(Type) and is
 		 useful for interception scenario's.
