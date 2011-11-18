@@ -10,7 +10,7 @@
     public class ResolvingFactoriesExtensionsTests
     {
         [TestMethod]
-        public void AllowResolvingLazyFactories_Scenario_Behavior()
+        public void AllowResolvingLazyFactories_GettingALazyForARegisteredType_Succeeds()
         {
             // Arrange
             var container = new Container();
