@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SimpleInjector.Tests.Unit
 {
     [TestClass]
-    public class InterceptingTests
+    public class ExpressionBuiltTests
     {
         public interface IValidator<T>
         {
@@ -18,9 +18,9 @@ namespace SimpleInjector.Tests.Unit
             void Write(string message);
         }
 
-        // NOTE: This test is the example code of the XML documentation of the Container.Intercepting event.
+        // NOTE: This test is the example code of the XML documentation of the Container.ExpressionBuilt event.
         [TestMethod]
-        public void TestInterceptRegisteredType()
+        public void TestExpressionBuilt()
         {
             // Arrange
             var container = new Container();
@@ -30,7 +30,7 @@ namespace SimpleInjector.Tests.Unit
             container.Register<IValidator<Customer>, CustomerValidator>();
 
             // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType.IsGenericType &&
                     e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
@@ -65,7 +65,7 @@ namespace SimpleInjector.Tests.Unit
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -93,7 +93,7 @@ namespace SimpleInjector.Tests.Unit
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -123,7 +123,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -146,7 +146,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 // Assert
                 Assert.IsNotNull(e.Expression);
@@ -167,7 +167,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -194,7 +194,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -222,7 +222,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -246,7 +246,7 @@ namespace SimpleInjector.Tests.Unit
 
             var container = new Container();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(SqlUserRepository))
                 {
@@ -272,7 +272,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -301,7 +301,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {

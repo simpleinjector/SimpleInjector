@@ -177,9 +177,9 @@ namespace SimpleInjector.InstanceProducers
         {
             var expression = this.BuildExpressionCore();
 
-            var e = new InterceptingEventArgs(this.ServiceType, expression);
+            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
 
-            this.Container.OnIntercepting(e);
+            this.Container.OnExpressionBuilt(e);
 
             return e.Expression;
         }

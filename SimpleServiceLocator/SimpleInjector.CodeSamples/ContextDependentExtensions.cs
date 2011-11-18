@@ -64,7 +64,7 @@
             Func<DependencyContext, TService> contextBasedInstanceCreator) where TService : class
         {
             // Allow the Func<DependencyContext, TService> to be injected into transient parent types.
-            container.Intercepting += (sender, e) =>
+            container.ExpressionBuilt += (sender, e) =>
             {
                 bool serviceIsADirectDependency =
                     ServiceIsADirectDependencyOfType(e.Expression, typeof(TService));
@@ -98,7 +98,7 @@
         }
 
         private static IEnumerable<Expression> BuildNewListOfConstructorArguments<TService>(
-            InterceptingEventArgs e, Func<DependencyContext, TService> contextBasedInstanceCreator)
+            ExpressionBuiltEventArgs e, Func<DependencyContext, TService> contextBasedInstanceCreator)
         {
             var expression = (NewExpression)e.Expression;
 

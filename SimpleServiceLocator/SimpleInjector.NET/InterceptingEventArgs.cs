@@ -30,20 +30,18 @@ namespace SimpleInjector
 {
     /// <summary>
     /// Provides data for and interaction with the 
-    /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of 
-    /// the <see cref="Container"/>. An observer can check the 
-    /// <see cref="RegisteredServiceType"/> to see whether the unregistered type can be handled. The
-    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate 
-    /// that allows creation of instances of the unregistered for this and future requests.
+    /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event of 
+    /// the <see cref="Container"/>. An observer can change the 
+    /// <see cref="ExpressionBuilt.Expression"/> property to change the registered type.
     /// </summary>
-    public class InterceptingEventArgs : EventArgs
+    public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;
 
-        /// <summary>Initializes a new instance of the <see cref="InterceptingEventArgs"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="ExpressionBuiltEventArgs"/> class.</summary>
         /// <param name="registeredServiceType">Type of the registered service.</param>
         /// <param name="expression">The registered expression.</param>
-        public InterceptingEventArgs(Type registeredServiceType, Expression expression)
+        public ExpressionBuiltEventArgs(Type registeredServiceType, Expression expression)
         {
             this.RegisteredServiceType = registeredServiceType;
 

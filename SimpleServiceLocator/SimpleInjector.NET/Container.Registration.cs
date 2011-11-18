@@ -148,25 +148,25 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The <see cref="Intercepting"/> event is called by the container every time an registered type is 
+        /// The <see cref="ExpressionBuilt"/> event is called by the container every time an registered type is 
         /// getting compiled, allowing a developer to change the way the type is created. The delegate that
-        /// hooks to the <see cref="Intercepting"/> event, can change the 
-        /// <see cref="InterceptingEventArgs.Expression" /> property on the <see cref="InterceptingEventArgs"/>,
-        /// which allows changing the way the type is constructed.
+        /// hooks to the <see cref="ExpressionBuilt"/> event, can change the 
+        /// <see cref="ExpressionBuiltEventArgs.Expression" /> property on the 
+        /// <see cref="ExpressionBuiltEventArgs"/>, which allows changing the way the type is constructed.
         /// </para>
         /// <para>
         /// This event is called after unregistered types are resolved.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
-        /// are executed only once per service type. While the calls to <see cref="Intercepting" /> for a given 
+        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a given 
         /// type are finite (and will in most cases happen just once), a container can call the delegate 
         /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
         /// called multiple times and is thread-safe.
         /// </para>
         /// </remarks>
         /// <example>
-        /// The following example shows the usage of the <see cref="Intercepting" /> event:
+        /// The following example shows the usage of the <see cref="ExpressionBuilt" /> event:
         /// <code lang="cs"><![CDATA[
         /// public interface IValidator<T>
         /// {
@@ -199,7 +199,7 @@ namespace SimpleInjector
         /// }
         ///
         /// [TestMethod]
-        /// public void TestInterceptRegisteredType()
+        /// public void TestExpressionBuilt()
         /// {
         ///     // Arrange
         ///     var container = new Container();
@@ -209,7 +209,7 @@ namespace SimpleInjector
         ///     container.Register<IValidator<Customer>, CustomerValidator>();
         ///
         ///     // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
-        ///     container.Intercepting += (sender, e) =>
+        ///     container.ExpressionBuilt += (sender, e) =>
         ///     {
         ///         if (e.RegisteredServiceType.IsGenericType &&
         ///             e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
@@ -239,24 +239,24 @@ namespace SimpleInjector
         /// expression for an registered type. The delegate checks whether the requested type is a closed generic
         /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
         /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
-        /// will changes the current <see cref="InterceptingEventArgs.Expression"/> with a new one that creates
+        /// will changes the current <see cref="ExpressionBuiltEventArgs.Expression"/> with a new one that creates
         /// a new <b>MonitoringValidator&lt;T&gt;</b> that takes the current validator (and an <b>ILogger</b>)
         /// as an dependency.
         /// </example>
-        public event EventHandler<InterceptingEventArgs> Intercepting
+        public event EventHandler<ExpressionBuiltEventArgs> ExpressionBuilt
         {
             add
             {
                 this.ThrowWhenContainerIsLocked();
 
-                this.intercepting += value;
+                this.expressionBuilt += value;
             }
 
             remove
             {
                 this.ThrowWhenContainerIsLocked();
 
-                this.intercepting -= value;
+                this.expressionBuilt -= value;
             }
         }
 
