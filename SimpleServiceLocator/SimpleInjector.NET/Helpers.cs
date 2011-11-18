@@ -42,8 +42,8 @@ namespace SimpleInjector
     {
         internal const string InstanceProviderDebuggerDisplayString =
             "Producer: {this.GetType().Name}, " +
-            "ServiceType: {((IInstanceProducer)this).ServiceType}, " + 
-            "Expression: {((IInstanceProducer)this).BuildExpression().ToString()}";    
+            "ServiceType: {this.ServiceType}, " + 
+            "Expression: {this.BuildExpression().ToString()}";    
 
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
@@ -91,7 +91,7 @@ namespace SimpleInjector
         }
 
         // Throws an InvalidOperationException on failure.
-        internal static void Verify(this InstanceProducer instanceProducer, Type serviceType)
+        internal static void Verify(this IInstanceProducer instanceProducer, Type serviceType)
         {
             try
             {

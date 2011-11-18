@@ -38,12 +38,6 @@ namespace SimpleInjector.InstanceProducers
         {
         }
 
-        internal override ActivationException BuildErrorWhileTryingToGetInstanceOfTypexception(Exception ex)
-        {
-            return new ActivationException(
-                StringResources.ErrorWhileTryingToGetInstanceOfType(this.ServiceType, ex), ex);
-        }
-
         protected override Expression BuildExpressionCore()
         {
             NewExpression newExpression = this.BuildNewExpression();
@@ -58,6 +52,11 @@ namespace SimpleInjector.InstanceProducers
             }
 
             return newExpression;
+        }
+
+        protected override string BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage()
+        {
+            return StringResources.ErrorWhileTryingToGetInstanceOfType(this.ServiceType);
         }
 
         private static Expression BuildExpressionWithInstanceInitializer(Expression newExpression,
@@ -75,9 +74,7 @@ namespace SimpleInjector.InstanceProducers
                 return instance;
             };
 
-            var wrapper = new InstanceCreatorWrapper<TImplementation>(instanceCreatorWithInitializer);
-
-            return wrapper.GetInvocationExpression();
+            return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), new Expression[0]);
         }
 
         private NewExpression BuildNewExpression()

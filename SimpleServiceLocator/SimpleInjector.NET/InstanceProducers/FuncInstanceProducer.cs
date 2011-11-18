@@ -30,18 +30,18 @@ namespace SimpleInjector.InstanceProducers
 {
     internal sealed class FuncInstanceProducer<TService> : InstanceProducer where TService : class
     {
-        private readonly InstanceCreatorWrapper<TService> instanceCreatorContainer;
+        private readonly Func<TService> instanceCreator;
 
         internal FuncInstanceProducer(Func<TService> instanceCreator) : base(typeof(TService))
         {
-            this.instanceCreatorContainer = new InstanceCreatorWrapper<TService>(instanceCreator);
+            this.instanceCreator = instanceCreator;
         }
 
         protected override Expression BuildExpressionCore()
         {
             // By returning an expression that directly invokes the Func<T> we gain a bit of performance, but
-            // we loose some information in
-            return this.instanceCreatorContainer.GetInvocationExpression();
+            // the exception message will be less clear when the instanceCreator fails.
+            return Expression.Invoke(Expression.Constant(this.instanceCreator), new Expression[0]);
         }
     }
 }

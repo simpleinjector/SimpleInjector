@@ -54,7 +54,7 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            InstanceProducer instanceProducer;
+            IInstanceProducer instanceProducer;
 
             object instance;
 
@@ -80,7 +80,7 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 throw new ActivationException(
-                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(typeof(TService),
+                    StringResources.DelegateRegisteredUsingResolveUnregisteredTypeReturnedAnUnassignableFrom(typeof(TService),
                     instance.GetType()), ex);
             }
         }
@@ -96,7 +96,7 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            InstanceProducer instanceProducer;
+            IInstanceProducer instanceProducer;
 
             if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
@@ -152,7 +152,7 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            InstanceProducer instanceProducer;
+            IInstanceProducer instanceProducer;
 
             if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
@@ -168,7 +168,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the <see cref="IInstanceProducer"/> for the given <paramref name="serviceType"/>. When no
+        /// Gets the <see cref="InstanceProducer"/> for the given <paramref name="serviceType"/>. When no
         /// registration exists, the container will try creating a new producer. A producer can be created
         /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
         /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
@@ -186,7 +186,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
-        /// <returns>An <see cref="IInstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public IInstanceProducer GetRegistration(Type serviceType)
         {
             // Performance optimization: This if check is a duplicate to save a call to LockContainer.
@@ -244,7 +244,7 @@ namespace SimpleInjector
             this.propertyInjectorCache = snapshotCopy;
         }
 
-        private InstanceProducer GetInstanceProducerForType<TService>() where TService : class
+        private IInstanceProducer GetInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType<TService>();
             return this.GetInstanceProducerForType(typeof(TService), buildProducer);
@@ -252,20 +252,22 @@ namespace SimpleInjector
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        private InstanceProducer GetInstanceProducerForType(Type serviceType,
+        private IInstanceProducer GetInstanceProducerForType(Type serviceType,
             Func<InstanceProducer> buildInstanceProducer)
         {
-            InstanceProducer instanceProducer;
+            IInstanceProducer instanceProducer = null;
 
             var snapshot = this.registrations;
 
             if (!snapshot.TryGetValue(serviceType, out instanceProducer))
             {
-                instanceProducer = buildInstanceProducer();
+                var producer = buildInstanceProducer();
 
                 // Always register the producer, even if it is null. This improves performance for the
                 // GetService and GetRegistration methods.
-                this.RegisterInstanceProducer(serviceType, instanceProducer, snapshot);
+                this.RegisterInstanceProducer(serviceType, producer, snapshot);
+
+                return producer;
             }
 
             return instanceProducer;
@@ -273,7 +275,7 @@ namespace SimpleInjector
 
         private object GetInstanceForType<TService>() where TService : class
         {
-            InstanceProducer producer = this.GetInstanceProducerForType<TService>();
+            IInstanceProducer producer = this.GetInstanceProducerForType<TService>();
             return GetInstanceFromProducer(producer, typeof(TService));
         }
 
@@ -309,7 +311,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => BuildInstanceProducerForConcreteType<TService>();
+                () => this.BuildInstanceProducerForConcreteType<TService>();
 
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
@@ -345,7 +347,7 @@ namespace SimpleInjector
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
 
-            this.OnResolveUnregisteredType(e);
+            this.resolveUnregisteredType(this, e);
 
             if (e.Handled)
             {
@@ -400,7 +402,7 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>() where TConcrete : class
+        private InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>() where TConcrete : class
         {
             // NOTE: We don't check if the type is actually constructable. The TransientInstanceProducer will
             // do that by the time GetInstance is called for the first time on it.
@@ -426,30 +428,18 @@ namespace SimpleInjector
             }
         }
 
-        private void OnResolveUnregisteredType(UnregisteredTypeEventArgs e)
-        {
-            var handler = this.resolveUnregisteredType;
-
-            if (handler == null)
-            {
-                return;
-            }
-
-            handler(this, e);
-        }
-
         // We're registering a service type after 'locking down' the container here and that means that the
         // type is added to a copy of the registrations dictionary and the original replaced with a new one.
         // This 'reference swapping' is thread-safe, but can result in types disappearing again from the 
         // registrations when multiple threads simultaneously add different types. This however, does not
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.
-        private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer, 
-            Dictionary<Type, InstanceProducer> snapshot)
+        private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer,
+            Dictionary<Type, IInstanceProducer> snapshot)
         {
             if (instanceProducer != null)
             {
-                // Set the container (must be done before the next line because of thread-safety).
+                // Set the container (must be done before the snapshot gets public).
                 instanceProducer.Container = this;
             }
 
@@ -457,7 +447,7 @@ namespace SimpleInjector
 
             snapshotCopy.Add(serviceType, instanceProducer);
 
-            // Replace the original with the new version that includes the serviceType.
+            // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.registrations = snapshotCopy;
         }
 

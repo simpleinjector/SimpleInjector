@@ -43,11 +43,6 @@ namespace SimpleInjector.InstanceProducers
         /// <param name="serviceType">The type of the service this instance will produce.</param>
         protected InstanceProducer(Type serviceType)
         {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException("serviceType");
-            }
-
             this.ServiceType = serviceType;
             this.validator = new CyclicDependencyValidator(serviceType);
         }
@@ -64,7 +59,24 @@ namespace SimpleInjector.InstanceProducers
         /// <returns>An Expression.</returns>
         public Expression BuildExpression()
         {
-            return this.BuildExpressionWithCheckForRecursiveCalls();
+            this.validator.CheckForRecursiveCalls();
+
+            try
+            {
+                var expression = this.BuildExpressionCore();
+
+                this.RemoveValidator();
+
+                return expression;
+            }
+            catch (Exception ex)
+            {
+                this.validator.Reset();
+
+                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
+
+                throw;
+            }
         }
 
         /// <summary>Produces an instance.</summary>
@@ -93,18 +105,47 @@ namespace SimpleInjector.InstanceProducers
             {
                 this.validator.Reset();
 
-                throw this.BuildErrorWhileTryingToGetInstanceOfTypexception(ex);
+                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
+
+                throw;
             }
 
             if (instance == null)
             {
-                throw this.BuildRegisteredDelegateForTypeReturnedNullException();
+                throw new ActivationException(this.BuildRegisteredDelegateForTypeReturnedNullExceptionMessage());
             }
 
             return instance;
         }
 
-        internal virtual Func<object> BuildInstanceCreator()
+        /// <summary>
+        /// Builds an expression that expresses the intent to get an instance by the current producer.
+        /// </summary>
+        /// <returns>An Expression.</returns>
+        protected abstract Expression BuildExpressionCore();
+
+        protected virtual string BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage()
+        {
+            return StringResources.DelegateForTypeThrewAnException(this.ServiceType);
+        }
+
+        protected virtual string BuildRegisteredDelegateForTypeReturnedNullExceptionMessage()
+        {
+            return StringResources.DelegateForTypeReturnedNull(this.ServiceType);
+        }
+
+        private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
+        {
+            string exceptionMessage = this.BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage();
+
+            // Prevent wrapping duplicate exceptions.
+            if (!innerException.Message.StartsWith(exceptionMessage))
+            {
+                throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
+            }
+        }
+        
+        private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
             var expression = this.BuildExpressionCore();
@@ -122,23 +163,6 @@ namespace SimpleInjector.InstanceProducers
             }
         }
 
-        internal virtual ActivationException BuildErrorWhileTryingToGetInstanceOfTypexception(Exception ex)
-        {
-            return new ActivationException(
-                StringResources.DelegateForTypeThrewAnException(this.ServiceType, ex), ex);
-        }
-
-        internal virtual ActivationException BuildRegisteredDelegateForTypeReturnedNullException()
-        {
-            return new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
-        }
-
-        /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer.
-        /// </summary>
-        /// <returns>An Expression.</returns>
-        protected abstract Expression BuildExpressionCore();
-
         private void SetInstanceCreator()
         {
             // We use a lock to prevent the delegate to be created more than once.
@@ -148,20 +172,6 @@ namespace SimpleInjector.InstanceProducers
                 {
                     this.instanceCreator = this.BuildInstanceCreator();
                 }
-            }
-        }
-
-        private Expression BuildExpressionWithCheckForRecursiveCalls()
-        {
-            this.validator.CheckForRecursiveCalls();
-
-            try
-            {
-                return this.BuildExpressionCore();
-            }
-            finally
-            {
-                this.validator.Reset();
             }
         }
 

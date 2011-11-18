@@ -38,50 +38,16 @@ namespace SimpleInjector.InstanceProducers
             this.instanceCreator = instanceCreator;
         }
 
-        internal override Func<object> BuildInstanceCreator()
-        {
-            var instance = this.instanceCreator();
-
-            Func<object> singletonInstanceCreator = () => instance;
-
-            return singletonInstanceCreator;
-        }
-
         protected override Expression BuildExpressionCore()
         {
-            var instance = this.GetInstanceFromCreator();
-
-            return Expression.Constant(instance, this.ServiceType);
-        }
-
-        private TService GetInstanceFromCreator()
-        {
-            TService instance;
-
-            try
-            {
-                instance = this.instanceCreator();
-            }
-            catch (ActivationException)
-            {
-                // This extra catch statement prevents ActivationExceptions from being wrapped in a new
-                // ActivationException. This FuncSingletonInstanceProducer is used as wrapper around
-                // TransientInstanceProducer instances that can throw ActivationException on their own.
-                // Wrapping these again in a ActivationException would obfuscate the real error.
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new ActivationException(
-                    StringResources.DelegateForTypeThrewAnException(typeof(TService), ex), ex);
-            }
+            var instance = this.instanceCreator();
 
             if (instance == null)
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(TService)));
             }
 
-            return instance;
+            return Expression.Constant(instance, this.ServiceType);
         }
     }
 }

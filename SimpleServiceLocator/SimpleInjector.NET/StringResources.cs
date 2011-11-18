@@ -33,6 +33,14 @@ namespace SimpleInjector
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
+        internal static string ServiceTypeOfNewRegistrationMustNotChange(Type oldType, Type newType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The ServiceType property of the supplied InstanceProducer differs from that of the current " +
+                "registration. The ServiceType is not allowed to change. The new registration has service " + 
+                "type {0} while {1} is expected.", newType, oldType);
+        }
+
         internal static string ContainerCanNotBeChangedAfterUse(Type containerType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -46,11 +54,11 @@ namespace SimpleInjector
                 "The registered delegate for type {0} returned null.", serviceType);
         }
 
-        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, Exception exception)
+        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Error occurred while trying to get instance of type {0}. {1}",
-                serviceType, exception.Message);
+                "Error occurred while trying to get instance of type {0}.",
+                serviceType);
         }
 
         internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType, 
@@ -62,11 +70,10 @@ namespace SimpleInjector
                 serviceType, expression, exception.Message);
         }
            
-        internal static string DelegateForTypeThrewAnException(Type serviceType, Exception exception)
+        internal static string DelegateForTypeThrewAnException(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The registered delegate for type {0} threw an exception. {1}",
-                serviceType, exception.Message);
+                "The registered delegate for type {0} threw an exception.", serviceType);
         }
 
         internal static string NoRegistrationForTypeFound(Type serviceType)
@@ -143,7 +150,8 @@ namespace SimpleInjector
                 "register this type.", serviceType);
         }
 
-        internal static string MultipleObserversRegisteredTheSameType(Type unregisteredServiceType)
+        internal static string MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
+            Type unregisteredServiceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Multiple observers of the ResolveUnregisteredType event are registering a delegate for " +
@@ -152,24 +160,24 @@ namespace SimpleInjector
                 unregisteredServiceType);
         }
 
-        internal static string HandlerReturnedADelegateThatThrewAnException(Type serviceType, 
-            string innerExceptionMessage)
+        internal static string DelegateRegisteredUsingResolveUnregisteredTypeThatThrewAnException(
+            Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
-                "to the {0} service type, registered a delegate that threw an exception. {1}",
-                serviceType, innerExceptionMessage);
+                "to the {0} service type, registered a delegate that threw an exception.",
+                serviceType);
         }
-        
-        internal static string HandlerReturnedADelegateThatReturnedNull(Type serviceType)
+
+        internal static string DelegateRegisteredUsingResolveUnregisteredTypeThatReturnedNull(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
                 "to the {0} service type, registered a delegate that returned a null reference.", serviceType);
         }
 
-        internal static string HandlerReturnedDelegateThatReturnedAnUnassignableFrom(Type serviceType,
-            Type actualType)
+        internal static string DelegateRegisteredUsingResolveUnregisteredTypeReturnedAnUnassignableFrom(
+            Type serviceType, Type actualType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The delegate that was hooked to the ResolveUnregisteredType event and responded " +

@@ -83,7 +83,7 @@ namespace SimpleInjector
 
             if (this.Handled)
             {
-                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameType(
+                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
                     this.UnregisteredServiceType));
             }
 
@@ -114,7 +114,7 @@ namespace SimpleInjector
 
             if (this.Handled)
             {
-                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameType(
+                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
                     this.UnregisteredServiceType));
             }
 

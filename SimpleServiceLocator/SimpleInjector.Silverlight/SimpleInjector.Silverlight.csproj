@@ -70,7 +70,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>Bin\Release\SimpleInjector.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
@@ -118,8 +118,8 @@
     <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncSingletonInstanceProducer.cs">
       <Link>InstanceProducers\FuncSingletonInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\InstanceCreatorWrapper.cs">
-      <Link>InstanceProducers\InstanceCreatorWrapper.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducers\InstanceProducer.cs">
+      <Link>InstanceProducers\InstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\InstanceProducers\SingletonInstanceProducer.cs">
       <Link>InstanceProducers\SingletonInstanceProducer.cs</Link>
@@ -136,7 +136,6 @@
     <Compile Include="..\SimpleInjector.NET\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
-    <Compile Include="InstanceProducers\InstanceProducer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

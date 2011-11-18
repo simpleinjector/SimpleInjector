@@ -42,14 +42,14 @@ namespace SimpleInjector
         private readonly object locker = new object();
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
-        private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
+        private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
 
         private bool locked;
         
-        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
+        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
         
         private Dictionary<Type, PropertyInjector> propertyInjectorCache =
             new Dictionary<Type, PropertyInjector>();
@@ -83,7 +83,7 @@ namespace SimpleInjector
         /// guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>
-        /// <returns>An array of <see cref="IInstanceProducer"/> instances.</returns>
+        /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
         public IInstanceProducer[] GetCurrentRegistrations()
         {
             var snapshot = this.registrations;
@@ -91,7 +91,7 @@ namespace SimpleInjector
             // We must lock, because not locking could lead to race conditions.
             this.LockContainer();
 
-            return snapshot.Values.Cast<IInstanceProducer>().ToArray();
+            return snapshot.Values.ToArray();
         }
 
         /// <summary>

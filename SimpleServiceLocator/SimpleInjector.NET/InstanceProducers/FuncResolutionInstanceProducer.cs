@@ -37,8 +37,7 @@ namespace SimpleInjector.InstanceProducers
         /// Initializes a new instance of the <see cref="FuncResolutionInstanceProducer{TService}"/> class.
         /// </summary>
         /// <param name="instanceCreator">The delegate that knows how to create that type.</param>
-        public FuncResolutionInstanceProducer(Func<object> instanceCreator)
-            : base(typeof(TService))
+        public FuncResolutionInstanceProducer(Func<object> instanceCreator) : base(typeof(TService))
         {
             this.instanceCreator = instanceCreator;
         }
@@ -54,8 +53,8 @@ namespace SimpleInjector.InstanceProducers
             catch (Exception ex)
             {
                 throw new ActivationException(
-                    StringResources.HandlerReturnedADelegateThatThrewAnException(typeof(TService), ex.Message),
-                    ex);
+                    StringResources.DelegateRegisteredUsingResolveUnregisteredTypeThatThrewAnException(
+                    typeof(TService)) + " " + ex.Message, ex);
             }
 
             try
@@ -65,31 +64,9 @@ namespace SimpleInjector.InstanceProducers
             catch (Exception ex)
             {
                 throw new ActivationException(
-                    StringResources.HandlerReturnedDelegateThatReturnedAnUnassignableFrom(typeof(TService),
-                    instance.GetType()), ex);
+                    StringResources.DelegateRegisteredUsingResolveUnregisteredTypeReturnedAnUnassignableFrom(
+                    typeof(TService), instance.GetType()), ex);
             }
-        }
-
-        internal override Func<object> BuildInstanceCreator()
-        {
-            // We omit type checking here. This users can use this type (through ResolveUnregisteredType event)
-            // by returning a root level type that differs from it's service type when the type is requested
-            // using the non-generic Container.GetInstance(Type). This enables some interesting interception
-            // scenario's.
-            return this.instanceCreator;
-        }
-
-        internal override ActivationException BuildErrorWhileTryingToGetInstanceOfTypexception(Exception ex)
-        {
-            return new ActivationException(
-                StringResources.HandlerReturnedADelegateThatThrewAnException(typeof(TService), ex.Message),
-                ex);
-        }
-
-        internal override ActivationException BuildRegisteredDelegateForTypeReturnedNullException()
-        {
-            return new ActivationException(
-                StringResources.HandlerReturnedADelegateThatReturnedNull(typeof(TService)));
         }
 
         protected override Expression BuildExpressionCore()
@@ -98,6 +75,18 @@ namespace SimpleInjector.InstanceProducers
             // will be used to build up a larger expression and would fail later on with a very unclear
             // exception when the given type is not of TService. 
             return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstanceWithTypeCheck"));
+        }
+
+        protected override string BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage()
+        {
+            return StringResources.DelegateRegisteredUsingResolveUnregisteredTypeThatThrewAnException(
+                typeof(TService));
+        }
+
+        protected override string BuildRegisteredDelegateForTypeReturnedNullExceptionMessage()
+        {
+            return StringResources.DelegateRegisteredUsingResolveUnregisteredTypeThatReturnedNull(
+                typeof(TService));
         }
     }
 }

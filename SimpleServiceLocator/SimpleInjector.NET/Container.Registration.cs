@@ -562,7 +562,7 @@ namespace SimpleInjector
             foreach (var pair in this.registrations)
             {
                 Type serviceType = pair.Key;
-                InstanceProducer producer = pair.Value;
+                IInstanceProducer producer = pair.Value;
 
                 producer.Verify(serviceType);
             }

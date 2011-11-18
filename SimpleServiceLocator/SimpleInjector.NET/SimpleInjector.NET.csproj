@@ -59,7 +59,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\SimpleInjector.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -78,7 +78,6 @@
     <Compile Include="InstanceProducers\FuncInstanceProducer.cs" />
     <Compile Include="InstanceProducers\FuncResolutionInstanceProducer.cs" />
     <Compile Include="InstanceProducers\FuncSingletonInstanceProducer.cs" />
-    <Compile Include="InstanceProducers\InstanceCreatorWrapper.cs" />
     <Compile Include="InstanceProducers\InstanceProducer.cs" />
     <Compile Include="InstanceProducers\SingletonInstanceProducer.cs" />
     <Compile Include="InstanceProducers\TransientInstanceProducer.cs" />
