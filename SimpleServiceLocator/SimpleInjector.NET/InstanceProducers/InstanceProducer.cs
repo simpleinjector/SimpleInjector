@@ -38,6 +38,7 @@ namespace SimpleInjector.InstanceProducers
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
+        private Expression expression;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The type of the service this instance will produce.</param>
@@ -63,11 +64,11 @@ namespace SimpleInjector.InstanceProducers
 
             try
             {
-                var expression = this.BuildExpressionCore();
+                this.expression = this.GetExpression();
 
                 this.RemoveValidator();
 
-                return expression;
+                return this.expression;
             }
             catch (Exception ex)
             {
@@ -94,7 +95,7 @@ namespace SimpleInjector.InstanceProducers
             {
                 if (this.instanceCreator == null)
                 {
-                    this.SetInstanceCreator();
+                    this.instanceCreator = this.BuildInstanceCreator();
                 }
 
                 instance = this.instanceCreator();
@@ -134,21 +135,10 @@ namespace SimpleInjector.InstanceProducers
             return StringResources.DelegateForTypeReturnedNull(this.ServiceType);
         }
 
-        private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
-        {
-            string exceptionMessage = this.BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage();
-
-            // Prevent wrapping duplicate exceptions.
-            if (!innerException.Message.StartsWith(exceptionMessage))
-            {
-                throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
-            }
-        }
-        
         private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
-            var expression = this.BuildExpressionCore();
+            var expression = this.GetExpression();
 
             try
             {
@@ -163,15 +153,45 @@ namespace SimpleInjector.InstanceProducers
             }
         }
 
-        private void SetInstanceCreator()
+        private Expression GetExpression()
         {
-            // We use a lock to prevent the delegate to be created more than once.
-            lock (this.instanceCreationLock)
+            // Prevent the Expression from being built more than once on this InstanceProducer. Note that this
+            // still means that the expression can be created multiple times for a single service type, because
+            // the container does not guarantee that a single InstanceProducer is created, just as the
+            // ResolveUnregisteredType event can be called multiple times for a single service type.
+            if (this.expression == null)
             {
-                if (this.instanceCreator == null)
+                lock (this.instanceCreationLock)
                 {
-                    this.instanceCreator = this.BuildInstanceCreator();
+                    if (this.expression == null)
+                    {
+                        this.expression = this.BuildExpressionWithInterception();
+                    }
                 }
+            }
+
+            return this.expression;
+        }
+
+        private Expression BuildExpressionWithInterception()
+        {
+            var expression = this.BuildExpressionCore();
+
+            var e = new InterceptingEventArgs(this.ServiceType, expression);
+
+            this.Container.OnIntercepting(e);
+
+            return e.Expression;
+        }
+
+        private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
+        {
+            string exceptionMessage = this.BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage();
+
+            // Prevent wrapping duplicate exceptions.
+            if (!innerException.Message.StartsWith(exceptionMessage))
+            {
+                throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
             }
         }
 

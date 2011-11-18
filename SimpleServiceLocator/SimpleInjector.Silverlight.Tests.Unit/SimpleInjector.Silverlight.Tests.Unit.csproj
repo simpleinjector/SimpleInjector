@@ -112,6 +112,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\InjectPropertiesTests.cs">
       <Link>InjectPropertiesTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\InterceptingTests.cs">
+      <Link>InterceptingTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterAllTests.cs">
       <Link>RegisterAllTests.cs</Link>
     </Compile>

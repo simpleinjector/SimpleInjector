@@ -81,6 +81,7 @@
     <Compile Include="InstanceProducers\InstanceProducer.cs" />
     <Compile Include="InstanceProducers\SingletonInstanceProducer.cs" />
     <Compile Include="InstanceProducers\TransientInstanceProducer.cs" />
+    <Compile Include="InterceptingEventArgs.cs" />
     <Compile Include="PropertyInjector.cs" />
     <Compile Include="Container.Registration.cs" />
     <Compile Include="Container.Resolving.cs" />

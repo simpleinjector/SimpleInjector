@@ -60,7 +60,7 @@ namespace SimpleInjector
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
         /// are executed only once. While the calls to <see cref="ResolveUnregisteredType" /> for a given type
-        /// are finite (and will mostly happen just once), a container can call the delegate multiple times
+        /// are finite (and will in most cases happen just once), a container can call the delegate multiple times
         /// and make parallel calls to the delegate. You must make sure that the code can be called multiple 
         /// times and is thread-safe.
         /// </para>
@@ -83,7 +83,7 @@ namespace SimpleInjector
         /// }
         /// 
         /// [TestMethod]
-        /// public static void TestResolveUnregisteredType()
+        /// public void TestResolveUnregisteredType()
         /// {
         ///     // Arrange
         ///     var container = new Container();
@@ -138,6 +138,125 @@ namespace SimpleInjector
                 this.ThrowWhenContainerIsLocked();
 
                 this.resolveUnregisteredType -= value;
+            }
+        }
+
+        /// <summary>
+        /// Occurs after the creation of the <see cref="Expression"/> of a registered type, allowing the
+        /// created <see cref="Expression"/> to be replaced. Multiple delegates may handle the same service
+        /// type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <see cref="Intercepting"/> event is called by the container every time an registered type is 
+        /// getting compiled, allowing a developer to change the way the type is created. The delegate that
+        /// hooks to the <see cref="Intercepting"/> event, can change the 
+        /// <see cref="InterceptingEventArgs.Expression" /> property on the <see cref="InterceptingEventArgs"/>,
+        /// which allows changing the way the type is constructed.
+        /// </para>
+        /// <para>
+        /// This event is called after unregistered types are resolved.
+        /// </para>
+        /// <para>
+        /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
+        /// are executed only once per service type. While the calls to <see cref="Intercepting" /> for a given 
+        /// type are finite (and will in most cases happen just once), a container can call the delegate 
+        /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
+        /// called multiple times and is thread-safe.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// The following example shows the usage of the <see cref="Intercepting" /> event:
+        /// <code lang="cs"><![CDATA[
+        /// public interface IValidator<T>
+        /// {
+        ///     void Validate(T instance);
+        /// }
+        ///
+        /// public interface ILogger
+        /// {
+        ///     void Write(string message);
+        /// }
+        ///
+        /// // Implementation of the decorator pattern.
+        /// public class MonitoringValidator<T> : IValidator<T>
+        /// {
+        ///     private readonly IValidator<T> validator;
+        ///     private readonly ILogger logger;
+        ///
+        ///     public MonitoringValidator(IValidator<T> validator, ILogger logger)
+        ///     {
+        ///         this.validator = validator;
+        ///         this.logger = logger;
+        ///     }
+        ///
+        ///     public void Validate(T instance)
+        ///     {
+        ///         this.logger.Write("Validating " + typeof(T).Name);
+        ///         this.validator.Validate(instance);
+        ///         this.logger.Write("Validated " + typeof(T).Name);
+        ///     }
+        /// }
+        ///
+        /// [TestMethod]
+        /// public void TestInterceptRegisteredType()
+        /// {
+        ///     // Arrange
+        ///     var container = new Container();
+        ///
+        ///     container.RegisterSingle<ILogger, ConsoleLogger>();
+        ///     container.Register<IValidator<Order>, OrderValidator>();
+        ///     container.Register<IValidator<Customer>, CustomerValidator>();
+        ///
+        ///     // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
+        ///     container.Intercepting += (sender, e) =>
+        ///     {
+        ///         if (e.RegisteredServiceType.IsGenericType &&
+        ///             e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
+        ///         {
+        ///             var decoratorType = typeof(MonitoringValidator<>)
+        ///                 .MakeGenericType(e.RegisteredServiceType.GetGenericArguments());
+        ///
+        ///             // Wrap the IValidator<T> in a MonitoringValidator<T>.
+        ///             e.Expression = Expression.New(decoratorType.GetConstructors()[0], new Expression[]
+        ///             {
+        ///                 e.Expression,
+        ///                 container.GetRegistration(typeof(ILogger)).BuildExpression(),
+        ///             });
+        ///         }
+        ///     };
+        ///
+        ///     // Act
+        ///     var orderValidator = container.GetInstance<IValidator<Order>>();
+        ///     var customerValidator = container.GetInstance<IValidator<Customer>>();
+        ///
+        ///     // Assert
+        ///     Assert.IsInstanceOfType(orderValidator, typeof(MonitoringValidator<Order>));
+        ///     Assert.IsInstanceOfType(customerValidator, typeof(MonitoringValidator<Customer>));
+        /// }
+        /// ]]></code>
+        /// The example above registers a delegate that is fired every time the container compiles the
+        /// expression for an registered type. The delegate checks whether the requested type is a closed generic
+        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
+        /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
+        /// will changes the current <see cref="InterceptingEventArgs.Expression"/> with a new one that creates
+        /// a new <b>MonitoringValidator&lt;T&gt;</b> that takes the current validator (and an <b>ILogger</b>)
+        /// as an dependency.
+        /// </example>
+        public event EventHandler<InterceptingEventArgs> Intercepting
+        {
+            add
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.intercepting += value;
+            }
+
+            remove
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.intercepting -= value;
             }
         }
 

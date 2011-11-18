@@ -50,7 +50,8 @@ namespace SimpleInjector
         private bool locked;
         
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
-        
+        private EventHandler<InterceptingEventArgs> intercepting = (s, e) => { };
+      
         private Dictionary<Type, PropertyInjector> propertyInjectorCache =
             new Dictionary<Type, PropertyInjector>();
 
@@ -139,6 +140,11 @@ namespace SimpleInjector
         public new Type GetType()
         {
             return base.GetType();
+        }
+
+        internal void OnIntercepting(InterceptingEventArgs e)
+        {
+            this.intercepting(this, e);
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>

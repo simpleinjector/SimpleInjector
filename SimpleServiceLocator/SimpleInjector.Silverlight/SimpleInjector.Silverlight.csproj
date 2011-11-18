@@ -127,6 +127,9 @@
     <Compile Include="..\SimpleInjector.NET\InstanceProducers\TransientInstanceProducer.cs">
       <Link>InstanceProducers\TransientInstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\InterceptingEventArgs.cs">
+      <Link>InterceptingEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
     </Compile>
