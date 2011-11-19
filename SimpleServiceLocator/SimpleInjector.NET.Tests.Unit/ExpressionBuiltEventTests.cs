@@ -6,7 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class ExpressionBuiltTests
+    public class ExpressionBuiltEventTests
     {
         public interface IValidator<T>
         {
@@ -318,6 +318,78 @@
             // Assert
             Assert.AreEqual(expectedCallCount, actualCallCount,
                 "The event is expected to called just once for the IUserRepository for performance reasons.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException),
+            "Registration of an event after the container is locked is illegal.")]
+        public void AddExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+
+            // The first use of the container locks the container.
+            container.GetInstance<IUserRepository>();
+
+            // Act
+            container.ExpressionBuilt += (s, e) => { };
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException),
+            "Removal of an event after the container is locked is illegal.")]
+        public void RemoveExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+
+            // The first use of the container locks the container.
+            container.GetInstance<IUserRepository>();
+
+            // Act
+            container.ResolveUnregisteredType -= (s, e) => { };
+        }
+
+        [TestMethod]
+        public void RemoveExpressionBuilt_BeforeContainerHasBeenLocked_Succeeds()
+        {
+            // Arrange
+            bool handlerCalled = false;
+
+            var container = new Container();
+
+            EventHandler<ExpressionBuiltEventArgs> handler = (sender, e) =>
+            {
+                handlerCalled = true;
+            };
+
+            container.ExpressionBuilt += handler;
+
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            
+            // Act
+            container.ExpressionBuilt -= handler;
+
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var eventArgs = 
+                new ExpressionBuiltEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
+
+            // Act
+            eventArgs.Expression = null;
         }
 
         public class Order

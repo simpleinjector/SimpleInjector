@@ -311,7 +311,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteType<TService>();
+                () => BuildInstanceProducerForConcreteType<TService>();
 
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
@@ -402,7 +402,8 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>() where TConcrete : class
+        private static InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>() 
+            where TConcrete : class
         {
             // NOTE: We don't check if the type is actually constructable. The TransientInstanceProducer will
             // do that by the time GetInstance is called for the first time on it.

@@ -201,19 +201,25 @@
         public void RemoveResolveUnregisteredType_BeforeContainerHasBeenLocked_Succeeds()
         {
             // Arrange
+            bool handlerCalled = false;
+
             var container = new Container();
 
+            EventHandler<UnregisteredTypeEventArgs> handler = (sender, e) =>
+            {
+                handlerCalled = true;
+            };
+
+            container.ResolveUnregisteredType += handler;
+
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
-
-            var tester = new HandleTest();
-
-            container.ResolveUnregisteredType += tester.Handle;
-
+            
             // Act
-            container.ResolveUnregisteredType -= tester.Handle;
+            container.ResolveUnregisteredType -= handler;
 
             try
             {
+                // Call an unregistered type to trigger the ResolveUnregisteredType event.
                 container.GetInstance<IDisposable>();
             }
             catch
@@ -222,7 +228,7 @@
             }
 
             // Assert
-            Assert.IsFalse(tester.HandlerCalled, "The delegate was not removed correctly.");
+            Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
         }
 
         [TestMethod]

@@ -189,7 +189,7 @@ namespace SimpleInjector.InstanceProducers
             string exceptionMessage = this.BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage();
 
             // Prevent wrapping duplicate exceptions.
-            if (!innerException.Message.StartsWith(exceptionMessage))
+            if (!innerException.Message.StartsWith(exceptionMessage, StringComparison.OrdinalIgnoreCase))
             {
                 throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
             }

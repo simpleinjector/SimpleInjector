@@ -33,14 +33,6 @@ namespace SimpleInjector
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static string ServiceTypeOfNewRegistrationMustNotChange(Type oldType, Type newType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The ServiceType property of the supplied InstanceProducer differs from that of the current " +
-                "registration. The ServiceType is not allowed to change. The new registration has service " + 
-                "type {0} while {1} is expected.", newType, oldType);
-        }
-
         internal static string ContainerCanNotBeChangedAfterUse(Type containerType)
         {
             return string.Format(CultureInfo.InvariantCulture,
