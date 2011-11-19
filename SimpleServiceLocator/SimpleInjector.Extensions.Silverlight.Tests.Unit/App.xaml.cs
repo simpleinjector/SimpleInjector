@@ -1,10 +1,10 @@
-﻿using System;
-using System.Windows;
-
-using Microsoft.Silverlight.Testing;
-
-namespace SimpleInjector.Extensions.Silverlight.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Silverlight.Tests.Unit
 {
+    using System;
+    using System.Windows;
+
+    using Microsoft.Silverlight.Testing;
+
     /// <summary>
     /// Silverlight unit test form.
     /// </summary>

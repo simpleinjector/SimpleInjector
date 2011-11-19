@@ -1,10 +1,10 @@
-﻿using Microsoft.Silverlight.Testing.UnitTesting.Metadata.VisualStudio;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using SimpleInjector.Tests.Unit;
-
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
+    using Microsoft.Silverlight.Testing.UnitTesting.Metadata.VisualStudio;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector.Tests.Unit;
+
     /// <content>Silverlight specific tests for injecting properties.</content>
     public partial class InjectPropertiesTests
     {

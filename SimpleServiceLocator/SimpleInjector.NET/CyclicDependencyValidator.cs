@@ -23,12 +23,12 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-
 namespace SimpleInjector
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     /// <summary>
     /// Allows verifying whether a given type has a direct or indirect dependency on itself. Verifying is done
     /// by preventing recursive calls to a IInstanceProvider. An instance of this type is related to a single 

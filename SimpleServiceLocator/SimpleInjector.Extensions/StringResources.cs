@@ -23,11 +23,11 @@
 */
 #endregion
 
-using System;
-using System.Globalization;
-
 namespace SimpleInjector.Extensions
 {
+    using System;
+    using System.Globalization;
+
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Extensions.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class OpenGenericRegistrationExtensionsTests
     {

@@ -23,12 +23,12 @@
 */
 #endregion
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-
 namespace SimpleInjector
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq.Expressions;
+
     /// <summary>Contract for types that produce instances.</summary>
     public interface IInstanceProducer
     {

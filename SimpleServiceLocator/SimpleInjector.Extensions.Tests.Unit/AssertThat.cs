@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Extensions.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     internal static class AssertThat
     {
         internal static void StringContains(string expectedMessage, string actualMessage, string assertMessage)

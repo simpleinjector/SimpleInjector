@@ -23,16 +23,16 @@
 */
 #endregion
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-
-using SimpleInjector.InstanceProducers;
-
 namespace SimpleInjector
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
+    using SimpleInjector.InstanceProducers;
+
 #if DEBUG
     /// <summary>
     /// Methods for registration.

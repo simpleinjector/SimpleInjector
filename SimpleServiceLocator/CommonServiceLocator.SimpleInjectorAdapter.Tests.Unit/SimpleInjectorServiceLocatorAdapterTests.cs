@@ -1,11 +1,11 @@
-﻿using System;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using SimpleInjector;
-
-namespace CommonServiceLocator.SimpleInjectorAdapter.Tests.Unit
+﻿namespace CommonServiceLocator.SimpleInjectorAdapter.Tests.Unit
 {
+    using System;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector;
+
     [TestClass]
     public class SimpleInjectorServiceLocatorAdapterTests
     {

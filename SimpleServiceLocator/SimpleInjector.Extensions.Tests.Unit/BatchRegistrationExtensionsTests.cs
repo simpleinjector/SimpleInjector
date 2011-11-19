@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Extensions.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class BatchRegistrationExtensionsTests
     {

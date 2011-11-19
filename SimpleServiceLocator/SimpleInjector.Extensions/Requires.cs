@@ -23,14 +23,14 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-
 namespace SimpleInjector.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Globalization;
+    using System.Linq;
+
     /// <summary>
     /// Internal helper class for precondition validation.
     /// </summary>

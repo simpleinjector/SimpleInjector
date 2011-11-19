@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SimpleInjector.CodeSamples.Tests.Unit
+﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
+    using System;
+    using System.Collections.Generic;
+
     public interface ILogger
     {
         void Log(string message);

@@ -23,11 +23,11 @@
 */
 #endregion
 
-using System;
-using System.Linq.Expressions;
-
 namespace SimpleInjector.InstanceProducers
 {
+    using System;
+    using System.Linq.Expressions;
+
     internal sealed class FuncInstanceProducer<TService> : InstanceProducer where TService : class
     {
         private readonly Func<TService> instanceCreator;

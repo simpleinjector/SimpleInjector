@@ -23,12 +23,12 @@
 */
 #endregion
 
-using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
-
 namespace SimpleInjector.InstanceProducers
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq.Expressions;
+
     internal sealed class SingletonInstanceProducer<TService> : InstanceProducer where TService : class
     {
         private readonly TService instance;

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace SimpleInjector.CodeSamples
+﻿namespace SimpleInjector.CodeSamples
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class VarianceExtensions
     {
         /// <summary>

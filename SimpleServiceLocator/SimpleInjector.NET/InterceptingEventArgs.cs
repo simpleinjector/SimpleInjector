@@ -23,11 +23,11 @@
 */
 #endregion
 
-using System;
-using System.Linq.Expressions;
-
 namespace SimpleInjector
 {
+    using System;
+    using System.Linq.Expressions;
+
     /// <summary>
     /// Provides data for and interaction with the 
     /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event of 

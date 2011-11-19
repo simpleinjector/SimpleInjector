@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using SimpleInjector.Extensions;
-
-namespace SimpleInjector.CodeSamples.Tests.Unit
+﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector.Extensions;
+
     /// <summary>
     /// Variance Scenario 3: Multiple registrations, multiple resolve.
     /// Per service, multiple types are registered and multiple types are resolved or used behind

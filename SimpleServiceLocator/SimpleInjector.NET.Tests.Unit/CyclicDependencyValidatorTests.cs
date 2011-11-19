@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
+    using System.Threading;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class CyclicDependencyValidatorTests
     {

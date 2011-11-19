@@ -23,15 +23,15 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-
-using Microsoft.Practices.ServiceLocation;
-
-using SimpleInjector;
-
 namespace CommonServiceLocator.SimpleInjectorAdapter
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using SimpleInjector;
+
     /// <summary>
     /// Translates calls from <see cref="IServiceLocator"/> to Simple Injector's container.
     /// </summary>

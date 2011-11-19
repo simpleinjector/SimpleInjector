@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public interface ITimeProvider
     {
         DateTime Now { get; }

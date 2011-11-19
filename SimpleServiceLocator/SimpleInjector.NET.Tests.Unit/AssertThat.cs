@@ -1,9 +1,9 @@
-﻿using System;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     internal static class AssertThat
     {
         internal static void ExceptionContainsParamName(ArgumentException exception, string expectedParamName)

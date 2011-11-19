@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.CodeSamples.Tests.Unit
+﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
+    using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class CollectionRegistrationExtensionsTests
     {

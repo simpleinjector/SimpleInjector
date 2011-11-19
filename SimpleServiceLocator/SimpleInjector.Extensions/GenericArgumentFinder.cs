@@ -23,14 +23,14 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-
 namespace SimpleInjector.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reflection;
+
     /// <summary>
     /// Allows retrieving the concrete types of the generic type arguments of that must be used to create a
     /// closed generic implementation of a given open generic implementation, based on on the concrete

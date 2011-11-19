@@ -23,17 +23,17 @@
 */
 #endregion
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-
-using SimpleInjector.InstanceProducers;
-
 namespace SimpleInjector
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
+    using SimpleInjector.InstanceProducers;
+
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>

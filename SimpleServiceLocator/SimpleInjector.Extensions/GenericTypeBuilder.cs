@@ -23,12 +23,12 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace SimpleInjector.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     /// <summary>
     /// Helper class for building closed generic type for a given open generic type and a closed generic base.
     /// </summary>

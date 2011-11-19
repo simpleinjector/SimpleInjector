@@ -23,16 +23,15 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-
 namespace SimpleInjector.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
+
     /// <summary>
     /// Represents the method that will called to register one or multiple concrete. non-generic
     /// <paramref name="implementations"/> of the given closed generic type 

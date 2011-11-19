@@ -23,13 +23,13 @@
 */
 #endregion
 
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-
 namespace SimpleInjector.InstanceProducers
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Linq.Expressions;
+
     internal class TransientInstanceProducer<TService, TImplementation> : InstanceProducer
         where TImplementation : class, TService
         where TService : class

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.CodeSamples.Tests.Unit
+﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     /*
     // Example usage
     var container = new Container();
@@ -23,7 +24,7 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
 
     // Nested decorators: SqlUserRepository gets decorated by two interceptors.
     container.RegisterWithInterceptor<IUserRepository, YetAnotherInterestingInterceptor,
-    MonitoringInterceptor, SqlUserRepository>();
+        MonitoringInterceptor, SqlUserRepository>();
 
     // Manually: SqlUserRepository gets decorated by two interceptors.
     container.Register<IUserRepository>(() =>
@@ -40,17 +41,6 @@ namespace SimpleInjector.CodeSamples.Tests.Unit
     [TestClass]
     public class InterceptorExtensionsTests
     {
-        [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-
-            // Assert
-        }
-
         // Example interceptor
         private class MonitoringInterceptor : IInterceptor
         {

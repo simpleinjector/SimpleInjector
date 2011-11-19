@@ -23,13 +23,13 @@
 */
 #endregion
 
-using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-
 namespace SimpleInjector.InstanceProducers
 {
+    using System;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq.Expressions;
+
     /// <summary>Base class for producing instances.</summary>
     [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
     internal abstract class InstanceProducer : IInstanceProducer

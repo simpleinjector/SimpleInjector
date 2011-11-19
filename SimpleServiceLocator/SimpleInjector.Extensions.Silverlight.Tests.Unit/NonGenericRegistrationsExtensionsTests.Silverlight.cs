@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Extensions.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+    using System;
+    using System.Collections;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     /// <content>
     /// Silverlight specific tests for the NonGenericRegistrationsExtensions class.
     /// </content>

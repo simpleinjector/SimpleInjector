@@ -23,11 +23,11 @@
 */
 #endregion
 
-using System;
-using System.Linq.Expressions;
-
 namespace SimpleInjector.InstanceProducers
 {
+    using System;
+    using System.Linq.Expressions;
+
     internal class ExpressionResolutionInstanceProducer<TService> : InstanceProducer where TService : class
     {
         private readonly Expression expression;

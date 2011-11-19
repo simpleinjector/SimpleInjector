@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SimpleInjector.Extensions.Tests.Unit
+﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     /// <content>
     /// Tests for the NonGenericRegistrationsExtensions class.
     /// </content>
