@@ -619,8 +619,12 @@ namespace SimpleInjector
         /// invalid.</exception>
         public void Verify()
         {
+            bool wasLocked = this.locked;
+
             this.ValidateRegistrations();
             this.ValidateRegisteredCollections();
+
+            this.locked = wasLocked;
         }
         
         internal Action<T> GetInitializerFor<T>()

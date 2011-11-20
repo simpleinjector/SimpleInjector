@@ -12,6 +12,11 @@ Version vNext
 		 type. This allows them to be retrieved using the non-generic Container.GetInstance(Type) and is
 		 useful for interception scenarios.
 		-[Core] Large internal refactoring of the InstanceProducer model. A lot of duplicate code is removed.
+	
+	Bug Fixes:
+		-[Core] Calling the Verify method still resulted in a lockdown of the container, when the registered
+		 delegates called back into the container. This made it impossible to verify a partially configured
+		 container.
 
 
 Version 1.2.0.11273 (v1.2 RTM) 2011-09-30

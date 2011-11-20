@@ -20,10 +20,28 @@
         }
 
         [TestMethod]
-        public void Verify_Never_LocksContainer()
+        public void Verify_Never_LocksContainer1()
         {
             // Arrange
             var container = new Container();
+
+            container.Verify();
+
+            // Act
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+        }
+
+        [TestMethod]
+        public void Verify_Never_LocksContainer2()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ITimeProvider>(() =>
+            {
+                // Sneaky call back into the container.
+                return container.GetInstance<RealTimeProvider>();
+            });
 
             container.Verify();
 
@@ -39,12 +57,37 @@
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
-            // Act
             container.Verify();
 
             container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
 
+            // Act
             container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_CalledAfterGetInstance_DoesNotUnlockTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+
+            container.GetInstance<IUserRepository>();
+
+            container.Verify();
+
+            try
+            {
+                // Act
+                container.Register<ITimeProvider, RealTimeProvider>();
+
+                Assert.Fail("The container was expected to stay locked.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("Container can't be changed"), "Actual: " + ex.Message);
+            }
         }
 
         [TestMethod]
