@@ -98,14 +98,21 @@ namespace SimpleInjector
         internal static string TypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered.", serviceType);
+                "Type {0} has already been registered " +
+                "and the container is currently not configured to allow overriding registrations. " +
+                "To allow overriding the current registration, please create the container using the " + 
+                "constructor overload that takes a {1} instance and set the " +
+                "AllowOverridingRegistrations to true.", serviceType, typeof(ContainerOptions).Name);
         }
 
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
-        {
+        {            
             return string.Format(CultureInfo.InvariantCulture,
-                "Collection of items for type {0} has already been registered. A collection of items can " +
-                "only be registered once per type.", serviceType);
+                "Collection of items for type {0} has already been registeredand " +
+                "and the container is currently not configured to allow overriding registrations. " +
+                "To allow overriding the current registration, please create the container using the " +
+                "constructor overload that takes a {1} instance and set the " +
+                "AllowOverridingRegistrations to true.", serviceType, typeof(ContainerOptions).Name);
         }
 
         internal static string ParameterTypeMustBeRegistered(Type serviceType, Type parameterType)

@@ -35,6 +35,30 @@
             // Act
             container.Register<IUserRepository, InMemoryUserRepository>();
         }
+        
+        [TestMethod]
+        public void AllowOverridingRegistrations_False_ContainerThrowsExpectedExceptionMessage()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            try
+            {
+                // Act
+                container.Register<IUserRepository, InMemoryUserRepository>();
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Assert
+                Assert.IsTrue(ex.Message.Contains("ContainerOptions"), "Actual: " + ex);
+                Assert.IsTrue(ex.Message.Contains("AllowOverridingRegistrations"), "Actual: " + ex);
+            }
+        }
 
         [TestMethod]
         public void AllowOverridingRegistrations_True_ContainerDoesNotAllowOverringRegistrations()
