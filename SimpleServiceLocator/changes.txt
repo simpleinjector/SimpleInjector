@@ -21,6 +21,8 @@ Version vNext
 
 Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
 	General description:
+		This release fixes a few small bugs, adds the possibility to do property injection, improves 
+		performance and the SimpleInjector.Extensions.dll is now available for Silverlight.
 
 	Project Changes:
 		-The solution and projects are converted to Visual Studio 2010. The library is still compatible with
