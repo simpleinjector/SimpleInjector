@@ -91,6 +91,9 @@
     <Compile Include="..\SimpleInjector.NET\Container.Resolving.cs">
       <Link>Container.Resolving.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\ContainerOptions.cs">
+      <Link>ContainerOptions.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidator.cs">
       <Link>CyclicDependencyValidator.cs</Link>
     </Compile>

@@ -4,10 +4,13 @@ Version vNext
 	General description:
 	
 	Code Changes:
-		-[Core] Container.ExpressionBuilt event added to enable interception scenario's.
+		-[Core] New constructor overload added to the Container allowing to change the behavior of the
+		 container using the new ContainerOptions class. The only option currently supported is 
+		 AllowOverridingRegistrations.
+		-[Core] Container.ExpressionBuilt event added to enable interception scenarios.
 		-[Core] InstanceProducers are now allowed to return types that can not be casted to the given service 
 		 type. This allows them to be retrieved using the non-generic Container.GetInstance(Type) and is
-		 useful for interception scenario's.
+		 useful for interception scenarios.
 		-[Core] Large internal refactoring of the InstanceProducer model. A lot of duplicate code is removed.
 
 
@@ -25,17 +28,17 @@ Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
 		 container.Register<TService, TImplementation>() and container.RegisterSingle<T>(T), which are the
 		 fasted type of registrations.
 		-[Core] New UnregisteredTypeEventArgs.Register(Expression) method was added to allow improving
-		 performance of unregistered type resolution scenario's. (work item 16641).
+		 performance of unregistered type resolution scenarios. (work item 16641).
 		-[Extensions] Register(Container, Type) method added to the NonGenericRegistrationsExtensions class
 		 to allow registration of concrete transient types.
-		-[Core] The Container now registers itself upon creation. This makes some integration scenario's 
+		-[Core] The Container now registers itself upon creation. This makes some integration scenarios 
 		 easier.
 		-[Core] A InjectProperties(object) method has been added to the Container. This method enables 
 		 injecting public properties to a given type. By adding it to the core library the method can be 
-		 optimized for performance and used in integration scenario's without the need for adding the 
+		 optimized for performance and used in integration scenarios without the need for adding the 
 		 Extensions.dll.
 		-[Core] The 'Handled' property of the UnregisteredTypeEventArgs is made public. This enables some 
-		 rare but interesting scenario's were users want to prevent an ActivationException from being thrown 
+		 rare but interesting scenarios were users want to prevent an ActivationException from being thrown 
 		 when multiple delegates respond to the same ResolveUnregisteredType event. Publication of the 
 		 property allows users skip and continue when another delegate already registered that type.
 	
@@ -67,7 +70,7 @@ Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 		This release fixes a small bug and adds a small feature to the core that allows the retrieval of
 		IInstanceProvider types. The SimpleInjector.Extensions.dll builds upon this feature to improve 
 		performance of the registrations made using the RegisterAll extension method. The extensions project
-		also adds new RegisterManyForOpenGeneric that allow many more advanced scenario's.
+		also adds new RegisterManyForOpenGeneric that allow many more advanced scenarios.
 	
 	Code Changes:
 		-RegisterSingle(Container, Type) method removed from NonGenericRegistrationsExtensions class in 
@@ -84,7 +87,7 @@ Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
 		-IInstanceProducer has been made public to allow better performance optimizations in the Extensions
 		 library and to give users the possibility see what types are registered.
 		-New RegisterManyForOpenGeneric overloads added in the Extensions library that allow users to supply
-		 a callback delegate that does the actual registration. This allows alternative scenario's such as 
+		 a callback delegate that does the actual registration. This allows alternative scenarios such as 
 		 registration of multiple implementations of a closed generic service type. (work item 15878).
 		-The RegisterInitializer<T> method now allows multiple Action<T> delegates to be registered for a
 		 single T. (work item 15842).

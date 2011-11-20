@@ -41,6 +41,7 @@ namespace SimpleInjector
     {
         private readonly object locker = new object();
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
+        private readonly ContainerOptions options;
 
         private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
 
@@ -56,9 +57,23 @@ namespace SimpleInjector
             new Dictionary<Type, PropertyInjector>();
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
-        public Container()
+        public Container() : this(new ContainerOptions())
         {
             this.RegisterSingle<Container>(this);
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
+        /// <param name="options">The container options.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="options"/> is a null
+        /// reference.</exception>
+        public Container(ContainerOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            this.options = options;
         }
 
         /// <summary>

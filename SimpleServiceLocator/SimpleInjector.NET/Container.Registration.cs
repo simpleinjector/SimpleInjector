@@ -586,7 +586,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("collection");
             }
 
-            this.ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<TService>();
+            this.ThrowWhenCollectionTypeAlreadyRegistered<TService>();
 
             var immutableCollection = collection.MakeImmutable();
 
@@ -655,10 +655,19 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (this.registrations.ContainsKey(type))
+            if (!this.options.AllowOverridingRegistrations && this.registrations.ContainsKey(type))
+            {
+                throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
+            }
+        }
+
+        private void ThrowWhenCollectionTypeAlreadyRegistered<TItem>()
+        {
+            if (!this.options.AllowOverridingRegistrations && 
+                this.registrations.ContainsKey(typeof(IEnumerable<TItem>)))
             {
                 throw new InvalidOperationException(
-                    StringResources.TypeAlreadyRegistered(type));
+                    StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
             }
         }
 
@@ -696,14 +705,6 @@ namespace SimpleInjector
 
                 Helpers.ValidateIfCollectionCanBeIterated(collection, serviceType);
                 Helpers.ValidateIfCollectionForNullElements(collection, serviceType);
-            }
-        }
-
-        private void ThrowWhenRegisteredCollectionsAlreadyContainsKeyFor<T>()
-        {
-            if (this.registrations.ContainsKey(typeof(IEnumerable<T>)))
-            {
-                throw new InvalidOperationException(StringResources.CollectionTypeAlreadyRegistered(typeof(T)));
             }
         }
 
