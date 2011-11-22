@@ -92,15 +92,49 @@
         public void GetService_RequestingAUnregisteredTypeTwice_ReturnsNullSecondTime()
         {
             // Arrange
-            var container = new Container();
+            IServiceProvider container = new Container();
+
+            container.GetService(typeof(IUserRepository));
 
             // Act
-            ((IServiceProvider)container).GetService(typeof(IUserRepository));
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
+            var actualInstance = container.GetService(typeof(IUserRepository));
 
             // Assert
             Assert.IsNull(actualInstance, "The contract of the IServiceProvider states that it returns " +
                 "null when no registration is found.");
+        }
+
+        [TestMethod]
+        public void GetService_RequestedOnUnregisteredInvalidType_ReturnsNull()
+        {
+            // Arrange
+            Type invalidServiceType = typeof(ServiceWithUnregisteredDependencies);
+
+            IServiceProvider container = new Container();
+
+            // Act
+            var registration = container.GetService(invalidServiceType);
+
+            // Assert
+            Assert.IsNull(registration);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void GetService_RequestedOnRegisteredInvalidType_ReturnsInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ServiceWithUnregisteredDependencies>();
+
+            // Act
+            var registration =
+                ((IServiceProvider)container).GetService(typeof(ServiceWithUnregisteredDependencies));
+
+            // Assert
+            Assert.IsNotNull(registration, "The GetService method is expected to return an InstanceProducer " +
+                "since it is explicitly registered by the user.");
         }
     }
 }

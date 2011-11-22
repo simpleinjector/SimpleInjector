@@ -54,7 +54,7 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            IInstanceProducer instanceProducer;
+            InstanceProducer instanceProducer;
 
             object instance;
 
@@ -96,7 +96,7 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            IInstanceProducer instanceProducer;
+            InstanceProducer instanceProducer;
 
             if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
@@ -152,14 +152,14 @@ namespace SimpleInjector
                 this.LockContainer();
             }
 
-            IInstanceProducer instanceProducer;
+            InstanceProducer instanceProducer;
 
             if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
                 instanceProducer = (InstanceProducer)this.GetRegistration(serviceType);
             }
 
-            if (instanceProducer != null)
+            if (instanceProducer != null && instanceProducer.IsValid)
             {
                 return instanceProducer.GetInstance();
             }
@@ -189,17 +189,13 @@ namespace SimpleInjector
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public IInstanceProducer GetRegistration(Type serviceType)
         {
-            // Performance optimization: This if check is a duplicate to save a call to LockContainer.
-            if (!this.locked)
-            {
-                // We must lock, because not locking could lead to race conditions.
-                this.LockContainer();
-            }
+            // We must lock, because not locking could lead to race conditions.
+            this.LockContainer();
 
-            // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
-            Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
+            var producer = this.GetRegistrationEvenIfInvalid(serviceType);
 
-            return this.GetInstanceProducerForType(serviceType, buildProducer);
+            // Prevent returning invalid producers
+            return producer != null && producer.IsValid ? producer : null;
         }
 
         /// <summary>
@@ -233,6 +229,17 @@ namespace SimpleInjector
             propertyInjector.Inject(instance);
         }
 
+        internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType)
+        {
+            // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
+            Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
+
+            var producer = this.GetInstanceProducerForType(serviceType, buildProducer);
+
+            // Prevent returning invalid producers
+            return producer;
+        }
+
         private void RegisterPropertyInjector(Type serviceType, PropertyInjector injector,
             Dictionary<Type, PropertyInjector> snapshot)
         {
@@ -252,10 +259,10 @@ namespace SimpleInjector
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        private IInstanceProducer GetInstanceProducerForType(Type serviceType,
+        private InstanceProducer GetInstanceProducerForType(Type serviceType,
             Func<InstanceProducer> buildInstanceProducer)
         {
-            IInstanceProducer instanceProducer = null;
+            InstanceProducer instanceProducer = null;
 
             var snapshot = this.registrations;
 
@@ -319,7 +326,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType)
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteType(serviceType);
+                () => BuildInstanceProducerForConcreteType(serviceType);
 
             return this.BuildInstanceProducerForType(serviceType, buildInstanceProducerForConcreteType);
         }
@@ -402,31 +409,32 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>() 
-            where TConcrete : class
+        private static InstanceProducer BuildInstanceProducerForConcreteType<TService>() 
+            where TService : class
         {
-            // NOTE: We don't check if the type is actually constructable. The TransientInstanceProducer will
-            // do that by the time GetInstance is called for the first time on it.
-            if (Helpers.IsConcreteType(typeof(TConcrete)))
+            if (Helpers.IsConcreteConstructableType(typeof(TService)))
             {
-                return new ConcreteTransientInstanceProducer<TConcrete>();
+                return new ConcreteTransientInstanceProducer<TService>()
+                {
+                    IsResolvedThroughUnregisteredTypeResolution = true
+                };
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType(Type serviceType)
+        private static InstanceProducer BuildInstanceProducerForConcreteType(Type serviceType)
         {
-            if (Helpers.IsConcreteConstructableType(serviceType) && !serviceType.IsValueType)
+            if (!serviceType.IsValueType && Helpers.IsConcreteConstructableType(serviceType))
             {
-                return Helpers.CreateTransientInstanceProducerFor(serviceType, this);
+                var producer = Helpers.CreateTransientInstanceProducerFor(serviceType);
+
+                producer.IsResolvedThroughUnregisteredTypeResolution = true;
+
+                return producer;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the
@@ -436,7 +444,7 @@ namespace SimpleInjector
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.
         private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer,
-            Dictionary<Type, IInstanceProducer> snapshot)
+            Dictionary<Type, InstanceProducer> snapshot)
         {
             if (instanceProducer != null)
             {

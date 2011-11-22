@@ -170,5 +170,26 @@
             // Assert
             Assert.AreEqual(1, registrations.Count());
         }
+
+        [TestMethod]
+        public void GetCurrentRegistrations_InvalidTypeRequestedFromGetRegistration_InvalidTypeIsNotReturned()
+        {
+            // Arrange
+            Type invalidType = typeof(ServiceWithUnregisteredDependencies);
+
+            var container = new Container();
+
+            // This will force the creation and caching of the InstanceProducer of the invalidType.
+            container.GetRegistration(invalidType);
+
+            // Act
+            var registrations = container.GetCurrentRegistrations();
+           
+            // Assert
+            var actualRegistration = registrations.SingleOrDefault(r => r.ServiceType == invalidType);
+
+            Assert.IsNull(actualRegistration, "IInstanceProducer returned while it shouldn't be, because " +
+                "invalid registrations (for unregistered types) should not be returned.");
+        }
     }
 }

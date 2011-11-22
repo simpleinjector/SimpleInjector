@@ -196,7 +196,7 @@
         }
 
         [TestMethod]
-        public void GetRegistratoin_OnValueType_ReturnsNull()
+        public void GetRegistration_OnValueType_ReturnsNull()
         {
             // Arrange
             var container = new Container();
@@ -206,6 +206,35 @@
 
             // Assert
             Assert.IsNull(registration);
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnInvalidUnregisteredType_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var registration = container.GetRegistration(typeof(ServiceWithUnregisteredDependencies));
+
+            // Assert
+            Assert.IsNull(registration, "IInstanceProducer returned.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnInvalidButRegisteredType_ReturnsThatRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ServiceWithUnregisteredDependencies>();
+
+            // Act
+            var registration = container.GetRegistration(typeof(ServiceWithUnregisteredDependencies));
+
+            // Assert
+            Assert.IsNotNull(registration, "The GetRegistration method is expected to return an " +
+                "InstanceProducer since it is explicitly registered by the user.");
         }
     }
 }

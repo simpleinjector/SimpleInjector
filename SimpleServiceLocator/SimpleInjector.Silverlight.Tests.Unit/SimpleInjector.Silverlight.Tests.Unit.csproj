@@ -109,6 +109,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetInstanceTests.cs">
+      <Link>GetInstanceTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetRegistrationTests.cs">
       <Link>GetRegistrationTests.cs</Link>
     </Compile>

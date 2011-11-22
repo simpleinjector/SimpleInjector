@@ -47,8 +47,7 @@ namespace SimpleInjector
 
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
-        internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType, 
-            Container container)
+        internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
         {
             Type instanceProducerType = 
                 typeof(ConcreteTransientInstanceProducer<>).MakeGenericType(concreteType);
@@ -57,14 +56,14 @@ namespace SimpleInjector
 
             try
             {
+                var factory = new Container();
+
                 // HACK: Because of the security level of Silverlight applications, we can't create an
                 // transient instance producer using reflection; it is an internal type. We can however, abuse
                 // the container.GetInstance<T> method to create a new instance, because GetInstance<T> is 
                 // public :-). 
-                // Here we call: "container.GetInstance<ConcreteTransientInstanceProducer<[TConcrete]>>()".
-                // We use the current container as factory, because we need that container into the
-                // TransientInstanceProducer.
-                return (InstanceProducer)genericGetInstanceMethod.Invoke(container, null);    
+                // Here we call: "factory.GetInstance<ConcreteTransientInstanceProducer<[TConcrete]>>()".
+                return (InstanceProducer)genericGetInstanceMethod.Invoke(factory, null);    
             }
             catch (MemberAccessException ex)
             {
@@ -315,5 +314,5 @@ namespace SimpleInjector
             var body = methodCall.Body as MethodCallExpression;
             return body.Method.GetGenericMethodDefinition();
         }
-     }
+    }
 }

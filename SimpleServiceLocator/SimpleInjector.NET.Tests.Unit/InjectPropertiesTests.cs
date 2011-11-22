@@ -4,7 +4,7 @@
     using System.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+    
     /// <content>Tests for injecting properties.</content>
     [TestClass]
     public partial class InjectPropertiesTests
@@ -14,7 +14,7 @@
         public void InjectProperties_NullInstance_ThrowsExpectedException()
         {
             // Arrange
-            Container container = new Container();
+            var container = new Container();
 
             Service instance = null;
 
@@ -181,9 +181,44 @@
                 "Although IPlugin wasn't registered explicitly, it is expected to get resolved, because " +
                 "of the registered unregistered type resolution event.");
         }
+
+        [TestMethod]
+        public void InjectProperties_TypeWithNotInjectableDependency_DoesNotInjectThatProperty()
+        {
+            // Arrange
+            var container = new Container();
+
+            var instance = new ServiceWithNotInjectableDependency();            
+
+            // Act
+            container.InjectProperties(instance);
+
+            // Assert
+            Assert.IsNull(instance.NotInjectableDependency);
+        }
+
+        [TestMethod]
+        public void InjectProperties_TypeWithNotInjectableDependency_DoesInjectOtherProperties()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, PluginImpl>();
+
+            var instance = new ServiceWithNotInjectableDependency();
+
+            // Act
+            container.InjectProperties(instance);
+
+            // Assert
+            Assert.IsNotNull(instance.Plugin);
+        }
        
         public class Service
         {
+            // Should be skipped
+            public string StringProperty { get; set; }
+
             public ITimeProvider TimeProvider { get; set; }
 
             public IPlugin Plugin1 { get; set; }
@@ -194,7 +229,14 @@
 
             internal UserServiceBase InternalUserService { get; set; }
         }
-        
+
+        public class ServiceWithNotInjectableDependency
+        {
+            public ServiceWithUnregisteredDependencies NotInjectableDependency { get; set; }
+
+            public IPlugin Plugin { get; set; }
+        }
+
         public class ManyPropertiesService
         {
             public IPlugin Plugin01 { get; set; }

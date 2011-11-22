@@ -125,4 +125,11 @@
         {
         }
     }
+
+    public class ServiceWithUnregisteredDependencies
+    {
+        public ServiceWithUnregisteredDependencies(IDisposable a, IComparable b)
+        {
+        }
+    }
 }

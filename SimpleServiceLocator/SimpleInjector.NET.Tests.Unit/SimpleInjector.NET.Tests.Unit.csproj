@@ -72,6 +72,7 @@
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
+    <Compile Include="GetInstanceTests.cs" />
     <Compile Include="GetRegistrationTests.cs" />
     <Compile Include="GetServiceTests.cs" />
     <Compile Include="CyclicDependencyValidatorTests.cs" />

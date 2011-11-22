@@ -92,7 +92,7 @@ namespace SimpleInjector.InstanceProducers
 
         private Expression BuildParameterExpression(Type parameterType)
         {
-            var instanceProducer = this.Container.GetRegistration(parameterType);
+            var instanceProducer = this.Container.GetRegistrationEvenIfInvalid(parameterType);
 
             if (instanceProducer != null)
             {

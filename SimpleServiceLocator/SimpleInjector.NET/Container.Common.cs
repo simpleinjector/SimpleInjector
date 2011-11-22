@@ -43,7 +43,7 @@ namespace SimpleInjector
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
         private readonly ContainerOptions options;
 
-        private Dictionary<Type, IInstanceProducer> registrations = new Dictionary<Type, IInstanceProducer>(40);
+        private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
 
         // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
@@ -102,12 +102,17 @@ namespace SimpleInjector
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
         public IInstanceProducer[] GetCurrentRegistrations()
         {
-            var snapshot = this.registrations;
-
             // We must lock, because not locking could lead to race conditions.
             this.LockContainer();
 
-            return snapshot.Values.ToArray();
+            // Filter out the invalid registrations (see the IsValid property for more information).
+            return ( 
+                from registration in this.registrations.Values
+                where registration != null
+                where registration.IsValid
+                select registration)
+                .Cast<IInstanceProducer>()
+                .ToArray();
         }
 
         /// <summary>

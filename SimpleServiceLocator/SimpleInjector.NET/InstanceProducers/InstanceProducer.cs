@@ -39,6 +39,7 @@ namespace SimpleInjector.InstanceProducers
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
         private Expression expression;
+        private bool? isValid = true;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The type of the service this instance will produce.</param>
@@ -53,6 +54,29 @@ namespace SimpleInjector.InstanceProducers
         public Type ServiceType { get; private set; }
 
         internal Container Container { get; set; }
+
+        internal bool IsResolvedThroughUnregisteredTypeResolution
+        {
+            set { this.isValid = value ? null : (bool?)true; }
+        }
+
+        // Will only return false when the type is a concrete unregistered type that was automatically added
+        // by the container, while the expression can not be generated.
+        // Types that are registered upfront are always considered to be valid, while unregistered types must
+        // be validated. The reason for this is that we must prevent the container to throw an exception when
+        // GetRegistration() is called for an unregistered (concrete) type that can not be resolved.
+        internal bool IsValid
+        {
+            get
+            {
+                if (this.isValid == null)
+                {
+                    this.isValid = this.CanBuildExpression();
+                }
+
+                return this.isValid.Value;
+            }
+        }
 
         /// <summary>
         /// Builds an expression that expresses the intent to get an instance by the current producer.
@@ -205,6 +229,21 @@ namespace SimpleInjector.InstanceProducers
             if (this.validator != null)
             {
                 this.validator = null;
+            }
+        }
+
+        private bool CanBuildExpression()
+        {
+            try
+            {
+                // Test if the instance can be made.
+                this.BuildExpression();
+
+                return true;
+            }
+            catch (ActivationException)
+            {
+                return false;
             }
         }
     }

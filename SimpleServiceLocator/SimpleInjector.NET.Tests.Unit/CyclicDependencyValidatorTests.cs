@@ -19,15 +19,16 @@
         [TestMethod]
         public void GetInstance_RequestingTypeDependingOnItself_ThrowsExceptionWithExpectedMessage()
         {
+            // Arrange
             string expectedExcpetionMessage = "The configuration is invalid. The type " + typeof(A).FullName +
                 " is directly or indirectly depending on itself.";
 
+            var container = new Container();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
                 // Act
+                // Note: A depends on B which depends on A.
                 container.GetInstance<A>();
 
                 // Assert
@@ -42,14 +43,13 @@
         [TestMethod]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_Throws()
         {
+            // Arrange
+            var container = new Container();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
                 // Act
-                // Graph: TransientInstanceProducer<A> -> B
-                //        TransientInstanceProducer<B> -> A
+                // Note: A depends on B which depends on A.
                 container.GetInstance<A>();
 
                 // Assert
@@ -68,6 +68,7 @@
 
             try
             {
+                // Note: A depends on B which depends on A.
                 container.GetInstance<A>();
             }
             catch (ActivationException)
@@ -84,22 +85,22 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfViaASingletonType_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            // Note: A depends on B which depends on A.
+            container.RegisterSingle<B>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                container.RegisterSingle<B>();
-
                 // Act
-                // Graph: TransientInstanceProducer<A> -> B
-                //        FuncSingletonInstanceProducer<B> + TransientInstanceProducer<B> -> A
                 container.GetInstance<A>();
 
                 // Assert
@@ -107,22 +108,22 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaTransientType_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<A>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                container.RegisterSingle<A>();
-
                 // Act
-                // Graph: FuncSingletonInstanceProducer<A> + TransientInstanceProducer<A> -> B
-                //        TransientInstanceProducer<B> -> A
+                // Note: A depends on B which depends on A.
                 container.GetInstance<A>();
 
                 // Assert
@@ -130,22 +131,22 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaSingletonType_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            // Note: A depends on B which depends on A.
+            container.RegisterSingle<A>();
+            container.RegisterSingle<B>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                // Graph: FuncSingletonInstanceProducer<A> + TransientInstanceProducer<A> -> B
-                //        FuncSingletonInstanceProducer<B> + TransientInstanceProducer<B> -> A
-                container.RegisterSingle<A>();
-                container.RegisterSingle<B>();
-
                 // Act
                 container.GetInstance<A>();
 
@@ -154,22 +155,22 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            // One depends on ITwo and Two depends on IOne.
+            container.Register<IOne, One>();
+            container.Register<ITwo, Two>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                // Graph: TransientInstanceProducer<One> -> ITwo
-                //        TransientInstanceProducer<Two> -> IOne
-                container.Register<IOne, One>();
-                container.Register<ITwo, Two>();
-
                 // Act
                 container.GetInstance<IOne>();
 
@@ -178,22 +179,22 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            // One depends on ITwo and Two depends on IOne.
+            container.RegisterSingle<IOne, One>();
+            container.RegisterSingle<ITwo, Two>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                // Graph: FuncSingletonInstanceProducer<IOne> + TransientInstanceProducer<One> ->
-                //        FuncSingletonInstanceProducer<ITwo> + TransientInstanceProducer<Two> -> IOne
-                container.RegisterSingle<IOne, One>();
-                container.RegisterSingle<ITwo, Two>();
-
                 // Act
                 container.GetInstance<IOne>();
 
@@ -202,20 +203,21 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
+            container.Register<ITwo, Two>();
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
-                container.Register<ITwo, Two>();
-
                 // Act
                 container.GetInstance<IOne>();
 
@@ -224,19 +226,20 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 
         [TestMethod]
         public void GetInstance_RequestingTypeDependingDirectlyOnItselfThroughDelegateRegistration_Throws()
         {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IOne>(() => container.GetInstance<IOne>());
+
             try
             {
-                // Arrange
-                var container = new Container();
-
-                container.Register<IOne>(() => container.GetInstance<IOne>());
-
                 // Act
                 container.GetInstance<IOne>();
 
@@ -245,6 +248,7 @@
             }
             catch (ActivationException)
             {
+                // This exception is expected.
             }
         }
 

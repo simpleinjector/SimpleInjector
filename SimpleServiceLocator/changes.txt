@@ -14,6 +14,7 @@ Version vNext
 		-[Core] Large internal refactoring of the InstanceProducer model. A lot of duplicate code is removed.
 	
 	Bug Fixes:
+		-[Core] InjectProperties and GetRegistration failed in certain circumstances. (work item 16930)
 		-[Core] Calling the Verify method still resulted in a lockdown of the container, when the registered
 		 delegates called back into the container. This made it impossible to verify a partially configured
 		 container.

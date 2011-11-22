@@ -1,121 +1,105 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="CuttingEdge.ServiceLocation.FuncSingletonInstanceProducer&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="4" Y="8" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAABABAAAAAACAAAoAEABA=</HashCode>
-      <FileName>FuncSingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="validator" />
-    </ShowAsAssociation>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.Container">
-    <Position X="7.5" Y="1.5" Width="3" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <NestedTypes>
-      <Class Name="CuttingEdge.ServiceLocation.Container.InstanceInitializer" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Container.Common.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>gCAgAIYgAMAEYQUABAVBAAEQBAABIAAAABACAGERRAA=</HashCode>
-      <FileName>Container.Common.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.DelegateBuilder">
-    <Position X="11.25" Y="6" Width="2.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAgAAAAAAAgAA=</HashCode>
-      <FileName>DelegateBuilder.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.FuncInstanceProducer&lt;T&gt;">
-    <Position X="7.5" Y="8.75" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAAoAEAEA=</HashCode>
-      <FileName>FuncInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="validator" />
-    </ShowAsAssociation>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.SingletonInstanceProducer&lt;T&gt;">
-    <Position X="5.75" Y="13" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAgAAAEA=</HashCode>
-      <FileName>SingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.TransientInstanceProducer&lt;TConcrete&gt;">
-    <Position X="11.25" Y="8" Width="3" />
-    <TypeIdentifier>
-      <HashCode>BAEAAAAAIAAAAAAAAAAAAABABACCAEAAAAAAAIAEgEA=</HashCode>
-      <FileName>TransientInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="validator" />
-    </ShowAsAssociation>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.ResolutionInstanceProducer&lt;T&gt;">
-    <Position X="9.25" Y="13" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAAoAEAEA=</HashCode>
-      <FileName>ResolutionInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="validator" />
-    </ShowAsAssociation>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.UnregisteredTypeEventArgs">
+  <Class Name="SimpleInjector.UnregisteredTypeEventArgs">
     <Position X="4" Y="1.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAAAAAAAABAAAAABAAAAAAQAAAAAAAA=</HashCode>
       <FileName>UnregisteredTypeEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CuttingEdge.ServiceLocation.StringResources" Collapsed="true">
-    <Position X="11.25" Y="5" Width="2.5" />
+  <Class Name="SimpleInjector.Helpers" Collapsed="true">
+    <Position X="11.25" Y="1.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AgAAACgBAEEAAACIAEABBAMAIAQAECEAAAAABMIABAA=</HashCode>
-      <FileName>StringResources.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CuttingEdge.ServiceLocation.Helpers" Collapsed="true">
-    <Position X="11.25" Y="4" Width="2.5" />
-    <TypeIdentifier>
-      <HashCode>ALAAAABgAAAUAaAkAAQBBAAAAAggAAgAAQAAIAAAAAA=</HashCode>
+      <HashCode>ALAAAEBgAAAUAaAkAAQBBAAAAAggAAgAAQAAIAAAAAA=</HashCode>
       <FileName>Helpers.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CuttingEdge.ServiceLocation.CyclicDependencyValidator" Collapsed="true">
-    <Position X="7.5" Y="11.75" Width="3" />
+  <Class Name="SimpleInjector.CyclicDependencyValidator" Collapsed="true">
+    <Position X="0.75" Y="5.75" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CyclicDependencyValidator.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CuttingEdge.ServiceLocation.CyclicDependencyValidatorExtensions" Collapsed="true">
-    <Position X="11.25" Y="3" Width="2.5" />
+  <Class Name="SimpleInjector.InstanceProducers.TransientInstanceProducer&lt;TService, TImplementation&gt;" Collapsed="true">
+    <Position X="11.25" Y="3.75" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
-      <FileName>CyclicDependencyValidatorExtensions.cs</FileName>
+      <HashCode>AAAQAAAAAAAAAAABAAAAAAAAAAAAAAAIgAAAAAAAAAI=</HashCode>
+      <FileName>InstanceProducers\TransientInstanceProducer.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="CuttingEdge.ServiceLocation.IInstanceProducer">
+  <Class Name="SimpleInjector.InstanceProducers.SingletonInstanceProducer&lt;TService&gt;" Collapsed="true">
+    <Position X="11.25" Y="6.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InstanceProducers\SingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.FuncSingletonInstanceProducer&lt;TService&gt;" Collapsed="true">
+    <Position X="11.25" Y="7.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>InstanceProducers\FuncSingletonInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.FuncResolutionInstanceProducer&lt;TService&gt;" Collapsed="true">
+    <Position X="11.25" Y="2.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAARAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAI=</HashCode>
+      <FileName>InstanceProducers\FuncResolutionInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.ConcreteTransientInstanceProducer&lt;TConcrete&gt;" Collapsed="true">
+    <Position X="11.25" Y="4.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InstanceProducers\ConcreteTransientInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.ExpressionResolutionInstanceProducer&lt;TService&gt;" Collapsed="true">
+    <Position X="11.25" Y="8.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InstanceProducers\ExpressionResolutionInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.FuncInstanceProducer&lt;TService&gt;" Collapsed="true">
+    <Position X="11.25" Y="5.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>InstanceProducers\FuncInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.InstanceProducers.InstanceProducer" Collapsed="true">
+    <Position X="8.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAEZAAQAAAAACAAAAAgAAAAABBACAAAAkAAAAKAEgAI=</HashCode>
+      <FileName>InstanceProducers\InstanceProducer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SimpleInjector.Container" Collapsed="true">
+    <Position X="0.75" Y="4" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="SimpleInjector.Container.InstanceInitializer" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Container.Common.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>gGAAAAYgAKQGYQEEmEVBAAEQFIABIIGAQAACAGERRAA=</HashCode>
+      <FileName>Container.Registration.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="SimpleInjector.IInstanceProducer">
     <Position X="4.5" Y="6" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>IInstanceProducer.cs</FileName>
     </TypeIdentifier>
   </Interface>
