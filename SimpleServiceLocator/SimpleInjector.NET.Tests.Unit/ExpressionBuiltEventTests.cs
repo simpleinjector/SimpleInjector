@@ -139,6 +139,62 @@
         }
 
         [TestMethod]
+        public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnServiceType_CallsEventOnce()
+        {
+            // Arrange
+            int expectedCallCount = 1;
+            int actualCallCount = 0;
+
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            container.RegisterInitializer<IUserRepository>(instance => { });
+
+            container.ExpressionBuilt += (sender, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(IUserRepository))
+                {
+                    actualCallCount++;
+                }
+            };
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(expectedCallCount, actualCallCount);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnImplementation_CallsEventOnce()
+        {
+            // Arrange
+            int expectedCallCount = 1;
+            int actualCallCount = 0;
+
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            container.RegisterInitializer<SqlUserRepository>(instance => { });
+
+            container.ExpressionBuilt += (sender, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(IUserRepository))
+                {
+                    actualCallCount++;
+                }
+            };
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(expectedCallCount, actualCallCount);
+        }
+
+        [TestMethod]
         public void GetInstance_RegisteredTransientWithInterceptor_EventArgsContainsAnExpression()
         {
             // Arrange
