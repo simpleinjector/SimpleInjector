@@ -62,19 +62,14 @@ namespace SimpleInjector.InstanceProducers
         private static Expression BuildExpressionWithInstanceInitializer(Expression newExpression,
             Action<TImplementation> instanceInitializer)
         {
-            var instanceCreator =
-                Expression.Lambda<Func<TImplementation>>(newExpression, new ParameterExpression[0]).Compile();
-
-            Func<TImplementation> instanceCreatorWithInitializer = () =>
+            Func<TImplementation, TImplementation> instanceCreatorWithInitializer = instance =>
             {
-                TImplementation instance = instanceCreator();
-
                 instanceInitializer(instance);
 
                 return instance;
             };
 
-            return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), new Expression[0]);
+            return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), newExpression);
         }
 
         private NewExpression BuildNewExpression()
