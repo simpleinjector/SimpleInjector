@@ -50,17 +50,32 @@
             // Allow the Func<DependencyContext, TService> to be injected into transient parent types.
             container.ExpressionBuilt += (sender, e) =>
             {
-                bool serviceIsDependency = ServiceIsADirectDependencyOfType(e.Expression, typeof(TService));
-
-                if (serviceIsDependency)
+                if (e.Expression is NewExpression)
                 {
-                    var expression = (NewExpression)e.Expression;
-
-                    var arguments = BuildNewListOfConstructorArguments(e, contextBasedInstanceCreator);
-
-                    e.Expression = Expression.New(expression.Constructor, arguments.ToArray());
+                    e.Expression = BuildNewNewExpression(e, contextBasedInstanceCreator);
                 }
             };
+        }
+
+        private static NewExpression BuildNewNewExpression<TService>(ExpressionBuiltEventArgs e,
+            Func<DependencyContext, TService> contextBasedInstanceCreator) where TService : class
+        {
+            var originalExpression = (NewExpression)e.Expression;
+
+            bool serviceIsDependency = ServiceIsADirectDependencyOfType(originalExpression, typeof(TService));
+
+            if (serviceIsDependency)
+            {
+                var arguments = BuildNewListOfConstructorArguments(originalExpression, e.RegisteredServiceType,
+                    contextBasedInstanceCreator);
+
+                return (NewExpression)BuildNewExpressionWithNewListOfConstructorArguments(originalExpression,
+                    e.RegisteredServiceType, contextBasedInstanceCreator);
+            }
+            else
+            {
+                return originalExpression;
+            }
         }
 
         private static bool ServiceIsADirectDependencyOfType(Expression expression, Type serviceType)
@@ -80,12 +95,29 @@
             return constructorContainsService;
         }
 
-        private static IEnumerable<Expression> BuildNewListOfConstructorArguments<TService>(
-            ExpressionBuiltEventArgs e, Func<DependencyContext, TService> instanceCreator)
+        private static Expression BuildNewExpressionWithNewListOfConstructorArguments<TService>(
+            Expression expression, Type serviceType, Func<DependencyContext, TService> instanceCreator)
         {
-            var expression = (NewExpression)e.Expression;
+            var newExpression = expression as NewExpression;
 
-            var context = new DependencyContext(e.RegisteredServiceType, expression.Type);
+            if (newExpression == null)
+            {
+                return expression;
+            }
+            else
+            {
+                var arguments = 
+                    BuildNewListOfConstructorArguments<TService>(newExpression, serviceType, instanceCreator);
+
+                return Expression.New(newExpression.Constructor, arguments);
+            }
+        }
+
+        private static IEnumerable<Expression> BuildNewListOfConstructorArguments<TService>(
+            NewExpression expression, Type registeredServiceType, 
+            Func<DependencyContext, TService> instanceCreator)
+        {
+            var context = new DependencyContext(registeredServiceType, expression.Type);
 
             var parameters = expression.Constructor.GetParameters();
 
