@@ -38,6 +38,29 @@
         }
 
         [TestMethod]
+        public void GetInstance_ResolvingAConcreteTypeWithInitializerThatDependsOnAContextDependentType_InjectsExpectedType()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterWithContext<IContext>(dc =>
+            {
+                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+
+                return (IContext)container.GetInstance(contextType);
+            });
+
+            container.RegisterInitializer<IntCommandHandler>(_ => { });
+
+            // Act
+            // Note: IntCommandHandler depends on IContext.
+            var handler = container.GetInstance<IntCommandHandler>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+        }
+
+        [TestMethod]
         public void GetInstance_ResolvingAConcreteTypeThatDependsOnAContextDependentType_InjectsExpectedType2()
         {
             // Arrange
@@ -78,10 +101,6 @@
 
             // Act
             var handler = container.GetInstance<ICommandHandler<int>>() as IntCommandHandler;
-
-            // Assert.IsInstanceOfType failed.  
-            // Expected type:<CommandHandlerContext`1[IntCommandHandler]>. 
-            // Actual type:<CommandHandlerContext`1[ICommandHandler`1[System.Int32]]>.
 
             // Assert
             Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
@@ -198,6 +217,74 @@
                 typeof(CommandHandlerContext<CommandHandlerWrapper<int>>));
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingAnInterceptedTypeThatDependsOnAContextDependentType_InjectsExpectedType()
+        {
+            // Arrange
+            IContext injectedContext = null;
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<int>, IntCommandHandler>();
+
+            // Since both RegisterWithContext en InterceptWith work by replacing the underlighing Expression,
+            // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
+            container.InterceptWith<FakeInterceptor>(type => type.Name.Contains("CommandHandler"));
+
+            container.RegisterWithContext<IContext>(dc =>
+            {
+                Assert.IsNotNull(dc.ServiceType);
+                Assert.IsNotNull(dc.ImplementationType);
+
+                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+
+                injectedContext = (IContext)container.GetInstance(contextType);
+
+                return injectedContext;
+            });
+
+            // Act
+            // Note: IntCommandHandler depends on IContext.
+            var handler = container.GetInstance<ICommandHandler<int>>();
+
+            // Assert
+            Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInterceptedSingletonTypeThatDependsOnAContextDependentType_InjectsExpectedType()
+        {
+            // Arrange
+            IContext injectedContext = null;
+
+            var container = new Container();
+
+            container.RegisterSingle<ICommandHandler<int>, IntCommandHandler>();
+
+            // Since both RegisterWithContext en InterceptWith work by replacing the underlighing Expression,
+            // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
+            container.InterceptWith<FakeInterceptor>(type => type.Name.Contains("CommandHandler"));
+
+            container.RegisterWithContext<IContext>(dc =>
+            {
+                Assert.IsNotNull(dc.ServiceType);
+                Assert.IsNotNull(dc.ImplementationType);
+
+                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+
+                injectedContext = (IContext)container.GetInstance(contextType);
+
+                return injectedContext;
+            });
+
+            // Act
+            // Note: IntCommandHandler depends on IContext.
+            var handler = container.GetInstance<ICommandHandler<int>>();
+
+            // Assert
+            Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+        }
+
         private sealed class CommandHandlerWrapper<T>
         {
             public CommandHandlerWrapper(ICommandHandler<T> handler, IContext context, 
@@ -229,6 +316,14 @@
 
         private sealed class CommandHandlerContext<TCommandHandler> : IContext
         {
+        }
+
+        private sealed class FakeInterceptor : IInterceptor
+        {
+            public void Intercept(IInvocation invocation)
+            {
+                invocation.Proceed();
+            }
         }
     }
 }

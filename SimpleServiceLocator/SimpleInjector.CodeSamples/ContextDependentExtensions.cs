@@ -1,25 +1,20 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/wikipage?title=ContextDependentExtensions
+    // NOTE: You need .NET 4.0 to be able to use this code.
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
     using System.Linq.Expressions;
-
     using SimpleInjector;
 
     public class DependencyContext
     {
-        internal static readonly DependencyContext Root = new DependencyContext();
+        internal static readonly DependencyContext Root = new DependencyContext(null, null);
 
         internal DependencyContext(Type serviceType, Type implementationType)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
-        }
-
-        private DependencyContext()
-        {
         }
 
         public Type ServiceType { get; private set; }
@@ -33,107 +28,68 @@
             Func<DependencyContext, TService> contextBasedInstanceCreator)
             where TService : class
         {
-            AllowServiceToBeResolvedAsRootType<TService>(container, contextBasedInstanceCreator);
-            AllowServiceToBeResolvedAsDependency<TService>(container, contextBasedInstanceCreator);
-        }
+            Func<TService> rootTypeInstanceCreator = () => contextBasedInstanceCreator(DependencyContext.Root);
 
-        private static void AllowServiceToBeResolvedAsRootType<TService>(Container container, 
-            Func<DependencyContext, TService> contextBasedInstanceCreator) where TService : class
-        {
             // Allow TService to be resolved when calling Container.GetInstance<TService>());
-            container.Register<TService>(() => contextBasedInstanceCreator(DependencyContext.Root));
-        }
+            container.Register<TService>(rootTypeInstanceCreator);
 
-        private static void AllowServiceToBeResolvedAsDependency<TService>(Container container, 
-            Func<DependencyContext, TService> contextBasedInstanceCreator) where TService : class
-        {
             // Allow the Func<DependencyContext, TService> to be injected into transient parent types.
             container.ExpressionBuilt += (sender, e) =>
             {
-                if (e.Expression is NewExpression)
+                var rewriter = new DependencyContextRewriter
                 {
-                    e.Expression = BuildNewNewExpression(e, contextBasedInstanceCreator);
-                }
+                    DelegateToReplace = rootTypeInstanceCreator,
+                    ContextBasedInstanceCreator = contextBasedInstanceCreator,
+                    ServiceType = e.RegisteredServiceType
+                };
+
+                e.Expression = rewriter.Visit(e.Expression);
             };
         }
 
-        private static NewExpression BuildNewNewExpression<TService>(ExpressionBuiltEventArgs e,
-            Func<DependencyContext, TService> contextBasedInstanceCreator) where TService : class
+        private sealed class DependencyContextRewriter : ExpressionVisitor
         {
-            var originalExpression = (NewExpression)e.Expression;
+            private readonly List<Expression> parents = new List<Expression>();
+            
+            public object DelegateToReplace { get; set; }
 
-            bool serviceIsDependency = ServiceIsADirectDependencyOfType(originalExpression, typeof(TService));
+            public object ContextBasedInstanceCreator { get; set; }
 
-            if (serviceIsDependency)
+            public Type ServiceType { get; set; }
+
+            private Expression Parent
             {
-                var arguments = BuildNewListOfConstructorArguments(originalExpression, e.RegisteredServiceType,
-                    contextBasedInstanceCreator);
-
-                return (NewExpression)BuildNewExpressionWithNewListOfConstructorArguments(originalExpression,
-                    e.RegisteredServiceType, contextBasedInstanceCreator);
-            }
-            else
-            {
-                return originalExpression;
-            }
-        }
-
-        private static bool ServiceIsADirectDependencyOfType(Expression expression, Type serviceType)
-        {
-            var newExpression = expression as NewExpression;
-
-            // Only constructor calls can be intercepted.
-            if (newExpression == null)
-            {
-                return false;
+                get { return this.parents.Count < 2 ? null : this.parents[this.parents.Count - 2]; }
             }
 
-            var parameters = newExpression.Constructor.GetParameters();
-
-            bool constructorContainsService = parameters.Any(p => p.ParameterType == serviceType);
-
-            return constructorContainsService;
-        }
-
-        private static Expression BuildNewExpressionWithNewListOfConstructorArguments<TService>(
-            Expression expression, Type serviceType, Func<DependencyContext, TService> instanceCreator)
-        {
-            var newExpression = expression as NewExpression;
-
-            if (newExpression == null)
+            public override Expression Visit(Expression node)
             {
-                return expression;
+                this.parents.Add(node);
+
+                node = base.Visit(node);
+
+                this.parents.RemoveAt(this.parents.Count - 1);
+
+                return node;
             }
-            else
+
+            protected override Expression VisitInvocation(InvocationExpression node)
             {
-                var arguments = 
-                    BuildNewListOfConstructorArguments<TService>(newExpression, serviceType, instanceCreator);
+                bool isRootTypeContextRegistration = 
+                    node.Expression.NodeType == ExpressionType.Constant &&
+                    ((ConstantExpression)node.Expression).Value == this.DelegateToReplace;
 
-                return Expression.New(newExpression.Constructor, arguments);
-            }
-        }
+                var parent = this.Parent as NewExpression;
 
-        private static IEnumerable<Expression> BuildNewListOfConstructorArguments<TService>(
-            NewExpression expression, Type registeredServiceType, 
-            Func<DependencyContext, TService> instanceCreator)
-        {
-            var context = new DependencyContext(registeredServiceType, expression.Type);
-
-            var parameters = expression.Constructor.GetParameters();
-
-            for (int index = 0; index < expression.Arguments.Count; index++)
-            {
-                if (parameters[index].ParameterType == typeof(TService))
+                if (isRootTypeContextRegistration && parent != null)
                 {
-                    // Change the argument to an invocation of the instanceCreator with a context.
-                    yield return Expression.Invoke(Expression.Constant(instanceCreator), 
+                    var context = new DependencyContext(this.ServiceType, parent.Type);
+
+                    return Expression.Invoke(Expression.Constant(this.ContextBasedInstanceCreator),
                         Expression.Constant(context));
                 }
-                else
-                {
-                    // The original argument
-                    yield return expression.Arguments[index];
-                }
+
+                return base.VisitInvocation(node);
             }
         }
     }
