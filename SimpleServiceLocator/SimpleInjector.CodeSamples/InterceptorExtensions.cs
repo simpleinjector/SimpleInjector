@@ -1,7 +1,39 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    /*
+    // Example usage
+    var container = new Container();
+
+    // Ensures that IUserRepository gets intercepted using a MonitoringInterceptor.
+    container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
+    
+    // Use multiple interceptors (YetAnotherInterceptor wraps MonitoringInterceptor wraps IUserRepository).
+    container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
+    container.InterceptWith<YetAnotherInterceptor>(type => type == typeof(IUserRepository));
+    
+    // Ensures that all registered (interface) service that who's name end with 'CommandHandler' get 
+    // intercepted using with a MonitoringInterceptor.
+    container.InterceptWith<MonitoringInterceptor>(type => type.Name.EndsWith("CommandHandler"));
+
+    // Reuse the same interceptor instance.
+    container.RegisterSingle<MonitoringInterceptor>();
+    container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
+    
+    // Manually: returns a SqlUserRepository decorated by a MonitoringInterceptor.
+    container.Register<IUserRepository>(() =>
+        Interceptor.CreateProxy<IUserRepository>(
+            container.GetInstance<MonitoringInterceptor>(),
+            container.GetInstance<SqlUserRepository>()
+        )
+    );
+    */
+
     // http://simpleinjector.codeplex.com/wikipage?title=InterceptionExtensions
     using System;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.Remoting.Messaging;
     using System.Runtime.Remoting.Proxies;
@@ -22,77 +54,144 @@
         MethodBase GetConcreteMethod();
     }
 
-    // Extension methods for interceptor registration    
+    // Extension methods for interceptor registration
+    // NOTE: These extension methods can only intercept interfaces, not abstract types.
     public static class InterceptorExtensions
     {
-        public static void RegisterWithInterceptor<TService, TInterceptor, TImplementation>(
-            this Container container)
-            where TService : class
+        public static void InterceptWith<TInterceptor>(this Container container, Func<Type, bool> predicate)
             where TInterceptor : class, IInterceptor
-            where TImplementation : class, TService
         {
-            container.Register<TService>(() =>
+            RequiresIsNotNull(container, "container");
+            RequiresIsNotNull(predicate, "predicate");
+
+            var interceptWith = new InterceptionHelper(container)
             {
-                var interceptor = container.GetInstance<TInterceptor>();
-                var realInstance = container.GetInstance<TImplementation>();
-                return Interceptor.CreateProxy<TService>(interceptor, realInstance);
-            });          
+                BuildInterceptorExpression = () => BuildInterceptorExpression<TInterceptor>(container),
+                Predicate = type => type.IsInterface && predicate(type)
+            };
+
+            container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
         }
 
-        public static void RegisterSingleWithInterceptor<TService, TInterceptor, TImplementation>(
-            this Container container)
-            where TService : class
-            where TInterceptor : class, IInterceptor
-            where TImplementation : class, TService
+        public static void InterceptWith(this Container container, Func<IInterceptor> interceptorCreator,
+            Func<Type, bool> predicate)
         {
-            container.RegisterSingle<TService>(() =>
+            RequiresIsNotNull(container, "container");
+            RequiresIsNotNull(interceptorCreator, "interceptorCreator");
+            RequiresIsNotNull(predicate, "predicate");
+
+            var interceptWith = new InterceptionHelper(container)
             {
-                var interceptor = container.GetInstance<TInterceptor>();
-                var realInstance = container.GetInstance<TImplementation>();
-                return Interceptor.CreateProxy<TService>(interceptor, realInstance);
-            });  
+                BuildInterceptorExpression = () => Expression.Invoke(Expression.Constant(interceptorCreator)),
+                Predicate = type => type.IsInterface && predicate(type)
+            };
+
+            container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
         }
 
-        public static void RegisterWithInterceptor<TService, TInterceptor1, TInterceptor2, TImplementation>(
-            this Container container)
-            where TService : class
-            where TInterceptor1 : class, IInterceptor
-            where TInterceptor2 : class, IInterceptor
-            where TImplementation : class, TService
+        public static void InterceptWith(this Container container, IInterceptor interceptor, 
+            Func<Type, bool> predicate)
         {
-            container.Register<TService>(() =>
-            {
-                var interceptor1 = container.GetInstance<TInterceptor1>();
-                var interceptor2 = container.GetInstance<TInterceptor2>();
-                var realInstance = container.GetInstance<TImplementation>();
+            RequiresIsNotNull(container, "container");
+            RequiresIsNotNull(interceptor, "interceptor");
+            RequiresIsNotNull(predicate, "predicate");
 
-                return Interceptor.CreateProxy<TService>(
-                    interceptor1,
-                    Interceptor.CreateProxy<TService>(
-                        interceptor2,
-                        realInstance));
-            });  
+            var interceptWith = new InterceptionHelper(container)
+            {
+                BuildInterceptorExpression = () => Expression.Constant(interceptor),
+                Predicate = type => type.IsInterface && predicate(type)
+            };
+
+            container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
         }
 
-        public static void RegisterSingleWithInterceptor<TService, TInterceptor1, TInterceptor2, TImplementation>(
-            this Container container)
-            where TService : class
-            where TInterceptor1 : class, IInterceptor
-            where TInterceptor2 : class, IInterceptor
-            where TImplementation : class, TService
+        [DebuggerStepThrough]
+        private static Expression BuildInterceptorExpression<TInterceptor>(Container container)
         {
-            container.RegisterSingle<TService>(() =>
-            {
-                var interceptor1 = container.GetInstance<TInterceptor1>();
-                var interceptor2 = container.GetInstance<TInterceptor2>();
-                var realInstance = container.GetInstance<TImplementation>();
+            var interceptorRegistration = container.GetRegistration(typeof(TInterceptor));
 
-                return Interceptor.CreateProxy<TService>(
-                    interceptor1,
-                    Interceptor.CreateProxy<TService>(
-                        interceptor2,
-                        realInstance));
-            });  
+            if (interceptorRegistration == null)
+            {
+                throw new ActivationException(string.Format("No registration for interceptor type {0} " +
+                    "could be found and an implicit registration could not be made.", typeof(TInterceptor)));
+            }
+
+            return interceptorRegistration.BuildExpression();
+        }
+
+        private static void RequiresIsNotNull(object instance, string paramName)
+        {
+            if (instance == null)
+            {
+                throw new ArgumentNullException(paramName);
+            }
+        }
+
+        private class InterceptionHelper
+        {
+            private static readonly MethodInfo NonGenericInterceptorCreateProxyMethod = (
+                from method in typeof(Interceptor).GetMethods()
+                where method.Name == "CreateProxy"
+                where method.GetParameters().Length == 3
+                select method)
+                .Single();
+
+            public InterceptionHelper(Container container)
+            {
+                this.Container = container;
+            }
+
+            internal Container Container { get; private set; }
+
+            internal Func<Expression> BuildInterceptorExpression { get; set; }
+
+            internal Func<Type, bool> Predicate { get; set; }
+
+            [DebuggerStepThrough]
+            public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
+            {
+                // NOTE: We can only handle interfaces, because System.Runtime.Remoting.Proxies.RealProxy
+                // only supports interfaces.
+                bool interceptType = 
+                    e.RegisteredServiceType.IsInterface && this.Predicate(e.RegisteredServiceType);
+
+                if (interceptType)
+                {
+                    e.Expression = this.BuildProxyExpression(e);
+                }
+            }
+
+            [DebuggerStepThrough]
+            private Expression BuildProxyExpression(ExpressionBuiltEventArgs e)
+            {
+                var interceptor = this.BuildInterceptorExpression();
+
+                // Create call to (ServiceType)Interceptor.CreateProxy(Type, IInterceptor, object)
+                var proxyExpression =
+                    Expression.Convert(
+                        Expression.Call(NonGenericInterceptorCreateProxyMethod,
+                            Expression.Constant(e.RegisteredServiceType), 
+                            interceptor,
+                            e.Expression), 
+                        e.RegisteredServiceType);
+
+                // Optimization for singletons.
+                if (e.Expression is ConstantExpression && interceptor is ConstantExpression)
+                {
+                    return Expression.Constant(CreateInstance(proxyExpression), e.RegisteredServiceType);
+                }
+
+                return proxyExpression;
+            }
+
+            [DebuggerStepThrough]
+            private static object CreateInstance(Expression expression)
+            {
+                var instanceCreator = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0])
+                    .Compile();
+
+                return instanceCreator();
+            }
         }
     }
 
@@ -100,9 +199,14 @@
     {
         public static T CreateProxy<T>(IInterceptor interceptor, T realInstance)
         {
-            var proxy = new InterceptorProxy(typeof(T), realInstance, interceptor);
+            return (T)CreateProxy(typeof(T), interceptor, realInstance);
+        }
 
-            return (T)proxy.GetTransparentProxy();
+        public static object CreateProxy(Type serviceType, IInterceptor interceptor, object realInstance)
+        {
+            var proxy = new InterceptorProxy(serviceType, realInstance, interceptor);
+
+            return proxy.GetTransparentProxy();
         }
 
         private sealed class InterceptorProxy : RealProxy
