@@ -15,9 +15,9 @@
         public static void RegisterPerWebRequestWithDisposal<TService, TImplementation>(
             this Container container)
             where TService : class
-            where TImplementation : class, TService
+            where TImplementation : class, TService, IDisposable
         {
-            container.RegisterPerWebRequest(() => container.GetInstance<TImplementation>());
+            container.RegisterPerWebRequestWithDisposal(() => container.GetInstance<TImplementation>());
         }
 
         public static void RegisterPerWebRequestWithDisposal<TService>(this Container container,
