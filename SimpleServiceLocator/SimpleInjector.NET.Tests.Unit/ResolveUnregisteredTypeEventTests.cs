@@ -112,12 +112,11 @@
         {
             // Arrange
             string expectedMessage = 
-                "No registration for type " + typeof(RealUserService).FullName + " could be found " + 
+                "No registration for type RealUserService could be found " + 
                 "and an implicit registration could not be made. The constructor of the type contains the " +
-                "parameter of type " + typeof(IUserRepository).FullName + " that is not registered. " +
-                "Please ensure " + typeof(IUserRepository).Name + " is registered in the container, change " +
-                "the constructor of the type or register the type " + typeof(RealUserService).Name + 
-                " directly.";
+                "parameter of type IUserRepository that is not registered. " +
+                "Please ensure IUserRepository is registered in the container, " + 
+                "or change the constructor of RealUserService.";
 
             // We don't register the required IUserRepository dependency.
             var container = new Container();

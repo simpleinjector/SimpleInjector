@@ -47,8 +47,7 @@
         public void Validate_InValidRegisterSingleByFuncRegistration_ThrowsExpectedExceptionMessage()
         {
             // Arrange
-            string expectedMessage = "The registered delegate for type " +
-                typeof(IUserRepository).FullName + " returned null";
+            string expectedMessage = "The registered delegate for type IUserRepository returned null";
 
             var container = new Container();
             Func<IUserRepository> invalidDelegate = () => null;
@@ -226,8 +225,8 @@
             }
             catch (ActivationException ex)
             {
-                string expectedMessage = "The registered delegate for type " + 
-                    typeof(IUserRepository).FullName + " threw an exception. Bla.";
+                string expectedMessage = 
+                    "The registered delegate for type IUserRepository threw an exception. Bla.";
 
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
@@ -251,8 +250,7 @@
             }
             catch (ActivationException ex)
             {
-                string expectedMessage = "The registered delegate for type " +
-                    typeof(IUserRepository).FullName + " returned null.";
+                string expectedMessage = "The registered delegate for type IUserRepository returned null.";
 
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }

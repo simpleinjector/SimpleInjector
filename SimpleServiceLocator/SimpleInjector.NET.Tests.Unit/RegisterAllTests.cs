@@ -252,8 +252,7 @@
         {
             // Arrange
             string expectedMessage =
-                "The registered delegate for type System.Collections.Generic.IEnumerable`1[" +
-                    typeof(IUserRepository).FullName + "] returned null.";
+                "The registered delegate for type IEnumerable<IUserRepository> returned null.";
             
             var container = new Container();
 

@@ -119,11 +119,8 @@
             {
                 string message = ex.Message;
 
-                Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
-                    "The exception message should contain the name of the type. Actual message: " + message);
-
-                Assert.IsTrue(message.Contains("should contain exactly one public constructor, but it has 2."),
-                    "The exception message should describe the actual problem. Actual message: " + message);
+                AssertThat.StringContains(typeof(ConcreteTypeWithMultiplePublicConstructors).Name, message);
+                AssertThat.StringContains("should contain exactly one public constructor, but it has 2.", message);
             }
         }
 
@@ -145,8 +142,7 @@
             {
                 string message = ex.Message;
 
-                Assert.IsTrue(message.Contains(typeof(ConcreteTypeWithMultiplePublicConstructors).FullName),
-                    "The exception message should contain the name of the type. Actual message: " + message);
+                AssertThat.StringContains(typeof(ConcreteTypeWithMultiplePublicConstructors).Name, message);
             }
         }
 
@@ -195,18 +191,17 @@
             {
                 string message = ex.Message;
 
-                AssertThat.StringContains(typeof(RealUserService).FullName, ex.Message,
+                AssertThat.StringContains(typeof(RealUserService).Name, ex.Message,
                     "The exception message should contain the name of the type.");
 
-                AssertThat.StringContains(typeof(IUserRepository).FullName, ex.Message,
+                AssertThat.StringContains(typeof(IUserRepository).Name, ex.Message,
                     "The exception message should contain the missing constructor argument.");
 
-                AssertThat.StringContains("Please ensure " + typeof(IUserRepository).Name +
-                    " is registered in the container", ex.Message,
-                    "(1) The exception message should give a solution to solve the problem.");
+                AssertThat.StringContains("Please ensure IUserRepository is registered in the container", 
+                    ex.Message, "(1) The exception message should give a solution to solve the problem.");
 
-                AssertThat.StringContains("register the type " + typeof(RealUserService).Name + " directly", 
-                    ex.Message,
+                AssertThat.StringContains("Please ensure IUserRepository is registered in the container, " + 
+                    "or change the constructor of RealUserService", ex.Message,
                     "(2) The exception message should give a solution to solve the problem.");
             }
         }
@@ -227,7 +222,7 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(typeof(GenericType<>).Name));
+                AssertThat.StringContains("GenericType<T>", ex.Message);
             }
         }
 
@@ -255,7 +250,8 @@
         {
             // Arrange
             string expectedMessage = typeof(ConcreteTypeWithValueTypeConstructorArgument).Name + " contains" +
-                " parameter 'intParam' of type System.Int32 which can not be used for constructor injection.";
+                " parameter 'intParam' of type Int32 which can not be used for constructor " +
+                "injection because it is a value type.";
 
             var container = new Container();
 
@@ -270,7 +266,7 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+                AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
 
@@ -279,7 +275,7 @@
         {
             // Arrange
             string expectedMessage = typeof(ConcreteTypeWithStringConstructorArgument).Name + " contains pa" +
-                "rameter 'stringParam' of type System.String which can not be used for constructor injection.";
+                "rameter 'stringParam' of type String which can not be used for constructor injection.";
 
             var container = new Container();
 

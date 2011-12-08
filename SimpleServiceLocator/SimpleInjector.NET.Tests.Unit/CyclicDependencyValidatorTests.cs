@@ -20,8 +20,8 @@
         public void GetInstance_RequestingTypeDependingOnItself_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedExcpetionMessage = "The configuration is invalid. The type " + typeof(A).FullName +
-                " is directly or indirectly depending on itself.";
+            string expectedExcpetionMessage = "The configuration is invalid. The type A is directly or " + 
+                "indirectly depending on itself.";
 
             var container = new Container();
 
@@ -282,8 +282,7 @@
         {
             // Arrange
             string expectedExceptionMessage = 
-                "The registered delegate for type " + typeof(IUserRepository).FullName + " threw an " + 
-                "exception.";
+                "The registered delegate for type IUserRepository threw an exception.";
 
             var container = new Container();
 
@@ -321,8 +320,8 @@
         public void GetInstance_RecursiveDependencyInTransientInitializer_ThrowsMeaningfulError()
         {
             // Arrange
-            string expectedMessage = "The configuration is invalid. The type " + typeof(RealUserService).FullName +
-                " is directly or indirectly depending on itself.";
+            string expectedMessage = "The configuration is invalid. The type RealUserService " + 
+                "is directly or indirectly depending on itself.";
 
             var container = new Container();
 
@@ -351,8 +350,8 @@
         public void GetInstance_CalledMultipleTimesOnAnInvalidRegistrationOfSingletonFunc_ShouldNeverTriggerACyclicDependencyError()
         {
             // Arrange
-            string expectedMessage = string.Format(
-                "The registered delegate for type {0} threw an exception.", typeof(ITimeProvider).FullName);
+            string expectedMessage =
+                "The registered delegate for type ITimeProvider threw an exception.";
 
             var container = new Container();
 

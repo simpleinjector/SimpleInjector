@@ -4,6 +4,9 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-[Core] All exception messages now display the names of generic types in short C# notation. 
+		 For instance, messages will now show a name such as IEnumerable<IComparable<Int32>> instead of the
+		 unreadable System.Collections.Generic.IEnumerable`1[System.IComparable`1[System.Int32]].
 		-[Core] New constructor overload added to the Container allowing to change the behavior of the
 		 container using the new ContainerOptions class. The only option currently supported is 
 		 AllowOverridingRegistrations.
