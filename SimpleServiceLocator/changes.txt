@@ -4,6 +4,11 @@ Version vNext
 	General description:
 	
 	Code Changes:
+		-[Core] A new overload to the Container.GetRegistration() method has been added. This overload allows
+		 users to signal whether the method should throw or return null (what the original overload does).
+		 Since the GetRegistration is the only method in the system that both builds and returns
+		 IInstanceProducers, it is very convenient when it can throw, because this makes some scenario's
+		 using the ExpressionBuilt event much cleaner, with less code.
 		-[Core] All exception messages now display the names of generic types in short C# notation. 
 		 For instance, messages will now show a name such as IEnumerable<IComparable<Int32>> instead of the
 		 unreadable System.Collections.Generic.IEnumerable`1[System.IComparable`1[System.Int32]].

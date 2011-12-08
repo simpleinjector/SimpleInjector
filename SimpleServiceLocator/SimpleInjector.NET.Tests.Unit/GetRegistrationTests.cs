@@ -12,12 +12,31 @@
     {
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetRegistration_Always_LocksTheContainer()
+        public void GetRegistration_Always_LocksTheContainer1()
         {
             // Arrange
             var container = new Container();
 
             container.GetRegistration(typeof(ITimeProvider));
+
+            // Act
+            container.Register<ITimeProvider, RealTimeProvider>();
+
+            // Assert
+            Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
+                "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
+                "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
+                "always lock the container for reasons of correctness.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void GetRegistration_Always_LocksTheContainer2()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetRegistration(typeof(ITimeProvider), throwOnFailure: false);
 
             // Act
             container.Register<ITimeProvider, RealTimeProvider>();
@@ -170,7 +189,7 @@
         }
 
         [TestMethod]
-        public void GetRegistratoin_OnOnregisteredConcreteConstructableType_ReturnsInstance()
+        public void GetRegistration_OnUnregisteredUnconstructableType_ReturnsNull()
         {
             // Arrange
             var container = new Container();
@@ -181,9 +200,42 @@
             // Assert
             Assert.IsNull(registration);
         }
+
+        [TestMethod]
+        public void GetRegistrationDontThrowOnFailure_OnUnregisteredUnconstructableType_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var registration = container.GetRegistration(typeof(IDisposable), throwOnFailure: false);
+
+            // Assert
+            Assert.IsNull(registration);
+        }
+
+        [TestMethod]
+        public void GetRegistrationDoThrowOnFailure_OnUnregisteredUnconstructableType_Throws()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                var registration = container.GetRegistration(typeof(IDisposable), throwOnFailure: true);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains("No registration for type IDisposable could be found.", ex.Message);               	
+            }
+        }
         
         [TestMethod]
-        public void GetRegistratoin_OnOnregisteredString_ReturnsNull()
+        public void GetRegistration_OnOnregisteredString_ReturnsNull()
         {
             // Arrange
             var container = new Container();

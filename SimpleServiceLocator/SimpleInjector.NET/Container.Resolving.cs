@@ -189,13 +189,50 @@ namespace SimpleInjector
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public IInstanceProducer GetRegistration(Type serviceType)
         {
+            return this.GetRegistration(serviceType, throwOnFailure : false);
+        }
+
+        // Yippie, we broke a framework design guideline here :-).
+        // 7.1 DO NOT have public members that can either throw or not based on some option.
+        /// <summary>
+        /// Gets the <see cref="InstanceProducer"/> for the given <paramref name="serviceType"/>. When no
+        /// registration exists, the container will try creating a new producer. A producer can be created
+        /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
+        /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
+        /// Otherwise <b>null</b> (Nothing in VB) is returned, or an exception is throw when
+        /// <paramref name="throwOnFailure"/> is set to <b>true</b>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A call to this method locks the container. No new registrations can be made after a call to this 
+        /// method.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same <b>IInstanceProducer</b>
+        /// instance for a given <see cref="Type"/>. It will however either always return <b>null</b> or
+        /// always return a producer that is able to return the expected instance.
+        /// </para>
+        /// </remarks>
+        /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
+        /// <param name="throwOnFailure">The indication whether the method should return null or throw
+        /// an exception when the type is not registered.</param>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        public IInstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
+        {
             // We must lock, because not locking could lead to race conditions.
             this.LockContainer();
 
             var producer = this.GetRegistrationEvenIfInvalid(serviceType);
 
+            bool producerIsValid = producer != null && producer.IsValid;
+
+            if (!producerIsValid && throwOnFailure)
+            {
+                ThrowMissingInstanceProducerException(serviceType);
+            }
+
             // Prevent returning invalid producers
-            return producer != null && producer.IsValid ? producer : null;
+            return producerIsValid ? producer : null;
         }
 
         /// <summary>
