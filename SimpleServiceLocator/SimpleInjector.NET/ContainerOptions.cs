@@ -26,6 +26,32 @@
 namespace SimpleInjector
 {
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
+    /// <example>
+    /// The following example shows the typical usage of the <b>ContainerOptions</b> class.
+    /// <code lang="cs"><![CDATA[
+    /// var container = new Container(new ContainerOptions { AllowOverridingRegistrations = true });
+    /// 
+    /// container.Register<ITimeProvider, DefaultTimeProvider>();
+    /// 
+    /// // Replaces the previous registration of ITimeProvider
+    /// container.Register<ITimeProvider, CustomTimeProvider>();
+    /// ]]></code>
+    /// Instead of applying the created <b>ContainerOptions</b> directly to the container's constructor, the
+    /// options class can be stored in a local variable. This allows changing the behavior of the container
+    /// during the initialization process.
+    /// <code lang="cs"><![CDATA[
+    /// var options = new ContainerOptions { AllowOverridingRegistrations = false };
+    /// 
+    /// var container = new Container(options);
+    /// 
+    /// BusinessLayerBootstrapper.Bootstrap(container);
+    /// 
+    /// options.AllowOverridingRegistrations = true;
+    /// 
+    /// // Replaces a possibly former registration of ITimeProvider
+    /// container.Register<ITimeProvider, CustomTimeProvider>();
+    /// ]]></code>
+    /// </example>
     public class ContainerOptions
     {
         /// <summary>
