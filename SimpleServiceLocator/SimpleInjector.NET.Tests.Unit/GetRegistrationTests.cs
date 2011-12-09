@@ -230,10 +230,10 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains("No registration for type IDisposable could be found.", ex.Message);               	
+                AssertThat.StringContains("No registration for type IDisposable could be found.", ex.Message);
             }
         }
-        
+
         [TestMethod]
         public void GetRegistration_OnOnregisteredString_ReturnsNull()
         {

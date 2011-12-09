@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-
+    using System.Linq.Expressions;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -140,11 +140,12 @@ namespace SimpleInjector
                 this.resolveUnregisteredType -= value;
             }
         }
-
+        
         /// <summary>
-        /// Occurs after the creation of the <see cref="Expression"/> of a registered type, allowing the
-        /// created <see cref="Expression"/> to be replaced. Multiple delegates may handle the same service
-        /// type.
+        /// Occurs after the creation of the <see cref="System.Linq.Expressions.Expression">Expression</see> 
+        /// of a registered type, allowing the created 
+        /// <see cref="System.Linq.Expressions.Expression">Expression</see>  to be replaced. Multiple delegates 
+        /// may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>

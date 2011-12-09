@@ -32,7 +32,7 @@ namespace SimpleInjector
     /// Provides data for and interaction with the 
     /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event of 
     /// the <see cref="Container"/>. An observer can change the 
-    /// <see cref="ExpressionBuilt.Expression"/> property to change the registered type.
+    /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the registered type.
     /// </summary>
     public class ExpressionBuiltEventArgs : EventArgs
     {

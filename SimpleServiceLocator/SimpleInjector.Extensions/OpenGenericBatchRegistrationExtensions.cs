@@ -126,8 +126,8 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same closed generic 
         /// version of the given <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="accessibility"/> 
-        /// contains an invalid value.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
@@ -151,8 +151,8 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="accessibility"/> 
-        /// contains an invalid value.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
@@ -206,8 +206,8 @@ namespace SimpleInjector.Extensions
         /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="accessibility"/> 
-        /// contains an invalid value.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
             Justification = "By using the 'this Container' argument, we allow this extension method to " +
             "show when using Intellisense over the Container.")]
@@ -283,8 +283,8 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same closed generic 
         /// version of the given <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="accessibility"/> 
-        /// contains an invalid value.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
@@ -308,8 +308,8 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidEnumArgumentException">Thrown when <paramref name="accessibility"/> 
-        /// contains an invalid value.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {

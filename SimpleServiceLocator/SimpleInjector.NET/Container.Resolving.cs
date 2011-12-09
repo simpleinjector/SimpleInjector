@@ -189,11 +189,9 @@ namespace SimpleInjector
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public IInstanceProducer GetRegistration(Type serviceType)
         {
-            return this.GetRegistration(serviceType, throwOnFailure : false);
+            return this.GetRegistration(serviceType, throwOnFailure: false);
         }
 
-        // Yippie, we broke a framework design guideline here :-).
-        // 7.1 DO NOT have public members that can either throw or not based on some option.
         /// <summary>
         /// Gets the <see cref="InstanceProducer"/> for the given <paramref name="serviceType"/>. When no
         /// registration exists, the container will try creating a new producer. A producer can be created
@@ -217,6 +215,8 @@ namespace SimpleInjector
         /// <param name="throwOnFailure">The indication whether the method should return null or throw
         /// an exception when the type is not registered.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        //// Yippie, we broke a framework design guideline rule here :-).
+        //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public IInstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
             // We must lock, because not locking could lead to race conditions.
