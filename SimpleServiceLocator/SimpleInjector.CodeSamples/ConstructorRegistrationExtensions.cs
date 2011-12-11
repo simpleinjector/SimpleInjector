@@ -6,71 +6,92 @@
     using System.Linq.Expressions;
     using System.Reflection;
 
+    public interface IConstructorSelector
+    {
+        ConstructorInfo GetConstructor(Type type);
+    }
+
+    public sealed class ConstructorSelector : IConstructorSelector
+    {
+        public static readonly IConstructorSelector MostParameters =
+            new ConstructorSelector(type => type.GetConstructors().OrderByDescending(c => c.GetParameters().Length).First());
+
+        public static readonly IConstructorSelector LeastParameters =
+            new ConstructorSelector(type => type.GetConstructors().OrderBy(c => c.GetParameters().Length).First());
+
+        private readonly Func<Type, ConstructorInfo> selector;
+
+        public ConstructorSelector(Func<Type, ConstructorInfo> selector)
+        {
+            this.selector = selector;
+        }
+
+        public ConstructorInfo GetConstructor(Type type)
+        {
+            return this.selector(type);
+        }
+    }
+
     public static class ConstructorRegistrationExtensions
     {
-        public static void RegisterWithConstructor<TService>(this Container container, 
-            Expression<Func<TService>> constructorCall)
+        public static void Register<TService, TImplementation>(this Container container,
+            IConstructorSelector selector)
             where TService : class
         {
-            var ctor = ((NewExpression)constructorCall.Body).Constructor;
+            Func<TService> fakeInstanceCreator = () => null;
 
-            var producer = new Transient<TService>(container, ctor);
+            container.Register<TService>(fakeInstanceCreator);
 
-            container.Register<TService>(producer.GetInstance);
-        }
-
-        [DebuggerStepThrough]
-        private static Func<TService> Build<TService>(Container container, 
-            ConstructorInfo constructor)
-        {
-            var parameters =
-                from parameter in constructor.GetParameters()
-                select BuildParameter(container, parameter.ParameterType);
-
-            var newExpression = Expression.Lambda<Func<TService>>(
-                Expression.New(constructor, parameters.ToArray()), 
-                new ParameterExpression[0]);
-
-            return newExpression.Compile();
-        }
-
-        [DebuggerStepThrough]
-        private static Expression BuildParameter(Container container,
-            Type parameterType)
-        {
-            var instanceProducer = container.GetRegistration(parameterType);
-
-            if (instanceProducer == null)
+            container.ExpressionBuilt += (sender, e) =>
             {
-                container.GetInstance(parameterType);
-            }
-
-            return instanceProducer.BuildExpression();
-        }
-
-        private sealed class Transient<TService>
-        {
-            private readonly Container container;
-            private readonly ConstructorInfo ctor;
-
-            private Func<TService> instanceCreator;
-
-            public Transient(Container container, ConstructorInfo ctor)
-            {
-                this.container = container;
-                this.ctor = ctor;
-            }
-
-            [DebuggerStepThrough]
-            public TService GetInstance()
-            {
-                if (this.instanceCreator == null)
+                if (e.RegisteredServiceType == typeof(TService))
                 {
-                    this.instanceCreator = Build<TService>(this.container, this.ctor);
-                }
+                    Verify(e.Expression, fakeInstanceCreator);
 
-                return this.instanceCreator();
+                    var ctor = selector.GetConstructor(typeof(TImplementation));
+
+                    e.Expression = Expression.New(ctor,
+                        from parameter in ctor.GetParameters()
+                        select container.GetRegistration(parameter.ParameterType, true).BuildExpression());
+                }
+            };
+        }
+
+        public static void RegisterSingle<TService, TImplementation>(this Container container,
+            IConstructorSelector selector)
+            where TService : class
+        {
+            Register<TService, TImplementation>(container, selector);
+
+            container.ExpressionBuilt += (sender, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(TService))
+                {
+                    var instanceCreator = Expression.Lambda<Func<TService>>(e.Expression).Compile();
+
+                    e.Expression = Expression.Constant(instanceCreator(), typeof(TService));
+                }
+            };
+        }
+
+        private static void Verify<TService>(Expression expression, Func<TService> fakeInstanceCreator)
+        {
+            var invocation = expression as InvocationExpression;
+
+            if (invocation != null)
+            {
+                var constant = invocation.Expression as ConstantExpression;
+
+                if (constant != null && object.ReferenceEquals(constant.Value, fakeInstanceCreator))
+                {
+                    return;
+                }
             }
+
+            throw new ActivationException(string.Format("The {0} was registered with an " +
+                "IConstructorSelector, but its Expression was changed, which indicates there was another " +
+                "delegate hooked to the ExpressionBuilt event that altered the registration for this type. " +
+                "Make sure that delegate fires after this one.", typeof(TService)));
         }
     }
 }

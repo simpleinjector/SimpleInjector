@@ -10,6 +10,10 @@
     [TestClass]
     public class ConstructorRegistrationExtensionsTests
     {
+        private interface ISomeDependency
+        {
+        }
+
         [TestMethod]
         public void RegisterWithConstructor_WithValidArgument_Succeeds()
         {
@@ -17,17 +21,30 @@
             var container = new Container();
             
             // Act
-            container.RegisterWithConstructor<ICommand>(() => new MultipleConstructorsCommand((ILogger)null));
+            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
         }
 
         [TestMethod]
-        public void GetInstance_CalledAfterValidRegistration_Succeeds()
+        public void GetInstance_CalledAfterValidRegistration_Succeeds1()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);
+
+            // Act
+            var command = container.GetInstance<ICommand>();
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledAfterValidRegistration_Succeeds2()
         {
             // Arrange
             var container = new Container();
 
             container.RegisterSingle<ILogger, NullLogger>();
-            container.RegisterWithConstructor<ICommand>(() => new MultipleConstructorsCommand((ILogger)null));
+            container.RegisterSingle<ISomeDependency, SomeDependency>();
+            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
 
             // Act
             var command = container.GetInstance<ICommand>();
@@ -43,17 +60,21 @@
             {
             }
 
-            public MultipleConstructorsCommand(ICommand command)
+            public MultipleConstructorsCommand(ISomeDependency command)
             {
             }
 
-            public MultipleConstructorsCommand(ILogger logger, ICommand command)
+            public MultipleConstructorsCommand(ILogger logger, ISomeDependency command)
             {
             }
 
             public void Execute()
             {
             }
+        }
+
+        private sealed class SomeDependency : ISomeDependency
+        {
         }
     }
 }
