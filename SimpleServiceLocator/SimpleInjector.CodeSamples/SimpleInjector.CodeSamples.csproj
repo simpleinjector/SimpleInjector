@@ -91,6 +91,7 @@
     <Compile Include="RegisterAttributeFilterProvider.cs" />
     <Compile Include="ResolvingExtensions.cs" />
     <Compile Include="ResolvingFactoriesExtensions.cs" />
+    <Compile Include="SimpleInjectorMVC3Extensions.cs" />
     <Compile Include="VarianceExtensions.cs" />
     <Compile Include="WinFormsIntegrationExtensions.cs" />
   </ItemGroup>
