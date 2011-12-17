@@ -69,7 +69,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DecoratorPredicateContext.cs" />
     <Compile Include="GenericArgumentFinder.cs" />
+    <Compile Include="GenericDecoratorExtensions.cs" />
     <Compile Include="GenericTypeBuilder.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Requires.cs" />

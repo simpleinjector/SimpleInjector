@@ -101,6 +101,12 @@
     <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\BatchRegistrationExtensionsTests.cs">
       <Link>BatchRegistrationExtensionsTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\EnumerableExtensions.cs">
+      <Link>EnumerableExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\GenericDecoratorExtensionsTests.cs">
+      <Link>GenericDecoratorExtensionsTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\NonGenericRegistrationsExtensionsTests.cs">
       <Link>NonGenericRegistrationsExtensionsTests.cs</Link>
     </Compile>

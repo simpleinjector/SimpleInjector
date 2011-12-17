@@ -27,6 +27,7 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Globalization;
+    using System.Linq;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -39,6 +40,44 @@ namespace SimpleInjector.Extensions
                 "not permit the creation of this type. Explicitly register the type using one of the " +
                 "generic Register overloads or consider making it public. {1}", serviceType, 
                 innerException.Message);
+        }
+
+        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, string message)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Error occurred while trying to get an instance of type {0}. {1}",
+                serviceType.ToFriendlyName(), message);
+        }
+
+        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0}, it should contain exactly one public " +
+                "constructor, but it has {1}.",
+                serviceType.ToFriendlyName(), serviceType.GetConstructors().Length);
+        }
+
+        internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
+            Type serviceType, int numberOfServiceTypeDependencies)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to use {0} as a decorator, its constructor should have a " +
+                "single argument of type {1}, but it currently has {2}.", decoratorType.ToFriendlyName(),
+                serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+        }
+
+        private static string ToFriendlyName(this Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return type.Name;
+            }
+
+            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
+
+            var genericArguments = type.GetGenericArguments().Select(argument => argument.ToFriendlyName());
+
+            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
         }
     }
 }

@@ -73,7 +73,7 @@ namespace SimpleInjector.Extensions
         /// }
         /// 
         /// [TestMethod]
-        /// public static void TestRegisterInitializer()
+        /// public static void TestRegisterOpenGeneric()
         /// {
         ///     // Arrange
         ///     var container = new Container();
@@ -95,7 +95,7 @@ namespace SimpleInjector.Extensions
         /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
-        /// used to retrieve instances..</param>
+        /// used to retrieve instances.</param>
         /// <param name="openGenericImplementation">The definition of the open generic implementation type
         /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
         public static void RegisterOpenGeneric(this Container container,
@@ -152,7 +152,7 @@ namespace SimpleInjector.Extensions
         /// }
         /// 
         /// [TestMethod]
-        /// public static void TestRegisterInitializer()
+        /// public static void TestRegisterOpenGeneric()
         /// {
         ///     // Arrange
         ///     var container = new Container();

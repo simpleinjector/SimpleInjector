@@ -141,5 +141,35 @@ namespace SimpleInjector.Extensions
                     " must be different types.", paramName);
             }
         }
+        
+        internal static void ContainsOneSinglePublicConstructor(Type implementationType, string paramName)
+        {
+            if (implementationType.GetConstructors().Length != 1)
+            {
+                throw new ArgumentException(
+                    StringResources.TypeMustHaveASinglePublicConstructor(implementationType), paramName);
+            }
+        }
+
+        internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(
+            Type decoratorType, Type serviceType, string paramName)
+        {
+            var serviceTypeArguments =
+                from parameter in decoratorType.GetConstructors().Single().GetParameters()
+                let type = parameter.ParameterType
+                where type.IsGenericType
+                where type.GetGenericTypeDefinition() == serviceType
+                select parameter;
+
+            int numberOfServiceTypeDependencies = serviceTypeArguments.Count();
+
+            if (numberOfServiceTypeDependencies != 1)
+            {
+                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
+                    decoratorType, serviceType, numberOfServiceTypeDependencies);
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
     }
 }
