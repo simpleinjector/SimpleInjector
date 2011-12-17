@@ -25,7 +25,8 @@
         public static void RegisterOpenGenericDecorator(this Container container,
             Type openGenericType, Type openGenericDecorator)
         {
-            container.RegisterOpenGenericDecorator(openGenericType, openGenericDecorator, c => true);
+            DecoratorExtensions.RegisterOpenGenericDecorator(container, openGenericType, openGenericDecorator, 
+                c => true);
         }
 
         public static void RegisterOpenGenericDecorator(this Container container,
@@ -119,13 +120,15 @@
 
                     var ctor = closedGenericDecorator.GetConstructors().Single();
 
-                    e.Expression = Expression.New(ctor,
+                    var expression = Expression.New(ctor,
                         from parameter in ctor.GetParameters()
                         let type = parameter.ParameterType
                         select type == serviceType ? e.Expression :
                             this.Container.GetRegistration(type, true).BuildExpression());
 
                     GetServiceTypeInfo(e).AppliedDecorators.Add(closedGenericDecorator);
+
+                    e.Expression = expression;
                 }
             }
         }
