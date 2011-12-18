@@ -27,7 +27,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
@@ -48,7 +48,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
 
             // Act
             container.GetInstance<ICommandHandler<RealCommand>>().Handle(new RealCommand());
@@ -69,8 +69,8 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator2<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator2<>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
@@ -91,8 +91,8 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator2<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator2<>));
 
             // Act
             container.GetInstance<ICommandHandler<RealCommand>>().Handle(new RealCommand());
@@ -110,7 +110,7 @@
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
             // Decorator1Handler depends on ILogger, but ILogger is not registered.
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(HandlerDecorator1<>));
 
             try
             {
@@ -134,7 +134,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), 
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), 
                 c => false);
 
             // Act
@@ -152,7 +152,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>),
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>),
                 c => true);
 
             // Act
@@ -173,7 +173,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateServiceType = c.ServiceType;
                 return true;
@@ -197,7 +197,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -223,7 +223,7 @@
 
             container.RegisterInitializer<StubCommandHandler>(handlerToInitialize => { });
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -247,7 +247,7 @@
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new StubCommandHandler());
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -273,7 +273,7 @@
             // type. In that case the ImplementationType should equal the ServiceType.
             container.Register<ICommandHandler<RealCommand>>(() => new StubCommandHandler());
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -297,9 +297,9 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -322,7 +322,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 actualPredicateExpression = c.Expression;
                 return true;
@@ -346,13 +346,13 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
             {
                 predicateExpressionOnFirstCall = c.Expression;
                 return true;
             });
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
             {
                 predicateExpressionOnSecondCall = c.Expression;
                 return true;
@@ -376,7 +376,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
@@ -399,9 +399,9 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
@@ -425,9 +425,9 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>));
-            DecoratorExtensions.RegisterOpenGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator1<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>));
+            DecoratorExtensions.RegisterGenericDecorator(container, typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
