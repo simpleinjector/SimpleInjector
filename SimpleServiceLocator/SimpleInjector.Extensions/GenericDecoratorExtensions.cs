@@ -39,8 +39,8 @@ namespace SimpleInjector.Extensions
     public static class GenericDecoratorExtensions
     {
         /// <summary>
-        /// Registers a closed generic version of the supplied <paramref name="openGenericDecorator"/> 
-        /// decorator to be returned wrapping the original closed generic version of the registered
+        /// Ensures that a closed generic version of the supplied <paramref name="openGenericDecorator"/> 
+        /// decorator is returned, wrapping the original closed generic version of the registered
         /// <paramref name="openGenericServiceType"/>, by injecting that service type into the constructor
         /// of the supplied <paramref name="openGenericDecorator"/>. Multiple decorators may be applied to the
         /// same <paramref name="openGenericServiceType"/>.
@@ -63,12 +63,9 @@ namespace SimpleInjector.Extensions
         /// </para>
         /// </remarks>
         /// <example>
-        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
-        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
-        /// The registration ensures a <b>OrderValidator</b> is returned when a 
-        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
-        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
-        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
+        /// The following example shows the definition of a generic <b>ICommandHandler&lt;T&gt;</b> interface,
+        /// a <b>CustomerMovedCommandHandler</b> implementing that interface, and a 
+        /// <b>ValidatorCommandHandlerDecorator&lt;T&gt;</b> that acts as a decorator for that interface.
         /// <code lang="cs"><![CDATA[
         /// using System.ComponentModel.DataAnnotations;
         /// using System.Diagnostics;
@@ -220,8 +217,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers a closed generic version of the supplied <paramref name="openGenericDecorator"/> 
-        /// decorator to be returned wrapping the original closed generic version of the registered
+        /// Ensures that a closed generic version of the supplied <paramref name="openGenericDecorator"/> 
+        /// decorator is returned, wrapping the original closed generic version of the registered
         /// <paramref name="openGenericServiceType"/>, by injecting that service type into the constructor
         /// of the supplied <paramref name="openGenericDecorator"/>. Multiple decorators may be applied to the
         /// same <paramref name="openGenericServiceType"/>.
@@ -244,12 +241,9 @@ namespace SimpleInjector.Extensions
         /// </para>
         /// </remarks>
         /// <example>
-        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
-        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
-        /// The registration ensures a <b>OrderValidator</b> is returned when a 
-        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
-        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
-        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
+        /// The following example shows the definition of a generic <b>ICommandHandler&lt;T&gt;</b> interface,
+        /// a <b>CustomerMovedCommandHandler</b> implementing that interface, and a 
+        /// <b>ValidatorCommandHandlerDecorator&lt;T&gt;</b> that acts as a decorator for that interface.
         /// <code lang="cs"><![CDATA[
         /// using System.ComponentModel.DataAnnotations;
         /// using System.Diagnostics;
