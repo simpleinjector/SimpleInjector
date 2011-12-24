@@ -7,8 +7,8 @@
     using SimpleInjector;
 
     /// <summary>
-    /// Extension methods for registering types on a per web request basis and ensuring that the object will
-    /// get disposed after the request ends.
+    /// Extension methods for registering types on a per web request basis and ensuring 
+    /// that the object will get disposed after the request ends.
     /// </summary>
     public static class PerWebRequestRegistrationsWithDisposalExtensions
     {
@@ -17,19 +17,22 @@
             where TService : class
             where TImplementation : class, TService, IDisposable
         {
-            container.RegisterPerWebRequestWithDisposal(() => container.GetInstance<TImplementation>());
+            container.RegisterPerWebRequestWithDisposal(
+                () => container.GetInstance<TImplementation>());
         }
 
-        public static void RegisterPerWebRequestWithDisposal<TService>(this Container container,
-            Func<TService> instanceCreator) where TService : class
+        public static void RegisterPerWebRequestWithDisposal<TService>(
+            this Container container, Func<TService> instanceCreator) 
+            where TService : class
         {
-            var creator = new DisposablePerWebRequestInstanceCreator<TService>(instanceCreator);
+            var creator = 
+                new DisposablePerWebRequestInstanceCreator<TService>(instanceCreator);
+
             container.Register<TService>(creator.GetInstance);
         }
 
         private sealed class DisposablePerWebRequestInstanceCreator<T> where T : class
         {
-            private static readonly string key = "DisposablePerWebRequestInstanceCreator_" + typeof(T).FullName;
             private readonly Func<T> instanceCreator;
             private bool endRequestIsRegistered;
 
@@ -45,17 +48,17 @@
         
                 if (context == null)
                 {
-                    // No HttpContext: Create the object as transient.
+                    // No HttpContext, this happens during Verify().
+                    // Create the object as transient instead.
                     return this.instanceCreator();
                 }
             
-                if (!this.endRequestIsRegistered)
-                {
-                    // EndRequest must be registered here, because the HttpApplication does not exist during
-                    // startup.
-                    this.RegisterEndRequest();
-                }
-            
+                // EndRequest must be registered here, because the
+                // HttpApplication does not exist during startup.
+                this.RegisterEndRequest();
+
+                object key = this.GetType();
+
                 T instance = (T)context.Items[key];
 
                 if (instance == null)
@@ -69,14 +72,26 @@
             [DebuggerStepThrough]
             private void RegisterEndRequest()
             {
-                HttpContext.Current.ApplicationInstance.EndRequest += this.Dispose;
-            
-                this.endRequestIsRegistered = true;
+                if (!this.endRequestIsRegistered)
+                {
+                    lock (this)
+                    {
+                        if (!this.endRequestIsRegistered)
+                        {
+                            HttpContext.Current.ApplicationInstance
+                                .EndRequest += this.Dispose;
+
+                            this.endRequestIsRegistered = true;
+                        }
+                    }
+                }
             }
         
             [DebuggerStepThrough]
             private void Dispose(object sender, EventArgs e)
             {
+                object key = this.GetType();
+
                 var instance = HttpContext.Current.Items[key] as IDisposable;
             
                 if (instance != null)
