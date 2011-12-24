@@ -83,7 +83,6 @@
     <Compile Include="ImplicitPropertyInjectionExtensions.cs" />
     <Compile Include="InterceptorExtensions.cs" />
     <Compile Include="LifetimeScopeExtensions.cs" />
-    <Compile Include="PerWebRequestRegistrationsWithDisposalExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CollectionRegistrationExtensions.cs" />
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
