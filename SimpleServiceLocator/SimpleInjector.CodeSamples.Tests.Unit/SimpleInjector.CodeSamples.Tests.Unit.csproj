@@ -69,7 +69,6 @@
   <ItemGroup>
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
-    <Compile Include="DecoratorExtensionsTests.cs" />
     <Compile Include="ExpirationExtensionsTests.cs" />
     <Compile Include="InterceptorExtensionsTests.cs" />
     <Compile Include="LifetimeScopeExtensionsTests.cs" />
