@@ -79,9 +79,6 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions\DecoratorPredicateContext.cs">
-      <Link>DecoratorPredicateContext.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.Extensions\GenericArgumentFinder.cs">
       <Link>GenericArgumentFinder.cs</Link>
     </Compile>
