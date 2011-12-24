@@ -438,9 +438,9 @@ namespace SimpleInjector.Extensions
         }
         
         /// <summary>
-        /// An instance of this type will be supplied to the <see cref="Func{DecoratorPredicateContext, bool}"/>
+        /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
         /// delegate that is that is supplied to the 
-        /// <see cref="GenericDecoratorExtensions.RegisterOpenGenericDecorator">RegisterOpenGenericDecorator</see>
+        /// <see cref="GenericDecoratorExtensions.RegisterOpenGenericDecorator(Container, Type, Type)">RegisterOpenGenericDecorator</see>
         /// overload that takes this delegate. This type contains information about the decoration that is about
         /// to be applied and it allows users to examine the given instance to see whether the decorator should
         /// be applied or not.
