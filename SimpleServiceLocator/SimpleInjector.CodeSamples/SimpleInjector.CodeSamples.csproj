@@ -78,7 +78,6 @@
     <Compile Include="AspNetIntegrationExtensions.cs" />
     <Compile Include="ConstructorRegistrationExtensions.cs" />
     <Compile Include="ContextDependentExtensions.cs" />
-    <Compile Include="DecoratorExtensions.cs" />
     <Compile Include="ExpirationExtensions.cs" />
     <Compile Include="ImplicitPropertyInjectionExtensions.cs" />
     <Compile Include="InterceptorExtensions.cs" />
