@@ -63,7 +63,7 @@
 
                 if (serviceType.IsGenericType && 
                     serviceType.GetGenericTypeDefinition() == this.OpenGenericType &&
-                    this.Predicate(CreatePredicateContext(e)))
+                    this.Predicate(this.CreatePredicateContext(e)))
                 {
                     var closedGenericDecorator = this.OpenGenericDecorator
                         .MakeGenericType(serviceType.GetGenericArguments());
@@ -107,8 +107,7 @@
 
                 if (containerCache == null)
                 {
-                    containerCache = new Dictionary<Container, 
-                        Dictionary<Type, ServiceTypeDecoratorInfo>>();
+                    containerCache = new Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>();
                     serviceTypeInfos = containerCache;
                 }
 
