@@ -483,6 +483,50 @@
             Assert.IsInstanceOfType(handler, typeof(StructCommandHandler));
         }
 
+        [TestMethod]
+        public void RegisterOpenGenericDecorator_DecoratorWithMultiplePublicConstructors_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
+                    typeof(MultipleConstructorsCommandHandlerDecorator<>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains("it should contain exactly one public constructor", ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterOpenGenericDecorator_SupplyingTypeThatIsNotADecorator_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
+                    typeof(NoDecoratorCommandHandlerDecorator<>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(
+                    "its constructor should have a single argument of type ICommandHandler<TCommand>", 
+                    ex.Message);
+            }
+        }
+
         public struct StructCommand
         {
         }
@@ -499,6 +543,32 @@
 
         public class RealCommand
         {
+        }
+
+        public class MultipleConstructorsCommandHandlerDecorator<T> : ICommandHandler<T>
+        {
+            public MultipleConstructorsCommandHandlerDecorator()
+            {
+            }
+
+            public MultipleConstructorsCommandHandlerDecorator(ICommandHandler<T> decorated)
+            {
+            }
+
+            public void Handle(T command)
+            {
+            }
+        }
+
+        public class NoDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
+        {
+            public NoDecoratorCommandHandlerDecorator(ILogger logger)
+            {
+            }
+
+            public void Handle(T command)
+            {
+            }
         }
 
         public class StubCommandHandler : ICommandHandler<RealCommand>

@@ -28,6 +28,7 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -444,8 +445,15 @@ namespace SimpleInjector.Extensions
         /// to be applied and it allows users to examine the given instance to see whether the decorator should
         /// be applied or not.
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible", Justification =
+            "Users will never have to spell out GenericDecoratorExtensions.PredicateContext, since this " +
+            "type is supplied as input argument of a Predicate<T>.")]
         public sealed class PredicateContext
         {
+            internal PredicateContext()
+            {
+            }
+
             /// <summary>
             /// Gets the closed generic service type for which the decorator is about to be applied. The original
             /// service type will be returned, even if other decorators have already been applied to this type.

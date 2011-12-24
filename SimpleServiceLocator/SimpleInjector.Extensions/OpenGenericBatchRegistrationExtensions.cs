@@ -131,7 +131,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
+            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility,
+                (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -159,6 +160,32 @@ namespace SimpleInjector.Extensions
             container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
         }
 #endif
+        /// <summary>
+        /// Allows registration of all concrete, public, non-generic types in the given set of 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
+        /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
+        /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="callback">The delegate that will be called for each found closed generic version of
+        /// the given open generic <paramref name="openGenericServiceType"/> to do the actual registration.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="callback"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "By using the 'this Container' argument, we allow this extension method to " +
+            "show when using Intellisense over the Container.")]
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, BatchRegistrationCallback callback,
+            params Assembly[] assemblies)
+        {
+            RegisterManyForOpenGeneric(container, openGenericServiceType, callback,
+                (IEnumerable<Assembly>)assemblies);
+        }
 
         /// <summary>
         /// Allows registration of all concrete, public, non-generic types in the given set of 
@@ -188,6 +215,36 @@ namespace SimpleInjector.Extensions
         }
 
 #if !SILVERLIGHT
+        /// <summary>
+        /// Allows registration of all concrete, non-generic types with the given 
+        /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
+        /// the given <paramref name="openGenericServiceType"/>, by supplying a 
+        /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
+        /// implementation of the given <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
+        /// <param name="callback">The delegate that will be called for each found closed generic version of
+        /// the given open generic <paramref name="openGenericServiceType"/> to do the actual registration.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="callback"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "By using the 'this Container' argument, we allow this extension method to " +
+            "show when using Intellisense over the Container.")]
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
+            params Assembly[] assemblies)
+        {
+            RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility, callback);
+        }
+
         /// <summary>
         /// Allows registration of all concrete, non-generic types with the given 
         /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 

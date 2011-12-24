@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -424,7 +425,7 @@
         }
 
         [TestMethod]
-        public void RegisterManyForOpenGeneric_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
+        public void RegisterManyForOpenGenericAssemblyParams_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
         {
             // Arrange
             var container = new Container();
@@ -434,17 +435,41 @@
                 // Do nothing.
             };
 
-            var assemblies = new[] { Assembly.GetExecutingAssembly() };
-
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, assemblies);
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, Assembly.GetExecutingAssembly());
 
             // Assert
             var registration = container.GetRegistration(typeof(IService<string, object>));
 
-            Assert.IsNull(registration, "This call should fail, because by supplying a delegate, the " +
+            Assert.IsNull(registration, "GetRegistration should result in null, because by supplying a delegate, the " +
                 "extension method does not do any registration itself.");
         }
+
+#if !SILVERLIGHT
+        [TestMethod]
+        public void RegisterManyForOpenGenericAssemblyIEnumerable_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
+        {
+            // Arrange
+            var container = new Container();
+
+            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
+            {
+                // Do nothing.
+            };
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly, 
+                callback, assemblies);
+
+            // Assert
+            var registration = container.GetRegistration(typeof(IService<string, object>));
+
+            Assert.IsNull(registration, "GetRegistration should result in null, because by supplying a delegate, the " +
+                "extension method does not do any registration itself.");
+        }
+#endif
 
         [TestMethod]
         public void RegisterManyForOpenGenericEnumerable_WithValidArguments_Succeeds()

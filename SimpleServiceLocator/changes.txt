@@ -2,8 +2,10 @@
 
 Version vNext
 	General description:
+		RegisterOpenGenericDecorator extension methods added to the SimpleInjector.Extensions project.
 
 	Code Changes:
+		-[Extensions]: New RegisterManyForOpenGeneric overloads added.
 		-[Extensions]: RegisterOpenGenericDecorator extension methods have been added.
 
 
