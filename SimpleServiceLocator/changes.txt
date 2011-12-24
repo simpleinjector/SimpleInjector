@@ -1,5 +1,12 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+
+	Code Changes:
+		-[Extensions]: RegisterOpenGenericDecorator extension methods have been added.
+
+
 Version 1.3.0.11343 (v1.3 RTM) 2011-12-09
 	General description:
 		This release adds a few features and fixes two bugs in the core library. The most important new

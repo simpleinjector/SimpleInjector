@@ -396,7 +396,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterOpenGenericDecorator(this Container container,
             Type openGenericServiceType, Type openGenericDecorator,
-            Predicate<DecoratorPredicateContext> predicate)
+            Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(predicate, "predicate");
 
@@ -405,7 +405,7 @@ namespace SimpleInjector.Extensions
 
         private static void RegisterOpenGenericDecoratorCore(this Container container,
             Type openGenericServiceType, Type openGenericDecorator,
-            Predicate<DecoratorPredicateContext> predicate)
+            Predicate<PredicateContext> predicate)
         {
             VerifyMethodArguments(container, openGenericServiceType, openGenericDecorator);
 
@@ -433,7 +433,47 @@ namespace SimpleInjector.Extensions
             Requires.ContainsOneSinglePublicConstructor(openGenericDecorator, "openGenericDecorator");
             Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(openGenericDecorator,
                 openGenericServiceType, "openGenericDecorator");
-        }        
+        }
+        
+        /// <summary>
+        /// An instance of this type will be supplied to the <see cref="Func{DecoratorPredicateContext, bool}"/>
+        /// delegate that is that is supplied to the 
+        /// <see cref="GenericDecoratorExtensions.RegisterOpenGenericDecorator">RegisterOpenGenericDecorator</see>
+        /// overload that takes this delegate. This type contains information about the decoration that is about
+        /// to be applied and it allows users to examine the given instance to see whether the decorator should
+        /// be applied or not.
+        /// </summary>
+        public sealed class PredicateContext
+        {
+            /// <summary>
+            /// Gets the closed generic service type for which the decorator is about to be applied. The original
+            /// service type will be returned, even if other decorators have already been applied to this type.
+            /// </summary>
+            /// <value>The closed generic service type.</value>
+            public Type ServiceType { get; internal set; }
+
+            /// <summary>
+            /// Gets the type of the implementation that is created by the container and for which the decorator
+            /// is about to be applied. The original implementation type will be returned, even if other decorators
+            /// have already been applied to this type. Please not that the implementation type can not always be
+            /// determined. In that case the closed generic service type will be returned.
+            /// </summary>
+            /// <value>The implementation type.</value>
+            public Type ImplementationType { get; internal set; }
+
+            /// <summary>
+            /// Gets the list of the types of decorators that have already been applied to this instance.
+            /// </summary>
+            /// <value>The applied decorators.</value>
+            public ReadOnlyCollection<Type> AppliedDecorators { get; internal set; }
+
+            /// <summary>
+            /// Gets the current <see cref="Expression"/> object that describes the intention to create a new
+            /// instance with its currently applied decorators.
+            /// </summary>
+            /// <value>The current expression that is about to be decorated.</value>
+            public Expression Expression { get; internal set; }
+        }
 
         private sealed class DecoratorExpressionInterceptor
         {
@@ -455,7 +495,7 @@ namespace SimpleInjector.Extensions
 
             public Type OpenGenericDecorator { get; set; }
 
-            public Predicate<DecoratorPredicateContext> Predicate { get; set; }
+            public Predicate<PredicateContext> Predicate { get; set; }
 
             public void Decorate(object sender, ExpressionBuiltEventArgs e)
             {
@@ -514,11 +554,11 @@ namespace SimpleInjector.Extensions
                 return true;
             }
 
-            private DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
+            private PredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
             {
                 var info = this.GetServiceTypeInfo(e);
 
-                return new DecoratorPredicateContext
+                return new PredicateContext
                 {
                     ServiceType = e.RegisteredServiceType,
                     ImplementationType = info.ImplementationType,
