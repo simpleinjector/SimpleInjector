@@ -54,8 +54,16 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
-        internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType, 
+        internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType,
             Expression expression, Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Error occurred while trying to build a delegate for type {0} using the expression \"{1}\". " +
+                "{2}", serviceType.ToFriendlyName(), expression, exception.Message);
+        }
+
+        internal static string ErrorWhileBuildingDelegateFromExpressionForUnregisteredTypeEventArgs(
+            Type serviceType, Expression expression, Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Error occurred while trying to build a delegate for type {0} using the expression \"{1}\" " +

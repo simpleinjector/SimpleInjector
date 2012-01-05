@@ -159,6 +159,13 @@ namespace SimpleInjector.InstanceProducers
             return StringResources.DelegateForTypeReturnedNull(this.ServiceType);
         }
 
+        protected virtual string BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
+            Expression expression, Exception exception)
+        {
+            return StringResources.ErrorWhileBuildingDelegateFromExpression(this.ServiceType, expression, 
+                exception);
+        }
+
         private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
@@ -172,8 +179,10 @@ namespace SimpleInjector.InstanceProducers
             }
             catch (Exception ex)
             {
-                throw new ActivationException(StringResources.ErrorWhileBuildingDelegateFromExpression(
-                    this.ServiceType, expression, ex), ex);
+                string message = this.BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
+                    expression, ex);
+
+                throw new ActivationException(message, ex);
             }
         }
 

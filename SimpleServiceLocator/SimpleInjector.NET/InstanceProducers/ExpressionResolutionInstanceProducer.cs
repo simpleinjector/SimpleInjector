@@ -45,5 +45,12 @@ namespace SimpleInjector.InstanceProducers
         {
             return this.expression;
         }
+
+        protected override string BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
+            Expression expression, Exception exception)
+        {
+            return StringResources.ErrorWhileBuildingDelegateFromExpressionForUnregisteredTypeEventArgs(
+                this.ServiceType, expression, exception);
+        }
     }
 }
