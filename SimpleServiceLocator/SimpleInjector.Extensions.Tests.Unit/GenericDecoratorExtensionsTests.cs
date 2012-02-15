@@ -107,6 +107,39 @@
         }
 
         [TestMethod]
+        public void GetInstance_WithInitializerOnDecorator_InitializesThatDecorator()
+        {
+            // Arrange
+            int expectedItem1Value = 1;
+            string expectedItem2Value = "some value";
+
+            var container = new Container();
+
+            container.RegisterInitializer<HandlerDecoratorWithPropertiesBase>(decorator =>
+            {
+                decorator.Item1 = expectedItem1Value;
+            });
+
+            container.RegisterInitializer<HandlerDecoratorWithPropertiesBase>(decorator =>
+            {
+                decorator.Item2 = expectedItem2Value;
+            });
+
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), 
+                typeof(HandlerDecoratorWithProperties<>));
+            
+            // Act
+            var handler = 
+                (HandlerDecoratorWithPropertiesBase)container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.AreEqual(expectedItem1Value, handler.Item1, "Initializer did not run.");
+            Assert.AreEqual(expectedItem2Value, handler.Item2, "Initializer did not run.");
+        }
+
+        [TestMethod]
         public void GetInstance_DecoratorWithMissingDependency_ThrowAnExceptionWithADescriptiveMessage()
         {
             // Arrange
@@ -668,6 +701,27 @@
 
             public void Handle(T command)
             {                
+            }
+        }
+
+        public class HandlerDecoratorWithPropertiesBase
+        {
+            public int Item1 { get; set; }
+
+            public string Item2 { get; set; }
+        }
+
+        public class HandlerDecoratorWithProperties<T> : HandlerDecoratorWithPropertiesBase, ICommandHandler<T>
+        {
+            private readonly ICommandHandler<T> wrapped;
+
+            public HandlerDecoratorWithProperties(ICommandHandler<T> wrapped)
+            {
+                this.wrapped = wrapped;
+            }
+
+            public void Handle(T command)
+            {
             }
         }
     }
