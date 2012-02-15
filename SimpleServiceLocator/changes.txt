@@ -4,13 +4,21 @@ Version vNext
 	General description:
 
 	Code Changes:
+
+	Bug fixes:
+
+
+Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18
+	General description:
+
+	Code Changes:
 		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
 		 GetInitializer<T>. This enables certain specialized scenarios. The main (external) consumer of
 		 this method is the RegisterManyForOpenGeneric method of the Extensions project.
-
-	Bug fixes:
 		-[Extensions] Decorators created using the RegisterManyForOpenGeneric extension methods now get
 		 initialized with any registered initializers (if any).
+
+	Bug fixes:
 		-[Core] The exception message that was thrown in case the delegate of a type could not be compiled, 
 		 incorrectly described the UnregisteredTypeEventArgs.Register method, which was confusing.
 

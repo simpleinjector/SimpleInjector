@@ -267,7 +267,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Builds up a <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
+        /// Builds up an <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
         /// are registered using <see cref="Container.RegisterInitializer{T}">RegisterInitializer</see> and
         /// that apply to the given <typeparamref name="TService"/> (including delegates that are registered
         /// for interfaces <typeparamref name="TService"/> implements and base types that 
