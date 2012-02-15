@@ -42,7 +42,7 @@ namespace SimpleInjector.InstanceProducers
         {
             NewExpression newExpression = this.BuildNewExpression();
 
-            Action<TImplementation> instanceInitializer = this.Container.GetInitializerFor<TImplementation>();
+            Action<TImplementation> instanceInitializer = this.Container.BuildInitializerFor<TImplementation>();
 
             if (instanceInitializer != null)
             {

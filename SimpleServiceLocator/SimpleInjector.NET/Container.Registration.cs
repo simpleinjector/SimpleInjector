@@ -628,26 +628,6 @@ namespace SimpleInjector
             this.locked = wasLocked;
         }
         
-        internal Action<T> GetInitializerFor<T>()
-        {
-            var initializersForType = this.GetInstanceInitializersFor<T>();
-
-            if (initializersForType.Length <= 1)
-            {
-                return initializersForType.FirstOrDefault();
-            }
-            else
-            {
-                return obj =>
-                {
-                    for (int index = 0; index < initializersForType.Length; index++)
-                    {
-                        initializersForType[index](obj);
-                    }
-                };
-            }
-        }
-
         private void AddRegistration(InstanceProducer registration)
         {
             this.ThrowWhenContainerIsLocked();

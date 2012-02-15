@@ -266,6 +266,36 @@ namespace SimpleInjector
             propertyInjector.Inject(instance);
         }
 
+        /// <summary>
+        /// Builds up a <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
+        /// are registered using <see cref="Container.RegisterInitializer{T}">RegisterInitializer</see> and
+        /// that apply to the given <typeparamref name="TService"/> (including delegates that are registered
+        /// for interfaces <typeparamref name="TService"/> implements and base types that 
+        /// <typeparamref name="TService"/> inherits from). <b>Null</b> will be returned when no delegates are
+        /// registered that apply to this type.
+        /// </summary>
+        /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
+        /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
+        public Action<TService> BuildInitializerFor<TService>()
+        {
+            var initializersForType = this.GetInstanceInitializersFor<TService>();
+
+            if (initializersForType.Length <= 1)
+            {
+                return initializersForType.FirstOrDefault();
+            }
+            else
+            {
+                return obj =>
+                {
+                    for (int index = 0; index < initializersForType.Length; index++)
+                    {
+                        initializersForType[index](obj);
+                    }
+                };
+            }
+        }
+
         internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType)
         {
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
