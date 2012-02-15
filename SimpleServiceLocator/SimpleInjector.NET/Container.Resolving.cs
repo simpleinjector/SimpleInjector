@@ -276,7 +276,7 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
         /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
-        public Action<TService> BuildInitializerFor<TService>()
+        public Action<TService> GetInitializer<TService>()
         {
             var initializersForType = this.GetInstanceInitializersFor<TService>();
 

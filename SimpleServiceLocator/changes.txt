@@ -5,7 +5,7 @@ Version vNext
 
 	Code Changes:
 		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
-		 BuildInitializerFor<T>. This enables certain specialized scenarios. The main (external) consumer of
+		 GetInitializer<T>. This enables certain specialized scenarios. The main (external) consumer of
 		 this method is the RegisterManyForOpenGeneric method of the Extensions project.
 
 	Bug fixes:

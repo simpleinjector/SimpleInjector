@@ -523,19 +523,19 @@ namespace SimpleInjector.Extensions
             // This method must be public because of Silverlight Sandbox restrictions.
             public Func<TImplementation, TImplementation> BuildFuncInitializer<TImplementation>()
             {
-                var instanceInitializer = this.BuildInitializerFor<TImplementation>();
+                var instanceInitializer = this.Container.GetInitializer<TImplementation>();
 
-                if (instanceInitializer == null)
+                if (instanceInitializer != null)
                 {
-                    return null;
+                    return instance =>
+                    {
+                        instanceInitializer(instance);
+
+                        return instance;
+                    };
                 }
 
-                return instance =>
-                {
-                    instanceInitializer(instance);
-
-                    return instance;
-                };
+                return null;
             }
 
             private bool MustDecorate(ExpressionBuiltEventArgs e, out Type closedGenericDecorator)
@@ -687,22 +687,14 @@ namespace SimpleInjector.Extensions
 
                 var newInstanceExpression = Expression.New(ctor, parameters);
 
-                if (instanceInitializer == null)
+                if (instanceInitializer != null)
                 {
-                    return newInstanceExpression;
+                    // It's not possible to return a Expression that is as heavily optimized as the
+                    // Expression.New simply is, because the instance initializer must be called as well.
+                    return Expression.Invoke(Expression.Constant(instanceInitializer), newInstanceExpression);
                 }
-
-                // It's not possible to return a Expression that is as heavily optimized as the Expression.New
-                // simply is, because the instance initializer must be called as well.
-                return Expression.Invoke(Expression.Constant(instanceInitializer), newInstanceExpression);
-            }
-
-            private Action<TImplementation> BuildInitializerFor<TImplementation>()
-            {
-                return (Action<TImplementation>)
-                    typeof(Container).GetMethod("BuildInitializerFor")
-                    .MakeGenericMethod(typeof(TImplementation))
-                    .Invoke(this.Container, null);
+                
+                return newInstanceExpression;
             }
 
             private sealed class ServiceTypeDecoratorInfo
