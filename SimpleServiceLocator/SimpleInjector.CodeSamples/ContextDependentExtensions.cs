@@ -9,9 +9,11 @@
 
     public class DependencyContext
     {
-        internal static readonly DependencyContext Root = new DependencyContext(null, null);
+        internal static readonly DependencyContext Root =
+            new DependencyContext(null, null);
 
-        internal DependencyContext(Type serviceType, Type implementationType)
+        internal DependencyContext(Type serviceType, 
+            Type implementationType)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
@@ -24,22 +26,26 @@
 
     public static class ContextDependentExtensions
     {
-        public static void RegisterWithContext<TService>(this Container container,
-            Func<DependencyContext, TService> contextBasedInstanceCreator)
+        public static void RegisterWithContext<TService>(
+            this Container container,
+            Func<DependencyContext, TService> contextBasedFactory)
             where TService : class
         {
-            Func<TService> rootTypeInstanceCreator = () => contextBasedInstanceCreator(DependencyContext.Root);
+            Func<TService> rootTypeInstanceCreator = 
+                () => contextBasedFactory(DependencyContext.Root);
 
-            // Allow TService to be resolved when calling Container.GetInstance<TService>());
+            // Allow TService to be resolved when calling 
+            // Container.GetInstance<TService>());
             container.Register<TService>(rootTypeInstanceCreator);
 
-            // Allow the Func<DependencyContext, TService> to be injected into transient parent types.
+            // Allow the Func<DependencyContext, TService> to be 
+            // injected into transient parent types.
             container.ExpressionBuilt += (sender, e) =>
             {
                 var rewriter = new DependencyContextRewriter
                 {
                     DelegateToReplace = rootTypeInstanceCreator,
-                    ContextBasedInstanceCreator = contextBasedInstanceCreator,
+                    ContextBasedFactory = contextBasedFactory,
                     ServiceType = e.RegisteredServiceType
                 };
 
@@ -47,19 +53,26 @@
             };
         }
 
-        private sealed class DependencyContextRewriter : ExpressionVisitor
+        private sealed class DependencyContextRewriter 
+            : ExpressionVisitor
         {
-            private readonly List<Expression> parents = new List<Expression>();
+            private readonly List<Expression> parents = 
+                new List<Expression>();
             
             public object DelegateToReplace { get; set; }
 
-            public object ContextBasedInstanceCreator { get; set; }
+            public object ContextBasedFactory { get; set; }
 
             public Type ServiceType { get; set; }
 
             private Expression Parent
             {
-                get { return this.parents.Count < 2 ? null : this.parents[this.parents.Count - 2]; }
+                get 
+                { 
+                    return this.parents.Count < 2 
+                        ? null 
+                        : this.parents[this.parents.Count - 2]; 
+                }
             }
 
             public override Expression Visit(Expression node)
@@ -73,23 +86,37 @@
                 return node;
             }
 
-            protected override Expression VisitInvocation(InvocationExpression node)
+            protected override Expression VisitInvocation(
+                InvocationExpression node)
             {
-                bool isRootTypeContextRegistration = 
-                    node.Expression.NodeType == ExpressionType.Constant &&
-                    ((ConstantExpression)node.Expression).Value == this.DelegateToReplace;
-
                 var parent = this.Parent as NewExpression;
 
-                if (isRootTypeContextRegistration && parent != null)
+                if (parent != null && 
+                    this.IsRootTypeContextRegistration(node))
                 {
-                    var context = new DependencyContext(this.ServiceType, parent.Type);
+                    var context = new DependencyContext(
+                        this.ServiceType, parent.Type);
 
-                    return Expression.Invoke(Expression.Constant(this.ContextBasedInstanceCreator),
+                    return Expression.Invoke(
+                        Expression.Constant(this.ContextBasedFactory),
                         Expression.Constant(context));
                 }
 
                 return base.VisitInvocation(node);
+            }
+
+            private bool IsRootTypeContextRegistration(
+                InvocationExpression node)
+            {
+                if (node.Expression.NodeType != ExpressionType.Constant)
+                {
+                    return false;
+                }
+
+                var constantValue = 
+                    ((ConstantExpression)node.Expression).Value;
+
+                return constantValue == this.DelegateToReplace;
             }
         }
     }
