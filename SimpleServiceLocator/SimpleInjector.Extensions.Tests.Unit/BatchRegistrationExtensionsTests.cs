@@ -25,6 +25,58 @@
         }
 
         [TestMethod]
+        public void GetTypesToRegister1_Always_ReturnsAValue()
+        {
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
+                typeof(IService<,>).Assembly);
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void GetTypesToRegister2_Always_ReturnsAValue()
+        {
+            // Arrange
+            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
+
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
+                assemblies);
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+#if !SILVERLIGHT
+        [TestMethod]
+        public void GetTypesToRegister3_Always_ReturnsAValue()
+        {
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
+                AccessibilityOption.AllTypes, typeof(IService<,>).Assembly);
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void GetTypesToRegister4_Always_ReturnsAValue()
+        {
+            // Arrange
+            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
+
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
+                AccessibilityOption.AllTypes, assemblies);
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+#endif
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void RegisterManyForOpenGeneric_WithClosedGenericType_Fails()
         {

@@ -160,6 +160,7 @@ namespace SimpleInjector.Extensions
             container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
         }
 #endif
+
         /// <summary>
         /// Allows registration of all concrete, public, non-generic types in the given set of 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
@@ -519,6 +520,164 @@ namespace SimpleInjector.Extensions
 
             RegisterManyForOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
         }
+
+        /// <summary>
+        /// Returns all public types from the supplied <paramref name="assemblies"/> that implement or inherit
+        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterManyForOpenGeneric"/>. The <see cref="RegisterManyForOpenGeneric"/> overloads
+        /// that take a collection of <see cref="Assembly"/> objects use this method to get the list of types
+        /// that need to be registered. Instead of calling such overload, you can call an overload that takes
+        /// a list of <see cref="Type"/> objects and pass in a filtered result from this 
+        /// <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var types = OpenGenericBatchRegistrationExtensions
+        ///     .GetTypesToRegister(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly)
+        ///     .Where(type => !type.Name.EndsWith("Decorator"));
+        /// 
+        /// container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
+        /// <see cref="RegisterManyForOpenGeneric"/> overload that takes a list of types to finish the
+        /// registration.
+        /// </remarks>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A list of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="openGenericServiceType"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
+            params Assembly[] assemblies)
+        {
+            return GetTypesToRegisterInternal(openGenericServiceType, AccessibilityOption.PublicTypesOnly, assemblies);
+        }
+
+        /// <summary>
+        /// Returns all public types from the supplied <paramref name="assemblies"/> that implement or inherit
+        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterManyForOpenGeneric"/>. The <see cref="RegisterManyForOpenGeneric"/> overloads
+        /// that take a collection of <see cref="Assembly"/> objects use this method to get the list of types
+        /// that need to be registered. Instead of calling such overload, you can call an overload that takes
+        /// a list of <see cref="Type"/> objects and pass in a filtered result from this 
+        /// <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var types = OpenGenericBatchRegistrationExtensions
+        ///     .GetTypesToRegister(typeof(ICommandHandler<>), typeof(ICommandHandler<>).Assembly)
+        ///     .Where(type => !type.Name.EndsWith("Decorator"));
+        /// 
+        /// container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
+        /// <see cref="RegisterManyForOpenGeneric"/> overload that takes a list of types to finish the
+        /// registration.
+        /// </remarks>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A list of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="openGenericServiceType"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
+            IEnumerable<Assembly> assemblies)
+        {
+            return GetTypesToRegisterInternal(openGenericServiceType, AccessibilityOption.PublicTypesOnly, assemblies);
+        }
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Returns all types from the supplied <paramref name="assemblies"/> that implement or inherit
+        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterManyForOpenGeneric"/>. The <see cref="RegisterManyForOpenGeneric"/> overloads
+        /// that take a collection of <see cref="Assembly"/> objects use this method to get the list of types
+        /// that need to be registered. Instead of calling such overload, you can call an overload that takes
+        /// a list of <see cref="Type"/> objects and pass in a filtered result from this 
+        /// <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var types = OpenGenericBatchRegistrationExtensions
+        ///     .GetTypesToRegister(typeof(ICommandHandler<>), AccessibilityOption.PublicTypesOnly,
+        ///         typeof(ICommandHandler<>).Assembly)
+        ///     .Where(type => !type.Name.EndsWith("Decorator"));
+        /// 
+        /// container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
+        /// <see cref="RegisterManyForOpenGeneric"/> overload that takes a list of types to finish the
+        /// registration.
+        /// </remarks>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A list of types.</returns>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="openGenericServiceType"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
+            AccessibilityOption accessibility, params Assembly[] assemblies)
+        {
+            return GetTypesToRegisterInternal(openGenericServiceType, accessibility, assemblies);
+        }
+
+        /// <summary>
+        /// Returns all types from the supplied <paramref name="assemblies"/> that implement or inherit
+        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterManyForOpenGeneric"/>. The <see cref="RegisterManyForOpenGeneric"/> overloads
+        /// that take a collection of <see cref="Assembly"/> objects use this method to get the list of types
+        /// that need to be registered. Instead of calling such overload, you can call an overload that takes
+        /// a list of <see cref="Type"/> objects and pass in a filtered result from this 
+        /// <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var types = OpenGenericBatchRegistrationExtensions
+        ///     .GetTypesToRegister(typeof(ICommandHandler<>), AccessibilityOption.PublicTypesOnly, 
+        ///         typeof(ICommandHandler<>).Assembly)
+        ///     .Where(type => !type.Name.EndsWith("Decorator"));
+        /// 
+        /// container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
+        /// <see cref="RegisterManyForOpenGeneric"/> overload that takes a list of types to finish the
+        /// registration.
+        /// </remarks>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A list of types.</returns>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="openGenericServiceType"/>, or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
+            AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
+        {
+            return GetTypesToRegisterInternal(openGenericServiceType, accessibility, assemblies);
+        }
+#endif
 
         private static void RegisterManyForOpenGenericInternal(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)

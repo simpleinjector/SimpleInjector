@@ -4,6 +4,8 @@ Version vNext
 	General description:
 
 	Code Changes:
+		-[Extensions] GetTypesToRegister methods added to the OpenGenericBatchRegistrationExtensions class
+		 which allows to customize the behavior.
 		-[Extensions] RegisterOpenGenericDecorator extension methods now allow registering non-generic
 		 implementations, as long as they implement the supplied open generic service type.
 
