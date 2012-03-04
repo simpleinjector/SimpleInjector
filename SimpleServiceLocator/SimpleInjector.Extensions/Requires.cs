@@ -27,7 +27,6 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Globalization;
     using System.Linq;
 
@@ -58,9 +57,9 @@ namespace SimpleInjector.Extensions
             if (accessibility != AccessibilityOption.AllTypes &&
                 accessibility != AccessibilityOption.PublicTypesOnly)
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The value of argument {0} ({1}) is invalid for Enum-type {2}.",
-                    paramName, (int)accessibility, typeof(AccessibilityOption).Name), paramName);
+                throw new ArgumentException(
+                    StringResources.ValueIsInvalidForEnumType((int)accessibility, typeof(AccessibilityOption)),
+                    paramName);
             }
         }
 
@@ -68,9 +67,7 @@ namespace SimpleInjector.Extensions
         {
             if (!type.IsGenericTypeDefinition)
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' is not an open generic type.", type),
-                    paramName);
+                throw new ArgumentException(StringResources.SuppliedTypeIsNotAnOpenGenericType(type), paramName);
             }
         }
 
@@ -78,10 +75,7 @@ namespace SimpleInjector.Extensions
         {
             if (type.IsGenericTypeDefinition)
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' is an open generic type. Use the RegisterOpenGeneric or " +
-                    "RegisterManyForOpenGeneric extension method for registering open generic types.", type),
-                    paramName);
+                throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
             }
         }
 
@@ -89,9 +83,7 @@ namespace SimpleInjector.Extensions
         {
             if (!type.IsClass && !type.IsInterface)
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' is not a reference type. Only reference types are supported.", type),
-                    paramName);
+                throw new ArgumentException(StringResources.SuppliedTypeIsNotAReferenceType(type), paramName);
             }
         }
 
@@ -106,17 +98,16 @@ namespace SimpleInjector.Extensions
         internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
             string paramName)
         {
-            if (service != implementation && 
+            if (service != implementation &&
                 !Helpers.ServiceIsAssignableFromImplementation(service, implementation))
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' does not inherit from or implement '{1}'.",
-                    implementation, service),
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(implementation, service),
                     paramName);
             }
         }
 
-        internal static void ServiceIsAssignableFromImplementations(Type serviceType, 
+        internal static void ServiceIsAssignableFromImplementations(Type serviceType,
             IEnumerable<Type> typesToRegister, string paramName)
         {
             var invalidType = (
@@ -132,16 +123,16 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void ServiceTypeDiffersFromImplementationType(Type serviceType, Type implementation, 
+        internal static void ServiceTypeDiffersFromImplementationType(Type serviceType, Type implementation,
             string paramName, string implementationParamName)
         {
             if (serviceType == implementation)
             {
-                throw new ArgumentException(paramName + " and " + implementationParamName + 
+                throw new ArgumentException(paramName + " and " + implementationParamName +
                     " must be different types.", paramName);
             }
         }
-        
+
         internal static void ContainsOneSinglePublicConstructor(Type implementationType, string paramName)
         {
             if (implementationType.GetConstructors().Length != 1)

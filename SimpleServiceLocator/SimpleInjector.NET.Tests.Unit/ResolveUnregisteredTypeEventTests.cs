@@ -39,7 +39,7 @@
         public void GetInstance_MultipleDelegatesHookedUpToEvent_FailsWhenBothDelegatesRegisterSameServiceType()
         {
             // Arrange
-            string expectedMessage = "Multiple observers of the ResolveUnregisteredType event are " + 
+            string expectedMessage = "Multiple observers of the ResolveUnregisteredType event are " +
                 "registering a delegate for the same service type";
 
             var container = new Container();
@@ -111,11 +111,11 @@
         public void GetInstance_UnregisteredConcreteTypeWithUnregistedDependencies_ThrowsExpectedException()
         {
             // Arrange
-            string expectedMessage = 
-                "No registration for type RealUserService could be found " + 
+            string expectedMessage =
+                "No registration for type RealUserService could be found " +
                 "and an implicit registration could not be made. The constructor of the type contains the " +
                 "parameter of type IUserRepository that is not registered. " +
-                "Please ensure IUserRepository is registered in the container, " + 
+                "Please ensure IUserRepository is registered in the container, " +
                 "or change the constructor of RealUserService.";
 
             // We don't register the required IUserRepository dependency.
@@ -212,7 +212,7 @@
             container.ResolveUnregisteredType += handler;
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
-            
+
             // Act
             container.ResolveUnregisteredType -= handler;
 
@@ -236,7 +236,7 @@
             // Arrange
             const int ExpectedEventCallCount = 1;
             int actualEventCallCount = 0;
-            
+
             var container = new Container();
 
             container.ResolveUnregisteredType += (s, e) =>
@@ -306,7 +306,7 @@
                 const string AssertMessage = "Exception message was not descriptive.";
 
                 AssertThat.StringContains("ResolveUnregisteredType", ex.Message, AssertMessage);
-                AssertThat.StringContains("registered a delegate that threw an exception", ex.Message, 
+                AssertThat.StringContains("registered a delegate that threw an exception", ex.Message,
                     AssertMessage);
             }
         }
@@ -367,11 +367,11 @@
             {
                 const string AssertMessage = "Exception message was not descriptive.";
 
-                AssertThat.StringContains("Error occurred while trying to build a delegate for type", 
+                AssertThat.StringContains("Error occurred while trying to build a delegate for type",
                     ex.Message, AssertMessage);
                 AssertThat.StringContains("UnregisteredTypeEventArgs.Register(Expression)", ex.Message,
                     AssertMessage);
-                AssertThat.StringContains("Expression of type 'System.Boolean' cannot be used for return type", 
+                AssertThat.StringContains("Expression of type 'System.Boolean' cannot be used for return type",
                     ex.Message, AssertMessage);
             }
         }
@@ -429,7 +429,7 @@
                 const string AssertMessage = "Exception message was not descriptive. Actual message: ";
 
                 AssertThat.StringContains("ResolveUnregisteredType", ex.Message, AssertMessage);
-                AssertThat.StringContains("registered a delegate that returned a null reference", ex.Message, 
+                AssertThat.StringContains("registered a delegate that returned a null reference", ex.Message,
                     AssertMessage);
             }
         }
@@ -476,7 +476,7 @@
             bool resolveUnregisteredTypeWasTriggered = false;
 
             var container = new Container();
-            
+
             container.ResolveUnregisteredType += (s, e) =>
             {
                 if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
@@ -495,6 +495,9 @@
         [TestMethod]
         public void GetAllInstancesByType_OnUnregisteredType_TriggersUnregisteredTypeResolution()
         {
+            Dictionary<Type, object> o = new Dictionary<Type, object>(40);
+            o[typeof(object)] = 3;
+
             // Arrange
             bool resolveUnregisteredTypeWasTriggered = false;
 

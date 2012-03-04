@@ -38,25 +38,25 @@ namespace SimpleInjector.Extensions
     /// </summary>
     public static class NonGenericRegistrationsExtensions
     {
-        private static readonly MethodInfo register = 
+        private static readonly MethodInfo register =
             Helpers.GetGenericMethod(c => c.Register<object, object>());
 
         private static readonly MethodInfo registerConcrete =
             Helpers.GetGenericMethod(c => c.Register<object>());
 
-        private static readonly MethodInfo registerSingle = 
+        private static readonly MethodInfo registerSingle =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object, object>());
 
-        private static readonly MethodInfo registerByFunc = 
+        private static readonly MethodInfo registerByFunc =
             Helpers.GetGenericMethod(c => c.Register<object>((Func<object>)null));
 
-        private static readonly MethodInfo registerAll = 
+        private static readonly MethodInfo registerAll =
             Helpers.GetGenericMethod(c => c.RegisterAll<object>((IEnumerable<object>)null));
 
         private static readonly MethodInfo registerSingleByFunc =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object>((Func<object>)null));
 
-        private static readonly MethodInfo registerSingleByT = 
+        private static readonly MethodInfo registerSingleByT =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object>((object)null));
 
         /// <summary>
@@ -372,11 +372,11 @@ namespace SimpleInjector.Extensions
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, implementation, ex);
             }
-            catch (TargetInvocationException tiex)
+            catch (TargetInvocationException ex)
             {
-                if (tiex.InnerException != null)
+                if (ex.InnerException != null)
                 {
-                    throw tiex.InnerException;
+                    throw ex.InnerException;
                 }
 
                 throw;
@@ -409,11 +409,11 @@ namespace SimpleInjector.Extensions
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, paramName);
             }
-            catch (TargetInvocationException tiex)
+            catch (TargetInvocationException ex)
             {
-                if (tiex.InnerException != null)
+                if (ex.InnerException != null)
                 {
-                    throw tiex.InnerException;
+                    throw ex.InnerException;
                 }
 
                 throw;

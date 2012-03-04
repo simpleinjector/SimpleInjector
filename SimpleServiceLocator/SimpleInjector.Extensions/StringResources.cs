@@ -32,13 +32,14 @@ namespace SimpleInjector.Extensions
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType, 
+        // Gets called when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType,
             Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to register type {0}. The security restrictions of your application's sandbox do " +
                 "not permit the creation of this type. Explicitly register the type using one of the " +
-                "generic Register overloads or consider making it public. {1}", serviceType, 
+                "generic Register overloads or consider making it public. {1}", serviceType,
                 innerException.Message);
         }
 
@@ -64,6 +65,41 @@ namespace SimpleInjector.Extensions
                 "For the container to be able to use {0} as a decorator, its constructor should have a " +
                 "single argument of type {1}, but it currently has {2}.", decoratorType.ToFriendlyName(),
                 serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+        }
+
+        internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type implementation, Type service)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' does not inherit from or implement '{1}'.",
+                implementation.ToFriendlyName(), service.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsNotAReferenceType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is not a reference type. Only reference types are supported.",
+                type.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsAnOpenGenericType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is an open generic type. Use the RegisterOpenGeneric or " +
+                "RegisterManyForOpenGeneric extension method for registering open generic types.",
+                type.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsNotAnOpenGenericType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is not an open generic type.", type.ToFriendlyName());
+        }
+
+        internal static string ValueIsInvalidForEnumType(int value, Type enumType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The value {0} is invalid for Enum-type {1}.",
+                value, enumType.ToFriendlyName());
         }
 
         private static string ToFriendlyName(this Type type)

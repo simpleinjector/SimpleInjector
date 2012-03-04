@@ -127,11 +127,11 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), 
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
                 typeof(HandlerDecoratorWithProperties<>));
-            
+
             // Act
-            var handler = 
+            var handler =
                 (HandlerDecoratorWithPropertiesBase)container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
@@ -488,7 +488,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), 
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
                 typeof(ClassConstraintHandlerDecorator<>));
 
             // Act
@@ -555,9 +555,93 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(
-                    "its constructor should have a single argument of type ICommandHandler<TCommand>", 
+                    "its constructor should have a single argument of type ICommandHandler<TCommand>",
                     ex.Message);
             }
+        }
+
+        [TestMethod]
+        public void RegisterOpenGenericDecorator_SupplyingAnUnrelatedType_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), typeof(KeyValuePair<,>));
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(
+                    "The supplied type 'KeyValuePair<TKey, TValue>' does not inherit from " +
+                    "or implement 'ICommandHandler<TCommand>'.",
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterOpenGenericDecorator_SupplyingAConcreteNonGenericType_ShouldSucceed()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericDecoratorSupplyingAConcreteNonGenericType_ReturnsExpectedDecorator1()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericDecoratorSupplyingAConcreteNonGenericTypeThatDoesNotMatch_DoesNotReturnThatDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            // StructCommandHandler implements ICommandHandler<StructCommand>
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
+
+            // ConcreteCommandHandlerDecorator implements ICommandHandler<RealCommand>
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<StructCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(StructCommandHandler));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericDecoratorSupplyingAConcreteNonGenericType_ReturnsExpectedDecorator2()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+            container.Register<ICommandHandler<StructCommand>, StructCommandHandler>();
+
+            container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
         }
 
         public struct StructCommand
@@ -633,6 +717,17 @@
             }
         }
 
+        public class ConcreteCommandHandlerDecorator : ICommandHandler<RealCommand>
+        {
+            public ConcreteCommandHandlerDecorator(ICommandHandler<RealCommand> wrapped)
+            {
+            }
+
+            public void Handle(RealCommand command)
+            {
+            }
+        }
+
         public class StubDecorator1<T> : ICommandHandler<T>
         {
             public StubDecorator1(ICommandHandler<T> wrapped)
@@ -700,7 +795,7 @@
             }
 
             public void Handle(T command)
-            {                
+            {
             }
         }
 

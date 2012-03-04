@@ -203,11 +203,10 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="openGenericServiceType"/>, or <paramref name="openGenericDecorator"/> are null
         /// references.</exception>
-        /// <exception cref="ArgumentException">Thrown when either <paramref name="openGenericServiceType"/> 
-        /// or <paramref name="openGenericDecorator"/> are not open generic types, when 
-        /// <paramref name="openGenericDecorator"/> does not inherit from or implement 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/>  is not
+        /// an open generic type, when <paramref name="openGenericDecorator"/> does not inherit from or implement 
         /// <paramref name="openGenericServiceType"/>, when <paramref name="openGenericDecorator"/> does not
-        /// have a single public constructor, and when <paramref name="openGenericDecorator"/> does not
+        /// have a single public constructor, or when <paramref name="openGenericDecorator"/> does not
         /// contain a constructor that has exactly one argument of type 
         /// <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterOpenGenericDecorator(this Container container,
@@ -383,12 +382,11 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="openGenericServiceType"/>, <paramref name="openGenericDecorator"/>, or
         /// <paramref name="predicate"/> are null references.</exception>
-        /// <exception cref="ArgumentException">Thrown when either <paramref name="openGenericServiceType"/> 
-        /// or <paramref name="openGenericDecorator"/> are not open generic types, when 
-        /// <paramref name="openGenericDecorator"/> does not inherit from or implement 
-        /// <paramref name="openGenericServiceType"/>, when <paramref name="openGenericDecorator"/> does not
-        /// have a single public constructor, and when <paramref name="openGenericDecorator"/> does not
-        /// contain a constructor that has exactly one argument of type 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type, when <paramref name="openGenericDecorator"/> does not inherit from or 
+        /// implement <paramref name="openGenericServiceType"/>, when <paramref name="openGenericDecorator"/>
+        /// does not have a single public constructor, or when <paramref name="openGenericDecorator"/> does 
+        /// not contain a constructor that has exactly one argument of type 
         /// <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterOpenGenericDecorator(this Container container,
             Type openGenericServiceType, Type openGenericDecorator,
@@ -416,21 +414,20 @@ namespace SimpleInjector.Extensions
             container.ExpressionBuilt += interceptor.Decorate;
         }
 
-        private static void VerifyMethodArguments(Container container, Type openGenericServiceType, 
+        private static void VerifyMethodArguments(Container container, Type openGenericServiceType,
             Type openGenericDecorator)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(openGenericDecorator, "openGenericDecorator");
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
-            Requires.TypeIsOpenGeneric(openGenericDecorator, "openGenericDecorator");
-            Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericDecorator, 
+            Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericDecorator,
                 "openGenericServiceType");
             Requires.ContainsOneSinglePublicConstructor(openGenericDecorator, "openGenericDecorator");
             Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(openGenericDecorator,
                 openGenericServiceType, "openGenericDecorator");
         }
-        
+
         /// <summary>
         /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
         /// delegate that is that is supplied to the 
@@ -489,7 +486,7 @@ namespace SimpleInjector.Extensions
             // an InstanceProducer stores the Expression, we can safely store this information in a 
             // thread-static field.
             [ThreadStatic]
-            private static Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>> 
+            private static Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
                 threadStaticServiceTypePredicateCache;
 
             public Container Container { get; set; }
@@ -511,7 +508,7 @@ namespace SimpleInjector.Extensions
                     var ctor = closedGenericDecorator.GetConstructors().Single();
 
                     var serviceInfo = this.GetServiceTypeInfo(e);
-                    
+
                     // Add the decorator to the list of applied decorator. This way users can use this
                     // information in the predicate of the next decorator they add.
                     serviceInfo.AppliedDecorators.Add(closedGenericDecorator);
@@ -693,7 +690,7 @@ namespace SimpleInjector.Extensions
                     // Expression.New simply is, because the instance initializer must be called as well.
                     return Expression.Invoke(Expression.Constant(instanceInitializer), newInstanceExpression);
                 }
-                
+
                 return newInstanceExpression;
             }
 

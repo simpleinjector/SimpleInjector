@@ -29,7 +29,7 @@
             };
 
             this.container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), callback,
-                AppDomain.CurrentDomain.GetAssemblies());
+                typeof(IEventHandler<>).Assembly);
 
             this.container.RegisterSingleOpenGeneric(typeof(IEventHandler<>),
                 typeof(MultipleDispatchEventHandler<>));

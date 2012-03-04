@@ -3,7 +3,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,7 +54,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
                 Assembly.GetExecutingAssembly());
         }
 
@@ -159,7 +158,7 @@
             var container = new Container();
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-            
+
             // Act
             container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), assemblies);
         }
@@ -187,7 +186,7 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, 
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
                 assemblies);
         }
 
@@ -209,7 +208,7 @@
         {
             // Arrange
             var container = new Container();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
                 Assembly.GetExecutingAssembly());
 
             // Act
@@ -238,7 +237,7 @@
         {
             // Arrange
             var container = new Container();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
                 Assembly.GetExecutingAssembly());
 
             // Act
@@ -342,7 +341,7 @@
                 Assert.IsTrue(ex.Message.Contains(serviceType.Name), AssertMessage + ex.Message);
             }
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullAssemblyParamsArgument_ThrowsException()
@@ -460,7 +459,7 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
                 callback, assemblies);
 
             // Assert
@@ -497,7 +496,7 @@
             var assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, callback, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, callback,
                 assemblies);
         }
 #endif
@@ -515,7 +514,7 @@
             List<Type> actualClosedServiceTypes = new List<Type>();
 
             var container = new Container();
-            
+
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
                 actualClosedServiceTypes.Add(closedServiceType);

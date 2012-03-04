@@ -49,7 +49,10 @@ namespace SimpleInjector.Extensions
                     ClosedServiceTypeSatisfiesAllTypeConstraints = false
                 };
             }
-            else
+
+            bool isGenericType = this.OpenGenericImplementation.GetGenericArguments().Length > 0;
+
+            if (isGenericType)
             {
                 var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
 
@@ -57,6 +60,14 @@ namespace SimpleInjector.Extensions
                 {
                     ClosedServiceTypeSatisfiesAllTypeConstraints = true,
                     ClosedGenericImplementation = this.OpenGenericImplementation.MakeGenericType(arguments)
+                };
+            }
+            else
+            {
+                return new BuildResult
+                {
+                    ClosedServiceTypeSatisfiesAllTypeConstraints = true,
+                    ClosedGenericImplementation = this.OpenGenericImplementation
                 };
             }
         }
@@ -85,12 +96,26 @@ namespace SimpleInjector.Extensions
 
         private bool SatisfiesGenericTypeConstraints(Type serviceType)
         {
-            var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
+            bool implementationHasGenericArguments =
+                this.OpenGenericImplementation.GetGenericArguments().Length == 0;
 
-            // Type arguments that don't match are left out. When the length of the result does not match the
-            // actual length, this means that the generic type constraints don't match and the given service 
-            // type does not satisft the generic type constraints.
-            return arguments.Length == this.OpenGenericImplementation.GetGenericArguments().Length;
+            if (implementationHasGenericArguments)
+            {
+                // When there are no generic type arguments, there are (obviously) no generic type constraints
+                // so checking for the number of argument would always succeed, while this is not correct.
+                // Instead we should check whether the given service type is the requested closed generic base
+                // type.
+                return this.ClosedGenericBaseType == serviceType;
+            }
+            else
+            {
+                var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
+
+                // Type arguments that don't match are left out. When the length of the result does not match 
+                // the actual length, this means that the generic type constraints don't match and the given 
+                // service type does not satisft the generic type constraints.
+                return arguments.Length == this.OpenGenericImplementation.GetGenericArguments().Length;
+            }
         }
 
         private Type[] GetMatchingGenericArgumentsForOpenImplementationBasedOn(Type openGenericServiceType)
