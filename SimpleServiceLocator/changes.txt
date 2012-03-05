@@ -4,6 +4,15 @@ Version vNext
 	General description:
 
 	Code Changes:
+
+	Bug fixes:
+
+
+Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
+	General description:
+		RegisterOpenGenericDecorator extension methods improved to allow registering non-generic deceorator.
+
+	Code Changes:
 		-[Extensions] GetTypesToRegister methods added to the OpenGenericBatchRegistrationExtensions class
 		 which allows to customize the behavior.
 		-[Extensions] RegisterOpenGenericDecorator extension methods now allow registering non-generic
@@ -14,6 +23,8 @@ Version vNext
 
 Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18
 	General description:
+		Container.GetInitializer<T> method added to the core library, and RegisterManyForOpenGeneric in
+		extensions now execute initalizers on decorators.
 
 	Code Changes:
 		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
