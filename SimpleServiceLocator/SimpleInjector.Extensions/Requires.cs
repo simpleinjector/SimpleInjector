@@ -148,8 +148,8 @@ namespace SimpleInjector.Extensions
             var serviceTypeArguments =
                 from parameter in decoratorType.GetConstructors().Single().GetParameters()
                 let type = parameter.ParameterType
-                where type.IsGenericType
-                where type.GetGenericTypeDefinition() == serviceType
+                where (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType) ||
+                    type == serviceType
                 select parameter;
 
             int numberOfServiceTypeDependencies = serviceTypeArguments.Count();
@@ -160,6 +160,17 @@ namespace SimpleInjector.Extensions
                     decoratorType, serviceType, numberOfServiceTypeDependencies);
 
                 throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(Type serviceType,
+            Type decoratorType, string parameterName)
+        {
+            if (!serviceType.IsGenericTypeDefinition && decoratorType.IsGenericTypeDefinition)
+            {
+                throw new ArgumentException(
+                    StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(
+                        serviceType, decoratorType), parameterName);
             }
         }
     }

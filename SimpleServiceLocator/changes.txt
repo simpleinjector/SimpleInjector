@@ -4,6 +4,8 @@ Version vNext
 	General description:
 
 	Code Changes:
+		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
+		 and allows registering both generic and non-generic decorators.
 
 	Bug fixes:
 

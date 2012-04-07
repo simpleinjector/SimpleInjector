@@ -102,6 +102,14 @@ namespace SimpleInjector.Extensions
                 value, enumType.ToFriendlyName());
         }
 
+        internal static string DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(Type serviceType,
+            Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied decorator '{0}' is an open generic type definition, while the supplied " +
+                "service type '{1}' is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+        }
+
         private static string ToFriendlyName(this Type type)
         {
             if (!type.IsGenericType)

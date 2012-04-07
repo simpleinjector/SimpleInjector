@@ -26,12 +26,9 @@
 namespace SimpleInjector.Extensions
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     /// <summary>
     /// Extension methods for applying generic decorators.
@@ -209,10 +206,17 @@ namespace SimpleInjector.Extensions
         /// have a single public constructor, or when <paramref name="openGenericDecorator"/> does not
         /// contain a constructor that has exactly one argument of type 
         /// <paramref name="openGenericServiceType"/>.</exception>
+#if !DEBUG
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("This method is obsolete. Please use the " +
+            "SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator extension method instead.")]
+#endif
         public static void RegisterOpenGenericDecorator(this Container container,
             Type openGenericServiceType, Type openGenericDecorator)
         {
-            container.RegisterOpenGenericDecoratorCore(openGenericServiceType, openGenericDecorator, null);
+            Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
+
+            container.RegisterDecorator(openGenericServiceType, openGenericDecorator);
         }
 
         /// <summary>
@@ -388,50 +392,36 @@ namespace SimpleInjector.Extensions
         /// does not have a single public constructor, or when <paramref name="openGenericDecorator"/> does 
         /// not contain a constructor that has exactly one argument of type 
         /// <paramref name="openGenericServiceType"/>.</exception>
+#if !DEBUG
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("This method is obsolete. Please use the " +
+            "SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator extension method instead.")]
+#endif
         public static void RegisterOpenGenericDecorator(this Container container,
             Type openGenericServiceType, Type openGenericDecorator,
             Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(predicate, "predicate");
-
-            container.RegisterOpenGenericDecoratorCore(openGenericServiceType, openGenericDecorator, predicate);
-        }
-
-        private static void RegisterOpenGenericDecoratorCore(this Container container,
-            Type openGenericServiceType, Type openGenericDecorator,
-            Predicate<PredicateContext> predicate)
-        {
-            VerifyMethodArguments(container, openGenericServiceType, openGenericDecorator);
-
-            var interceptor = new DecoratorExpressionInterceptor
-            {
-                Container = container,
-                OpenGenericServiceType = openGenericServiceType,
-                OpenGenericDecorator = openGenericDecorator,
-                Predicate = predicate
-            };
-
-            container.ExpressionBuilt += interceptor.Decorate;
-        }
-
-        private static void VerifyMethodArguments(Container container, Type openGenericServiceType,
-            Type openGenericDecorator)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
-            Requires.IsNotNull(openGenericDecorator, "openGenericDecorator");
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
-            Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericDecorator,
-                "openGenericServiceType");
-            Requires.ContainsOneSinglePublicConstructor(openGenericDecorator, "openGenericDecorator");
-            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(openGenericDecorator,
-                openGenericServiceType, "openGenericDecorator");
+
+            container.RegisterDecorator(openGenericServiceType, openGenericDecorator,
+                context => predicate(ConvertToPredicateContext(context)));
+        }
+
+        private static PredicateContext ConvertToPredicateContext(DecoratorPredicateContext context)
+        {
+            return new PredicateContext
+            {
+                ServiceType = context.ServiceType,
+                ImplementationType = context.ImplementationType,
+                AppliedDecorators = context.AppliedDecorators,
+                Expression = context.Expression,
+            };
         }
 
         /// <summary>
         /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
         /// delegate that is that is supplied to the 
-        /// <see cref="GenericDecoratorExtensions.RegisterOpenGenericDecorator(Container, Type, Type)">RegisterOpenGenericDecorator</see>
+        /// <see cref="GenericDecoratorExtensions.RegisterOpenGenericDecorator(Container, Type, Type, Predicate{PredicateContext})">RegisterOpenGenericDecorator</see>
         /// overload that takes this delegate. This type contains information about the decoration that is about
         /// to be applied and it allows users to examine the given instance to see whether the decorator should
         /// be applied or not.
@@ -473,239 +463,6 @@ namespace SimpleInjector.Extensions
             /// </summary>
             /// <value>The current expression that is about to be decorated.</value>
             public Expression Expression { get; internal set; }
-        }
-
-        private sealed class DecoratorExpressionInterceptor
-        {
-            // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
-            // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
-            // get raised by multiple threads at the same time (especially for types resolved using
-            // unregistered type resolution) and using the same dictionary could lead to duplicate entries
-            // in the ServiceTypeDecoratorInfo.AppliedDecorators list. Because the ExpressionBuilt event gets 
-            // raised and all delegates registered to that event will get called on the same thread and before
-            // an InstanceProducer stores the Expression, we can safely store this information in a 
-            // thread-static field.
-            [ThreadStatic]
-            private static Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-                threadStaticServiceTypePredicateCache;
-
-            public Container Container { get; set; }
-
-            public Type OpenGenericServiceType { get; set; }
-
-            public Type OpenGenericDecorator { get; set; }
-
-            public Predicate<PredicateContext> Predicate { get; set; }
-
-            public void Decorate(object sender, ExpressionBuiltEventArgs e)
-            {
-                Type closedGenericDecorator;
-
-                if (this.MustDecorate(e, out closedGenericDecorator))
-                {
-                    var parameters = this.BuildParameters(closedGenericDecorator, e);
-
-                    var ctor = closedGenericDecorator.GetConstructors().Single();
-
-                    var serviceInfo = this.GetServiceTypeInfo(e);
-
-                    // Add the decorator to the list of applied decorator. This way users can use this
-                    // information in the predicate of the next decorator they add.
-                    serviceInfo.AppliedDecorators.Add(closedGenericDecorator);
-
-                    e.Expression = this.BuildDecoratorExpression(ctor, parameters);
-                }
-            }
-
-            // This method must be public because of Silverlight Sandbox restrictions.
-            public Func<TImplementation, TImplementation> BuildFuncInitializer<TImplementation>()
-            {
-                var instanceInitializer = this.Container.GetInitializer<TImplementation>();
-
-                if (instanceInitializer != null)
-                {
-                    return instance =>
-                    {
-                        instanceInitializer(instance);
-
-                        return instance;
-                    };
-                }
-
-                return null;
-            }
-
-            private bool MustDecorate(ExpressionBuiltEventArgs e, out Type closedGenericDecorator)
-            {
-                closedGenericDecorator = null;
-
-                if (!this.OpenGenericServiceType.IsGenericTypeDefinitionOf(e.RegisteredServiceType))
-                {
-                    return false;
-                }
-
-                var builder = new GenericTypeBuilder
-                {
-                    ClosedGenericBaseType = e.RegisteredServiceType,
-                    OpenGenericImplementation = this.OpenGenericDecorator
-                };
-
-                var results = builder.BuildClosedGenericImplementation();
-
-                if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
-                {
-                    return false;
-                }
-
-                if (this.Predicate != null)
-                {
-                    var context = this.CreatePredicateContext(e);
-
-                    if (!this.Predicate(context))
-                    {
-                        return false;
-                    }
-                }
-
-                closedGenericDecorator = results.ClosedGenericImplementation;
-
-                return true;
-            }
-
-            private PredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
-            {
-                var info = this.GetServiceTypeInfo(e);
-
-                return new PredicateContext
-                {
-                    ServiceType = e.RegisteredServiceType,
-                    ImplementationType = info.ImplementationType,
-                    AppliedDecorators = info.AppliedDecorators.ToList().AsReadOnly(),
-                    Expression = e.Expression,
-                };
-            }
-
-            private ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
-            {
-                var predicateCache = this.GetServiceTypePredicateCache();
-
-                if (!predicateCache.ContainsKey(e.RegisteredServiceType))
-                {
-                    Type implementationType = DetermineImplementationType(e);
-
-                    predicateCache[e.RegisteredServiceType] = new ServiceTypeDecoratorInfo(implementationType);
-                }
-
-                return predicateCache[e.RegisteredServiceType];
-            }
-
-            private Dictionary<Type, ServiceTypeDecoratorInfo> GetServiceTypePredicateCache()
-            {
-                var predicateCache = threadStaticServiceTypePredicateCache;
-
-                if (predicateCache == null)
-                {
-                    predicateCache = new Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>();
-
-                    threadStaticServiceTypePredicateCache = predicateCache;
-                }
-
-                if (!predicateCache.ContainsKey(this.Container))
-                {
-                    predicateCache[this.Container] = new Dictionary<Type, ServiceTypeDecoratorInfo>();
-                }
-
-                return predicateCache[this.Container];
-            }
-
-            private static Type DetermineImplementationType(ExpressionBuiltEventArgs e)
-            {
-                if (e.Expression is ConstantExpression)
-                {
-                    // Singleton
-                    return ((ConstantExpression)e.Expression).Value.GetType();
-                }
-
-                if (e.Expression is NewExpression)
-                {
-                    // Transient without initializers.
-                    return ((NewExpression)e.Expression).Constructor.DeclaringType;
-                }
-
-                var invocation = e.Expression as InvocationExpression;
-
-                if (invocation != null && invocation.Expression is ConstantExpression &&
-                    invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
-                {
-                    // Transient with initializers.
-                    return ((NewExpression)invocation.Arguments[0]).Constructor.DeclaringType;
-                }
-
-                // Implementation type can not be determined.
-                return e.RegisteredServiceType;
-            }
-
-            private Expression[] BuildParameters(Type closedGenericDecorator, ExpressionBuiltEventArgs e)
-            {
-                var parameters =
-                    from parameter in closedGenericDecorator.GetConstructors().Single().GetParameters()
-                    select this.BuildExpressionForParameter(parameter, e);
-
-                try
-                {
-                    return parameters.ToArray();
-                }
-                catch (ActivationException ex)
-                {
-                    // Build a more expressive exception message.
-                    string message =
-                        StringResources.ErrorWhileTryingToGetInstanceOfType(closedGenericDecorator, ex.Message);
-
-                    throw new ActivationException(message, ex);
-                }
-            }
-
-            private Expression BuildExpressionForParameter(ParameterInfo parameter,
-                ExpressionBuiltEventArgs e)
-            {
-                if (parameter.ParameterType == e.RegisteredServiceType)
-                {
-                    return e.Expression;
-                }
-
-                return this.Container.GetRegistration(parameter.ParameterType, true).BuildExpression();
-            }
-
-            private Expression BuildDecoratorExpression(ConstructorInfo ctor, Expression[] parameters)
-            {
-                var instanceInitializer =
-                    this.GetType().GetMethod("BuildFuncInitializer").MakeGenericMethod(ctor.DeclaringType)
-                    .Invoke(this, null);
-
-                var newInstanceExpression = Expression.New(ctor, parameters);
-
-                if (instanceInitializer != null)
-                {
-                    // It's not possible to return a Expression that is as heavily optimized as the
-                    // Expression.New simply is, because the instance initializer must be called as well.
-                    return Expression.Invoke(Expression.Constant(instanceInitializer), newInstanceExpression);
-                }
-
-                return newInstanceExpression;
-            }
-
-            private sealed class ServiceTypeDecoratorInfo
-            {
-                public ServiceTypeDecoratorInfo(Type implementationType)
-                {
-                    this.ImplementationType = implementationType;
-                    this.AppliedDecorators = new List<Type>();
-                }
-
-                public Type ImplementationType { get; private set; }
-
-                public List<Type> AppliedDecorators { get; private set; }
-            }
         }
     }
 }

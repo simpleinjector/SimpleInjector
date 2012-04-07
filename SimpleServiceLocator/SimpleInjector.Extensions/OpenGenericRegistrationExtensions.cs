@@ -226,7 +226,7 @@ namespace SimpleInjector.Extensions
 
                 e.Register(expression);
             }
-            
+
             private object GetSingleton(Type closedGenericImplementation)
             {
                 object singleton;
@@ -267,11 +267,7 @@ namespace SimpleInjector.Extensions
                     return;
                 }
 
-                var builder = new GenericTypeBuilder
-                {
-                    ClosedGenericBaseType = e.UnregisteredServiceType,
-                    OpenGenericImplementation = this.OpenGenericImplementation
-                };
+                var builder = new GenericTypeBuilder(e.UnregisteredServiceType, this.OpenGenericImplementation);
 
                 var results = builder.BuildClosedGenericImplementation();
 

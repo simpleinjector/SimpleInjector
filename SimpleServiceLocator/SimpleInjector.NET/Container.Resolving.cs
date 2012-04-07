@@ -251,7 +251,7 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("instance");
             }
-            
+
             var snapshot = this.propertyInjectorCache;
 
             PropertyInjector propertyInjector;
@@ -276,6 +276,8 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
         /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "We need to return a Action<TService> and we therefore need the generic type param.")]
         public Action<TService> GetInitializer<TService>()
         {
             var initializersForType = this.GetInstanceInitializersFor<TService>();
@@ -476,7 +478,7 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteType<TService>() 
+        private static InstanceProducer BuildInstanceProducerForConcreteType<TService>()
             where TService : class
         {
             if (Helpers.IsConcreteConstructableType(typeof(TService)))

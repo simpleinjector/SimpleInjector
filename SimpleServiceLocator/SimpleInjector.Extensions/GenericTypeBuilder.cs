@@ -34,9 +34,15 @@ namespace SimpleInjector.Extensions
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
-        internal Type ClosedGenericBaseType { get; set; }
+        public GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
+        {
+            this.ClosedGenericBaseType = closedGenericBaseType;
+            this.OpenGenericImplementation = openGenericImplementation;
+        }
 
-        internal Type OpenGenericImplementation { get; set; }
+        private Type ClosedGenericBaseType { get; set; }
+
+        private Type OpenGenericImplementation { get; set; }
 
         internal BuildResult BuildClosedGenericImplementation()
         {
@@ -50,9 +56,7 @@ namespace SimpleInjector.Extensions
                 };
             }
 
-            bool isGenericType = this.OpenGenericImplementation.GetGenericArguments().Length > 0;
-
-            if (isGenericType)
+            if (this.OpenGenericImplementation.IsGenericTypeDefinition)
             {
                 var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
 
@@ -96,10 +100,7 @@ namespace SimpleInjector.Extensions
 
         private bool SatisfiesGenericTypeConstraints(Type serviceType)
         {
-            bool implementationHasGenericArguments =
-                this.OpenGenericImplementation.GetGenericArguments().Length == 0;
-
-            if (implementationHasGenericArguments)
+            if (!this.OpenGenericImplementation.IsGenericTypeDefinition)
             {
                 // When there are no generic type arguments, there are (obviously) no generic type constraints
                 // so checking for the number of argument would always succeed, while this is not correct.

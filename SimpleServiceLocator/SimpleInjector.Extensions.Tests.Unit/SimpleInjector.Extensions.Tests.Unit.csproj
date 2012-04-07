@@ -55,7 +55,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertThat.cs" />
+    <Compile Include="DecoratorExtensionsTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="GenericDecoratorExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
