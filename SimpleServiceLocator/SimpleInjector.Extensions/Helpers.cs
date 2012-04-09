@@ -36,6 +36,13 @@ namespace SimpleInjector.Extensions
     /// </summary>
     internal static class Helpers
     {
+        internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
+        {
+            var body = methodCall.Body as MethodCallExpression;
+
+            return body.Method.GetGenericMethodDefinition();
+        }
+
         internal static MethodInfo GetGenericMethod(Expression<Action<Container>> methodCall)
         {
             var body = methodCall.Body as MethodCallExpression;
@@ -87,7 +94,7 @@ namespace SimpleInjector.Extensions
                 return Enumerable.Empty<Type>();
             }
         }
-        
+
         internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition,
             Type typeToCheck)
         {

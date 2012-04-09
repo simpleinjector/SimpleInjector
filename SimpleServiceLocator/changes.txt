@@ -5,7 +5,8 @@ Version vNext
 
 	Code Changes:
 		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
-		 and allows registering both generic and non-generic decorators.
+		 and allows registering both generic and non-generic decorators and enables decorating collections
+		 that are returned using GetAllInstances or are injected using IEnumerable<T> constructor arguments.
 
 	Bug fixes:
 

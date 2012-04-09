@@ -777,6 +777,54 @@
             Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
         }
 
+        [TestMethod]
+        public void GetAllInstances_TypeDecorated_ReturnsCollectionWithDecorators()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(StubCommandHandler) });
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+
+            // Act
+            var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
+
+            var handler = handlers.Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+
+            Assert.IsInstanceOfType(((ConcreteCommandHandlerDecorator)handler).DecoratedHandler,
+                typeof(StubCommandHandler));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_TypeDecoratedWithMultipleDecorators_ReturnsCollectionWithDecorators()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<ILogger>(new FakeLogger());
+
+            container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(StubCommandHandler) });
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+
+            // Act
+            var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
+
+            var handler = handlers.Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+
+            Assert.IsInstanceOfType(((ConcreteCommandHandlerDecorator)handler).DecoratedHandler,
+                typeof(LoggingHandlerDecorator1<RealCommand>));
+        }
+
         public struct StructCommand
         {
         }
@@ -852,9 +900,12 @@
 
         public class ConcreteCommandHandlerDecorator : ICommandHandler<RealCommand>
         {
-            public ConcreteCommandHandlerDecorator(ICommandHandler<RealCommand> wrapped)
+            public ConcreteCommandHandlerDecorator(ICommandHandler<RealCommand> decoratedHandler)
             {
+                this.DecoratedHandler = decoratedHandler;
             }
+
+            public ICommandHandler<RealCommand> DecoratedHandler { get; private set; }
 
             public void Handle(RealCommand command)
             {

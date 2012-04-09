@@ -37,6 +37,12 @@ namespace SimpleInjector.Extensions
     /// </summary>
     public static class DecoratorExtensions
     {
+        private static readonly MethodInfo EnumerableSelectMethod =
+            Helpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
+
+        private static readonly MethodInfo ExpressionLambdaMethod =
+            Helpers.GetGenericMethod(() => Expression.Lambda<Action>(null, (ParameterExpression[])null));
+
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 
         /// original registered <paramref name="serviceType"/>, by injecting that service type into the 
@@ -454,22 +460,9 @@ namespace SimpleInjector.Extensions
 
             public void Decorate(object sender, ExpressionBuiltEventArgs e)
             {
-                Type decoratorType;
+                this.TryDecorateServiceType(e);
 
-                if (this.MustDecorate(e, out decoratorType))
-                {
-                    var parameters = this.BuildParameters(decoratorType, e);
-
-                    var ctor = decoratorType.GetConstructors().Single();
-
-                    var serviceInfo = this.GetServiceTypeInfo(e);
-
-                    // Add the decorator to the list of applied decorator. This way users can use this
-                    // information in the predicate of the next decorator they add.
-                    serviceInfo.AppliedDecorators.Add(decoratorType);
-
-                    e.Expression = this.BuildDecoratorExpression(ctor, parameters);
-                }
+                this.TryDecorateEnumerableServiceType(e);
             }
 
             // This method must be public because of Silverlight Sandbox restrictions.
@@ -492,21 +485,62 @@ namespace SimpleInjector.Extensions
                 return null;
             }
 
-            private bool MustDecorate(ExpressionBuiltEventArgs e, out Type decoratorType)
+            private void TryDecorateServiceType(ExpressionBuiltEventArgs e)
+            {
+                Type decoratorType;
+
+                if (this.MustDecorate(e.RegisteredServiceType, e, out decoratorType))
+                {
+                    var parameters = this.BuildParameters(decoratorType, e);
+
+                    var serviceInfo = this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType);
+
+                    // Add the decorator to the list of applied decorator. This way users can use this
+                    // information in the predicate of the next decorator they add.
+                    serviceInfo.AppliedDecorators.Add(decoratorType);
+
+                    e.Expression = this.BuildDecoratorExpression(decoratorType, parameters);
+                }
+            }
+
+            private void TryDecorateEnumerableServiceType(ExpressionBuiltEventArgs e)
+            {
+                if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(e.RegisteredServiceType))
+                {
+                    var registeredElementType = e.RegisteredServiceType.GetGenericArguments()[0];
+
+                    Type decoratorType;
+
+                    if (this.MustDecorate(registeredElementType, e, out decoratorType))
+                    {
+                        var serviceInfo = this.GetServiceTypeInfo(e.Expression, registeredElementType);
+
+                        // Add the decorator to the list of applied decorator. This way users can use this
+                        // information in the predicate of the next decorator they add.
+                        serviceInfo.AppliedDecorators.Add(decoratorType);
+
+                        e.Expression = this.BuildDecoratorEnumerableExpression(decoratorType,
+                            registeredElementType, e.Expression);
+                    }
+                }
+            }
+
+            private bool MustDecorate(Type registeredServiceType, ExpressionBuiltEventArgs e,
+                out Type decoratorType)
             {
                 decoratorType = null;
 
-                if (this.ServiceType == e.RegisteredServiceType)
+                if (this.ServiceType == registeredServiceType)
                 {
                     decoratorType = this.Decorator;
                 }
-                else if (!this.ServiceType.IsGenericTypeDefinitionOf(e.RegisteredServiceType))
+                else if (!this.ServiceType.IsGenericTypeDefinitionOf(registeredServiceType))
                 {
                     return false;
                 }
                 else
                 {
-                    var results = this.BuildClosedGenericImplementation(e.RegisteredServiceType);
+                    var results = this.BuildClosedGenericImplementation(registeredServiceType);
 
                     if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
                     {
@@ -525,6 +559,39 @@ namespace SimpleInjector.Extensions
                 return true;
             }
 
+            private Expression BuildDecoratorEnumerableExpression(Type decoratorType,
+                Type registeredElementType, Expression expression)
+            {
+                var ctor = decoratorType.GetConstructors().Single();
+
+                ParameterExpression parameter = Expression.Parameter(registeredElementType, "service");
+
+                var parameters = this.BuildParameters(decoratorType,
+                    new ExpressionBuiltEventArgs(registeredElementType, parameter));
+
+                var selectMethod = EnumerableSelectMethod
+                    .MakeGenericMethod(registeredElementType, registeredElementType);
+
+                Expression instanceWrapper =
+                    BuildDecoratorWrapper(registeredElementType, ctor, parameter, parameters);
+
+                return Expression.Call(selectMethod, expression, instanceWrapper);
+            }
+
+            private static Expression BuildDecoratorWrapper(Type serviceType, ConstructorInfo ctor,
+                ParameterExpression parameter, Expression[] parameters)
+            {
+                Type funcType = typeof(Func<,>).MakeGenericType(serviceType, serviceType);
+
+                MethodInfo lambdaCreator = ExpressionLambdaMethod.MakeGenericMethod(funcType);
+
+                return (Expression)lambdaCreator.Invoke(null, new object[]
+                {
+                    Expression.New(ctor, parameters), 
+                    new ParameterExpression[] { parameter }
+                });
+            }
+
             private GenericTypeBuilder.BuildResult BuildClosedGenericImplementation(Type serviceType)
             {
                 var builder = new GenericTypeBuilder(serviceType, this.Decorator);
@@ -539,7 +606,7 @@ namespace SimpleInjector.Extensions
 
             private DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
             {
-                var info = this.GetServiceTypeInfo(e);
+                var info = this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType);
 
                 return new DecoratorPredicateContext
                 {
@@ -550,18 +617,18 @@ namespace SimpleInjector.Extensions
                 };
             }
 
-            private ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
+            private ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression expression, Type registeredServiceType)
             {
                 var predicateCache = this.GetServiceTypePredicateCache();
 
-                if (!predicateCache.ContainsKey(e.RegisteredServiceType))
+                if (!predicateCache.ContainsKey(registeredServiceType))
                 {
-                    Type implementationType = DetermineImplementationType(e);
+                    Type implementationType = DetermineImplementationType(expression, registeredServiceType);
 
-                    predicateCache[e.RegisteredServiceType] = new ServiceTypeDecoratorInfo(implementationType);
+                    predicateCache[registeredServiceType] = new ServiceTypeDecoratorInfo(implementationType);
                 }
 
-                return predicateCache[e.RegisteredServiceType];
+                return predicateCache[registeredServiceType];
             }
 
             private Dictionary<Type, ServiceTypeDecoratorInfo> GetServiceTypePredicateCache()
@@ -583,21 +650,23 @@ namespace SimpleInjector.Extensions
                 return predicateCache[this.Container];
             }
 
-            private static Type DetermineImplementationType(ExpressionBuiltEventArgs e)
+            [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
+                Justification = "I don't care about the extra casts. This is not a performance critical part.")]
+            private static Type DetermineImplementationType(Expression expression, Type registeredServiceType)
             {
-                if (e.Expression is ConstantExpression)
+                if (expression is ConstantExpression)
                 {
                     // Singleton
-                    return ((ConstantExpression)e.Expression).Value.GetType();
+                    return ((ConstantExpression)expression).Value.GetType();
                 }
 
-                if (e.Expression is NewExpression)
+                if (expression is NewExpression)
                 {
                     // Transient without initializers.
-                    return ((NewExpression)e.Expression).Constructor.DeclaringType;
+                    return ((NewExpression)expression).Constructor.DeclaringType;
                 }
 
-                var invocation = e.Expression as InvocationExpression;
+                var invocation = expression as InvocationExpression;
 
                 if (invocation != null && invocation.Expression is ConstantExpression &&
                     invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
@@ -607,7 +676,7 @@ namespace SimpleInjector.Extensions
                 }
 
                 // Implementation type can not be determined.
-                return e.RegisteredServiceType;
+                return registeredServiceType;
             }
 
             private Expression[] BuildParameters(Type closedGenericDecorator, ExpressionBuiltEventArgs e)
@@ -641,8 +710,10 @@ namespace SimpleInjector.Extensions
                 return this.Container.GetRegistration(parameter.ParameterType, true).BuildExpression();
             }
 
-            private Expression BuildDecoratorExpression(ConstructorInfo ctor, Expression[] parameters)
+            private Expression BuildDecoratorExpression(Type decoratorType, Expression[] parameters)
             {
+                var ctor = decoratorType.GetConstructors().Single();
+
                 var instanceInitializer =
                     this.GetType().GetMethod("BuildFuncInitializer").MakeGenericMethod(ctor.DeclaringType)
                     .Invoke(this, null);
