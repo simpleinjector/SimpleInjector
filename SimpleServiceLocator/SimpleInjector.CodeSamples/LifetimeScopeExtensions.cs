@@ -41,6 +41,30 @@
             return new LifetimeScope().Begin();
         }
 
+        public static void RegisterLifetimeScope<TService>(this Container container,
+            Func<TService> instanceCreator) where TService : class
+        {
+            container.ResolveUnregisteredType += (sender, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(TService))
+                {
+                    e.Register(() =>
+                    {
+                        var scope = CurrentScope;
+
+                        if (scope == null)
+                        {
+                            throw new ActivationException(string.Format(
+                                CultureInfo.InvariantCulture,
+                                NoLifetimeScopeMessage, typeof(TService)));
+                        }
+
+                        return scope.GetInstance<TService>(container, instanceCreator);
+                    });
+                }
+            };
+        }
+
         public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -75,20 +99,25 @@
         {
             container.RegisterInitializer<TDisposable>(disposable =>
             {
-                var scope = CurrentScope;
-
-                if (scope != null)
-                {
-                    scope.RegisterForDisposal(disposable);
-                }
-                else
-                {
-                    // Instances that are created outside the scope of a lifetime
-                    // scope will most likely be singletons or transients created 
-                    // during the call to Verify(). We have no way of knowing
-                    // whether we can dispose it. Therefore, we simply continue.
-                }
+                RegisterForDisposal(disposable);
             });
+        }
+
+        private static void RegisterForDisposal(IDisposable disposable)
+        {
+            var scope = CurrentScope;
+
+            if (scope != null)
+            {
+                scope.RegisterForDisposal(disposable);
+            }
+            else
+            {
+                // Instances that are created outside the scope of a lifetime
+                // scope will most likely be singletons or transients created 
+                // during the call to Verify(). We have no way of knowing
+                // whether we can dispose it. Therefore, we simply continue.
+            }
         }
 
         private sealed class LifetimeScope : IDisposable
@@ -136,6 +165,20 @@
                 {
                     instance = container.GetInstance<TService>();
                     this.instances[typeof(TService)] = instance;                        
+                }
+
+                return (TService)instance;
+            }
+
+            internal TService GetInstance<TService>(Container container, Func<TService> instanceCreator)
+                where TService : class
+            {
+                object instance;
+
+                if (!this.instances.TryGetValue(typeof(TService), out instance))
+                {
+                    instance = instanceCreator();
+                    this.instances[typeof(TService)] = instance;
                 }
 
                 return (TService)instance;
