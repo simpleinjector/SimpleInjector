@@ -299,6 +299,29 @@ namespace SimpleInjector.Extensions
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public static void RegisterAll(this Container container, Type serviceType,
+            params Type[] serviceTypes)
+        {
+            RegisterAll(container, serviceType, (IEnumerable<Type>)serviceTypes);
+        }
+
+        /// <summary>
+        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
+        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
+        /// requested. On enumeration the container is called for each type in the list.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
+        /// (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
+        public static void RegisterAll(this Container container, Type serviceType,
             IEnumerable<Type> serviceTypes)
         {
             // Make a copy for correctness and performance.
