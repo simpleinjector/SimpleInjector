@@ -41,15 +41,15 @@ namespace SimpleInjector
     internal static class Helpers
     {
         internal const string InstanceProviderDebuggerDisplayString =
-            "Producer: {this.GetType().Name}, " +
-            "ServiceType: {this.ServiceType}, " + 
-            "Expression: {this.BuildExpression().ToString()}";    
+            "Producer: {GetType().Name}, " +
+            "ServiceType: {ServiceType}, " +
+            "Expression: {BuildExpression().ToString()}";
 
         private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
 
         internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
         {
-            Type instanceProducerType = 
+            Type instanceProducerType =
                 typeof(ConcreteTransientInstanceProducer<>).MakeGenericType(concreteType);
 
             var genericGetInstanceMethod = GetInstanceOfT.MakeGenericMethod(instanceProducerType);
@@ -63,7 +63,7 @@ namespace SimpleInjector
                 // the container.GetInstance<T> method to create a new instance, because GetInstance<T> is 
                 // public :-). 
                 // Here we call: "factory.GetInstance<ConcreteTransientInstanceProducer<[TConcrete]>>()".
-                return (InstanceProducer)genericGetInstanceMethod.Invoke(factory, null);    
+                return (InstanceProducer)genericGetInstanceMethod.Invoke(factory, null);
             }
             catch (MemberAccessException ex)
             {
@@ -134,7 +134,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType, 
+        internal static void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
             string parameterName)
         {
             string exceptionMessage;
