@@ -117,8 +117,11 @@ namespace SimpleInjector.Extensions
                 string.Join(", ", implementations.Select(type => type.ToFriendlyName()).ToArray());
 
             return string.Format(CultureInfo.InvariantCulture,
-                    "There are {0} types that represent the closed generic type '{1}'. Types: {2}.",
-                    implementations.Length, closedServiceType.ToFriendlyName(), typeDescription);
+                    "There are {0} types that represent the closed generic type '{1}'. Types: {2}. " +
+                    "Either remove one of the types or use an overload that takes an {3} delegate, " +
+                    "which allows you to define the way these types should be registered.",
+                    implementations.Length, closedServiceType.ToFriendlyName(), typeDescription,
+                    typeof(BatchRegistrationCallback).Name);
         }
 
         private static string ToFriendlyName(this Type type)
