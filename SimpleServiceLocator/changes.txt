@@ -9,6 +9,8 @@ Version vNext
 		 that are returned using GetAllInstances or are injected using IEnumerable<T> constructor arguments.
 
 	Bug fixes:
+		-[Extensions] RegisterManyForOpenGeneric extension method threw an exception which message contained
+		 the .NET type instead of the 'friendly' type name, as the rest of the Simple Injector uses.
 
 
 Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05

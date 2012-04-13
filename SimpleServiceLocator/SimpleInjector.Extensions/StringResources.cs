@@ -110,6 +110,17 @@ namespace SimpleInjector.Extensions
                 "service type '{1}' is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
+        internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
+            Type[] implementations)
+        {
+            var typeDescription =
+                string.Join(", ", implementations.Select(type => type.ToFriendlyName()).ToArray());
+
+            return string.Format(CultureInfo.InvariantCulture,
+                    "There are {0} types that represent the closed generic type '{1}'. Types: {2}.",
+                    implementations.Length, closedServiceType.ToFriendlyName(), typeDescription);
+        }
+
         private static string ToFriendlyName(this Type type)
         {
             if (!type.IsGenericType)

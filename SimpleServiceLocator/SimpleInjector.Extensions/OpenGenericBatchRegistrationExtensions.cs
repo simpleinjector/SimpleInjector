@@ -28,7 +28,6 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
     using System.Reflection;
 
@@ -775,13 +774,9 @@ namespace SimpleInjector.Extensions
         {
             if (implementations.Length > 1)
             {
-                var typeDescription = string.Join(", ", (
-                    from type in implementations
-                    select string.Format(CultureInfo.InvariantCulture, "'{0}'", type)).ToArray());
-
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "There are {0} types that represent the closed generic type '{1}'. Types: {2}.",
-                    implementations.Length, closedServiceType, typeDescription));
+                throw new InvalidOperationException(
+                    StringResources.MultipleTypesThatRepresentClosedGenericType(closedServiceType,
+                    implementations));
             }
         }
     }
