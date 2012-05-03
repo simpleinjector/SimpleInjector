@@ -46,6 +46,25 @@
         }
 
         [TestMethod]
+        public void GetInstance_OnDecoratedNonGenericType_DecoratesInstanceWithExpectedLifeTime()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Register as transient
+            container.Register<INonGenericService, RealNonGenericService>();
+            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
+
+            // Act
+            var decorator1 = (NonGenericServiceDecorator)container.GetInstance<INonGenericService>();
+            var decorator2 = (NonGenericServiceDecorator)container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(decorator1.DecoratedService, decorator2.DecoratedService),
+                "The decorated instance is expected to be a transient.");
+        }
+
+        [TestMethod]
         public void RegisterDecorator_RegisteringAnOpenGenericDecoratorWithANonGenericService_ThrowsExpectedException()
         {
             // Arrange
@@ -55,12 +74,16 @@
             {
                 // Act
                 container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator<>));
+
+                Assert.Fail("Exception was expected.");
             }
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(
                     "The supplied decorator 'NonGenericServiceDecorator<T>' is an open generic type definition",
                     ex.Message);
+
+                AssertThat.ExceptionContainsParamName("decoratorType", ex);
             }
         }
 
@@ -173,6 +196,52 @@
 
             // Assert
             Assert.IsInstanceOfType(handler, typeof(RealCommandHandler));
+        }
+
+        [TestMethod]
+        public void GetInstance_NonGenericDecoratorForMatchingClosedGenericServiceType_ReturnsTheNonGenericDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+
+            Type closedGenericServiceType = typeof(ICommandHandler<RealCommand>);
+            Type nonGenericDecorator = typeof(ConcreteCommandHandlerDecorator);
+
+            container.RegisterDecorator(closedGenericServiceType, nonGenericDecorator);
+
+            // Act
+            var decorator = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(decorator, nonGenericDecorator);
+        }
+
+        [TestMethod]
+        public void GetInstance_NonGenericDecoratorForNonMatchingClosedGenericServiceType_ThrowsAnException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type nonMathcingClosedGenericServiceType = typeof(ICommandHandler<int>);
+
+            // Decorator implements ICommandHandler<RealCommand>
+            Type nonGenericDecorator = typeof(ConcreteCommandHandlerDecorator);
+
+            try
+            {
+                // Act
+                container.RegisterDecorator(nonMathcingClosedGenericServiceType, nonGenericDecorator);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains("The supplied type 'ConcreteCommandHandlerDecorator' does not " +
+                    "inherit from or implement 'ICommandHandler<Int32>'", ex.Message);
+            }
         }
 
         [TestMethod]
@@ -639,8 +708,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>),
-                typeof(ClassConstraintHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ClassConstraintHandlerDecorator<>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<StructCommand>>();
