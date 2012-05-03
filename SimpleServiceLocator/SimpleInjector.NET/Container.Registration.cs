@@ -263,7 +263,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
-        /// is requested (transient). Note that calling this method is redundant in most scenario's, because
+        /// is requested (transient). Note that calling this method is redundant in most scenarios, because
         /// the container will return a new instance for unregistered concrete types. Registration is needed
         /// when the security restrictions of the application's sandbox don't allow the container to create
         /// such type.
