@@ -65,9 +65,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation Genaration", 
 		SimpleInjector.SandcastleGUI = SimpleInjector.SandcastleGUI
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web", "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj", "{FB925C19-CDA9-44B4-A149-B20E8516A382}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.Mvc", "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj", "{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.WebForms", "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.WebForms.csproj", "{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
+		SccNumberOfProjects = 16
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -107,6 +113,15 @@ Global
 		SccProjectUniqueName12 = SimpleInjector.Extensions.Silverlight\\SimpleInjector.Extensions.Silverlight.csproj
 		SccProjectName12 = SimpleInjector.Extensions.Silverlight
 		SccLocalPath12 = SimpleInjector.Extensions.Silverlight
+		SccProjectUniqueName13 = SimpleInjector.Integration.Web\\SimpleInjector.Integration.Web.csproj
+		SccProjectName13 = SimpleInjector.Integration.Web
+		SccLocalPath13 = SimpleInjector.Integration.Web
+		SccProjectUniqueName14 = SimpleInjector.Integration.Web.Mvc\\SimpleInjector.Integration.Web.Mvc.csproj
+		SccProjectName14 = SimpleInjector.Integration.Web.Mvc
+		SccLocalPath14 = SimpleInjector.Integration.Web.Mvc
+		SccProjectUniqueName15 = SimpleInjector.Integration.Web.WebForms\\SimpleInjector.Integration.Web.WebForms.csproj
+		SccProjectName15 = SimpleInjector.Integration.Web.WebForms
+		SccLocalPath15 = SimpleInjector.Integration.Web.WebForms
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +180,18 @@ Global
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB925C19-CDA9-44B4-A149-B20E8516A382}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB925C19-CDA9-44B4-A149-B20E8516A382}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB925C19-CDA9-44B4-A149-B20E8516A382}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB925C19-CDA9-44B4-A149-B20E8516A382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

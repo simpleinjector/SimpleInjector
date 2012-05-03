@@ -3,6 +3,13 @@
 Version vNext
 	General description:
 
+	Project Changes:
+		-Integration assemblies were added to the solution:
+			-SimpleInjector.Integration.Web
+			-SimpleInjector.Integration.Web.Mvc
+			-SimpleInjector.Integration.Web.WebForms
+		 All three assemblies are .NET 4 only.
+
 	Code Changes:
 		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
 		 and allows registering both generic and non-generic decorators and enables decorating collections
@@ -63,7 +70,7 @@ Version 1.3.0.11343 (v1.3 RTM) 2011-12-09
 		-[Core] A new overload to the Container.GetRegistration() method has been added. This overload allows
 		 users to signal whether the method should throw or return null (what the original overload does).
 		 Since the GetRegistration is the only method in the system that both builds and returns
-		 IInstanceProducers, it is very convenient when it can throw, because this makes some scenario's
+		 IInstanceProducers, it is very convenient when it can throw, because this makes some scenarios
 		 using the ExpressionBuilt event much cleaner, with less code.
 		-[Core] All exception messages now display the names of generic types in short C# notation. 
 		 For instance, messages will now show a name such as IEnumerable<IComparable<Int32>> instead of the
