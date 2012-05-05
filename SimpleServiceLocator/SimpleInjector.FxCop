@@ -16,13 +16,14 @@
   <Spelling Locale="en-US" />
   <OverrideRuleVisibilities>False</OverrideRuleVisibilities>
   <CustomDictionaries SearchFxCopDir="True" SearchUserProfile="True" SearchProjectDir="True" />
-  <SearchGlobalAssemblyCache>False</SearchGlobalAssemblyCache>
+  <SearchGlobalAssemblyCache>True</SearchGlobalAssemblyCache>
   <DeadlockDetectionTimeout>120</DeadlockDetectionTimeout>
   <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
  </ProjectOptions>
  <Targets>
-  <Target Name="$(ProjectDir)/SimpleInjector.Extensions/bin/Debug/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/SimpleInjector.NET/bin/Debug/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/SimpleInjector.Extensions/bin/Debug/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/SimpleInjector.Integration.Web.WebForms/bin/Debug/SimpleInjector.Integration.Web.WebForms.dll" Analyze="True" AnalyzeAllChildren="True" />
  </Targets>
  <Rules>
   <RuleFiles>

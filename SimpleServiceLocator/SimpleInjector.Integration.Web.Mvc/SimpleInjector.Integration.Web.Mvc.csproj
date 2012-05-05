@@ -54,10 +54,6 @@
       <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
       <Name>SimpleInjector.Extensions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj">
-      <Project>{FB925C19-CDA9-44B4-A149-B20E8516A382}</Project>
-      <Name>SimpleInjector.Integration.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>

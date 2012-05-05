@@ -29,6 +29,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using System.Web.Mvc;
@@ -39,12 +40,17 @@ namespace SimpleInjector
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET MVC applications.
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
+        Justification = "Mvc is the word")]
     public static class SimpleInjectorMvcExtensions
     {
         /// <summary>Registers the container as MVC dependency resolver.</summary>
         /// <param name="container">The container that should be registered as dependency resolver.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
+            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
+                            "grouped together.")]
         public static void RegisterMvcDependencyResolver(this Container container)
         {
             if (container == null)
@@ -61,6 +67,9 @@ namespace SimpleInjector
         /// that the MVC framework uses.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
+            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
+                            "grouped together.")]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
         {
             if (container == null)
@@ -85,6 +94,9 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies to search.</param>
         /// <exception cref="ArgumentNullException">Thrown when either the <paramref name="container"/> or the
         /// <paramref name="assemblies"/> are a null reference (Nothing in VB).</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
+            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
+                            "grouped together.")]
         public static void RegisterMvcControllers(this Container container, params Assembly[] assemblies)
         {
             if (container == null)
@@ -92,15 +104,15 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            if (assemblies == null)
+            if (assemblies == null || assemblies.Length == 0)
             {
-                throw new ArgumentNullException("assemblies");
+                assemblies = AppDomain.CurrentDomain.GetAssemblies();
             }
 
             var controllerTypes =
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
-                where type.Name.EndsWith("Controller")
+                where type.Name.EndsWith("Controller", StringComparison.Ordinal)
                 where typeof(IController).IsAssignableFrom(type)
                 where !type.IsAbstract
                 select type;

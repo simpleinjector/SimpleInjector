@@ -35,13 +35,28 @@ namespace SimpleInjector
 
     using SimpleInjector.Extensions;
 
+    /// <summary>
+    /// Extension methods for integrating Simple Injector with ASP.NET Web Forms applications.
+    /// </summary>
     public static class SimpleInjectorWebFormExtensions
     {
+        /// <summary>
+        /// Registers the <see cref="Page"/> instances that are declared as public concrete types in the 
+        /// supplied set of <paramref name="assemblies"/>.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
         public static void RegisterWebFormPages(this Container container, params Assembly[] assemblies)
         {
             RegisterTypes<Page>(container, assemblies);
         }
 
+        /// <summary>
+        /// Registers the <see cref="UserControl"/> instances that are declared as public concrete types in the 
+        /// supplied set of <paramref name="assemblies"/>.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
         public static void RegisterWebFormUserControls(this Container container, params Assembly[] assemblies)
         {
             RegisterTypes<UserControl>(container, assemblies);
@@ -54,12 +69,10 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            if (assemblies == null)
+            if (assemblies == null || assemblies.Length == 0)
             {
-                throw new ArgumentNullException("assemblies");
-            }
-
-            assemblies = assemblies.Length > 0 ? assemblies : AppDomain.CurrentDomain.GetAssemblies();
+                assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            }            
 
             var concreteTypes =
                 from assembly in assemblies

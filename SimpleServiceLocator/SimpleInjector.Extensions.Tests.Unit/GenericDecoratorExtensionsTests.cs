@@ -1,5 +1,7 @@
 ﻿namespace SimpleInjector.Extensions.Tests.Unit
 {
+#pragma warning disable 0618 // This test class tests the old deprecated RegisterOpenGenericDecorator.
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
