@@ -71,9 +71,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.WebForms", "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.WebForms.csproj", "{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping", "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj", "{D140D43C-B7AB-43B2-A287-394DF871EB56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit", "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj", "{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.Mvc.LifetimeScoping", "SimpleInjector.Integration.Web.Mvc.LifetimeScoping\SimpleInjector.Integration.Web.Mvc.LifetimeScoping.csproj", "{F13F4161-0BEE-4742-9F1B-6FB584BBD57E}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 16
+		SccNumberOfProjects = 19
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -122,6 +128,15 @@ Global
 		SccProjectUniqueName15 = SimpleInjector.Integration.Web.WebForms\\SimpleInjector.Integration.Web.WebForms.csproj
 		SccProjectName15 = SimpleInjector.Integration.Web.WebForms
 		SccLocalPath15 = SimpleInjector.Integration.Web.WebForms
+		SccProjectUniqueName16 = SimpleInjector.Extensions.LifetimeScoping\\SimpleInjector.Extensions.LifetimeScoping.csproj
+		SccProjectName16 = SimpleInjector.Extensions.LifetimeScoping
+		SccLocalPath16 = SimpleInjector.Extensions.LifetimeScoping
+		SccProjectUniqueName17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj
+		SccProjectName17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+		SccLocalPath17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+		SccProjectUniqueName18 = SimpleInjector.Integration.Web.Mvc.LifetimeScoping\\SimpleInjector.Integration.Web.Mvc.LifetimeScoping.csproj
+		SccProjectName18 = SimpleInjector.Integration.Web.Mvc.LifetimeScoping
+		SccLocalPath18 = SimpleInjector.Integration.Web.Mvc.LifetimeScoping
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -192,6 +207,18 @@ Global
 		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91FC5C46-32AF-4CEC-9BD0-73750B65FFA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D140D43C-B7AB-43B2-A287-394DF871EB56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D140D43C-B7AB-43B2-A287-394DF871EB56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D140D43C-B7AB-43B2-A287-394DF871EB56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D140D43C-B7AB-43B2-A287-394DF871EB56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F13F4161-0BEE-4742-9F1B-6FB584BBD57E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F13F4161-0BEE-4742-9F1B-6FB584BBD57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F13F4161-0BEE-4742-9F1B-6FB584BBD57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F13F4161-0BEE-4742-9F1B-6FB584BBD57E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

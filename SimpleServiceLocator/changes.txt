@@ -4,11 +4,23 @@ Version vNext
 	General description:
 
 	Project Changes:
-		-Integration assemblies were added to the solution:
-			-SimpleInjector.Integration.Web
-			-SimpleInjector.Integration.Web.Mvc
-			-SimpleInjector.Integration.Web.WebForms
-		 All three assemblies are .NET 4 only.
+		-New projects that were added to the solution:
+			+SimpleInjector.Extensions.LifetimeScoping (.NET 4.0)
+			 Adds extension methods for Lifetime Scope lifestyle. This functionality can not be placed in 
+			 SimpleInjector.Extensions, because it has a dependency on .NET 4.0 (makes use of ThreadLocal<T>), 
+			 while SimpleInjector.Extensions must stay compatible with .NET 3.5 (for now).
+			+SimpleInjector.Integration.Web (.NET 4.0)
+			 Adds extension methods for Per Web Request lifestyle. This assembly takes a dependency on 
+			 .NET 4.0 to allow the needed HTTP Module to be auto registered on application start-up.
+			+SimpleInjector.Integration.Web.WebForms (.NET 3.5)
+			 Adds extension methods for registering Page and UserControl classes.
+			+SimpleInjector.Integration.Web.Mvc (.NET 4.0)
+			 Adds extension methods for adding the container as Dependency Resolver (MVC3 / .NET 4) and
+			 registering all Controller classes.
+			+SimpleInjector.Integration.Web.Mvc.LifetimeScoping (.NET 4.0)
+			 Integrates the Lifetime Scope lifestyle (SimpleInjector.Extensions.LifetimeScoping) with MVC3
+			 by auto-registering a HTTP Module that starts a lifestime scope at the beginning of each request
+			 and disposing at the end of the request.	 
 
 	Code Changes:
 		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
@@ -31,6 +43,7 @@ Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
 		 implementations, as long as they implement the supplied open generic service type.
 
 	Bug fixes:
+		-None.
 
 
 Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18

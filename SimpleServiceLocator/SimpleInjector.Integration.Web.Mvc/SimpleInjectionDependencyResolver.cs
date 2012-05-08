@@ -29,23 +29,43 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System.Collections.Generic;
     using System.Web.Mvc;
 
-    internal sealed class SimpleInjectionDependencyResolver : IDependencyResolver
+    /// <summary>MVC Dependency resolver for Simple Injector.</summary>
+    public class SimpleInjectionDependencyResolver : IDependencyResolver
     {
-        private readonly Container container;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleInjectionDependencyResolver"/> class.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
+        /// reference.</exception>
         public SimpleInjectionDependencyResolver(Container container)
         {
-            this.container = container;
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            this.Container = container;
         }
 
-        object IDependencyResolver.GetService(Type serviceType)
+        /// <summary>Gets the container.</summary>
+        /// <value>The <see cref="Container"/>.</value>
+        public Container Container { get; private set; }
+
+        /// <summary>Resolves singly registered services that support arbitrary object creation.</summary>
+        /// <param name="serviceType">The type of the requested service or object.</param>
+        /// <returns>The requested service or object.</returns>
+        public object GetService(Type serviceType)
         {
-            return ((IServiceProvider)this.container).GetService(serviceType);
+            return ((IServiceProvider)this.Container).GetService(serviceType);
         }
 
-        IEnumerable<object> IDependencyResolver.GetServices(Type serviceType)
+        /// <summary>Resolves multiply registered services.</summary>
+        /// <param name="serviceType">The type of the requested services.</param>
+        /// <returns>The requested services.</returns>
+        public IEnumerable<object> GetServices(Type serviceType)
         {
-            return this.container.GetAllInstances(serviceType);
+            return this.Container.GetAllInstances(serviceType);
         }
     }
 }

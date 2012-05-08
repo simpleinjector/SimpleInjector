@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
@@ -8,11 +7,11 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimpleInjector.Integration.Web.Mvc")]
-[assembly: AssemblyDescription("Integration library for ASP.NET MVC3 and up for the Simple Injector Inversion of Control library.")]
+[assembly: AssemblyTitle("SimpleInjector.Extensions.LifetimeScoping")]
+[assembly: AssemblyDescription("Lifetime Scoping extensions for the Simple Injector")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
-[assembly: AssemblyProduct("SimpleInjector.Integration.Web.Mvc")]
+[assembly: AssemblyProduct("SimpleInjector.Extensions.LifetimeScoping")]
 [assembly: AssemblyCopyright("Copyright © 2012 S. van Deursen")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -23,7 +22,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a26adb2c-9f1a-4002-b654-686c7d51f3e2")]
+[assembly: Guid("01dbe7e9-16a4-4228-b1d5-feab986d84c3")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -42,13 +41,3 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
-
-[module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
-    MessageId = "Mvc",
-    Justification = "Mvc is the word")]
-
-[module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
-    Scope = "namespace",
-    Target = "SimpleInjector.Integration.Web.Mvc",
-    MessageId = "Mvc",
-    Justification = "Mvc is the word")]

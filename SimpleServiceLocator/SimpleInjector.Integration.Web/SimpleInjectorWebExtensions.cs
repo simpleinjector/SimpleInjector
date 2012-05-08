@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Web;
+
     using SimpleInjector.Integration.Web;
 
     /// <summary>
@@ -41,10 +42,13 @@ namespace SimpleInjector
     {
         /// <summary>
         /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
-        /// request. When no web request is available, a new instance will be returned each time (transient).
+        /// request and ensures that -if <typeparamref name="TConcrete"/> implements 
+        /// <see cref="IDisposable"/>- this instance will get disposed on the end of the web request. 
+        /// When no web request is available, a new instance will be returned each time (transient) and those 
+        /// instances will <b>not</b> get disposed.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="container">The container to make the registrations in.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <typeparamref name="TConcrete"/> has already been registered.
@@ -72,49 +76,20 @@ namespace SimpleInjector
             // By registering an ExpressionBuilt event we use the ability of the container to create an
             // Expression tree that auto-wires that instance, since calling GetInstance<TConcrete> would cause
             // an stack overflow exception.
-            ReplaceRegistrationWithPerWebRequestBehavior<TConcrete>(container, disposeWhenRequestEnds: false);
+            ReplaceRegistrationWithPerWebRequestBehavior<TConcrete>(container);
         }
 
         /// <summary>
-        /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
-        /// request and ensures that this instance will get disposed on the end of each web request. 
-        /// When no web request is available, a new instance will be returned each time (transient) and those 
-        /// instances will not get disposed.
+        /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every 
+        /// web request every time a <typeparamref name="TService"/> is requested and ensures that -if 
+        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>- this instance 
+        /// will get disposed on the end of the web request. When no web request is available, a new instance 
+        /// will be returned each time (transient) and those instances will <b>not</b> get disposed.
         /// </summary>
-        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
-        /// the <typeparamref name="TConcrete"/> has already been registered.
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
-        /// that can not be created by the container.</exception>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
-        /// reference.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
-        public static void RegisterPerWebRequestWithDisposal<TConcrete>(this Container container)
-            where TConcrete : class, IDisposable
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            container.Register<TConcrete>();
-
-            ReplaceRegistrationWithPerWebRequestBehavior<TConcrete>(container, disposeWhenRequestEnds: true);
-        }
-
-        /// <summary>
-        /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every web
-        /// request every time a <typeparamref name="TService"/> is requested. When no web request is 
-        /// available, a new instance will be returned each time (transient).
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.
+        /// </typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="container">The container to make the registrations in.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <typeparamref name="TService"/> has already been registered.</exception>
@@ -137,92 +112,52 @@ namespace SimpleInjector
 
             container.Register<TService, TImplementation>();
 
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenRequestEnds: false);
-        }
-
-        /// <summary>
-        /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every web
-        /// request every time a <typeparamref name="TService"/> is requested and ensures that this instance 
-        /// will get disposed on the end of each web request. When no web request is available, a new instance 
-        /// will be returned each time (transient) and those instances will not get disposed.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
-        /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
-        /// type is not a type that can be created by the container.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
-        /// reference.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
-        public static void RegisterPerWebRequestWithDisposal<TService, TImplementation>(this Container container)
-            where TService : class
-            where TImplementation : class, TService, IDisposable
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            container.Register<TService, TImplementation>();
-
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenRequestEnds: true);
+            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container);
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
-        /// and the returned instance will be reused for the duration of a single web request. When no web 
-        /// request is available, the specified delegate will be called each time.
+        /// and the returned instance will be reused for the duration of a single web request and ensures that,
+        /// if the returned instance implements <see cref="IDisposable"/>, that instance will get
+        /// disposed on the end of the web request. When no web request is available, the specified delegate
+        /// will be called each time and those instances will not get disposed.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="container">The container to make the registrations in.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null 
+        /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
-
-            container.Register<TService>(instanceCreator);
-
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenRequestEnds: false);
+            RegisterPerWebRequest(container, instanceCreator, disposeWhenWebRequestEnds: true);
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
-        /// and the returned instance will be reused for the duration of a single web request and ensures that
-        /// this instance will get disposed on the end of each web request. When no web request is available, 
-        /// the specified delegate will be called each time and those instances will not get disposed.
+        /// and the returned instance will be reused for the duration of a single web request and ensures that,
+        /// if the returned instance implements <see cref="IDisposable"/>, and
+        /// <paramref name="disposeWhenWebRequestEnds"/> is set to <b>true</b>, that instance will get
+        /// disposed on the end of the web request. When no web request is available, the specified delegate
+        /// will be called each time and those instances will not get disposed.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="container">The container to make the registrations in.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="disposeWhenWebRequestEnds">If set to <c>true</c>, the instance will get disposed
+        /// when it implements <see cref="IDisposable"/> at the end of the web request.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null 
+        /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
-        public static void RegisterPerWebRequestWithDisposal<TService>(this Container container,
-            Func<TService> instanceCreator) where TService : class
+        public static void RegisterPerWebRequest<TService>(this Container container,
+            Func<TService> instanceCreator, bool disposeWhenWebRequestEnds) where TService : class
         {
             if (container == null)
             {
@@ -236,7 +171,7 @@ namespace SimpleInjector
 
             container.Register<TService>(instanceCreator);
 
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenRequestEnds: true);
+            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenWebRequestEnds);
         }
 
         internal static void RegisterDelegateForEndWebRequest(HttpContext context, Action webRequestEnds)
@@ -269,7 +204,7 @@ namespace SimpleInjector
         }
 
         private static void ReplaceRegistrationWithPerWebRequestBehavior<TService>(
-            Container container, bool disposeWhenRequestEnds)
+            Container container, bool disposeWhenRequestEnds = true)
             where TService : class
         {
             // In case of calling RegisterPerWebRequest<TConcrete>, the e.Expression contains a 

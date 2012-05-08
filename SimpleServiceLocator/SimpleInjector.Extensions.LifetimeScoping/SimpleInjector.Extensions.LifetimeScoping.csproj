@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{03A3F36B-1561-4C1B-9BCA-A8F74F8C2514}</ProjectGuid>
+    <ProjectGuid>{D140D43C-B7AB-43B2-A287-394DF871EB56}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleInjector.Integration.Web.Mvc</RootNamespace>
-    <AssemblyName>SimpleInjector.Integration.Web.Mvc</AssemblyName>
+    <RootNamespace>SimpleInjector.Extensions.LifetimeScoping</RootNamespace>
+    <AssemblyName>SimpleInjector.Extensions.LifetimeScoping</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -34,25 +34,19 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\SimpleInjector.Integration.Web.Mvc.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>bin\Release\SimpleInjector.Extensions.LifetimeScoping.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SimpleInjectorLifetimeScopeExtensions.cs" />
+    <Compile Include="LifetimeScope.cs" />
+    <Compile Include="LifetimeScopeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleInjectionDependencyResolver.cs" />
-    <Compile Include="SimpleInjectorFilterAttributeFilterProvider.cs" />
-    <Compile Include="SimpleInjectorMvcExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>
