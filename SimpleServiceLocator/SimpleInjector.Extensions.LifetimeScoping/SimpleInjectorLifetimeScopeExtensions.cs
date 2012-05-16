@@ -76,6 +76,41 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Gets the <see cref="LifetimeScope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="LifetimeScope"/> is currently in scope.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
+        /// returned every time) and registers an initializer for that type that will register that instance
+        /// for disposal in the <see cref="LifetimeScope"/> in which context it is created:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(instance =>
+        /// {
+        ///     LifetimeScope scope = container.GetCurrentLifetimeScope();
+        ///     if (scope != null) scope.RegisterForDisposal(instance);
+        /// });
+        /// ]]></code>
+        /// </example>
+        /// <param name="container">The container.</param>
+        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        public static LifetimeScope GetCurrentLifetimeScope(this Container container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            IServiceProvider provider = container;
+
+            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
+
+            return manager != null ? manager.CurrentScope : null;
+        }
+
+        /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
         /// each lifetime scope that has been started using <see cref="BeginLifetimeScope"/>. When the 
         /// lifetime scope is disposed and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,

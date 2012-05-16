@@ -34,9 +34,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </summary>
     public sealed class LifetimeScope : IDisposable
     {
-        // Design Note: LifetimeScope needs to be public, because it is returned from the BeginLifetimeScope 
-        // extension method. By returning LifetimeScope instead of IDisposable, we can extend the API in a 
-        // future release by adding public methods to LifetimeScope, without breaking the existing API. 
         private readonly Dictionary<Type, object> lifetimeScopedInstances = new Dictionary<Type, object>();
         private LifetimeScopeManager manager;
         private List<IDisposable> disposables;
@@ -44,6 +41,44 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         internal LifetimeScope(LifetimeScopeManager manager)
         {
             this.manager = manager;
+        }
+
+        /// <summary>
+        /// Registers the supplied <paramref name="disposable"/> to be disposed when the lifetime scope end.
+        /// Calling this method is useful for instances that are registered with a lifecycle shorter than
+        /// that of the scope (where possibly multiple instances are created per scope, such as transient
+        /// services, that are registered with one of the <b>Register</b> overloads), but still need to be
+        /// disposed explicitly.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
+        /// returned every time) and registers an initializer for that type that will register that instance
+        /// for disposal in the <see cref="LifetimeScope"/> in which context it is created:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(instance =>
+        /// {
+        ///     LifetimeScope scope = container.GetCurrentLifetimeScope();
+        ///     if (scope != null) scope.RegisterForDisposal(instance);
+        /// });
+        /// ]]></code>
+        /// </example>
+        /// <param name="disposable">The disposable.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="disposable"/> is a null reference.</exception>
+        public void RegisterForDisposal(IDisposable disposable)
+        {
+            if (disposable == null)
+            {
+                throw new ArgumentNullException("disposable");
+            }
+
+            if (this.disposables == null)
+            {
+                this.disposables = new List<IDisposable>();
+            }
+
+            this.disposables.Add(disposable);
         }
 
         /// <summary>
@@ -64,16 +99,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
                 this.disposables = null;
             }
-        }
-
-        internal void RegisterForDisposal(IDisposable disposable)
-        {
-            if (this.disposables == null)
-            {
-                this.disposables = new List<IDisposable>();
-            }
-
-            this.disposables.Add(disposable);
         }
 
         internal TService GetInstance<TService>(Func<TService> instanceCreator)
