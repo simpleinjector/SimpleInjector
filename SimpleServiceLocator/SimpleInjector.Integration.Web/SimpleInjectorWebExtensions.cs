@@ -174,6 +174,42 @@ namespace SimpleInjector
             ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenWebRequestEnds);
         }
 
+        /// <summary>
+        /// Registers the supplied <paramref name="disposable"/> for disposal when the current web request
+        /// ends.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>DisposableServiceImpl</b> type as transient (a new instance 
+        /// will be returned every time) and registers an initializer for that type that will ensure that
+        /// that instance will be disposed when the web request ends:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(SimpleInjectorWebExtensions.RegisterForDisposal);
+        /// ]]></code>
+        /// </example>
+        /// <param name="disposable">The disposable.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the given <paramref name="disposable"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the <see cref="HttpContext.Current"/>
+        /// returns null.</exception>
+        public static void RegisterForDisposal(IDisposable disposable)
+        {
+            if (disposable == null)
+            {
+                throw new ArgumentNullException("disposable");
+            }
+
+            var context = HttpContext.Current;
+
+            if (context == null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called in the context of a web request.");
+            }
+
+            RegisterDelegateForEndWebRequest(context, () => disposable.Dispose());
+        }
+
         internal static void RegisterDelegateForEndWebRequest(HttpContext context, Action webRequestEnds)
         {
             var key = typeof(SimpleInjectorWebExtensions);
