@@ -44,23 +44,6 @@ namespace SimpleInjector
         Justification = "Mvc is the word")]
     public static class SimpleInjectorMvcExtensions
     {
-        /// <summary>Registers the container as MVC dependency resolver.</summary>
-        /// <param name="container">The container that should be registered as dependency resolver.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
-            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
-                            "grouped together.")]
-        public static void RegisterMvcDependencyResolver(this Container container)
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            DependencyResolver.SetResolver(new SimpleInjectionDependencyResolver(container));
-        }
-
         /// <summary>Registers a <see cref="IFilterProvider"/>. Use this method in conjunction with the
         /// <see cref="RegisterMvcDependencyResolver"/> method.</summary>
         /// <param name="container">The container that should be used for injecting properties into attributes

@@ -30,15 +30,15 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System.Web.Mvc;
 
     /// <summary>MVC Dependency resolver for Simple Injector.</summary>
-    public class SimpleInjectionDependencyResolver : IDependencyResolver
+    public class SimpleInjectorDependencyResolver : IDependencyResolver
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleInjectionDependencyResolver"/> class.
+        /// Initializes a new instance of the <see cref="SimpleInjectorDependencyResolver"/> class.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference.</exception>
-        public SimpleInjectionDependencyResolver(Container container)
+        public SimpleInjectorDependencyResolver(Container container)
         {
             if (container == null)
             {
