@@ -14,5 +14,5 @@ Internals=false
 TOC=true
 CSSyntaxDeclaration=true
 VBSyntaxDeclaration=true
-CPPSyntaxDeclaration=true
-JavaScriptSyntaxDeclaration=true
+CPPSyntaxDeclaration=false
+JavaScriptSyntaxDeclaration=false

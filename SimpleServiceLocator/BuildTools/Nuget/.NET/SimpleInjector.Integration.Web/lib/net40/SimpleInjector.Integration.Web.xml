@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SimpleInjector.Integration.Web</name>
+    </assembly>
+    <members>
+        <member name="T:SimpleInjector.SimpleInjectorWebExtensions">
+            <summary>
+            Extension methods for integrating Simple Injector with ASP.NET web applications.
+            </summary>
+        </member>
+        <member name="M:SimpleInjector.SimpleInjectorWebExtensions.RegisterPerWebRequest``1(SimpleInjector.Container)">
+            <summary>
+            Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
+            request and ensures that -if <typeparamref name="TConcrete"/> implements 
+            <see cref="T:System.IDisposable"/>- this instance will get disposed on the end of the web request. 
+            When no web request is available, a new instance will be returned each time (transient) and those 
+            instances will <b>not</b> get disposed.
+            </summary>
+            <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+            <param name="container">The container to make the registrations in.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when this container instance is locked and can not be altered, or when an 
+            the <typeparamref name="TConcrete"/> has already been registered.
+            </exception>
+            <exception cref="T:System.ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
+            that can not be created by the container.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when the <paramref name="container"/> is a null
+            reference.</exception>
+        </member>
+        <member name="M:SimpleInjector.SimpleInjectorWebExtensions.RegisterPerWebRequest``2(SimpleInjector.Container)">
+            <summary>
+            Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every 
+            web request every time a <typeparamref name="TService"/> is requested and ensures that -if 
+            <typeparamref name="TImplementation"/> implements <see cref="T:System.IDisposable"/>- this instance 
+            will get disposed on the end of the web request. When no web request is available, a new instance 
+            will be returned each time (transient) and those instances will <b>not</b> get disposed.
+            </summary>
+            <typeparam name="TService">The interface or base type that can be used to retrieve the instances.
+            </typeparam>
+            <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+            <param name="container">The container to make the registrations in.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when this container instance is locked and can not be altered, or when an 
+            the <typeparamref name="TService"/> has already been registered.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+            type is not a type that can be created by the container.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when the <paramref name="container"/> is a null
+            reference.</exception>
+        </member>
+        <member name="M:SimpleInjector.SimpleInjectorWebExtensions.RegisterPerWebRequest``1(SimpleInjector.Container,System.Func{``0})">
+            <summary>
+            Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
+            and the returned instance will be reused for the duration of a single web request and ensures that,
+            if the returned instance implements <see cref="T:System.IDisposable"/>, that instance will get
+            disposed on the end of the web request. When no web request is available, the specified delegate
+            will be called each time and those instances will not get disposed.
+            </summary>
+            <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+            <param name="container">The container to make the registrations in.</param>
+            <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when this container instance is locked and can not be altered, or when the
+            <typeparamref name="TService"/> has already been registered.</exception>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
+            references.</exception>
+        </member>
+        <member name="M:SimpleInjector.SimpleInjectorWebExtensions.RegisterPerWebRequest``1(SimpleInjector.Container,System.Func{``0},System.Boolean)">
+            <summary>
+            Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
+            and the returned instance will be reused for the duration of a single web request and ensures that,
+            if the returned instance implements <see cref="T:System.IDisposable"/>, and
+            <paramref name="disposeWhenWebRequestEnds"/> is set to <b>true</b>, that instance will get
+            disposed on the end of the web request. When no web request is available, the specified delegate
+            will be called each time and those instances will not get disposed.
+            </summary>
+            <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+            <param name="container">The container to make the registrations in.</param>
+            <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+            <param name="disposeWhenWebRequestEnds">If set to <c>true</c>, the instance will get disposed
+            when it implements <see cref="T:System.IDisposable"/> at the end of the web request.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when this container instance is locked and can not be altered, or when the
+            <typeparamref name="TService"/> has already been registered.</exception>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
+            references.</exception>
+        </member>
+        <member name="M:SimpleInjector.SimpleInjectorWebExtensions.RegisterForDisposal(System.IDisposable)">
+            <summary>
+            Registers the supplied <paramref name="disposable"/> for disposal when the current web request
+            ends.
+            </summary>
+            <example>
+            The following example registers a <b>DisposableServiceImpl</b> type as transient (a new instance 
+            will be returned every time) and registers an initializer for that type that will ensure that
+            that instance will be disposed when the web request ends:
+            <code lang="cs"><![CDATA[
+            container.Register<IService, ServiceImpl>();
+            container.RegisterInitializer<ServiceImpl>(SimpleInjectorWebExtensions.RegisterForDisposal);
+            ]]></code>
+            </example>
+            <param name="disposable">The disposable.</param>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown when the given <paramref name="disposable"/> is a null reference.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when the <see cref="P:System.Web.HttpContext.Current"/>
+            returns null.</exception>
+        </member>
+        <member name="T:SimpleInjector.Integration.Web.SimpleInjectorWebInitializer">
+            <summary>
+            Pre application start code.
+            </summary>
+        </member>
+        <member name="M:SimpleInjector.Integration.Web.SimpleInjectorWebInitializer.Initialize">
+            <summary>Registers an HttpModule that allows disposing instances that are registered as
+            Per Web Request.</summary>
+        </member>
+        <member name="T:SimpleInjector.Integration.Web.SimpleInjectorHttpModule">
+            <summary>
+            Simple Injector web integration Http Module.
+            </summary>
+        </member>
+        <member name="M:SimpleInjector.Integration.Web.SimpleInjectorHttpModule.System#Web#IHttpModule#Init(System.Web.HttpApplication)">
+            <summary>Initializes a module and prepares it to handle requests.</summary>
+            <param name="context">An <see cref="T:System.Web.HttpApplication"/> that provides access to the methods, 
+            properties, and events common to all application objects within an ASP.NET application.</param>
+        </member>
+        <member name="M:SimpleInjector.Integration.Web.SimpleInjectorHttpModule.System#Web#IHttpModule#Dispose">
+            <summary>
+            Disposes of the resources (other than memory) used by the module that implements 
+            <see cref="T:System.Web.IHttpModule"/>.
+            </summary>
+        </member>
+    </members>
+</doc>
