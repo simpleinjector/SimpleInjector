@@ -70,8 +70,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		Documentation\ILMerge License.rtf = Documentation\ILMerge License.rtf
 		licence.txt = licence.txt
 		Documentation\Res_NDependWhiteBook_Assembly.pdf = Documentation\Res_NDependWhiteBook_Assembly.pdf
-		Documentation\SimpleInjector.chm = Documentation\SimpleInjector.chm
-		SimpleInjector.snk = SimpleInjector.snk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation Genaration", "Documentation Genaration", "{59B27DFA-E74B-4A06-8DF2-7DFBBE6B7C5D}"
