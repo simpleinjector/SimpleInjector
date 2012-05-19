@@ -74,16 +74,6 @@
     <Compile Include="SimpleInjectorServiceLocatorAdapterTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj">
-      <Project>{442373FD-50BC-4833-B791-6DCC681ABF31}</Project>
-      <Name>CommonServiceLocator.SimpleInjectorAdapter</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +97,16 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj">
+      <Project>{442373FD-50BC-4833-B791-6DCC681ABF31}</Project>
+      <Name>CommonServiceLocator.SimpleInjectorAdapter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
+      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
+      <Name>SimpleInjector.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

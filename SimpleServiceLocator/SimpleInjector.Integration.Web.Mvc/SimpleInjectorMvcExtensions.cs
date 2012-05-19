@@ -44,8 +44,8 @@ namespace SimpleInjector
         Justification = "Mvc is the word")]
     public static class SimpleInjectorMvcExtensions
     {
-        /// <summary>Registers a <see cref="IFilterProvider"/>. Use this method in conjunction with the
-        /// <see cref="RegisterMvcDependencyResolver"/> method.</summary>
+        /// <summary>Registers a <see cref="IFilterProvider"/> that allows implicit property injection into
+        /// the filter attributes that are returned from the provider.</summary>
         /// <param name="container">The container that should be used for injecting properties into attributes
         /// that the MVC framework uses.</param>
         /// <exception cref="ArgumentNullException">

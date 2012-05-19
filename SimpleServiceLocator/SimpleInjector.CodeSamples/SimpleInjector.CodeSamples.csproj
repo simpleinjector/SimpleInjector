@@ -65,14 +65,6 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspNetIntegrationExtensions.cs" />
@@ -94,16 +86,6 @@
     <Compile Include="WinFormsIntegrationExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -119,6 +101,16 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
+      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
+      <Name>SimpleInjector.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
+      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
+      <Name>SimpleInjector.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

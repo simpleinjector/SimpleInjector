@@ -48,7 +48,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>Bin\Debug</OutputPath>
+    <OutputPath>..\bin\Silverlight\</OutputPath>
     <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
@@ -59,14 +59,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>Bin\Release</OutputPath>
+    <OutputPath>..\bin\Silverlight\</OutputPath>
     <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>Bin\Release\CommonServiceLocator.SimpleInjectorAdapter.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
@@ -75,6 +75,10 @@
       <HintPath>..\Shared Silverlight Assemblies\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="SimpleInjector">
+      <HintPath>..\bin\Silverlight\SimpleInjector.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="system" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -83,12 +87,6 @@
       <Link>SimpleInjectorServiceLocatorAdapter.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
-      <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
-      <Name>SimpleInjector.Silverlight</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

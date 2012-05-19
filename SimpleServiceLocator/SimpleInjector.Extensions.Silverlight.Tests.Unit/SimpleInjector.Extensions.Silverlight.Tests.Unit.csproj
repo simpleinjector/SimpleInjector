@@ -138,16 +138,6 @@
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj">
-      <Project>{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}</Project>
-      <Name>SimpleInjector.Extensions.Silverlight</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
-      <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
-      <Name>SimpleInjector.Silverlight</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -163,6 +153,16 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj">
+      <Project>{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}</Project>
+      <Name>SimpleInjector.Extensions.Silverlight</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
+      <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
+      <Name>SimpleInjector.Silverlight</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

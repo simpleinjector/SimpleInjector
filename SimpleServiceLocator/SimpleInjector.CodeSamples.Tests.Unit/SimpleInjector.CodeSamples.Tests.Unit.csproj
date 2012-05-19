@@ -83,20 +83,6 @@
     <Compile Include="VarianceExtensions_RegisteringMultipleRegistrationsAndResolvingCollections.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj">
-      <Project>{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}</Project>
-      <Name>SimpleInjector.CodeSamples</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +106,20 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj">
+      <Project>{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}</Project>
+      <Name>SimpleInjector.CodeSamples</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
+      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
+      <Name>SimpleInjector.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
+      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
+      <Name>SimpleInjector.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

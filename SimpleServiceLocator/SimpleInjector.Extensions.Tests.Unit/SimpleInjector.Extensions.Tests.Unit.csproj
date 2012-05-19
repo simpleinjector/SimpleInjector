@@ -61,7 +61,6 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -78,16 +77,6 @@
     <Compile Include="BatchRegistrationExtensionsTests.cs" />
     <Compile Include="OpenGenericRegistrationExtensionsTests.cs" />
     <Compile Include="TestClasses.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Settings.StyleCop" />
@@ -113,6 +102,16 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
+      <Project>{CA5A8A13-AA2C-4C21-80E3-98452A94CFF7}</Project>
+      <Name>SimpleInjector.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
+      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
+      <Name>SimpleInjector.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

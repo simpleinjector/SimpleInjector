@@ -1,14 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version 1.4.2.12140 (v1.4.2 RTM) 2012-05-19
 	General description:
+		The extensions project now contains 'RegisterDecorator' extension methods that replace the old
+		'RegisterOpenGenericDecorator' extension methods. The new methods allow registering both generic and
+		non-generic decorators. Integration projects have been added to the solution, which should make it
+		easier to integrate Simple Injector with ASP.NET.
 
 	Project Changes:
 		-New projects that were added to the solution:
-			+SimpleInjector.Extensions.LifetimeScoping (.NET 4.0)
-			 Adds extension methods for Lifetime Scope lifestyle. This functionality can not be placed in 
-			 SimpleInjector.Extensions, because it has a dependency on .NET 4.0 (makes use of ThreadLocal<T>), 
-			 while SimpleInjector.Extensions must stay compatible with .NET 3.5 (for now).
 			+SimpleInjector.Integration.Web (.NET 4.0)
 			 Adds extension methods for Per Web Request lifestyle. This assembly takes a dependency on 
 			 .NET 4.0 to allow the needed HTTP Module to be auto registered on application start-up.
@@ -17,10 +17,10 @@ Version vNext
 			+SimpleInjector.Integration.Web.Mvc (.NET 4.0)
 			 Adds extension methods for adding the container as Dependency Resolver (MVC3 / .NET 4) and
 			 registering all Controller classes.
-			+SimpleInjector.Integration.Web.Mvc.LifetimeScoping (.NET 4.0)
-			 Integrates the Lifetime Scope lifestyle (SimpleInjector.Extensions.LifetimeScoping) with MVC3
-			 by auto-registering a HTTP Module that starts a lifestime scope at the beginning of each request
-			 and disposing at the end of the request.	 
+			+SimpleInjector.Extensions.LifetimeScoping (.NET 4.0)
+			 Adds extension methods for Lifetime Scope lifestyle. This functionality can not be placed in 
+			 SimpleInjector.Extensions, because it has a dependency on .NET 4.0 (makes use of ThreadLocal<T>), 
+			 while SimpleInjector.Extensions must stay compatible with .NET 3.5 (for now).
 
 	Code Changes:
 		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
@@ -30,11 +30,12 @@ Version vNext
 	Bug fixes:
 		-[Extensions] RegisterManyForOpenGeneric extension method threw an exception which message contained
 		 the .NET type instead of the 'friendly' type name, as the rest of the Simple Injector uses.
+		-[Core] DebuggerDisplay for InstanceProducers did not work when running the VB debugger.
 
 
 Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
 	General description:
-		RegisterOpenGenericDecorator extension methods improved to allow registering non-generic deceorator.
+		RegisterOpenGenericDecorator extension methods improved to allow registering non-generic decorator.
 
 	Code Changes:
 		-[Extensions] GetTypesToRegister methods added to the OpenGenericBatchRegistrationExtensions class

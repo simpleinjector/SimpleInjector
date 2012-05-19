@@ -53,6 +53,9 @@
     <Compile Include="SimpleInjectorLifetimeScopeExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Settings.StyleCop" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
       <Project>{D140D43C-B7AB-43B2-A287-394DF871EB56}</Project>
       <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
@@ -61,9 +64,6 @@
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
