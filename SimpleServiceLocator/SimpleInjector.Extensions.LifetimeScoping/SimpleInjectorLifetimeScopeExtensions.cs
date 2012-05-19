@@ -37,10 +37,6 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorLifetimeScopeExtensions
     {
-        private const string LifetimeScopingIsNotEnabledExceptionMessage =
-            "To enable lifetime scoping, please make sure the EnableLifetimeScoping extension method is " +
-            "called during the configuration of the container.";
-
         /// <summary>
         /// Begins a new lifetime scope for the given <paramref name="container"/>. 
         /// Services, registered with <b>RegisterLifetimeScope</b>, that are requested within the same thread
