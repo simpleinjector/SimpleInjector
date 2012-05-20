@@ -71,7 +71,6 @@
     <Compile Include="ContextDependentExtensionsTests.cs" />
     <Compile Include="ExpirationExtensionsTests.cs" />
     <Compile Include="InterceptorExtensionsTests.cs" />
-    <Compile Include="LifetimeScopeExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CollectionRegistrationExtensionsTests.cs" />
     <Compile Include="PerThreadRegistrationsExtensionsTests.cs" />

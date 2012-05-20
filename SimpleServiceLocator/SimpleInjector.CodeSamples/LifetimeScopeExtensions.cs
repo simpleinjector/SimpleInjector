@@ -1,195 +1,289 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     // http://simpleinjector.codeplex.com/wikipage?title=LifetimeScopeExtensions
-    // Differences with Autofac:
-    // 1. In Autofac you call scope.Resolve while here you should just call container.Resolve. In other words, 
-    //    this implementation works much like the TransactionScope.
-    // 2. In Autofac the container acts like a scope as well, resolving 'per lifetime scoped' objects is the
-    //    same as resolving singletons in the container. This implementation throws an exception when
-    //    resolving 'per lifetime scoped' outside the context of a lifetime scope.
-    // 3. By default, Autofac will track all types that implement IDisposable. We can mimic this behavior
-    //    by calling container.MarkAsDisposable<IDisposable>();
-    // 4. In Autofac there are many advanced scenario's possible.
+    // These extension methods are provided for compatibility with .NET 3.5. For .NET 4.0 please use the
+    // SimpleInjector.Extensions.LifetimeScoping dll or NuGet package).
+    // Behavior:
+    // 1. Calling container.BeginLifetimeScope will start a new scope and the scope ends when the returned
+    //    object gets disposed. All 'lifetime scoped' objects that are requested from the container in between
+    //    are singletons in that scope.
+    // 2. A lifetime scope is thread-specific. Each new thread should call BeginLifetimeScope.
+    // 3. Scopes can be nested. Each new scope gets its own new set of instances. Do not use lifetime scoping
+    //    in a web request, since web requests can end at a different thread than where they were started.
+    // 4. This implementation will not work correctly when multiple containers are involved. Instances are
+    //    singleton within a scope on a thread. Multiple containers share their scopes.
+    // 2. The container acts like a scope as well, resolving 'per lifetime scoped' objects outside any scope
+    //    is the same as resolving singletons in the container.
+    // 3. Objects that implement IDisposable are tracked and disposed when the scope ends.
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using SimpleInjector;
+    using System.Linq.Expressions;
 
-    // Note: Lifetime scoping depends on thread local storage.
-    public static class LifetimeScopeExtensions
+    public static class SimpleInjectorLifetimeScopeExtensions
     {
-        private const string NoLifetimeScopeMessage = "The type {0} is " +
-            "registered as 'lifetime scope' and can't be resolved " +
-            "outside the context of a BeginLifetimeScope call.";
-
-        [ThreadStatic]
-        private static Stack<LifetimeScope> scopes;
-
-        private static LifetimeScope CurrentScope
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                var scopes = LifetimeScopeExtensions.scopes;
-                return scopes != null && scopes.Count > 0 ? scopes.Peek() : null;
-            }
-        }
-
-        public static IDisposable BeginLifetimeScope(this Container container)
-        {
-            return new LifetimeScope().Begin();
-        }
-
-        public static void RegisterLifetimeScope<TService>(this Container container,
-            Func<TService> instanceCreator) where TService : class
-        {
-            container.ResolveUnregisteredType += (sender, e) =>
-            {
-                if (e.UnregisteredServiceType == typeof(TService))
-                {
-                    e.Register(() =>
-                    {
-                        var scope = CurrentScope;
-
-                        if (scope == null)
-                        {
-                            throw new ActivationException(string.Format(
-                                CultureInfo.InvariantCulture,
-                                NoLifetimeScopeMessage, typeof(TService)));
-                        }
-
-                        return scope.GetInstance<TService>(container, instanceCreator);
-                    });
-                }
-            };
-        }
-
-        public static void RegisterLifetimeScope<TService, TImplementation>(
+        public static IDisposable BeginLifetimeScope(
             this Container container)
-            where TImplementation : class, TService
+        {
+            IServiceProvider provider = container;
+
+            var manager =
+                provider.GetService(typeof(LifetimeScopeManager))
+                as LifetimeScopeManager;
+
+            if (manager != null)
+            {
+                return manager.BeginLifetimeScope();
+            }
+
+            return new LifetimeScope(null);
+        }
+
+        public static void RegisterLifetimeScope<TConcrete>(
+            this Container container)
+            where TConcrete : class
+        {
+            container.Register<TConcrete>();
+            container.RegisterLifetimeScopeManager();
+            AsLifetimeScope<TConcrete>(container);
+        }
+
+        public static void RegisterLifetimeScope<TService, TImpl>(
+            this Container container)
+            where TImpl : class, TService
             where TService : class
         {
-            // We must use the ResolveUnregisteredType to prevent the registered
-            // delegate from firing during Verify().
-            container.ResolveUnregisteredType += (sender, e) =>
+            container.Register<TService, TImpl>();
+            container.RegisterLifetimeScopeManager();
+            AsLifetimeScope<TService>(container);
+        }
+
+        public static void RegisterLifetimeScope<TService>(
+            this Container container,
+            Func<TService> instanceCreator)
+            where TService : class
+        {
+            RegisterLifetimeScope<TService>(container,
+                instanceCreator, true);
+        }
+
+        public static void RegisterLifetimeScope<TService>(
+            this Container container,
+            Func<TService> instanceCreator,
+            bool disposeWhenLifetimeScopeEnds)
+            where TService : class
+        {
+            container.Register<TService>(instanceCreator);
+            container.RegisterLifetimeScopeManager();
+            AsLifetimeScope<TService>(container,
+                disposeWhenLifetimeScopeEnds);
+        }
+
+        private static void AsLifetimeScope<TService>(
+            Container c, bool dispose = true)
+            where TService : class
+        {
+            var helper = new AsLifetimeScopeHelper<TService>(c)
             {
-                if (e.UnregisteredServiceType == typeof(TService))
-                {
-                    e.Register(() =>
-                    {
-                        var scope = CurrentScope;
-
-                        if (scope == null)
-                        {
-                            throw new ActivationException(string.Format(
-                                CultureInfo.InvariantCulture,
-                                NoLifetimeScopeMessage, typeof(TService)));
-                        }
-
-                        return scope.GetInstance<TImplementation>(container);
-                    });
-                }
+                DisposeWhenLifetimeScopeEnds = dispose
             };
+
+            c.ExpressionBuilt += helper.ExpressionBuilt;
         }
 
-        public static void DisposeWhenLifetimeScopeEnds<TDisposable>(
+        private static void RegisterLifetimeScopeManager(
             this Container container)
-            where TDisposable : class, IDisposable
         {
-            container.RegisterInitializer<TDisposable>(disposable =>
+            try
             {
-                RegisterForDisposal(disposable);
-            });
-        }
-
-        private static void RegisterForDisposal(IDisposable disposable)
-        {
-            var scope = CurrentScope;
-
-            if (scope != null)
-            {
-                scope.RegisterForDisposal(disposable);
+                container.RegisterSingle<LifetimeScopeManager>(
+                    new LifetimeScopeManager());
             }
-            else
+            catch (InvalidOperationException)
             {
-                // Instances that are created outside the scope of a lifetime
-                // scope will most likely be singletons or transients created 
-                // during the call to Verify(). We have no way of knowing
-                // whether we can dispose it. Therefore, we simply continue.
             }
         }
 
-        private sealed class LifetimeScope : IDisposable
+        internal sealed class LifetimeScopeManager
         {
-            private readonly Dictionary<Type, object> instances = 
+            [ThreadStatic]
+            private static Stack<LifetimeScope> threadStaticScopes;
+
+            internal LifetimeScopeManager()
+            {
+            }
+
+            internal LifetimeScope CurrentScope
+            {
+                get
+                {
+                    var scopes = threadStaticScopes;
+
+                    return scopes != null && scopes.Count > 0
+                        ? scopes.Peek() : null;
+                }
+            }
+
+            internal LifetimeScope BeginLifetimeScope()
+            {
+                Stack<LifetimeScope> scopes = threadStaticScopes;
+
+                if (scopes == null)
+                {
+                    threadStaticScopes =
+                        scopes = new Stack<LifetimeScope>();
+                }
+
+                var scope = new LifetimeScope(this);
+
+                scopes.Push(scope);
+
+                return scope;
+            }
+
+            internal void EndLifetimeScope(LifetimeScope scope)
+            {
+                var scopes = threadStaticScopes;
+
+                if (scopes != null && scopes.Contains(scope))
+                {
+                    while (scopes.Count > 0 && scopes.Pop() != scope)
+                    {
+                    }
+                }
+            }
+        }
+
+        internal sealed class LifetimeScope : IDisposable
+        {
+            private readonly Dictionary<Type, object> instances =
                 new Dictionary<Type, object>();
 
-            private bool disposed;
-
+            private LifetimeScopeManager manager;
             private List<IDisposable> disposables;
 
-            void IDisposable.Dispose()
+            internal LifetimeScope(LifetimeScopeManager manager)
             {
-                if (!this.disposed)
-                {
-                    this.disposed = true;
+                this.manager = manager;
+            }
 
-                    scopes.Pop();
+            public void Dispose()
+            {
+                if (this.manager != null)
+                {
+                    this.manager.EndLifetimeScope(this);
+
+                    this.manager = null;
 
                     if (this.disposables != null)
                     {
                         this.disposables.ForEach(d => d.Dispose());
                     }
+
+                    this.disposables = null;
                 }
-            }
-
-            internal LifetimeScope Begin()
-            {
-                if (scopes == null)
-                {
-                    scopes = new Stack<LifetimeScope>();
-                }
-
-                scopes.Push(this);
-
-                return this;
-            }
-
-            internal TService GetInstance<TService>(Container container)
-                where TService : class
-            {
-                object instance;
-
-                if (!this.instances.TryGetValue(typeof(TService), out instance))
-                {
-                    instance = container.GetInstance<TService>();
-                    this.instances[typeof(TService)] = instance;                        
-                }
-
-                return (TService)instance;
-            }
-
-            internal TService GetInstance<TService>(Container container, Func<TService> instanceCreator)
-                where TService : class
-            {
-                object instance;
-
-                if (!this.instances.TryGetValue(typeof(TService), out instance))
-                {
-                    instance = instanceCreator();
-                    this.instances[typeof(TService)] = instance;
-                }
-
-                return (TService)instance;
             }
 
             internal void RegisterForDisposal(IDisposable disposable)
             {
-                var disposables = 
-                    this.disposables ?? (this.disposables = new List<IDisposable>());
+                if (this.disposables == null)
+                {
+                    this.disposables = new List<IDisposable>();
+                }
 
-                disposables.Add(disposable);
+                this.disposables.Add(disposable);
+            }
+
+            internal TService GetInstance<TService>(
+                Func<TService> instanceCreator)
+                where TService : class
+            {
+                object instance;
+
+                if (!this.instances.TryGetValue(typeof(TService),
+                    out instance))
+                {
+                    this.instances[typeof(TService)] =
+                        instance = instanceCreator();
+                }
+
+                return (TService)instance;
+            }
+        }
+
+        private sealed class AsLifetimeScopeHelper<TService>
+            where TService : class
+        {
+            private readonly Container container;
+            private TService singleton;
+            private LifetimeScopeManager manager;
+            private Func<TService> instanceCreator;
+
+            internal AsLifetimeScopeHelper(Container container)
+            {
+                this.container = container;
+            }
+
+            internal bool DisposeWhenLifetimeScopeEnds { get; set; }
+
+            internal void ExpressionBuilt(object sender,
+                ExpressionBuiltEventArgs e)
+            {
+                if (e.RegisteredServiceType == typeof(TService))
+                {
+                    this.manager = this.container
+                        .GetInstance<LifetimeScopeManager>();
+
+                    this.instanceCreator =
+                        Expression.Lambda<Func<TService>>(e.Expression)
+                        .Compile();
+
+                    Func<TService> scopedInstanceCreator =
+                        this.CreateScopedInstance;
+
+                    e.Expression = Expression.Invoke(
+                        Expression.Constant(scopedInstanceCreator));
+                }
+            }
+
+            private TService CreateScopedInstance()
+            {
+                var scope = this.manager.CurrentScope;
+
+                if (scope != null)
+                {
+                    var instance =
+                        scope.GetInstance(this.instanceCreator);
+
+                    if (this.DisposeWhenLifetimeScopeEnds)
+                    {
+                        var disposable = instance as IDisposable;
+
+                        if (disposable != null)
+                        {
+                            scope.RegisterForDisposal(disposable);
+                        }
+                    }
+
+                    return instance;
+                }
+
+                return this.GetSingleton();
+            }
+
+            private TService GetSingleton()
+            {
+                if (this.singleton == null)
+                {
+                    lock (this)
+                    {
+                        if (this.singleton == null)
+                        {
+                            this.singleton = this.instanceCreator();
+                        }
+                    }
+                }
+
+                return this.singleton;
             }
         }
     }
