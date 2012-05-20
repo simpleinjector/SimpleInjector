@@ -21,9 +21,9 @@
   <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
  </ProjectOptions>
  <Targets>
-  <Target Name="$(ProjectDir)/SimpleInjector.NET/bin/Debug/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
-  <Target Name="$(ProjectDir)/SimpleInjector.Extensions/bin/Debug/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
-  <Target Name="$(ProjectDir)/SimpleInjector.Integration.Web.WebForms/bin/Debug/SimpleInjector.Integration.Web.WebForms.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.WebForms.dll" Analyze="True" AnalyzeAllChildren="True" />
  </Targets>
  <Rules>
   <RuleFiles>
