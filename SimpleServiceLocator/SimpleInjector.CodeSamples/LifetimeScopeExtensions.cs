@@ -109,7 +109,7 @@
             c.ExpressionBuilt += helper.ExpressionBuilt;
         }
 
-        internal sealed class LifetimeScopeManager
+        private sealed class LifetimeScopeManager
         {
             [ThreadStatic]
             private static Stack<LifetimeScope> threadStaticScopes;
@@ -159,7 +159,7 @@
             }
         }
 
-        internal sealed class LifetimeScope : IDisposable
+        private sealed class LifetimeScope : IDisposable
         {
             private readonly Dictionary<Type, object> instances =
                 new Dictionary<Type, object>();
