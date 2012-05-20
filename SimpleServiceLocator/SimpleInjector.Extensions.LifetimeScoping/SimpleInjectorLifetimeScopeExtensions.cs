@@ -37,6 +37,31 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorLifetimeScopeExtensions
     {
+        private const string LifetimeScopingIsNotEnabledExceptionMessage =
+            "To enable lifetime scoping, please make sure the EnableLifetimeScoping extension method is " +
+            "called during the configuration of the container.";
+
+        /// <summary>
+        /// Enables the lifetime scoping for the given <paramref name="container"/>. Lifetime scoping is
+        /// enabled automatically when services get registered using one of the <b>RegisterLifetimeScope</b>
+        /// overloads. When no services are registered per Lifetime Scope however, but lifetime scoping is
+        /// still used (for instance when you want instances to be disposed at the end of a lifetime scope),
+        /// lifetime scoping must be enabled explicitly.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        public static void EnableLifetimeScoping(this Container container)
+        {
+            try
+            {
+                container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager());
+            }
+            catch (InvalidOperationException)
+            {
+                // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
+                // nasty, but probably the only way to do this.
+            }
+        }
+
         /// <summary>
         /// Begins a new lifetime scope for the given <paramref name="container"/>. 
         /// Services, registered with <b>RegisterLifetimeScope</b>, that are requested within the same thread
@@ -47,8 +72,15 @@ namespace SimpleInjector
         /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when <see cref="RegisterLifetimeScopeManager"/> has
+        /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
         /// not been called previously.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
+        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
+        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
+        /// by registering a service using one of the 
+        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
+        /// overloads.
+        /// </exception>
         public static LifetimeScope BeginLifetimeScope(this Container container)
         {
             if (container == null)
@@ -67,8 +99,15 @@ namespace SimpleInjector
 
             // When no LifetimeScopeManager is registered, this means that there are no lifetime scope
             // registrations (since the first call to RegisterLifetimeScope also registers the singleton
-            // manager) and we can return a dummy scope.
-            return new LifetimeScope(null);
+            // manager). However, since the user has called BeginLifetimeScope, he/she expects to be able to
+            // use it, for instance to allow disposing instances with a different/shorter lifetime than 
+            // Lifetime Scope (using the LifetimeScope.RegisterForDisposal method). For this to work however,
+            // we need a LifetimeScopeManager, but at this point it is impossible to register it, since
+            // BeginLifetimeScope will be called after the initialization phase. We have no other option than
+            // to inform the user about enabling lifetime scoping explicitly by throwing an exception. You
+            // might see this as a design flaw, but since this feature is implemented on top of the core 
+            // library (instead of being written inside of the core library), there is no other option.
+            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
         }
 
         /// <summary>
@@ -92,6 +131,13 @@ namespace SimpleInjector
         /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
+        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
+        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
+        /// by registering a service using one of the 
+        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
+        /// overloads.
+        /// </exception>
         public static LifetimeScope GetCurrentLifetimeScope(this Container container)
         {
             if (container == null)
@@ -103,7 +149,16 @@ namespace SimpleInjector
 
             var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
 
-            return manager != null ? manager.CurrentScope : null;
+            if (manager != null)
+            {
+                // CurrentScope can be null, when there is currently no scope.
+                return manager.CurrentScope;
+            }
+
+            // When no LifetimeScopeManager is registered, we explicitly throw an exception. See the comments
+            // in the BeginLifetimeScope method for more information.
+            // We could return null here, since the BeginLifetimeScope already throws an exception,
+            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
         }
 
         /// <summary>
@@ -143,7 +198,7 @@ namespace SimpleInjector
             // saving us from having to build such registration ourselves.
             container.Register<TConcrete>();
 
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
 
             ReplaceRegistrationAsLifetimeScope<TConcrete>(container);
         }
@@ -182,7 +237,7 @@ namespace SimpleInjector
 
             container.Register<TService, TImplementation>();
 
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
 
             ReplaceRegistrationAsLifetimeScope<TService>(container);
         }
@@ -247,7 +302,7 @@ namespace SimpleInjector
 
             container.Register<TService>(instanceCreator);
 
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
 
             ReplaceRegistrationAsLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
         }
@@ -261,19 +316,6 @@ namespace SimpleInjector
             helper.DisposeWhenLifetimeScopeEnds = disposeWhenLifetimeScopeEnds;
 
             container.ExpressionBuilt += helper.ExpressionBuilt;
-        }
-
-        private static void RegisterLifetimeScopeManager(this Container container)
-        {
-            try
-            {
-                container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager());
-            }
-            catch (InvalidOperationException)
-            {
-                // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
-                // nasty, but probably the only way to do this.
-            }
         }
 
         // This class is thread-safe within the context of a single Container.

@@ -21,6 +21,24 @@
 
     public static class SimpleInjectorLifetimeScopeExtensions
     {
+        private const string LifetimeScopingIsNotEnabledMessage =
+            "To enable lifetime scoping, please make sure the " +
+            "EnableLifetimeScoping extension method is " +
+            "called during the configuration of the container.";
+
+        public static void EnableLifetimeScoping(
+            this Container container)
+        {
+            try
+            {
+                container.RegisterSingle<LifetimeScopeManager>(
+                    new LifetimeScopeManager());
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
         public static IDisposable BeginLifetimeScope(
             this Container container)
         {
@@ -35,7 +53,8 @@
                 return manager.BeginLifetimeScope();
             }
 
-            return new LifetimeScope(null);
+            throw new InvalidOperationException(
+                LifetimeScopingIsNotEnabledMessage);
         }
 
         public static void RegisterLifetimeScope<TConcrete>(
@@ -43,7 +62,7 @@
             where TConcrete : class
         {
             container.Register<TConcrete>();
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
             AsLifetimeScope<TConcrete>(container);
         }
 
@@ -53,7 +72,7 @@
             where TService : class
         {
             container.Register<TService, TImpl>();
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
             AsLifetimeScope<TService>(container);
         }
 
@@ -73,7 +92,7 @@
             where TService : class
         {
             container.Register<TService>(instanceCreator);
-            container.RegisterLifetimeScopeManager();
+            container.EnableLifetimeScoping();
             AsLifetimeScope<TService>(container,
                 disposeWhenLifetimeScopeEnds);
         }
@@ -88,19 +107,6 @@
             };
 
             c.ExpressionBuilt += helper.ExpressionBuilt;
-        }
-
-        private static void RegisterLifetimeScopeManager(
-            this Container container)
-        {
-            try
-            {
-                container.RegisterSingle<LifetimeScopeManager>(
-                    new LifetimeScopeManager());
-            }
-            catch (InvalidOperationException)
-            {
-            }
         }
 
         internal sealed class LifetimeScopeManager

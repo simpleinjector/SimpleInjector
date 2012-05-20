@@ -18,10 +18,33 @@
             // Arrange
             var container = new Container();
 
+            container.EnableLifetimeScoping();
+
             // Act
             using (var scope = container.BeginLifetimeScope())
             {
                 container.GetInstance<ConcreteCommand>();
+            }
+        }
+
+        [TestMethod]
+        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrationsAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.BeginLifetimeScope();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: " + ex.Message);
             }
         }
 
@@ -45,7 +68,97 @@
             container.RegisterLifetimeScope<ConcreteCommand>();
             container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
         }
-          
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void GetCurrentLifetimeScope_WithNullContainerArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = null;
+
+            // Act
+            container.GetCurrentLifetimeScope();
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_OutsideTheContextOfALifetimeScope_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            // Act
+            var currentScope = container.GetCurrentLifetimeScope();
+
+            // Assert
+            Assert.IsNull(currentScope);
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_OutsideTheContextOfALifetimeScopeWithoutScopingEnabled_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetCurrentLifetimeScope();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_InsideTheContextOfALifetimeScope_ReturnsThatScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            using (var scope = container.BeginLifetimeScope())
+            {
+                // Act
+                var currentScope = container.GetCurrentLifetimeScope();
+
+                // Assert
+                Assert.IsNotNull(currentScope);
+                Assert.IsTrue(object.ReferenceEquals(scope, currentScope));
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_InsideANestedLifetimeScope_ReturnsTheInnerMostScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            using (var outerScope = container.BeginLifetimeScope())
+            {
+                using (var innerScope = container.BeginLifetimeScope())
+                {
+                    Assert.IsFalse(object.ReferenceEquals(outerScope, innerScope), "Test setup failed.");
+
+                    // Act
+                    var currentScope = container.GetCurrentLifetimeScope();
+
+                    // Assert
+                    Assert.IsTrue(object.ReferenceEquals(innerScope, currentScope));
+                }
+            }
+        }
+
         [TestMethod]
         public void GetInstance_WithoutLifetimeScope_ReturnsSingleton()
         {
@@ -199,6 +312,8 @@
             // Arrange
             var container = new Container();
 
+            container.EnableLifetimeScoping();
+
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
@@ -214,6 +329,63 @@
             Assert.IsFalse(command.HasBeenDisposed,
                 "The lifetime scope should not dispose objects that are not explicitly marked as such, since " +
                 "this would allow the scope to accidentally dispose singletons.");
+        }
+
+        [TestMethod]
+        public void LifetimeScopeDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            // Transient
+            container.Register<ICommand, DisposableCommand>();
+
+            container.RegisterInitializer<DisposableCommand>(instance =>
+            {
+                var scope = container.GetCurrentLifetimeScope();
+
+                // The following line explictly registers the transient DisposableCommand for disposal when
+                // the lifetime scope ends.
+                scope.RegisterForDisposal(instance);
+            });
+
+            DisposableCommand command;
+
+            // Act
+            using (container.BeginLifetimeScope())
+            {
+                command = container.GetInstance<DisposableCommand>();
+            }
+
+            // Assert
+            Assert.IsTrue(command.HasBeenDisposed,
+                "The transient instance was expected to be disposed, because it was registered for disposal.");
+        }
+
+        [TestMethod]
+        public void RegisterForDisposal_WithNullArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            // Act
+            using (var scope = container.BeginLifetimeScope())
+            {
+                try
+                {
+                    scope.RegisterForDisposal(null);
+
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ArgumentNullException)
+                {
+                    // This exception is expected.
+                }
+            }
         }
 
         [TestMethod]
@@ -299,7 +471,7 @@
                     "Actual: " + ex.Message);
             }
         }
-      
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void BeginLifetimeScope_WithNullArgument_ThrowsExpectedException()
@@ -327,7 +499,7 @@
         {
             SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(null, () => null);
         }
-              
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()

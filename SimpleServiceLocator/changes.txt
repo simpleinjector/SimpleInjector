@@ -1,5 +1,20 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+
+	Code Changes:
+
+	Bug fixes:
+
+
+Version 1.4.2.12141 (v1.4.2 RTM) 2012-05-20
+	Bug fixes:
+		-There was a bug in the SimpleInjector.Extensions.LifetimeScoping.dll, which made it impossible to
+		 register instances (with a different lifestyle than Lifetime Scope) for disposal, when no services
+		 where registered with the Lifetime Scope lifestyle.
+
+
 Version 1.4.2.12140 (v1.4.2 RTM) 2012-05-19
 	General description:
 		The extensions project now contains 'RegisterDecorator' extension methods that replace the old
