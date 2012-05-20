@@ -2,6 +2,7 @@
 
 set version=1.4.2.12140
 set versionCore=1.4.2.12140
+set version_Extensions_LifetimeScoping=1.4.2.12141
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
 
@@ -47,7 +48,7 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version% /out:%targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Extensions_LifetimeScoping% /out:%targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
@@ -227,11 +228,11 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.LifetimeScoping Release
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40\SimpleInjector.Extensions.LifetimeScoping.dll
 copy  bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40\SimpleInjector.Extensions.LifetimeScoping.xml
-%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %version_Extensions_LifetimeScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%version%.zip"
-ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %version_Extensions_LifetimeScoping%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%version_Extensions_LifetimeScoping%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%version_Extensions_LifetimeScoping%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
