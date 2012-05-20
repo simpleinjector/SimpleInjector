@@ -28,6 +28,11 @@ namespace $rootnamespace$.App_Start
      
         private static void InitializeContainer(Container container)
         {
+            // Please note that if you updated the SimpleInjector.MVC3 package from a previous version, this
+            // SimpleInjectorInitializer class replaces the previous SimpleInjectorMVC3 class. You should
+            // move the registrations from the old SimpleInjectorMVC3.InitializeContainer to this method,
+            // and remove the SimpleInjectorMVC3 and SimpleInjectorMVC3Extensions class from the App_Start
+            // folder.
 #error Register your services here (remove this line).
 
             // For instance:
