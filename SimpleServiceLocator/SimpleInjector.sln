@@ -104,9 +104,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit", "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj", "{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Packaging", "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj", "{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{D1A45E86-CD79-4F65-AC0B-25A21166B1E9}"
+	ProjectSection(SolutionItems) = preProject
+		BuildTools\builddocs.bat = BuildTools\builddocs.bat
+		BuildTools\DayOfYear.exe = BuildTools\DayOfYear.exe
+		BuildTools\ILMerge.exe = BuildTools\ILMerge.exe
+		BuildTools\ILMerge.exe.config = BuildTools\ILMerge.exe.config
+		BuildTools\replace.exe = BuildTools\replace.exe
+		BuildTools\SandcastleGUI.exe = BuildTools\SandcastleGUI.exe
+		BuildTools\SandcastleGUI.exe.config = BuildTools\SandcastleGUI.exe.config
+		BuildTools\SimpleInjector.SandcastleGUI = BuildTools\SimpleInjector.SandcastleGUI
+		BuildTools\zip.vbs = BuildTools\zip.vbs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 18
+		SccNumberOfProjects = 19
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -161,6 +176,9 @@ Global
 		SccProjectUniqueName17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj
 		SccProjectName17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 		SccLocalPath17 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+		SccProjectUniqueName18 = SimpleInjector.Packaging\\SimpleInjector.Packaging.csproj
+		SccProjectName18 = SimpleInjector.Packaging
+		SccLocalPath18 = SimpleInjector.Packaging
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -239,6 +257,10 @@ Global
 		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

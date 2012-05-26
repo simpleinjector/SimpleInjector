@@ -23,6 +23,7 @@
  <Targets>
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Packaging.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.WebForms.dll" Analyze="True" AnalyzeAllChildren="True" />
  </Targets>
  <Rules>

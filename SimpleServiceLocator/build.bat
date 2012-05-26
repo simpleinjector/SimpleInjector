@@ -46,6 +46,11 @@ ren %targetPathNet%\SimpleInjector.Extensions.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version% /out:%targetPathNet%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
+%msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:Configuration=%configuration%
+ren %targetPathNet%\SimpleInjector.Packaging.dll temp.dll
+%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version% /out:%targetPathNet%\SimpleInjector.Packaging.dll /keyfile:SimpleInjector.snk
+del %targetPathNet%\temp.dll
+
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Extensions_LifetimeScoping% /out:%targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll /keyfile:SimpleInjector.snk
@@ -144,6 +149,8 @@ copy bin\NET\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET35\CommonS
 mkdir Releases\temp\NET35\Extensions
 copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET35\Extensions\SimpleInjector.Extensions.dll
 copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET35\Extensions\SimpleInjector.Extensions.xml
+copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET35\Extensions\SimpleInjector.Packaging.dll
+copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET35\Extensions\SimpleInjector.Packaging.xml
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET40\SimpleInjector.xml
@@ -221,6 +228,18 @@ copy  bin\NET\SimpleInjector.Extensions.xml Releases\temp\lib\net35\SimpleInject
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3b15d35fbc3a4556960337dcd95cf0f4.psmdcp {version} %version%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version%.zip"
 ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
+
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy  bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\net35\SimpleInjector.Packaging.dll
+copy  bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\net35\SimpleInjector.Packaging.xml
+%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %versionCore%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %version%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp

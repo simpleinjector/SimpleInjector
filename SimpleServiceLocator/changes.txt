@@ -36,6 +36,8 @@ Version 1.4.2.12140 (v1.4.2 RTM) 2012-05-19
 			 Adds extension methods for Lifetime Scope lifestyle. This functionality can not be placed in 
 			 SimpleInjector.Extensions, because it has a dependency on .NET 4.0 (makes use of ThreadLocal<T>), 
 			 while SimpleInjector.Extensions must stay compatible with .NET 3.5 (for now).
+			+SimpleInjector.Packaging (.NET 3.5) allows bundling sets of related services and register them
+			 together.
 
 	Code Changes:
 		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
