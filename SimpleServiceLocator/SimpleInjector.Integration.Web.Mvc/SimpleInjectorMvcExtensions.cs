@@ -28,7 +28,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
@@ -94,7 +93,8 @@ namespace SimpleInjector
 
             var controllerTypes =
                 from assembly in assemblies
-                from type in GetExportedTypesFrom(assembly)
+                where !assembly.IsDynamic
+                from type in assembly.GetExportedTypes()
                 where type.Name.EndsWith("Controller", StringComparison.Ordinal)
                 where typeof(IController).IsAssignableFrom(type)
                 where !type.IsAbstract
@@ -103,20 +103,6 @@ namespace SimpleInjector
             foreach (var controllerType in controllerTypes)
             {
                 container.Register(controllerType);
-            }
-        }
-
-        private static IEnumerable<Type> GetExportedTypesFrom(Assembly assembly)
-        {
-            try
-            {
-                return assembly.GetExportedTypes();
-            }
-            catch (NotSupportedException)
-            {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
-                // Assembly and it would be safe to skip this exception.
-                return Enumerable.Empty<Type>();
             }
         }
     }
