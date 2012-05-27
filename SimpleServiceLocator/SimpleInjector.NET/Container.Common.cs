@@ -59,7 +59,6 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container() : this(new ContainerOptions())
         {
-            this.RegisterSingle<Container>(this);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
@@ -74,6 +73,8 @@ namespace SimpleInjector
             }
 
             this.options = options;
+
+            this.RegisterSingle<Container>(this);
         }
 
         /// <summary>

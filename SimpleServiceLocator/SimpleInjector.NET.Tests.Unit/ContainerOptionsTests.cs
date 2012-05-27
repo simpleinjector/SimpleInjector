@@ -1,9 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -35,7 +33,7 @@
             // Act
             container.Register<IUserRepository, InMemoryUserRepository>();
         }
-        
+
         [TestMethod]
         public void AllowOverridingRegistrations_False_ContainerThrowsExpectedExceptionMessage()
         {
@@ -111,6 +109,31 @@
             // Assert
             var instance = container.GetAllInstances<IUserRepository>().Single();
             Assert.IsInstanceOfType(instance, typeof(InMemoryUserRepository));
+        }
+
+        // NOTE: There was a bug in the framework. The container did not selfregister when the overloaded
+        // constructor with the ContainerOptions was used. This test proves this bug.
+        [TestMethod]
+        public void ContainerWithOptions_ResolvingATypeThatDependsOnTheContainer_ContainerInjectsItself()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions());
+
+            // Act
+            var instance = container.GetInstance<ClassWithContainerAsDependency>();
+
+            // Assert
+            Assert.AreEqual(container, instance.Container);
+        }
+
+        public sealed class ClassWithContainerAsDependency
+        {
+            public ClassWithContainerAsDependency(Container container)
+            {
+                this.Container = container;
+            }
+
+            public Container Container { get; private set; }
         }
     }
 }
