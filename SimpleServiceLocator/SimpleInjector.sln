@@ -3,12 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
-		ILMerge.exe = ILMerge.exe
-		ILMerge.exe.config = ILMerge.exe.config
 		Settings.StyleCop = Settings.StyleCop
 		SimpleInjector.FxCop = SimpleInjector.FxCop
 		SimpleInjector.ncover = SimpleInjector.ncover
-		SimpleInjector.snk = SimpleInjector.snk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Assemblies", "Shared Assemblies", "{C7BE8829-1B19-494C-B719-CFA494053C22}"
