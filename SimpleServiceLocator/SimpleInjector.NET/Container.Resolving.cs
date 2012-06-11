@@ -73,16 +73,7 @@ namespace SimpleInjector
                 instance = instanceProducer.GetInstance();
             }
 
-            try
-            {
-                return (TService)instance;
-            }
-            catch (Exception ex)
-            {
-                throw new ActivationException(
-                    StringResources.DelegateRegisteredUsingResolveUnregisteredTypeReturnedAnUnassignableFrom(typeof(TService),
-                    instance.GetType()), ex);
-            }
+            return (TService)instance;
         }
 
         /// <summary>Gets an instance of the given <paramref name="serviceType"/>.</summary>
