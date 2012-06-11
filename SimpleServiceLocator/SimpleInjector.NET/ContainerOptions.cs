@@ -25,6 +25,9 @@
 
 namespace SimpleInjector
 {
+    using System;
+    using SimpleInjector.Advanced;
+
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
     /// <example>
     /// The following example shows the typical usage of the <b>ContainerOptions</b> class.
@@ -54,11 +57,59 @@ namespace SimpleInjector
     /// </example>
     public class ContainerOptions
     {
+        private ConstructorResolutionBehavior constructorResolutionBehavior =
+            new DefaultConstructorResolutionBehavior();
+
         /// <summary>
         /// Gets or sets a value indicating whether the container allows overriding registrations. The default
         /// is false.
         /// </summary>
         /// <value>The value indicating whether the container allows overriding registrations.</value>
         public bool AllowOverridingRegistrations { get; set; }
+
+        /// <summary>Gets or sets the constructor resolution behavior.</summary>
+        /// <value>The constructor resolution behavior.</value>
+        public ConstructorResolutionBehavior ConstructorResolutionBehavior
+        {
+            get
+            {
+                return this.constructorResolutionBehavior;
+            }
+
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                this.ThrowWhenContainerHasRegistrations();
+
+                if (value.Container != null && !object.ReferenceEquals(value.Container, this.Container))
+                {
+                    throw new ArgumentException(
+                        StringResources.ConstructorResolutionBehaviorBelongsToAnotherContainer(), "value");
+                }
+
+                this.constructorResolutionBehavior = value;
+                this.constructorResolutionBehavior.Container = this.Container;
+            }
+        }
+
+        internal Container Container { get; set; }
+
+        private void ThrowWhenContainerHasRegistrations()
+        {
+            if (this.Container == null)
+            {
+                return;
+            }
+
+            if (this.Container.HasRegistrations || this.Container.IsLocked)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConstructorResolutionBehaviorCanNotBeChangedAfterTheFirstRegistration());
+            }
+        }
     }
 }

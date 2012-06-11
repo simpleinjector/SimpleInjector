@@ -68,6 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AspNetIntegrationExtensions.cs" />
+    <Compile Include="MostParametersConstructorResolutionBehavior.cs" />
+    <Compile Include="MostResolvableParametersConstructorResolutionBehavior.cs" />
     <Compile Include="ConstructorRegistrationExtensions.cs" />
     <Compile Include="ContextDependentExtensions.cs" />
     <Compile Include="ExpirationExtensions.cs" />

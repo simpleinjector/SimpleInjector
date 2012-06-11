@@ -39,9 +39,10 @@ namespace SimpleInjector
     /// </summary>
     public partial class Container
     {
+        internal readonly ContainerOptions Options;
+
         private readonly object locker = new object();
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
-        private readonly ContainerOptions options;
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
 
@@ -49,15 +50,16 @@ namespace SimpleInjector
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
 
         private bool locked;
-        
+
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
         private EventHandler<ExpressionBuiltEventArgs> expressionBuilt = (s, e) => { };
-      
+
         private Dictionary<Type, PropertyInjector> propertyInjectorCache =
             new Dictionary<Type, PropertyInjector>();
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
-        public Container() : this(new ContainerOptions())
+        public Container()
+            : this(new ContainerOptions())
         {
         }
 
@@ -65,6 +67,9 @@ namespace SimpleInjector
         /// <param name="options">The container options.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="options"/> is a null
         /// reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when supplied <paramref name="options"/> is an instance
+        /// that already is supplied to another <see cref="Container"/> instance. Every container must get
+        /// its own <see cref="ContainerOptions"/> instance.</exception>
         public Container(ContainerOptions options)
         {
             if (options == null)
@@ -72,9 +77,35 @@ namespace SimpleInjector
                 throw new ArgumentNullException("options");
             }
 
-            this.options = options;
+            if (options.Container != null)
+            {
+                throw new ArgumentException(StringResources.ContainerOptionsBelongsToAnotherContainer(),
+                    "options");
+            }
+
+            options.Container = this;
+            options.ConstructorResolutionBehavior.Container = this;
+            this.Options = options;
 
             this.RegisterSingle<Container>(this);
+        }
+
+        internal bool IsLocked
+        {
+            get
+            {
+                // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+                // immediately.
+                lock (this.locker)
+                {
+                    return this.locked;
+                }
+            }
+        }
+
+        internal bool HasRegistrations
+        {
+            get { return this.registrations.Count > 1; }
         }
 
         /// <summary>
@@ -107,7 +138,7 @@ namespace SimpleInjector
             this.LockContainer();
 
             // Filter out the invalid registrations (see the IsValid property for more information).
-            return ( 
+            return (
                 from registration in this.registrations.Values
                 where registration != null
                 where registration.IsValid

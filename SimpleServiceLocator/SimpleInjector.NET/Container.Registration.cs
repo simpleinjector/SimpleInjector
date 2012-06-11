@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Linq.Expressions;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -140,7 +139,7 @@ namespace SimpleInjector
                 this.resolveUnregisteredType -= value;
             }
         }
-        
+
         /// <summary>
         /// Occurs after the creation of the <see cref="System.Linq.Expressions.Expression">Expression</see> 
         /// of a registered type, allowing the created 
@@ -280,7 +279,7 @@ namespace SimpleInjector
             "overloads also take a generic T.")]
         public void Register<TConcrete>() where TConcrete : class
         {
-            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             this.AddRegistration(new ConcreteTransientInstanceProducer<TConcrete>());
         }
@@ -303,7 +302,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
 
             this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>());
         }
@@ -344,7 +343,7 @@ namespace SimpleInjector
             "overloads also take a generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
-            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
             var instanceProducer = new ConcreteTransientInstanceProducer<TConcrete> { Container = this };
 
@@ -373,7 +372,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Helpers.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
 
             var producer = new TransientInstanceProducer<TService, TImplementation> { Container = this };
 
@@ -627,7 +626,21 @@ namespace SimpleInjector
 
             this.locked = wasLocked;
         }
-        
+
+        internal void ThrowWhenContainerIsLocked()
+        {
+            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+            // immediately.
+            lock (this.locker)
+            {
+                if (this.locked)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.ContainerCanNotBeChangedAfterUse(this.GetType()));
+                }
+            }
+        }
+
         private void AddRegistration(InstanceProducer registration)
         {
             this.ThrowWhenContainerIsLocked();
@@ -640,7 +653,7 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (!this.options.AllowOverridingRegistrations && this.registrations.ContainsKey(type))
+            if (!this.Options.AllowOverridingRegistrations && this.registrations.ContainsKey(type))
             {
                 throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
             }
@@ -648,25 +661,11 @@ namespace SimpleInjector
 
         private void ThrowWhenCollectionTypeAlreadyRegistered<TItem>()
         {
-            if (!this.options.AllowOverridingRegistrations && 
+            if (!this.Options.AllowOverridingRegistrations &&
                 this.registrations.ContainsKey(typeof(IEnumerable<TItem>)))
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
-            }
-        }
-
-        private void ThrowWhenContainerIsLocked()
-        {
-            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-            // immediately.
-            lock (this.locker)
-            {
-                if (this.locked)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ContainerCanNotBeChangedAfterUse(this.GetType()));
-                }
             }
         }
 
@@ -702,6 +701,22 @@ namespace SimpleInjector
                 where typeHierarchy.Contains(instanceInitializer.ServiceType)
                 select Helpers.CreateAction<T>(instanceInitializer.Action))
                 .ToArray();
+        }
+
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
+            string parameterName)
+        {
+            string exceptionMessage;
+
+            if (!this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
+                out exceptionMessage))
+            {
+                // After some doubt (and even after reading http://bit.ly/1CPDv9) I decided to throw an
+                // ArgumentException when the given generic type argument was invalid. Mainly because a
+                // generic type argument is just an argument, and ArgumentException even allows us to supply 
+                // the name of the argument. No developer will be surprise to see an ArgEx in this case.
+                throw new ArgumentException(exceptionMessage, parameterName);
+            }
         }
     }
 }

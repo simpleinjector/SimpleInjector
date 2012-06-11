@@ -30,6 +30,8 @@ namespace SimpleInjector.Extensions
     using System.Globalization;
     using System.Linq;
 
+    using SimpleInjector.Advanced;
+
     /// <summary>
     /// Internal helper class for precondition validation.
     /// </summary>
@@ -133,20 +135,28 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void ContainsOneSinglePublicConstructor(Type implementationType, string paramName)
+        internal static void ContainsOneSinglePublicConstructor(Container container, Type implementationType,
+            string paramName)
         {
-            if (implementationType.GetConstructors().Length != 1)
+            string errorMessage;
+
+            var constructorResolver = container.GetConstructorResolutionBehavior();
+
+            if (!constructorResolver.IsConstructableType(implementationType, out errorMessage))
             {
-                throw new ArgumentException(
-                    StringResources.TypeMustHaveASinglePublicConstructor(implementationType), paramName);
+                throw new ArgumentException(errorMessage, paramName);
             }
         }
 
-        internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(
+        internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(Container container,
             Type decoratorType, Type serviceType, string paramName)
         {
+            var constructorResolver = container.GetConstructorResolutionBehavior();
+
+            var constructor = constructorResolver.GetConstructor(decoratorType);
+
             var serviceTypeArguments =
-                from parameter in decoratorType.GetConstructors().Single().GetParameters()
+                from parameter in constructor.GetParameters()
                 let type = parameter.ParameterType
                 where (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType) ||
                     type == serviceType

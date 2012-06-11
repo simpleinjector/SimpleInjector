@@ -70,7 +70,7 @@ namespace SimpleInjector
                 "that was supplied by calling the UnregisteredTypeEventArgs.Register(Expression) method. {2}",
                 serviceType.ToFriendlyName(), expression, exception.Message);
         }
-           
+
         internal static string DelegateForTypeThrewAnException(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -83,7 +83,7 @@ namespace SimpleInjector
                 "No registration for type {0} could be found.", serviceType.ToFriendlyName());
         }
 
-        internal static string ConfigurationInvalidCreatingInstanceFailed(Type serviceType, 
+        internal static string ConfigurationInvalidCreatingInstanceFailed(Type serviceType,
             Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -91,7 +91,7 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), exception.Message);
         }
 
-        internal static string ConfigurationInvalidIteratingCollectionFailed(Type serviceType, 
+        internal static string ConfigurationInvalidIteratingCollectionFailed(Type serviceType,
             Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -111,20 +111,20 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "Type {0} has already been registered " +
                 "and the container is currently not configured to allow overriding registrations. " +
-                "To allow overriding the current registration, please create the container using the " + 
+                "To allow overriding the current registration, please create the container using the " +
                 "constructor overload that takes a {1} instance and set the " +
-                "AllowOverridingRegistrations property to true.", 
+                "AllowOverridingRegistrations property to true.",
                 serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
         }
 
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
-        {            
+        {
             return string.Format(CultureInfo.InvariantCulture,
                 "Collection of items for type {0} has already been registeredand " +
                 "and the container is currently not configured to allow overriding registrations. " +
                 "To allow overriding the current registration, please create the container using the " +
                 "constructor overload that takes a {1} instance and set the " +
-                "AllowOverridingRegistrations property to true.", 
+                "AllowOverridingRegistrations property to true.",
                 serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
         }
 
@@ -133,19 +133,19 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 ImplicitRegistrationCouldNotBeMadeForType(implementationType) +
                 "The constructor of the type contains the parameter of type {0} that is not registered. " +
-                "Please ensure {0} is registered in the container, or change the constructor of {1}.", 
+                "Please ensure {0} is registered in the container, or change the constructor of {1}.",
                 parameterType.ToFriendlyName(), implementationType.ToFriendlyName());
         }
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain exactly one public " + 
+                "For the container to be able to create {0}, it should contain exactly one public " +
                 "constructor, but it has {1}.",
                 serviceType.ToFriendlyName(), serviceType.GetConstructors().Length);
         }
 
-        internal static string ConstructorMustNotContainInvalidParameter(Type serviceType, 
+        internal static string ConstructorMustNotContainInvalidParameter(ConstructorInfo constructor,
             ParameterInfo invalidParameter)
         {
             string reason = string.Empty;
@@ -157,8 +157,8 @@ namespace SimpleInjector
 
             return string.Format(CultureInfo.InvariantCulture,
                 "The constructor of type {0} contains parameter '{1}' of type {2} which can not be used " +
-                "for constructor injection{3}.", 
-                serviceType.ToFriendlyName(), invalidParameter.Name,
+                "for constructor injection{3}.",
+                constructor.DeclaringType.ToFriendlyName(), invalidParameter.Name,
                 invalidParameter.ParameterType.ToFriendlyName(), reason);
         }
 
@@ -220,13 +220,13 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
-        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType, 
+        internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType,
             Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to resolve type {0}. The security restrictions of your application's sandbox do " +
                 "not permit the creation of this type. Explicitly register the type using one of the " +
-                "generic 'Register' overloads or consider making it public. {1}", 
+                "generic 'Register' overloads or consider making it public. {1}",
                 serviceType.ToFriendlyName(), innerException.Message);
         }
 
@@ -239,6 +239,27 @@ namespace SimpleInjector
                 "dependency using one of the generic 'Register' overloads or consider making it public. " +
                 "Please see the inner exception for more details about which type caused this failure. {1}",
                 injectee.ToFriendlyName(), innerException.Message);
+        }
+
+        internal static string ContainerOptionsBelongsToAnotherContainer()
+        {
+            return
+                "The supplied ContainerOptions instance belongs to another Container instance. Create a " +
+                "new ContainerOptions per Container instance.";
+        }
+
+        internal static string ConstructorResolutionBehaviorBelongsToAnotherContainer()
+        {
+            return
+                "The supplied ConstructorResolutionBehavior instance belongs to another Container " +
+                "instance. Create a new ConstructorResolutionBehavior per Container instance.";
+        }
+
+        internal static string ConstructorResolutionBehaviorCanNotBeChangedAfterTheFirstRegistration()
+        {
+            return
+                "The ConstructorResolutionBehavior cannot be changed after the first registration has " +
+                "been made to the container.";
         }
 
         private static string ToFriendlyName(this Type type)

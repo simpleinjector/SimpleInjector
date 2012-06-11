@@ -79,6 +79,15 @@
     <Compile Include="..\SimpleInjector.NET\ActivationException.cs">
       <Link>ActivationException.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ConstructorResolutionBehavior.cs">
+      <Link>Advanced\ConstructorResolutionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ConstructorResolutionBehaviorExtensions.cs">
+      <Link>Advanced\ConstructorResolutionBehaviorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
+      <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
     </Compile>
@@ -141,9 +150,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Advanced\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

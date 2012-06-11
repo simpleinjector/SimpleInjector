@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-
+    using System.Reflection;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -67,7 +67,7 @@ namespace SimpleInjector
             {
                 if (instanceProducer == null)
                 {
-                    ThrowMissingInstanceProducerException(typeof(TService));
+                    this.ThrowMissingInstanceProducerException(typeof(TService));
                 }
 
                 instance = instanceProducer.GetInstance();
@@ -105,7 +105,7 @@ namespace SimpleInjector
 
             if (instanceProducer == null)
             {
-                ThrowMissingInstanceProducerException(serviceType);
+                this.ThrowMissingInstanceProducerException(serviceType);
             }
 
             return instanceProducer.GetInstance();
@@ -228,7 +228,7 @@ namespace SimpleInjector
 
             if (!producerIsValid && throwOnFailure)
             {
-                ThrowMissingInstanceProducerException(serviceType);
+                this.ThrowMissingInstanceProducerException(serviceType);
             }
 
             // Prevent returning invalid producers
@@ -309,6 +309,23 @@ namespace SimpleInjector
             return producer;
         }
 
+        internal void ThrowActivationExceptionWhenTypeIsNotConstructable(Type serviceType)
+        {
+            string exceptionMessage;
+
+            if (!this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
+                out exceptionMessage))
+            {
+                throw new ActivationException(
+                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(serviceType) + exceptionMessage);
+            }
+        }
+
+        internal ConstructorInfo GetConstructor(Type concreteType)
+        {
+            return this.Options.ConstructorResolutionBehavior.GetConstructor(concreteType);
+        }
+
         private void RegisterPropertyInjector(Type serviceType, PropertyInjector injector,
             Dictionary<Type, PropertyInjector> snapshot)
         {
@@ -352,20 +369,20 @@ namespace SimpleInjector
         private object GetInstanceForType<TService>() where TService : class
         {
             IInstanceProducer producer = this.GetInstanceProducerForType<TService>();
-            return GetInstanceFromProducer(producer, typeof(TService));
+            return this.GetInstanceFromProducer(producer, typeof(TService));
         }
 
         private object GetInstanceForType(Type serviceType)
         {
             IInstanceProducer producer = this.GetRegistration(serviceType);
-            return GetInstanceFromProducer(producer, serviceType);
+            return this.GetInstanceFromProducer(producer, serviceType);
         }
 
-        private static object GetInstanceFromProducer(IInstanceProducer instanceProducer, Type serviceType)
+        private object GetInstanceFromProducer(IInstanceProducer instanceProducer, Type serviceType)
         {
             if (instanceProducer == null)
             {
-                ThrowMissingInstanceProducerException(serviceType);
+                this.ThrowMissingInstanceProducerException(serviceType);
             }
 
             // We create the instance AFTER registering the instance producer. Registering the producer after
@@ -374,11 +391,11 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private static void ThrowMissingInstanceProducerException(Type serviceType)
+        private void ThrowMissingInstanceProducerException(Type serviceType)
         {
             if (Helpers.IsConcreteType(serviceType))
             {
-                Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(serviceType);
+                this.ThrowActivationExceptionWhenTypeIsNotConstructable(serviceType);
             }
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
@@ -387,7 +404,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => BuildInstanceProducerForConcreteType<TService>();
+                () => this.BuildInstanceProducerForConcreteType<TService>();
 
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
@@ -395,7 +412,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType)
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => BuildInstanceProducerForConcreteType(serviceType);
+                () => this.BuildInstanceProducerForConcreteType(serviceType);
 
             return this.BuildInstanceProducerForType(serviceType, buildInstanceProducerForConcreteType);
         }
@@ -478,10 +495,10 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteType<TService>()
+        private InstanceProducer BuildInstanceProducerForConcreteType<TService>()
             where TService : class
         {
-            if (Helpers.IsConcreteConstructableType(typeof(TService)))
+            if (this.IsConcreteConstructableType(typeof(TService)))
             {
                 return new ConcreteTransientInstanceProducer<TService>()
                 {
@@ -492,9 +509,10 @@ namespace SimpleInjector
             return null;
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteType(Type serviceType)
+        private InstanceProducer BuildInstanceProducerForConcreteType(Type serviceType)
         {
-            if (!serviceType.IsValueType && Helpers.IsConcreteConstructableType(serviceType))
+            if (!serviceType.IsValueType && this.IsConcreteConstructableType(serviceType) &&
+                !serviceType.IsGenericTypeDefinition)
             {
                 var producer = Helpers.CreateTransientInstanceProducerFor(serviceType);
 
@@ -504,6 +522,14 @@ namespace SimpleInjector
             }
 
             return null;
+        }
+
+        private bool IsConcreteConstructableType(Type serviceType)
+        {
+            string errorMesssage;
+
+            return this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
+                out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the

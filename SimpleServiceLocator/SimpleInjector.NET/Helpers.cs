@@ -45,7 +45,7 @@ namespace SimpleInjector
             "ServiceType: {ServiceType}, " +
             "Expression: {BuildExpression().ToString()}";
 
-        private static readonly MethodInfo GetInstanceOfT = GetGenericMethod(c => c.GetInstance<object>());
+        private static readonly MethodInfo GetInstanceOfT = GetContainerMethod(c => c.GetInstance<object>());
 
         internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
         {
@@ -121,32 +121,6 @@ namespace SimpleInjector
             }
 
             return copy;
-        }
-
-        internal static void ThrowActivationExceptionWhenTypeIsNotConstructable(Type serviceType)
-        {
-            string exceptionMessage;
-
-            if (!IsConcreteConstructableType(serviceType, out exceptionMessage))
-            {
-                throw new ActivationException(
-                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(serviceType) + exceptionMessage);
-            }
-        }
-
-        internal static void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
-            string parameterName)
-        {
-            string exceptionMessage;
-
-            if (!IsConcreteConstructableType(serviceType, out exceptionMessage))
-            {
-                // After some doubt (and even after reading http://bit.ly/1CPDv9) I decided to throw an
-                // ArgumentException when the given generic type argument was invalid. Mainly because a
-                // generic type argument is just an argument, and ArgumentException even allows us to supply 
-                // the name of the argument. No developer will be surprise to see an ArgEx in this case.
-                throw new ArgumentException(exceptionMessage, parameterName);
-            }
         }
 
         internal static void ValidateIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
@@ -225,13 +199,6 @@ namespace SimpleInjector
             return instanceInitializer.Compile();
         }
 
-        internal static bool IsConcreteConstructableType(Type serviceType)
-        {
-            string errorMesssage;
-
-            return IsConcreteConstructableType(serviceType, out errorMesssage);
-        }
-
         private static IEnumerable<Type> GetBaseTypes(Type type)
         {
             Type baseType = type.BaseType;
@@ -242,55 +209,6 @@ namespace SimpleInjector
 
                 baseType = baseType.BaseType;
             }
-        }
-
-        private static bool HasSinglePublicConstructor(Type serviceType)
-        {
-            return serviceType.GetConstructors().Length == 1;
-        }
-
-        private static bool HasConstructorWithOnlyValidParameters(Type serviceType)
-        {
-            return GetFirstInvalidConstructorParameter(serviceType) == null;
-        }
-
-        private static ParameterInfo GetFirstInvalidConstructorParameter(Type serviceType)
-        {
-            return (
-                from constructor in serviceType.GetConstructors()
-                from parameter in constructor.GetParameters()
-                let type = parameter.ParameterType
-                where type.IsValueType || type == typeof(string)
-                select parameter).FirstOrDefault();
-        }
-
-        private static bool IsConcreteConstructableType(Type serviceType, out string errorMessage)
-        {
-            errorMessage = null;
-
-            if (!IsConcreteType(serviceType))
-            {
-                errorMessage = StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(serviceType);
-                return false;
-            }
-
-            if (!HasSinglePublicConstructor(serviceType))
-            {
-                errorMessage = StringResources.TypeMustHaveASinglePublicConstructor(serviceType);
-                return false;
-            }
-
-            if (!HasConstructorWithOnlyValidParameters(serviceType))
-            {
-                var invalidParameter = Helpers.GetFirstInvalidConstructorParameter(serviceType);
-
-                errorMessage =
-                    StringResources.ConstructorMustNotContainInvalidParameter(serviceType, invalidParameter);
-
-                return false;
-            }
-
-            return true;
         }
 
         private static IEnumerable<T> CreateImmutableCollection<T>(IEnumerable<T> collection)
@@ -309,7 +227,7 @@ namespace SimpleInjector
             }
         }
 
-        private static MethodInfo GetGenericMethod(Expression<Action<Container>> methodCall)
+        private static MethodInfo GetContainerMethod(Expression<Action<Container>> methodCall)
         {
             var body = methodCall.Body as MethodCallExpression;
             return body.Method.GetGenericMethodDefinition();

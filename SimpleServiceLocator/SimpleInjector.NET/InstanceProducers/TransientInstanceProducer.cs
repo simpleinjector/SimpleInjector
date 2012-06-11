@@ -26,7 +26,6 @@
 namespace SimpleInjector.InstanceProducers
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
 
@@ -34,7 +33,8 @@ namespace SimpleInjector.InstanceProducers
         where TImplementation : class, TService
         where TService : class
     {
-        public TransientInstanceProducer() : base(typeof(TService))
+        public TransientInstanceProducer()
+            : base(typeof(TService))
         {
         }
 
@@ -74,9 +74,9 @@ namespace SimpleInjector.InstanceProducers
 
         private NewExpression BuildNewExpression()
         {
-            Helpers.ThrowActivationExceptionWhenTypeIsNotConstructable(typeof(TImplementation));
+            this.Container.ThrowActivationExceptionWhenTypeIsNotConstructable(typeof(TImplementation));
 
-            var constructor = typeof(TImplementation).GetConstructors().Single();
+            var constructor = this.Container.GetConstructor(typeof(TImplementation));
 
             var constructorArgumentCalls =
                 from parameter in constructor.GetParameters()

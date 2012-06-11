@@ -50,14 +50,6 @@ namespace SimpleInjector.Extensions
                 serviceType.ToFriendlyName(), message);
         }
 
-        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain exactly one public " +
-                "constructor, but it has {1}.",
-                serviceType.ToFriendlyName(), serviceType.GetConstructors().Length);
-        }
-
         internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
             Type serviceType, int numberOfServiceTypeDependencies)
         {

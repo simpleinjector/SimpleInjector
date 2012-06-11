@@ -91,6 +91,12 @@
     <Reference Include="system" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\ConstructorResolutionBehaviorExtensionsTests.cs">
+      <Link>Advanced\ConstructorResolutionBehaviorExtensionsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\ConstructorResolutionBehaviorTests.cs">
+      <Link>Advanced\ConstructorResolutionBehaviorTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AssertThat.cs">
       <Link>AssertThat.cs</Link>
     </Compile>

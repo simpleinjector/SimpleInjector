@@ -31,6 +31,7 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Extension methods for applying decorators.
@@ -429,9 +430,9 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(decoratorType, "decoratorType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, decoratorType, "serviceType");
-            Requires.ContainsOneSinglePublicConstructor(decoratorType, "decoratorType");
-            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(decoratorType, serviceType,
-                "decoratorType");
+            Requires.ContainsOneSinglePublicConstructor(container, decoratorType, "decoratorType");
+            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(container, decoratorType,
+                serviceType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,
                 decoratorType, "decoratorType");
         }
@@ -457,6 +458,11 @@ namespace SimpleInjector.Extensions
             internal Type Decorator { get; set; }
 
             internal Predicate<DecoratorPredicateContext> Predicate { get; set; }
+
+            private ConstructorResolutionBehavior ConstructorResolver
+            {
+                get { return this.Container.GetConstructorResolutionBehavior(); }
+            }
 
             public void Decorate(object sender, ExpressionBuiltEventArgs e)
             {
@@ -559,23 +565,25 @@ namespace SimpleInjector.Extensions
                 return true;
             }
 
-            private Expression BuildDecoratorEnumerableExpression(Type decoratorType,
-                Type registeredElementType, Expression expression)
+            private Expression BuildDecoratorEnumerableExpression(Type closedGenericDecorator,
+                Type registeredElementType, Expression enumerableExpression)
             {
-                var ctor = decoratorType.GetConstructors().Single();
+                ConstructorInfo constructor = this.GetConstructor(closedGenericDecorator);
 
                 ParameterExpression parameter = Expression.Parameter(registeredElementType, "service");
 
-                var parameters = this.BuildParameters(decoratorType,
+                var parameters = this.BuildParameters(closedGenericDecorator,
                     new ExpressionBuiltEventArgs(registeredElementType, parameter));
 
+                // We make use of .NET's built in Enumerable.Select to wrap the collection with the decorators.
                 var selectMethod = EnumerableSelectMethod
                     .MakeGenericMethod(registeredElementType, registeredElementType);
 
                 Expression instanceWrapper =
-                    BuildDecoratorWrapper(registeredElementType, ctor, parameter, parameters);
+                    BuildDecoratorWrapper(registeredElementType, constructor, parameter, parameters);
 
-                return Expression.Call(selectMethod, expression, instanceWrapper);
+                // This translates to Enumerable.Select(source, instance => new Decorator(instance, ...));
+                return Expression.Call(selectMethod, enumerableExpression, instanceWrapper);
             }
 
             private static Expression BuildDecoratorWrapper(Type serviceType, ConstructorInfo ctor,
@@ -679,10 +687,13 @@ namespace SimpleInjector.Extensions
                 return registeredServiceType;
             }
 
-            private Expression[] BuildParameters(Type closedGenericDecorator, ExpressionBuiltEventArgs e)
+            private Expression[] BuildParameters(Type closedGenericDecorator,
+                ExpressionBuiltEventArgs e)
             {
+                ConstructorInfo constructor = this.GetConstructor(closedGenericDecorator);
+
                 var parameters =
-                    from parameter in closedGenericDecorator.GetConstructors().Single().GetParameters()
+                    from parameter in constructor.GetParameters()
                     select this.BuildExpressionForParameter(parameter, e);
 
                 try
@@ -699,6 +710,23 @@ namespace SimpleInjector.Extensions
                 }
             }
 
+            private ConstructorInfo GetConstructor(Type closedGenericDecorator)
+            {
+                this.ThrowWhenDecoratorIsNotConstructable(closedGenericDecorator);
+
+                return this.ConstructorResolver.GetConstructor(closedGenericDecorator);
+            }
+
+            private void ThrowWhenDecoratorIsNotConstructable(Type closedGenericDecorator)
+            {
+                string errorMessage;
+
+                if (!this.ConstructorResolver.IsConstructableType(closedGenericDecorator, out errorMessage))
+                {
+                    throw new ActivationException(errorMessage);
+                }
+            }
+
             private Expression BuildExpressionForParameter(ParameterInfo parameter,
                 ExpressionBuiltEventArgs e)
             {
@@ -712,7 +740,7 @@ namespace SimpleInjector.Extensions
 
             private Expression BuildDecoratorExpression(Type decoratorType, Expression[] parameters)
             {
-                var ctor = decoratorType.GetConstructors().Single();
+                var ctor = this.ConstructorResolver.GetConstructor(decoratorType);
 
                 var instanceInitializer =
                     this.GetType().GetMethod("BuildFuncInitializer").MakeGenericMethod(ctor.DeclaringType)
