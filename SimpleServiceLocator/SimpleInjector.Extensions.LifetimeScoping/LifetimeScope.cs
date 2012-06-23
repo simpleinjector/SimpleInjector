@@ -94,14 +94,18 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
                 if (this.disposables != null)
                 {
-                    this.disposables.ForEach(d => d.Dispose());
+                    foreach (var disposable in this.disposables)
+                    {
+                        disposable.Dispose();
+                    }
                 }
 
                 this.disposables = null;
             }
         }
 
-        internal TService GetInstance<TService>(Func<TService> instanceCreator)
+        internal TService GetInstance<TService>(Func<TService> instanceCreator,
+            bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
             object instance;
@@ -109,6 +113,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             if (!this.lifetimeScopedInstances.TryGetValue(typeof(TService), out instance))
             {
                 this.lifetimeScopedInstances[typeof(TService)] = instance = instanceCreator();
+
+                if (disposeWhenLifetimeScopeEnds)
+                {
+                    var disposable = instance as IDisposable;
+
+                    if (disposable != null)
+                    {
+                        this.RegisterForDisposal(disposable);
+                    }
+                }
             }
 
             return (TService)instance;

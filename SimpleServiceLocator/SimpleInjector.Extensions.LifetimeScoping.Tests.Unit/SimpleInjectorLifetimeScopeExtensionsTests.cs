@@ -449,6 +449,64 @@
         }
 
         [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnALifetimeScopeServiceWithinASingleScope_DisposesThatInstanceOnce()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<DisposableCommand>();
+
+            DisposableCommand command;
+
+            // Act
+            using (container.BeginLifetimeScope())
+            {
+                command = container.GetInstance<DisposableCommand>();
+
+                container.GetInstance<DisposableCommand>();
+                container.GetInstance<DisposableCommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, command.DisposeCount, "Dispose should be called exactly once.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolveMultipleLifetimeScopedServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<DisposableCommandWithOverriddenEquality1>();
+            container.RegisterLifetimeScope<DisposableCommandWithOverriddenEquality2>();
+
+            // Act
+            DisposableCommandWithOverriddenEquality1 command1;
+            DisposableCommandWithOverriddenEquality2 command2;
+
+            // Act
+            using (container.BeginLifetimeScope())
+            {
+                command1 = container.GetInstance<DisposableCommandWithOverriddenEquality1>();
+                command2 = container.GetInstance<DisposableCommandWithOverriddenEquality2>();
+
+                // Give both instances the same hash code. Both have an equals implementation that compared
+                // using the hash code, which make them look like they're the same instance.
+                command1.HashCode = 1;
+                command2.HashCode = 1;
+            }
+
+            // Assert
+            string assertMessage =
+                "Dispose is expected to be called on this command, even when it contains a GetHashCode and " +
+                "Equals implementation that is totally screwed up, since storing disposable objects, " +
+                "should be completely independant to this implementation. ";
+
+            Assert.AreEqual(1, command1.DisposeCount, assertMessage + "command1");
+            Assert.AreEqual(1, command2.DisposeCount, assertMessage + "command2");
+        }
+
+        [TestMethod]
         public void RegisterLifetimeScope_CalledAfterInitialization_ThrowsExpectedException()
         {
             // Arrange
@@ -516,15 +574,54 @@
 
         public class DisposableCommand : ICommand, IDisposable
         {
-            public bool HasBeenDisposed { get; private set; }
+            public int DisposeCount { get; private set; }
+
+            public bool HasBeenDisposed
+            {
+                get { return this.DisposeCount > 0; }
+            }
 
             public void Dispose()
             {
-                this.HasBeenDisposed = true;
+                this.DisposeCount++;
             }
 
             public void Execute()
             {
+            }
+        }
+
+        public class DisposableCommandWithOverriddenEquality1 : DisposableCommandWithOverriddenEquality
+        {
+        }
+
+        public class DisposableCommandWithOverriddenEquality2 : DisposableCommandWithOverriddenEquality
+        {
+        }
+
+        public abstract class DisposableCommandWithOverriddenEquality : ICommand, IDisposable
+        {
+            public int HashCode { get; set; }
+
+            public int DisposeCount { get; private set; }
+
+            public void Dispose()
+            {
+                this.DisposeCount++;
+            }
+
+            public void Execute()
+            {
+            }
+
+            public override int GetHashCode()
+            {
+                return this.HashCode;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this.GetHashCode() == obj.GetHashCode();
             }
         }
     }

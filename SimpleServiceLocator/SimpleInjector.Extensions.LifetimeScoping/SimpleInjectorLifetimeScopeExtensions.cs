@@ -353,19 +353,7 @@ namespace SimpleInjector
 
                 if (scope != null)
                 {
-                    var instance = scope.GetInstance(this.instanceCreator);
-
-                    if (this.DisposeWhenLifetimeScopeEnds)
-                    {
-                        var disposable = instance as IDisposable;
-
-                        if (disposable != null)
-                        {
-                            scope.RegisterForDisposal(disposable);
-                        }
-                    }
-
-                    return instance;
+                    return scope.GetInstance(this.instanceCreator, this.DisposeWhenLifetimeScopeEnds);
                 }
 
                 // Return a singleton when there is no scope.

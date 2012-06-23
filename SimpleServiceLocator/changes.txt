@@ -8,6 +8,8 @@ Version vNext
 	Bug fixes:
 		-[Core] Container did not self-register when created with Container(ContainerOptions) ctor.
 		 (work item 18139)
+		-[LifetimeScoping] Dispose was called multiple times on instances, for each time they were resolved.
+		 (work item 18268)
 
 
 Version 1.4.2.12141 (v1.4.2 RTM) 2012-05-20
