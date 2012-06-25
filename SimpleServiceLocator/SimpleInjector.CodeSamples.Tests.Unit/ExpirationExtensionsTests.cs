@@ -10,9 +10,9 @@
     {
         // DateTime.UtcNow and DateTime.Now only have a precision up to about 15 ms. But since it
         // depends on the machine, we take 30 ms. Just to make the tests trustworthy.
-        private static readonly TimeSpan oneTimeUnit = TimeSpan.FromMilliseconds(30);
-        private static readonly TimeSpan twoTimeUnits = new TimeSpan(oneTimeUnit.Ticks * 2);
-        private static readonly TimeSpan threeTimeUnits = new TimeSpan(oneTimeUnit.Ticks * 3);
+        private static readonly TimeSpan OneTimeUnit = TimeSpan.FromMilliseconds(30);
+        private static readonly TimeSpan TwoTimeUnits = new TimeSpan(OneTimeUnit.Ticks * 2);
+        private static readonly TimeSpan ThreeTimeUnits = new TimeSpan(OneTimeUnit.Ticks * 3);
 
         [TestMethod]
         public void RegisterWithAbsoluteExpiration_WithValidArguments_Succeeds()
@@ -60,22 +60,22 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(threeTimeUnits);
+            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(ThreeTimeUnits);
 
             // Act
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             // Timing only begins during first call to GetInstance.
             var instance1 = container.GetInstance<ICommand>();
 
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
             Assert.AreEqual(instance1, instance2, string.Format("Timing only begins during first call to " + 
                 "GetInstance. The timeout is {0} ms. and {1} ms. is within this timeout. We should get the " +
-                "same instance.", threeTimeUnits, twoTimeUnits));
+                "same instance.", ThreeTimeUnits, TwoTimeUnits));
         }
 
         [TestMethod]
@@ -84,12 +84,12 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(oneTimeUnit);
+            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(OneTimeUnit);
 
             // Act
             var instance1 = container.GetInstance<ICommand>();
 
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             var instance2 = container.GetInstance<ICommand>();
 
@@ -104,14 +104,14 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(threeTimeUnits);
+            container.RegisterWithAbsoluteExpiration<ICommand, ConcreteCommand>(ThreeTimeUnits);
 
             // Act
             var instance1 = container.GetInstance<ICommand>();
 
             for (int i = 0; i < 5; i++)
             {
-                WaitFor(oneTimeUnit);
+                WaitFor(OneTimeUnit);
                 
                 container.GetInstance<ICommand>();
             }
@@ -169,22 +169,22 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(threeTimeUnits);
+            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(ThreeTimeUnits);
 
             // Act
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             // Timing only begins during first call to GetInstance.
             var instance1 = container.GetInstance<ICommand>();
 
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
             Assert.AreEqual(instance1, instance2, string.Format("Timing only begins during first call to " +
                 "GetInstance. The timeout is {0} ms. and {1} ms. is within this timeout. We should get the " +
-                "same instance.", threeTimeUnits, twoTimeUnits));
+                "same instance.", ThreeTimeUnits, TwoTimeUnits));
         }
 
         [TestMethod]
@@ -193,12 +193,12 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(oneTimeUnit);
+            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(OneTimeUnit);
 
             // Act
             var instance1 = container.GetInstance<ICommand>();
 
-            WaitFor(twoTimeUnits);
+            WaitFor(TwoTimeUnits);
 
             var instance2 = container.GetInstance<ICommand>();
 
@@ -213,16 +213,16 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(threeTimeUnits);
+            container.RegisterWithSlidingExpiration<ICommand, ConcreteCommand>(ThreeTimeUnits);
 
             for (int i = 0; i < 10; i++)
             {
                 // Act
-                WaitFor(oneTimeUnit);
+                WaitFor(OneTimeUnit);
 
                 var instance1 = container.GetInstance<ICommand>();
 
-                WaitFor(oneTimeUnit);
+                WaitFor(OneTimeUnit);
 
                 var instance2 = container.GetInstance<ICommand>();
 
