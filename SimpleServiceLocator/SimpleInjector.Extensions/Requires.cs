@@ -27,7 +27,6 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using SimpleInjector.Advanced;
@@ -110,17 +109,18 @@ namespace SimpleInjector.Extensions
         }
 
         internal static void ServiceIsAssignableFromImplementations(Type serviceType,
-            IEnumerable<Type> typesToRegister, string paramName)
+            IEnumerable<Type> typesToRegister, string paramName, bool typeCanBeServiceType = false)
         {
             var invalidType = (
                 from type in typesToRegister
                 where !Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
+                where !typeCanBeServiceType || type != serviceType
                 select type).FirstOrDefault();
 
             if (invalidType != null)
             {
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
-                    "The supplied type '{0}' does not implement '{1}'.", invalidType, serviceType),
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(invalidType, serviceType),
                     paramName);
             }
         }
@@ -135,7 +135,7 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void ContainsOneSinglePublicConstructor(Container container, Type implementationType,
+        internal static void DecoratorHasSelectableConstructor(Container container, Type implementationType,
             string paramName)
         {
             string errorMessage;
@@ -151,15 +151,13 @@ namespace SimpleInjector.Extensions
         internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(Container container,
             Type decoratorType, Type serviceType, string paramName)
         {
-            var constructorResolver = container.GetConstructorResolutionBehavior();
-
-            var constructor = constructorResolver.GetConstructor(decoratorType);
+            var constructor = container.GetConstructorResolutionBehavior().GetConstructor(decoratorType);
 
             var serviceTypeArguments =
                 from parameter in constructor.GetParameters()
-                let type = parameter.ParameterType
-                where (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType) ||
-                    type == serviceType
+                where
+                    IsDecorateeDependencyParameter(parameter.ParameterType, serviceType) ||
+                    IsDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType)
                 select parameter;
 
             int numberOfServiceTypeDependencies = serviceTypeArguments.Count();
@@ -182,6 +180,31 @@ namespace SimpleInjector.Extensions
                     StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(
                         serviceType, decoratorType), parameterName);
             }
+        }
+
+        private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
+        {
+            if (!parameterType.IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
+            {
+                return false;
+            }
+
+            Type funcTypeArgument = parameterType.GetGenericArguments()[0];
+
+            return IsDecorateeDependencyParameter(funcTypeArgument, serviceType);
+        }
+
+        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType)
+        {
+            if (parameterType == serviceType)
+            {
+                return true;
+            }
+
+            return
+                serviceType.IsGenericType &&
+                parameterType.IsGenericType &&
+                serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
         }
     }
 }

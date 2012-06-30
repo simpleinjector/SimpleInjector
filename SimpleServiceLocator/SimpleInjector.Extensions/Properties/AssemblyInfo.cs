@@ -44,4 +44,5 @@ using System.Security;
 [assembly: AllowPartiallyTrustedCallers]
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
-    Target = "SimpleInjector.Extensions")]
+    Target = "SimpleInjector.Extensions",
+    Justification = "Cannot really make up new types just to satisfy this rule.")]

@@ -2,14 +2,44 @@
 
 Version vNext
 	General description:
+		An extension point is added to the core library, which allows developers to override the constructor
+		resolution behavior. For normal scenarios the use of the default behavior (which only allows one
+		single public constructor) is still advised. 
+		
+		Other great improvements are in the RegisterDecorator extension methods of the Extensions project. 
+		The container now allows injecting a Func<ServiceType> into the decorator (besides injecting the 
+		decorated service type), which enabled more advanced scenarios where creation of the decorated type 
+		should be delayed (which is especially usefull when defining decorators for asynchronous execution and
+		lifetime scoping). New RegisterSingleDecorator extension methods have been added, which can improve 
+		performance and are especially useful when using Func<ServiceType> decorators. Support to decorating 
+		collections has been improved. In most situations the predicate will be called for each element in the
+		collection.
 
 	Code Changes:
+		-[Core] An extension point added in the form of ContainerOptions.ConstructorResolutionBehavior, which
+		 allows developers to override the constructor resolution behavior of the container. (work item 18097)
+		-[Extensions] RegisterDecorator extension methods now allow injecting Func<ServiceType> delegates. This
+		 enables some interesting advanced scenarios where the creation of the decorated instance should be
+		 delayed. (work item 18211)
+		-[Extensions] RegisterSingeDecorator overloads added. These overloads are especially useful when
+		 injecting Func<ServiceType> delegates into decorators.
+		-[Extensions] When collections are registered using RegisterAll overloads that either take a list of
+		 System.Type instances or a array of singletons (so not with RegisterAll<T>(IEnumerable<T>)), the
+		 predicate supplied to RegisterDecorator will be called on each item in the collection, instead of
+		 being called once for the complete collection. This allows individual items to be decorated while
+		 skipping others.
 
 	Bug fixes:
 		-[Core] Container did not self-register when created with Container(ContainerOptions) ctor.
 		 (work item 18139)
 		-[LifetimeScoping] Dispose was called multiple times on instances, for each time they were resolved.
 		 (work item 18268)
+		 -[Extensions] RegisterAll did not allow registering a service type that equaled the registered
+		 service type, for instance container.RegisterAll<IService>(new[] { typeof(IService) }) failed.
+		-[Extensions] Conditional decoration (using the Predicate<DecoratorPredicateContext>) fixed for
+		 decorating items in collections. The predicate was not checked on collections.
+		-[Extensions] The IEnumerable<ServiceType> was supplied to the Predicate<DecoratorPredicateContext>
+		 through the ServiceType property, instead of the service type itself when decorating collections.
 
 
 Version 1.4.2.12141 (v1.4.2 RTM) 2012-05-20

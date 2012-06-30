@@ -144,15 +144,29 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
             var container = new Container();
-            container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
 
-            // Act
-            container.Verify();
+            IEnumerable<IUserRepository> repositories = new IUserRepository[] { null };
+
+            container.RegisterAll<IUserRepository>(repositories);
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.StringContains(
+                    "One of the items in the collection for type IUserRepository is a null reference.",
+                    ex.Message);
+            }
         }
 
         [TestMethod]

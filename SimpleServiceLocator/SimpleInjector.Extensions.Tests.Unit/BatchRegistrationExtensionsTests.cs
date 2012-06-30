@@ -388,9 +388,8 @@
             }
             catch (Exception ex)
             {
-                const string AssertMessage = "Exception message not descriptive. Actual message: ";
-                Assert.IsTrue(ex.Message.Contains(invalidType.Name), AssertMessage + ex.Message);
-                Assert.IsTrue(ex.Message.Contains(serviceType.Name), AssertMessage + ex.Message);
+                AssertThat.StringContains("List<Int32>", ex.Message);
+                AssertThat.StringContains("IService<TA, TB>", ex.Message);
             }
         }
 

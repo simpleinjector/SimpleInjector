@@ -127,7 +127,10 @@ namespace SimpleInjector
 
             var collection = (IEnumerable)this.GetInstance(collectionType);
 
-            return collection.Cast<object>();
+            // We can't use collection.Cast<object>(), since this does an 'as IEnumerable<object>' under the
+            // covers, and this can return a collection of Expressions (in .NET 4.0), because of our special
+            // ResolvableEnumerable.
+            return ToGenericEnumerable(collection);
         }
 
         /// <summary>Gets the service object of the specified type.</summary>
@@ -557,6 +560,14 @@ namespace SimpleInjector
                 {
                     this.locked = true;
                 }
+            }
+        }
+
+        private static IEnumerable<object> ToGenericEnumerable(IEnumerable enumerable)
+        {
+            foreach (object item in enumerable)
+            {
+                yield return item;
             }
         }
     }

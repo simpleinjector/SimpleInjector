@@ -32,31 +32,32 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
     /// Extension methods with non-generic method overloads.
     /// </summary>
     public static class NonGenericRegistrationsExtensions
     {
-        private static readonly MethodInfo register =
+        private static readonly MethodInfo RegisterMethod =
             Helpers.GetGenericMethod(c => c.Register<object, object>());
 
-        private static readonly MethodInfo registerConcrete =
+        private static readonly MethodInfo RegisterConcreteMethod =
             Helpers.GetGenericMethod(c => c.Register<object>());
 
-        private static readonly MethodInfo registerSingle =
+        private static readonly MethodInfo RegisterSingleMethod =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object, object>());
 
-        private static readonly MethodInfo registerByFunc =
+        private static readonly MethodInfo RegisterByFuncMethod =
             Helpers.GetGenericMethod(c => c.Register<object>((Func<object>)null));
 
-        private static readonly MethodInfo registerAll =
+        private static readonly MethodInfo RegisterAllMethod =
             Helpers.GetGenericMethod(c => c.RegisterAll<object>((IEnumerable<object>)null));
 
-        private static readonly MethodInfo registerSingleByFunc =
+        private static readonly MethodInfo RegisterSingleByFunc =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object>((Func<object>)null));
 
-        private static readonly MethodInfo registerSingleByT =
+        private static readonly MethodInfo RegisterSingleByT =
             Helpers.GetGenericMethod(c => c.RegisterSingle<object>((object)null));
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace SimpleInjector.Extensions
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
 
-            var method = registerSingle.MakeGenericMethod(serviceType, implementation);
+            var method = RegisterSingleMethod.MakeGenericMethod(serviceType, implementation);
 
             SafeInvoke(serviceType, implementation, () => method.Invoke(container, null));
         }
@@ -117,7 +118,7 @@ namespace SimpleInjector.Extensions
                 // Build the following delegate: () => (ServiceType)instanceCreator();
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
 
-                var method = registerSingleByFunc.MakeGenericMethod(serviceType);
+                var method = RegisterSingleByFunc.MakeGenericMethod(serviceType);
 
                 method.Invoke(container, new[] { typeSafeInstanceCreator });
             });
@@ -144,7 +145,7 @@ namespace SimpleInjector.Extensions
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
-            var method = registerSingleByT.MakeGenericMethod(serviceType);
+            var method = RegisterSingleByT.MakeGenericMethod(serviceType);
 
             SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { instance }));
         }
@@ -167,7 +168,7 @@ namespace SimpleInjector.Extensions
             Requires.TypeIsReferenceType(concreteType, "serviceType");
             Requires.TypeIsNotOpenGeneric(concreteType, "concreteType");
 
-            var method = registerConcrete.MakeGenericMethod(concreteType);
+            var method = RegisterConcreteMethod.MakeGenericMethod(concreteType);
 
             SafeInvoke(concreteType, "concreteType", () => method.Invoke(container, null));
         }
@@ -199,7 +200,7 @@ namespace SimpleInjector.Extensions
             Requires.ServiceTypeDiffersFromImplementationType(serviceType, implementation, "serviceType",
                 "implementation");
 
-            var method = register.MakeGenericMethod(serviceType, implementation);
+            var method = RegisterMethod.MakeGenericMethod(serviceType, implementation);
 
             SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, null));
         }
@@ -228,7 +229,7 @@ namespace SimpleInjector.Extensions
                 // Build the following delegate: () => (ServiceType)instanceCreator();
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
 
-                var method = registerByFunc.MakeGenericMethod(serviceType);
+                var method = RegisterByFuncMethod.MakeGenericMethod(serviceType);
 
                 method.Invoke(container, new[] { typeSafeInstanceCreator });
             });
@@ -302,18 +303,20 @@ namespace SimpleInjector.Extensions
             IEnumerable<Type> serviceTypes)
         {
             // Make a copy for correctness and performance.
-            serviceTypes = serviceTypes != null ? serviceTypes.ToArray() : null;
+            Type[] types = serviceTypes != null ? serviceTypes.ToArray() : null;
 
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(serviceTypes, "serviceTypes");
-            Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
-            Requires.DoesNotContainOpenGenericTypes(serviceTypes, "serviceTypes");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes");
+            Requires.IsNotNull(types, "serviceTypes");
+            Requires.DoesNotContainNullValues(types, "serviceTypes");
+            Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
+            Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
+                typeCanBeServiceType: true);
 
-            IEnumerable<object> instances = new AllIterator(container, serviceTypes);
+            IDecoratableEnumerable enumerable =
+                DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, types);
 
-            RegisterAll(container, serviceType, instances);
+            RegisterAll(container, serviceType, enumerable);
         }
 
         /// <summary>
@@ -356,7 +359,7 @@ namespace SimpleInjector.Extensions
                 castedCollection = castMethod.Invoke(null, new[] { collection });
             }
 
-            var method = registerAll.MakeGenericMethod(serviceType);
+            var method = RegisterAllMethod.MakeGenericMethod(serviceType);
 
             SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { castedCollection }));
         }
@@ -447,64 +450,6 @@ namespace SimpleInjector.Extensions
             // This might throw an MemberAccessException when serviceType is internal while we're running in
             // a Silverlight sandbox.
             return Expression.Lambda(convertExpression, parameters).Compile();
-        }
-
-        /// <summary>Allows iterating a set of services.</summary>
-        private sealed class AllIterator : IEnumerable<object>
-        {
-            private readonly Container container;
-            private readonly IEnumerable<Type> serviceTypes;
-
-            private IInstanceProducer[] instanceProducers;
-
-            internal AllIterator(Container container, IEnumerable<Type> serviceTypes)
-            {
-                this.container = container;
-                this.serviceTypes = serviceTypes;
-            }
-
-            /// <summary>Returns an enumerator that iterates through the collection.</summary>
-            /// <returns>A IEnumerator that can be used to iterate through the collection.</returns>
-            public IEnumerator<object> GetEnumerator()
-            {
-                if (this.instanceProducers == null)
-                {
-                    this.instanceProducers = this.serviceTypes.Select(t => this.GetRegistration(t)).ToArray();
-                }
-
-                return this.GetIterator();
-            }
-
-            /// <summary>Returns an enumerator that iterates through a collection.</summary>
-            /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
-            }
-
-            private IEnumerator<object> GetIterator()
-            {
-                var producers = this.instanceProducers;
-
-                for (int i = 0; i < producers.Length; i++)
-                {
-                    yield return producers[i].GetInstance();
-                }
-            }
-
-            private IInstanceProducer GetRegistration(Type serviceType)
-            {
-                var producer = this.container.GetRegistration(serviceType);
-
-                if (producer == null)
-                {
-                    // This will throw an exception, because there is no registration for the service type.
-                    // By calling GetInstnce we reuse the descriptive exception messages of the container.
-                    this.container.GetInstance(serviceType);
-                }
-
-                return producer;
-            }
         }
     }
 }

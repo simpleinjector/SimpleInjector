@@ -89,6 +89,33 @@
     <Compile Include="..\SimpleInjector.Extensions\DecoratorPredicateContext.cs">
       <Link>DecoratorPredicateContext.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerControlledServicesExpressionInterceptor.cs">
+      <Link>Decorators\ContainerControlledServicesExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerUncontrolledServicesExpressionInterceptor.cs">
+      <Link>Decorators\ContainerUncontrolledServicesExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratableEnumerable.cs">
+      <Link>Decorators\DecoratableEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptor.cs">
+      <Link>Decorators\DecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptorData.cs">
+      <Link>Decorators\DecoratorExpressionInterceptorData.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorHelpers.cs">
+      <Link>Decorators\DecoratorHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\IDecoratableEnumerable.cs">
+      <Link>Decorators\IDecoratableEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
+      <Link>Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceTypeDecoratorInfo.cs">
+      <Link>Decorators\ServiceTypeDecoratorInfo.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.Extensions\GenericArgumentFinder.cs">
       <Link>GenericArgumentFinder.cs</Link>
     </Compile>

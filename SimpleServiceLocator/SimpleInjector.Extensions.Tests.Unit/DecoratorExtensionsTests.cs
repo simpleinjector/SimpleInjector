@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -115,17 +114,15 @@
 
             var container = new Container();
 
-            container.RegisterSingle<ILogger>(logger);
-
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(LoggingHandlerDecorator1<RealCommand>));
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
         }
 
         [TestMethod]
@@ -134,15 +131,15 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<RealCommand>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<RealCommand>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(StubDecorator1<RealCommand>));
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
         }
 
         [TestMethod]
@@ -151,15 +148,17 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<RealCommand>), typeof(StubDecorator1<RealCommand>));
+            container.RegisterDecorator(
+                typeof(ICommandHandler<RealCommand>),
+                typeof(TransactionHandlerDecorator<RealCommand>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(StubDecorator1<RealCommand>));
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
         }
 
         [TestMethod]
@@ -168,9 +167,9 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<int>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<int>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
@@ -187,9 +186,9 @@
 
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<int>), typeof(StubDecorator1<int>));
+            container.RegisterDecorator(typeof(ICommandHandler<int>), typeof(TransactionHandlerDecorator<int>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
@@ -204,10 +203,10 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler(null));
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             Type closedGenericServiceType = typeof(ICommandHandler<RealCommand>);
-            Type nonGenericDecorator = typeof(ConcreteCommandHandlerDecorator);
+            Type nonGenericDecorator = typeof(RealCommandHandlerDecorator);
 
             container.RegisterDecorator(closedGenericServiceType, nonGenericDecorator);
 
@@ -227,7 +226,7 @@
             Type nonMathcingClosedGenericServiceType = typeof(ICommandHandler<int>);
 
             // Decorator implements ICommandHandler<RealCommand>
-            Type nonGenericDecorator = typeof(ConcreteCommandHandlerDecorator);
+            Type nonGenericDecorator = typeof(RealCommandHandlerDecorator);
 
             try
             {
@@ -239,7 +238,7 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains("The supplied type 'ConcreteCommandHandlerDecorator' does not " +
+                AssertThat.StringContains("The supplied type 'RealCommandHandlerDecorator' does not " +
                     "inherit from or implement 'ICommandHandler<Int32>'", ex.Message);
             }
         }
@@ -254,7 +253,7 @@
 
             container.RegisterSingle<ILogger>(logger);
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(LoggingRealCommandHandler));
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
 
@@ -273,18 +272,16 @@
 
             var container = new Container();
 
-            container.RegisterSingle<ILogger>(logger);
-
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator2<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LogExceptionCommandHandlerDecorator<>));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(LoggingHandlerDecorator2<RealCommand>));
+            Assert.IsInstanceOfType(handler, typeof(LogExceptionCommandHandlerDecorator<RealCommand>));
         }
 
         [TestMethod]
@@ -297,7 +294,7 @@
 
             container.RegisterSingle<ILogger>(logger);
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(LoggingRealCommandHandler));
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator2<>));
@@ -375,7 +372,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c => false);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c => false);
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
@@ -392,14 +389,14 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>),
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>),
                 c => true);
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(StubDecorator1<RealCommand>));
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
         }
 
         [TestMethod]
@@ -413,7 +410,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateServiceType = c.ServiceType;
                 return true;
@@ -437,7 +434,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -463,7 +460,7 @@
 
             container.RegisterInitializer<StubCommandHandler>(handlerToInitialize => { });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -477,6 +474,30 @@
         }
 
         [TestMethod]
+        public void GetInstance_SingletonDecoratorWithInitializer_ShouldReturnSingleton()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+
+            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
+
+            container.RegisterInitializer<AsyncCommandHandlerProxy<RealCommand>>(handler => { });
+
+            // Act
+            var handler1 = container.GetInstance<ICommandHandler<RealCommand>>();
+            var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(AsyncCommandHandlerProxy<RealCommand>));
+
+            Assert.IsTrue(object.ReferenceEquals(handler1, handler2),
+                "GetInstance should always return the same instance, since AsyncCommandHandlerProxy is " +
+                "registered as singleton.");
+        }
+
+        [TestMethod]
         public void GetInstance_OnDecoratedSingleton_CallsThePredicateWithTheExpectedImplementationType()
         {
             // Arrange
@@ -487,7 +508,7 @@
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new StubCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -497,7 +518,7 @@
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
+            AssertThat.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
         }
 
         [TestMethod]
@@ -513,7 +534,7 @@
             // type. In that case the ImplementationType should equal the ServiceType.
             container.Register<ICommandHandler<RealCommand>>(() => new StubCommandHandler());
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -523,7 +544,7 @@
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
+            AssertThat.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
         }
 
         [TestMethod]
@@ -537,9 +558,11 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>), c =>
             {
                 actualPredicateImplementationType = c.ImplementationType;
                 return true;
@@ -549,7 +572,7 @@
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
+            AssertThat.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
         }
 
         [TestMethod]
@@ -562,7 +585,7 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 actualPredicateExpression = c.Expression;
                 return true;
@@ -586,13 +609,14 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
                 predicateExpressionOnFirstCall = c.Expression;
                 return true;
             });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>), c =>
             {
                 predicateExpressionOnSecondCall = c.Expression;
                 return true;
@@ -616,7 +640,9 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
@@ -639,9 +665,10 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
@@ -652,7 +679,7 @@
 
             // Assert
             Assert.AreEqual(1, appliedDecorators.Count());
-            Assert.AreEqual(typeof(StubDecorator1<RealCommand>), appliedDecorators.First());
+            Assert.AreEqual(typeof(TransactionHandlerDecorator<RealCommand>), appliedDecorators.First());
         }
 
         [TestMethod]
@@ -665,9 +692,15 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator1<>));
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>));
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(StubDecorator2<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>));
+
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(LogExceptionCommandHandlerDecorator<>), c =>
             {
                 appliedDecorators = c.AppliedDecorators;
                 return true;
@@ -678,8 +711,8 @@
 
             // Assert
             Assert.AreEqual(2, appliedDecorators.Count());
-            Assert.AreEqual(typeof(StubDecorator1<RealCommand>), appliedDecorators.First());
-            Assert.AreEqual(typeof(StubDecorator2<RealCommand>), appliedDecorators.Second());
+            Assert.AreEqual(typeof(TransactionHandlerDecorator<RealCommand>), appliedDecorators.First());
+            Assert.AreEqual(typeof(LogExceptionCommandHandlerDecorator<RealCommand>), appliedDecorators.Second());
         }
 
         [TestMethod]
@@ -748,7 +781,7 @@
             {
                 // Act
                 container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(NoDecoratorCommandHandlerDecorator<>));
+                    typeof(InvalidDecoratorCommandHandlerDecorator<>));
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -788,7 +821,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
         }
 
         [TestMethod]
@@ -799,13 +832,13 @@
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+            Assert.IsInstanceOfType(handler, typeof(RealCommandHandlerDecorator));
         }
 
         [TestMethod]
@@ -818,7 +851,7 @@
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
 
             // ConcreteCommandHandlerDecorator implements ICommandHandler<RealCommand>
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<StructCommand>>();
@@ -836,61 +869,200 @@
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
             container.Register<ICommandHandler<StructCommand>, StructCommandHandler>();
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+            Assert.IsInstanceOfType(handler, typeof(RealCommandHandlerDecorator));
         }
 
         [TestMethod]
-        public void GetAllInstances_TypeDecorated_ReturnsCollectionWithDecorators()
+        public void RegisterDecorator_NonGenericDecoratorWithFuncAsConstructorArgument_InjectsAFactoryThatCreatesNewInstancesOfTheDecoratedType()
         {
             // Arrange
             var container = new Container();
 
-            container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(StubCommandHandler) });
+            container.Register<INonGenericService, RealNonGenericService>();
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecoratorWithFunc));
+
+            var decorator = (NonGenericServiceDecoratorWithFunc)container.GetInstance<INonGenericService>();
+
+            Func<INonGenericService> factory = decorator.DecoratedServiceCreator;
 
             // Act
-            var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
-
-            var handler = handlers.Single();
+            // Execute the factory twice.
+            INonGenericService instance1 = factory();
+            INonGenericService instance2 = factory();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+            Assert.IsInstanceOfType(instance1, typeof(RealNonGenericService),
+                "The injected factory is expected to create instances of type RealNonGenericService.");
 
-            Assert.IsInstanceOfType(((ConcreteCommandHandlerDecorator)handler).DecoratedHandler,
-                typeof(StubCommandHandler));
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
+                "The factory is expected to create transient instances, since that is how " +
+                "RealNonGenericService is registered.");
         }
 
         [TestMethod]
-        public void GetAllInstances_TypeDecoratedWithMultipleDecorators_ReturnsCollectionWithDecorators()
+        public void RegisterDecorator_GenericDecoratorWithFuncAsConstructorArgument_InjectsAFactoryThatCreatesNewInstancesOfTheDecoratedType()
         {
             // Arrange
             var container = new Container();
 
             container.RegisterSingle<ILogger>(new FakeLogger());
 
-            container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(StubCommandHandler) });
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LogExceptionCommandHandlerDecorator<>));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ConcreteCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
 
             // Act
-            var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
+            var handler =
+                (AsyncCommandHandlerProxy<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>();
 
-            var handler = handlers.Single();
+            Func<ICommandHandler<RealCommand>> factory = handler.DecorateeFactory;
+
+            // Execute the factory twice.
+            ICommandHandler<RealCommand> instance1 = factory();
+            ICommandHandler<RealCommand> instance2 = factory();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(ConcreteCommandHandlerDecorator));
+            Assert.IsInstanceOfType(instance1, typeof(LogExceptionCommandHandlerDecorator<RealCommand>),
+                "The injected factory is expected to create instances of type " +
+                "LogAndContinueCommandHandlerDecorator<RealCommand>.");
 
-            Assert.IsInstanceOfType(((ConcreteCommandHandlerDecorator)handler).DecoratedHandler,
-                typeof(LoggingHandlerDecorator1<RealCommand>));
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
+                "The factory is expected to create transient instances.");
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_CalledWithDecoratorTypeWithBothAFuncAndADecorateeParameter_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterDecorator(typeof(INonGenericService),
+                    typeof(NonGenericServiceDecoratorWithBothDecorateeAndFunc));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains("its constructor should have a single argument of type " +
+                    "INonGenericService or Func<INonGenericService>",
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeRegisteredWithRegisterSingleDecorator_AlwaysReturnsTheSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>();
+
+            container.RegisterSingleDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
+
+            // Act
+            var decorator1 = container.GetInstance<INonGenericService>();
+            var decorator2 = container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsInstanceOfType(decorator1, typeof(NonGenericServiceDecorator));
+
+            Assert.IsTrue(object.ReferenceEquals(decorator1, decorator2),
+                "Since the decorator is registered as singleton, GetInstance should always return the same " +
+                "instance.");
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeRegisteredWithRegisterSingleDecoratorPredicate_AlwaysReturnsTheSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>();
+
+            container.RegisterSingleDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator),
+                c => true);
+
+            // Act
+            var decorator1 = container.GetInstance<INonGenericService>();
+            var decorator2 = container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsInstanceOfType(decorator1, typeof(NonGenericServiceDecorator));
+
+            Assert.IsTrue(object.ReferenceEquals(decorator1, decorator2),
+                "Since the decorator is registered as singleton, GetInstance should always return the same " +
+                "instance.");
+        }
+
+        [TestMethod]
+        public void Verify_DecoratorRegisteredThatCanNotBeResolved_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+
+            // LoggingHandlerDecorator1 depends on ILogger, which is not registered.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.StringContains("No registration for type ILogger could be found", ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_DecoratorRegisteredTwiceAsSingleton_WrapsTheDecorateeTwice()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+
+            // Register the same decorator twice. 
+            container.RegisterSingleDecorator(
+                typeof(ICommandHandler<>),
+                typeof(TransactionHandlerDecorator<>));
+
+            container.RegisterSingleDecorator(
+                typeof(ICommandHandler<>),
+                typeof(TransactionHandlerDecorator<>));
+
+            // Act
+            var decorator1 = (TransactionHandlerDecorator<RealCommand>)
+                container.GetInstance<ICommandHandler<RealCommand>>();
+
+            var decorator2 = decorator1.Decorated;
+
+            // Assert
+            Assert.IsInstanceOfType(decorator2, typeof(TransactionHandlerDecorator<RealCommand>),
+                "Since the decorator is registered twice, it should wrap the decoratee twice.");
+
+            var decoratee = ((TransactionHandlerDecorator<RealCommand>)decorator2).Decorated;
+
+            Assert.IsInstanceOfType(decoratee, typeof(StubCommandHandler));
         }
 
         public struct StructCommand
@@ -926,9 +1098,10 @@
             }
         }
 
-        public class NoDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
+        public class InvalidDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
         {
-            public NoDecoratorCommandHandlerDecorator(ILogger logger)
+            // This is no decorator, since it lacks the ICommandHandler<T> parameter.
+            public InvalidDecoratorCommandHandlerDecorator(ILogger logger)
             {
             }
 
@@ -953,9 +1126,16 @@
 
         public class RealCommandHandler : ICommandHandler<RealCommand>
         {
+            public void Handle(RealCommand command)
+            {
+            }
+        }
+
+        public class LoggingRealCommandHandler : ICommandHandler<RealCommand>
+        {
             private readonly ILogger logger;
 
-            public RealCommandHandler(ILogger logger)
+            public LoggingRealCommandHandler(ILogger logger)
             {
                 this.logger = logger;
             }
@@ -966,39 +1146,46 @@
             }
         }
 
-        public class ConcreteCommandHandlerDecorator : ICommandHandler<RealCommand>
+        public class RealCommandHandlerDecorator : ICommandHandler<RealCommand>
         {
-            public ConcreteCommandHandlerDecorator(ICommandHandler<RealCommand> decoratedHandler)
+            public RealCommandHandlerDecorator(ICommandHandler<RealCommand> decorated)
             {
-                this.DecoratedHandler = decoratedHandler;
+                this.Decorated = decorated;
             }
 
-            public ICommandHandler<RealCommand> DecoratedHandler { get; private set; }
+            public ICommandHandler<RealCommand> Decorated { get; private set; }
 
             public void Handle(RealCommand command)
             {
             }
         }
 
-        public class StubDecorator1<T> : ICommandHandler<T>
+        public class TransactionHandlerDecorator<T> : ICommandHandler<T>
         {
-            public StubDecorator1(ICommandHandler<T> wrapped)
+            public TransactionHandlerDecorator(ICommandHandler<T> decorated)
             {
+                this.Decorated = decorated;
             }
+
+            public ICommandHandler<T> Decorated { get; private set; }
 
             public void Handle(T command)
             {
             }
         }
 
-        public class StubDecorator2<T> : ICommandHandler<T>
+        public class LogExceptionCommandHandlerDecorator<T> : ICommandHandler<T>
         {
-            public StubDecorator2(ICommandHandler<T> wrapped)
+            private readonly ICommandHandler<T> decorated;
+
+            public LogExceptionCommandHandlerDecorator(ICommandHandler<T> decorated)
             {
+                this.decorated = decorated;
             }
 
             public void Handle(T command)
             {
+                // called the decorated instance and log any exceptions (not important for these tests).
             }
         }
 
@@ -1037,6 +1224,37 @@
                 this.logger.Log("Begin2 ");
                 this.wrapped.Handle(command);
                 this.logger.Log(" End2");
+            }
+        }
+
+        public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
+        {
+            public AsyncCommandHandlerProxy(Container container, Func<ICommandHandler<T>> decorateeFactory)
+            {
+                this.DecorateeFactory = decorateeFactory;
+            }
+
+            public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+
+            public void Handle(T command)
+            {
+                // Run decorated instance on new thread (not important for these tests).
+            }
+        }
+
+        public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
+        {
+            public LifetimeScopeCommandHandlerProxy(Func<ICommandHandler<T>> decorateeFactory,
+                Container container)
+            {
+                this.DecorateeFactory = decorateeFactory;
+            }
+
+            public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+
+            public void Handle(T command)
+            {
+                // Start lifetime scope here (not important for these tests).
             }
         }
 
@@ -1106,6 +1324,33 @@
             public void DoSomething()
             {
                 this.DecoratedService.DoSomething();
+            }
+        }
+
+        public class NonGenericServiceDecoratorWithFunc : INonGenericService
+        {
+            public NonGenericServiceDecoratorWithFunc(Func<INonGenericService> decoratedCreator)
+            {
+                this.DecoratedServiceCreator = decoratedCreator;
+            }
+
+            public Func<INonGenericService> DecoratedServiceCreator { get; private set; }
+
+            public void DoSomething()
+            {
+                this.DecoratedServiceCreator().DoSomething();
+            }
+        }
+
+        public class NonGenericServiceDecoratorWithBothDecorateeAndFunc : INonGenericService
+        {
+            public NonGenericServiceDecoratorWithBothDecorateeAndFunc(INonGenericService decoratee,
+                Func<INonGenericService> decoratedCreator)
+            {
+            }
+
+            public void DoSomething()
+            {
             }
         }
     }

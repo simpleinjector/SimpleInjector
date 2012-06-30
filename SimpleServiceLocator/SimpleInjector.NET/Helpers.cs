@@ -73,7 +73,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static IEnumerable<T> MakeImmutable<T>(this IEnumerable<T> collection)
+        internal static IEnumerable<T> MakeReadOnly<T>(this IEnumerable<T> collection)
         {
             bool typeIsReadOnlyCollection = collection is ReadOnlyCollection<T>;
 
@@ -85,7 +85,7 @@ namespace SimpleInjector
             }
             else
             {
-                return CreateImmutableCollection(collection);
+                return CreateReadOnlyCollection(collection);
             }
         }
 
@@ -123,7 +123,7 @@ namespace SimpleInjector
             return copy;
         }
 
-        internal static void ValidateIfCollectionCanBeIterated(IEnumerable collection, Type serviceType)
+        internal static void ThrowWhenCollectionCanNotBeIterated(IEnumerable collection, Type serviceType)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace SimpleInjector
             return !serviceType.IsAbstract && !serviceType.IsGenericTypeDefinition && !serviceType.IsArray;
         }
 
-        internal static void ValidateIfCollectionForNullElements(IEnumerable collection, Type serviceType)
+        internal static void ThrowWhenCollectionContainsNullArguments(IEnumerable collection, Type serviceType)
         {
             bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
 
@@ -211,7 +211,7 @@ namespace SimpleInjector
             }
         }
 
-        private static IEnumerable<T> CreateImmutableCollection<T>(IEnumerable<T> collection)
+        private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection)
         {
             return RegisterAllEnumerable(collection);
         }

@@ -179,7 +179,7 @@
 
             // Act
             container.RegisterSingle(typeof(IPublicService), typeof(PublicServiceImpl));
-            
+
             var instance1 = container.GetInstance<IPublicService>();
             var instance2 = container.GetInstance<IPublicService>();
 
@@ -306,7 +306,7 @@
             catch (ArgumentException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("The supplied type ") &&
-                    ex.Message.Contains("is not a reference type. Only reference types are supported."), 
+                    ex.Message.Contains("is not a reference type. Only reference types are supported."),
                     "Actual: " + ex.Message);
             }
         }
@@ -436,7 +436,7 @@
             // Act
             container.Register(invalidConcrete);
         }
-        
+
         [TestMethod]
         public void RegisterConcrete_ConcreteIsNotAConstructableType_ThrowsException()
         {
@@ -618,7 +618,7 @@
         public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedException = 
+            string expectedException =
                 string.Format("No registration for type {0} could be found.", typeof(IPublicServiceEx).Name);
 
             var container = new Container();
@@ -636,7 +636,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                string actualMessage = 
+                string actualMessage =
                     ex.Message.Replace(typeof(IPublicServiceEx).FullName, typeof(IPublicServiceEx).Name);
 
                 string exceptionInfo = string.Empty;
@@ -645,7 +645,7 @@
 
                 while (exception != null)
                 {
-                    exceptionInfo += 
+                    exceptionInfo +=
                         exception.GetType().FullName + Environment.NewLine +
                         exception.Message + Environment.NewLine +
                         exception.StackTrace + Environment.NewLine + Environment.NewLine;
@@ -653,7 +653,7 @@
                     exception = exception.InnerException;
                 }
 
-                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);                               
+                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);
             }
         }
 
@@ -661,17 +661,19 @@
         public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage = string.Format(
-                "The supplied type '{0}' does not implement '{0}'.", 
-                typeof(IPublicService).Name);
+            string expectedMessage =
+                "The supplied type 'IDisposable' does not inherit from or implement 'IPublicService'.";
 
             var container = new Container();
 
             try
             {
                 // Act
-                // Cannot register a IService, because this would cause a recursive dependency.
-                container.RegisterAll<IPublicService>(new[] { typeof(InternalImplOfPublicService), typeof(IPublicService) });
+                container.RegisterAll<IPublicService>(new[]
+                { 
+                    typeof(InternalImplOfPublicService), 
+                    typeof(IDisposable) 
+                });
 
                 Assert.Fail("Exception expected.");
             }
@@ -681,6 +683,21 @@
 
                 AssertThat.StringContains(expectedMessage, actualMessage);
             }
+        }
+
+        [TestMethod]
+        public void RegisterAll_RegisteringATypeThatEqualsTheRegisteredServiceType_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPublicService, PublicServiceImpl>();
+
+            // Act
+            // Registers a type that references the registration above.
+            container.RegisterAll<IPublicService>(
+                typeof(InternalImplOfPublicService),
+                typeof(IPublicService));
         }
 
         public sealed class Dependency

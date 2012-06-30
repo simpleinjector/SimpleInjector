@@ -28,8 +28,10 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Linq.Expressions;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -569,7 +571,10 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a collection of elements of <typeparamref name="TService"/>.
+        /// Registers a dynamic collection of elements of type <typeparamref name="TService"/>. A call to
+        /// <see cref="GetAllInstances{T}"/> will return the <see cref="collection"/> itself, and updates to 
+        /// the collection will be reflected in the result. If updates are allowed, make sure the collection
+        /// can be iterated safely if you're running a multi-threaded application.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
@@ -588,27 +593,39 @@ namespace SimpleInjector
 
             this.ThrowWhenCollectionTypeAlreadyRegistered<TService>();
 
-            var immutableCollection = collection.MakeImmutable();
+            var readOnlyCollection = collection.MakeReadOnly();
 
-            this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(immutableCollection));
+            this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(readOnlyCollection));
 
-            this.collectionsToValidate[typeof(TService)] = immutableCollection;
+            this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
         }
 
         /// <summary>
-        /// Registers a collection of elements of <typeparamref name="TService"/>.
+        /// Registers a collection of singleton elements of type <typeparamref name="TService"/>.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="collection">The collection to register.</param>
+        /// <param name="singletons">The collection to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="singletons"/>
         /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="singletons"/> is a null
         /// reference.</exception>
-        public void RegisterAll<TService>(params TService[] collection) where TService : class
+        /// <exception cref="ArgumentException">Thrown when one of the elements of <paramref name="singletons"/>
+        /// is a null reference.</exception>
+        public void RegisterAll<TService>(params TService[] singletons) where TService : class
         {
-            this.RegisterAll<TService>((IEnumerable<TService>)collection);
+            if (singletons == null)
+            {
+                throw new ArgumentNullException("singletons");
+            }
+
+            if (singletons.Any(element => element == null))
+            {
+                throw new ArgumentException("The collection may not contain null references.", "singletons");
+            }
+
+            this.RegisterAll<TService>(new DecoratableEnumerable<TService>(singletons));
         }
 
         /// <summary>
@@ -687,8 +704,8 @@ namespace SimpleInjector
                 Type serviceType = pair.Key;
                 IEnumerable collection = pair.Value;
 
-                Helpers.ValidateIfCollectionCanBeIterated(collection, serviceType);
-                Helpers.ValidateIfCollectionForNullElements(collection, serviceType);
+                Helpers.ThrowWhenCollectionCanNotBeIterated(collection, serviceType);
+                Helpers.ThrowWhenCollectionContainsNullArguments(collection, serviceType);
             }
         }
 
@@ -716,6 +733,25 @@ namespace SimpleInjector
                 // generic type argument is just an argument, and ArgumentException even allows us to supply 
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
                 throw new ArgumentException(exceptionMessage, parameterName);
+            }
+        }
+
+        // This class is a trick to allow the SimpleInjector.Extensions library to correctly wrap these
+        // instances with decorators (it uses the IEnumerable<Expression>).
+        private sealed class DecoratableEnumerable<TService> : ReadOnlyCollection<TService>,
+            IEnumerable<Expression>
+        {
+            internal DecoratableEnumerable(TService[] services)
+                : base(services.ToArray())
+            {
+            }
+
+            IEnumerator<Expression> IEnumerable<Expression>.GetEnumerator()
+            {
+                foreach (TService service in this)
+                {
+                    yield return Expression.Constant(service);
+                }
             }
         }
     }

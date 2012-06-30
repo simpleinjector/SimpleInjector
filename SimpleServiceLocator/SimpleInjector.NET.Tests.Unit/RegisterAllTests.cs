@@ -12,13 +12,26 @@
     public class RegisterAllTests
     {
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterAllTService_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<IPlugin> plugins = null;
+
+            // Act
+            container.RegisterAll<IPlugin>(plugins);
+        }
+
+        [TestMethod]
         public void GetInstance_TypeWithEnumerableAsConstructorArguments_InjectsExpectedTypes()
         {
             // Arrange
             var container = new Container();
 
             container.RegisterAll<IPlugin>(new PluginImpl(), new PluginImpl(), new PluginImpl());
-            
+
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
             var manager = container.GetInstance<PluginManager>();
@@ -95,7 +108,7 @@
             var container = new Container();
 
             container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
-            
+
             // Act
             container.RegisterAll<IPlugin>(new PluginImpl());
         }
@@ -140,7 +153,7 @@
         {
             // Arrange
             var container = new Container();
-            
+
             container.RegisterAll<IUserRepository>(new InMemoryUserRepository(), new SqlUserRepository());
 
             // Act
@@ -253,7 +266,7 @@
             // Arrange
             string expectedMessage =
                 "The registered delegate for type IEnumerable<IUserRepository> returned null.";
-            
+
             var container = new Container();
 
             Func<IEnumerable<IUserRepository>> invalidDelegate = () => null;
@@ -287,6 +300,25 @@
 
             // Assert
             Assert_IsNotAMutableCollection(collection);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithArrayRegistered_DoesNotAllowChangesToTheOriginalArray()
+        {
+            // Arrange
+            var container = new Container();
+
+            var repositories = new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() };
+
+            container.RegisterAll<IUserRepository>(repositories);
+
+            repositories[0] = null;
+
+            // Act
+            var collection = container.GetAllInstances<IUserRepository>().ToArray();
+
+            // Assert
+            Assert.IsNotNull(collection[0], "RegisterAll<T>(T[]) did not make a copy of the supplied array.");
         }
 
         [TestMethod]
@@ -359,11 +391,11 @@
             var secondContainer = container.GetInstance<PluginContainer>();
 
             // Assert
-            Assert.AreEqual(secondContainer.Plugins, right, 
+            Assert.AreEqual(secondContainer.Plugins, right,
                 "When using Register<T> to register collections, the collection should not be treated as a " +
                 "singleton.");
         }
-        
+
         [TestMethod]
         public void GetInstance_OnATypeThatDependsOnACollectionThatIsNotRegistered_SameInstanceInjectedEachTime()
         {
@@ -381,10 +413,26 @@
                 "every time. This saves performance.");
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisterAllTService_RegisteredCollectionWithNullElements_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
                 "users to change the collection.";
+
+            if (collection is ReadOnlyCollection<T>)
+            {
+                return;
+            }
 
             Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
             Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);

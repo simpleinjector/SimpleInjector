@@ -26,7 +26,9 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -36,6 +38,72 @@ namespace SimpleInjector.Extensions
     /// </summary>
     internal static class Helpers
     {
+        // This method name does not describe what it does, but since the C# compiler will create a iterator
+        // type named after this method, it allows us to return a type that has a nice name that will show up
+        // during debugging.
+        public static IEnumerable<T> ReadOnlyCollection<T>(T[] collection)
+        {
+            for (int index = 0; index < collection.Length; index++)
+            {
+                yield return collection[index];
+            }
+        }
+
+        internal static string ToFriendlyName(Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return type.Name;
+            }
+
+            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
+
+            var genericArguments =
+                type.GetGenericArguments().Select(argument => Helpers.ToFriendlyName(argument));
+
+            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
+        }
+
+        internal static IEnumerable MakeReadOnly(Type elementType, Array collection)
+        {
+            var readOnlyCollection = typeof(Helpers).GetMethod("ReadOnlyCollection")
+                .MakeGenericMethod(elementType)
+                .Invoke(null, new object[] { collection });
+
+            return (IEnumerable)readOnlyCollection;
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
+            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
+        internal static Type DetermineImplementationType(Expression expression, Type registeredServiceType)
+        {
+            if (expression is ConstantExpression)
+            {
+                var constantExpression = (ConstantExpression)expression;
+
+                object singleton = constantExpression.Value;
+                return singleton == null ? constantExpression.Type : singleton.GetType();
+            }
+
+            if (expression is NewExpression)
+            {
+                // Transient without initializers.
+                return ((NewExpression)expression).Constructor.DeclaringType;
+            }
+
+            var invocation = expression as InvocationExpression;
+
+            if (invocation != null && invocation.Expression is ConstantExpression &&
+                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
+            {
+                // Transient with initializers.
+                return ((NewExpression)invocation.Arguments[0]).Constructor.DeclaringType;
+            }
+
+            // Implementation type can not be determined.
+            return registeredServiceType;
+        }
+
         internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
         {
             var body = methodCall.Body as MethodCallExpression;

@@ -26,6 +26,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -80,6 +81,10 @@ namespace SimpleInjector.Advanced
         /// <returns>
         ///   <c>true</c> if the <paramref name="type"/> is constructable; otherwise, <c>false</c>.
         /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "1#",
+            Justification = "I can't think of any better design.")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
+            MessageId = "Constructable", Justification = "I do think 'constructable' is a word.")]
         public bool IsConstructableType(Type type, out string errorMessage)
         {
             errorMessage = null;

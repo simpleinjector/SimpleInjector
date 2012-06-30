@@ -55,8 +55,8 @@ namespace SimpleInjector.Extensions
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to use {0} as a decorator, its constructor should have a " +
-                "single argument of type {1}, but it currently has {2}.", decoratorType.ToFriendlyName(),
-                serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+                "single argument of type {1} or Func<{1}>, but it currently has {2}.",
+                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
         }
 
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type implementation, Type service)
@@ -116,18 +116,22 @@ namespace SimpleInjector.Extensions
                     typeof(BatchRegistrationCallback).Name);
         }
 
+        internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
+                "decorator, that will be wrapped around instances of the collection of {0} instances, " +
+                "because the registration hasn't been made using one of the RegisterAll overloads that " +
+                "take a list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is " +
+                "impossible for the container to determine its lifestyle, which makes it impossible to " +
+                "generate a Func<T>. Either switch to one of the other RegisterAll overloads, or don't " +
+                "use a decorator that depends on a Func<T> for injecting the decoratee.",
+                serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
+        }
+
         private static string ToFriendlyName(this Type type)
         {
-            if (!type.IsGenericType)
-            {
-                return type.Name;
-            }
-
-            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
-
-            var genericArguments = type.GetGenericArguments().Select(argument => argument.ToFriendlyName());
-
-            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
+            return Helpers.ToFriendlyName(type);
         }
     }
 }

@@ -426,7 +426,7 @@
             container.ExpressionBuilt += handler;
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
-            
+
             // Act
             container.ExpressionBuilt -= handler;
 
@@ -441,11 +441,42 @@
         public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
-            var eventArgs = 
+            var eventArgs =
                 new ExpressionBuiltEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
 
             // Act
             eventArgs.Expression = null;
+        }
+
+        [TestMethod]
+        public void GetInstance_ExpressionBuiltWithInvalidExpression_ThrowsAnDescriptiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            container.ExpressionBuilt += (s, e) =>
+            {
+                var invalidExpression = Expression.GreaterThan(Expression.Constant(1), Expression.Constant(1));
+
+                e.Expression = invalidExpression;
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance<IUserRepository>();
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (Exception ex)
+            {
+                AssertThat.StringContains(
+                    "Error occurred while trying to build a delegate for type IUserRepository",
+                    ex.Message, "Exception message was not descriptive.");
+            }
         }
 
         public class Order

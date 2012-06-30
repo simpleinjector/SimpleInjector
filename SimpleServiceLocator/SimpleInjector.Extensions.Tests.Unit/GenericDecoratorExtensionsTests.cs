@@ -297,7 +297,7 @@
             var handler = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
+            AssertThat.AreEqual(expectedPredicateImplementationType, actualPredicateImplementationType);
         }
 
         [TestMethod]
