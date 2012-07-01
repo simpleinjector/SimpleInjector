@@ -572,9 +572,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a dynamic collection of elements of type <typeparamref name="TService"/>. A call to
-        /// <see cref="GetAllInstances{T}"/> will return the <see cref="collection"/> itself, and updates to 
-        /// the collection will be reflected in the result. If updates are allowed, make sure the collection
-        /// can be iterated safely if you're running a multi-threaded application.
+        /// <see cref="GetAllInstances{T}"/> will return the <paramref name="collection"/> itself, and updates 
+        /// to the collection will be reflected in the result. If updates are allowed, make sure the 
+        /// collection can be iterated safely if you're running a multi-threaded application.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
