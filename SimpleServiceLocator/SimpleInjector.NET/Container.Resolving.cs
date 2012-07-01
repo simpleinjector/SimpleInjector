@@ -246,15 +246,13 @@ namespace SimpleInjector
                 throw new ArgumentNullException("instance");
             }
 
-            var snapshot = this.propertyInjectorCache;
-
             PropertyInjector propertyInjector;
 
-            if (!snapshot.TryGetValue(instance.GetType(), out propertyInjector))
+            if (!this.propertyInjectorCache.TryGetValue(instance.GetType(), out propertyInjector))
             {
                 propertyInjector = new PropertyInjector(this, instance.GetType());
 
-                this.RegisterPropertyInjector(instance.GetType(), propertyInjector, snapshot);
+                this.RegisterPropertyInjector(propertyInjector);
             }
 
             propertyInjector.Inject(instance);
@@ -320,15 +318,14 @@ namespace SimpleInjector
             return this.Options.ConstructorResolutionBehavior.GetConstructor(concreteType);
         }
 
-        private void RegisterPropertyInjector(Type serviceType, PropertyInjector injector,
-            Dictionary<Type, PropertyInjector> snapshot)
+        private void RegisterPropertyInjector(PropertyInjector injector)
         {
-            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
+            var copy = Helpers.MakeCopyOf(this.propertyInjectorCache);
 
-            snapshotCopy.Add(serviceType, injector);
+            copy[injector.Type] = injector;
 
             // Replace the original with the new version that includes the serviceType.
-            this.propertyInjectorCache = snapshotCopy;
+            this.propertyInjectorCache = copy;
         }
 
         private IInstanceProducer GetInstanceProducerForType<TService>() where TService : class

@@ -45,17 +45,13 @@ namespace SimpleInjector
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
-
-        // This dictionary is only used for validation. After validation is gets erased.
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
+        private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
 
         private bool locked;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
         private EventHandler<ExpressionBuiltEventArgs> expressionBuilt = (s, e) => { };
-
-        private Dictionary<Type, PropertyInjector> propertyInjectorCache =
-            new Dictionary<Type, PropertyInjector>();
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()

@@ -44,7 +44,6 @@ namespace SimpleInjector
             ActionDelegates.Max(d => d.GetGenericArguments().Length);
 
         private readonly Container container;
-        private readonly Type type;
 
         // This class builds a list of delegates where each delegate injects at most 3 properties (on .NET 3.5)
         // or at most 7 properties (on .NET 4.0 and up).
@@ -53,8 +52,10 @@ namespace SimpleInjector
         internal PropertyInjector(Container container, Type type)
         {
             this.container = container;
-            this.type = type;
+            this.Type = type;
         }
+
+        internal Type Type { get; set; }
 
         internal void Inject(object instance)
         {
@@ -112,7 +113,7 @@ namespace SimpleInjector
         private PropertyInfo[] GetInjectableProperties()
         {
             return (
-                from property in this.type.GetProperties()
+                from property in this.Type.GetProperties()
                 where property.CanWrite
                 where property.GetSetMethod() != null
                 where !property.PropertyType.IsValueType
@@ -128,7 +129,7 @@ namespace SimpleInjector
 
             var delegateType = this.GetCorrectDelegateForType(propertyTypes);
 
-            var parameters = new List<Type> { this.type };
+            var parameters = new List<Type> { this.Type };
 
             parameters.AddRange(propertyTypes);
 
@@ -136,7 +137,7 @@ namespace SimpleInjector
 
             parameters.AddRange(Enumerable.Repeat(typeof(object), numberOfEmptySlots));
 
-            var method = new DynamicMethod(this.type.Name + "_Injector", typeof(void), parameters.ToArray());
+            var method = new DynamicMethod(this.Type.Name + "_Injector", typeof(void), parameters.ToArray());
 
             EmitMethodBody(method, properties);
 
@@ -187,7 +188,7 @@ namespace SimpleInjector
         {
             var delegateType = GetActionDelegateWithGenericArgumentCount(propertyTypes.Length + 1);
 
-            var typeArguments = new List<Type> { this.type };
+            var typeArguments = new List<Type> { this.Type };
             typeArguments.AddRange(propertyTypes);
 
             int numberOfEmptySlots = delegateType.GetGenericArguments().Length - propertyTypes.Length - 1;
@@ -219,7 +220,7 @@ namespace SimpleInjector
 
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "instance");
 
-            var arguments = new List<Expression> { Expression.Convert(instanceParameter, this.type) };
+            var arguments = new List<Expression> { Expression.Convert(instanceParameter, this.Type) };
 
             // We build up the delegate using the instance producers BuildExpression method, making the
             // delegate as efficient as technically possible.
