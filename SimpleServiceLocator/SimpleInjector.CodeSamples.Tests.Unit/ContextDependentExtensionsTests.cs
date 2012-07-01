@@ -1,7 +1,5 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
-    using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -14,6 +12,32 @@
         public interface ICommandHandler<TCommand>
         {
             void Execute(TCommand command);
+        }
+
+        [TestMethod]
+        public void InjectProperties_ServiceWithContextProperty_CallsTheDelegateWithTheExpectedDependencyContext()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterWithContext<IContext>(dc =>
+            {
+                Assert.IsNotNull(dc.ImplementationType, "No root DependencyContext was expected.");
+
+                Assert.IsInstanceOfType(dc.ImplementationType, typeof(ServiceWithProperty));
+
+                return new CommandHandlerContext<int>();
+            });
+
+            container.RegisterInitializer<ServiceWithProperty>(s => container.InjectProperties(s));
+
+            var service = new ServiceWithProperty();
+
+            // Act
+            container.InjectProperties(service);
+
+            // Assert
+            Assert.IsNotNull(service.PropertyToInject);
         }
 
         [TestMethod]
@@ -285,9 +309,14 @@
             Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
         }
 
+        public sealed class ServiceWithProperty
+        {
+            public IContext PropertyToInject { get; set; }
+        }
+
         private sealed class CommandHandlerWrapper<T>
         {
-            public CommandHandlerWrapper(ICommandHandler<T> handler, IContext context, 
+            public CommandHandlerWrapper(ICommandHandler<T> handler, IContext context,
                 ConcreteCommand justAnExtraArgumentToMakeUsFindBugsFaster)
             {
                 this.InjectedHandler = handler;

@@ -38,12 +38,12 @@ namespace SimpleInjector.Extensions.Decorators
     // -RegisterAll(this Container container, Type serviceType, IEnumerable<Type> serviceTypes)
     // -RegisterAll<TService>(this Container container, IEnumerable<Type> serviceTypes)
     // -RegisterAll<TService>(this Container container, params Type[] serviceTypes)
-    internal sealed class ContainerControlledServicesExpressionInterceptor : DecoratorExpressionInterceptor
+    internal sealed class ContainerControlledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
         private readonly Dictionary<Type, IDecoratableEnumerable> decoratableEnumerables =
             new Dictionary<Type, IDecoratableEnumerable>();
 
-        internal ContainerControlledServicesExpressionInterceptor(DecoratorExpressionInterceptorData data)
+        internal ContainerControlledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data)
             : base(data)
         {
         }

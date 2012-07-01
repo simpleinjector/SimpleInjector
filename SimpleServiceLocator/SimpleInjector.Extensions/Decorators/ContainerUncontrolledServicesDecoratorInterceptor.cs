@@ -38,7 +38,7 @@ namespace SimpleInjector.Extensions.Decorators
     // -RegisterAll<TService>(IEnumerable<TService> collection)
     // -Register<TService>(TService) (where TService is a IEnumerable<T>)
     // -RegisterAll(this Container container, Type serviceType, IEnumerable collection).
-    internal sealed class ContainerUncontrolledServicesExpressionInterceptor : DecoratorExpressionInterceptor
+    internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
         // NOTE: We have a memory leak here, in the situation when many containers are newed up.
         // Store a ServiceTypeDecoratorInfo object per closed service type. This list must be shared across
@@ -53,7 +53,7 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollections =
             new Dictionary<Type, IEnumerable>();
 
-        internal ContainerUncontrolledServicesExpressionInterceptor(DecoratorExpressionInterceptorData data)
+        internal ContainerUncontrolledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data)
             : base(data)
         {
         }

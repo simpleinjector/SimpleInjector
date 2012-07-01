@@ -89,11 +89,11 @@
     <Compile Include="..\SimpleInjector.Extensions\DecoratorPredicateContext.cs">
       <Link>DecoratorPredicateContext.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerControlledServicesExpressionInterceptor.cs">
-      <Link>Decorators\ContainerControlledServicesExpressionInterceptor.cs</Link>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs">
+      <Link>Decorators\ContainerControlledServicesDecoratorInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerUncontrolledServicesExpressionInterceptor.cs">
-      <Link>Decorators\ContainerUncontrolledServicesExpressionInterceptor.cs</Link>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
+      <Link>Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratableEnumerable.cs">
       <Link>Decorators\DecoratableEnumerable.cs</Link>

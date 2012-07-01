@@ -74,12 +74,12 @@
     <Compile Include="DecoratorExtensions.cs" />
     <Compile Include="DecoratorPredicateContext.cs" />
     <Compile Include="Decorators\DecoratableEnumerable.cs" />
-    <Compile Include="Decorators\ContainerControlledServicesExpressionInterceptor.cs" />
+    <Compile Include="Decorators\ContainerControlledServicesDecoratorInterceptor.cs" />
     <Compile Include="Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Decorators\DecoratorHelpers.cs" />
     <Compile Include="Decorators\IDecoratableEnumerable.cs" />
-    <Compile Include="Decorators\ContainerUncontrolledServicesExpressionInterceptor.cs" />
+    <Compile Include="Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
     <Compile Include="Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Decorators\ServiceTypeDecoratorInfo.cs" />
     <Compile Include="GenericArgumentFinder.cs" />
