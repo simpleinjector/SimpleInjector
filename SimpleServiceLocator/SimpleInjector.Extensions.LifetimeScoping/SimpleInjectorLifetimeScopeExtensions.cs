@@ -200,7 +200,7 @@ namespace SimpleInjector
 
             container.EnableLifetimeScoping();
 
-            ReplaceRegistrationAsLifetimeScope<TConcrete>(container);
+            ReplaceDummyRegistrationWithLifetimeScope<TConcrete>(container);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace SimpleInjector
 
             container.EnableLifetimeScoping();
 
-            ReplaceRegistrationAsLifetimeScope<TService>(container);
+            ReplaceDummyRegistrationWithLifetimeScope<TService>(container);
         }
 
         /// <summary>
@@ -304,29 +304,30 @@ namespace SimpleInjector
 
             container.EnableLifetimeScoping();
 
-            ReplaceRegistrationAsLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
+            ReplaceDummyRegistrationWithLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
         }
 
-        private static void ReplaceRegistrationAsLifetimeScope<TService>(Container container,
+        private static void ReplaceDummyRegistrationWithLifetimeScope<TService>(Container container,
             bool disposeWhenLifetimeScopeEnds = true)
             where TService : class
         {
-            var helper = new ReplaceRegistrationAsLifetimeScopeHelper<TService>(container);
-
-            helper.DisposeWhenLifetimeScopeEnds = disposeWhenLifetimeScopeEnds;
+            var helper = new ReplaceWithLifetimeScopeHelper<TService>(container)
+            {
+                DisposeWhenLifetimeScopeEnds = disposeWhenLifetimeScopeEnds
+            };
 
             container.ExpressionBuilt += helper.ExpressionBuilt;
         }
 
         // This class is thread-safe within the context of a single Container.
-        private sealed class ReplaceRegistrationAsLifetimeScopeHelper<TService> where TService : class
+        private sealed class ReplaceWithLifetimeScopeHelper<TService> where TService : class
         {
             private readonly Container container;
             private TService containerScopedServiceInstance;
             private LifetimeScopeManager manager;
             private Func<TService> instanceCreator;
 
-            internal ReplaceRegistrationAsLifetimeScopeHelper(Container container)
+            internal ReplaceWithLifetimeScopeHelper(Container container)
             {
                 this.container = container;
             }
