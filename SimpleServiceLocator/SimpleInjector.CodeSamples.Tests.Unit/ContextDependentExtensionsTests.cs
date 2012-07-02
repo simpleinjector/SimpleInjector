@@ -15,32 +15,6 @@
         }
 
         [TestMethod]
-        public void InjectProperties_ServiceWithContextProperty_CallsTheDelegateWithTheExpectedDependencyContext()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                Assert.IsNotNull(dc.ImplementationType, "No root DependencyContext was expected.");
-
-                Assert.IsInstanceOfType(dc.ImplementationType, typeof(ServiceWithProperty));
-
-                return new CommandHandlerContext<int>();
-            });
-
-            container.RegisterInitializer<ServiceWithProperty>(s => container.InjectProperties(s));
-
-            var service = new ServiceWithProperty();
-
-            // Act
-            container.InjectProperties(service);
-
-            // Assert
-            Assert.IsNotNull(service.PropertyToInject);
-        }
-
-        [TestMethod]
         public void GetInstance_ResolvingAConcreteTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
@@ -307,11 +281,6 @@
 
             // Assert
             Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
-        }
-
-        public sealed class ServiceWithProperty
-        {
-            public IContext PropertyToInject { get; set; }
         }
 
         private sealed class CommandHandlerWrapper<T>
