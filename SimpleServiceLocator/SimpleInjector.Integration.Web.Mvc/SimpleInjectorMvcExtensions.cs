@@ -66,6 +66,8 @@ namespace SimpleInjector
             var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToList();
 
             providers.ForEach(provider => FilterProviders.Providers.Remove(provider));
+
+            FilterProviders.Providers.Add(singletonFilterProvider);
         }
 
         /// <summary>
