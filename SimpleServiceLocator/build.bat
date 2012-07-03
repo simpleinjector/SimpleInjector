@@ -2,7 +2,8 @@
 
 set version=1.4.2.12140
 set versionCore=1.4.2.12140
-set version_Extensions_LifetimeScoping=1.4.2.12141
+set version_Integration_Mvc=1.4.3.12185
+set version_Extensions_LifetimeScoping=1.4.3.12185
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
 
@@ -68,7 +69,7 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Integration_Mvc% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 
@@ -272,10 +273,11 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
 copy  bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Mvc} %version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version%.zip"
-ren "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %version_Integration_Mvc%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version_Integration_Mvc%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version_Integration_Mvc%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 

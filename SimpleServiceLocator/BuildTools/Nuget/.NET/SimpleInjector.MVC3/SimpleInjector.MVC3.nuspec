@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <version>{version}</version>
+    <version>{version_Integration_Mvc}</version>
     <authors>S. van Deursen</authors>
     <owners>S. van Deursen</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
