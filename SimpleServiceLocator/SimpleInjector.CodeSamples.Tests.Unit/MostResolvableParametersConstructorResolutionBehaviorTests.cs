@@ -242,11 +242,14 @@
 
         private static Container CreateContainerWithMostResolvableParametersConstructorResolutionBehavior()
         {
-            return new Container(new ContainerOptions
-            {
-                ConstructorResolutionBehavior =
-                    new MostResolvableParametersConstructorResolutionBehavior()
-            });
+            var options = new ContainerOptions();
+
+            var container = new Container(options);
+
+            options.ConstructorResolutionBehavior =
+                new MostResolvableParametersConstructorResolutionBehavior(container);
+
+            return container;
         }
 
         public sealed class MultipleConstructorsType : IDisposable

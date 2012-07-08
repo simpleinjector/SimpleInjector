@@ -2,6 +2,8 @@
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
 
@@ -32,7 +34,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AllowOverridingRegistrations_False_ContainerDoesNotAllowOverringRegistrations()
+        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringRegistrations()
         {
             // Arrange
             var container = new Container(new ContainerOptions
@@ -40,14 +42,21 @@
                 AllowOverridingRegistrations = false
             });
 
-            container.Register<IUserRepository, SqlUserRepository>();
+            try
+            {
+                container.Register<IUserRepository, SqlUserRepository>();
+            }
+            catch
+            {
+                Assert.Fail("Test setup fail. This call is expected to succeed.");
+            }
 
             // Act
             container.Register<IUserRepository, InMemoryUserRepository>();
         }
 
         [TestMethod]
-        public void AllowOverridingRegistrations_False_ContainerThrowsExpectedExceptionMessage()
+        public void AllowOverridingRegistrations_SetToFalse_ContainerThrowsExpectedExceptionMessage()
         {
             // Arrange
             var container = new Container(new ContainerOptions
@@ -65,13 +74,13 @@
             catch (InvalidOperationException ex)
             {
                 // Assert
-                Assert.IsTrue(ex.Message.Contains("ContainerOptions"), "Actual: " + ex);
-                Assert.IsTrue(ex.Message.Contains("AllowOverridingRegistrations"), "Actual: " + ex);
+                AssertThat.ExceptionMessageContains("ContainerOptions", ex);
+                AssertThat.ExceptionMessageContains("AllowOverridingRegistrations", ex);
             }
         }
 
         [TestMethod]
-        public void AllowOverridingRegistrations_True_ContainerDoesNotAllowOverringRegistrations()
+        public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringRegistrations()
         {
             // Arrange
             var container = new Container(new ContainerOptions
@@ -85,12 +94,13 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(container.GetInstance<IUserRepository>(), typeof(InMemoryUserRepository));
+            Assert.IsInstanceOfType(container.GetInstance<IUserRepository>(), typeof(InMemoryUserRepository),
+                "The registration was not overridden properly.");
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AllowOverridingRegistrations_False_ContainerDoesNotAllowOverringCollections()
+        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringCollections()
         {
             // Arrange
             var container = new Container(new ContainerOptions
@@ -98,14 +108,21 @@
                 AllowOverridingRegistrations = false
             });
 
-            container.RegisterAll<IUserRepository>(new SqlUserRepository());
+            try
+            {
+                container.RegisterAll<IUserRepository>(new SqlUserRepository());
+            }
+            catch
+            {
+                Assert.Fail("Test setup fail. This call was not expected to fail.");
+            }
 
             // Act
             container.RegisterAll<IUserRepository>(new InMemoryUserRepository());
         }
 
         [TestMethod]
-        public void AllowOverridingRegistrations_True_ContainerDoesNotAllowOverringCollections()
+        public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringCollections()
         {
             // Arrange
             var container = new Container(new ContainerOptions
@@ -156,8 +173,8 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains(
-                    "supplied ContainerOptions instance belongs to another Container instance.", ex.Message);
+                AssertThat.ExceptionMessageContains(
+                    "supplied ContainerOptions instance belongs to another Container instance.", ex);
             }
         }
 
@@ -186,7 +203,8 @@
             options.ConstructorResolutionBehavior = expectedBehavior;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.ConstructorResolutionBehavior));
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.ConstructorResolutionBehavior),
+                "The set_ConstructorResolutionBehavior did not work.");
         }
 
         [TestMethod]
@@ -211,9 +229,9 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.StringContains(
-                    "ConstructorResolutionBehavior cannot be changed after the first registration",
-                    ex.Message);
+                AssertThat.ExceptionMessageContains(
+                    "ConstructorResolutionBehavior property cannot be changed after the first registration",
+                    ex);
             }
         }
 
@@ -241,82 +259,66 @@
             catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains(
-                    "ConstructorResolutionBehavior cannot be changed after the first registration",
+                    "ConstructorResolutionBehavior property cannot be changed after the first registration",
                     ex.Message);
             }
         }
 
         [TestMethod]
-        public void ConstructorResolutionBehavior_SetWithAValueThatBelongsToADifferentContainer1_Fails()
-        {
-            // Arrange
-            var options1 = new ContainerOptions();
-            var container1 = new Container(options1);
-
-            var options2 = new ContainerOptions();
-
-            // Register this options2 to a new container.
-            var container2 = new Container(options2);
-
-            try
-            {
-                // Act
-                options2.ConstructorResolutionBehavior = options1.ConstructorResolutionBehavior;
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    "The supplied ConstructorResolutionBehavior instance belongs to another Container",
-                    ex.Message);
-
-                AssertThat.ExceptionContainsParamName(ex, "value");
-            }
-        }
-
-        [TestMethod]
-        public void ConstructorResolutionBehavior_SetWithAValueThatBelongsToADifferentContainer2_Fails()
-        {
-            // Arrange
-            var options1 = new ContainerOptions();
-            var container1 = new Container(options1);
-
-            // In this test, we don't register the options2 to a container, but we'd expect the assignment of
-            // ConstructorResolutionBehavior still to fail.
-            var options2 = new ContainerOptions();
-
-            try
-            {
-                // Act
-                options2.ConstructorResolutionBehavior = options1.ConstructorResolutionBehavior;
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    "The supplied ConstructorResolutionBehavior instance belongs to another Container",
-                    ex.Message);
-
-                AssertThat.ExceptionContainsParamName(ex, "value");
-            }
-        }
-
-        [TestMethod]
-        public void ConstructorResolutionBehavior_SetWithValueFromSameContainer_Succeeds()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
-            var container = new Container(options);
-            var behavior = options.ConstructorResolutionBehavior;
-
-            options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
 
             // Act
-            options.ConstructorResolutionBehavior = behavior;
+            options.ConstructorInjectionBehavior = null;
+        }
+
+        [TestMethod]
+        public void ConstructorInjectionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var expectedBehavior = new AlternativeConstructorInjectionBehavior();
+
+            var options = new ContainerOptions();
+
+            var container = new Container(options);
+
+            // Act
+            options.ConstructorInjectionBehavior = expectedBehavior;
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.ConstructorInjectionBehavior),
+                "The set_ConstructorInjectionBehavior did not work.");
+        }
+
+        [TestMethod]
+        public void ConstructorInjectionBehavior_ChangedAfterFirstRegistration_Fails()
+        {
+            // Arrange
+            var expectedBehavior = new AlternativeConstructorInjectionBehavior();
+
+            var options = new ContainerOptions();
+
+            var container = new Container(options);
+
+            container.RegisterSingle<object>("The first registration.");
+
+            try
+            {
+                // Act
+                options.ConstructorInjectionBehavior = expectedBehavior;
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "ConstructorInjectionBehavior property cannot be changed after the first registration",
+                    ex);
+            }
         }
 
         public sealed class ClassWithContainerAsDependency
@@ -329,11 +331,19 @@
             public Container Container { get; private set; }
         }
 
-        private sealed class AlternativeConstructorResolutionBehavior : ConstructorResolutionBehavior
+        private sealed class AlternativeConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public override System.Reflection.ConstructorInfo GetConstructor(Type type)
+            public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
             {
-                return type.GetConstructors()[0];
+                return implementationType.GetConstructors()[0];
+            }
+        }
+
+        private sealed class AlternativeConstructorInjectionBehavior : IConstructorInjectionBehavior
+        {
+            public Expression BuildParameterExpression(ParameterInfo parameter)
+            {
+                throw new NotImplementedException();
             }
         }
     }

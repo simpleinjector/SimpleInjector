@@ -1028,7 +1028,9 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.StringContains("No registration for type ILogger could be found", ex.Message);
+                AssertThat.ExceptionMessageContains(
+                    "The constructor of the type LoggingHandlerDecorator1<RealCommand> contains the " +
+                    "parameter of type ILogger with name 'logger' that is not registered.", ex);
             }
         }
 

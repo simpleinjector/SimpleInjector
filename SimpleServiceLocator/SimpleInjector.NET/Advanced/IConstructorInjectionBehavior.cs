@@ -25,26 +25,22 @@
 
 namespace SimpleInjector.Advanced
 {
-    using System;
+    using System.Linq.Expressions;
+    using System.Reflection;
 
     /// <summary>
-    /// Extension methods for working with <see cref="ConstructorResolutionBehavior"/> instances.
+    /// Defines the container's behavior for building an expression tree based on the supplied constructor of
+    /// a given type.
     /// </summary>
-    public static class ConstructorResolutionBehaviorExtensions
+    public interface IConstructorInjectionBehavior
     {
         /// <summary>
-        /// Gets the <see cref="ConstructorResolutionBehavior"/> for the supplied container.
+        /// Builds an <see cref="Expression"/> for the supplied <paramref name="parameter"/>, based on the
+        /// container's configuration.
         /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>The <see cref="ConstructorResolutionBehavior"/> for the supplied container.</returns>
-        public static ConstructorResolutionBehavior GetConstructorResolutionBehavior(this Container container)
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            return container.Options.ConstructorResolutionBehavior;
-        }
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
+        /// <paramref name="parameter"/>.</returns>
+        Expression BuildParameterExpression(ParameterInfo parameter);
     }
 }

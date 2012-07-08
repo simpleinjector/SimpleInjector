@@ -26,51 +26,42 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.InstanceProducers;
 
-    internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
+    internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior
     {
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        // By supplying a delegate for the retrieval of the container, the ContainerOptions can create and 
+        // return a DefaultConstructorInjectionBehavior before this ContainerOptions instance has been added
+        // to a container
+        private readonly Func<Container> getContainer;
+
+        internal DefaultConstructorInjectionBehavior(Func<Container> getContainer)
         {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException("serviceType");
-            }
-
-            if (implementationType == null)
-            {
-                throw new ArgumentNullException("implementationType");
-            }
-
-            VerifyTypeIsConcrete(implementationType);
-
-            return GetSinglePublicConstructor(implementationType);
+            this.getContainer = getContainer;
         }
 
-        private static void VerifyTypeIsConcrete(Type implementationType)
+        public Expression BuildParameterExpression(ParameterInfo parameter)
         {
-            if (implementationType.IsAbstract || implementationType.IsArray)
+            if (parameter == null)
             {
-                // While array types are in fact concrete, we can not create them and creating them would be
-                // pretty useless.
-                throw new ActivationException(
-                    StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(implementationType));
-            }
-        }
-
-        private static ConstructorInfo GetSinglePublicConstructor(Type implementationType)
-        {
-            var constructors = implementationType.GetConstructors();
-
-            bool hasSuitableConstructor = constructors.Length == 1;
-
-            if (!hasSuitableConstructor)
-            {
-                throw new ActivationException(
-                    StringResources.TypeMustHaveASinglePublicConstructor(implementationType));
+                throw new ArgumentNullException("parameter");
             }
 
-            return constructors[0];
+            Container container = this.getContainer();
+
+            InstanceProducer producer =
+                container == null ? null : container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
+
+            if (producer != null)
+            {
+                // When the instance producer is invalid, this call will fail with an expressive exception.
+                return producer.BuildExpression();
+            }
+
+            throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
+                parameter.Member.DeclaringType, parameter));
         }
     }
 }

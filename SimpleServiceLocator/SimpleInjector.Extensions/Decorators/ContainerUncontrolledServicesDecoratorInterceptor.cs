@@ -99,7 +99,8 @@ namespace SimpleInjector.Extensions.Decorators
             // information in the predicate of the next decorator they add.
             serviceInfo.AppliedDecorators.Add(decoratorType);
 
-            ConstructorInfo decoratorConstructor = this.GetDecoratorConstructor(decoratorType);
+            ConstructorInfo decoratorConstructor =
+                this.ResolutionBehavior.GetConstructor(serviceType, decoratorType);
 
             this.ThrowWhenDecoratorNeedsAFunc(serviceType, decoratorConstructor);
 

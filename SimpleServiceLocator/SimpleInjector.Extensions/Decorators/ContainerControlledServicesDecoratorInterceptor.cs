@@ -112,7 +112,7 @@ namespace SimpleInjector.Extensions.Decorators
         private IDecoratableEnumerable BuildDecoratableEnumerable(Type serviceType, Type decoratorType,
             IDecoratableEnumerable originalDecoratables)
         {
-            var decoratorConstructor = this.GetDecoratorConstructor(decoratorType);
+            var decoratorConstructor = this.ResolutionBehavior.GetConstructor(serviceType, decoratorType);
 
             IEnumerable<DecoratorPredicateContext> predicateContexts =
                 from context in originalDecoratables.GetDecoratorPredicateContexts()

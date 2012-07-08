@@ -2,9 +2,9 @@
 
 Version vNext
 	General description:
-		An extension point is added to the core library, which allows developers to override the constructor
-		resolution behavior. For normal scenarios the use of the default behavior (which only allows one
-		single public constructor) is still advised. 
+		An extension point is added to the core library, which allows developers to override the behavior of
+		resolution and injection of constructors. For normal scenarios the use of the default behavior 
+		(which only allows one single public constructor) is still advised. 
 		
 		Other great improvements are in the RegisterDecorator extension methods of the Extensions project. 
 		The container now allows injecting a Func<ServiceType> into the decorator (besides injecting the 
@@ -16,8 +16,8 @@ Version vNext
 		collection.
 
 	Code Changes:
-		-[Core] An extension point added in the form of ContainerOptions.ConstructorResolutionBehavior, which
-		 allows developers to override the constructor resolution behavior of the container. (work item 18097)
+		-[Core] Extension points added in the form of ContainerOptions.ConstructorXXXBehavior, which allows 
+		 developers to override the behavior of constructor resolution and injection. (work item 18097)
 		-[Extensions] RegisterDecorator extension methods now allow injecting Func<ServiceType> delegates. This
 		 enables some interesting advanced scenarios where the creation of the decorated instance should be
 		 delayed. (work item 18211)

@@ -8,29 +8,20 @@
     using SimpleInjector.Advanced;
 
     // Mimics the constructor resolution behavior of Autofac and Unity.
-    public class MostParametersConstructorResolutionBehavior : ConstructorResolutionBehavior
+    public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
-        public override ConstructorInfo GetConstructor(Type type)
+        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
-            var constructors = GetConstructorsWithMostParameters(type);
+            ConstructorInfo[] constructors = GetConstructorsWithMostParameters(implementationType);
 
-            return constructors.Length == 1 ? constructors[0] : null;
-        }
-
-        protected override string BuildErrorMessageForTypeWithoutSuitableConstructor(Type type)
-        {
-            var constructors = GetConstructorsWithMostParameters(type);
-
-            if (constructors.Length == 0)
+            if (constructors.Length == 1)
             {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "For the container to be able to create {0}, it should contain at least one " +
-                    "public constructor.", type);
+                return constructors[0];
             }
 
-            return string.Format(CultureInfo.InvariantCulture,
-                "{0} contains multiple public constructors that contain {1} parameters, and because of " +
-                "the container is unable to create it.", type, constructors[0].GetParameters().Length);
+            string exceptionMessage = BuildExceptionMessage(implementationType, constructors);
+
+            throw new ActivationException(exceptionMessage);
         }
 
         private static ConstructorInfo[] GetConstructorsWithMostParameters(Type type)
@@ -50,6 +41,21 @@
                 where constructor.GetParameters().Length == maximumNumberOfParameters
                 select constructor)
                 .ToArray();
+        }
+
+        private static string BuildExceptionMessage(Type type, ConstructorInfo[] constructors)
+        {
+            if (constructors.Length == 0)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "For the container to be able to create {0}, it should contain at least one " +
+                    "public constructor.", type);
+            }
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0} contains multiple public constructors that contain {1} parameters. " +
+                "There can only be one public constructor with the highest number of parameters.",
+                type, constructors[0].GetParameters().Length);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Reflection;
     using SimpleInjector.Advanced;
 
     /// <summary>
@@ -135,23 +135,23 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void DecoratorHasSelectableConstructor(Container container, Type implementationType,
-            string paramName)
+        internal static void DecoratorHasSelectableConstructor(Container container, Type serviceType,
+            Type decoratorType, string paramName)
         {
-            string errorMessage;
+            string message;
 
-            var constructorResolver = container.GetConstructorResolutionBehavior();
-
-            if (!constructorResolver.IsConstructableType(implementationType, out errorMessage))
+            if (!container.IsConstructableType(serviceType, decoratorType, out message))
             {
-                throw new ArgumentException(errorMessage, paramName);
+                throw new ArgumentException(message, paramName);
             }
         }
 
         internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(Container container,
-            Type decoratorType, Type serviceType, string paramName)
+            Type serviceType, Type decoratorType, string paramName)
         {
-            var constructor = container.GetConstructorResolutionBehavior().GetConstructor(decoratorType);
+            IConstructorResolutionBehavior behavior = container.GetConstructorResolutionBehavior();
+
+            ConstructorInfo constructor = behavior.GetConstructor(serviceType, decoratorType);
 
             var serviceTypeArguments =
                 from parameter in constructor.GetParameters()

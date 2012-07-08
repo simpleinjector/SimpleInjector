@@ -69,8 +69,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationExceptionTests.cs" />
-    <Compile Include="Advanced\ConstructorResolutionBehaviorExtensionsTests.cs" />
-    <Compile Include="Advanced\ConstructorResolutionBehaviorTests.cs" />
+    <Compile Include="Advanced\AdvancedExtensionsTests.cs" />
+    <Compile Include="Advanced\DefaultConstructorInjectionBehaviorTests.cs" />
+    <Compile Include="Advanced\DefaultConstructorResolutionBehaviorTests.cs" />
+    <Compile Include="Advanced\DefaultConstructorVerificationBehaviorTests.cs" />
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />

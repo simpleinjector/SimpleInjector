@@ -80,7 +80,6 @@ namespace SimpleInjector
             }
 
             options.Container = this;
-            options.ConstructorResolutionBehavior.Container = this;
             this.Options = options;
 
             this.RegisterSingle<Container>(this);

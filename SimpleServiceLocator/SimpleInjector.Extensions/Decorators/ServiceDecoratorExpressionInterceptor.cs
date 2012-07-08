@@ -80,7 +80,8 @@ namespace SimpleInjector.Extensions.Decorators
         {
             var parameters = this.BuildParameters(decoratorType, e);
 
-            ConstructorInfo constructor = this.GetDecoratorConstructor(decoratorType);
+            ConstructorInfo constructor = 
+                this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
 
             Expression decoratorExpression = 
                 DecoratorHelpers.BuildDecoratorExpression(this.Container, constructor, parameters);

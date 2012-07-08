@@ -7,27 +7,54 @@
     using SimpleInjector.Advanced;
 
     // Mimics the constructor resolution behavior of Ninject, Castle Windsor and StructureMap.
-    public class MostResolvableParametersConstructorResolutionBehavior : ConstructorResolutionBehavior
+    public class MostResolvableParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
-        public override ConstructorInfo GetConstructor(Type type)
+        private readonly Container container;
+
+        public MostResolvableParametersConstructorResolutionBehavior(Container container)
         {
+            this.container = container;
+        }
+
+        private bool IsCalledDuringRegistrationPhase
+        {
+            get { return !this.container.IsLocked(); }
+        }
+
+        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        {
+            var constructor = this.GetConstructorOrNull(implementationType);
+
+            if (constructor != null)
+            {
+                return constructor;
+            }
+
+            throw new ActivationException(this.BuildExceptionMessage(implementationType));
+        }
+
+        private ConstructorInfo GetConstructorOrNull(Type type)
+        {
+            // We prevent calling GetRegistration during the registration phase, because at this point not
+            // all dependencies might be registered, and calling GetRegistration would lock the container,
+            // making it impossible to do other registrations.
             return (
-                from constructor in type.GetConstructors()
-                let parameters = constructor.GetParameters()
+                from ctor in type.GetConstructors()
+                let parameters = ctor.GetParameters()
                 orderby parameters.Length descending
-                where this.IsRegistrationPhase ||
-                    parameters.All(p => this.Container.GetRegistration(p.ParameterType) != null)
-                select constructor)
+                where this.IsCalledDuringRegistrationPhase ||
+                    parameters.All(p => this.container.GetRegistration(p.ParameterType) != null)
+                select ctor)
                 .FirstOrDefault();
         }
 
-        protected override string BuildErrorMessageForTypeWithoutSuitableConstructor(Type type)
+        private string BuildExceptionMessage(Type type)
         {
-            if (this.IsRegistrationPhase || !type.GetConstructors().Any())
+            if (!type.GetConstructors().Any())
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "For the container to be able to create {0}, it should contain at least one " +
-                    "public constructor.", type);
+                    "For the container to be able to create {0}, it should contain at least one public " +
+                    "constructor.", type);
             }
 
             return string.Format(CultureInfo.InvariantCulture,

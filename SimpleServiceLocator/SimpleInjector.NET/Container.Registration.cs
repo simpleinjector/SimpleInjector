@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -304,7 +305,8 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
+                "TImplementation");
 
             this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>());
         }
@@ -374,7 +376,8 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation), "TImplementation");
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
+                "TImplementation");
 
             var producer = new TransientInstanceProducer<TService, TImplementation> { Container = this };
 
@@ -658,6 +661,25 @@ namespace SimpleInjector
             }
         }
 
+        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
+        {
+            errorMessage = null;
+
+            try
+            {
+                var constructor = this.Options.ConstructorResolutionBehavior
+                    .GetConstructor(serviceType, implementationType);
+
+                this.Options.ConstructorVerificationBehavior.Verify(constructor);
+            }
+            catch (ActivationException ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            return errorMessage == null;
+        }
+
         private void AddRegistration(InstanceProducer registration)
         {
             this.ThrowWhenContainerIsLocked();
@@ -720,19 +742,25 @@ namespace SimpleInjector
                 .ToArray();
         }
 
-        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
-            string parameterName)
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type concreteType, string parameterName)
         {
-            string exceptionMessage;
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(concreteType, concreteType, parameterName);
+        }
 
-            if (!this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
-                out exceptionMessage))
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
+            Type implementationType, string parameterName)
+        {
+            string message;
+
+            bool constructable = this.IsConstructableType(serviceType, implementationType, out message);
+
+            if (!constructable)
             {
                 // After some doubt (and even after reading http://bit.ly/1CPDv9) I decided to throw an
                 // ArgumentException when the given generic type argument was invalid. Mainly because a
                 // generic type argument is just an argument, and ArgumentException even allows us to supply 
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
-                throw new ArgumentException(exceptionMessage, parameterName);
+                throw new ArgumentException(message, parameterName);
             }
         }
 

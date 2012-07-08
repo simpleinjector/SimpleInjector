@@ -57,8 +57,17 @@ namespace SimpleInjector
     /// </example>
     public class ContainerOptions
     {
-        private ConstructorResolutionBehavior constructorResolutionBehavior =
-            new DefaultConstructorResolutionBehavior();
+        private IConstructorResolutionBehavior resolutionBehavior;
+        private IConstructorVerificationBehavior verificationBehavior;
+        private IConstructorInjectionBehavior injectionBehavior;
+
+        /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
+        public ContainerOptions()
+        {
+            this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
+            this.verificationBehavior = new DefaultConstructorVerificationBehavior();
+            this.injectionBehavior = new DefaultConstructorInjectionBehavior(() => this.Container);
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the container allows overriding registrations. The default
@@ -69,11 +78,11 @@ namespace SimpleInjector
 
         /// <summary>Gets or sets the constructor resolution behavior.</summary>
         /// <value>The constructor resolution behavior.</value>
-        public ConstructorResolutionBehavior ConstructorResolutionBehavior
+        public IConstructorResolutionBehavior ConstructorResolutionBehavior
         {
             get
             {
-                return this.constructorResolutionBehavior;
+                return this.resolutionBehavior;
             }
 
             set
@@ -83,22 +92,59 @@ namespace SimpleInjector
                     throw new ArgumentNullException("value");
                 }
 
-                this.ThrowWhenContainerHasRegistrations();
+                this.ThrowWhenContainerHasRegistrations("ConstructorResolutionBehavior");
 
-                if (value.Container != null && !object.ReferenceEquals(value.Container, this.Container))
+                this.resolutionBehavior = value;
+            }
+        }
+
+        /// <summary>Gets or sets the constructor resolution behavior.</summary>
+        /// <value>The constructor resolution behavior.</value>
+        public IConstructorVerificationBehavior ConstructorVerificationBehavior
+        {
+            get
+            {
+                return this.verificationBehavior;
+            }
+
+            set
+            {
+                if (value == null)
                 {
-                    throw new ArgumentException(
-                        StringResources.ConstructorResolutionBehaviorBelongsToAnotherContainer(), "value");
+                    throw new ArgumentNullException("value");
                 }
 
-                this.constructorResolutionBehavior = value;
-                this.constructorResolutionBehavior.Container = this.Container;
+                this.ThrowWhenContainerHasRegistrations("ConstructorVerificationBehavior");
+
+                this.verificationBehavior = value;
+            }
+        }
+
+        /// <summary>Gets or sets the constructor injection behavior.</summary>
+        /// <value>The constructor injection behavior.</value>
+        public IConstructorInjectionBehavior ConstructorInjectionBehavior
+        {
+            get
+            {
+                return this.injectionBehavior;
+            }
+
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                this.ThrowWhenContainerHasRegistrations("ConstructorInjectionBehavior");
+
+                this.injectionBehavior = value;
             }
         }
 
         internal Container Container { get; set; }
 
-        private void ThrowWhenContainerHasRegistrations()
+        private void ThrowWhenContainerHasRegistrations(string propertyName)
         {
             if (this.Container == null)
             {
@@ -108,7 +154,7 @@ namespace SimpleInjector
             if (this.Container.HasRegistrations || this.Container.IsLocked)
             {
                 throw new InvalidOperationException(
-                    StringResources.ConstructorResolutionBehaviorCanNotBeChangedAfterTheFirstRegistration());
+                    StringResources.PropertyCanNotBeChangedAfterTheFirstRegistration(propertyName));
             }
         }
     }

@@ -78,9 +78,14 @@ namespace SimpleInjector.Extensions.Decorators
             set;
         }
 
-        private ConstructorResolutionBehavior ConstructorResolver
+        protected IConstructorResolutionBehavior ResolutionBehavior
         {
             get { return this.Container.GetConstructorResolutionBehavior(); }
+        }
+
+        private IConstructorInjectionBehavior InjectionBehavior
+        {
+            get { return this.Container.GetConstructorInjectionBehavior(); }
         }
 
         protected bool MustDecorate(Type serviceType, out Type decoratorType)
@@ -142,7 +147,8 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected Expression[] BuildParameters(Type decoratorType, ExpressionBuiltEventArgs e)
         {
-            ConstructorInfo constructor = this.GetDecoratorConstructor(decoratorType);
+            ConstructorInfo constructor = 
+                this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
 
             var dependencyParameters =
                 from dependencyParameter in constructor.GetParameters()
@@ -160,13 +166,6 @@ namespace SimpleInjector.Extensions.Decorators
 
                 throw new ActivationException(message, ex);
             }
-        }
-
-        protected ConstructorInfo GetDecoratorConstructor(Type decoratorType)
-        {
-            this.ThrowWhenDecoratorIsNotConstructable(decoratorType);
-
-            return this.ConstructorResolver.GetConstructor(decoratorType);
         }
 
         protected static bool IsDecorateeFactoryParameter(ParameterInfo parameter, Type serviceType)
@@ -215,16 +214,6 @@ namespace SimpleInjector.Extensions.Decorators
             return predicateCache[this.Container];
         }
 
-        private void ThrowWhenDecoratorIsNotConstructable(Type closedGenericDecorator)
-        {
-            string errorMessage;
-
-            if (!this.ConstructorResolver.IsConstructableType(closedGenericDecorator, out errorMessage))
-            {
-                throw new ActivationException(errorMessage);
-            }
-        }
-
         private Expression BuildExpressionForDependencyParameter(ParameterInfo parameter,
             ExpressionBuiltEventArgs e)
         {
@@ -265,7 +254,7 @@ namespace SimpleInjector.Extensions.Decorators
 
         private Expression BuildExpressionForNormalDependencyParameter(ParameterInfo parameter)
         {
-            return this.Container.GetRegistration(parameter.ParameterType, true).BuildExpression();
+            return this.InjectionBehavior.BuildParameterExpression(parameter);
         }
     }
 }

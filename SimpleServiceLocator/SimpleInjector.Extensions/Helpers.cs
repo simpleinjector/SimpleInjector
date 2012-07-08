@@ -33,6 +33,8 @@ namespace SimpleInjector.Extensions
     using System.Linq.Expressions;
     using System.Reflection;
 
+    using SimpleInjector.Advanced;
+
     /// <summary>
     /// Helper methods for the extensions.
     /// </summary>
@@ -187,6 +189,31 @@ namespace SimpleInjector.Extensions
         internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
         {
             return type.GetInterfaces().Concat(type.GetBaseTypes());
+        }
+
+        internal static bool IsConstructableType(this Container container, Type serviceType,
+            Type implementationType, out string errorMessage)
+        {
+            errorMessage = null;
+
+            var resolutionBehavior = container.GetConstructorResolutionBehavior();
+            var verificationBehavior = container.GetConstructorVerificationBehavior();
+
+            try
+            {
+                var constructor = resolutionBehavior.GetConstructor(serviceType, implementationType);
+
+                foreach (var parameter in constructor.GetParameters())
+                {
+                    verificationBehavior.Verify(parameter);
+                }
+            }
+            catch (ActivationException ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            return errorMessage == null;
         }
 
         private static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)

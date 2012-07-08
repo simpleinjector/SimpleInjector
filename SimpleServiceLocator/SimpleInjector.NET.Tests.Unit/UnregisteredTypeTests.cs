@@ -167,7 +167,7 @@
                 string actualMessage = ex.Message;
 
                 Assert.IsTrue(actualMessage.Contains(expectedMessage),
-                    "The exception message should describe the actual problem. Actual message: " + 
+                    "The exception message should describe the actual problem. Actual message: " +
                     actualMessage);
             }
         }
@@ -191,17 +191,21 @@
             {
                 string message = ex.Message;
 
-                AssertThat.StringContains(typeof(RealUserService).Name, ex.Message,
+                AssertThat.ExceptionMessageContains(typeof(RealUserService).Name, ex,
                     "The exception message should contain the name of the type.");
 
-                AssertThat.StringContains(typeof(IUserRepository).Name, ex.Message,
+                AssertThat.ExceptionMessageContains(typeof(IUserRepository).Name, ex,
                     "The exception message should contain the missing constructor argument.");
 
-                AssertThat.StringContains("Please ensure IUserRepository is registered in the container", 
-                    ex.Message, "(1) The exception message should give a solution to solve the problem.");
+                AssertThat.ExceptionMessageContains(
+                    "Please ensure IUserRepository is registered in the container",
+                    ex, "(1) The exception message should give a solution to solve the problem.");
 
-                AssertThat.StringContains("Please ensure IUserRepository is registered in the container, " + 
-                    "or change the constructor of RealUserService", ex.Message,
+                AssertThat.ExceptionMessageContains(@"
+                    Please ensure IUserRepository is registered in the container,
+                    or change the constructor of RealUserService"
+                    .TrimInside(),
+                    ex,
                     "(2) The exception message should give a solution to solve the problem.");
             }
         }
@@ -315,12 +319,12 @@
                 Console.WriteLine(ex.StackTrace);
 
                 AssertThat.StringContains(typeof(RealUserService).Name, ex.Message);
-                
+
                 // Note: the next line is removed. We optimized Func<T> registrations, and because of this
                 // we miss the information about that type.
                 // AssertThat.StringContains(typeof(IUserRepository).Name, ex.Message);
                 AssertThat.StringContains("Bla", ex.Message);
-            }            
+            }
         }
     }
 }

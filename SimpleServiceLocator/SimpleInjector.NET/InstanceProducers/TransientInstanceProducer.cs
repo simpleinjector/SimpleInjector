@@ -28,6 +28,7 @@ namespace SimpleInjector.InstanceProducers
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     internal class TransientInstanceProducer<TService, TImplementation> : InstanceProducer
         where TImplementation : class, TService
@@ -59,6 +60,22 @@ namespace SimpleInjector.InstanceProducers
             return StringResources.ErrorWhileTryingToGetInstanceOfType(this.ServiceType);
         }
 
+        private NewExpression BuildNewExpression()
+        {
+            var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
+
+            ConstructorInfo constructor =
+                resolutionBehavior.GetConstructor(typeof(TService), typeof(TImplementation));
+
+            var injectionBehavior = this.Container.Options.ConstructorInjectionBehavior;
+
+            var parameters =
+                from parameter in constructor.GetParameters()
+                select injectionBehavior.BuildParameterExpression(parameter);
+
+            return Expression.New(constructor, parameters.ToArray());
+        }
+
         private static Expression BuildExpressionWithInstanceInitializer(Expression newExpression,
             Action<TImplementation> instanceInitializer)
         {
@@ -70,32 +87,6 @@ namespace SimpleInjector.InstanceProducers
             };
 
             return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), newExpression);
-        }
-
-        private NewExpression BuildNewExpression()
-        {
-            this.Container.ThrowActivationExceptionWhenTypeIsNotConstructable(typeof(TImplementation));
-
-            var constructor = this.Container.GetConstructor(typeof(TImplementation));
-
-            var constructorArgumentCalls =
-                from parameter in constructor.GetParameters()
-                select this.BuildParameterExpression(parameter.ParameterType);
-
-            return Expression.New(constructor, constructorArgumentCalls.ToArray());
-        }
-
-        private Expression BuildParameterExpression(Type parameterType)
-        {
-            var instanceProducer = this.Container.GetRegistrationEvenIfInvalid(parameterType);
-
-            if (instanceProducer != null)
-            {
-                return instanceProducer.BuildExpression();
-            }
-
-            throw new ActivationException(
-                StringResources.ParameterTypeMustBeRegistered(typeof(TImplementation), parameterType));
         }
     }
 }

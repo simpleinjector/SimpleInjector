@@ -128,13 +128,15 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
         }
 
-        internal static string ParameterTypeMustBeRegistered(Type implementationType, Type parameterType)
+        internal static string ParameterTypeMustBeRegistered(Type implementationType, ParameterInfo parameter)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 ImplicitRegistrationCouldNotBeMadeForType(implementationType) +
-                "The constructor of the type contains the parameter of type {0} that is not registered. " +
-                "Please ensure {0} is registered in the container, or change the constructor of {1}.",
-                parameterType.ToFriendlyName(), implementationType.ToFriendlyName());
+                "The constructor of the type {3} contains the parameter of type {0} with name '{1}' that is " +
+                "not registered. Please ensure {0} is registered in the container, or change the " +
+                "constructor of {2}.",
+                parameter.ParameterType.ToFriendlyName(), parameter.Name, implementationType.ToFriendlyName(),
+                parameter.Member.DeclaringType.ToFriendlyName());
         }
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
@@ -248,17 +250,10 @@ namespace SimpleInjector
                 "new ContainerOptions per Container instance.";
         }
 
-        internal static string ConstructorResolutionBehaviorBelongsToAnotherContainer()
+        internal static string PropertyCanNotBeChangedAfterTheFirstRegistration(string propertyName)
         {
             return
-                "The supplied ConstructorResolutionBehavior instance belongs to another Container " +
-                "instance. Create a new ConstructorResolutionBehavior per Container instance.";
-        }
-
-        internal static string ConstructorResolutionBehaviorCanNotBeChangedAfterTheFirstRegistration()
-        {
-            return
-                "The ConstructorResolutionBehavior cannot be changed after the first registration has " +
+                "The " + propertyName + " property cannot be changed after the first registration has " +
                 "been made to the container.";
         }
 

@@ -532,9 +532,9 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(decoratorType, "decoratorType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, decoratorType, "serviceType");
-            Requires.DecoratorHasSelectableConstructor(container, decoratorType, "decoratorType");
-            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(container, decoratorType,
-                serviceType, "decoratorType");
+            Requires.DecoratorHasSelectableConstructor(container, serviceType, decoratorType, "decoratorType");
+            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(container, serviceType, 
+                decoratorType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,
                 decoratorType, "decoratorType");
         }

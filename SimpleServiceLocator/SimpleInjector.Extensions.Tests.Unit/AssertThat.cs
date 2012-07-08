@@ -46,6 +46,38 @@
 #endif
         }
 
+        internal static void ExceptionMessageContains(string expectedMessage, Exception actualException,
+            string assertMessage = null)
+        {
+            if (expectedMessage == null)
+            {
+                return;
+            }
+
+            string stackTrace = "stackTrace: " + Environment.NewLine + Environment.NewLine;
+
+            Exception exception = actualException;
+
+            while (exception != null)
+            {
+                stackTrace += exception.StackTrace +
+                    Environment.NewLine + " <-----------> " + Environment.NewLine;
+
+                exception = exception.InnerException;
+            }
+
+            string actualMessage = actualException.Message;
+
+            Assert.IsTrue(actualMessage != null && actualMessage.Contains(expectedMessage),
+                assertMessage +
+                " The string did not contain the expected value. " +
+                "Actual string: \"" + actualMessage + "\". " +
+                "Expected value to be in the string: \"" + expectedMessage + "\"." + Environment.NewLine +
+                stackTrace);
+
+            StringContains(expectedMessage, actualException.Message, "stackTrace: " + stackTrace);
+        }
+
         private static string ToFriendlyName(Type type)
         {
             if (type == null)

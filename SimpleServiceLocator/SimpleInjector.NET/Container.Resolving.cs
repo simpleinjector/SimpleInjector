@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Reflection;
+    using SimpleInjector.Advanced;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -301,23 +301,6 @@ namespace SimpleInjector
             return producer;
         }
 
-        internal void ThrowActivationExceptionWhenTypeIsNotConstructable(Type serviceType)
-        {
-            string exceptionMessage;
-
-            if (!this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
-                out exceptionMessage))
-            {
-                throw new ActivationException(
-                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(serviceType) + exceptionMessage);
-            }
-        }
-
-        internal ConstructorInfo GetConstructor(Type concreteType)
-        {
-            return this.Options.ConstructorResolutionBehavior.GetConstructor(concreteType);
-        }
-
         private void RegisterPropertyInjector(PropertyInjector injector)
         {
             var copy = Helpers.MakeCopyOf(this.propertyInjectorCache);
@@ -390,6 +373,20 @@ namespace SimpleInjector
             }
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+        }
+
+        private void ThrowActivationExceptionWhenTypeIsNotConstructable(Type concreteType)
+        {
+            string exceptionMessage;
+
+            bool constructable = this.IsConstructableType(concreteType, concreteType, out exceptionMessage);
+
+            if (!constructable)
+            {
+                throw new ActivationException(
+                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType)
+                    + exceptionMessage);
+            }
         }
 
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
@@ -486,12 +483,12 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(instanceProducerType, emptyArray);
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType<TService>()
-            where TService : class
+        private InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>()
+            where TConcrete : class
         {
-            if (this.IsConcreteConstructableType(typeof(TService)))
+            if (this.IsConcreteConstructableType(typeof(TConcrete)))
             {
-                return new ConcreteTransientInstanceProducer<TService>()
+                return new ConcreteTransientInstanceProducer<TConcrete>()
                 {
                     IsResolvedThroughUnregisteredTypeResolution = true
                 };
@@ -500,12 +497,12 @@ namespace SimpleInjector
             return null;
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType(Type serviceType)
+        private InstanceProducer BuildInstanceProducerForConcreteType(Type concreteType)
         {
-            if (!serviceType.IsValueType && this.IsConcreteConstructableType(serviceType) &&
-                !serviceType.IsGenericTypeDefinition)
+            if (!concreteType.IsValueType && this.IsConcreteConstructableType(concreteType) &&
+                !concreteType.IsGenericTypeDefinition)
             {
-                var producer = Helpers.CreateTransientInstanceProducerFor(serviceType);
+                var producer = Helpers.CreateTransientInstanceProducerFor(concreteType);
 
                 producer.IsResolvedThroughUnregisteredTypeResolution = true;
 
@@ -515,12 +512,11 @@ namespace SimpleInjector
             return null;
         }
 
-        private bool IsConcreteConstructableType(Type serviceType)
+        private bool IsConcreteConstructableType(Type concreteType)
         {
             string errorMesssage;
 
-            return this.Options.ConstructorResolutionBehavior.IsConstructableType(serviceType,
-                out errorMesssage);
+            return this.IsConstructableType(concreteType, concreteType, out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the

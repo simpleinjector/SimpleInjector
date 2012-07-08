@@ -79,14 +79,26 @@
     <Compile Include="..\SimpleInjector.NET\ActivationException.cs">
       <Link>ActivationException.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ConstructorResolutionBehavior.cs">
-      <Link>Advanced\ConstructorResolutionBehavior.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
+      <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ConstructorResolutionBehaviorExtensions.cs">
-      <Link>Advanced\ConstructorResolutionBehaviorExtensions.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
+      <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
       <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorVerificationBehavior.cs">
+      <Link>Advanced\DefaultConstructorVerificationBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorInjectionBehavior.cs">
+      <Link>Advanced\IConstructorInjectionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorResolutionBehavior.cs">
+      <Link>Advanced\IConstructorResolutionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
+      <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>

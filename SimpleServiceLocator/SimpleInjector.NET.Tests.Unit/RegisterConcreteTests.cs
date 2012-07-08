@@ -63,6 +63,30 @@
         }
 
         [TestMethod]
+        public void Register_AbstractTypeWithSinglePublicConstructor_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedMessage = @"
+                The given type AbstractTypeWithSinglePublicConstructor is not a concrete type. 
+                Please use one of the other overloads to register this type.
+                ".TrimInside();
+
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.Register<AbstractTypeWithSinglePublicConstructor>();
+
+                Assert.Fail("The abstract type was not expected to be registered successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.ExceptionMessageContains(expectedMessage, ex);
+            }
+        }
+
+        [TestMethod]
         public void Register_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedParamName()
         {
             // Arrange
@@ -96,6 +120,13 @@
             // UserController is dependant on UserServiceBase. 
             // Registration should succeed even though IUserRepository is not registered yet.
             container.Register<UserController>();
+        }
+
+        public abstract class AbstractTypeWithSinglePublicConstructor
+        {
+            public AbstractTypeWithSinglePublicConstructor()
+            {
+            }
         }
     }
 }
