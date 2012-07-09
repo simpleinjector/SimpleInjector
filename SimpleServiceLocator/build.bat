@@ -181,13 +181,13 @@ mkdir Releases\temp
 copy licence.txt Releases\temp\licence.txt
 mkdir Releases\temp\Documentation
 copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
-copy bin\Silverlight\SimpleInjector.dll Releases\temp\NET35\SimpleInjector.dll
-copy bin\Silverlight\SimpleInjector.xml Releases\temp\NET35\SimpleInjector.xml
+copy bin\Silverlight\SimpleInjector.dll Releases\temp\SimpleInjector.dll
+copy bin\Silverlight\SimpleInjector.xml Releases\temp\SimpleInjector.xml
 mkdir Releases\temp\CommonServiceLocator
 copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
 copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\Microsoft.Practices.ServiceLocation.dll
-copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\Microsoft.Practices.ServiceLocation.xml
+copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
+copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 mkdir Releases\temp\Extensions
 copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
 copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
