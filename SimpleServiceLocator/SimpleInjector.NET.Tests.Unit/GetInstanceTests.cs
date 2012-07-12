@@ -53,6 +53,17 @@
             container.GetInstance<ServiceWithUnregisteredDependencies>();
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void GetInstance_OnObjectWhileUnregistered_ThrowsActivationException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.GetInstance<object>();
+        }
+
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
     }
 }
