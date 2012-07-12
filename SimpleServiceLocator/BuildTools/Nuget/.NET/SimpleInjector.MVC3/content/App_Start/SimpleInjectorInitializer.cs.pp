@@ -21,6 +21,7 @@ namespace $rootnamespace$.App_Start
             
             container.RegisterMvcAttributeFilterProvider();
        
+            // Using Entity Framework? Please read this: http://simpleinjector.codeplex.com/discussions/363935
             container.Verify();
             
             DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
