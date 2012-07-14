@@ -199,14 +199,41 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void RegisterSingleByType_ImplementationIsServiceType_Fails()
+        public void RegisterSingleByType_ImplementationIsServiceType_Succeeds()
         {
             // Arrange
             var container = new Container();
 
             // Act
             container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+        }
+
+        [TestMethod]
+        public void RegisterSingleByType_ImplementationIsServiceType_ImplementationCanBeResolvedByItself()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+
+            // Act
+            container.GetInstance<InternalImplOfPublicService>();
+        }
+
+        [TestMethod]
+        public void RegisterSingleByType_ImplementationIsServiceType_RegistersTheTypeAsSingleton()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+
+            // Act
+            var instance1 = container.GetInstance<InternalImplOfPublicService>();
+            var instance2 = container.GetInstance<InternalImplOfPublicService>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
         }
 
         [TestMethod]
@@ -517,8 +544,7 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void RegisterByType_ServiceTypeAndImplementationSameType_ThrowsException()
+        public void RegisterByType_ServiceTypeAndImplementationSameType_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -527,6 +553,34 @@
 
             // Act
             container.Register(implementation, implementation);
+        }
+
+        [TestMethod]
+        public void RegisterByType_ImplementationIsServiceType_ImplementationCanBeResolvedByItself()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+
+            // Act
+            container.GetInstance<InternalImplOfPublicService>();
+        }
+
+        [TestMethod]
+        public void RegisterByType_ImplementationIsServiceType_RegistersTheTypeAsTransient()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+
+            // Act
+            var instance1 = container.GetInstance<InternalImplOfPublicService>();
+            var instance2 = container.GetInstance<InternalImplOfPublicService>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2));
         }
 
         [TestMethod]

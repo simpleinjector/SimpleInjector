@@ -125,16 +125,6 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void ServiceTypeDiffersFromImplementationType(Type serviceType, Type implementation,
-            string paramName, string implementationParamName)
-        {
-            if (serviceType == implementation)
-            {
-                throw new ArgumentException(paramName + " and " + implementationParamName +
-                    " must be different types.", paramName);
-            }
-        }
-
         internal static void DecoratorHasSelectableConstructor(Container container, Type serviceType,
             Type decoratorType, string paramName)
         {
