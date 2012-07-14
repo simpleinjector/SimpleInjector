@@ -80,12 +80,12 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected IConstructorResolutionBehavior ResolutionBehavior
         {
-            get { return this.Container.GetConstructorResolutionBehavior(); }
+            get { return this.Container.Options.ConstructorResolutionBehavior; }
         }
 
         private IConstructorInjectionBehavior InjectionBehavior
         {
-            get { return this.Container.GetConstructorInjectionBehavior(); }
+            get { return this.Container.Options.ConstructorInjectionBehavior; }
         }
 
         protected bool MustDecorate(Type serviceType, out Type decoratorType)

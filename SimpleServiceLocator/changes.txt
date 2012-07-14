@@ -18,6 +18,7 @@ Version vNext
 	Code Changes:
 		-[Core] Extension points added in the form of ContainerOptions.ConstructorXXXBehavior, which allows 
 		 developers to override the behavior of constructor resolution and injection. (work item 18097)
+		-[Core] Container.Options property has been added, containing the container options.
 		-[Extensions] RegisterDecorator extension methods now allow injecting Func<ServiceType> delegates. This
 		 enables some interesting advanced scenarios where the creation of the decorated instance should be
 		 delayed. (work item 18211)

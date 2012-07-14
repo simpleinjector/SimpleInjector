@@ -282,13 +282,11 @@
 
         private static Container CreateContainerWithConvention(params IParameterConvention[] conventions)
         {
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             foreach (var convention in conventions)
             {
-                options.AddParameterConvention(convention);
+                container.Options.AddParameterConvention(convention);
             }
 
             return container;

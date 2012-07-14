@@ -33,43 +33,6 @@ namespace SimpleInjector.Advanced
     public static class AdvancedExtensions
     {
         /// <summary>
-        /// Gets the <see cref="IConstructorResolutionBehavior"/> for the supplied container.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>The <see cref="IConstructorResolutionBehavior"/> for the supplied container.</returns>
-        public static IConstructorResolutionBehavior GetConstructorResolutionBehavior(this Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return container.Options.ConstructorResolutionBehavior;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IConstructorVerificationBehavior"/> for the supplied container.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>The <see cref="IConstructorVerificationBehavior"/> for the supplied container.</returns>
-        public static IConstructorVerificationBehavior GetConstructorVerificationBehavior(
-            this Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return container.Options.ConstructorVerificationBehavior;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IConstructorInjectionBehavior"/> for the supplied container.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>The <see cref="IConstructorInjectionBehavior"/> for the supplied container.</returns>
-        public static IConstructorInjectionBehavior GetConstructorInjectionBehavior(this Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return container.Options.ConstructorInjectionBehavior;
-        }
-
-        /// <summary>
         /// Determines whether the specified container is locked making any new registrations. The container
         /// is automatically locked when <see cref="Container.GetInstance">GetInstance</see> is called for the
         /// first time.

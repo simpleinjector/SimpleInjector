@@ -149,7 +149,7 @@ namespace SimpleInjector.Extensions
         internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(Container container,
             Type serviceType, Type decoratorType, string paramName)
         {
-            IConstructorResolutionBehavior behavior = container.GetConstructorResolutionBehavior();
+            IConstructorResolutionBehavior behavior = container.Options.ConstructorResolutionBehavior;
 
             ConstructorInfo constructor = behavior.GetConstructor(serviceType, decoratorType);
 

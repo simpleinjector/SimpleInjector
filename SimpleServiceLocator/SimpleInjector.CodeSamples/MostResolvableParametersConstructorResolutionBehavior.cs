@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
@@ -21,6 +22,7 @@
             get { return !this.container.IsLocked(); }
         }
 
+        [DebuggerStepThrough]
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
             var constructor = this.GetConstructorOrNull(implementationType);

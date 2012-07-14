@@ -1,15 +1,16 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-
     using SimpleInjector.Advanced;
 
     // Mimics the constructor resolution behavior of Autofac and Unity.
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
+        [DebuggerStepThrough]
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
             ConstructorInfo[] constructors = GetConstructorsWithMostParameters(implementationType);
@@ -43,6 +44,7 @@
                 .ToArray();
         }
 
+        [DebuggerStepThrough]
         private static string BuildExceptionMessage(Type type, ConstructorInfo[] constructors)
         {
             if (constructors.Length == 0)

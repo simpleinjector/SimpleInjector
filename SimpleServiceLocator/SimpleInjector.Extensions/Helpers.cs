@@ -196,8 +196,8 @@ namespace SimpleInjector.Extensions
         {
             errorMessage = null;
 
-            var resolutionBehavior = container.GetConstructorResolutionBehavior();
-            var verificationBehavior = container.GetConstructorVerificationBehavior();
+            var resolutionBehavior = container.Options.ConstructorResolutionBehavior;
+            var verificationBehavior = container.Options.ConstructorVerificationBehavior;
 
             try
             {

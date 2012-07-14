@@ -39,8 +39,6 @@ namespace SimpleInjector
     /// </summary>
     public partial class Container
     {
-        internal readonly ContainerOptions Options;
-
         private readonly object locker = new object();
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
 
@@ -81,6 +79,10 @@ namespace SimpleInjector
 
             this.RegisterSingle<Container>(this);
         }
+
+        /// <summary>Gets the container options.</summary>
+        /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
+        public ContainerOptions Options { get; private set; }
 
         internal bool IsLocked
         {
