@@ -241,10 +241,7 @@ namespace SimpleInjector
         /// on an internal type in a Silverlight sandbox, or when running in partial trust.</exception>
         public void InjectProperties(object instance)
         {
-            if (instance == null)
-            {
-                throw new ArgumentNullException("instance");
-            }
+            Requires.IsNotNull(instance, "instance");
 
             PropertyInjector propertyInjector;
 

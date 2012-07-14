@@ -109,10 +109,7 @@ namespace SimpleInjector
 
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
+                Requires.IsNotNull(value, "value");
 
                 this.ThrowWhenContainerHasRegistrations("ConstructorVerificationBehavior");
 
@@ -131,10 +128,7 @@ namespace SimpleInjector
 
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
+                Requires.IsNotNull(value, "value");
 
                 this.ThrowWhenContainerHasRegistrations("ConstructorInjectionBehavior");
 

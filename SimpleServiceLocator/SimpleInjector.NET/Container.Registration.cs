@@ -323,10 +323,7 @@ namespace SimpleInjector
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             this.AddRegistration(new FuncInstanceProducer<TService>(instanceCreator));
         }
@@ -397,10 +394,7 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingle<TService>(TService instance) where TService : class
         {
-            if (instance == null)
-            {
-                throw new ArgumentNullException("instance");
-            }
+            Requires.IsNotNull(instance, "instance");
 
             this.AddRegistration(new SingletonInstanceProducer<TService>(instance));
         }
@@ -421,10 +415,7 @@ namespace SimpleInjector
         /// null reference.</exception>
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator));
         }
@@ -559,10 +550,7 @@ namespace SimpleInjector
         /// </remarks>
         public void RegisterInitializer<TService>(Action<TService> instanceInitializer) where TService : class
         {
-            if (instanceInitializer == null)
-            {
-                throw new ArgumentNullException("instanceInitializer");
-            }
+            Requires.IsNotNull(instanceInitializer, "instanceInitializer");
 
             this.ThrowWhenContainerIsLocked();
 
@@ -589,10 +577,7 @@ namespace SimpleInjector
         /// reference.</exception>
         public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
+            Requires.IsNotNull(collection, "collection");
 
             this.ThrowWhenCollectionTypeAlreadyRegistered<TService>();
 
@@ -618,10 +603,7 @@ namespace SimpleInjector
         /// is a null reference.</exception>
         public void RegisterAll<TService>(params TService[] singletons) where TService : class
         {
-            if (singletons == null)
-            {
-                throw new ArgumentNullException("singletons");
-            }
+            Requires.IsNotNull(singletons, "singletons");
 
             if (singletons.Any(element => element == null))
             {

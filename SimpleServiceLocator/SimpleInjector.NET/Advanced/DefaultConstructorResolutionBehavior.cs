@@ -32,15 +32,8 @@ namespace SimpleInjector.Advanced
     {
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException("serviceType");
-            }
-
-            if (implementationType == null)
-            {
-                throw new ArgumentNullException("implementationType");
-            }
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
 
             VerifyTypeIsConcrete(implementationType);
 

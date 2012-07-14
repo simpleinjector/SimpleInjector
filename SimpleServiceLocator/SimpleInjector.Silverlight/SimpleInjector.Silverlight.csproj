@@ -154,6 +154,9 @@
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Requires.cs">
+      <Link>Requires.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\StringResources.cs">
       <Link>StringResources.cs</Link>
     </Compile>

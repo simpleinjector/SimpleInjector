@@ -25,7 +25,6 @@
 
 namespace SimpleInjector.Advanced
 {
-    using System;
     using System.Reflection;
 
     /// <summary>
@@ -40,10 +39,7 @@ namespace SimpleInjector.Advanced
         /// <returns>The <see cref="IConstructorResolutionBehavior"/> for the supplied container.</returns>
         public static IConstructorResolutionBehavior GetConstructorResolutionBehavior(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             return container.Options.ConstructorResolutionBehavior;
         }
@@ -56,10 +52,7 @@ namespace SimpleInjector.Advanced
         public static IConstructorVerificationBehavior GetConstructorVerificationBehavior(
             this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             return container.Options.ConstructorVerificationBehavior;
         }
@@ -71,10 +64,7 @@ namespace SimpleInjector.Advanced
         /// <returns>The <see cref="IConstructorInjectionBehavior"/> for the supplied container.</returns>
         public static IConstructorInjectionBehavior GetConstructorInjectionBehavior(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             return container.Options.ConstructorInjectionBehavior;
         }
@@ -90,10 +80,7 @@ namespace SimpleInjector.Advanced
         /// </returns>
         public static bool IsLocked(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             return container.IsLocked;
         }

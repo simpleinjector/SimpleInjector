@@ -64,10 +64,7 @@ namespace SimpleInjector
 
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
+                Requires.IsNotNull(value, "value");
 
                 this.expression = value;
             }

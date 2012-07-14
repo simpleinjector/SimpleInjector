@@ -68,10 +68,7 @@ namespace SimpleInjector
         /// its own <see cref="ContainerOptions"/> instance.</exception>
         public Container(ContainerOptions options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
+            Requires.IsNotNull(options, "options");
 
             if (options.Container != null)
             {

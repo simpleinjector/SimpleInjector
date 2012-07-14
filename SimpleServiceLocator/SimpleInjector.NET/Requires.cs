@@ -23,42 +23,18 @@
 */
 #endregion
 
-namespace SimpleInjector.Advanced
+namespace SimpleInjector
 {
     using System;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using SimpleInjector.InstanceProducers;
 
-    internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior
+    internal static class Requires
     {
-        // By supplying a delegate for the retrieval of the container, the ContainerOptions can create and 
-        // return a DefaultConstructorInjectionBehavior before this ContainerOptions instance has been added
-        // to a container
-        private readonly Func<Container> getContainer;
-
-        internal DefaultConstructorInjectionBehavior(Func<Container> getContainer)
+        internal static void IsNotNull(object instance, string paramName)
         {
-            this.getContainer = getContainer;
-        }
-
-        public Expression BuildParameterExpression(ParameterInfo parameter)
-        {
-            Requires.IsNotNull(parameter, "parameter");
-
-            Container container = this.getContainer();
-
-            InstanceProducer producer =
-                container == null ? null : container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
-
-            if (producer != null)
+            if (instance == null)
             {
-                // When the instance producer is invalid, this call will fail with an expressive exception.
-                return producer.BuildExpression();
+                throw new ArgumentNullException(paramName);
             }
-
-            throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
-                parameter.Member.DeclaringType, parameter));
         }
     }
 }
