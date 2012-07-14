@@ -143,6 +143,36 @@
         }
 
         [TestMethod]
+        public void RegisterDecorator_WithClosedGenericServiceAndOpenGenericDecorator_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = @"
+                Registering a closed generic service type with an open generic decorator is not supported. 
+                Instead, register the service type as open generic, and the decorator as closed generic 
+                type."
+                .TrimInside();
+
+            var container = new Container();
+
+            container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
+
+            try
+            {
+                // Act
+                container.RegisterDecorator(
+                    typeof(ICommandHandler<RealCommand>),
+                    typeof(TransactionHandlerDecorator<>));
+
+                // Assert
+                Assert.Fail("Exception excepted.");
+            }
+            catch (NotSupportedException ex)
+            {
+                AssertThat.ExceptionMessageContains(expectedMessage, ex);
+            }
+        }
+
+        [TestMethod]
         public void GetInstance_WithExplicitGenericImplementionRegisteredAsDecoratorThatMatchesTheRequestedService2_ReturnsTheDecorator()
         {
             // Arrange

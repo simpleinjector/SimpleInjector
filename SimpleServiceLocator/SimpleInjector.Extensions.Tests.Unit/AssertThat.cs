@@ -6,6 +6,34 @@
 
     internal static class AssertThat
     {
+        internal static string TrimInside(this string value)
+        {
+            if (value == null)
+            {
+                return value;
+            }
+
+            var whiteSpaceCharacters = (
+                from c in value
+                where char.IsWhiteSpace(c)
+                where c != ' '
+                select c)
+                .Distinct()
+                .ToArray();
+
+            foreach (char whiteSpaceCharacter in whiteSpaceCharacters)
+            {
+                value = value.Replace(whiteSpaceCharacter, ' ');
+            }
+
+            while (value.Contains("  "))
+            {
+                value = value.Replace("  ", " ");
+            }
+
+            return value.Trim();
+        }
+
         internal static void AreEqual(Type expectedType, Type actualType, string message = null)
         {
             if (expectedType != actualType)

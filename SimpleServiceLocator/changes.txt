@@ -31,6 +31,10 @@ Version vNext
 		-[Extensions] The extension methods Register(this Container, Type service, Type implementation) and 
 		 RegisterSingle(this Container, Type service, Type implementation) now allow supplying the same type
 		 for service and implementation, which registers the type by itself.
+		-[Extensions] RegisterDecorator and RegisterSingleDecorator extension methods now throw an expressive
+		 NotSupportedException when a closed generic service type with open generic decorator type is supplied.
+		 The container cannot handle this scenario, but the user can simply swap the generic type from the
+		 service type to the decorator to get this to work.
 
 	Bug fixes:
 		-[Core] Container did not self-register when created with Container(ContainerOptions) ctor.

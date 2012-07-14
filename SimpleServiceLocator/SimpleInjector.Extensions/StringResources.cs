@@ -59,11 +59,19 @@ namespace SimpleInjector.Extensions
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
         }
 
-        internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type implementation, Type service)
+        internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied type '{0}' does not inherit from or implement '{1}'.",
                 implementation.ToFriendlyName(), service.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed()
+        {
+            return
+                "Registering a closed generic service type with an open generic decorator is not " +
+                "supported. Instead, register the service type as open generic, and the decorator as " +
+                "closed generic type.";
         }
 
         internal static string SuppliedTypeIsNotAReferenceType(Type type)

@@ -96,6 +96,16 @@ namespace SimpleInjector.Extensions
             }
         }
 
+        internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
+        {
+            if (service.IsGenericType && !service.IsGenericTypeDefinition && 
+                implementation.IsGenericType && implementation.IsGenericTypeDefinition)
+            {
+                throw new NotSupportedException(
+                    StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
+            }
+        }
+
         internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
             string paramName)
         {
@@ -103,7 +113,7 @@ namespace SimpleInjector.Extensions
                 !Helpers.ServiceIsAssignableFromImplementation(service, implementation))
             {
                 throw new ArgumentException(
-                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(implementation, service),
+                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
                     paramName);
             }
         }
@@ -120,7 +130,7 @@ namespace SimpleInjector.Extensions
             if (invalidType != null)
             {
                 throw new ArgumentException(
-                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(invalidType, serviceType),
+                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(serviceType, invalidType),
                     paramName);
             }
         }
