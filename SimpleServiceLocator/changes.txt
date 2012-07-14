@@ -28,6 +28,9 @@ Version vNext
 		 predicate supplied to RegisterDecorator will be called on each item in the collection, instead of
 		 being called once for the complete collection. This allows individual items to be decorated while
 		 skipping others.
+		-[Extensions] The extension methods Register(this Container, Type service, Type implementation) and 
+		 RegisterSingle(this Container, Type service, Type implementation) now allow supplying the same type
+		 for service and implementation, which registers the type by itself.
 
 	Bug fixes:
 		-[Core] Container did not self-register when created with Container(ContainerOptions) ctor.
