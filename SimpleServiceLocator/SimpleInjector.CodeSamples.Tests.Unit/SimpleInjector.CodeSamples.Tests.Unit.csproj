@@ -85,6 +85,7 @@
     <Compile Include="VarianceExtensions_AllowToResolveVariantCollectionsTests.cs" />
     <Compile Include="VarianceExtensions_AllowToResolveVariantTypesTests.cs" />
     <Compile Include="VarianceExtensions_RegisteringMultipleRegistrationsAndResolvingCollections.cs" />
+    <Compile Include="WithParameterConventionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
