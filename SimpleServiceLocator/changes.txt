@@ -27,7 +27,7 @@ Version 1.5.0.12199 v1.5.0 RTM) 2012-07-17
 		-[Extensions] RegisterDecorator extension methods now allow injecting Func<ServiceType> delegates. This
 		 enables some interesting advanced scenarios where the creation of the decorated instance should be
 		 delayed. (work item 18211)
-		-[Extensions] RegisterSingeDecorator overloads added. These overloads are especially useful when
+		-[Extensions] RegisterSingleDecorator overloads added. These overloads are especially useful when
 		 injecting Func<ServiceType> delegates into decorators.
 		-[Extensions] When collections are registered using RegisterAll overloads that either take a list of
 		 System.Type instances or a array of singletons (so not with RegisterAll<T>(IEnumerable<T>)), the
@@ -36,7 +36,7 @@ Version 1.5.0.12199 v1.5.0 RTM) 2012-07-17
 		 skipping others.
 		-[Extensions] The extension methods Register(this Container, Type service, Type implementation) and 
 		 RegisterSingle(this Container, Type service, Type implementation) now allow supplying the same type
-		 for service and implementation, which registers the type by itself.
+		 for service and implementation, which registers the type by itself. (work item 18234)
 		-[Extensions] RegisterDecorator and RegisterSingleDecorator extension methods now throw an expressive
 		 NotSupportedException when a closed generic service type with open generic decorator type is supplied.
 		 The container cannot handle this scenario, but the user can simply swap the generic type from the

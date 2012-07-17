@@ -163,6 +163,8 @@ copy bin\NET\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET40\CommonS
 mkdir Releases\temp\NET40\Extensions
 copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.dll
 copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.xml
+copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
+copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
 mkdir Releases\temp\NET40\Integration
