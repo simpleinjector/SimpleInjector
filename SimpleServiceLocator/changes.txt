@@ -2,6 +2,11 @@
 
 Version vNext
 	General description:
+	Code Changes:
+
+
+Version 1.5.0.12199 v1.5.0 RTM) 2012-07-17
+	General description:
 		An extension point is added to the core library, which allows developers to override the behavior of
 		resolution and injection of constructors. For normal scenarios the use of the default behavior 
 		(which only allows one single public constructor) is still advised. 

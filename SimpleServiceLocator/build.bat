@@ -1,9 +1,9 @@
 @ECHO OFF
 
-set version=1.4.2.12140
-set versionCore=1.4.2.12140
-set version_Integration_Mvc=1.4.3.12185
-set version_Extensions_LifetimeScoping=1.4.3.12185
+set version=1.5.0.12199
+set versionCore=1.5.0.12199
+set version_Integration_Mvc=1.5.0.12199
+set version_Extensions_LifetimeScoping=1.5.0.12199
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
 
