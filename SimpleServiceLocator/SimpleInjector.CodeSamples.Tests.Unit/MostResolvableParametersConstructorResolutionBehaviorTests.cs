@@ -242,11 +242,9 @@
 
         private static Container CreateContainerWithMostResolvableParametersConstructorResolutionBehavior()
         {
-            var options = new ContainerOptions();
+            var container = new Container();
 
-            var container = new Container(options);
-
-            options.ConstructorResolutionBehavior =
+            container.Options.ConstructorResolutionBehavior =
                 new MostResolvableParametersConstructorResolutionBehavior(container);
 
             return container;

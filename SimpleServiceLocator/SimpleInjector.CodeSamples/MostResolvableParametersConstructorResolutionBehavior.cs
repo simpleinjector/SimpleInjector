@@ -8,6 +8,9 @@
     using SimpleInjector.Advanced;
 
     // Mimics the constructor resolution behavior of Ninject, Castle Windsor and StructureMap.
+    // Register this as follows:
+    // container.Options.ConstructorResolutionBehavior =
+    //     new MostResolvableParametersConstructorResolutionBehavior(container);
     public class MostResolvableParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         private readonly Container container;

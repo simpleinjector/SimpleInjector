@@ -8,6 +8,8 @@
     using SimpleInjector.Advanced;
 
     // Mimics the constructor resolution behavior of Autofac and Unity.
+    // Register this as follows:
+    // container.Options.ConstructorResolutionBehavior = new MostParametersConstructorResolutionBehavior();
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         [DebuggerStepThrough]

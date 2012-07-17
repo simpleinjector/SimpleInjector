@@ -210,10 +210,11 @@
 
         private static Container CreateContainerWithMostParametersConstructorResolutionBehavior()
         {
-            return new Container(new ContainerOptions
-            {
-                ConstructorResolutionBehavior = new MostParametersConstructorResolutionBehavior()
-            });
+            var container = new Container();
+
+            container.Options.ConstructorResolutionBehavior = new MostParametersConstructorResolutionBehavior();
+
+            return container;
         }
 
         public sealed class MultipleConstructorsType : IDisposable

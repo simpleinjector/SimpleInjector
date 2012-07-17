@@ -138,7 +138,7 @@
             // Act
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
             container.RegisterSingle<ClassWithAPrimitiveConstructorParam>(
-                convention.WithParameter("someDecimal", Decimal.MinValue));
+                convention.WithParameter("someDecimal", decimal.MinValue));
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@
         {
             // Arrange
             var expectedDependency = new Dependency();
-            Decimal expectedDecimal = Decimal.MaxValue;
+            decimal expectedDecimal = decimal.MaxValue;
 
             var container = new Container();
             var convention = new WithParameterConvention(container);
@@ -245,7 +245,7 @@
 
         public class ClassWithAPrimitiveConstructorParam
         {
-            public ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
+            public ClassWithAPrimitiveConstructorParam(IDependency dependency, decimal someDecimal)
             {
                 this.Dependency = dependency;
                 this.SomeDecimal = someDecimal;
@@ -253,7 +253,7 @@
 
             public IDependency Dependency { get; private set; }
 
-            public Decimal SomeDecimal { get; private set; }
+            public decimal SomeDecimal { get; private set; }
         }
 
         public class Dependency : IDependency
