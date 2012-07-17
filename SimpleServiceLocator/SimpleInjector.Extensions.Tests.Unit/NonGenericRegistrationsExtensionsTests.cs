@@ -205,7 +205,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+            container.RegisterSingle(typeof(PublicServiceImpl), typeof(PublicServiceImpl));
         }
 
         [TestMethod]
@@ -214,10 +214,10 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+            container.RegisterSingle(typeof(PublicServiceImpl), typeof(PublicServiceImpl));
 
             // Act
-            container.GetInstance<InternalImplOfPublicService>();
+            container.GetInstance<PublicServiceImpl>();
         }
 
         [TestMethod]
@@ -226,11 +226,11 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+            container.RegisterSingle(typeof(PublicServiceImpl), typeof(PublicServiceImpl));
 
             // Act
-            var instance1 = container.GetInstance<InternalImplOfPublicService>();
-            var instance2 = container.GetInstance<InternalImplOfPublicService>();
+            var instance1 = container.GetInstance<PublicServiceImpl>();
+            var instance2 = container.GetInstance<PublicServiceImpl>();
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
@@ -549,7 +549,7 @@
             // Arrange
             var container = new Container();
 
-            Type implementation = typeof(InternalImplOfPublicService);
+            Type implementation = typeof(PublicServiceImpl);
 
             // Act
             container.Register(implementation, implementation);
@@ -561,10 +561,10 @@
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+            container.Register(typeof(PublicServiceImpl), typeof(PublicServiceImpl));
 
             // Act
-            container.GetInstance<InternalImplOfPublicService>();
+            container.GetInstance<PublicServiceImpl>();
         }
 
         [TestMethod]
@@ -573,11 +573,11 @@
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(InternalImplOfPublicService), typeof(InternalImplOfPublicService));
+            container.Register(typeof(PublicServiceImpl), typeof(PublicServiceImpl));
 
             // Act
-            var instance1 = container.GetInstance<InternalImplOfPublicService>();
-            var instance2 = container.GetInstance<InternalImplOfPublicService>();
+            var instance1 = container.GetInstance<PublicServiceImpl>();
+            var instance2 = container.GetInstance<PublicServiceImpl>();
 
             // Assert
             Assert.IsFalse(object.ReferenceEquals(instance1, instance2));
