@@ -31,6 +31,9 @@ namespace SimpleInjector.Advanced
     /// <summary>
     /// Defines the container's behavior for building an expression tree based on the supplied constructor of
     /// a given type.
+    /// Set the <see cref="ContainerOptions.ConstructorInjectionBehavior">ConstructorInjectionBehavior</see> 
+    /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
+    /// of the container.
     /// </summary>
     public interface IConstructorInjectionBehavior
     {

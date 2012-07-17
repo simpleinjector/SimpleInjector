@@ -31,6 +31,9 @@ namespace SimpleInjector.Advanced
     /// <summary>
     /// Defines the container's behavior for verifying the constructor that will be picked by the
     /// <see cref="IConstructorResolutionBehavior"/>.
+    /// Set the <see cref="ContainerOptions.ConstructorVerificationBehavior">ConstructorVerificationBehavior</see> 
+    /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
+    /// of the container.
     /// </summary>
     public interface IConstructorVerificationBehavior
     {

@@ -30,6 +30,9 @@ namespace SimpleInjector.Advanced
 
     /// <summary>
     /// Defines the container's behavior for finding a suitable constructor for the creation of a type.
+    /// Set the <see cref="ContainerOptions.ConstructorResolutionBehavior">ConstructorResolutionBehavior</see> 
+    /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
+    /// of the container.
     /// </summary>
     public interface IConstructorResolutionBehavior
     {
