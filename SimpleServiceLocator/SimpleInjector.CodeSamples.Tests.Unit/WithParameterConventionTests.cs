@@ -22,7 +22,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
@@ -42,7 +42,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
@@ -62,7 +62,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
@@ -82,7 +82,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
@@ -106,7 +106,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
             container.Register<ClassWithOnlyPrimitiveConstructorParams>(
@@ -131,7 +131,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             container.RegisterSingle<IDependency>(new Dependency());
 
@@ -150,7 +150,7 @@
 
             var container = new Container();
             var convention = new WithParameterConvention(container);
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
             container.RegisterSingle<IDependency>(expectedDependency);
 
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
@@ -173,7 +173,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             try
             {
@@ -204,7 +204,7 @@
 
             var convention = new WithParameterConvention(container);
 
-            container.Options.AddParameterConvention(convention);
+            container.Options.RegisterParameterConvention(convention);
 
             try
             {

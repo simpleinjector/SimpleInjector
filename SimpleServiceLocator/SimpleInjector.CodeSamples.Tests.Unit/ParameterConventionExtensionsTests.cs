@@ -286,7 +286,7 @@
 
             foreach (var convention in conventions)
             {
-                container.Options.AddParameterConvention(convention);
+                container.Options.RegisterParameterConvention(convention);
             }
 
             return container;

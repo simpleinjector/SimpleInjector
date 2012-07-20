@@ -3,10 +3,10 @@
     using System;
     using System.ComponentModel;
     using System.Configuration;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using SimpleInjector.Advanced;
 
     public interface IParameterConvention
@@ -18,7 +18,7 @@
 
     public static class ParameterConventionExtensions
     {
-        public static void AddParameterConvention(
+        public static void RegisterParameterConvention(
             this ContainerOptions options,
             IParameterConvention convention)
         {
@@ -89,6 +89,7 @@
         private const string ConnectionStringPostFix =
             "ConnectionString";
 
+        [DebuggerStepThrough]
         public bool CanResolve(ParameterInfo parameter)
         {
             bool resolvable =
@@ -104,6 +105,7 @@
             return resolvable;
         }
 
+        [DebuggerStepThrough]
         public Expression BuildExpression(ParameterInfo parameter)
         {
             var constr = this.GetConnectionString(parameter);
@@ -111,11 +113,13 @@
             return Expression.Constant(constr, typeof(string));
         }
 
+        [DebuggerStepThrough]
         private void VerifyConfigurationFile(ParameterInfo parameter)
         {
             this.GetConnectionString(parameter);
         }
 
+        [DebuggerStepThrough]
         private string GetConnectionString(ParameterInfo parameter)
         {
             string name = parameter.Name.Substring(0,
@@ -140,6 +144,7 @@
     {
         private const string AppSettingsPostFix = "AppSetting";
 
+        [DebuggerStepThrough]
         public bool CanResolve(ParameterInfo parameter)
         {
             Type type = parameter.ParameterType;
@@ -157,6 +162,7 @@
             return resolvable;
         }
 
+        [DebuggerStepThrough]
         public Expression BuildExpression(ParameterInfo parameter)
         {
             object valueToInject = this.GetAppSettingValue(parameter);
@@ -165,11 +171,13 @@
                 parameter.ParameterType);
         }
 
+        [DebuggerStepThrough]
         private void VerifyConfigurationFile(ParameterInfo parameter)
         {
             this.GetAppSettingValue(parameter);
         }
 
+        [DebuggerStepThrough]
         private object GetAppSettingValue(ParameterInfo parameter)
         {
             string key = parameter.Name.Substring(0,
