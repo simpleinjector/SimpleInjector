@@ -160,7 +160,32 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithoutLifetimeScope_ReturnsSingleton()
+        public void GetInstance_WithoutLifetimeScope_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            try
+            {
+                // Act
+                var firstInstance = container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "The ICommand is registered as 'LifetimeScope', but the instance is requested outside " +
+                    "the context of a lifetime scope. Make sure you call container.BeginLifetimeScope() first."),
+                    "Actual message: " + ex.Message);
+            }
+        }
+        
+        [TestMethod]
+        public void Verify_WithoutLifetimeScope_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -168,17 +193,7 @@
             container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
 
             // Act
-            var firstInstance = container.GetInstance<ICommand>();
-
-            using (container.BeginLifetimeScope())
-            {
-                container.GetInstance<ICommand>();
-            }
-
-            var secondInstance = container.GetInstance<ICommand>();
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(firstInstance, secondInstance));
+            container.Verify();
         }
 
         [TestMethod]
@@ -196,26 +211,6 @@
 
                 // Assert
                 Assert.IsInstanceOfType(actualInstance, typeof(ConcreteCommand));
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_WithinLifetimeScope_ReturnsADifferentInstanceThanTheOneCreatedOutsideThatScope()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            // Act
-            var firstInstance = container.GetInstance<ICommand>();
-
-            using (container.BeginLifetimeScope())
-            {
-                var secondInstance = container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsFalse(object.ReferenceEquals(firstInstance, secondInstance));
             }
         }
 

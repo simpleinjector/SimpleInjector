@@ -30,6 +30,8 @@ namespace SimpleInjector
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
+
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.LifetimeScoping;
 
     /// <summary>
@@ -166,8 +168,7 @@ namespace SimpleInjector
         /// each lifetime scope that has been started using <see cref="BeginLifetimeScope"/>. When the 
         /// lifetime scope is disposed and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,
         /// the cached instance will be disposed as well.
-        /// Scopes can be nested, and each scope gets its own instance. Instances that are requested outside 
-        /// the context of a scope will have the lifetime of the container (singleton).
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -208,8 +209,7 @@ namespace SimpleInjector
         /// each lifetime scope that has been started using <see cref="BeginLifetimeScope"/>. When the 
         /// lifetime scope is disposed and <typeparamref name="TImplementation"/> implements 
         /// <see cref="IDisposable"/>, the cached instance will be disposed as well.
-        /// Scopes can be nested, and each scope gets its own instance. Instances that are requested outside 
-        /// the context of a scope will have the lifetime of the container (singleton).
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
@@ -247,8 +247,7 @@ namespace SimpleInjector
         /// and returned instances are cached during the lifetime of a given scope that has been started using
         /// <see cref="BeginLifetimeScope"/>. When the lifetime scope is disposed, and the cached instance
         /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
-        /// Scopes can be nested, and each scope gets its own instance. Instances that are requested outside
-        /// the context of a scope will have the lifetime of the container (singleton).
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -272,8 +271,7 @@ namespace SimpleInjector
         /// <see cref="BeginLifetimeScope"/>. When the lifetime scope is disposed, 
         /// <paramref name="disposeWhenLifetimeScopeEnds"/> is set to <b>true</b>, and the cached instance
         /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
-        /// Scopes can be nested, and each scope gets its own instance. Instances that are requested outside
-        /// the context of a scope will have the lifetime of the container (singleton).
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -323,7 +321,6 @@ namespace SimpleInjector
         private sealed class ReplaceWithLifetimeScopeHelper<TService> where TService : class
         {
             private readonly Container container;
-            private TService containerScopedServiceInstance;
             private LifetimeScopeManager manager;
             private Func<TService> instanceCreator;
 
@@ -357,24 +354,15 @@ namespace SimpleInjector
                     return scope.GetInstance(this.instanceCreator, this.DisposeWhenLifetimeScopeEnds);
                 }
 
-                // Return a singleton when there is no scope.
-                return this.GetSingleton();
-            }
-
-            private TService GetSingleton()
-            {
-                if (this.containerScopedServiceInstance == null)
+                if (this.container.IsVerifying())
                 {
-                    lock (this)
-                    {
-                        if (this.containerScopedServiceInstance == null)
-                        {
-                            this.containerScopedServiceInstance = this.instanceCreator();
-                        }
-                    }
+                    // Return a transient instance when this method is called during verification
+                    return this.instanceCreator();
                 }
 
-                return this.containerScopedServiceInstance;
+                throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
+                    "'LifetimeScope', but the instance is requested outside the context of a lifetime " +
+                    "scope. Make sure you call container.BeginLifetimeScope() first.");
             }
         }
     }
