@@ -42,6 +42,8 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
+        private bool verifying;
+
         /// <summary>
         /// Occurs when an instance of a type is requested that has not been registered, allowing resolution
         /// of unregistered types.
@@ -622,13 +624,39 @@ namespace SimpleInjector
         public void Verify()
         {
             bool wasLocked = this.locked;
+            this.IsVerifying = true;
 
-            this.ValidateRegistrations();
-            this.ValidateRegisteredCollections();
-
-            this.locked = wasLocked;
+            try
+            {
+                this.ValidateRegistrations();
+                this.ValidateRegisteredCollections();
+            }
+            finally
+            {
+                this.locked = wasLocked;
+                this.IsVerifying = false;
+            }
         }
 
+        internal bool IsVerifying
+        {
+            get
+            {
+                // By using a lock, we have the certainty that all threads will see the new value for 
+                // 'verifying' immediately.
+                lock (this.locker)
+                {
+                    return this.verifying;
+                }
+            }
+            private set
+            {
+                lock (this.locker)
+                {
+                    this.verifying = value;
+                }
+            }
+        }
         internal void ThrowWhenContainerIsLocked()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'

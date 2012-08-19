@@ -41,11 +41,23 @@ namespace SimpleInjector.Advanced
         /// <returns>
         ///   <c>true</c> if the specified container is locked; otherwise, <c>false</c>.
         /// </returns>
+        /// <exception cref="ArgumentNulLException">Thrown when <paramref name="container"/> is null.</exception>
         public static bool IsLocked(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
             return container.IsLocked;
+        }
+
+        /// <summary>Determines whether the specified container is currently verifying its configuration.</summary>
+        /// <param name="container">The container.</param>
+        /// <returns><c>true</c> if the specified container is verifying; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNulLException">Thrown when <paramref name="container"/> is null.</exception>
+        public static bool IsVerifying(this Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            return container.IsVerifying;
         }
 
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)
