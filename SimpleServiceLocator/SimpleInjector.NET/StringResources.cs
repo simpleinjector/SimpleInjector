@@ -256,19 +256,5 @@ namespace SimpleInjector
                 "The " + propertyName + " property cannot be changed after the first registration has " +
                 "been made to the container.";
         }
-
-        private static string ToFriendlyName(this Type type)
-        {
-            if (!type.IsGenericType)
-            {
-                return type.Name;
-            }
-
-            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
-
-            var genericArguments = type.GetGenericArguments().Select(argument => argument.ToFriendlyName());
-
-            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
-        }
     }
 }

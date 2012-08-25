@@ -41,11 +41,25 @@ namespace SimpleInjector
     internal static class Helpers
     {
         internal const string InstanceProviderDebuggerDisplayString =
-            "Producer: {GetType().Name}, " +
-            "ServiceType: {ServiceType}, " +
-            "Expression: {BuildExpression().ToString()}";
+            "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
+            "Producer = {SimpleInjector.Helpers.ToFriendlyName(GetType()),nq}, " +
+            "Expression = {BuildExpression().ToString()}";
 
         private static readonly MethodInfo GetInstanceOfT = GetContainerMethod(c => c.GetInstance<object>());
+
+        internal static string ToFriendlyName(this Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return type.Name;
+            }
+
+            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
+
+            var genericArguments = type.GetGenericArguments().Select(argument => argument.ToFriendlyName());
+
+            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
+        }
 
         internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
         {
