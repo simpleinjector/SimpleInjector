@@ -217,15 +217,22 @@ namespace SimpleInjector.Extensions
                     {
                         this.Container.GetInstance(closedGenericImplementation);
                     }
-                    catch (Exception getInstanceEx)
+                    catch (Exception ex2)
                     {
-                        // The exception thrown from GetInstance (if any) will be much more descriptive.
-                        ex = getInstanceEx;
+                        // The exception thrown from GetInstance (if any) will be much more descriptive,
+                        // due to bug: http://simpleinjector.codeplex.com/workitem/18542
+                        throw this.CreateErrorInRegistrationException(closedGenericImplementation, ex2);
                     }
 
-                    throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
-                        this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
+                    throw this.CreateErrorInRegistrationException(closedGenericImplementation, ex);
                 }
+            }
+
+            private ActivationException CreateErrorInRegistrationException(Type closedGenericImplementation,
+                Exception exception)
+            {
+                return new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
+                    this.OpenGenericServiceType, closedGenericImplementation, exception.Message), exception);
             }
         }
 
