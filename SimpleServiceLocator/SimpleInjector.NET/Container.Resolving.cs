@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using SimpleInjector.Advanced;
     using SimpleInjector.InstanceProducers;
 
 #if DEBUG
@@ -487,6 +486,7 @@ namespace SimpleInjector
             {
                 return new ConcreteTransientInstanceProducer<TConcrete>()
                 {
+                    // TODO: Write a test case for = false.
                     IsResolvedThroughUnregisteredTypeResolution = true
                 };
             }
