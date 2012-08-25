@@ -265,6 +265,27 @@ namespace SimpleInjector
             }
         }
 
+        internal bool IsVerifying
+        {
+            get
+            {
+                // By using a lock, we have the certainty that all threads will see the new value for 
+                // 'verifying' immediately.
+                lock (this.locker)
+                {
+                    return this.verifying;
+                }
+            }
+
+            private set
+            {
+                lock (this.locker)
+                {
+                    this.verifying = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
         /// is requested (transient). Note that calling this method is redundant in most scenarios, because
@@ -638,25 +659,6 @@ namespace SimpleInjector
             }
         }
 
-        internal bool IsVerifying
-        {
-            get
-            {
-                // By using a lock, we have the certainty that all threads will see the new value for 
-                // 'verifying' immediately.
-                lock (this.locker)
-                {
-                    return this.verifying;
-                }
-            }
-            private set
-            {
-                lock (this.locker)
-                {
-                    this.verifying = value;
-                }
-            }
-        }
         internal void ThrowWhenContainerIsLocked()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
