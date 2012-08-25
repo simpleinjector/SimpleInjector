@@ -545,6 +545,114 @@
                 "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
         }
 
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationWithMultipleConstructors_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(@"
+                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
+                    it should contain exactly one public constructor, but it has 2.".TrimInside(),
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterSingleOpenGeneric_ImplementationWithMultipleConstructors_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(@"
+                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
+                    it should contain exactly one public constructor, but it has 2.".TrimInside(),
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericWithRegistrationWithMissingDependency_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
+            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
+
+            try
+            {
+                // Act
+                container.GetInstance<IDoStuff<bool>>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(@"
+                    There was an error in the registration of open generic type IDoStuff<T>. Failed to 
+                    build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
+                    ex.Message);
+
+                AssertThat.StringContains(@"                                                                     
+                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
+                    of type IService<Boolean, Int32>  with name 'service' that is not registered.".TrimInside(),
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterSingleOpenGenericWithRegistrationWithMissingDependency_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
+            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
+
+            try
+            {
+                // Act
+                container.GetInstance<IDoStuff<bool>>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(@"
+                    There was an error in the registration of open generic type IDoStuff<T>. Failed to 
+                    build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
+                    ex.Message);
+
+                AssertThat.StringContains(@"                                                                     
+                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
+                    of type IService<Boolean, Int32>  with name 'service' that is not registered.".TrimInside(),
+                    ex.Message);
+            }
+        }
+
         public struct StructEvent : IAuditableEvent
         {
         }
@@ -618,6 +726,24 @@
 
         public sealed class ServiceImpl<TA, TB> : IService<TA, TB>
         {
+        }
+
+        public sealed class ServiceImplWithMultipleCtors<TA, TB> : IService<TA, TB>
+        {
+            public ServiceImplWithMultipleCtors()
+            {
+            }
+
+            public ServiceImplWithMultipleCtors(int x)
+            {
+            }
+        }
+
+        public sealed class ServiceImplWithDependency<TA, TB> : IService<TA, TB>
+        {
+            public ServiceImplWithDependency(IProducer<int> producer)
+            {
+            }
         }
 
         // The type constraint will prevent the type from being created when the arguments are ordered

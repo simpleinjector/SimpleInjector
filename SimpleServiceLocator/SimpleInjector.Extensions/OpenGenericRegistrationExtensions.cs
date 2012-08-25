@@ -105,6 +105,8 @@ namespace SimpleInjector.Extensions
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
                 "openGenericServiceType");
+            Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
+                openGenericImplementation, "openGenericImplementation");
 
             var transientResolver = new TransientOpenGenericResolver
             {
@@ -184,6 +186,8 @@ namespace SimpleInjector.Extensions
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
                 "openGenericServiceType");
+            Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
+                openGenericImplementation, "openGenericImplementation");
 
             var singletonResolver = new SingleOpenGenericResolver
             {
@@ -200,9 +204,28 @@ namespace SimpleInjector.Extensions
         {
             internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
             {
-                IInstanceProducer producer = this.Container.GetRegistration(closedGenericImplementation);
+                try
+                {
+                    IInstanceProducer producer =
+                        this.Container.GetRegistration(closedGenericImplementation, throwOnFailure: true);
 
-                e.Register(producer.BuildExpression());
+                    e.Register(producer.BuildExpression());
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        this.Container.GetInstance(closedGenericImplementation);
+                    }
+                    catch (Exception getInstanceEx)
+                    {
+                        // The exception thrown from GetInstance (if any) will be much more descriptive.
+                        ex = getInstanceEx;
+                    }
+
+                    throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
+                        this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
+                }
             }
         }
 
@@ -235,7 +258,20 @@ namespace SimpleInjector.Extensions
                 {
                     if (!this.singletons.TryGetValue(closedGenericImplementation, out singleton))
                     {
-                        singleton = this.Container.GetInstance(closedGenericImplementation);
+                        try
+                        {
+                            // Due to a bug in v1.5 of the core library we must call GetRegistration first to
+                            // prevent GetInstance(Type) from throwing a non-descriptive exception message.
+                            // See: http://simpleinjector.codeplex.com/workitem/18542
+                            this.Container.GetRegistration(closedGenericImplementation);
+                            singleton = this.Container.GetInstance(closedGenericImplementation);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
+                                this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
+                        }
+
                         this.singletons[closedGenericImplementation] = singleton;
                     }
                 }

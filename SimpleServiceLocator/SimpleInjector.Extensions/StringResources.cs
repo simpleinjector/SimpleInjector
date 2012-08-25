@@ -137,6 +137,16 @@ namespace SimpleInjector.Extensions
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
         }
 
+        internal static string ErrorInRegisterOpenGenericRegistration(Type openGenericServiceType,
+            Type closedGenericImplementation, string message)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "There was an error in the registration of open generic type {0}. " +
+                "Failed to build a registration for type {1}. {2}",
+                openGenericServiceType.ToFriendlyName(), closedGenericImplementation.ToFriendlyName(),
+                message);
+        }
+
         private static string ToFriendlyName(this Type type)
         {
             return Helpers.ToFriendlyName(type);

@@ -135,12 +135,12 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void DecoratorHasSelectableConstructor(Container container, Type serviceType,
-            Type decoratorType, string paramName)
+        internal static void ImplementationHasSelectableConstructor(Container container, Type serviceType,
+            Type implementationType, string paramName)
         {
             string message;
 
-            if (!container.IsConstructableType(serviceType, decoratorType, out message))
+            if (!container.IsConstructableType(serviceType, implementationType, out message))
             {
                 throw new ArgumentException(message, paramName);
             }
