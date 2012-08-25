@@ -31,13 +31,13 @@
             IService<T, int> Service { get; }
         }
 
-        public interface IEventHandler<TEvent> 
+        public interface IEventHandler<TEvent>
         {
             void Handle(TEvent @event);
         }
 
-        public interface IAuditableEvent 
-        { 
+        public interface IAuditableEvent
+        {
         }
 
         public interface IProducer<T>
@@ -55,6 +55,21 @@
 
             // Assert
             var impl = container.GetInstance<IService<int, string>>();
+
+            Assert.IsInstanceOfType(impl, typeof(ServiceImpl<int, string>));
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_WithConcreteType_ReturnsExpectedTypeOnGetInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGeneric(typeof(ServiceImpl<,>), typeof(ServiceImpl<,>));
+
+            // Assert
+            var impl = container.GetInstance<ServiceImpl<int, string>>();
 
             Assert.IsInstanceOfType(impl, typeof(ServiceImpl<int, string>));
         }
@@ -327,7 +342,7 @@
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
                 "registered  event handler and the container should return null.");
         }
-          
+
         [TestMethod]
         public void GetRegistration_TypeSatisfyingGenericClassConstraint_ReturnsInstanceProducer()
         {
@@ -459,7 +474,7 @@
             var producer = container.GetRegistration(typeof(IProducer<int?>));
 
             // Assert
-            Assert.IsNotNull(producer, 
+            Assert.IsNotNull(producer,
                 "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
 
             Assert.IsInstanceOfType(producer.GetInstance(), typeof(NullableProducer<int>),
@@ -526,7 +541,7 @@
             var instance = container.GetInstance<IFoo<Baz>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(Foo<Baz, Bar>), 
+            Assert.IsInstanceOfType(instance, typeof(Foo<Baz, Bar>),
                 "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
         }
 
@@ -556,7 +571,7 @@
         {
         }
 
-        public class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent> 
+        public class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent>
             where TEvent : IAuditableEvent
         {
             public void Handle(TEvent @event)
@@ -578,7 +593,7 @@
             }
         }
 
-        public class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent> 
+        public class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent>
             where TClassEvent : class
         {
             public void Handle(TClassEvent @event)
@@ -586,7 +601,7 @@
             }
         }
 
-        public class MonoDictionary<T> : Dictionary<T, T> 
+        public class MonoDictionary<T> : Dictionary<T, T>
         {
         }
 
@@ -597,8 +612,8 @@
         // Note: This class deliberately implements a second IProducer. This will verify wether the code can
         // handle types with multiple versions of the same interface.
         public class NullableProducer<T> : IProducer<T?>, IProducer<IValidate<T>>, IProducer<double>
-            where T : struct 
-        { 
+            where T : struct
+        {
         }
 
         public sealed class ServiceImpl<TA, TB> : IService<TA, TB>
@@ -608,7 +623,8 @@
         // The type constraint will prevent the type from being created when the arguments are ordered
         // incorrectly.
         public sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
-            where B : struct where A : class
+            where B : struct
+            where A : class
         {
         }
 
