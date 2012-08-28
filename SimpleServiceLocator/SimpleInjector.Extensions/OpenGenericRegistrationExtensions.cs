@@ -220,19 +220,13 @@ namespace SimpleInjector.Extensions
                     catch (Exception ex2)
                     {
                         // The exception thrown from GetInstance (if any) will be much more descriptive,
-                        // due to bug: http://simpleinjector.codeplex.com/workitem/18542
-                        throw this.CreateErrorInRegistrationException(closedGenericImplementation, ex2);
+                        // than the one thrown from GetRegistration (this is by design).
+                        ex = ex2;
                     }
 
-                    throw this.CreateErrorInRegistrationException(closedGenericImplementation, ex);
+                    throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
+                        this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
                 }
-            }
-
-            private ActivationException CreateErrorInRegistrationException(Type closedGenericImplementation,
-                Exception exception)
-            {
-                return new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
-                    this.OpenGenericServiceType, closedGenericImplementation, exception.Message), exception);
             }
         }
 
@@ -267,10 +261,6 @@ namespace SimpleInjector.Extensions
                     {
                         try
                         {
-                            // Due to a bug in v1.5 of the core library we must call GetRegistration first to
-                            // prevent GetInstance(Type) from throwing a non-descriptive exception message.
-                            // See: http://simpleinjector.codeplex.com/workitem/18542
-                            this.Container.GetRegistration(closedGenericImplementation);
                             singleton = this.Container.GetInstance(closedGenericImplementation);
                         }
                         catch (Exception ex)

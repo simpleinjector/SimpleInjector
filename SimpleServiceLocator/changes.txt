@@ -2,10 +2,19 @@
 
 Version vNext
 	General description:
+	
 	Code Changes:
 
+	Bug fixes:
+		-[Core] GetInstance(Type) threw a less expressive exception as GetInstance<TService>() when a type
+		 could not be resolved. (work item 18542)
+		-[Extensions] RegisterOpenGeneric allowed registering types that could never be resolved (for instance
+		 because they had multiple constructors). An ArgumentException is now thrown during registration.
+		-[Extensions] A implementation type registered using RegisterOpenGeneric that could not be resolved
+		 (because for instance it has unregistered dependencies) caused a NullReferenceException.
 
-Version 1.5.0.12199 v1.5.0 RTM) 2012-07-17
+
+Version 1.5.0.12199 (v1.5.0 RTM) 2012-07-17
 	General description:
 		An extension point is added to the core library, which allows developers to override the behavior of
 		resolution and injection of constructors. For normal scenarios the use of the default behavior 

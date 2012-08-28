@@ -313,6 +313,12 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(typeof(TService), buildProducer);
         }
 
+        private IInstanceProducer GetInstanceProducerForType(Type serviceType)
+        {
+            Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
+            return this.GetInstanceProducerForType(serviceType, buildProducer);
+        }
+
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
         private InstanceProducer GetInstanceProducerForType(Type serviceType,
@@ -344,7 +350,7 @@ namespace SimpleInjector
 
         private object GetInstanceForType(Type serviceType)
         {
-            IInstanceProducer producer = this.GetRegistration(serviceType);
+            IInstanceProducer producer = this.GetInstanceProducerForType(serviceType);
             return this.GetInstanceFromProducer(producer, serviceType);
         }
 
