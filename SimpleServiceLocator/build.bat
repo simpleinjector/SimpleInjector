@@ -3,6 +3,7 @@
 set version=1.5.0.12199
 set versionCore=1.5.0.12199
 set version_Integration_Mvc=1.5.0.12199
+set version_Extensions=1.5.0.12238
 set version_Extensions_LifetimeScoping=1.5.0.12199
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
@@ -22,7 +23,7 @@ set defineConstandsSilverlight=PUBLISH;SILVERLIGHT
 set targetPath=bin
 set targetPathNet=%targetPath%\NET
 set targetPathSilverlight=%targetPath%\Silverlight\
-set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v3.0
+set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
 
 mkdir %targetPathNet%
 
@@ -44,7 +45,7 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions\SimpleInjector.Extensions.csproj" /nologo /p:Configuration=%configuration%
 ren %targetPathNet%\SimpleInjector.Extensions.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version% /out:%targetPathNet%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version_Extensions% /out:%targetPathNet%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:Configuration=%configuration%
@@ -86,7 +87,7 @@ del %targetPathSilverlight%\temp.dll
 
 %msbuild32% "SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstandsSilverlight%"
 ren %targetPathSilverlight%\SimpleInjector.Extensions.dll temp.dll
-%ilmerge% %targetPathSilverlight%\temp.dll /ndebug /targetplatform:v4,"%silverlightFrameworkFolder%" /ver:%version% /out:%targetPathSilverlight%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathSilverlight%\temp.dll /ndebug /targetplatform:v4,"%silverlightFrameworkFolder%" /ver:%version_Extensions% /out:%targetPathSilverlight%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
 del %targetPathSilverlight%\temp.dll
 
 %msbuild32% "CommonServiceLocator.SimpleInjectorAdapter.Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstandsSilverlight%"
@@ -226,11 +227,11 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Extensions.dll Releases\temp\lib\net35\SimpleInjector.Extensions.dll
 copy  bin\NET\SimpleInjector.Extensions.xml Releases\temp\lib\net35\SimpleInjector.Extensions.xml
-%replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {version} %version_Extensions%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\3b15d35fbc3a4556960337dcd95cf0f4.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version%.zip"
-ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\package\services\metadata\core-properties\3b15d35fbc3a4556960337dcd95cf0f4.psmdcp {version} %version_Extensions%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version_Extensions%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Extensions.%version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -315,8 +316,8 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\lib\sl30\SimpleInjector.Extensions.dll
 copy  bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\lib\sl30\SimpleInjector.Extensions.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {version} %version%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\7ed90488e5714295854ab251e2959afe.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\Silverlight\SimpleInjector.Extensions.Silverlight.%version%.zip"
-ren "%CD%\Releases\v%version%\Silverlight\SimpleInjector.Extensions.Silverlight.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {version} %version_Extensions%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\7ed90488e5714295854ab251e2959afe.psmdcp {version} %version_Extensions%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\Silverlight\SimpleInjector.Extensions.Silverlight.%version_Extensions%.zip"
+ren "%CD%\Releases\v%version%\Silverlight\SimpleInjector.Extensions.Silverlight.%version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
