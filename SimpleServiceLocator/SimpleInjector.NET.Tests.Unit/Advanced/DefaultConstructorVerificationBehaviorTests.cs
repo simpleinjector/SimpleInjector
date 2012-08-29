@@ -23,9 +23,10 @@
         {
             // Arrange
             string expectedString = @"
-                The constructor of type TypeWithSinglePublicConstructorWithValueTypeParameter contains
-                parameter 'intArgument' of type Int32 which can not be used for constructor injection because 
-                it is a value type.
+                The constructor of type 
+                DefaultConstructorVerificationBehaviorTests+TypeWithSinglePublicConstructorWithValueTypeParameter 
+                contains parameter 'intArgument' of type Int32 which can not be used for constructor injection 
+                because it is a value type.
                 ".TrimInside();
 
             var behavior = new ContainerOptions().ConstructorVerificationBehavior;
@@ -54,9 +55,11 @@
         {
             // Arrange
             string expectedString = @"
-                The constructor of type TypeWithSinglePublicConstructorWithStringTypeParameter contains
-                parameter 'stringArgument' of type String which can not be used for constructor injection.
-                ".TrimInside();
+                The constructor of type 
+                DefaultConstructorVerificationBehaviorTests+TypeWithSinglePublicConstructorWithStringTypeParameter 
+                contains parameter 'stringArgument' of type String which can not be used for constructor 
+                injection."
+                .TrimInside();
 
             var behavior = new ContainerOptions().ConstructorVerificationBehavior;
 
@@ -75,10 +78,7 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains(@"
-                    The constructor of type TypeWithSinglePublicConstructorWithStringTypeParameter contains
-                    parameter 'stringArgument' of type String which can not be used for constructor 
-                    injection.".TrimInside(), ex.Message);
+                AssertThat.StringContains(expectedString, ex.Message);
             }
         }
 

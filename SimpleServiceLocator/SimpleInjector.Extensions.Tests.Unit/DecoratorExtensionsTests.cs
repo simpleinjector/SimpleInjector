@@ -78,8 +78,9 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains(
-                    "The supplied decorator 'NonGenericServiceDecorator<T>' is an open generic type definition",
+                AssertThat.StringContains(@"
+                    The supplied decorator 'DecoratorExtensionsTests+NonGenericServiceDecorator<T>' is an open
+                    generic type definition".TrimInside(),
                     ex.Message);
 
                 AssertThat.ExceptionContainsParamName("decoratorType", ex);
@@ -268,8 +269,9 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains("The supplied type 'RealCommandHandlerDecorator' does not " +
-                    "inherit from or implement 'ICommandHandler<Int32>'", ex.Message);
+                AssertThat.StringContains(
+                    "The supplied type 'DecoratorExtensionsTests+RealCommandHandlerDecorator' does not " +
+                    "inherit from or implement 'DecoratorExtensionsTests+ICommandHandler<Int32>'", ex.Message);
             }
         }
 
@@ -818,8 +820,9 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains(
-                    "its constructor should have a single argument of type ICommandHandler<TCommand>",
+                AssertThat.StringContains(@"
+                    its constructor should have a single argument of type 
+                    DecoratorExtensionsTests+ICommandHandler<TCommand>".TrimInside(),
                     ex.Message);
             }
         }
@@ -839,7 +842,7 @@
             {
                 AssertThat.StringContains(
                     "The supplied type 'KeyValuePair<TKey, TValue>' does not inherit from " +
-                    "or implement 'ICommandHandler<TCommand>'.",
+                    "or implement 'DecoratorExtensionsTests+ICommandHandler<TCommand>'.",
                     ex.Message);
             }
         }
@@ -987,7 +990,7 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains("its constructor should have a single argument of type " +
-                    "INonGenericService or Func<INonGenericService>",
+                    "DecoratorExtensionsTests+INonGenericService or Func<DecoratorExtensionsTests+INonGenericService>",
                     ex.Message);
             }
         }
@@ -1058,9 +1061,11 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.ExceptionMessageContains(
-                    "The constructor of the type LoggingHandlerDecorator1<RealCommand> contains the " +
-                    "parameter of type ILogger with name 'logger' that is not registered.", ex);
+                AssertThat.ExceptionMessageContains(@"
+                    The constructor of the type 
+                    DecoratorExtensionsTests+LoggingHandlerDecorator1<DecoratorExtensionsTests+RealCommand> 
+                    contains the parameter of type DecoratorExtensionsTests+ILogger with name 'logger' that is 
+                    not registered.".TrimInside(), ex);
             }
         }
 

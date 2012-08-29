@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -287,6 +285,46 @@
             // Assert
             Assert.IsNotNull(registration, "The GetRegistration method is expected to return an " +
                 "InstanceProducer since it is explicitly registered by the user.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnOpenGenericType_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEnumerable<>));
+
+            // Assert
+            Assert.IsNull(registration);
+        }
+
+        [TestMethod]
+        public void GetRegistration_DeeplyNestedGenericTypeWithInternalConstructor_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var registration = container.GetRegistration(
+                typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
+
+            // Assert
+            Assert.IsNull(registration);
+        }
+
+        public class SomeGenericNastyness<TBla>
+        {
+            public class ReadOnlyDictionary<TKey, TValue>
+            {
+                public sealed class KeyCollection
+                {
+                    internal KeyCollection(ICollection<TKey> collection)
+                    {
+                    }
+                }
+            }
         }
     }
 }

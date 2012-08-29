@@ -6,6 +6,10 @@ Version vNext
 	Code Changes:
 
 	Bug fixes:
+		-[Core] Building a friendly name for an exception message failed for types nested in a generic type.
+		 The original error was lost.
+		-[Core] Calling GetService(Type) and GetRegistration(Type) with type being typeof(IEnumerable<>) 
+		 failed instead of returning null.
 		-[Core] GetInstance(Type) threw a less expressive exception as GetInstance<TService>() when a type
 		 could not be resolved. (work item 18542)
 		-[Extensions] RegisterOpenGeneric allowed registering types that could never be resolved (for instance

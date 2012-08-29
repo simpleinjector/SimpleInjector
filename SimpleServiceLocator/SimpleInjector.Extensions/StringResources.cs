@@ -146,10 +146,5 @@ namespace SimpleInjector.Extensions
                 openGenericServiceType.ToFriendlyName(), closedGenericImplementation.ToFriendlyName(),
                 message);
         }
-
-        private static string ToFriendlyName(this Type type)
-        {
-            return Helpers.ToFriendlyName(type);
-        }
     }
 }

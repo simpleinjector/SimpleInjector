@@ -49,16 +49,25 @@ namespace SimpleInjector
 
         internal static string ToFriendlyName(this Type type)
         {
-            if (!type.IsGenericType)
+            string name = type.Name;
+
+            if (type.IsNested && !type.IsGenericParameter)
             {
-                return type.Name;
+                name = type.DeclaringType.ToFriendlyName() + "+" + type.Name;
             }
 
-            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
+            var genericArguments = GetGenericArguments(type);
 
-            var genericArguments = type.GetGenericArguments().Select(argument => argument.ToFriendlyName());
+            if (genericArguments.Length == 0)
+            {
+                return name;
+            }
 
-            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
+            name = name.Substring(0, name.IndexOf('`'));
+
+            var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
+
+            return name + "<" + string.Join(", ", argumentNames) + ">";
         }
 
         internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
@@ -245,6 +254,22 @@ namespace SimpleInjector
         {
             var body = methodCall.Body as MethodCallExpression;
             return body.Method.GetGenericMethodDefinition();
+        }
+
+        private static Type[] GetGenericArguments(Type type)
+        {
+            if (!type.Name.Contains('`'))
+            {
+                return Type.EmptyTypes;
+            }
+
+            int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1));
+
+            var argumentOfTypeAndOuterType = type.GetGenericArguments();
+
+            return argumentOfTypeAndOuterType
+                .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
+                .ToArray();
         }
     }
 }

@@ -458,7 +458,9 @@ namespace SimpleInjector
         private static InstanceProducer BuildInstanceProducerForCollection(Type serviceType)
         {
             bool typeIsGenericEnumerable =
-                serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                serviceType.IsGenericType &&
+                !serviceType.IsGenericTypeDefinition &&
+                serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
             if (typeIsGenericEnumerable)
             {

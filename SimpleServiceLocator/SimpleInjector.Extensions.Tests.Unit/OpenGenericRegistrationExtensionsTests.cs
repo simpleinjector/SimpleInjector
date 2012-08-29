@@ -562,7 +562,8 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(@"
-                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
+                    For the container to be able to create 
+                    OpenGenericRegistrationExtensionsTests+ServiceImplWithMultipleCtors<TA, TB>, 
                     it should contain exactly one public constructor, but it has 2.".TrimInside(),
                     ex.Message);
             }
@@ -585,7 +586,8 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(@"
-                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
+                    For the container to be able to create 
+                    OpenGenericRegistrationExtensionsTests+ServiceImplWithMultipleCtors<TA, TB>, 
                     it should contain exactly one public constructor, but it has 2.".TrimInside(),
                     ex.Message);
             }
@@ -611,13 +613,18 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains(@"
-                    There was an error in the registration of open generic type IDoStuff<T>. Failed to 
-                    build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
+                    There was an error in the registration of open generic type 
+                    OpenGenericRegistrationExtensionsTests+IDoStuff<T>. 
+                    Failed to build a registration for type 
+                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean>.".TrimInside(),
                     ex.Message);
 
                 AssertThat.StringContains(@"                                                                     
-                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
-                    of type IService<Boolean, Int32>  with name 'service' that is not registered.".TrimInside(),
+                    The constructor of the type OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean> 
+                    contains the parameter of type 
+                    OpenGenericRegistrationExtensionsTests+IService<Boolean, Int32> with name 'service' that 
+                    is not registered."
+                    .TrimInside(),
                     ex.Message);
             }
         }
@@ -642,13 +649,19 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains(@"
-                    There was an error in the registration of open generic type IDoStuff<T>. Failed to 
-                    build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
+                    There was an error in the registration of open generic type 
+                    OpenGenericRegistrationExtensionsTests+IDoStuff<T>. 
+                    Failed to build a registration for type 
+                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean>."
+                    .TrimInside(),
                     ex.Message);
 
                 AssertThat.StringContains(@"                                                                     
-                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
-                    of type IService<Boolean, Int32>  with name 'service' that is not registered.".TrimInside(),
+                    The constructor of the type 
+                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean> contains the parameter 
+                    of type OpenGenericRegistrationExtensionsTests+IService<Boolean, Int32>  with name 
+                    'service' that is not registered."
+                    .TrimInside(),
                     ex.Message);
             }
         }

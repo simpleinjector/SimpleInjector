@@ -67,8 +67,8 @@
         {
             // Arrange
             string expectedMessage = @"
-                The given type AbstractTypeWithSinglePublicConstructor is not a concrete type. 
-                Please use one of the other overloads to register this type.
+                The given type RegisterConcreteTests+AbstractTypeWithSinglePublicConstructor is not a concrete
+                type. Please use one of the other overloads to register this type.
                 ".TrimInside();
 
             var container = new Container();

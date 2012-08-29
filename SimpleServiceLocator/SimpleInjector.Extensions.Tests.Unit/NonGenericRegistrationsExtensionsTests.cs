@@ -672,8 +672,8 @@
         public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedException =
-                string.Format("No registration for type {0} could be found.", typeof(IPublicServiceEx).Name);
+            string expectedException = "No registration for type " +
+                "NonGenericRegistrationsExtensionsTests+IPublicServiceEx could be found.";
 
             var container = new Container();
 
@@ -715,8 +715,8 @@
         public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage =
-                "The supplied type 'IDisposable' does not inherit from or implement 'IPublicService'.";
+            string expectedMessage = "The supplied type 'IDisposable' does not inherit from or implement " +
+                "'NonGenericRegistrationsExtensionsTests+IPublicService'.";
 
             var container = new Container();
 

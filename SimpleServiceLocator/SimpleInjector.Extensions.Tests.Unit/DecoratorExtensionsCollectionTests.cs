@@ -1255,9 +1255,11 @@
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(
             ActivationException ex)
         {
-            AssertThat.StringContains(
-                "impossible for the container to generate a Func<ICommandHandler<RealCommand>> for " +
-                "injection into the AsyncCommandHandlerProxy<T> decorator",
+            AssertThat.StringContains(@"
+                impossible for the container to generate a 
+                Func<DecoratorExtensionsCollectionTests+ICommandHandler<DecoratorExtensionsCollectionTests+RealCommand>> 
+                for injection into the DecoratorExtensionsCollectionTests+AsyncCommandHandlerProxy<T> decorator"
+                .TrimInside(),
                 ex.Message);
 
             AssertThat.StringContains(

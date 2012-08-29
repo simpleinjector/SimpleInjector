@@ -33,8 +33,6 @@ namespace SimpleInjector.Extensions
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using SimpleInjector.Advanced;
-
     /// <summary>
     /// Helper methods for the extensions.
     /// </summary>
@@ -51,19 +49,27 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static string ToFriendlyName(Type type)
+        internal static string ToFriendlyName(this Type type)
         {
-            if (!type.IsGenericType)
+            string name = type.Name;
+
+            if (type.IsNested && !type.IsGenericParameter)
             {
-                return type.Name;
+                name = type.DeclaringType.ToFriendlyName() + "+" + type.Name;
             }
 
-            string name = type.Name.Substring(0, type.Name.IndexOf('`'));
+            var genericArguments = GetGenericArguments(type);
 
-            var genericArguments =
-                type.GetGenericArguments().Select(argument => Helpers.ToFriendlyName(argument));
+            if (genericArguments.Length == 0)
+            {
+                return name;
+            }
 
-            return name + "<" + string.Join(", ", genericArguments.ToArray()) + ">";
+            name = name.Substring(0, name.IndexOf('`'));
+
+            var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
+
+            return name + "<" + string.Join(", ", argumentNames) + ">";
         }
 
         internal static IEnumerable MakeReadOnly(Type elementType, Array collection)
@@ -241,6 +247,22 @@ namespace SimpleInjector.Extensions
                 where type == serviceType ||
                     (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
                 select type;
+        }
+
+        private static Type[] GetGenericArguments(Type type)
+        {
+            if (!type.Name.Contains('`'))
+            {
+                return Type.EmptyTypes;
+            }
+
+            int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1));
+
+            var argumentOfTypeAndOuterType = type.GetGenericArguments();
+
+            return argumentOfTypeAndOuterType
+                .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
+                .ToArray();
         }
     }
 }

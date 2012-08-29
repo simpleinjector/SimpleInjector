@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -114,6 +115,41 @@
             container.GetInstance<object>();
         }
 
+        [TestMethod]
+        public void GetInstanceType_DeeplyNestedGenericTypeWithInternalConstructor_ThrowsExceptionWithProperFriendlyTypeName()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(
+                    "GetInstanceTests+SomeGenericNastyness<TBla>+ReadOnlyDictionary<TKey, TValue>+KeyCollection",
+                    ex.Message);
+            }
+        }
+
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
+
+        public class SomeGenericNastyness<TBla>
+        {
+            public class ReadOnlyDictionary<TKey, TValue>
+            {
+                public sealed class KeyCollection
+                {
+                    internal KeyCollection(ICollection<TKey> collection)
+                    {
+                    }
+                }
+            }
+        }
     }
 }

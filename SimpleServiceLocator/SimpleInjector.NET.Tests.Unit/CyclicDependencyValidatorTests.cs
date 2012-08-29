@@ -20,8 +20,10 @@
         public void GetInstance_RequestingTypeDependingOnItself_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedExcpetionMessage = "The configuration is invalid. The type A is directly or " + 
-                "indirectly depending on itself.";
+            string expectedExcpetionMessage = @"
+                The configuration is invalid. The type CyclicDependencyValidatorTests+A is directly or
+                indirectly depending on itself."
+                .TrimInside();
 
             var container = new Container();
 
@@ -59,7 +61,7 @@
             {
             }
         }
-            
+
         [TestMethod]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_AlsoFailsOnConsecutiveCalls()
         {
@@ -264,7 +266,7 @@
                 Thread.Sleep(200);
                 return new SqlUserRepository();
             });
-            
+
             // Act
             var thread2 = ThreadWrapper.StartNew(() => container.GetInstance<IUserRepository>());
             var thread3 = ThreadWrapper.StartNew(() => container.GetInstance<IUserRepository>());
@@ -281,7 +283,7 @@
         public void GetInstance_CalledMultipleTimesOnRegisteredTypeWithFailingDelegate_WillAlwaysFailWithTheSameException()
         {
             // Arrange
-            string expectedExceptionMessage = 
+            string expectedExceptionMessage =
                 "The registered delegate for type IUserRepository threw an exception.";
 
             var container = new Container();
@@ -313,14 +315,14 @@
                 AssertThat.StringContains(expectedExceptionMessage, ex.Message, "The GetInstance is " +
                     "expected to always fail with the same exception. When this is not the case, this " +
                     "indicates that recursion detection went off.");
-            }            
+            }
         }
 
         [TestMethod]
         public void GetInstance_RecursiveDependencyInTransientInitializer_ThrowsMeaningfulError()
         {
             // Arrange
-            string expectedMessage = "The configuration is invalid. The type RealUserService " + 
+            string expectedMessage = "The configuration is invalid. The type RealUserService " +
                 "is directly or indirectly depending on itself.";
 
             var container = new Container();
@@ -379,7 +381,7 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains(expectedMessage, ex.Message, 
+                AssertThat.StringContains(expectedMessage, ex.Message,
                     "Repeating calls to a failing FuncSingletonInstanceProducer should result in the same " +
                     "exception being thrown every time.");
             }

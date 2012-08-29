@@ -556,8 +556,8 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains(
-                    "its constructor should have a single argument of type ICommandHandler<TCommand>",
+                AssertThat.StringContains("its constructor should have a single argument of type " +
+                    "GenericDecoratorExtensionsTests+ICommandHandler<TCommand>",
                     ex.Message);
             }
         }
@@ -577,7 +577,7 @@
             {
                 AssertThat.StringContains(
                     "The supplied type 'KeyValuePair<TKey, TValue>' does not inherit from " +
-                    "or implement 'ICommandHandler<TCommand>'.",
+                    "or implement 'GenericDecoratorExtensionsTests+ICommandHandler<TCommand>'.",
                     ex.Message);
             }
         }
