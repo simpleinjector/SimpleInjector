@@ -55,7 +55,7 @@ namespace SimpleInjector
         {
             try
             {
-                container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager());
+                container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager(null));
             }
             catch (InvalidOperationException)
             {

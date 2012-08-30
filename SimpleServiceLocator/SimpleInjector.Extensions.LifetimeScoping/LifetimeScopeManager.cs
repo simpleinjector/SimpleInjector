@@ -48,7 +48,18 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         private readonly ThreadLocal<Stack<LifetimeScope>> threadLocalScopes =
             new ThreadLocal<Stack<LifetimeScope>>();
 
-        internal LifetimeScopeManager()
+        internal LifetimeScopeManager(IAutoRegistrationProtection autoWiringProtection)
+        {
+        }
+
+        // This marker interface protects the LifetimeScopeManager from being auto-registered in the case
+        // where a user overrides the container.Options.ConstructorResolutionBehavior to allow registering 
+        // types with internal constructors. Because the user can't register this internal interface, it is
+        // very unlikely it will be able to register this manager. Auto-registration is bad, since this
+        // manager must be registered as a singleton. A user would still be able to auto-register this type,
+        // by overriding the container.Options.ConstructorInjectionBehavior, but this would be a very
+        // deliberate action and an unlike situation.
+        internal interface IAutoRegistrationProtection
         {
         }
 
