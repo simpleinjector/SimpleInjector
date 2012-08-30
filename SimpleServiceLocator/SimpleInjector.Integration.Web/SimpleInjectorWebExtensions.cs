@@ -44,8 +44,6 @@ namespace SimpleInjector
         /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
         /// request and ensures that -if <typeparamref name="TConcrete"/> implements 
         /// <see cref="IDisposable"/>- this instance will get disposed on the end of the web request. 
-        /// When no web request is available, a new instance will be returned each time (transient) and those 
-        /// instances will <b>not</b> get disposed.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -83,8 +81,7 @@ namespace SimpleInjector
         /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every 
         /// web request every time a <typeparamref name="TService"/> is requested and ensures that -if 
         /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>- this instance 
-        /// will get disposed on the end of the web request. When no web request is available, a new instance 
-        /// will be returned each time (transient) and those instances will <b>not</b> get disposed.
+        /// will get disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.
         /// </typeparam>
@@ -119,8 +116,7 @@ namespace SimpleInjector
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
         /// and the returned instance will be reused for the duration of a single web request and ensures that,
         /// if the returned instance implements <see cref="IDisposable"/>, that instance will get
-        /// disposed on the end of the web request. When no web request is available, the specified delegate
-        /// will be called each time and those instances will not get disposed.
+        /// disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -142,8 +138,7 @@ namespace SimpleInjector
         /// and the returned instance will be reused for the duration of a single web request and ensures that,
         /// if the returned instance implements <see cref="IDisposable"/>, and
         /// <paramref name="disposeWhenWebRequestEnds"/> is set to <b>true</b>, that instance will get
-        /// disposed on the end of the web request. When no web request is available, the specified delegate
-        /// will be called each time and those instances will not get disposed.
+        /// disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
