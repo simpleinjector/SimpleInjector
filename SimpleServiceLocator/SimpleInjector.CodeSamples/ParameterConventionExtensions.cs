@@ -7,6 +7,7 @@
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.InteropServices;
     using SimpleInjector.Advanced;
 
     public interface IParameterConvention
@@ -47,6 +48,7 @@
                 this.convention = convention;
             }
 
+            [DebuggerStepThrough]
             public void Verify(ParameterInfo parameter)
             {
                 if (!this.convention.CanResolve(parameter))
@@ -70,6 +72,7 @@
                 this.convention = convention;
             }
 
+            [DebuggerStepThrough]
             public Expression BuildParameterExpression(
                 ParameterInfo parameter)
             {
@@ -199,6 +202,36 @@
 
             return converter.ConvertFromString(null,
                 CultureInfo.InvariantCulture, configurationValue);
+        }
+    }
+
+    // Using optional parameters in constructor arguments is higly discouraged. This code is merely an example.
+    public class OptionalParameterConvention : IParameterConvention
+    {
+        private readonly IConstructorInjectionBehavior injectionBehavior;
+
+        public OptionalParameterConvention(IConstructorInjectionBehavior injectionBehavior)
+        {
+            this.injectionBehavior = injectionBehavior;
+        }
+
+        [DebuggerStepThrough]
+        public bool CanResolve(ParameterInfo parameter)
+        {
+            return parameter.GetCustomAttributes(typeof(OptionalAttribute), true).Length > 0;
+        }
+
+        [DebuggerStepThrough]
+        public Expression BuildExpression(ParameterInfo parameter)
+        {
+            try
+            {
+                return this.injectionBehavior.BuildParameterExpression(parameter);
+            }
+            catch (ActivationException)
+            {
+                return Expression.Constant(parameter.RawDefaultValue, parameter.ParameterType);
+            }
         }
     }
 }

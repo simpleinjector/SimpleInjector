@@ -2,6 +2,7 @@
 {
     using System;
     using System.Configuration;
+    using System.Data.SqlClient;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -11,7 +12,7 @@
         public void ConnectionStringsConvention_RegisteringTypeWithConnectionStringParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             // Act
             container.Register<TypeWithConnectionStringConstructorArgument>();
@@ -23,7 +24,7 @@
             // Arrange
             string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
 
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             // Act
             var instance = container.GetInstance<TypeWithConnectionStringConstructorArgument>();
@@ -36,7 +37,7 @@
         public void ConnectionStringsConvention_RegisteringTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             try
             {
@@ -59,7 +60,7 @@
         public void ConnectionStringsConvention_ResolvingTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             try
             {
@@ -82,7 +83,7 @@
         public void ConnectionStringsConvention_RegisteringTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             try
             {
@@ -103,7 +104,7 @@
         public void ConnectionStringsConvention_ResolvingTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
 
             try
             {
@@ -124,7 +125,7 @@
         public void AppSettingsConvention_RegisteringTypeWithStringAppSettingParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             // Act
             container.Register<TypeWithAppSettingsStringConstructorArgument>();
@@ -136,7 +137,7 @@
             // Arrange
             string expectedAppSetting = ConfigurationManager.AppSettings["as1"];
 
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsStringConstructorArgument>();
@@ -149,7 +150,7 @@
         public void AppSettingsConvention_RegisteringTypeWithGuidAppSettingParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             // Act
             container.Register<TypeWithAppSettingsStringConstructorArgument>();
@@ -161,7 +162,7 @@
             // Arrange
             Guid expectedAppSetting = Guid.Parse(ConfigurationManager.AppSettings["as2"]);
 
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsGuidConstructorArgument>();
@@ -174,7 +175,7 @@
         public void AppSettingsConvention_RegisteringTypeWithReferenceTypeParameterWhichNameEndsWithAppSetting_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             // Act
             // This type depends on an reference type and since reference types are not handled by the
@@ -187,7 +188,7 @@
         public void AppSettingsConvention_ResolvingTypeWithReferenceTypeParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             try
             {
@@ -210,7 +211,7 @@
         public void AppSettingsConvention_RegisteringTypeWithNonExistingAppSettingsParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             try
             {
@@ -231,7 +232,7 @@
         public void AppSettingsConvention_ResolvingTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConvention(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention());
 
             try
             {
@@ -252,7 +253,7 @@
         public void MultipleParameterConventions_RegisterATypeWithMultipleConventionBasedParameters_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConvention(
+            var container = CreateContainerWithConventions(
                 new ConnectionStringsConvention(),
                 new AppSettingsConvention());
 
@@ -267,7 +268,7 @@
             string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
             string expectedAppSetting = ConfigurationManager.AppSettings["as2"];
 
-            var container = CreateContainerWithConvention(
+            var container = CreateContainerWithConventions(
                 new ConnectionStringsConvention(),
                 new AppSettingsConvention());
 
@@ -280,16 +281,88 @@
             Assert.AreEqual(expectedAppSetting, instance.AppSetting);
         }
 
-        private static Container CreateContainerWithConvention(params IParameterConvention[] conventions)
+        [TestMethod]
+        public void OptionalParameterConvention_TypeWithOptionalDependencyAndDependencyNotRegistered_InjectsNullIntoTheInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            AddConventions(container,
+                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+
+            // Act
+            var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();
+
+            // Assert
+            Assert.IsNull(instance.Dependency);
+        }
+
+        [TestMethod]
+        public void OptionalParameterConvention_TypeWithOptionalDependencyAndDependencyRegistered_InjectsDependency()
+        {
+            // Arrange
+            var dependency = new SqlConnection();
+
+            var container = new Container();
+
+            AddConventions(container,
+                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+
+            container.RegisterSingle<IDisposable>(dependency);
+
+            // Act
+            var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(dependency, instance.Dependency));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void OptionalParameterConvention_TypeWithRequiredDependencyAndDependencyNotRegistered_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            AddConventions(container,
+                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+
+            // Act
+            container.GetInstance<TypeWithRequiredDependency<IDisposable>>();
+        }
+
+        [TestMethod]
+        public void OptionalParameterConvention_TypeWithOptionalIntDependencyWithDefaultValueOfFive_InjectsFive()
+        {
+            // Arrange
+            var container = new Container();
+
+            AddConventions(container,
+                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+
+            // Act
+            var instance = container.GetInstance<TypeWithOptionalIntDependencyWithDefaultValueOfFive>();
+
+            // Assert
+            Assert.AreEqual(5, instance.Value);
+        }
+
+        private static Container CreateContainerWithConventions(params IParameterConvention[] conventions)
         {
             var container = new Container();
 
+            AddConventions(container, conventions);
+
+            return container;
+        }
+
+        private static void AddConventions(Container container,
+            params IParameterConvention[] conventions)
+        {
             foreach (var convention in conventions)
             {
                 container.Options.RegisterParameterConvention(convention);
             }
-
-            return container;
         }
 
         public class TypeWithConnectionStringConstructorArgument
@@ -367,6 +440,36 @@
             public string ConnectionString { get; private set; }
 
             public string AppSetting { get; private set; }
+        }
+
+        public class TypeWithRequiredDependency<T>
+        {
+            public TypeWithRequiredDependency(T dependency)
+            {
+                this.Dependency = dependency;
+            }
+
+            public T Dependency { get; private set; }
+        }
+
+        public class TypeWithOptionalDependency<T> where T : class
+        {
+            public TypeWithOptionalDependency(T dependency = null)
+            {
+                this.Dependency = dependency;
+            }
+
+            public T Dependency { get; private set; }
+        }
+
+        public class TypeWithOptionalIntDependencyWithDefaultValueOfFive
+        {
+            public TypeWithOptionalIntDependencyWithDefaultValueOfFive(int value = 5)
+            {
+                this.Value = value;
+            }
+
+            public int Value { get; private set; }
         }
     }
 }
