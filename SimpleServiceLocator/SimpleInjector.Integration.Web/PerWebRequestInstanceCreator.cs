@@ -28,13 +28,18 @@ namespace SimpleInjector.Integration.Web
     using System;
     using System.Web;
 
-    internal sealed class PerWebRequestInstanceCreator<T> where T : class
+    using SimpleInjector.Advanced;
+
+    internal sealed class PerWebRequestInstanceCreator<TService> where TService : class
     {
-        private readonly Func<T> instanceCreator;
+        private readonly Container container;
+        private readonly Func<TService> instanceCreator;
         private readonly bool disposeWhenRequestEnds;
 
-        internal PerWebRequestInstanceCreator(Func<T> instanceCreator, bool disposeWhenRequestEnds)
+        internal PerWebRequestInstanceCreator(Container container, Func<TService> instanceCreator,
+            bool disposeWhenRequestEnds)
         {
+            this.container = container;
             this.instanceCreator = instanceCreator;
             this.disposeWhenRequestEnds = disposeWhenRequestEnds;
         }
@@ -42,17 +47,27 @@ namespace SimpleInjector.Integration.Web
         // This method needs to be public, because the RegisterPerWebRequest extension methods build a
         // MethodCallExpression using this method, and this would fail in partial trust when the method is 
         // not public.
-        public T GetInstance()
+        public TService GetInstance()
         {
             var context = HttpContext.Current;
 
             if (context == null)
             {
-                // No HttpContext: Let's create a transient object.
-                return this.instanceCreator();
+                if (this.container.IsVerifying())
+                {
+                    // Return a transient instance when this method is called during verification
+                    return this.instanceCreator();
+                }
+
+                throw new ActivationException("The " + typeof(TService).FullName + " is registered as " +
+                    "'PerWebRequest', but the instance is requested outside the context of a HttpContext (" +
+                    "HttpContext.Current is null). Make sure instances using this lifestyle are not " + 
+                    "resolved during the application initialization phase and when running on a background " +
+                    "thread. For resolving instances on background threads, try registering this instance " + 
+                    "as 'Per Lifetime Scope': http://bit.ly/N1s8hN.");
             }
 
-            T instance = (T)context.Items[this.GetType()];
+            TService instance = (TService)context.Items[this.GetType()];
 
             if (instance == null)
             {
@@ -62,9 +77,9 @@ namespace SimpleInjector.Integration.Web
             return instance;
         }
 
-        private T CreateInstance(HttpContext context)
+        private TService CreateInstance(HttpContext context)
         {
-            T instance = this.instanceCreator();
+            TService instance = this.instanceCreator();
 
             context.Items[this.GetType()] = instance;
 

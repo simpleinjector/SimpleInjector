@@ -258,8 +258,8 @@ namespace SimpleInjector
                     var transientInstanceCreator = Expression.Lambda<Func<TService>>(
                         e.Expression, new ParameterExpression[0]).Compile();
 
-                    var instanceCreator = new PerWebRequestInstanceCreator<TService>(transientInstanceCreator,
-                        disposeWhenRequestEnds);
+                    var instanceCreator = new PerWebRequestInstanceCreator<TService>(container,
+                        transientInstanceCreator, disposeWhenRequestEnds);
 
                     // Swap the original expression so that the lifetime becomes a per-web-request.
                     e.Expression = Expression.Call(Expression.Constant(instanceCreator),

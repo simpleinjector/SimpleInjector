@@ -3,7 +3,15 @@
 Version vNext
 	General description:
 	
-	Code Changes:
+	Breaking changes:
+		-[Extensions.LifetimeScoping] now throws an exception when a per-lifetime scoped instance is requested
+		 outside the context of a Lifetime Scope. The previous released returned a singleton, but this would
+		 easily lead to hard to track errors.
+		-[Integration.Web] now throws an exception when a per-web-request scoped instance is requested outside
+		 the context of a HTTP request (when HttpContext.Current is null). The previous release returned a
+		 transient, but this would easily lead to hard to track errors.
+
+	Other code changes:
 
 	Bug fixes:
 		-[Core] Building a friendly name for an exception message failed for types nested in a generic type.
@@ -33,7 +41,7 @@ Version 1.5.0.12199 (v1.5.0 RTM) 2012-07-17
 		collections has been improved. In most situations the predicate will be called for each element in the
 		collection.
 
-	Code Changes:
+	Code changes:
 		-[Core] Extension points added in the form of ContainerOptions.ConstructorXXXBehavior, which allows 
 		 developers to override the behavior of constructor resolution and injection. (work item 18097)
 		-[Core] Container.Options property has been added, containing the container options.
@@ -82,7 +90,7 @@ Version 1.4.2.12140 (v1.4.2 RTM) 2012-05-19
 		non-generic decorators. Integration projects have been added to the solution, which should make it
 		easier to integrate Simple Injector with ASP.NET.
 
-	Project Changes:
+	Project changes:
 		-New projects that were added to the solution:
 			+SimpleInjector.Integration.Web (.NET 4.0)
 			 Adds extension methods for Per Web Request lifestyle. This assembly takes a dependency on 
@@ -114,7 +122,7 @@ Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
 	General description:
 		RegisterOpenGenericDecorator extension methods improved to allow registering non-generic decorator.
 
-	Code Changes:
+	Code changes:
 		-[Extensions] GetTypesToRegister methods added to the OpenGenericBatchRegistrationExtensions class
 		 which allows to customize the behavior.
 		-[Extensions] RegisterOpenGenericDecorator extension methods now allow registering non-generic
@@ -129,7 +137,7 @@ Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18
 		Container.GetInitializer<T> method added to the core library, and RegisterManyForOpenGeneric in
 		extensions now execute initalizers on decorators.
 
-	Code Changes:
+	Code changes:
 		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
 		 GetInitializer<T>. This enables certain specialized scenarios. The main (external) consumer of
 		 this method is the RegisterManyForOpenGeneric method of the Extensions project.
@@ -157,7 +165,7 @@ Version 1.3.0.11343 (v1.3 RTM) 2011-12-09
 		created by the container. This enables scenarios as interception, context based injection, and 
 		wrapping types with decorators.
 			
-	Code Changes:
+	Code changes:
 		-[Core] A new overload to the Container.GetRegistration() method has been added. This overload allows
 		 users to signal whether the method should throw or return null (what the original overload does).
 		 Since the GetRegistration is the only method in the system that both builds and returns
@@ -187,12 +195,12 @@ Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
 		This release fixes a few small bugs, adds the possibility to do property injection, improves 
 		performance and the SimpleInjector.Extensions.dll is now available for Silverlight.
 
-	Project Changes:
+	Project changes:
 		-The solution and projects are converted to Visual Studio 2010. The library is still compatible with
 		 .NET 3.5 though.
 		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
 	
-	Code Changes:
+	Code changes:
 		-[Extensions] Performance optimization in the RegisterOpenGeneric en RegisterSingleOpenGeneric 
 		 extension methods. Types can now be resolved as quickly as types that are registered using 
 		 container.Register<TService, TImplementation>() and container.RegisterSingle<T>(T), which are the
@@ -212,7 +220,7 @@ Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
 		 when multiple delegates respond to the same ResolveUnregisteredType event. Publication of the 
 		 property allows users skip and continue when another delegate already registered that type.
 	
-	Bug Fixes:
+	Bug fixes:
 		-[Extensions] NonGenericRegistrationsExtensions.RegisterAll(Container, Type, params Type[]) method was
 		 removed, because it was never picked by C# compiler when doing overload resolution.
 		-[Core] FuncSingletonInstanceProducer<T> did not reset the CyclicDependencyValidator in case of an
