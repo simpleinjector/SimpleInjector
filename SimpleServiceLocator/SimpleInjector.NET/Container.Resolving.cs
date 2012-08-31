@@ -262,6 +262,10 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> inherits from). <b>Null</b> will be returned when no delegates are
         /// registered that apply to this type.
         /// </summary>
+        /// <remarks>
+        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
+        /// critical path of the application.
+        /// </remarks>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
         /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",

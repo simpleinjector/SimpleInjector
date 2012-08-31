@@ -117,6 +117,10 @@ namespace SimpleInjector
         /// method.
         /// </para>
         /// <para>
+        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
+        /// critical path of the application.
+        /// </para>
+        /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same <b>IInstanceProducer</b>
         /// instance for a given <see cref="Type"/>. It will however either always return <b>null</b> or
         /// always return a producer that is able to return the expected instance. Because of this, do not
