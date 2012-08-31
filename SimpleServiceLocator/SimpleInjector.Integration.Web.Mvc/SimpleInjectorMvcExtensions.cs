@@ -97,9 +97,10 @@ namespace SimpleInjector
                 from assembly in assemblies
                 where !assembly.IsDynamic
                 from type in assembly.GetExportedTypes()
-                where type.Name.EndsWith("Controller", StringComparison.Ordinal)
                 where typeof(IController).IsAssignableFrom(type)
                 where !type.IsAbstract
+                where !type.IsGenericTypeDefinition
+                where type.Name.EndsWith("Controller", StringComparison.Ordinal)
                 select type;
 
             foreach (var controllerType in controllerTypes)
