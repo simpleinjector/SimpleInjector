@@ -27,6 +27,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Threading;
 
     /// <summary>
     /// Thread and container specific cache for services that are registered with one of the 
@@ -35,13 +37,18 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     public sealed class LifetimeScope : IDisposable
     {
         private readonly Dictionary<Type, object> lifetimeScopedInstances = new Dictionary<Type, object>();
+        private readonly int initialThreadId;
         private LifetimeScopeManager manager;
         private List<IDisposable> disposables;
 
-        internal LifetimeScope(LifetimeScopeManager manager)
+        internal LifetimeScope(LifetimeScopeManager manager, LifetimeScope parentScope)
         {
             this.manager = manager;
+            this.ParentScope = parentScope;
+            this.initialThreadId = Thread.CurrentThread.ManagedThreadId;
         }
+
+        internal LifetimeScope ParentScope { get; private set; }
 
         /// <summary>
         /// Registers the supplied <paramref name="disposable"/> to be disposed when the lifetime scope end.
@@ -82,12 +89,26 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
+        /// resources.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when <b>Dispose</b> was called on a different
+        /// thread than where this instance was constructed.</exception>
         public void Dispose()
         {
             if (this.manager != null)
             {
+                if (this.initialThreadId != Thread.CurrentThread.ManagedThreadId)
+                {
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                        "It is not safe to use a LifetimeScope instance across threads. Make sure the " +
+                        "complete operation that the lifetime scope surrounds gets executed within the " +
+                        "same thread and make sure that the LifetimeScope instance gets disposed on the " +
+                        "same thread as it gets created. Dispose was called on thread with ManagedThreadId " +
+                        "{0}, but was created on thread with id {1}.", Thread.CurrentThread.ManagedThreadId,
+                        this.initialThreadId));
+                }
+
                 this.manager.EndLifetimeScope(this);
 
                 this.manager = null;
