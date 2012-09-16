@@ -4,7 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class WithParameterConventionTests
+    public class ParameterConventionTests
     {
         public interface IService
         {
@@ -20,7 +20,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -40,7 +40,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -60,7 +60,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -80,7 +80,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -104,7 +104,7 @@
 
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -129,7 +129,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -149,7 +149,7 @@
             decimal expectedDecimal = decimal.MaxValue;
 
             var container = new Container();
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
             container.Options.RegisterParameterConvention(convention);
             container.RegisterSingle<IDependency>(expectedDependency);
 
@@ -171,7 +171,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 
@@ -202,7 +202,7 @@
             // Arrange
             var container = new Container();
 
-            var convention = new WithParameterConvention(container);
+            var convention = new ParameterConvention(container);
 
             container.Options.RegisterParameterConvention(convention);
 

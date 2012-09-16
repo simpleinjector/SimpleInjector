@@ -6,12 +6,12 @@
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public class WithParameterConvention : IParameterConvention
+    public class ParameterConvention : IParameterConvention
     {
         private readonly List<ParameterDeclaringTypePair> parameters = new List<ParameterDeclaringTypePair>();
         private readonly Container container;
 
-        public WithParameterConvention(Container container)
+        public ParameterConvention(Container container)
         {
             this.container = container;
         }
@@ -119,13 +119,13 @@
 
         public class Parameter
         {
-            public Parameter(WithParameterConvention convention, Type parameterType)
+            public Parameter(ParameterConvention convention, Type parameterType)
             {
                 this.Convention = convention;
                 this.Type = parameterType;
             }
 
-            internal WithParameterConvention Convention { get; private set; }
+            internal ParameterConvention Convention { get; private set; }
 
             internal Type Type { get; private set; }
 
@@ -145,7 +145,7 @@
     public static class WithParameterConventionExtensions
     {
         public static void Register<TConcrete>(this Container container,
-            params WithParameterConvention.Parameter[] parameters)
+            params ParameterConvention.Parameter[] parameters)
             where TConcrete : class
         {
             AddParameters(typeof(TConcrete), parameters);
@@ -153,7 +153,7 @@
         }
 
         public static void Register<TService, TImplementation>(this Container container,
-            params WithParameterConvention.Parameter[] parameters)
+            params ParameterConvention.Parameter[] parameters)
             where TImplementation : class, TService
             where TService : class
         {
@@ -162,7 +162,7 @@
         }
 
         public static void RegisterSingle<TConcrete>(this Container container,
-            params WithParameterConvention.Parameter[] parameters)
+            params ParameterConvention.Parameter[] parameters)
             where TConcrete : class
         {
             AddParameters(typeof(TConcrete), parameters);
@@ -170,7 +170,7 @@
         }
 
         public static void RegisterSingle<TService, TImplementation>(this Container container,
-            params WithParameterConvention.Parameter[] parameters)
+            params ParameterConvention.Parameter[] parameters)
             where TImplementation : class, TService
             where TService : class
         {
@@ -178,9 +178,9 @@
             container.RegisterSingle<TService, TImplementation>();
         }
 
-        private static void AddParameters(Type concreteType, WithParameterConvention.Parameter[] parameters)
+        private static void AddParameters(Type concreteType, ParameterConvention.Parameter[] parameters)
         {
-            foreach (var parameter in parameters ?? Enumerable.Empty<WithParameterConvention.Parameter>())
+            foreach (var parameter in parameters ?? Enumerable.Empty<ParameterConvention.Parameter>())
             {
                 parameter.Convention.Add(concreteType, parameter);
             }

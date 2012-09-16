@@ -87,7 +87,7 @@
     <Compile Include="ResolvingFactoriesExtensions.cs" />
     <Compile Include="VarianceExtensions.cs" />
     <Compile Include="WinFormsIntegrationExtensions.cs" />
-    <Compile Include="WithParameterConvention.cs" />
+    <Compile Include="ParameterConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
