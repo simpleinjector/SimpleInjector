@@ -3,6 +3,7 @@
 set version=1.5.0.12199
 set versionCore=1.5.0.12199
 set version_Integration_Mvc=1.5.0.12199
+set version_Integration_Wcf=1.5.0.12267
 set version_Extensions=1.5.0.12238
 set version_Extensions_LifetimeScoping=1.5.0.12199
 
@@ -71,6 +72,11 @@ del %targetPathNet%\temp.dll
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Integration_Mvc% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
+del %targetPathNet%\temp.dll
+
+%msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
+ren %targetPathNet%\SimpleInjector.Integration.Wcf.dll temp.dll
+%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version_Integration_Wcf% /out:%targetPathNet%\SimpleInjector.Integration.Wcf.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 
@@ -153,6 +159,10 @@ copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET35\Extensions\Simple
 copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET35\Extensions\SimpleInjector.Extensions.xml
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET35\Extensions\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET35\Extensions\SimpleInjector.Packaging.xml
+mkdir Releases\temp\NET35\Integration
+copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET35\Integration\SimpleInjector.Integration.Wcf.dll
+copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET35\Integration\SimpleInjector.Integration.Wcf.xml
+
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET40\SimpleInjector.xml
@@ -173,6 +183,8 @@ copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\
 copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.xml
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.dll
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.xml
+copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
+copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\SimpleInjector Runtime Library v%version%.zip"
 
 rmdir Releases\temp /s /q
@@ -283,6 +295,17 @@ copy  bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\Sim
 ren "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version_Integration_Mvc%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy  bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net35\SimpleInjector.Integration.Wcf.dll
+copy  bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net35\SimpleInjector.Integration.Wcf.xml
+%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %version_Integration_Wcf%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %versionCore%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\13850374b87d467da12f21ca32dac632.psmdcp {version} %version_Integration_Wcf%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Wcf.%version_Integration_Wcf%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Wcf.%version_Integration_Wcf%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
 
 
 echo NUGET PACKAGES SILVERLIGHT
