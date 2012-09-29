@@ -51,7 +51,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         internal LifetimeScope ParentScope { get; private set; }
 
         /// <summary>
-        /// Registers the supplied <paramref name="disposable"/> to be disposed when the lifetime scope end.
+        /// Registers the supplied <paramref name="disposable"/> to be disposed when the lifetime scope ends.
         /// Calling this method is useful for instances that are registered with a lifecycle shorter than
         /// that of the scope (where possibly multiple instances are created per scope, such as transient
         /// services, that are registered with one of the <b>Register</b> overloads), but still need to be

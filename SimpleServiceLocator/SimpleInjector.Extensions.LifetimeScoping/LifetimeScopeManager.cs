@@ -47,7 +47,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
         }
 
-        // This marker interface protects the LifetimeScopeManager from being auto-registered in the case
+        // This marker interface protects this manager from being auto-registered in the case
         // where a user overrides the container.Options.ConstructorResolutionBehavior to allow registering 
         // types with internal constructors. Because the user can't register this internal interface, it is
         // very unlikely it will be able to register this manager. Auto-registration is bad, since this

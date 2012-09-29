@@ -57,110 +57,15 @@ namespace SimpleInjector
             {
                 container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager(null));
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
                 // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
                 // nasty, but probably the only way to do this.
+                if (!ex.Message.Contains("already been registered"))
+                {
+                    throw;
+                }
             }
-        }
-
-        /// <summary>
-        /// Begins a new lifetime scope for the given <paramref name="container"/>. 
-        /// Services, registered with <b>RegisterLifetimeScope</b>, that are requested within the same thread
-        /// as where the lifetime scope is created, are cached during the lifetime of that scope.
-        /// The scope should be disposed explicitly when the scope ends.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
-        /// not been called previously.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
-        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
-        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
-        /// by registering a service using one of the 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
-        /// overloads.
-        /// </exception>
-        public static LifetimeScope BeginLifetimeScope(this Container container)
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            IServiceProvider provider = container;
-
-            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
-
-            if (manager != null)
-            {
-                return manager.BeginLifetimeScope();
-            }
-
-            // When no LifetimeScopeManager is registered, this means that there are no lifetime scope
-            // registrations (since the first call to RegisterLifetimeScope also registers the singleton
-            // manager). However, since the user has called BeginLifetimeScope, he/she expects to be able to
-            // use it, for instance to allow disposing instances with a different/shorter lifetime than 
-            // Lifetime Scope (using the LifetimeScope.RegisterForDisposal method). For this to work however,
-            // we need a LifetimeScopeManager, but at this point it is impossible to register it, since
-            // BeginLifetimeScope will be called after the initialization phase. We have no other option than
-            // to inform the user about enabling lifetime scoping explicitly by throwing an exception. You
-            // might see this as a design flaw, but since this feature is implemented on top of the core 
-            // library (instead of being written inside of the core library), there is no other option.
-            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="LifetimeScope"/> that is currently in scope or <b>null</b> when no
-        /// <see cref="LifetimeScope"/> is currently in scope.
-        /// </summary>
-        /// <example>
-        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
-        /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="LifetimeScope"/> in which context it is created:
-        /// <code lang="cs"><![CDATA[
-        /// container.Register<IService, ServiceImpl>();
-        /// container.RegisterInitializer<ServiceImpl>(instance =>
-        /// {
-        ///     LifetimeScope scope = container.GetCurrentLifetimeScope();
-        ///     if (scope != null) scope.RegisterForDisposal(instance);
-        /// });
-        /// ]]></code>
-        /// </example>
-        /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
-        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
-        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
-        /// by registering a service using one of the 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
-        /// overloads.
-        /// </exception>
-        public static LifetimeScope GetCurrentLifetimeScope(this Container container)
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            IServiceProvider provider = container;
-
-            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
-
-            if (manager != null)
-            {
-                // CurrentScope can be null, when there is currently no scope.
-                return manager.CurrentScope;
-            }
-
-            // When no LifetimeScopeManager is registered, we explicitly throw an exception. See the comments
-            // in the BeginLifetimeScope method for more information.
-            // We could return null here, since the BeginLifetimeScope already throws an exception,
-            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
         }
 
         /// <summary>
@@ -303,6 +208,105 @@ namespace SimpleInjector
             container.EnableLifetimeScoping();
 
             ReplaceDummyRegistrationWithLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
+        }
+
+
+        /// <summary>
+        /// Begins a new lifetime scope for the given <paramref name="container"/>. 
+        /// Services, registered with <b>RegisterLifetimeScope</b>, that are requested within the same thread
+        /// as where the lifetime scope is created, are cached during the lifetime of that scope.
+        /// The scope should be disposed explicitly when the scope ends.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
+        /// not been called previously.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
+        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
+        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
+        /// by registering a service using one of the 
+        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
+        /// overloads.
+        /// </exception>
+        public static LifetimeScope BeginLifetimeScope(this Container container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            IServiceProvider provider = container;
+
+            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
+
+            if (manager != null)
+            {
+                return manager.BeginLifetimeScope();
+            }
+
+            // When no LifetimeScopeManager is registered, this means that there are no lifetime scope
+            // registrations (since the first call to RegisterLifetimeScope also registers the singleton
+            // manager). However, since the user has called BeginLifetimeScope, he/she expects to be able to
+            // use it, for instance to allow disposing instances with a different/shorter lifetime than 
+            // Lifetime Scope (using the LifetimeScope.RegisterForDisposal method). For this to work however,
+            // we need a LifetimeScopeManager, but at this point it is impossible to register it, since
+            // BeginLifetimeScope will be called after the initialization phase. We have no other option than
+            // to inform the user about enabling lifetime scoping explicitly by throwing an exception. You
+            // might see this as a design flaw, but since this feature is implemented on top of the core 
+            // library (instead of being written inside of the core library), there is no other option.
+            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="LifetimeScope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="LifetimeScope"/> is currently in scope.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
+        /// returned every time) and registers an initializer for that type that will register that instance
+        /// for disposal in the <see cref="LifetimeScope"/> in which context it is created:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(instance =>
+        /// {
+        ///     container.GetCurrentLifetimeScope().RegisterForDisposal(instance);
+        /// });
+        /// ]]></code>
+        /// </example>
+        /// <param name="container">The container.</param>
+        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
+        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
+        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
+        /// by registering a service using one of the 
+        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
+        /// overloads.
+        /// </exception>
+        public static LifetimeScope GetCurrentLifetimeScope(this Container container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            IServiceProvider provider = container;
+
+            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
+
+            if (manager != null)
+            {
+                // CurrentScope can be null, when there is currently no scope.
+                return manager.CurrentScope;
+            }
+
+            // When no LifetimeScopeManager is registered, we explicitly throw an exception. 
+            // Otherwise this might lead users to think that they would actually register there
+            // transients for disposal, while there's no lifetime scope.
+            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
         }
 
         private static void ReplaceDummyRegistrationWithLifetimeScope<TService>(Container container,
