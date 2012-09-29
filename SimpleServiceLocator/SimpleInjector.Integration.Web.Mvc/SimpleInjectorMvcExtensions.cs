@@ -76,8 +76,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either the <paramref name="container"/> or the
-        /// <paramref name="assemblies"/> are a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null 
+        /// reference (Nothing in VB).</exception>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
