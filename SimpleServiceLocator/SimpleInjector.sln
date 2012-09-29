@@ -1,11 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
 		Settings.StyleCop = Settings.StyleCop
 		SimpleInjector.FxCop = SimpleInjector.FxCop
 		SimpleInjector.ncover = SimpleInjector.ncover
+		SimpleInjector.Net40.FxCop = SimpleInjector.Net40.FxCop
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Assemblies", "Shared Assemblies", "{C7BE8829-1B19-494C-B719-CFA494053C22}"
@@ -121,7 +122,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 20
+		SccNumberOfProjects = 21
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -182,6 +183,9 @@ Global
 		SccProjectUniqueName19 = SimpleInjector.Integration.Wcf\\SimpleInjector.Integration.Wcf.csproj
 		SccProjectName19 = SimpleInjector.Integration.Wcf
 		SccLocalPath19 = SimpleInjector.Integration.Wcf
+		SccProjectUniqueName20 = SimpleInjector.Extensions.Silverlight.Tests.Unit\\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj
+		SccProjectName20 = ../SimpleInjector.Extensions.Silverlight.Tests.Unit
+		SccLocalPath20 = SimpleInjector.Extensions.Silverlight.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

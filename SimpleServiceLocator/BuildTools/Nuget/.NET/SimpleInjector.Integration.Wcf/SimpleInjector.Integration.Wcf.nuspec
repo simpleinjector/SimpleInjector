@@ -8,7 +8,9 @@
     <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=WCF%20Integration</projectUrl>
     <iconUrl>http://simpleinjector.cuttingedge.it/SimpleInjector.ico</iconUrl>
     <dependencies>
+      <dependency id="WebActivator" version="1.4.4" />
       <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="SimpleInjector.Extensions" version="{version_Extensions}" />
     </dependencies>
     <id>SimpleInjector.Integration.Wcf</id>
     <title>Simple Injector WCF Integration</title>

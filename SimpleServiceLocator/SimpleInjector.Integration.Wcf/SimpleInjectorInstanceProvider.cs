@@ -18,17 +18,19 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
+            this.container.BeginWcfRequestScope();
+
             return this.container.GetInstance(this.serviceType);
         }
 
         public object GetInstance(InstanceContext instanceContext, Message message)
         {
-            return this.container.GetInstance(this.serviceType);
+            return this.GetInstance(instanceContext);
         }
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            // Simple Injector does not dispose instances.
+            this.container.GetCurrentWcfRequestScope().Dispose();
         }
     }
 }
