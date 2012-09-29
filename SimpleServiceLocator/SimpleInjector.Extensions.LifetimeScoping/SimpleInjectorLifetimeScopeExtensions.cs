@@ -209,8 +209,7 @@ namespace SimpleInjector
 
             ReplaceDummyRegistrationWithLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
         }
-
-
+        
         /// <summary>
         /// Begins a new lifetime scope for the given <paramref name="container"/>. 
         /// Services, registered with <b>RegisterLifetimeScope</b>, that are requested within the same thread
