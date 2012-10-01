@@ -53,8 +53,8 @@
     <Reference Include="System.ServiceModel.Activation" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WcfRequestScope.cs" />
-    <Compile Include="WcfRequestScopeManager.cs" />
+    <Compile Include="WcfOperationScope.cs" />
+    <Compile Include="WcfOperationScopeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleInjectorInstanceProvider.cs" />
     <Compile Include="SimpleInjectorWcfExtensions.cs" />

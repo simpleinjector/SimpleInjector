@@ -18,7 +18,7 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
-            this.container.BeginWcfRequestScope();
+            this.container.BeginWcfOperationScope();
 
             return this.container.GetInstance(this.serviceType);
         }
@@ -30,7 +30,7 @@ namespace SimpleInjector.Integration.Wcf
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            this.container.GetCurrentWcfRequestScope().Dispose();
+            this.container.GetCurrentWcfOperationScope().Dispose();
         }
     }
 }

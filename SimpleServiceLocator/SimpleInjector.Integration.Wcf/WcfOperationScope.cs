@@ -34,14 +34,14 @@ namespace SimpleInjector.Integration.Wcf
     /// Thread and container specific cache for services that are registered with one of the 
     /// <see cref="SimpleInjectorWcfExtensions">RegisterPerWcfRequest</see> extension method overloads.
     /// </summary>
-    public sealed class WcfRequestScope : IDisposable
+    public sealed class WcfOperationScope : IDisposable
     {
         private readonly Dictionary<Type, object> lifetimeScopedInstances = new Dictionary<Type, object>();
         private readonly int initialThreadId;
-        private WcfRequestScopeManager manager;
+        private WcfOperationScopeManager manager;
         private List<IDisposable> disposables;
 
-        internal WcfRequestScope(WcfRequestScopeManager manager)
+        internal WcfOperationScope(WcfOperationScopeManager manager)
         {
             this.manager = manager;
             this.initialThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -57,7 +57,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <example>
         /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
         /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="WcfRequestScope"/> in which context it is created:
+        /// for disposal in the <see cref="WcfOperationScope"/> in which context it is created:
         /// <code lang="cs"><![CDATA[
         /// container.Register<IService, ServiceImpl>();
         /// container.RegisterInitializer<ServiceImpl>(instance =>

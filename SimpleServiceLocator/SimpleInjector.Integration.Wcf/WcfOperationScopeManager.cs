@@ -33,18 +33,18 @@ namespace SimpleInjector.Integration.Wcf
     // application -for some reason- has multiple containers) to have it's own set of lifetime scopes, without
     // influencing other scopes from other containers.
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "A WcfRequestScopeManager instance is stored as singleton in a Container instance, " +
+        Justification = "A WcfOperationScopeManager instance is stored as singleton in a Container instance, " +
             "but the container itself does not implement IDisposable, and will never dispose any instances " +
             "it contains. Letting WcfRequestScopeManager implement IDisposable does not help and when the " +
             "application creates multiple Containers (that go out of scope before the AppDomain is stopped), " +
             "we must rely on the garbage collector calling the Finalize method of the ThreadLocal<T>.")]
-    internal sealed class WcfRequestScopeManager
+    internal sealed class WcfOperationScopeManager
     {
         // Here we use .NET 4.0 ThreadLocal instead of the [ThreadStatic] attribute, to allow each container
         // to have it's own set of scopes.
-        private readonly ThreadLocal<WcfRequestScope> threadLocalScopes = new ThreadLocal<WcfRequestScope>();
+        private readonly ThreadLocal<WcfOperationScope> threadLocalScopes = new ThreadLocal<WcfOperationScope>();
 
-        internal WcfRequestScopeManager(IAutoRegistrationProtection autoWiringProtection)
+        internal WcfOperationScopeManager(IAutoRegistrationProtection autoWiringProtection)
         {
         }
 
@@ -59,26 +59,26 @@ namespace SimpleInjector.Integration.Wcf
         {
         }
 
-        internal WcfRequestScope CurrentScope
+        internal WcfOperationScope CurrentScope
         {
             get { return this.threadLocalScopes.Value; }
         }
 
-        internal WcfRequestScope BeginScope()
+        internal WcfOperationScope BeginScope()
         {
             if (this.threadLocalScopes.Value != null)
             {
                 throw new InvalidOperationException("WCF Scopes can not be nested.");
             }
 
-            var scope = new WcfRequestScope(this);
+            var scope = new WcfOperationScope(this);
 
             this.threadLocalScopes.Value = scope;
 
             return scope;
         }
 
-        internal void EndLifetimeScope(WcfRequestScope scope)
+        internal void EndLifetimeScope(WcfOperationScope scope)
         {
             this.threadLocalScopes.Value = null;
         }

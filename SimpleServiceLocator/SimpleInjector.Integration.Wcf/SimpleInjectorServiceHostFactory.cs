@@ -27,7 +27,7 @@
                     "This method can only be called once. The container has already been set.");
             }
 
-            SimpleInjectorWcfExtensions.EnablePerWcfRequestScoping(container);
+            SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
 
             SimpleInjectorServiceHostFactory.container = container;
         }
