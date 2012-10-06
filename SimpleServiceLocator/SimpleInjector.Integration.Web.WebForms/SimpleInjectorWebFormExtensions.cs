@@ -31,8 +31,8 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Web.Compilation;
     using System.Web.UI;
-
     using SimpleInjector.Extensions;
 
     /// <summary>
@@ -71,7 +71,7 @@ namespace SimpleInjector
 
             if (assemblies == null || assemblies.Length == 0)
             {
-                assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                assemblies = BuildManager.GetReferencedAssemblies().OfType<Assembly>().ToArray();
             }            
 
             var concreteTypes =

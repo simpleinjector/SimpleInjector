@@ -31,8 +31,8 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
+    using System.Web.Compilation;
     using System.Web.Mvc;
-
     using SimpleInjector.Extensions;
     using SimpleInjector.Integration.Web.Mvc;
 
@@ -90,7 +90,7 @@ namespace SimpleInjector
 
             if (assemblies == null || assemblies.Length == 0)
             {
-                assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                assemblies = BuildManager.GetReferencedAssemblies().OfType<Assembly>().ToArray();
             }
 
             var controllerTypes =
