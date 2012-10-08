@@ -38,7 +38,7 @@ namespace SimpleInjector.Extensions
     /// to be applied and it allows users to examine the given instance to see whether the decorator should
     /// be applied or not.
     /// </summary>
-    [DebuggerDisplay("DecoratorPredicateContext (ServiceType: {Helpers.ToFriendlyName(ServiceType)}, ImplementationType: {Helpers.ToFriendlyName(ImplementationType)}, Expression: {Expression})")]
+    [DebuggerDisplay("DecoratorPredicateContext (ServiceType: {Helpers.ToFriendlyName(ServiceType),nq}, ImplementationType: {Helpers.ToFriendlyName(ImplementationType),nq}, Expression: {Expression})")]
     public sealed class DecoratorPredicateContext
     {
         internal static readonly ReadOnlyCollection<Type> EmptyAppliedDecorators =
