@@ -85,7 +85,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types in the given 
+        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with a transient lifetime.
         /// </summary>
@@ -109,8 +109,8 @@ namespace SimpleInjector.Extensions
 
 #if !SILVERLIGHT
         /// <summary>
-        /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
-        /// given <paramref name="assemblies"/> that implement the given 
+        /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/>
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a transient lifetime.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -135,8 +135,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
-        /// given <paramref name="assemblies"/> that implement the given 
+        /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> 
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a transient lifetime.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -161,7 +161,7 @@ namespace SimpleInjector.Extensions
 #endif
 
         /// <summary>
-        /// Allows registration of all concrete, public, non-generic types in the given set of 
+        /// Allows registration of all concrete, public, non-generic types that are located in the given set of 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
         /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
         /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
@@ -188,7 +188,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Allows registration of all concrete, public, non-generic types in the given set of 
+        /// Allows registration of all concrete, public, non-generic types that are located in the given set of 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
         /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
         /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
@@ -217,8 +217,8 @@ namespace SimpleInjector.Extensions
 #if !SILVERLIGHT
         /// <summary>
         /// Allows registration of all concrete, non-generic types with the given 
-        /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
-        /// the given <paramref name="openGenericServiceType"/>, by supplying a 
+        /// <paramref name="accessibility"/> that are located in the given set of <paramref name="assemblies"/> 
+        /// that implement the given <paramref name="openGenericServiceType"/>, by supplying a 
         /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
@@ -247,8 +247,8 @@ namespace SimpleInjector.Extensions
 
         /// <summary>
         /// Allows registration of all concrete, non-generic types with the given 
-        /// <paramref name="accessibility"/> in the given set of <paramref name="assemblies"/> that implement 
-        /// the given <paramref name="openGenericServiceType"/>, by supplying a 
+        /// <paramref name="accessibility"/> that are located in the given set of <paramref name="assemblies"/> 
+        /// that implement the given <paramref name="openGenericServiceType"/>, by supplying a 
         /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
@@ -277,7 +277,7 @@ namespace SimpleInjector.Extensions
 #endif
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types in the given 
+        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
@@ -300,7 +300,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types in the given 
+        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with a singleton lifetime.
         /// </summary>
@@ -324,8 +324,8 @@ namespace SimpleInjector.Extensions
 
 #if !SILVERLIGHT
         /// <summary>
-        /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
-        /// given <paramref name="assemblies"/> that implement the given 
+        /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/> 
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -349,8 +349,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> in the 
-        /// given <paramref name="assemblies"/> that implement the given 
+        /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> 
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
@@ -521,8 +521,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Returns all public types from the supplied <paramref name="assemblies"/> that implement or inherit
-        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
@@ -559,8 +559,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Returns all public types from the supplied <paramref name="assemblies"/> that implement or inherit
-        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
@@ -597,8 +597,8 @@ namespace SimpleInjector.Extensions
 
 #if !SILVERLIGHT
         /// <summary>
-        /// Returns all types from the supplied <paramref name="assemblies"/> that implement or inherit
-        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// Returns all types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
@@ -639,8 +639,8 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Returns all types from the supplied <paramref name="assemblies"/> that implement or inherit
-        /// from the supplied <paramref name="openGenericServiceType"/>.
+        /// Returns all types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
