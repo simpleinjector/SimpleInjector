@@ -4,15 +4,17 @@
     // NOTE: You need .NET 4.0 to be able to use this code.
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq.Expressions;
     using SimpleInjector;
 
+    [DebuggerDisplay("DependencyContext (ServiceType: {ServiceType}, ImplementationType: {ImplementationType})")]
     public class DependencyContext
     {
         internal static readonly DependencyContext Root =
             new DependencyContext(null, null);
 
-        internal DependencyContext(Type serviceType, 
+        internal DependencyContext(Type serviceType,
             Type implementationType)
         {
             this.ServiceType = serviceType;
@@ -31,7 +33,7 @@
             Func<DependencyContext, TService> contextBasedFactory)
             where TService : class
         {
-            Func<TService> rootTypeInstanceCreator = 
+            Func<TService> rootTypeInstanceCreator =
                 () => contextBasedFactory(DependencyContext.Root);
 
             // Allow TService to be resolved when calling 
@@ -53,12 +55,12 @@
             };
         }
 
-        private sealed class DependencyContextRewriter 
+        private sealed class DependencyContextRewriter
             : ExpressionVisitor
         {
-            private readonly List<Expression> parents = 
+            private readonly List<Expression> parents =
                 new List<Expression>();
-            
+
             public object DelegateToReplace { get; set; }
 
             public object ContextBasedFactory { get; set; }
@@ -67,11 +69,11 @@
 
             private Expression Parent
             {
-                get 
-                { 
-                    return this.parents.Count < 2 
-                        ? null 
-                        : this.parents[this.parents.Count - 2]; 
+                get
+                {
+                    return this.parents.Count < 2
+                        ? null
+                        : this.parents[this.parents.Count - 2];
                 }
             }
 
@@ -91,7 +93,7 @@
             {
                 var parent = this.Parent as NewExpression;
 
-                if (parent != null && 
+                if (parent != null &&
                     this.IsRootTypeContextRegistration(node))
                 {
                     var context = new DependencyContext(
@@ -113,7 +115,7 @@
                     return false;
                 }
 
-                var constantValue = 
+                var constantValue =
                     ((ConstantExpression)node.Expression).Value;
 
                 return constantValue == this.DelegateToReplace;
