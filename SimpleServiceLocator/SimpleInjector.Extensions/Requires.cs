@@ -66,7 +66,7 @@ namespace SimpleInjector.Extensions
 
         internal static void TypeIsOpenGeneric(Type type, string paramName)
         {
-            if (!type.IsGenericTypeDefinition)
+            if (!type.ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsNotAnOpenGenericType(type), paramName);
             }
@@ -74,7 +74,7 @@ namespace SimpleInjector.Extensions
 
         internal static void TypeIsNotOpenGeneric(Type type, string paramName)
         {
-            if (type.IsGenericTypeDefinition)
+            if (type.ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
             }
@@ -98,8 +98,8 @@ namespace SimpleInjector.Extensions
 
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
-            if (service.IsGenericType && !service.IsGenericTypeDefinition && 
-                implementation.IsGenericType && implementation.IsGenericTypeDefinition)
+            if (service.IsGenericType && !service.ContainsGenericParameters &&
+                implementation.IsGenericType && implementation.ContainsGenericParameters)
             {
                 throw new NotSupportedException(
                     StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
@@ -174,7 +174,7 @@ namespace SimpleInjector.Extensions
         internal static void DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(Type serviceType,
             Type decoratorType, string parameterName)
         {
-            if (!serviceType.IsGenericTypeDefinition && decoratorType.IsGenericTypeDefinition)
+            if (!serviceType.ContainsGenericParameters && decoratorType.ContainsGenericParameters)
             {
                 throw new ArgumentException(
                     StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(

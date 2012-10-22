@@ -35,7 +35,7 @@ namespace SimpleInjector
     /// the <see cref="Container"/>. An observer can change the 
     /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the registered type.
     /// </summary>
-    [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: {RegisteredServiceType}, Expression: {Expression})")]
+    [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: {SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;

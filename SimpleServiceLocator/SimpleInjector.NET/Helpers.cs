@@ -179,7 +179,7 @@ namespace SimpleInjector
         {
             // While array types are in fact concrete, we can not create them and creating them would be
             // pretty useless.
-            return !serviceType.IsAbstract && !serviceType.IsGenericTypeDefinition && !serviceType.IsArray;
+            return !serviceType.IsAbstract && !serviceType.ContainsGenericParameters && !serviceType.IsArray;
         }
 
         internal static void ThrowWhenCollectionContainsNullArguments(IEnumerable collection, Type serviceType)

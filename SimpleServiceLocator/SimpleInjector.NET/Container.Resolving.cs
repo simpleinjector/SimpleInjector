@@ -463,7 +463,7 @@ namespace SimpleInjector
         {
             bool typeIsGenericEnumerable =
                 serviceType.IsGenericType &&
-                !serviceType.IsGenericTypeDefinition &&
+                !serviceType.ContainsGenericParameters &&
                 serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
             if (typeIsGenericEnumerable)
@@ -509,7 +509,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForConcreteType(Type concreteType)
         {
             if (!concreteType.IsValueType && this.IsConcreteConstructableType(concreteType) &&
-                !concreteType.IsGenericTypeDefinition)
+                !concreteType.ContainsGenericParameters)
             {
                 var producer = Helpers.CreateTransientInstanceProducerFor(concreteType);
 

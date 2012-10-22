@@ -22,7 +22,7 @@ Version vNext
 		 could not be resolved. (work item 18542)
 		-[Extensions] RegisterOpenGeneric allowed registering types that could never be resolved (for instance
 		 because they had multiple constructors). An ArgumentException is now thrown during registration.
-		-[Extensions] A implementation type registered using RegisterOpenGeneric that could not be resolved
+		-[Extensions] An implementation type registered using RegisterOpenGeneric that could not be resolved
 		 (because for instance it has unregistered dependencies) caused a NullReferenceException.
 
 

@@ -26,10 +26,12 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.InstanceProducers;
 
+    [DebuggerDisplay("{GetType().Name}")]
     internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior
     {
         // By supplying a delegate for the retrieval of the container, the ContainerOptions can create and 

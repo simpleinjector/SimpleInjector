@@ -56,7 +56,7 @@ namespace SimpleInjector.Extensions
                 };
             }
 
-            if (this.OpenGenericImplementation.IsGenericTypeDefinition)
+            if (this.OpenGenericImplementation.ContainsGenericParameters)
             {
                 var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
 

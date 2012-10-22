@@ -146,7 +146,7 @@ namespace SimpleInjector.Extensions
 
         internal static bool IsConcreteType(Type type)
         {
-            return !type.IsAbstract && !type.IsGenericTypeDefinition;
+            return !type.IsAbstract && !type.ContainsGenericParameters;
         }
 
         internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly,

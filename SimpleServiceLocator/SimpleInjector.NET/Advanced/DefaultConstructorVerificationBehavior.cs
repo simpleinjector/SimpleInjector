@@ -25,8 +25,10 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System.Diagnostics;
     using System.Reflection;
 
+    [DebuggerDisplay("{GetType().Name}")]
     internal sealed class DefaultConstructorVerificationBehavior : IConstructorVerificationBehavior
     {
         public void Verify(ParameterInfo parameter)

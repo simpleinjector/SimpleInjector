@@ -26,8 +26,10 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics;
     using System.Reflection;
 
+    [DebuggerDisplay("{GetType().Name}")]
     internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)

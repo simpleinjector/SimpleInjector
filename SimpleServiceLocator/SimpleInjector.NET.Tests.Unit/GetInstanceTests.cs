@@ -137,6 +137,24 @@
             }
         }
 
+        [TestMethod]
+        public void GetAllInstances_WithOpenGenericType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetAllInstances(typeof(IEnumerable<>));
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "No registration for type IEnumerable<IEnumerable<T>> could be found.", ex);
+            }
+        }
+
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
 
         public class SomeGenericNastyness<TBla>
