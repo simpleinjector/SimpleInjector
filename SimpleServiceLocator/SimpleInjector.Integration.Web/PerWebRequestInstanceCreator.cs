@@ -30,15 +30,37 @@ namespace SimpleInjector.Integration.Web
 
     using SimpleInjector.Advanced;
 
-    internal sealed class PerWebRequestInstanceCreator<TService> where TService : class
+    /// <summary>
+    /// Helper class that allows caching instances returned from the supplied <see cref="Func{TService}"/>
+    /// delegate during the lifetime of the web request.
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    public sealed class PerWebRequestInstanceCreator<TService> where TService : class
     {
         private readonly Container container;
         private readonly Func<TService> instanceCreator;
         private readonly bool disposeWhenRequestEnds;
-
-        internal PerWebRequestInstanceCreator(Container container, Func<TService> instanceCreator,
+        
+        /// <summary>
+        /// Creates a new instance of the <see cref="PerWebRequestInstanceCreator{TService}"/> class.
+        /// </summary>
+        /// <param name="container">The container instance.</param>
+        /// <param name="instanceCreator">The delagate that creates the instance.</param>
+        /// <param name="disposeWhenRequestEnds">Indicates whether the created instance should be disposed
+        /// on the end on the web request.</param>
+        public PerWebRequestInstanceCreator(Container container, Func<TService> instanceCreator,
             bool disposeWhenRequestEnds)
         {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (instanceCreator == null)
+            {
+                throw new ArgumentNullException("instanceCreator");
+            }
+
             this.container = container;
             this.instanceCreator = instanceCreator;
             this.disposeWhenRequestEnds = disposeWhenRequestEnds;
@@ -47,6 +69,10 @@ namespace SimpleInjector.Integration.Web
         // This method needs to be public, because the RegisterPerWebRequest extension methods build a
         // MethodCallExpression using this method, and this would fail in partial trust when the method is 
         // not public.
+        /// <summary>
+        /// Gets the instance that is cached during the lifetime of the web request.
+        /// </summary>
+        /// <returns>A new or cached instance.</returns>
         public TService GetInstance()
         {
             var context = HttpContext.Current;
