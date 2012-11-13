@@ -34,14 +34,17 @@ namespace SimpleInjector
 
     internal sealed class PropertyInjector
     {
+        // NOTE: .NET 3.5 only has Action delegate that goes up to Action<T1, T2, T3, T4>. Still we could make this,
+        // maximum dynamic which would improve performance (it actually was in the past). However, for some strange 
+        // reason, this lead to a bug that was reported by several users: http://bit.ly/ZDTvSh. For some strange
+        // reason, doing an OpCodes.Ldarg_S with a System.Windows.Forms.BindingContext doesn't play well together.
+        private const int RuntimeMaximumActionTypeArguments = 4;
+        
         private static readonly Type[] ActionDelegates = (
             from type in typeof(Action).Assembly.GetExportedTypes()
             where type.FullName.StartsWith("System.Action`", StringComparison.Ordinal)
             select type)
             .ToArray();
-
-        private static readonly int RuntimeMaximumActionTypeArguments =
-            ActionDelegates.Max(d => d.GetGenericArguments().Length);
 
         private readonly Container container;
 

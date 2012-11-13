@@ -20,6 +20,8 @@ Version vNext
 		 failed instead of returning null.
 		-[Core] GetInstance(Type) threw a less expressive exception as GetInstance<TService>() when a type
 		 could not be resolved. (work item 18542)
+		-[Core] Injecting properties could fail under .NET 4.0 and up where class inherited from 
+		 System.Windows.Forms.UserControl (work item 18909).
 		-[Extensions] RegisterOpenGeneric allowed registering types that could never be resolved (for instance
 		 because they had multiple constructors). An ArgumentException is now thrown during registration.
 		-[Extensions] An implementation type registered using RegisterOpenGeneric that could not be resolved
