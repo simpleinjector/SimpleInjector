@@ -508,8 +508,8 @@ namespace SimpleInjector
 
         private InstanceProducer BuildInstanceProducerForConcreteType(Type concreteType)
         {
-            if (!concreteType.IsValueType && this.IsConcreteConstructableType(concreteType) &&
-                !concreteType.ContainsGenericParameters)
+            if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
+                this.IsConcreteConstructableType(concreteType))
             {
                 var producer = Helpers.CreateTransientInstanceProducerFor(concreteType);
 

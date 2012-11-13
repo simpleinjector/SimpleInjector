@@ -5,45 +5,49 @@
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    public interface IStruct<T> where T : struct
+    {
+    }
+
+    public interface IFoo<T>
+    {
+    }
+
+    public interface IBar<T>
+    {
+    }
+
+    // This is the open generic interface that will be used as service type.
+    public interface IService<TA, TB>
+    {
+    }
+
+    public interface IValidate<T>
+    {
+        void Validate(T instance);
+    }
+
+    public interface IDoStuff<T>
+    {
+        IService<T, int> Service { get; }
+    }
+
+    public interface IEventHandler<TEvent>
+    {
+        void Handle(TEvent @event);
+    }
+
+    public interface IAuditableEvent
+    {
+    }
+
+    public interface IProducer<T>
+    {
+    }
+
     [TestClass]
     public class OpenGenericRegistrationExtensionsTests
     {
-        public interface IFoo<T>
-        {
-        }
-
-        public interface IBar<T>
-        {
-        }
-
-        // This is the open generic interface that will be used as service type.
-        public interface IService<TA, TB>
-        {
-        }
-
-        public interface IValidate<T>
-        {
-            void Validate(T instance);
-        }
-
-        public interface IDoStuff<T>
-        {
-            IService<T, int> Service { get; }
-        }
-
-        public interface IEventHandler<TEvent>
-        {
-            void Handle(TEvent @event);
-        }
-
-        public interface IAuditableEvent
-        {
-        }
-
-        public interface IProducer<T>
-        {
-        }
-
         [TestMethod]
         public void RegisterOpenGeneric_WithValidArguments_ReturnsExpectedTypeOnGetInstance()
         {
@@ -613,16 +617,13 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains(@"
-                    There was an error in the registration of open generic type 
-                    OpenGenericRegistrationExtensionsTests+IDoStuff<T>. 
-                    Failed to build a registration for type 
-                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean>.".TrimInside(),
+                    There was an error in the registration of open generic type IDoStuff<T>. 
+                    Failed to build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
                     ex.Message);
 
                 AssertThat.StringContains(@"                                                                     
-                    The constructor of the type OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean> 
-                    contains the parameter of type 
-                    OpenGenericRegistrationExtensionsTests+IService<Boolean, Int32> with name 'service' that 
+                    The constructor of the type DefaultStuffDoer<Boolean> 
+                    contains the parameter of type IService<Boolean, Int32> with name 'service' that 
                     is not registered."
                     .TrimInside(),
                     ex.Message);
@@ -649,18 +650,14 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains(@"
-                    There was an error in the registration of open generic type 
-                    OpenGenericRegistrationExtensionsTests+IDoStuff<T>. 
-                    Failed to build a registration for type 
-                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean>."
+                    There was an error in the registration of open generic type IDoStuff<T>. 
+                    Failed to build a registration for type DefaultStuffDoer<Boolean>."
                     .TrimInside(),
                     ex.Message);
 
                 AssertThat.StringContains(@"                                                                     
-                    The constructor of the type 
-                    OpenGenericRegistrationExtensionsTests+DefaultStuffDoer<Boolean> contains the parameter 
-                    of type OpenGenericRegistrationExtensionsTests+IService<Boolean, Int32>  with name 
-                    'service' that is not registered."
+                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
+                    of type IService<Boolean, Int32>  with name 'service' that is not registered."
                     .TrimInside(),
                     ex.Message);
             }
@@ -767,16 +764,6 @@
         {
         }
 
-        public sealed class DefaultStuffDoer<T> : IDoStuff<T>
-        {
-            public DefaultStuffDoer(IService<T, int> service)
-            {
-                this.Service = service;
-            }
-
-            public IService<T, int> Service { get; private set; }
-        }
-
         public sealed class NullValidator<T> : IValidate<T>
         {
             public void Validate(T instance)
@@ -796,5 +783,15 @@
         public class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
         {
         }
+    }
+
+    public sealed class DefaultStuffDoer<T> : IDoStuff<T>
+    {
+        public DefaultStuffDoer(IService<T, int> service)
+        {
+            this.Service = service;
+        }
+
+        public IService<T, int> Service { get; private set; }
     }
 }

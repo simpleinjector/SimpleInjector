@@ -66,7 +66,10 @@ namespace SimpleInjector.Extensions
 
         internal static void TypeIsOpenGeneric(Type type, string paramName)
         {
-            if (!type.ContainsGenericParameters)
+            // We don't check for ContainsGenericParameters, because we can't handle types that don't have
+            // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
+            // implementation of the GenericArgumentFinder. That's not an easy thing to fix :-(
+            if (!type.IsGenericTypeDefinition)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsNotAnOpenGenericType(type), paramName);
             }
@@ -74,6 +77,8 @@ namespace SimpleInjector.Extensions
 
         internal static void TypeIsNotOpenGeneric(Type type, string paramName)
         {
+            // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
+            // to find out if this type can be created.
             if (type.ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);

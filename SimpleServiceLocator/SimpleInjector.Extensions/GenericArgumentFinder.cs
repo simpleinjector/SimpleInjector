@@ -192,6 +192,10 @@ namespace SimpleInjector.Extensions
         /// A map containing a generic argument (such as T) and the concrete type (such as Int32) that it
         /// represents.
         /// </summary>
+        [DebuggerDisplay(
+            "Argument: {SimpleInjector.Extensions.Helpers.ToFriendlyName(Argument),nq}, " + 
+            "ConcreteType: {SimpleInjector.Extensions.Helpers.ToFriendlyName(ConcreteType),nq}, " + 
+            "TypeConstraintsAreSatisfied: {TypeConstraintsAreSatisfied}")]
         private sealed class ArgumentMapping : IEquatable<ArgumentMapping>
         {
             internal ArgumentMapping(Type argument, Type concreteType)

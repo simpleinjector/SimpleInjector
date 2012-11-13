@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -138,7 +139,28 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_WithOpenGenericType_ThrowsExpectedException()
+        public void GetInstance_WithNastyOpenGenericType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Lazy<Func<TResult>>
+            var nastyOpenGenericType = typeof(Lazy<>).MakeGenericType(typeof(Func<>));
+
+            try
+            {
+                // Act
+                container.GetInstance(nastyOpenGenericType);
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "No registration for type Lazy<Func<TResult>> could be found.", ex);
+            }
+        }
+
+        [TestMethod]
+        public void GetAllInstances_WithOpenGenericEnumerableType_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();

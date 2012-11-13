@@ -90,14 +90,6 @@ namespace SimpleInjector
             }
         }
 
-#pragma warning disable 1591
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use EnablePerWcfOperationLifestyle() instead.", true)]
-        public static void EnablePerWcfRequestScoping(Container container)
-        {
-            EnablePerWcfOperationLifestyle(container);
-        }
-
         /// <summary>
         /// Allows the container to resolve instances with a Per Wcf Operation lifestyle for the given 
         /// <paramref name="container"/>. This is 
@@ -121,14 +113,6 @@ namespace SimpleInjector
                     throw;
                 }
             }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use RegisterPerWcfOperation<TConcrete>() instead.", true)]
-        public static void RegisterPerWcfRequest<TConcrete>(this Container container)
-            where TConcrete : class
-        {
-            RegisterPerWcfOperation<TConcrete>(container);
         }
 
         /// <summary>
@@ -171,15 +155,6 @@ namespace SimpleInjector
             ReplaceDummyRegistrationWithWcfScope<TConcrete>(container);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use RegisterPerWcfOperation<TService, TImplementation>() instead.", true)]
-        public static void RegisterPerWcfRequest<TService, TImplementation>(this Container container)
-            where TImplementation : class, TService
-            where TService : class
-        {
-            RegisterPerWcfOperation<TService, TImplementation>(container);
-        }
-
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned during
         /// the execution of a single Operation Contract. When the 
@@ -217,15 +192,6 @@ namespace SimpleInjector
             ReplaceDummyRegistrationWithWcfScope<TService>(container);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use RegisterPerWcfOperation<TService>(Func<TService>) instead.", true)]
-        public static void RegisterPerWcfRequest<TService>(this Container container,
-            Func<TService> instanceCreator)
-            where TService : class
-        {
-            RegisterPerWcfOperation<TService>(container, instanceCreator);
-        }
-
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the execution of a single Operation Contract.
@@ -246,15 +212,6 @@ namespace SimpleInjector
             where TService : class
         {
             RegisterPerWcfOperation<TService>(container, instanceCreator, disposeWhenRequestEnds: true);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use RegisterPerWcfOperation<TService>(Func<TService>, bool) instead.", true)]
-        public static void RegisterPerWcfRequest<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenRequestEnds)
-            where TService : class
-        {
-            RegisterPerWcfOperation<TService>(container, instanceCreator, disposeWhenRequestEnds);
         }
 
         /// <summary>
@@ -294,13 +251,6 @@ namespace SimpleInjector
             SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
 
             ReplaceDummyRegistrationWithWcfScope<TService>(container, disposeWhenRequestEnds);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use GetCurrentWcfOperationScope() instead.", true)]
-        public static void GetCurrentWcfRequestScope(this Container container)
-        {
-            GetCurrentWcfOperationScope(container);
         }
 
         /// <summary>
@@ -431,11 +381,11 @@ namespace SimpleInjector
                     return scope.GetInstance(this.instanceCreator, this.DisposeWhenRequestEnds);
                 }
 
-                //if (this.container.IsVerifying())
-                //{
-                //    // Return a transient instance when this method is called during verification
-                //    return this.instanceCreator();
-                //}
+                if (this.container.IsVerifying())
+                {
+                    // Return a transient instance when this method is called during verification
+                    return this.instanceCreator();
+                }
 
                 throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
                     "'PerWcfRequest', but the instance is requested outside the context of a WcfRequestScope.");

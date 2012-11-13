@@ -100,7 +100,7 @@ namespace SimpleInjector.Extensions
 
         private bool SatisfiesGenericTypeConstraints(Type serviceType)
         {
-            if (!this.OpenGenericImplementation.IsGenericTypeDefinition)
+            if (!this.OpenGenericImplementation.ContainsGenericParameters)
             {
                 // When there are no generic type arguments, there are (obviously) no generic type constraints
                 // so checking for the number of argument would always succeed, while this is not correct.

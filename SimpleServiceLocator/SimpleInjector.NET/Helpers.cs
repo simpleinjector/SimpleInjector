@@ -29,10 +29,10 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using SimpleInjector.InstanceProducers;
 
     /// <summary>
@@ -263,7 +263,8 @@ namespace SimpleInjector
                 return Type.EmptyTypes;
             }
 
-            int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1));
+            int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1),
+                 CultureInfo.InvariantCulture);
 
             var argumentOfTypeAndOuterType = type.GetGenericArguments();
 
