@@ -1,11 +1,11 @@
 @ECHO OFF
 
-set version=1.5.0.12199
-set versionCore=1.5.0.12199
-set version_Integration_Mvc=1.5.0.12199
-set version_Integration_Wcf=1.5.0.12267
-set version_Extensions=1.5.0.12238
-set version_Extensions_LifetimeScoping=1.5.0.12199
+set version=1.6.0.12319
+set versionCore=1.6.0.12319
+set version_Integration_Mvc=1.6.0.12319
+set version_Integration_Wcf=1.6.0.12319
+set version_Extensions=1.6.0.12319
+set version_Extensions_LifetimeScoping=1.6.0.12319
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
 
@@ -23,7 +23,7 @@ set defineConstantsNet=PUBLISH
 set defineConstandsSilverlight=PUBLISH;SILVERLIGHT
 set targetPath=bin
 set targetPathNet=%targetPath%\NET
-set targetPathSilverlight=%targetPath%\Silverlight\
+set targetPathSilverlight=%targetPath%\Silverlight
 set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
 
 mkdir %targetPathNet%
@@ -34,6 +34,7 @@ mkdir %targetPathNet%
 
 copy "Shared Assemblies\*.*" %targetPathNet%\*.*
 
+
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%versionCore% /out:%targetPathNet%\SimpleInjector.dll /keyfile:SimpleInjector.snk
@@ -42,6 +43,7 @@ del %targetPathNet%\temp.dll
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=Release /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\CommonServiceLocator.SimpleInjectorAdapter.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%versionCore% /out:%targetPathNet%\CommonServiceLocator.SimpleInjectorAdapter.dll /keyfile:SimpleInjector.snk
+
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions\SimpleInjector.Extensions.csproj" /nologo /p:Configuration=%configuration%
@@ -76,7 +78,7 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Wcf.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version_Integration_Wcf% /out:%targetPathNet%\SimpleInjector.Integration.Wcf.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Integration_Wcf% /out:%targetPathNet%\SimpleInjector.Integration.Wcf.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 
@@ -97,7 +99,7 @@ ren %targetPathSilverlight%\SimpleInjector.Extensions.dll temp.dll
 del %targetPathSilverlight%\temp.dll
 
 %msbuild32% "CommonServiceLocator.SimpleInjectorAdapter.Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstandsSilverlight%"
-ren %targetPathSilverlight%\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.dll temp.dll
+ren %targetPathSilverlight%\CommonServiceLocator.SimpleInjectorAdapter.dll temp.dll
 %ilmerge% %targetPathSilverlight%\temp.dll /ndebug /targetplatform:v4,"%silverlightFrameworkFolder%" /ver:%versionCore% /out:%targetPathSilverlight%\CommonServiceLocator.SimpleInjectorAdapter.dll /keyfile:SimpleInjector.snk
 del %targetPathSilverlight%\temp.dll
 
@@ -111,6 +113,9 @@ copy bin\NET\SimpleInjector.dll Help.Asm\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Help.Asm\SimpleInjector.xml
 copy bin\NET\SimpleInjector.Extensions.dll Help.Asm\SimpleInjector.Extensions.dll
 copy bin\NET\SimpleInjector.Extensions.xml Help.Asm\SimpleInjector.Extensions.xml
+copy bin\NET\SimpleInjector.Packaging.dll Help.Asm\SimpleInjector.Packaging.dll
+copy bin\NET\SimpleInjector.Packaging.xml Help.Asm\SimpleInjector.Packaging.xml
+
 
 
 %sandcastlegui% /document %buildToolsPath%\SimpleInjector.SandcastleGUI
@@ -118,6 +123,7 @@ ren Help\Documentation.chm SimpleInjector.chm
 ren Help\Presentation.css presentation.xxx
 ren Help\presentation.xxx presentation.css
 rmdir Help.Asm /q /s
+
 
 
 mkdir Releases\v%version%
@@ -298,10 +304,11 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy  bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net35\SimpleInjector.Integration.Wcf.dll
-copy  bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net35\SimpleInjector.Integration.Wcf.xml
+copy  bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.dll
+copy  bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %versionCore%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version_Extensions} %version_Extensions%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\13850374b87d467da12f21ca32dac632.psmdcp {version} %version_Integration_Wcf%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Wcf.%version_Integration_Wcf%.zip"
 ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Wcf.%version_Integration_Wcf%.zip" "*.nupkg"

@@ -1,9 +1,9 @@
-Copyright=Copyright (C) 2011 S. van Deursen
+Copyright=Copyright (C) 2012 S. van Deursen
 ProductName=Simple Injector
 AssemblyDir=D:\Cutting Edge\Technisch\Development\SimpleInjector\Help.Asm
 OutputDir=D:\Cutting Edge\Technisch\Development\SimpleInjector\Help
 DocDir=
-Namespaces=SimpleInjector;SimpleInjector.Extensions
+Namespaces=SimpleInjector;SimpleInjector.Extensions;SimpleInjector.Integration.Web;SimpleInjector.Integration.Web.Mvc;SimpleInjector.Integration.Wcf;SimpleInjector.Packaging
 Logo=
 MSDNLinks=true
 OutputType=website;chm
