@@ -1,7 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version 1.6.0.12318 (v1.6.0 RTM) 2012-11-13
 	General description:
+		A few minor bug fixes have been made to the Core and Extensions project and the behaviors of the Per
+		Web Request lifestyle (RegisterPerWebRequest/SimpleInjector.Integration.Web) and Per Lifetime Scope
+		(RegisterLifetimeScope/SimpleInjector.Extensions.LifetimeScoping) have been changed. Both lifestyles
+		now throw an exception when an instance is trying to be resolved outside their scope. For Per Web 
+		Request this means that calling GetInstance when HttpContext.Current == null will fail, instead of
+		returning a transient instance. For Per Lifetime Scope this means that calling GetInstance will fail
+		when no scope is defined, instead of returning a singleton instance.
 	
 	Breaking changes:
 		-[Extensions.LifetimeScoping] now throws an exception when a per-lifetime scoped instance is requested
@@ -11,7 +18,9 @@ Version vNext
 		 the context of a HTTP request (when HttpContext.Current is null). The previous release returned a
 		 transient, but this would easily lead to hard to track errors.
 
-	Other code changes:
+	Code changes:
+		-[Integration.Web] PerWebRequestInstanceCreator<TService> class made public to make it easier to make
+		 open generic registrations with a per web request lifestyle.
 
 	Bug fixes:
 		-[Core] Building a friendly name for an exception message failed for types nested in a generic type.
