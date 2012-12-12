@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <version>{version_Integration_Mvc}</version>
+    <version>{version}</version>
     <authors>S. van Deursen</authors>
     <owners>S. van Deursen</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
@@ -10,8 +10,8 @@
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
       <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Extensions" version="{version}" />
-      <dependency id="SimpleInjector.Integration.Web" version="{version}" />
+      <dependency id="SimpleInjector.Extensions" version="{version_Extensions}" />
+      <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />

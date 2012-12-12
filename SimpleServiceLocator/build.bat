@@ -1,11 +1,14 @@
 @ECHO OFF
 
-set version=1.6.0.12319
+set version=1.6.1
+
 set versionCore=1.6.0.12319
-set version_Integration_Mvc=1.6.0.12319
-set version_Integration_Wcf=1.6.0.12319
-set version_Extensions=1.6.0.12319
-set version_Extensions_LifetimeScoping=1.6.0.12319
+set version_Packaging=%versionCore%
+set version_Extensions=%versionCore%
+set version_Integration_Web=1.6.1.12347
+set version_Integration_Mvc=1.6.1.12347
+set version_Integration_Wcf=1.6.1.0
+set version_Extensions_LifetimeScoping=1.6.1.0
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
 
@@ -25,6 +28,7 @@ set targetPath=bin
 set targetPathNet=%targetPath%\NET
 set targetPathSilverlight=%targetPath%\Silverlight
 set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
+set v4targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
 
 mkdir %targetPathNet%
 
@@ -53,32 +57,32 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:Configuration=%configuration%
 ren %targetPathNet%\SimpleInjector.Packaging.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version% /out:%targetPathNet%\SimpleInjector.Packaging.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version_Packaging% /out:%targetPathNet%\SimpleInjector.Packaging.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Extensions_LifetimeScoping% /out:%targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%version_Extensions_LifetimeScoping% /out:%targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version% /out:%targetPathNet%\SimpleInjector.Integration.Web.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%version_Integration_Web% /out:%targetPathNet%\SimpleInjector.Integration.Web.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.WebForms.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%version% /out:%targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%versionCore% /out:%targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Integration_Mvc% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%version_Integration_Mvc% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Wcf.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:v4 /ver:%version_Integration_Wcf% /out:%targetPathNet%\SimpleInjector.Integration.Wcf.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%version_Integration_Wcf% /out:%targetPathNet%\SimpleInjector.Integration.Wcf.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 
@@ -257,11 +261,11 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\net35\SimpleInjector.Packaging.dll
 copy  bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\net35\SimpleInjector.Packaging.xml
-%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %version_Packaging%
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version%.zip"
-ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %version_Packaging%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version_Packaging%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Packaging.%version_Packaging%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -281,11 +285,11 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web Releases\temp /E /
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.dll
 copy  bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %version%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %version_Integration_Web%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {versionCore} %versionCore%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\fb4dd696b20548afa09bcbbf3ea6c7d0.psmdcp {version} %version%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Web.%version%.zip"
-ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Web.%version%.zip" "*.nupkg"
+%replace% /source:Releases\temp\package\services\metadata\core-properties\fb4dd696b20548afa09bcbbf3ea6c7d0.psmdcp {version} %version_Integration_Web%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Web.%version_Integration_Web%.zip"
+ren "%CD%\Releases\v%version%\.NET\SimpleInjector.Integration.Web.%version_Integration_Web%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -293,9 +297,10 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector.MVC3 Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy  bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
 copy  bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
-%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %version%
-%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Mvc} %version_Integration_Mvc%
+%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {versionCore} %versionCore%
+%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Extensions} %version_Extensions%
+%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Web} %version_Integration_Web%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version_Integration_Mvc%.zip"
 ren "%CD%\Releases\v%version%\.NET\SimpleInjector.MVC3.%version_Integration_Mvc%.zip" "*.nupkg"
