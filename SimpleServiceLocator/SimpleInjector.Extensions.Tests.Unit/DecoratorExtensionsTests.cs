@@ -6,24 +6,28 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    public interface ILogger
+    {
+        void Log(string message);
+    }
+
+    public interface ICommandHandler<TCommand>
+    {
+        void Handle(TCommand command);
+    }
+
+    public interface INonGenericService
+    {
+        void DoSomething();
+    }
+
+    public struct StructCommand
+    {
+    }
+
     [TestClass]
     public class DecoratorExtensionsTests
     {
-        public interface ILogger
-        {
-            void Log(string message);
-        }
-
-        public interface ICommandHandler<TCommand>
-        {
-            void Handle(TCommand command);
-        }
-
-        public interface INonGenericService
-        {
-            void DoSomething();
-        }
-
         [TestMethod]
         public void GetInstance_OnDecoratedNonGenericType_ReturnsTheDecoratedService()
         {
@@ -74,12 +78,13 @@
                 // Act
                 container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator<>));
 
+                // Assert
                 Assert.Fail("Exception was expected.");
             }
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(@"
-                    The supplied decorator 'DecoratorExtensionsTests+NonGenericServiceDecorator<T>' is an open
+                    The supplied decorator 'NonGenericServiceDecorator<T>' is an open
                     generic type definition".TrimInside(),
                     ex.Message);
 
@@ -270,8 +275,8 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(
-                    "The supplied type 'DecoratorExtensionsTests+RealCommandHandlerDecorator' does not " +
-                    "inherit from or implement 'DecoratorExtensionsTests+ICommandHandler<Int32>'", ex.Message);
+                    "The supplied type 'RealCommandHandlerDecorator' does not " +
+                    "inherit from or implement 'ICommandHandler<Int32>'", ex.Message);
             }
         }
 
@@ -822,7 +827,7 @@
             {
                 AssertThat.StringContains(@"
                     its constructor should have a single argument of type 
-                    DecoratorExtensionsTests+ICommandHandler<TCommand>".TrimInside(),
+                    ICommandHandler<TCommand>".TrimInside(),
                     ex.Message);
             }
         }
@@ -842,7 +847,7 @@
             {
                 AssertThat.StringContains(
                     "The supplied type 'KeyValuePair<TKey, TValue>' does not inherit from " +
-                    "or implement 'DecoratorExtensionsTests+ICommandHandler<TCommand>'.",
+                    "or implement 'ICommandHandler<TCommand>'.",
                     ex.Message);
             }
         }
@@ -990,8 +995,61 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains("its constructor should have a single argument of type " +
-                    "DecoratorExtensionsTests+INonGenericService or Func<DecoratorExtensionsTests+INonGenericService>",
+                    "INonGenericService or Func<INonGenericService>",
                     ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_RegisteringAClassThatWrapsADifferentClosedTypeThanItImplements_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                // BadCommandHandlerDecorator1<T> implements ICommandHandler<int> but wraps ICommandHandler<T>
+                container.RegisterDecorator(typeof(ICommandHandler<>),
+                    typeof(BadCommandHandlerDecorator1));
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(
+                    @"its constructor should have an argument of one of the following types:
+                    ICommandHandler<Int32>, Func<ICommandHandler<Int32>>".TrimInside(),
+                    ex.Message);
+
+                AssertThat.ExceptionContainsParamName("decoratorType", ex);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_RegisteringADecoratorWithAnUnresolvableTypeArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                // BadCommandHandlerDecorator2<T, TUnresolved> contains an unmappable type argument TUnresolved.
+                container.RegisterDecorator(typeof(ICommandHandler<>),
+                    typeof(BadCommandHandlerDecorator2<,>));
+
+                // Assert
+                Assert.Fail("Exception was expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(
+                    @"contains unresolvable type arguments.",
+                    ex.Message);
+
+                AssertThat.ExceptionContainsParamName("decoratorType", ex);
             }
         }
 
@@ -1062,9 +1120,8 @@
             catch (InvalidOperationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    The constructor of the type 
-                    DecoratorExtensionsTests+LoggingHandlerDecorator1<DecoratorExtensionsTests+RealCommand> 
-                    contains the parameter of type DecoratorExtensionsTests+ILogger with name 'logger' that is 
+                    The constructor of the type LoggingHandlerDecorator1<RealCommand> 
+                    contains the parameter of type ILogger with name 'logger' that is 
                     not registered.".TrimInside(), ex);
             }
         }
@@ -1101,294 +1158,314 @@
 
             Assert.IsInstanceOfType(decoratee, typeof(StubCommandHandler));
         }
+    }
 
-        public struct StructCommand
+    public sealed class FakeLogger : ILogger
+    {
+        public string Message { get; private set; }
+
+        public void Log(string message)
+        {
+            this.Message += message;
+        }
+    }
+
+    public class RealCommand
+    {
+    }
+
+    public class MultipleConstructorsCommandHandlerDecorator<T> : ICommandHandler<T>
+    {
+        public MultipleConstructorsCommandHandlerDecorator()
         {
         }
 
-        public sealed class FakeLogger : ILogger
-        {
-            public string Message { get; private set; }
-
-            public void Log(string message)
-            {
-                this.Message += message;
-            }
-        }
-
-        public class RealCommand
+        public MultipleConstructorsCommandHandlerDecorator(ICommandHandler<T> decorated)
         {
         }
 
-        public class MultipleConstructorsCommandHandlerDecorator<T> : ICommandHandler<T>
+        public void Handle(T command)
         {
-            public MultipleConstructorsCommandHandlerDecorator()
-            {
-            }
+        }
+    }
 
-            public MultipleConstructorsCommandHandlerDecorator(ICommandHandler<T> decorated)
-            {
-            }
-
-            public void Handle(T command)
-            {
-            }
+    public class InvalidDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
+    {
+        // This is no decorator, since it lacks the ICommandHandler<T> parameter.
+        public InvalidDecoratorCommandHandlerDecorator(ILogger logger)
+        {
         }
 
-        public class InvalidDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
+        public void Handle(T command)
         {
-            // This is no decorator, since it lacks the ICommandHandler<T> parameter.
-            public InvalidDecoratorCommandHandlerDecorator(ILogger logger)
-            {
-            }
+        }
+    }
 
-            public void Handle(T command)
-            {
-            }
+    public class StubCommandHandler : ICommandHandler<RealCommand>
+    {
+        public void Handle(RealCommand command)
+        {
+        }
+    }
+
+    public class StructCommandHandler : ICommandHandler<StructCommand>
+    {
+        public void Handle(StructCommand command)
+        {
+        }
+    }
+
+    public class RealCommandHandler : ICommandHandler<RealCommand>
+    {
+        public void Handle(RealCommand command)
+        {
+        }
+    }
+
+    public class LoggingRealCommandHandler : ICommandHandler<RealCommand>
+    {
+        private readonly ILogger logger;
+
+        public LoggingRealCommandHandler(ILogger logger)
+        {
+            this.logger = logger;
         }
 
-        public class StubCommandHandler : ICommandHandler<RealCommand>
+        public void Handle(RealCommand command)
         {
-            public void Handle(RealCommand command)
-            {
-            }
+            this.logger.Log("RealCommand");
+        }
+    }
+
+    public class RealCommandHandlerDecorator : ICommandHandler<RealCommand>
+    {
+        public RealCommandHandlerDecorator(ICommandHandler<RealCommand> decorated)
+        {
+            this.Decorated = decorated;
         }
 
-        public class StructCommandHandler : ICommandHandler<StructCommand>
+        public ICommandHandler<RealCommand> Decorated { get; private set; }
+
+        public void Handle(RealCommand command)
         {
-            public void Handle(StructCommand command)
-            {
-            }
+        }
+    }
+
+    public class TransactionHandlerDecorator<T> : ICommandHandler<T>
+    {
+        public TransactionHandlerDecorator(ICommandHandler<T> decorated)
+        {
+            this.Decorated = decorated;
         }
 
-        public class RealCommandHandler : ICommandHandler<RealCommand>
+        public ICommandHandler<T> Decorated { get; private set; }
+
+        public void Handle(T command)
         {
-            public void Handle(RealCommand command)
-            {
-            }
+        }
+    }
+
+    public class LogExceptionCommandHandlerDecorator<T> : ICommandHandler<T>
+    {
+        private readonly ICommandHandler<T> decorated;
+
+        public LogExceptionCommandHandlerDecorator(ICommandHandler<T> decorated)
+        {
+            this.decorated = decorated;
         }
 
-        public class LoggingRealCommandHandler : ICommandHandler<RealCommand>
+        public void Handle(T command)
         {
-            private readonly ILogger logger;
+            // called the decorated instance and log any exceptions (not important for these tests).
+        }
+    }
 
-            public LoggingRealCommandHandler(ILogger logger)
-            {
-                this.logger = logger;
-            }
+    public class LoggingHandlerDecorator1<T> : ICommandHandler<T>
+    {
+        private readonly ICommandHandler<T> wrapped;
+        private readonly ILogger logger;
 
-            public void Handle(RealCommand command)
-            {
-                this.logger.Log("RealCommand");
-            }
+        public LoggingHandlerDecorator1(ICommandHandler<T> wrapped, ILogger logger)
+        {
+            this.wrapped = wrapped;
+            this.logger = logger;
         }
 
-        public class RealCommandHandlerDecorator : ICommandHandler<RealCommand>
+        public void Handle(T command)
         {
-            public RealCommandHandlerDecorator(ICommandHandler<RealCommand> decorated)
-            {
-                this.Decorated = decorated;
-            }
+            this.logger.Log("Begin1 ");
+            this.wrapped.Handle(command);
+            this.logger.Log(" End1");
+        }
+    }
 
-            public ICommandHandler<RealCommand> Decorated { get; private set; }
+    public class LoggingHandlerDecorator2<T> : ICommandHandler<T>
+    {
+        private readonly ICommandHandler<T> wrapped;
+        private readonly ILogger logger;
 
-            public void Handle(RealCommand command)
-            {
-            }
+        public LoggingHandlerDecorator2(ICommandHandler<T> wrapped, ILogger logger)
+        {
+            this.wrapped = wrapped;
+            this.logger = logger;
         }
 
-        public class TransactionHandlerDecorator<T> : ICommandHandler<T>
+        public void Handle(T command)
         {
-            public TransactionHandlerDecorator(ICommandHandler<T> decorated)
-            {
-                this.Decorated = decorated;
-            }
+            this.logger.Log("Begin2 ");
+            this.wrapped.Handle(command);
+            this.logger.Log(" End2");
+        }
+    }
 
-            public ICommandHandler<T> Decorated { get; private set; }
-
-            public void Handle(T command)
-            {
-            }
+    public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
+    {
+        public AsyncCommandHandlerProxy(Container container, Func<ICommandHandler<T>> decorateeFactory)
+        {
+            this.DecorateeFactory = decorateeFactory;
         }
 
-        public class LogExceptionCommandHandlerDecorator<T> : ICommandHandler<T>
+        public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+
+        public void Handle(T command)
         {
-            private readonly ICommandHandler<T> decorated;
+            // Run decorated instance on new thread (not important for these tests).
+        }
+    }
 
-            public LogExceptionCommandHandlerDecorator(ICommandHandler<T> decorated)
-            {
-                this.decorated = decorated;
-            }
-
-            public void Handle(T command)
-            {
-                // called the decorated instance and log any exceptions (not important for these tests).
-            }
+    public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
+    {
+        public LifetimeScopeCommandHandlerProxy(Func<ICommandHandler<T>> decorateeFactory,
+            Container container)
+        {
+            this.DecorateeFactory = decorateeFactory;
         }
 
-        public class LoggingHandlerDecorator1<T> : ICommandHandler<T>
+        public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+
+        public void Handle(T command)
         {
-            private readonly ICommandHandler<T> wrapped;
-            private readonly ILogger logger;
+            // Start lifetime scope here (not important for these tests).
+        }
+    }
 
-            public LoggingHandlerDecorator1(ICommandHandler<T> wrapped, ILogger logger)
-            {
-                this.wrapped = wrapped;
-                this.logger = logger;
-            }
-
-            public void Handle(T command)
-            {
-                this.logger.Log("Begin1 ");
-                this.wrapped.Handle(command);
-                this.logger.Log(" End1");
-            }
+    public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T> where T : class
+    {
+        public ClassConstraintHandlerDecorator(ICommandHandler<T> wrapped)
+        {
         }
 
-        public class LoggingHandlerDecorator2<T> : ICommandHandler<T>
+        public void Handle(T command)
         {
-            private readonly ICommandHandler<T> wrapped;
-            private readonly ILogger logger;
+        }
+    }
 
-            public LoggingHandlerDecorator2(ICommandHandler<T> wrapped, ILogger logger)
-            {
-                this.wrapped = wrapped;
-                this.logger = logger;
-            }
-
-            public void Handle(T command)
-            {
-                this.logger.Log("Begin2 ");
-                this.wrapped.Handle(command);
-                this.logger.Log(" End2");
-            }
+    // This is not a decorator, since the class implements ICommandHandler<int> but wraps ICommandHandler<T>
+    public class BadCommandHandlerDecorator1 : ICommandHandler<int>
+    {
+        public BadCommandHandlerDecorator1(ICommandHandler<byte> handler)
+        {
         }
 
-        public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
+        public void Handle(int command)
         {
-            public AsyncCommandHandlerProxy(Container container, Func<ICommandHandler<T>> decorateeFactory)
-            {
-                this.DecorateeFactory = decorateeFactory;
-            }
+        }
+    }
 
-            public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
-
-            public void Handle(T command)
-            {
-                // Run decorated instance on new thread (not important for these tests).
-            }
+    // This is not a decorator, since the class implements ICommandHandler<int> but wraps ICommandHandler<T>
+    public class BadCommandHandlerDecorator2<T, TUnresolved> : ICommandHandler<T>
+    {
+        public BadCommandHandlerDecorator2(ICommandHandler<T> handler)
+        {
         }
 
-        public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
+        public void Handle(T command)
         {
-            public LifetimeScopeCommandHandlerProxy(Func<ICommandHandler<T>> decorateeFactory,
-                Container container)
-            {
-                this.DecorateeFactory = decorateeFactory;
-            }
+        }
+    }
 
-            public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+    public class HandlerDecoratorWithPropertiesBase
+    {
+        public int Item1 { get; set; }
 
-            public void Handle(T command)
-            {
-                // Start lifetime scope here (not important for these tests).
-            }
+        public string Item2 { get; set; }
+    }
+
+    public class HandlerDecoratorWithProperties<T> : HandlerDecoratorWithPropertiesBase, ICommandHandler<T>
+    {
+        private readonly ICommandHandler<T> wrapped;
+
+        public HandlerDecoratorWithProperties(ICommandHandler<T> wrapped)
+        {
+            this.wrapped = wrapped;
         }
 
-        public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T> where T : class
+        public void Handle(T command)
         {
-            public ClassConstraintHandlerDecorator(ICommandHandler<T> wrapped)
-            {
-            }
+        }
+    }
 
-            public void Handle(T command)
-            {
-            }
+    public class RealNonGenericService : INonGenericService
+    {
+        public void DoSomething()
+        {
+        }
+    }
+
+    public class NonGenericServiceDecorator : INonGenericService
+    {
+        public NonGenericServiceDecorator(INonGenericService decorated)
+        {
+            this.DecoratedService = decorated;
         }
 
-        public class HandlerDecoratorWithPropertiesBase
-        {
-            public int Item1 { get; set; }
+        public INonGenericService DecoratedService { get; private set; }
 
-            public string Item2 { get; set; }
+        public void DoSomething()
+        {
+            this.DecoratedService.DoSomething();
+        }
+    }
+
+    public class NonGenericServiceDecorator<T> : INonGenericService
+    {
+        public NonGenericServiceDecorator(INonGenericService decorated)
+        {
+            this.DecoratedService = decorated;
         }
 
-        public class HandlerDecoratorWithProperties<T> : HandlerDecoratorWithPropertiesBase, ICommandHandler<T>
+        public INonGenericService DecoratedService { get; private set; }
+
+        public void DoSomething()
         {
-            private readonly ICommandHandler<T> wrapped;
+            this.DecoratedService.DoSomething();
+        }
+    }
 
-            public HandlerDecoratorWithProperties(ICommandHandler<T> wrapped)
-            {
-                this.wrapped = wrapped;
-            }
-
-            public void Handle(T command)
-            {
-            }
+    public class NonGenericServiceDecoratorWithFunc : INonGenericService
+    {
+        public NonGenericServiceDecoratorWithFunc(Func<INonGenericService> decoratedCreator)
+        {
+            this.DecoratedServiceCreator = decoratedCreator;
         }
 
-        public class RealNonGenericService : INonGenericService
+        public Func<INonGenericService> DecoratedServiceCreator { get; private set; }
+
+        public void DoSomething()
         {
-            public void DoSomething()
-            {
-            }
+            this.DecoratedServiceCreator().DoSomething();
+        }
+    }
+
+    public class NonGenericServiceDecoratorWithBothDecorateeAndFunc : INonGenericService
+    {
+        public NonGenericServiceDecoratorWithBothDecorateeAndFunc(INonGenericService decoratee,
+            Func<INonGenericService> decoratedCreator)
+        {
         }
 
-        public class NonGenericServiceDecorator : INonGenericService
+        public void DoSomething()
         {
-            public NonGenericServiceDecorator(INonGenericService decorated)
-            {
-                this.DecoratedService = decorated;
-            }
-
-            public INonGenericService DecoratedService { get; private set; }
-
-            public void DoSomething()
-            {
-                this.DecoratedService.DoSomething();
-            }
-        }
-
-        public class NonGenericServiceDecorator<T> : INonGenericService
-        {
-            public NonGenericServiceDecorator(INonGenericService decorated)
-            {
-                this.DecoratedService = decorated;
-            }
-
-            public INonGenericService DecoratedService { get; private set; }
-
-            public void DoSomething()
-            {
-                this.DecoratedService.DoSomething();
-            }
-        }
-
-        public class NonGenericServiceDecoratorWithFunc : INonGenericService
-        {
-            public NonGenericServiceDecoratorWithFunc(Func<INonGenericService> decoratedCreator)
-            {
-                this.DecoratedServiceCreator = decoratedCreator;
-            }
-
-            public Func<INonGenericService> DecoratedServiceCreator { get; private set; }
-
-            public void DoSomething()
-            {
-                this.DecoratedServiceCreator().DoSomething();
-            }
-        }
-
-        public class NonGenericServiceDecoratorWithBothDecorateeAndFunc : INonGenericService
-        {
-            public NonGenericServiceDecoratorWithBothDecorateeAndFunc(INonGenericService decoratee,
-                Func<INonGenericService> decoratedCreator)
-            {
-            }
-
-            public void DoSomething()
-            {
-            }
         }
     }
 }

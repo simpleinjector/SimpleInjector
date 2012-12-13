@@ -27,8 +27,8 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
-
     using SimpleInjector;
 
     /// <summary>
@@ -202,6 +202,8 @@ namespace SimpleInjector.Extensions
         /// <summary>Resolves a given open generic type as transient.</summary>
         private sealed class TransientOpenGenericResolver : OpenGenericResolver
         {
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+                Justification = "In this case we are already in an error path and will always throw an exception.")]
             internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
             {
                 try

@@ -26,6 +26,7 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
 
@@ -57,6 +58,23 @@ namespace SimpleInjector.Extensions
                 "For the container to be able to use {0} as a decorator, its constructor should have a " +
                 "single argument of type {1} or Func<{1}>, but it currently has {2}.",
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+        }
+
+        internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
+            IEnumerable<Type> validConstructorArgumentTypes)
+        {
+            var validConstructorArgumentFuncTypes =
+                from type in validConstructorArgumentTypes
+                select typeof(Func<>).MakeGenericType(type);
+
+            var friendlyValidTypes =
+                from type in validConstructorArgumentTypes.Concat(validConstructorArgumentFuncTypes)
+                select type.ToFriendlyName();
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to use {0} as a decorator, its constructor should have an " +
+                "argument of one of the following types: {1}.",
+                decoratorType.ToFriendlyName(), string.Join(", ", friendlyValidTypes.ToArray()));
         }
 
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)
@@ -108,6 +126,14 @@ namespace SimpleInjector.Extensions
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied decorator '{0}' is an open generic type definition, while the supplied " +
                 "service type '{1}' is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+        }
+
+        internal static string DecoratorContainsUnresolvableTypeArguments(Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied decorator '{0}' contains unresolvable type arguments. " +
+                "The type would never be resolved and is therefore not suited to be used as decorator.",
+                decoratorType.ToFriendlyName());
         }
 
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,

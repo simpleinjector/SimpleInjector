@@ -1,5 +1,21 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+
+	Bug fixes:
+		-[Extensions] RegisterDecorator extension methods did not check whether the registered decorator type
+		 contained a constructor argument that the type implemented. This allowed registration of decorators
+		 that could never be used. (work item 18956)
+
+
+Version 1.6.1 (v1.6.1 RTM) 2012-12-12
+	General description:
+		The integration packages that were targetted at .NET 4.0 were incorrectly targetted at .NET 4.5. This
+		was caused by a misconfiguration in the build script. This made it impossible to use those packages
+		when .NET 4.5 was not installed.
+
+
 Version 1.6.0.12318 (v1.6.0 RTM) 2012-11-13
 	General description:
 		A few minor bug fixes have been made to the Core and Extensions project and the behaviors of the Per

@@ -26,6 +26,8 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Reflection;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
@@ -534,10 +536,10 @@ namespace SimpleInjector.Extensions
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
             Requires.ServiceIsAssignableFromImplementation(serviceType, decoratorType, "serviceType");
             Requires.ImplementationHasSelectableConstructor(container, serviceType, decoratorType, "decoratorType");
-            Requires.DecoratorHasConstructorThatContainsServiceTypeAsArgument(container, serviceType,
-                decoratorType, "decoratorType");
+            Requires.IsDecorator(container, serviceType, decoratorType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,
                 decoratorType, "decoratorType");
+            Requires.DecoratorDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, "decoratorType");
         }
     }
 }

@@ -44,36 +44,24 @@ namespace SimpleInjector.Extensions
 
         private Type OpenGenericImplementation { get; set; }
 
+        internal bool ClosedServiceTypeSatisfiesAllTypeConstraints()
+        {
+            return this.FindMatchingOpenGenericServiceType() != null;
+        }
+
         internal BuildResult BuildClosedGenericImplementation()
         {
             var serviceType = this.FindMatchingOpenGenericServiceType();
 
             if (serviceType == null)
             {
-                return new BuildResult
-                {
-                    ClosedServiceTypeSatisfiesAllTypeConstraints = false
-                };
+                return BuildResult.Invalid();
             }
 
-            if (this.OpenGenericImplementation.ContainsGenericParameters)
-            {
-                var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
+            Type closedGenericImplementation = 
+                this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
-                return new BuildResult
-                {
-                    ClosedServiceTypeSatisfiesAllTypeConstraints = true,
-                    ClosedGenericImplementation = this.OpenGenericImplementation.MakeGenericType(arguments)
-                };
-            }
-            else
-            {
-                return new BuildResult
-                {
-                    ClosedServiceTypeSatisfiesAllTypeConstraints = true,
-                    ClosedGenericImplementation = this.OpenGenericImplementation
-                };
-            }
+            return BuildResult.Valid(closedGenericImplementation);
         }
 
         private Type FindMatchingOpenGenericServiceType()
@@ -85,6 +73,20 @@ namespace SimpleInjector.Extensions
                 where this.SatisfiesGenericTypeConstraints(serviceType)
                 select serviceType)
                 .FirstOrDefault();
+        }
+
+        private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(Type serviceType)
+        {
+            if (this.OpenGenericImplementation.ContainsGenericParameters)
+            {
+                var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
+
+                return this.OpenGenericImplementation.MakeGenericType(arguments);
+            }
+            else
+            {
+                return this.OpenGenericImplementation;
+            }
         }
 
         private IEnumerable<Type> GetCandidateServiceTypes()
@@ -134,9 +136,27 @@ namespace SimpleInjector.Extensions
         /// <summary>Result of the GenericTypeBuilder.</summary>
         internal sealed class BuildResult
         {
-            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints { get; set; }
+            private BuildResult()
+            {
+            }
 
-            internal Type ClosedGenericImplementation { get; set; }
+            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints { get; private set; }
+
+            internal Type ClosedGenericImplementation { get; private set; }
+
+            internal static BuildResult Invalid()
+            {
+                return new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
+            }
+
+            internal static BuildResult Valid(Type closedGenericImplementation)
+            {
+                return new BuildResult
+                {
+                    ClosedServiceTypeSatisfiesAllTypeConstraints = true,
+                    ClosedGenericImplementation = closedGenericImplementation,
+                };
+            }
         }
     }
 }

@@ -71,7 +71,9 @@ namespace SimpleInjector.Extensions
             // implementation of the GenericArgumentFinder. That's not an easy thing to fix :-(
             if (!type.IsGenericTypeDefinition)
             {
-                throw new ArgumentException(StringResources.SuppliedTypeIsNotAnOpenGenericType(type), paramName);
+                string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type);
+
+                throw new ArgumentException(message, paramName);
             }
         }
 
@@ -151,28 +153,19 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static void DecoratorHasConstructorThatContainsServiceTypeAsArgument(Container container,
-            Type serviceType, Type decoratorType, string paramName)
+        internal static void DecoratorDoesNotContainUnresolvableTypeArguments(Type serviceType, 
+            Type decoratorType, string parameterName)
         {
-            IConstructorResolutionBehavior behavior = container.Options.ConstructorResolutionBehavior;
-
-            ConstructorInfo constructor = behavior.GetConstructor(serviceType, decoratorType);
-
-            var serviceTypeArguments =
-                from parameter in constructor.GetParameters()
-                where
-                    IsDecorateeDependencyParameter(parameter.ParameterType, serviceType) ||
-                    IsDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType)
-                select parameter;
-
-            int numberOfServiceTypeDependencies = serviceTypeArguments.Count();
-
-            if (numberOfServiceTypeDependencies != 1)
+            if (serviceType.ContainsGenericParameters && decoratorType.ContainsGenericParameters)
             {
-                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                    decoratorType, serviceType, numberOfServiceTypeDependencies);
+                var builder = new GenericTypeBuilder(serviceType, decoratorType);
 
-                throw new ArgumentException(message, paramName);
+                if (!builder.ClosedServiceTypeSatisfiesAllTypeConstraints())
+                {
+                    string error = StringResources.DecoratorContainsUnresolvableTypeArguments(decoratorType);
+
+                    throw new ArgumentException(error, parameterName);
+                }
             }
         }
 
@@ -187,6 +180,68 @@ namespace SimpleInjector.Extensions
             }
         }
 
+        internal static void IsDecorator(Container container, Type serviceType, Type decoratorType, 
+            string paramName)
+        {
+            IConstructorResolutionBehavior behavior = container.Options.ConstructorResolutionBehavior;
+            ConstructorInfo decoratorConstructor = behavior.GetConstructor(serviceType, decoratorType);
+
+            DecoratesServiceType(decoratorType, decoratorConstructor, serviceType, paramName);
+
+            DecoratesBaseTypes(decoratorType, decoratorConstructor, serviceType, paramName);
+        }
+
+        private static void DecoratesServiceType(Type decoratorType, ConstructorInfo decoratorConstructor, 
+            Type serviceType, string paramName)
+        {
+            var validServiceTypeArguments =
+                from parameter in decoratorConstructor.GetParameters()
+                where
+                    IsDecorateeDependencyParameter(parameter.ParameterType, serviceType) ||
+                    IsDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType)
+                select parameter;
+
+            int numberOfServiceTypeDependencies = validServiceTypeArguments.Count();
+
+            if (numberOfServiceTypeDependencies != 1)
+            {
+                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
+                    decoratorType, serviceType, numberOfServiceTypeDependencies);
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
+        private static void DecoratesBaseTypes(Type decoratorType, ConstructorInfo decoratorConstructor, 
+            Type serviceType, string paramName)
+        {
+            var baseTypes = (
+                from baseType in decoratorType.GetBaseTypesAndInterfaces()
+                where IsDecorateeDependencyParameter(baseType, serviceType)
+                select baseType)
+                .ToArray();
+
+            var constructorParameters = decoratorConstructor.GetParameters();
+
+            // For a type to be a decorator, one of its constructor parameter types must exactly match with
+            // one of the interfaces it implements or base types it inherits from.
+            var decoratorParameters =
+                from baseType in baseTypes
+                from parameter in constructorParameters
+                where parameter.ParameterType == baseType ||
+                    parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType)
+                select parameter;
+
+            if (!decoratorParameters.Any())
+            {
+                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
+                    decoratorType, baseTypes);
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
+        // Checks if the given parameterType can function as the decorated instance of the given service type.
         private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
         {
             if (!parameterType.IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
@@ -194,11 +249,12 @@ namespace SimpleInjector.Extensions
                 return false;
             }
 
-            Type funcTypeArgument = parameterType.GetGenericArguments()[0];
+            Type funcArgumentType = parameterType.GetGenericArguments()[0];
 
-            return IsDecorateeDependencyParameter(funcTypeArgument, serviceType);
+            return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
         }
 
+        // Checks if the given parameterType can function as the decorated instance of the given service type.
         private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType)
         {
             if (parameterType == serviceType)
