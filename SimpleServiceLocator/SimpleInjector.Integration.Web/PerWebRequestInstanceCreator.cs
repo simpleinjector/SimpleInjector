@@ -34,7 +34,7 @@ namespace SimpleInjector.Integration.Web
     /// Helper class that allows caching instances returned from the supplied <see cref="Func{TService}"/>
     /// delegate during the lifetime of the web request.
     /// </summary>
-    /// <typeparam name="TService"></typeparam>
+    /// <typeparam name="TService">The service type to return.</typeparam>
     public sealed class PerWebRequestInstanceCreator<TService> where TService : class
     {
         private readonly Container container;
@@ -42,7 +42,7 @@ namespace SimpleInjector.Integration.Web
         private readonly bool disposeWhenRequestEnds;
         
         /// <summary>
-        /// Creates a new instance of the <see cref="PerWebRequestInstanceCreator{TService}"/> class.
+        /// Initializes a new instance of the <see cref="PerWebRequestInstanceCreator{TService}"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
         /// <param name="instanceCreator">The delagate that creates the instance.</param>
@@ -66,15 +66,15 @@ namespace SimpleInjector.Integration.Web
             this.disposeWhenRequestEnds = disposeWhenRequestEnds;
         }
 
-        // This method needs to be public, because the RegisterPerWebRequest extension methods build a
-        // MethodCallExpression using this method, and this would fail in partial trust when the method is 
-        // not public.
         /// <summary>
         /// Gets the instance that is cached during the lifetime of the web request.
         /// </summary>
         /// <returns>A new or cached instance.</returns>
         public TService GetInstance()
         {
+            // This method needs to be public, because the RegisterPerWebRequest extension methods build a
+            // MethodCallExpression using this method, and this would fail in partial trust when the method is 
+            // not public.
             var context = HttpContext.Current;
 
             if (context == null)
