@@ -9,22 +9,6 @@
     public class VerifyTests
     {
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterSingle<UserServiceBase, RealUserService>();
-            container.Register<ServiceWithUnregisteredDependencies>();
-            container.Register<IUserRepository, SqlUserRepository>();
-
-            // Act
-            Console.WriteLine();
-
-            // Assert
-        }
-
-        [TestMethod]
         public void Verify_WithEmptyConfiguration_Succeeds()
         {
             // Arrange
