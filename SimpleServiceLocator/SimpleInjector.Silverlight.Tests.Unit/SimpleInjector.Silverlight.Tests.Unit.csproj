@@ -176,6 +176,7 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\VerifyTests.cs">
       <Link>VerifyTests.cs</Link>
     </Compile>
+    <Compile Include="AmbiguousTypesTests.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

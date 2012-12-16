@@ -42,6 +42,8 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
+        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
+
         private bool verifying;
 
         /// <summary>
@@ -307,7 +309,7 @@ namespace SimpleInjector
         {
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
-            this.AddRegistration(new ConcreteTransientInstanceProducer<TConcrete>());
+            this.AddRegistration(new ConcreteTransientInstanceProducer<TConcrete>(), "TConcrete");
         }
 
         /// <summary>
@@ -331,7 +333,7 @@ namespace SimpleInjector
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
                 "TImplementation");
 
-            this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>());
+            this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>(), "TService");
         }
 
         /// <summary>
@@ -348,7 +350,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            this.AddRegistration(new FuncInstanceProducer<TService>(instanceCreator));
+            this.AddRegistration(new FuncInstanceProducer<TService>(instanceCreator), "TService");
         }
 
         /// <summary>
@@ -373,7 +375,7 @@ namespace SimpleInjector
 
             Func<TConcrete> instanceCreator = () => (TConcrete)instanceProducer.GetInstance();
 
-            this.AddRegistration(new FuncSingletonInstanceProducer<TConcrete>(instanceCreator));
+            this.AddRegistration(new FuncSingletonInstanceProducer<TConcrete>(instanceCreator), "TConcrete");
         }
 
         /// <summary>
@@ -403,7 +405,7 @@ namespace SimpleInjector
 
             Func<TService> instanceCreator = () => (TService)producer.GetInstance();
 
-            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator));
+            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator), "TService");
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -419,7 +421,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instance, "instance");
 
-            this.AddRegistration(new SingletonInstanceProducer<TService>(instance));
+            this.AddRegistration(new SingletonInstanceProducer<TService>(instance), "TService");
         }
 
         /// <summary>
@@ -440,7 +442,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator));
+            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator), "TService");
         }
 
         /// <summary>
@@ -606,7 +608,8 @@ namespace SimpleInjector
 
             var readOnlyCollection = collection.MakeReadOnly();
 
-            this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(readOnlyCollection));
+            this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(readOnlyCollection), 
+                "TService");
 
             this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
         }
@@ -692,10 +695,11 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        private void AddRegistration(InstanceProducer registration)
+        private void AddRegistration(InstanceProducer registration, string serviceTypeArgumentName)
         {
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(registration.ServiceType);
+            this.ThrowWhenTypeIsAmbiguous(registration.ServiceType, serviceTypeArgumentName);
 
             registration.Container = this;
 
@@ -717,6 +721,14 @@ namespace SimpleInjector
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
+            }
+        }
+
+        private void ThrowWhenTypeIsAmbiguous(Type type, string argumentName)
+        {
+            if (AmbiguousTypes.Contains(type))
+            {
+                throw new ArgumentException(StringResources.TypeIsAmbiguous(type), argumentName);
             }
         }
 
