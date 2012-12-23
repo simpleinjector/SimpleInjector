@@ -38,23 +38,42 @@
         }
 
         [TestMethod]
-        public void RegisterInitializer_CalledTwiceForTheSameServiceType_Succeeds()
+        public void GetInstance_RequestingInstanceRegisteredWithGenericRegister_CallsTheCorrespondingInitializer()
         {
             // Arrange
-            bool action1Called = false;
-            bool action2Called = false;
+            bool initializerWasCalled = false;
 
             var container = new Container();
 
-            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { action1Called = true; });
-            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { action2Called = true; });
+            container.Register<IUserRepository, InMemoryUserRepository>();
+
+            container.RegisterInitializer<IUserRepository>(repository => { initializerWasCalled = true; });
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.IsTrue(initializerWasCalled, "The initializer was never called.");
+        }
+
+        [TestMethod]
+        public void RegisterInitializer_RegisteredTwiceForTheSameServiceType_CallsBothInitializers()
+        {
+            // Arrange
+            bool firstInitializerWasCalled = false;
+            bool secondInitializerWasCalled = false;
+
+            var container = new Container();
+
+            container.RegisterInitializer<IUserRepository>(repository => { firstInitializerWasCalled = true; });
+            container.RegisterInitializer<IUserRepository>(repository => { secondInitializerWasCalled = true; });
 
             // Act
             container.GetInstance<SqlUserRepository>();
 
             // Assert
-            Assert.IsTrue(action1Called);
-            Assert.IsTrue(action2Called);
+            Assert.IsTrue(firstInitializerWasCalled, "The first initializer was never called.");
+            Assert.IsTrue(secondInitializerWasCalled, "The second initializer was never called.");
         }
 
         [TestMethod]
