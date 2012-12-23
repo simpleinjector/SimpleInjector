@@ -1,10 +1,11 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Diagnostics;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
+
+    using SimpleInjector.Advanced;
 
     public interface IConstructorSelector
     {
@@ -34,64 +35,82 @@
 
     public static class ConstructorRegistrationExtensions
     {
-        public static void Register<TService, TImplementation>(this Container container,
-            IConstructorSelector selector)
-            where TService : class
+        public static ConstructorSelectorConvention RegisterConstructorSelectorConvention(
+            this Container container)
         {
-            Func<TService> fakeInstanceCreator = () => null;
+            var convention = new ConstructorSelectorConvention(container, 
+                container.Options.ConstructorResolutionBehavior);
 
-            container.Register<TService>(fakeInstanceCreator);
+            container.Options.ConstructorResolutionBehavior = convention;
 
-            container.ExpressionBuilt += (sender, e) =>
-            {
-                if (e.RegisteredServiceType == typeof(TService))
-                {
-                    Verify(e.Expression, fakeInstanceCreator);
+            return convention;
+        }
+    }
 
-                    var ctor = selector.GetConstructor(typeof(TImplementation));
+    public sealed class ConstructorSelectorConvention : IConstructorResolutionBehavior
+    {
+        private readonly Container container;
+        private readonly IConstructorResolutionBehavior baseBehavior;
+        private readonly Dictionary<object, ConstructorInfo> constructors;
 
-                    e.Expression = Expression.New(ctor,
-                        from parameter in ctor.GetParameters()
-                        select container.GetRegistration(parameter.ParameterType, true).BuildExpression());
-                }
-            };
+        public ConstructorSelectorConvention(Container container,
+            IConstructorResolutionBehavior baseBehavior)
+        {
+            this.container = container;
+            this.baseBehavior = baseBehavior;
+            this.constructors = new Dictionary<object, ConstructorInfo>();
         }
 
-        public static void RegisterSingle<TService, TImplementation>(this Container container,
-            IConstructorSelector selector)
-            where TService : class
+        ConstructorInfo IConstructorResolutionBehavior.GetConstructor(Type serviceType,
+            Type implementationType)
         {
-            Register<TService, TImplementation>(container, selector);
+            ConstructorInfo constructor;
 
-            container.ExpressionBuilt += (sender, e) =>
+            if (this.constructors.TryGetValue(CreateKey(serviceType, implementationType), out constructor))
             {
-                if (e.RegisteredServiceType == typeof(TService))
-                {
-                    var instanceCreator = Expression.Lambda<Func<TService>>(e.Expression).Compile();
-
-                    e.Expression = Expression.Constant(instanceCreator(), typeof(TService));
-                }
-            };
-        }
-
-        private static void Verify<TService>(Expression expression, Func<TService> fakeInstanceCreator)
-        {
-            var invocation = expression as InvocationExpression;
-
-            if (invocation != null)
-            {
-                var constant = invocation.Expression as ConstantExpression;
-
-                if (constant != null && object.ReferenceEquals(constant.Value, fakeInstanceCreator))
-                {
-                    return;
-                }
+                return constructor;
             }
 
-            throw new ActivationException(string.Format("The {0} was registered with an " +
-                "IConstructorSelector, but its Expression was changed, which indicates there was another " +
-                "delegate hooked to the ExpressionBuilt event that altered the registration for this type. " +
-                "Make sure that delegate fires after this one.", typeof(TService)));
+            return this.baseBehavior.GetConstructor(serviceType, implementationType);
+        }
+
+        public void Register<TConcrete>(IConstructorSelector selector)
+            where TConcrete : class
+        {
+            this.RegisterExplicitConstructor<TConcrete, TConcrete>(this.container, selector);
+
+            this.container.Register<TConcrete, TConcrete>();
+        }
+
+        public void Register<TService, TImplementation>(IConstructorSelector selector)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            this.RegisterExplicitConstructor<TService, TImplementation>(this.container, selector);
+
+            this.container.Register<TService, TImplementation>();
+        }
+
+        public void RegisterSingle<TService, TImplementation>(IConstructorSelector selector)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            this.RegisterExplicitConstructor<TService, TImplementation>(this.container, selector);
+
+            this.container.RegisterSingle<TService, TImplementation>();
+        }
+
+        private void RegisterExplicitConstructor<TService, TImplementation>(Container container,
+            IConstructorSelector selector)
+        {
+            var constructor = selector.GetConstructor(typeof(TImplementation));
+
+            this.constructors[CreateKey(typeof(TService), typeof(TImplementation))] = constructor;
+        }
+
+        private static object CreateKey(Type serviceType, Type implementationType)
+        {
+            return new { serviceType, implementationType };
         }
     }
 }

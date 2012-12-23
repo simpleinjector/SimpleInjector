@@ -1,11 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class ConstructorRegistrationExtensionsTests
@@ -15,45 +11,100 @@
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Register_RegisterConstructorSelectorConvention_CanNotRegisterTypeWithMultipleConstructors()
+        {
+            // Arrange
+            var container = new Container();
+
+            var convention = container.RegisterConstructorSelectorConvention();
+            
+            // Act
+            container.Register<ICommand, MultipleConstructorsCommand>();
+        }
+
+        [TestMethod]
         public void RegisterWithConstructor_WithValidArgument_Succeeds()
         {
             // Arrange
             var container = new Container();
+
+            var convention = container.RegisterConstructorSelectorConvention();
             
             // Act
-            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
+            convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
         }
 
         [TestMethod]
-        public void GetInstance_CalledAfterValidRegistration_Succeeds1()
+        public void GetInstance_TypeRegisteredWithSpecificConstructor_CreatesThatTypeUsingThatConstructor1()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);
+            var convention = container.RegisterConstructorSelectorConvention();
+
+            convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);
 
             // Act
-            var command = container.GetInstance<ICommand>();
+            var command = (MultipleConstructorsCommand)container.GetInstance<ICommand>();
+
+            // Assert
+            Assert.AreEqual(MultipleConstructorsCommand.LeastParametersConstructor, command.ConstructorType);
         }
 
         [TestMethod]
-        public void GetInstance_CalledAfterValidRegistration_Succeeds2()
+        public void GetInstance_TypeRegisteredWithSpecificConstructor_CreatesThatTypeUsingThatConstructor2()
         {
             // Arrange
             var container = new Container();
+
+            var convention = container.RegisterConstructorSelectorConvention();
 
             container.RegisterSingle<ILogger, NullLogger>();
             container.RegisterSingle<ISomeDependency, SomeDependency>();
-            container.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
+
+            convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
 
             // Act
-            var command = container.GetInstance<ICommand>();
+            var command = (MultipleConstructorsCommand)container.GetInstance<ICommand>();
+
+            // Assert
+            Assert.AreEqual(MultipleConstructorsCommand.MostParametersConstructor, command.ConstructorType);
+        }
+                
+        [TestMethod]
+        public void GetInstance_ConcreteTypeRegisteredWithTwoDifferentKeys_ResolvesThatTypeWithTheDifferentConstructors()
+        {
+            // Arrange
+            var container = new Container();
+
+            var convention = container.RegisterConstructorSelectorConvention();
+
+            container.RegisterSingle<ILogger, NullLogger>();
+            container.RegisterSingle<ISomeDependency, SomeDependency>();
+
+            convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
+            convention.Register<MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);
+
+            // Act
+            var command1 = (MultipleConstructorsCommand)container.GetInstance<ICommand>();
+            var command2 = container.GetInstance<MultipleConstructorsCommand>();
+
+            // Assert
+            Assert.AreEqual(MultipleConstructorsCommand.MostParametersConstructor, command1.ConstructorType);
+            Assert.AreEqual(MultipleConstructorsCommand.LeastParametersConstructor, command2.ConstructorType);
         }
 
         private sealed class MultipleConstructorsCommand : ICommand
         {
+            public const string LeastParametersConstructor = "LeastParameters";
+            public const string MostParametersConstructor = "MostParameters";
+
+            public readonly string ConstructorType;
+
             public MultipleConstructorsCommand()
             {
+                this.ConstructorType = LeastParametersConstructor;
             }
 
             public MultipleConstructorsCommand(ILogger logger)
@@ -66,6 +117,7 @@
 
             public MultipleConstructorsCommand(ILogger logger, ISomeDependency command)
             {
+                this.ConstructorType = MostParametersConstructor;
             }
 
             public void Execute()
