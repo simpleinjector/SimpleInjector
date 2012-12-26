@@ -233,7 +233,7 @@
         }
 
         [TestMethod]
-        public void G2etInstance_DelegateReturningNullRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
+        public void GetInstance_DelegateReturningNullRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
         {
             // Arrange
             var container = new Container();
