@@ -156,16 +156,30 @@
             internal Func<Type, bool> Predicate { get; set; }
 
             [DebuggerStepThrough]
-            public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
+            public void OnExpressionBuilt(object sender, 
+                ExpressionBuiltEventArgs e)
+            {
+                if (this.Predicate(e.RegisteredServiceType))
+                {
+                    ThrowIfServiceTypeIsNotAnInterface(e);
+
+                    e.Expression = this.BuildProxyExpression(e);
+                }
+            }
+
+            [DebuggerStepThrough]
+            private static void ThrowIfServiceTypeIsNotAnInterface(
+                ExpressionBuiltEventArgs e)
             {
                 // NOTE: We can only handle interfaces, because 
-                // System.Runtime.Remoting.Proxies.RealProxy only supports interfaces.
-                bool interceptType = e.RegisteredServiceType.IsInterface && 
-                    this.Predicate(e.RegisteredServiceType);
-
-                if (interceptType)
+                // System.Runtime.Remoting.Proxies.RealProxy 
+                // only supports interfaces.
+                if (!e.RegisteredServiceType.IsInterface)
                 {
-                    e.Expression = this.BuildProxyExpression(e);
+                    throw new NotSupportedException(
+                        "Can't intercept type " +
+                        e.RegisteredServiceType.Name +
+                        " because it is not an interface.");
                 }
             }
 
