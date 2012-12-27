@@ -47,6 +47,46 @@
 
             Assert.IsInstanceOfType(decorator.DecoratedService, typeof(RealNonGenericService));
         }
+        
+        [TestMethod]
+        public void GetInstance_OnDecoratedNonGenericSingleton_ReturnsTheDecoratedService()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<INonGenericService, RealNonGenericService>();
+            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
+
+            // Act
+            var service = container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsInstanceOfType(service, typeof(NonGenericServiceDecorator));
+
+            var decorator = (NonGenericServiceDecorator)service;
+
+            Assert.IsInstanceOfType(decorator.DecoratedService, typeof(RealNonGenericService));
+        }
+
+        [TestMethod]
+        public void GetInstance_SingleInstanceWrappedByATransientDecorator_ReturnsANewDecoratorEveryTime()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<INonGenericService, RealNonGenericService>();
+            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
+
+            // Act
+            var decorator1 = (NonGenericServiceDecorator)container.GetInstance<INonGenericService>();
+            var decorator2 = (NonGenericServiceDecorator)container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2), 
+                "A new decorator should be created on each call to GetInstance().");
+            Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedService, decorator2.DecoratedService),
+                "The same instance should be wrapped on each call to GetInstance().");
+        }
 
         [TestMethod]
         public void GetInstance_OnDecoratedNonGenericType_DecoratesInstanceWithExpectedLifeTime()
