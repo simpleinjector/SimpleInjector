@@ -44,6 +44,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Requires.cs" />
     <Compile Include="SimpleInjectorLifetimeScopeExtensions.cs" />
     <Compile Include="LifetimeScope.cs" />
     <Compile Include="LifetimeScopeManager.cs" />

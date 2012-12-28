@@ -51,8 +51,12 @@ namespace SimpleInjector
         /// lifetime scoping must be enabled explicitly.
         /// </summary>
         /// <param name="container">The container.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         public static void EnableLifetimeScoping(this Container container)
         {
+            Requires.IsNotNull(container, "container");
+
             try
             {
                 container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager(null));
@@ -91,10 +95,7 @@ namespace SimpleInjector
         public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             // Dummy registration. This registration will be replaced later. By explicitly registering the
             // instance we use allow the container to verify whether TConcrete can be created and if
@@ -135,10 +136,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             container.Register<TService, TImplementation>();
 
@@ -193,15 +191,8 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             container.Register<TService>(instanceCreator);
 
@@ -231,10 +222,7 @@ namespace SimpleInjector
         /// </exception>
         public static LifetimeScope BeginLifetimeScope(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             IServiceProvider provider = container;
 
@@ -287,10 +275,7 @@ namespace SimpleInjector
         /// </exception>
         public static LifetimeScope GetCurrentLifetimeScope(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             IServiceProvider provider = container;
 
