@@ -652,6 +652,81 @@
             Assert.IsTrue(container.Options.AllowOverridingRegistrations);
         }
 
+        [TestMethod]
+        public void GetInstance_OnDecoratedLifetimeScopedInstance_WrapsTheInstanceWithTheDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                ICommand instance = container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.IsInstanceOfType(instance, typeof(CommandDecorator));
+
+                var decorator = (CommandDecorator)instance;
+
+                Assert.IsInstanceOfType(decorator.DecoratedInstance, typeof(ConcreteCommand));
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledTwiceInOneScopeForDecoratedLifetimeScopedInstance_WrapsATransientDecoratorAroundALifetimeScopedInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
+                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
+                    "The decorator should be transient.");
+
+                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
+                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledTwiceInOneScopeForDecoratedLifetimeScopedInstance2_WrapsATransientDecoratorAroundALifetimeScopedInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Same as previous test, but now with RegisterDecorator called first.
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
+                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
+                    "The decorator should be transient but seems to have a scoped lifetime.");
+
+                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
+                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
+            }
+        }
+
         public class ConcreteCommand : ICommand
         {
             public void Execute()
@@ -709,6 +784,20 @@
             public override bool Equals(object obj)
             {
                 return this.GetHashCode() == obj.GetHashCode();
+            }
+        }
+
+        public class CommandDecorator : ICommand
+        {
+            public CommandDecorator(ICommand decorated)
+            {
+                this.DecoratedInstance = decorated;
+            }
+
+            public ICommand DecoratedInstance { get; private set; }
+
+            public void Execute()
+            {
             }
         }
     }

@@ -60,6 +60,10 @@
       <Project>{D140D43C-B7AB-43B2-A287-394DF871EB56}</Project>
       <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
+      <Project>{ca5a8a13-aa2c-4c21-80e3-98452a94cff7}</Project>
+      <Name>SimpleInjector.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>
