@@ -120,6 +120,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Wcf", "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj", "{D17385DB-BEA4-4B14-A195-DB9ADEC4E709}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.Tests.Unit", "SimpleInjector.Integration.Web.Tests.Unit\SimpleInjector.Integration.Web.Tests.Unit.csproj", "{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 21
@@ -183,9 +185,9 @@ Global
 		SccProjectUniqueName19 = SimpleInjector.Integration.Wcf\\SimpleInjector.Integration.Wcf.csproj
 		SccProjectName19 = SimpleInjector.Integration.Wcf
 		SccLocalPath19 = SimpleInjector.Integration.Wcf
-		SccProjectUniqueName20 = SimpleInjector.Extensions.Silverlight.Tests.Unit\\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj
-		SccProjectName20 = ../SimpleInjector.Extensions.Silverlight.Tests.Unit
-		SccLocalPath20 = SimpleInjector.Extensions.Silverlight.Tests.Unit
+		SccProjectUniqueName20 = SimpleInjector.Integration.Web.Tests.Unit\\SimpleInjector.Integration.Web.Tests.Unit.csproj
+		SccProjectName20 = SimpleInjector.Integration.Web.Tests.Unit
+		SccLocalPath20 = SimpleInjector.Integration.Web.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -396,6 +398,16 @@ Global
 		{D17385DB-BEA4-4B14-A195-DB9ADEC4E709}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D17385DB-BEA4-4B14-A195-DB9ADEC4E709}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D17385DB-BEA4-4B14-A195-DB9ADEC4E709}.Release|x86.ActiveCfg = Release|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
