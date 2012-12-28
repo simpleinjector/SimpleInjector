@@ -57,8 +57,13 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
+            bool oldBehavior = container.Options.AllowOverridingRegistrations;
+
             try
             {
+                // Ensure a registered manager doesn't get overrided by disallowing overrides.
+                container.Options.AllowOverridingRegistrations = false;
+
                 container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager(null));
             }
             catch (InvalidOperationException ex)
@@ -69,6 +74,10 @@ namespace SimpleInjector
                 {
                     throw;
                 }
+            }
+            finally
+            {
+                container.Options.AllowOverridingRegistrations = oldBehavior;
             }
         }
 

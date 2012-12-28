@@ -560,6 +560,98 @@
             SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(new Container(), null);
         }
 
+        [TestMethod]
+        public void RegisterLifetimeScope_CalledAfterVerifyWithAllowOverridingRegistrationsSetToTrue_ShouldResolveAsExpected()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            container.Verify();
+
+            // Act
+            // This call should not replace the registrered LifetimeScopeManager. If it was changed, this test
+            // will fail.
+            container.RegisterLifetimeScope<IDisposable, DisposableCommand>();
+
+            ICommand command1, command2;
+
+            using (container.BeginLifetimeScope())
+            {
+                // Resolve the registration that was made before the call to Verify
+                command1 = container.GetInstance<ICommand>();
+                command2 = container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(command1, command2));
+        }
+
+        [TestMethod]
+        public void EnableLifetimeScoping_CalledAfterVerifyWithAllowOverridingRegistrationsSetToTrue_ShouldResolveAsExpected()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.AllowOverridingRegistrations = true;
+            
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            container.Verify();
+
+            // Act
+            // This call should not replace the registrered LifetimeScopeManager. If it was changed, this test
+            // will fail.
+            container.EnableLifetimeScoping();
+
+            ICommand command1, command2;
+
+            using (container.BeginLifetimeScope())
+            {
+                // Resolve the registration that was made before the call to Verify
+                command1 = container.GetInstance<ICommand>();
+                command2 = container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(command1, command2));
+        }
+
+        [TestMethod]
+        public void EnableLifetimeScoping_AllowOverridingRegistrationsIsTrue_AllowOverridingRegistrationsRemainsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.EnableLifetimeScoping();
+
+            // Assert
+            Assert.IsTrue(container.Options.AllowOverridingRegistrations);
+        }
+
+        [TestMethod]
+        public void EnableLifetimeScoping_CalledAgainAfterAllowOverridingRegistrationsIsTrue_AllowOverridingRegistrationsRemainsTrue()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.EnableLifetimeScoping();
+
+            // Assert
+            Assert.IsTrue(container.Options.AllowOverridingRegistrations);
+        }
+
         public class ConcreteCommand : ICommand
         {
             public void Execute()
