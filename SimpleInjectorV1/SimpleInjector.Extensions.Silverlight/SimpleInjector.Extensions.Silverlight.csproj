@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimpleInjector.Extensions</RootNamespace>
+    <AssemblyName>SimpleInjector.Extensions</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>false</ThrowErrorsInValidation>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>http://localhost/SimpleInjector.Extensions/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Silverlight\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Silverlight\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DocumentationFile>..\bin\Silverlight\SimpleInjector.Extensions.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SimpleInjector, Version=1.4.0.12049, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SimpleInjector.Extensions\DecoratorExtensions.cs">
+      <Link>DecoratorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\DecoratorPredicateContext.cs">
+      <Link>DecoratorPredicateContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs">
+      <Link>Decorators\ContainerControlledServicesDecoratorInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
+      <Link>Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratableEnumerable.cs">
+      <Link>Decorators\DecoratableEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptor.cs">
+      <Link>Decorators\DecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptorData.cs">
+      <Link>Decorators\DecoratorExpressionInterceptorData.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorHelpers.cs">
+      <Link>Decorators\DecoratorHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\IDecoratableEnumerable.cs">
+      <Link>Decorators\IDecoratableEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
+      <Link>Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceTypeDecoratorInfo.cs">
+      <Link>Decorators\ServiceTypeDecoratorInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\GenericArgumentFinder.cs">
+      <Link>GenericArgumentFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\GenericDecoratorExtensions.cs">
+      <Link>GenericDecoratorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\GenericTypeBuilder.cs">
+      <Link>GenericTypeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Helpers.cs">
+      <Link>Helpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\NonGenericRegistrationsExtensions.cs">
+      <Link>NonGenericRegistrationsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\OpenGenericBatchRegistrationExtensions.cs">
+      <Link>OpenGenericBatchRegistrationExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\OpenGenericRegistrationExtensions.cs">
+      <Link>OpenGenericRegistrationExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Requires.cs">
+      <Link>Requires.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\StringResources.cs">
+      <Link>StringResources.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
