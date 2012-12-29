@@ -120,9 +120,6 @@
     <Compile Include="..\SimpleInjector.Extensions\GenericArgumentFinder.cs">
       <Link>GenericArgumentFinder.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\GenericDecoratorExtensions.cs">
-      <Link>GenericDecoratorExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.Extensions\GenericTypeBuilder.cs">
       <Link>GenericTypeBuilder.cs</Link>
     </Compile>
