@@ -42,7 +42,7 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
+        private static readonly IEnumerable<Type> AmbiguousTypes = Enumerable.Empty<Type>();
 
         private bool verifying;
 
