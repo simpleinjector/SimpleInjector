@@ -30,6 +30,7 @@ namespace SimpleInjector.Extensions
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using SimpleInjector;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Provides a set of static (Shared in Visual Basic) methods for registration of open generic service
@@ -101,21 +102,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
-            Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
-            Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
-            Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
-                "openGenericServiceType");
-            Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
-                openGenericImplementation, "openGenericImplementation");
-
-            var transientResolver = new TransientOpenGenericResolver
-            {
-                OpenGenericServiceType = openGenericServiceType,
-                OpenGenericImplementation = openGenericImplementation,
-                Container = container
-            };
-
-            container.ResolveUnregisteredType += transientResolver.ResolveOpenGeneric;
+            RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
+                Lifestyle.Transient);
         }
 
         /// <summary>
@@ -182,6 +170,17 @@ namespace SimpleInjector.Extensions
         public static void RegisterSingleOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
+            RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
+                Lifestyle.Singleton);
+        }
+
+        public static void RegisterOpenGeneric(this Container container,
+            Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
+            Requires.IsNotNull(openGenericImplementation, "openGenericImplementation");
+            Requires.IsNotNull(lifestyle, "lifestyle");
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceIsAssignableFromImplementation(openGenericServiceType, openGenericImplementation,
@@ -189,113 +188,32 @@ namespace SimpleInjector.Extensions
             Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
                 openGenericImplementation, "openGenericImplementation");
 
-            var singletonResolver = new SingleOpenGenericResolver
+            var resolver = new UnregisteredOpenGenericResolver
             {
                 OpenGenericServiceType = openGenericServiceType,
                 OpenGenericImplementation = openGenericImplementation,
-                Container = container
+                Container = container,
+                Lifestyle = lifestyle
             };
 
-            container.ResolveUnregisteredType += singletonResolver.ResolveOpenGeneric;
-        }
-
-        /// <summary>Resolves a given open generic type as transient.</summary>
-        private sealed class TransientOpenGenericResolver : OpenGenericResolver
-        {
-            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-                Justification = "In this case we are already in an error path and will always throw an exception.")]
-            internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
-            {
-                try
-                {
-                    IInstanceProducer producer =
-                        this.Container.GetRegistration(closedGenericImplementation, throwOnFailure: true);
-
-                    e.Register(producer.BuildExpression());
-                }
-                catch (Exception ex)
-                {
-                    try
-                    {
-                        this.Container.GetInstance(closedGenericImplementation);
-                    }
-                    catch (Exception ex2)
-                    {
-                        // The exception thrown from GetInstance (if any) will be much more descriptive,
-                        // than the one thrown from GetRegistration (this is by design).
-                        ex = ex2;
-                    }
-
-                    throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
-                        this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
-                }
-            }
-        }
-
-        /// <summary>Resolves a given open generic type as singleton.</summary>
-        private sealed class SingleOpenGenericResolver : OpenGenericResolver
-        {
-            private readonly Dictionary<Type, object> singletons = new Dictionary<Type, object>();
-
-            public static Func<T> BuildFunc<T>(object instance)
-            {
-                var constant = Expression.Constant(instance, typeof(T));
-
-                return Expression.Lambda<Func<T>>(constant, new ParameterExpression[0]).Compile();
-            }
-
-            internal override void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e)
-            {
-                object singleton = this.GetSingleton(closedGenericImplementation);
-
-                Expression expression = Expression.Constant(singleton, e.UnregisteredServiceType);
-
-                e.Register(expression);
-            }
-
-            private object GetSingleton(Type closedGenericImplementation)
-            {
-                object singleton;
-
-                lock (this)
-                {
-                    if (!this.singletons.TryGetValue(closedGenericImplementation, out singleton))
-                    {
-                        try
-                        {
-                            singleton = this.Container.GetInstance(closedGenericImplementation);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
-                                this.OpenGenericServiceType, closedGenericImplementation, ex.Message), ex);
-                        }
-
-                        this.singletons[closedGenericImplementation] = singleton;
-                    }
-                }
-
-                return singleton;
-            }
-
-            private static Delegate BuildDelegate(object instance, Type serviceType)
-            {
-                return typeof(SingleOpenGenericResolver).GetMethod("BuildFunc")
-                    .MakeGenericMethod(serviceType)
-                    .Invoke(null, new[] { instance }) as Delegate;
-            }
+            container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
         }
 
         /// <summary>Resolves a given open generic type.</summary>
-        private abstract class OpenGenericResolver
+        private sealed class UnregisteredOpenGenericResolver
         {
+            private readonly Dictionary<Type, LifestyleRegistration> lifestyleRegistrationCache =
+                new Dictionary<Type, LifestyleRegistration>();
+
             internal Type OpenGenericServiceType { get; set; }
 
             internal Type OpenGenericImplementation { get; set; }
 
             internal Container Container { get; set; }
 
-            internal void ResolveOpenGeneric(object sender, UnregisteredTypeEventArgs e)
+            internal Lifestyle Lifestyle { get; set; }
+
+            internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
             {
                 if (!this.OpenGenericServiceType.IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
                 {
@@ -308,11 +226,48 @@ namespace SimpleInjector.Extensions
 
                 if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
                 {
-                    this.Register(results.ClosedGenericImplementation, e);
+                    var expression =
+                        this.BuildExpression(e.UnregisteredServiceType, results.ClosedGenericImplementation);
+
+                    // TODO: Should we be able to apply an ILifestyleExpressionProducer instead of an Expression?
+                    e.Register(expression);
                 }
             }
 
-            internal abstract void Register(Type closedGenericImplementation, UnregisteredTypeEventArgs e);
+            private Expression BuildExpression(Type serviceType, Type implementationType)
+            {
+                try
+                {
+                    return this.GetLifestyleRegistrationFor(serviceType, implementationType).BuildExpression();
+                }
+                catch (Exception ex)
+                {
+                    throw new ActivationException(StringResources.ErrorInRegisterOpenGenericRegistration(
+                        this.OpenGenericServiceType, implementationType, ex.Message), ex);
+                }
+            }
+
+            private LifestyleRegistration GetLifestyleRegistrationFor(Type serviceType, Type implementationType)
+            {
+                // We must cache the returned lifestyles to prevent any multi-threading issues in case the
+                // returned lifestyle does some caching internally (as the singleton lifestyle does).
+                lock (this.lifestyleRegistrationCache)
+                {
+                    LifestyleRegistration registration;
+
+                    if (!this.lifestyleRegistrationCache.TryGetValue(serviceType, out registration))
+                    {
+                        registration = 
+                            this.Lifestyle.CreateRegistration(serviceType, implementationType, this.Container);
+
+                        // TODO: Find out whether serviceType as key is enough or whether we need both the
+                        // serviceType and implementationType as the key.
+                        this.lifestyleRegistrationCache[serviceType] = registration;
+                    }
+
+                    return registration;
+                }
+            }
         }
     }
 }

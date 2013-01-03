@@ -33,22 +33,35 @@
             Func<DependencyContext, TService> contextBasedFactory)
             where TService : class
         {
-            Func<TService> rootTypeInstanceCreator =
-                () => contextBasedFactory(DependencyContext.Root);
+            if (contextBasedFactory == null)
+            {
+                throw new ArgumentNullException("contextBasedFactory");
+            }
 
-            // Allow TService to be resolved when calling 
-            // Container.GetInstance<TService>());
-            container.Register<TService>(rootTypeInstanceCreator);
+            // By using the ResolveUnregisteredType event we can
+            // exactly control which which expression is built.
+            container.ResolveUnregisteredType += (sender, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(TService))
+                {
+                    // () => contextBasedFactory(DependencyContext.Root)
+                    var expression = Expression.Invoke(
+                        Expression.Constant(contextBasedFactory),
+                        Expression.Constant(DependencyContext.Root));
+
+                    e.Register(expression);
+                }
+            };
 
             // Allow the Func<DependencyContext, TService> to be 
             // injected into transient parent types.
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 var rewriter = new DependencyContextRewriter
                 {
-                    DelegateToReplace = rootTypeInstanceCreator,
                     ContextBasedFactory = contextBasedFactory,
-                    ServiceType = e.RegisteredServiceType
+                    ServiceType = e.RegisteredServiceType,
+                    OriginalExpression = e.Expression
                 };
 
                 e.Expression = rewriter.Visit(e.Expression);
@@ -61,43 +74,22 @@
             private readonly List<Expression> parents =
                 new List<Expression>();
 
-            public object DelegateToReplace { get; set; }
-
             public object ContextBasedFactory { get; set; }
 
             public Type ServiceType { get; set; }
 
-            private Expression Parent
-            {
-                get
-                {
-                    return this.parents.Count < 2
-                        ? null
-                        : this.parents[this.parents.Count - 2];
-                }
-            }
-
-            public override Expression Visit(Expression node)
-            {
-                this.parents.Add(node);
-
-                node = base.Visit(node);
-
-                this.parents.RemoveAt(this.parents.Count - 1);
-
-                return node;
-            }
+            public Expression OriginalExpression { get; set; }
 
             protected override Expression VisitInvocation(
                 InvocationExpression node)
             {
-                var parent = this.Parent as NewExpression;
-
-                if (parent != null &&
-                    this.IsRootTypeContextRegistration(node))
+                if (this.IsRootTypeContextRegistration(node))
                 {
+                    var parent = this.OriginalExpression as NewExpression;
+
                     var context = new DependencyContext(
-                        this.ServiceType, parent.Type);
+                        this.ServiceType, 
+                        parent != null ? parent.Type : this.ServiceType);
 
                     return Expression.Invoke(
                         Expression.Constant(this.ContextBasedFactory),
@@ -110,15 +102,21 @@
             private bool IsRootTypeContextRegistration(
                 InvocationExpression node)
             {
-                if (node.Expression.NodeType != ExpressionType.Constant)
+                if (!(node.Expression is ConstantExpression) ||
+                    node.Arguments.Count != 1 ||
+                    !(node.Arguments[0] is ConstantExpression))
                 {
                     return false;
                 }
 
-                var constantValue =
+                var target =
                     ((ConstantExpression)node.Expression).Value;
 
-                return constantValue == this.DelegateToReplace;
+                var value =
+                    ((ConstantExpression)node.Arguments[0]).Value;
+
+                return target == this.ContextBasedFactory &&
+                    value == DependencyContext.Root;
             }
         }
     }

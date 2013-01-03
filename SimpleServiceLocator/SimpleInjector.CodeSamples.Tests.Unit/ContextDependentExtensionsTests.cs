@@ -1,17 +1,25 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
+    using System;
+    using System.Runtime.Remoting.Proxies;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ContextDependentExtensionsTests
     {
-        public interface IContext
+        public interface ILogger
         {
+            DependencyContext Context { get; }
         }
 
-        public interface ICommandHandler<TCommand>
+        public interface IRepository
         {
-            void Execute(TCommand command);
+            ILogger Logger { get; }
+        }
+
+        public interface IService
+        {
         }
 
         [TestMethod]
@@ -20,19 +28,14 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
-
-                return (IContext)container.GetInstance(contextType);
-            });
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
             // Act
-            // Note: IntCommandHandler depends on IContext.
-            var handler = container.GetInstance<IntCommandHandler>();
+            var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
 
             // Assert
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
         }
 
         [TestMethod]
@@ -41,91 +44,34 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            container.RegisterInitializer<IntCommandHandler>(_ => { });
+            container.RegisterInitializer<RepositoryThatDependsOnLogger>(_ => { });
 
             // Act
-            // Note: IntCommandHandler depends on IContext.
-            var handler = container.GetInstance<IntCommandHandler>();
+            var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
 
             // Assert
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
         }
-
-        [TestMethod]
-        public void GetInstance_ResolvingAConcreteTypeThatDependsOnAContextDependentType_InjectsExpectedType2()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                // Now we use the ServiceType instead of the ImplementationType.
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ServiceType);
-
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            // Act
-            // IntCommandHandler depends on IContext.
-            var handler = container.GetInstance<IntCommandHandler>();
-
-            // Assert
-            // Because we requested IntCommandHandler directly, the dc.ServiceType is of type IntCommandHandler.
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
-        }
-
+        
         [TestMethod]
         public void GetInstance_ResolvingAnInterfaceWhosImplementationDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            // Note: IntCommandHandler depends on IContext.
-            container.Register<ICommandHandler<int>, IntCommandHandler>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
             // Act
-            var handler = container.GetInstance<ICommandHandler<int>>() as IntCommandHandler;
+            var handler = container.GetInstance<IRepository>() as RepositoryThatDependsOnLogger;
 
             // Assert
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
-        }
-
-        [TestMethod]
-        public void GetInstance_ResolvingAnInterfaceWhosImplementationDependsOnAContextDependentType_InjectsExpectedType2()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                // Now we use the ServiceType instead of the ImplementationType.
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ServiceType);
-
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            // IntCommandHandler depends on IContext.
-            container.Register<ICommandHandler<int>, IntCommandHandler>();
-
-            // Act
-            var handler = container.GetInstance<ICommandHandler<int>>() as IntCommandHandler;
-
-            // Assert
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<ICommandHandler<int>>));
+            Assert.AreEqual(typeof(IRepository), handler.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
         }
 
         [TestMethod]
@@ -134,34 +80,14 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                // Assert
-                Assert.IsNull(dc.ServiceType);
-
-                return new CommandHandlerContext<object>();
-            });
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
             // Act
-            container.GetInstance<IContext>();
-        }
+            var logger = container.GetInstance<ILogger>() as ContectualLogger;
 
-        [TestMethod]
-        public void GetInstance_CalledDirectlyOnTheContextDependentType_InjectsADependencyContextWithoutImplementationType()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                // Assert
-                Assert.IsNull(dc.ImplementationType);
-
-                return new CommandHandlerContext<object>();
-            });
-
-            // Act
-            container.GetInstance<IContext>();
+            // Assert
+            Assert.AreEqual(null, logger.Context.ServiceType);
+            Assert.AreEqual(null, logger.Context.ImplementationType);
         }
 
         [TestMethod]
@@ -170,150 +96,169 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            // IntCommandHandler depends on IContext.
-            container.Register<ICommandHandler<int>, IntCommandHandler>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
             // Act
-            // CommandHandlerWrapper<T> depends on ICommandHandler<T>
-            var wrapper = container.GetInstance<CommandHandlerWrapper<int>>();
+            var service = container.GetInstance<ServiceThatDependsOnRepository>();
 
             // Assert
-            var handler = (IntCommandHandler)wrapper.InjectedHandler;
+            var logger = service.InjectedRepository.Logger;
 
-            Assert.IsInstanceOfType(handler.InjectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
-        }
-
-        [TestMethod]
-        public void GetInstance_TypeWithContextRegisteredAtMultipleLevels_GetsInjectedWithExpectedContext()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
-
-                return (IContext)container.GetInstance(contextType);
-            });
-
-            // IntCommandHandler depends on IContext.
-            container.Register<ICommandHandler<int>, IntCommandHandler>();
-
-            // Act
-            // CommandHandlerWrapper<T> depends on ICommandHandler<T>
-            var wrapper = container.GetInstance<CommandHandlerWrapper<int>>();
-
-            // Assert
-            Assert.IsInstanceOfType(wrapper.InjectedContext,
-                typeof(CommandHandlerContext<CommandHandlerWrapper<int>>));
+            Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
         }
 
         [TestMethod]
         public void GetInstance_ResolvingAnInterceptedTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
-            IContext injectedContext = null;
-
             var container = new Container();
 
-            container.Register<ICommandHandler<int>, IntCommandHandler>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
             // Since both RegisterWithContext en InterceptWith work by replacing the underlighing Expression,
             // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
-            container.InterceptWith<FakeInterceptor>(type => type.Name.Contains("CommandHandler"));
+            container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                Assert.IsNotNull(dc.ServiceType);
-                Assert.IsNotNull(dc.ImplementationType);
-
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
-
-                injectedContext = (IContext)container.GetInstance(contextType);
-
-                return injectedContext;
-            });
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
             // Act
-            // Note: IntCommandHandler depends on IContext.
-            var handler = container.GetInstance<ICommandHandler<int>>();
+            var repository = container.GetInstance<IRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+            Assert_IsIntercepted(repository);
+            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
         [TestMethod]
         public void GetInstance_ResolvingAnInterceptedSingletonTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
-            IContext injectedContext = null;
+            var container = new Container();
+
+            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+
+            container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            // Act
+            var repository = container.GetInstance<IRepository>();
+
+            // Assert
+            Assert_IsIntercepted(repository);
+            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingATypeThatDependsOnInterceptedTypeWithAContextDependentDependency_InjectsExpectedType()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+
+            // Since InterceptWith alters the Expression of ILogger, this would make it harder for 
+            // the Expression visitor of RegisterWithContext to find and alter this expression. So this is
+            // an interesting test.
+            container.InterceptWith<FakeInterceptor>(type => type == typeof(ILogger));
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            // Act
+            var repository = container.GetInstance<IRepository>();
+
+            // Assert
+            Assert_IsIntercepted(repository.Logger);
+            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
+        }
+
+        [TestMethod]
+        public void HybridLifestyle_WithContext_AppliesContextCorrectly1()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = new Container();
 
-            container.RegisterSingle<ICommandHandler<int>, IntCommandHandler>();
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
 
-            // Since both RegisterWithContext en InterceptWith work by replacing the underlighing Expression,
-            // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
-            container.InterceptWith<FakeInterceptor>(type => type.Name.Contains("CommandHandler"));
-
-            container.RegisterWithContext<IContext>(dc =>
-            {
-                Assert.IsNotNull(dc.ServiceType);
-                Assert.IsNotNull(dc.ImplementationType);
-
-                var contextType = typeof(CommandHandlerContext<>).MakeGenericType(dc.ImplementationType);
-
-                injectedContext = (IContext)container.GetInstance(contextType);
-
-                return injectedContext;
-            });
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
 
             // Act
-            // Note: IntCommandHandler depends on IContext.
-            var handler = container.GetInstance<ICommandHandler<int>>();
+            var repository = container.GetInstance<IRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(injectedContext, typeof(CommandHandlerContext<IntCommandHandler>));
+            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
-        private sealed class CommandHandlerWrapper<T>
+        [TestMethod]
+        public void HybridLifestyle_WithContext_AppliesContextCorrectly2()
         {
-            public CommandHandlerWrapper(ICommandHandler<T> handler, IContext context,
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
+
+            // Act
+            var repository = container.GetInstance<IRepository>();
+
+            // Assert
+            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
+        }
+
+        private static void Assert_IsIntercepted(object proxy)
+        {
+            RealProxy realProxy = System.Runtime.Remoting.RemotingServices.GetRealProxy(proxy);
+
+            Assert.IsNotNull(realProxy, "The given " + proxy.GetType().Name + " is not a proxy.");
+        }
+
+        public sealed class ServiceThatDependsOnRepository : IService
+        {
+            public ServiceThatDependsOnRepository(IRepository repository, ILogger logger,
                 ConcreteCommand justAnExtraArgumentToMakeUsFindBugsFaster)
             {
-                this.InjectedHandler = handler;
-                this.InjectedContext = context;
+                this.InjectedRepository = (RepositoryThatDependsOnLogger)repository;
+                this.InjectedLogger = (ContectualLogger)logger;
             }
 
-            public ICommandHandler<T> InjectedHandler { get; private set; }
+            public RepositoryThatDependsOnLogger InjectedRepository { get; private set; }
 
-            public IContext InjectedContext { get; private set; }
+            public ContectualLogger InjectedLogger { get; private set; }
         }
 
-        private sealed class IntCommandHandler : ICommandHandler<int>
+        public sealed class RepositoryThatDependsOnLogger : IRepository
         {
-            public IntCommandHandler(IContext context)
+            public RepositoryThatDependsOnLogger(ILogger logger)
             {
-                this.InjectedContext = context;
+                this.Logger = logger;
             }
 
-            public IContext InjectedContext { get; private set; }
-
-            public void Execute(int command)
-            {
-                // Not important.
-            }
+            public ILogger Logger { get; private set; }
         }
 
-        private sealed class CommandHandlerContext<TCommandHandler> : IContext
+        public sealed class ContectualLogger : ILogger
         {
+            public ContectualLogger(DependencyContext context)
+            {
+                Assert.IsNotNull(context, "context should not be null.");
+
+                this.Context = context;
+            }
+
+            public DependencyContext Context { get; private set; }
         }
 
         private sealed class FakeInterceptor : IInterceptor

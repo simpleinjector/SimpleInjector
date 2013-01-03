@@ -1,5 +1,27 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+
+Version vFuture
+	General description:
+
+	New features:
+		-[Core] Lifestyle and LifestyleRegistration classes added. These classes allow implementing custom
+		 lifestyle management.
+		-[Core] Register overloads added that take an Lifetyle as argument.
+		-[Core] ExpressionBuilding event added.
+		-[Core] HybridLifestyle added to allow registering hybrid lifestyles.
+
+	Breaking changes:
+		-[Core] ExpressionBuilt code get called twice. The first call to ExpressionBuilt is now prevented and
+		 the new ExpressionBuilding event handles this.
+		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
+		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). This could
+		 lead to inconsistent behavior or performance issues if the Func<T> delegate implements its own 
+		 caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
+		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
+		 PerWebRequestLifestyle can be used instead.
+
+
 Version vNext
 	General description:
 

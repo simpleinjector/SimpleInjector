@@ -23,42 +23,34 @@
 */
 #endregion
 
-namespace SimpleInjector.InstanceProducers
+namespace SimpleInjector
 {
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
 
-    /// <summary>Base class for producing instances.</summary>
+    using SimpleInjector.Lifestyles;
+
     [DebuggerDisplay(Helpers.InstanceProviderDebuggerDisplayString)]
-    internal abstract class InstanceProducer : IInstanceProducer
+    internal sealed class InstanceProducer : IInstanceProducer
     {
         private readonly object instanceCreationLock = new object();
+        private readonly LifestyleRegistration registration;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
         private Expression expression;
         private bool? isValid = true;
 
-        /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
-        /// <param name="serviceType">The type of the service this instance will produce.</param>
-        protected InstanceProducer(Type serviceType)
+        public InstanceProducer(Type serviceType, LifestyleRegistration registration)
         {
             this.ServiceType = serviceType;
+            this.registration = registration;
             this.validator = new CyclicDependencyValidator(serviceType);
         }
 
-        /// <summary>Gets the service type for which this producer produces instances.</summary>
-        /// <value>A <see cref="Type"/> instance.</value>
         public Type ServiceType { get; private set; }
-
-        internal Container Container { get; set; }
-
-        internal bool IsResolvedThroughUnregisteredTypeResolution
-        {
-            set { this.isValid = value ? null : (bool?)true; }
-        }
 
         // Will only return false when the type is a concrete unregistered type that was automatically added
         // by the container, while the expression can not be generated.
@@ -78,10 +70,6 @@ namespace SimpleInjector.InstanceProducers
             }
         }
 
-        /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer.
-        /// </summary>
-        /// <returns>An Expression.</returns>
         public Expression BuildExpression()
         {
             this.validator.CheckForRecursiveCalls();
@@ -104,9 +92,6 @@ namespace SimpleInjector.InstanceProducers
             }
         }
 
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
             "A property is not appropriate, because get instance could possibly be a heavy ")]
         public object GetInstance()
@@ -137,33 +122,15 @@ namespace SimpleInjector.InstanceProducers
 
             if (instance == null)
             {
-                throw new ActivationException(this.BuildRegisteredDelegateForTypeReturnedNullExceptionMessage());
+                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
             }
 
             return instance;
         }
 
-        /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer.
-        /// </summary>
-        /// <returns>An Expression.</returns>
-        protected abstract Expression BuildExpressionCore();
-
-        protected virtual string BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage()
+        internal void FlagAsConcreteTypeThatHasBeenResolvedThroughUnregisteredTypeResolution()
         {
-            return StringResources.DelegateForTypeThrewAnException(this.ServiceType);
-        }
-
-        protected virtual string BuildRegisteredDelegateForTypeReturnedNullExceptionMessage()
-        {
-            return StringResources.DelegateForTypeReturnedNull(this.ServiceType);
-        }
-
-        protected virtual string BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
-            Expression expression, Exception exception)
-        {
-            return StringResources.ErrorWhileBuildingDelegateFromExpression(this.ServiceType, expression, 
-                exception);
+            this.isValid = null;
         }
 
         private Func<object> BuildInstanceCreator()
@@ -179,8 +146,8 @@ namespace SimpleInjector.InstanceProducers
             }
             catch (Exception ex)
             {
-                string message = this.BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
-                    expression, ex);
+                string message =
+                    StringResources.ErrorWhileBuildingDelegateFromExpression(this.ServiceType, expression, ex);
 
                 throw new ActivationException(message, ex);
             }
@@ -208,18 +175,18 @@ namespace SimpleInjector.InstanceProducers
 
         private Expression BuildExpressionWithInterception()
         {
-            var expression = this.BuildExpressionCore();
+            var expression = this.registration.BuildExpression();
 
             var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
 
-            this.Container.OnExpressionBuilt(e);
+            this.registration.Container.OnExpressionBuilt(e);
 
             return e.Expression;
         }
 
         private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
         {
-            string exceptionMessage = this.BuildErrorWhileTryingToGetInstanceOfTypeExceptionMessage();
+            string exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
 
             // Prevent wrapping duplicate exceptions.
             if (!innerException.Message.StartsWith(exceptionMessage, StringComparison.OrdinalIgnoreCase))

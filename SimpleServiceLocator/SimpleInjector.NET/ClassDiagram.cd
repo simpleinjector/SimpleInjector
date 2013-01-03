@@ -1,106 +1,136 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="SimpleInjector.UnregisteredTypeEventArgs">
-    <Position X="4" Y="1.5" Width="3" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAIAAAAAAAAAAAABAAAAABAAAAAAQAAAAAAAA=</HashCode>
-      <FileName>UnregisteredTypeEventArgs.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="SimpleInjector.Helpers" Collapsed="true">
-    <Position X="11.25" Y="1.75" Width="2.5" />
+    <Position X="12" Y="7" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>ALAAAEBgAAAUAaAkAAQBBAAAAAggAAgAAQAAIAAAAAA=</HashCode>
+      <HashCode>CIEAAEAgAAAQIQIEAAABAAAAAAgAAIAIAQAEAAAIAAA=</HashCode>
       <FileName>Helpers.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SimpleInjector.CyclicDependencyValidator" Collapsed="true">
-    <Position X="0.75" Y="5.75" Width="3" />
+    <Position X="8.25" Y="7" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CyclicDependencyValidator.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="SimpleInjector.InstanceProducers.TransientInstanceProducer&lt;TService, TImplementation&gt;" Collapsed="true">
-    <Position X="11.25" Y="3.75" Width="3.25" />
+  <Class Name="SimpleInjector.InstanceProducer" Collapsed="true">
+    <Position X="3.5" Y="6.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAQAAAAAAAAAAABAAAAAAAAAAAAAAAIgAAAAAAAAAI=</HashCode>
-      <FileName>InstanceProducers\TransientInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.SingletonInstanceProducer&lt;TService&gt;" Collapsed="true">
-    <Position X="11.25" Y="6.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>InstanceProducers\SingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.FuncSingletonInstanceProducer&lt;TService&gt;" Collapsed="true">
-    <Position X="11.25" Y="7.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
-      <FileName>InstanceProducers\FuncSingletonInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.FuncResolutionInstanceProducer&lt;TService&gt;" Collapsed="true">
-    <Position X="11.25" Y="2.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAARAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAI=</HashCode>
-      <FileName>InstanceProducers\FuncResolutionInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.ConcreteTransientInstanceProducer&lt;TConcrete&gt;" Collapsed="true">
-    <Position X="11.25" Y="4.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>InstanceProducers\ConcreteTransientInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.ExpressionResolutionInstanceProducer&lt;TService&gt;" Collapsed="true">
-    <Position X="11.25" Y="8.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>InstanceProducers\ExpressionResolutionInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.FuncInstanceProducer&lt;TService&gt;" Collapsed="true">
-    <Position X="11.25" Y="5.75" Width="3.25" />
-    <TypeIdentifier>
-      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
-      <FileName>InstanceProducers\FuncInstanceProducer.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="SimpleInjector.InstanceProducers.InstanceProducer" Collapsed="true">
-    <Position X="8.5" Y="5.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>EAEZAAQAAAAACAAAAAgAAAAABBACAAAAkAAAAKAEgAI=</HashCode>
+      <HashCode>AAEYAAQAAAAACAAAAAgCAAAABBACAAAAkAQAAKAEgAA=</HashCode>
       <FileName>InstanceProducers\InstanceProducer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="SimpleInjector.Container" Collapsed="true">
-    <Position X="0.75" Y="4" Width="1.75" />
+    <Position X="0.75" Y="1.5" Width="1.75" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="SimpleInjector.Container.InstanceInitializer" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Container.Common.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>gGAAAAYgAKQGYQEEmEVBAAEQFIABIIGAQAACAGERRAA=</HashCode>
-      <FileName>Container.Registration.cs</FileName>
+      <HashCode>gCAAGAYgAKQOYQkEnEVBQAEQFIAhIImAUAACAGVVRAA=</HashCode>
+      <FileName>Container.Common.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="SimpleInjector.IInstanceProducer">
-    <Position X="4.5" Y="6" Width="2" />
+  <Class Name="SimpleInjector.Lifestyles.Lifestyle" Collapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEACAAAAAAAAAQAAAABAAAAEAEEAAAAAAAAA=</HashCode>
+      <FileName>Lifestyles\Lifestyle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.Lifestyles.HybridLifestyle" Collapsed="true">
+    <Position X="8" Y="1.5" Width="1.5" />
+    <InheritanceLine Type="SimpleInjector.Lifestyles.Lifestyle" FixedToPoint="true">
+      <Path>
+        <Point X="7.5" Y="1.875" />
+        <Point X="8" Y="1.875" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAEAQAAAAAAAAAAAAAAAAAAAAAAAIAEAAAAAAAAA=</HashCode>
+      <FileName>Lifestyles\HybridLifestyle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.Lifestyles.TransientLifestyle" Collapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Lifestyles\TransientLifestyle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.Lifestyles.SingletonLifestyle" Collapsed="true">
+    <Position X="8" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Lifestyles\SingletonLifestyle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.Lifestyles.LifestyleRegistration" Collapsed="true">
+    <Position X="10" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAQAABAgAAARAACAAAAAAAAABAAAAAAAAAAAkAA=</HashCode>
+      <FileName>Lifestyles\LifestyleRegistration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimpleInjector.Advanced.DefaultConstructorVerificationBehavior" Collapsed="true">
+    <Position X="3.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\DefaultConstructorVerificationBehavior.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SimpleInjector.Advanced.DefaultConstructorResolutionBehavior" Collapsed="true">
+    <Position X="3.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAABAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\DefaultConstructorResolutionBehavior.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SimpleInjector.Advanced.DefaultConstructorInjectionBehavior" Collapsed="true">
+    <Position X="3.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABAA=</HashCode>
+      <FileName>Advanced\DefaultConstructorInjectionBehavior.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SimpleInjector.Advanced.AdvancedExtensions" Collapsed="true">
+    <Position X="12.5" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAIAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\AdvancedExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="SimpleInjector.IInstanceProducer" Collapsed="true">
+    <Position X="0.5" Y="6.75" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>IInstanceProducer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SimpleInjector.Advanced.IConstructorVerificationBehavior" Collapsed="true">
+    <Position X="0.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\IConstructorVerificationBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SimpleInjector.Advanced.IConstructorResolutionBehavior" Collapsed="true">
+    <Position X="0.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\IConstructorResolutionBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SimpleInjector.Advanced.IConstructorInjectionBehavior" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Advanced\IConstructorInjectionBehavior.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Tahoma" Size="8.25" />

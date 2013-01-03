@@ -28,14 +28,12 @@
 namespace SimpleInjector
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
     using System.ServiceModel;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Integration.Wcf;
 
     /// <summary>
@@ -59,10 +57,7 @@ namespace SimpleInjector
         /// a null reference (Nothing in VB).</exception>
         public static void RegisterWcfServices(this Container container, params Assembly[] assemblies)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             if (assemblies == null || assemblies.Length == 0)
             {
@@ -100,18 +95,29 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         public static void EnablePerWcfOperationLifestyle(Container container)
         {
+            Requires.IsNotNull(container, "container");
+
+            bool oldBehavior = container.Options.AllowOverridingRegistrations;
+
             try
             {
+                // Ensure a registered manager doesn't get overrided by disallowing overrides.
+                container.Options.AllowOverridingRegistrations = false;
+
                 container.RegisterSingle<WcfOperationScopeManager>(new WcfOperationScopeManager(null));
             }
             catch (InvalidOperationException ex)
             {
-                // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
+                // Suppress the failure when WcfOperationScopeManager has already been registered. This is a bit
                 // nasty, but probably the only way to do this.
                 if (!ex.Message.Contains("already been registered"))
                 {
                     throw;
                 }
+            }
+            finally
+            {
+                container.Options.AllowOverridingRegistrations = oldBehavior;
             }
         }
 
@@ -137,22 +143,9 @@ namespace SimpleInjector
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
             where TConcrete : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
-            // Dummy registration. This registration will be replaced later. By explicitly registering the
-            // instance we use allow the container to verify whether TConcrete can be created and if
-            // TConcrete has already been registered or not. Also, the ExpressionBuilt event will only get
-            // raised for types that are registered, and because the type is registered, we can cleverly make
-            // use of the Expression that has already been created by the container for this registration,
-            // saving us from having to build such registration ourselves.
-            container.Register<TConcrete>();
-
-            SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
-
-            ReplaceDummyRegistrationWithWcfScope<TConcrete>(container);
+            container.Register<TConcrete, TConcrete>(PerWcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -180,16 +173,9 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>();
-
-            SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
-
-            ReplaceDummyRegistrationWithWcfScope<TService>(container);
+            container.Register<TService, TImplementation>(PerWcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -211,7 +197,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            RegisterPerWcfOperation<TService>(container, instanceCreator, disposeWhenRequestEnds: true);
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+
+            container.Register<TService>(instanceCreator, PerWcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -236,21 +225,11 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
-
-            container.Register<TService>(instanceCreator);
-
-            SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
-
-            ReplaceDummyRegistrationWithWcfScope<TService>(container, disposeWhenRequestEnds);
+            container.Register<TService>(instanceCreator, disposeWhenRequestEnds ? 
+                PerWcfOperationLifestyle.WithDisposal : PerWcfOperationLifestyle.NoDisposal);
         }
 
         /// <summary>
@@ -305,10 +284,7 @@ namespace SimpleInjector
 
         internal static WcfOperationScope BeginWcfOperationScope(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             IServiceProvider provider = container;
 
@@ -330,66 +306,6 @@ namespace SimpleInjector
             // might see this as a design flaw, but since this feature is implemented on top of the core 
             // library (instead of being written inside of the core library), there is no other option.
             throw new InvalidOperationException(WcfScopingIsNotEnabledExceptionMessage);
-        }
-
-        private static void ReplaceDummyRegistrationWithWcfScope<TService>(Container container,
-            bool disposeWhenLifetimeScopeEnds = true)
-            where TService : class
-        {
-            var helper = new ReplaceWithWcfOperationHelper<TService>(container)
-            {
-                DisposeWhenRequestEnds = disposeWhenLifetimeScopeEnds
-            };
-
-            container.ExpressionBuilt += helper.ExpressionBuilt;
-        }
-
-        // This class is thread-safe within the context of a single Container.
-        private sealed class ReplaceWithWcfOperationHelper<TService> where TService : class
-        {
-            private readonly Container container;
-            private WcfOperationScopeManager manager;
-            private Func<TService> instanceCreator;
-
-            internal ReplaceWithWcfOperationHelper(Container container)
-            {
-                this.container = container;
-            }
-
-            internal bool DisposeWhenRequestEnds { get; set; }
-
-            internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
-            {
-                if (e.RegisteredServiceType == typeof(TService))
-                {
-                    this.manager = this.container.GetInstance<WcfOperationScopeManager>();
-                    this.instanceCreator = Expression.Lambda<Func<TService>>(e.Expression).Compile();
-
-                    Func<TService> scopedInstanceCreator = this.CreateScopedInstance;
-
-                    // Replace the original expression with an invocation of the Func<TService>
-                    e.Expression = Expression.Invoke(Expression.Constant(scopedInstanceCreator));
-                }
-            }
-
-            private TService CreateScopedInstance()
-            {
-                var scope = this.manager.CurrentScope;
-
-                if (scope != null)
-                {
-                    return scope.GetInstance(this.instanceCreator, this.DisposeWhenRequestEnds);
-                }
-
-                if (this.container.IsVerifying())
-                {
-                    // Return a transient instance when this method is called during verification
-                    return this.instanceCreator();
-                }
-
-                throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
-                    "'PerWcfRequest', but the instance is requested outside the context of a WcfRequestScope.");
-            }
         }
     }
 }

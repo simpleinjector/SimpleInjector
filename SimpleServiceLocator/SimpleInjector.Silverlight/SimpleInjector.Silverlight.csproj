@@ -119,38 +119,38 @@
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\ExpressionBuildingEventArgs.cs">
+      <Link>ExpressionBuildingEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
+      <Link>ExpressionBuiltEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\IInstanceProducer.cs">
       <Link>IInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\ConcreteTransientInstanceProducer.cs">
-      <Link>InstanceProducers\ConcreteTransientInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\ExpressionResolutionInstanceProducer.cs">
-      <Link>InstanceProducers\ExpressionResolutionInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncInstanceProducer.cs">
-      <Link>InstanceProducers\FuncInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncResolutionInstanceProducer.cs">
-      <Link>InstanceProducers\FuncResolutionInstanceProducer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\FuncSingletonInstanceProducer.cs">
-      <Link>InstanceProducers\FuncSingletonInstanceProducer.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\InstanceProducers\InstanceProducer.cs">
       <Link>InstanceProducers\InstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\SingletonInstanceProducer.cs">
-      <Link>InstanceProducers\SingletonInstanceProducer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\ExpressionLifestyleRegistration.cs">
+      <Link>Lifestyles\ExpressionLifestyleRegistration.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\TransientInstanceProducer.cs">
-      <Link>InstanceProducers\TransientInstanceProducer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridLifestyle.cs">
+      <Link>Lifestyles\HybridLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InterceptingEventArgs.cs">
-      <Link>InterceptingEventArgs.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\Lifestyle.cs">
+      <Link>Lifestyles\Lifestyle.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\LifestyleRegistration.cs">
+      <Link>Lifestyles\LifestyleRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\SingletonLifestyle.cs">
+      <Link>Lifestyles\SingletonLifestyle.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\TransientLifestyle.cs">
+      <Link>Lifestyles\TransientLifestyle.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
@@ -164,6 +164,7 @@
     <Compile Include="..\SimpleInjector.NET\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
+    <Compile Include="Lifestyles\LifestyleRegistrationEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

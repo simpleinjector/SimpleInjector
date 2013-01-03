@@ -354,6 +354,52 @@
         }
 
         [TestMethod]
+        public void GetInstance_PerWebRequestInstanceWithInitializer_CallsInitializerOncePerWebRequest()
+        {
+            // Arrange
+            int callCount = 0;
+
+            var container = new Container();
+
+            container.RegisterPerWebRequest<ICommand, ConcreteCommand>();
+
+            container.RegisterInitializer<ICommand>(command => { callCount++; });
+
+            using (new HttpContextScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, callCount, "The initializer for ICommand is expected to get fired once.");
+        }
+
+        [TestMethod]
+        public void GetInstance_PerWebRequestFuncInstanceWithInitializer_CallsInitializerOncePerWebRequest()
+        {
+            // Arrange
+            int callCount = 0;
+
+            var container = new Container();
+
+            container.RegisterPerWebRequest<ICommand>(() => new ConcreteCommand());
+
+            container.RegisterInitializer<ICommand>(command => { callCount++; });
+
+            using (new HttpContextScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, callCount, "The initializer for ICommand is expected to get fired once.");
+        }
+
+        [TestMethod]
         public void GetInstance_OnDecoratedLifetimeScopedInstance_WrapsTheInstanceWithTheDecorator()
         {
             // Arrange

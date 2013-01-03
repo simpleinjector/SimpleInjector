@@ -371,6 +371,59 @@
                 "determine whether the delegate always returns the same or a new instance.");
         }
 
+        [TestMethod]
+        public void InterceptWith_WithInterceptorWithNoPublicConstructor_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, FakeCommand>();
+
+            try
+            {
+                // Act
+                container.InterceptWith<InterceptorWithInternalConstructor>(IsACommandPredicate);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("For the container to be able to create " + 
+                    "InterceptorExtensionsTests+InterceptorWithInternalConstructor, it should contain " +
+                    "exactly one public constructor"),
+                    "Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_OnInterceptedTypeWithInterceptorWithUnresolvableDependency_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, FakeCommand>();
+
+            // The interceptor depends on ILogger, but it is not registered.
+            container.InterceptWith<InterceptorWithDependencyOnLogger>(IsACommandPredicate);
+
+            try
+            {
+                // Act
+                container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The constructor of the type " +
+                    "InterceptorExtensionsTests+InterceptorWithDependencyOnLogger contains the parameter " +
+                    "of type ILogger with name 'logger' that is not registered."),
+                    "Actual: " + ex.Message);
+            }
+        }
+
         // Example interceptor
         private class InterceptorThatLogsBeforeAndAfter : IInterceptor
         {
@@ -413,6 +466,30 @@
 
         private class FakeInterceptor : IInterceptor
         {
+            public void Intercept(IInvocation invocation)
+            {
+                invocation.Proceed();
+            }
+        }
+
+        private class InterceptorWithDependencyOnLogger : IInterceptor
+        {
+            public InterceptorWithDependencyOnLogger(ILogger logger)
+            {
+            }
+
+            public void Intercept(IInvocation invocation)
+            {
+                invocation.Proceed();
+            }
+        }
+
+        private class InterceptorWithInternalConstructor : IInterceptor
+        {
+            internal InterceptorWithInternalConstructor()
+            {
+            }
+
             public void Intercept(IInvocation invocation)
             {
                 invocation.Proceed();

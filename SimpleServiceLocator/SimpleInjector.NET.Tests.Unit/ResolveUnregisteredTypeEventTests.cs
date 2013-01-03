@@ -305,8 +305,8 @@
             {
                 const string AssertMessage = "Exception message was not descriptive.";
 
-                AssertThat.ExceptionMessageContains("ResolveUnregisteredType", ex, AssertMessage);
-                AssertThat.ExceptionMessageContains("registered a delegate that threw an exception", ex,
+                AssertThat.ExceptionMessageContains(
+                    "registered delegate for type IUserRepository threw an exception", ex,
                     AssertMessage);
             }
         }
@@ -336,8 +336,8 @@
             {
                 const string AssertMessage = "Exception message was not descriptive.";
 
-                AssertThat.ExceptionMessageContains("ResolveUnregisteredType", ex, AssertMessage);
-                AssertThat.ExceptionMessageContains("registered a delegate that threw an exception", ex,
+                AssertThat.ExceptionMessageContains(
+                    "registered delegate for type UserServiceBase threw an exception", ex,
                     AssertMessage);
             }
         }
@@ -369,8 +369,6 @@
 
                 AssertThat.ExceptionMessageContains(
                     "Error occurred while trying to build a delegate for type", ex, AssertMessage);
-                AssertThat.ExceptionMessageContains(
-                    "UnregisteredTypeEventArgs.Register(Expression)", ex, AssertMessage);
                 AssertThat.ExceptionMessageContains(
                     "Expression of type 'System.Boolean' cannot be used for return type", ex, AssertMessage);
             }
@@ -428,9 +426,8 @@
             {
                 const string AssertMessage = "Exception message was not descriptive. Actual message: ";
 
-                AssertThat.ExceptionMessageContains("ResolveUnregisteredType", ex, AssertMessage);
                 AssertThat.ExceptionMessageContains(
-                    "registered a delegate that returned a null reference", ex, AssertMessage);
+                    "registered delegate for type IUserRepository returned null", ex, AssertMessage);
             }
         }
 
@@ -461,10 +458,11 @@
             {
                 const string AssertMessage = "Exception message was not descriptive enough.";
 
-                AssertThat.ExceptionMessageContains("ResolveUnregisteredType", ex, AssertMessage);
-                AssertThat.ExceptionMessageContains("registered a delegate that created an instance of type ",
-                    ex, AssertMessage);
-                AssertThat.ExceptionMessageContains("that can not be cast to the specified service type",
+                AssertThat.ExceptionMessageContains(@"
+                    The registered delegate for type RealUserService threw an exception. 
+                    Unable to cast object of type 'SimpleInjector.Tests.Unit.RealUserService' 
+                    to type 'SimpleInjector.Tests.Unit.IUserRepository'."
+                    .TrimInside(),
                     ex, AssertMessage);
             }
         }

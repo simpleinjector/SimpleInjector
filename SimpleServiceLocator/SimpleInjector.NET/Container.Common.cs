@@ -32,8 +32,6 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
-    using SimpleInjector.InstanceProducers;
-
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
@@ -49,6 +47,7 @@ namespace SimpleInjector
         private bool locked;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
+        private EventHandler<ExpressionBuildingEventArgs> expressionBuilding = (s, e) => { };
         private EventHandler<ExpressionBuiltEventArgs> expressionBuilt = (s, e) => { };
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
@@ -190,6 +189,11 @@ namespace SimpleInjector
         public new Type GetType()
         {
             return base.GetType();
+        }
+
+        internal void OnExpressionBuilding(ExpressionBuildingEventArgs e)
+        {
+            this.expressionBuilding(this, e);
         }
 
         internal void OnExpressionBuilt(ExpressionBuiltEventArgs e)

@@ -33,24 +33,13 @@ namespace SimpleInjector.Extensions
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Extension methods with non-generic method overloads.
     /// </summary>
     public static class NonGenericRegistrationsExtensions
     {
-        private static readonly MethodInfo RegisterMethod =
-            Helpers.GetGenericMethod(c => c.Register<object, object>());
-
-        private static readonly MethodInfo RegisterConcreteMethod =
-            Helpers.GetGenericMethod(c => c.Register<object>());
-
-        private static readonly MethodInfo RegisterSingleMethod =
-            Helpers.GetGenericMethod(c => c.RegisterSingle<object, object>());
-
-        private static readonly MethodInfo RegisterSingleConcreteMethod =
-            Helpers.GetGenericMethod(c => c.RegisterSingle<object>());
-
         private static readonly MethodInfo RegisterByFuncMethod =
             Helpers.GetGenericMethod(c => c.Register<object>((Func<object>)null));
 
@@ -80,26 +69,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterSingle(this Container container, Type serviceType, Type implementation)
         {
             Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementation, "implementation");
-            Requires.TypeIsReferenceType(serviceType, "serviceType");
-            Requires.TypeIsReferenceType(implementation, "implementation");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-            Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
 
-            if (serviceType == implementation)
-            {
-                var method = RegisterSingleConcreteMethod.MakeGenericMethod(implementation);
-
-                SafeInvoke(serviceType, implementation, () => method.Invoke(container, null));
-            }
-            else
-            {
-                var method = RegisterSingleMethod.MakeGenericMethod(serviceType, implementation);
-
-                SafeInvoke(serviceType, implementation, () => method.Invoke(container, null));
-            }
+            container.Register(serviceType, implementation, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -150,6 +121,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instance, "instance");
+
             Requires.TypeIsReferenceType(serviceType, "serviceType");
             Requires.TypeIsReferenceType(instance.GetType(), "instance");
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
@@ -175,12 +147,8 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(concreteType, "concreteType");
-            Requires.TypeIsReferenceType(concreteType, "serviceType");
-            Requires.TypeIsNotOpenGeneric(concreteType, "concreteType");
 
-            var method = RegisterConcreteMethod.MakeGenericMethod(concreteType);
-
-            SafeInvoke(concreteType, "concreteType", () => method.Invoke(container, null));
+            container.Register(concreteType, concreteType, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -200,24 +168,8 @@ namespace SimpleInjector.Extensions
         public static void Register(this Container container, Type serviceType, Type implementation)
         {
             Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementation, "implementation");
-            Requires.TypeIsReferenceType(serviceType, "serviceType");
-            Requires.TypeIsReferenceType(implementation, "implementation");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-            Requires.TypeIsNotOpenGeneric(serviceType, "implementation");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementation, "serviceType");
 
-            if (serviceType == implementation)
-            {
-                Register(container, implementation);
-            }
-            else
-            {
-                var method = RegisterMethod.MakeGenericMethod(serviceType, implementation);
-
-                SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, null));
-            }
+            container.Register(serviceType, implementation, Lifestyle.Transient);
         }
 
         /// <summary>

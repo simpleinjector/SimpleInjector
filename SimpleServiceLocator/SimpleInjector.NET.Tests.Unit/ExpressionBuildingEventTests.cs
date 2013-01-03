@@ -1,12 +1,13 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class ExpressionBuiltEventTests
+    public class ExpressionBuildingEventTests
     {
         public interface IValidator<T>
         {
@@ -18,9 +19,9 @@
             void Write(string message);
         }
 
-        // NOTE: This test is the example code of the XML documentation of the Container.ExpressionBuilt event.
+        // NOTE: This test is the example code of the XML documentation of the Container.ExpressionBuilding event.
         [TestMethod]
-        public void TestExpressionBuilt()
+        public void TestExpressionBuilding()
         {
             // Arrange
             var container = new Container();
@@ -30,7 +31,7 @@
             container.Register<IValidator<Customer>, CustomerValidator>();
 
             // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType.IsGenericType &&
                     e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
@@ -58,7 +59,7 @@
 
         // This test verifies the core difference between ExpressionBuilding and ExpressionBuilt
         [TestMethod]
-        public void GetInstance_OnInstanceRegisteredAsSingleton_ExpressionBuiltGetsFiredWithConstantExpression()
+        public void GetInstance_OnInstanceRegisteredAsSingleton_ExpressionBuildingGetsFiredWithNewExpression()
         {
             // Arrange
             var container = new Container();
@@ -67,7 +68,7 @@
 
             Expression actualExpression = null;
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -80,14 +81,14 @@
 
             // Assert
             Assert.IsNotNull(actualExpression);
-            Assert.IsInstanceOfType(actualExpression, typeof(ConstantExpression));
+            Assert.AreEqual("new SqlUserRepository()", actualExpression.ToString());
         }
 
         [TestMethod]
-        public void ExpressionBuilt_OnInstanceWithInitializer_GetsExpressionWhereInitializerIsApplied()
+        public void ExpressionBuilding_OnInstanceWithInitializer_GetsExpressionWhereInitializerIsNotAppliedYet()
         {
             // Arrange
-            Expression actualBuiltExpression = null;
+            Expression actualBuildingExpression = null;
 
             var container = new Container();
 
@@ -95,18 +96,19 @@
 
             container.RegisterInitializer<SqlUserRepository>(repository => { });
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 Assert.AreEqual(e.RegisteredServiceType, typeof(IUserRepository), "Test setup fail.");
-                actualBuiltExpression = e.Expression;
+                actualBuildingExpression = e.Expression;
             };
 
             // Act
             container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsNotInstanceOfType(actualBuiltExpression, typeof(NewExpression),
-                "The initializer is expected to be applied BEFORE the ExpressionBuilt event ran.");
+            Assert.IsInstanceOfType(actualBuildingExpression, typeof(NewExpression),
+                "The initializer is expected to be applied AFTER the ExpressionBuilding event ran. " +
+                "This makes it much easier to alter the given expression.");
         }
 
         [TestMethod]
@@ -118,12 +120,12 @@
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
                     // Replace the expression with a singleton
-                    e.Expression = Expression.Constant(new InMemoryUserRepository());
+                    e.Expression = Expression.Constant(new SqlUserRepository());
                 }
             };
 
@@ -132,9 +134,44 @@
             var actual2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(actual1, typeof(InMemoryUserRepository));
+            Assert.IsInstanceOfType(actual1, typeof(SqlUserRepository));
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ExpressionBuildingEventChangesTheTypeOfTheExpression_ThrowsExpressiveExceptionWhenApplyingInitializer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Register a transient instance
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            container.RegisterInitializer<object>(instance => { });
+
+            container.ExpressionBuilding += (sender, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(IUserRepository))
+                {
+                    // Replace the expression with a different type (this is incorrect behavior).
+                    e.Expression = Expression.Constant(new InMemoryUserRepository());
+                }
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance<IUserRepository>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "The initializer(s) for type SqlUserRepository could not be applied.", ex);
+            }
         }
 
         [TestMethod]
@@ -146,7 +183,7 @@
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -166,7 +203,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredTransientWithInterceptor_CallsEventOnce()
+        public void GetInstance_RegisteredTransient_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -176,7 +213,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -192,7 +229,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnServiceType_CallsEventOnce()
+        public void GetInstance_RegisteredTransientAndInitializerOnServiceType_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -204,7 +241,7 @@
 
             container.RegisterInitializer<IUserRepository>(instance => { });
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -220,7 +257,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnImplementation_CallsEventOnce()
+        public void GetInstance_RegisteredTransientAndInitializerOnImplementation_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -232,7 +269,7 @@
 
             container.RegisterInitializer<SqlUserRepository>(instance => { });
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -248,25 +285,29 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredTransientWithInterceptor_EventArgsContainsAnExpression()
+        public void GetInstance_RegisteredTransient_EventArgsContainsAnExpression()
         {
             // Arrange
+            Expression actualExpression = null;
+
             var container = new Container();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
-                // Assert
-                Assert.IsNotNull(e.Expression);
+                actualExpression = e.Expression;
             };
 
             // Act
             container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.IsNotNull(actualExpression);
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesOnTypeRegisteredTransientWithInterceptor_CallsEventOnce()
+        public void GetInstance_CalledMultipleTimesOnTypeRegisteredTransient_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -276,7 +317,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -293,7 +334,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredSingletonWithInterceptor_CallsEventOnce()
+        public void GetInstance_RegisteredSingleton_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -303,7 +344,7 @@
 
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -322,7 +363,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegisteredFuncWithInterceptor_CallsEventOnce()
+        public void GetInstance_RegisteredFunc_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -332,7 +373,7 @@
 
             container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -348,7 +389,40 @@
         }
 
         [TestMethod]
-        public void GetInstance_UnregisteredConcreteTypeWithInterceptor_CallsEventOnce()
+        public void GetInstance_RegisteredFunc_CallsEventWithExpectedExpression()
+        {
+            // Arrange
+            Expression actualExpression = null;
+
+            Func<IUserRepository> registeredFactory = () => new SqlUserRepository();
+
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(registeredFactory);
+
+            container.ExpressionBuilding += (sender, e) =>
+            {
+                actualExpression = e.Expression;
+            };
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            var constantValues = 
+                Visitor.GetAllExpressions(actualExpression)
+                .OfType<ConstantExpression>()
+                .Select(expr => expr.Value);
+            
+            Assert.IsTrue(constantValues.Contains(registeredFactory),
+                "The expression that is generated for a Func<T> registration should contain a " +
+                "ConstantExpression with a reference of the registered factory delegate. This way " +
+                "ExpressionBuilding registrations can replace the original registered delegate with " +
+                "something different.");
+        }
+        
+        [TestMethod]
+        public void GetInstance_UnregisteredConcreteType_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -356,7 +430,7 @@
 
             var container = new Container();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(SqlUserRepository))
                 {
@@ -372,7 +446,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledOnMultipleTypesThatDependOnAInterceptedType_CallsEventOnce()
+        public void GetInstance_CalledOnMultipleTypesThatDependOnAnInterceptedType_CallsEventOnceForGivenServiceType()
         {
             // Arrange
             int expectedCallCount = 1;
@@ -382,7 +456,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -411,7 +485,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (sender, e) =>
+            container.ExpressionBuilding += (sender, e) =>
             {
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
@@ -433,7 +507,7 @@
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "Registration of an event after the container is locked is illegal.")]
-        public void AddExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
+        public void AddExpressionBuilding_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
             var container = new Container();
@@ -444,13 +518,13 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ExpressionBuilt += (s, e) => { };
+            container.ExpressionBuilding += (s, e) => { };
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException),
             "Removal of an event after the container is locked is illegal.")]
-        public void RemoveExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
+        public void RemoveExpressionBuilding_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
             var container = new Container();
@@ -465,24 +539,24 @@
         }
 
         [TestMethod]
-        public void RemoveExpressionBuilt_BeforeContainerHasBeenLocked_Succeeds()
+        public void RemoveExpressionBuilding_BeforeContainerHasBeenLocked_Succeeds()
         {
             // Arrange
             bool handlerCalled = false;
 
             var container = new Container();
 
-            EventHandler<ExpressionBuiltEventArgs> handler = (sender, e) =>
+            EventHandler<ExpressionBuildingEventArgs> handler = (sender, e) =>
             {
                 handlerCalled = true;
             };
 
-            container.ExpressionBuilt += handler;
+            container.ExpressionBuilding += handler;
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
-            container.ExpressionBuilt -= handler;
+            container.ExpressionBuilding -= handler;
 
             container.GetInstance<IUserRepository>();
 
@@ -492,25 +566,25 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
+        public void ExpressionBuildingEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
             var eventArgs =
-                new ExpressionBuiltEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
+                new ExpressionBuildingEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
 
             // Act
             eventArgs.Expression = null;
         }
 
         [TestMethod]
-        public void GetInstance_ExpressionBuiltWithInvalidExpression_ThrowsAnDescriptiveException()
+        public void GetInstance_ExpressionBuildingWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange
             var container = new Container();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            container.ExpressionBuilt += (s, e) =>
+            container.ExpressionBuilding += (s, e) =>
             {
                 var invalidExpression = Expression.GreaterThan(Expression.Constant(1), Expression.Constant(1));
 
@@ -580,6 +654,33 @@
                 this.logger.Write("Validating " + typeof(T).Name);
                 this.validator.Validate(instance);
                 this.logger.Write("Validated " + typeof(T).Name);
+            }
+        }
+
+        private sealed class Visitor : ExpressionVisitor
+        {
+            private readonly Action<Expression> visit;
+
+            public Visitor(Action<Expression> visit)
+            {
+                this.visit = visit;
+            }
+
+            public static IEnumerable<Expression> GetAllExpressions(Expression expression)
+            {
+                var expressions = new List<Expression>();
+
+                var visitor = new Visitor(expr => { expressions.Add(expr); });
+
+                visitor.Visit(expression);
+
+                return expressions;
+            }
+
+            public override Expression Visit(Expression node)
+            {
+                this.visit(node);
+                return base.Visit(node);
             }
         }
     }

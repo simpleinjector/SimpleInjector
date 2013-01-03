@@ -26,14 +26,54 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Linq;
 
     internal static class Requires
     {
+        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
+
         internal static void IsNotNull(object instance, string paramName)
         {
             if (instance == null)
             {
                 throw new ArgumentNullException(paramName);
+            }
+        }
+
+        internal static void IsReferenceType(Type type, string paramName)
+        {
+            if (!type.IsClass && !type.IsInterface)
+            {
+                throw new ArgumentException(StringResources.SuppliedTypeIsNotAReferenceType(type), paramName);
+            }
+        }
+
+        internal static void IsNotOpenGenericType(Type type, string paramName)
+        {
+            // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
+            // to find out if this type can be created.
+            if (type.ContainsGenericParameters)
+            {
+                throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
+            }
+        }
+
+        internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
+            string paramName)
+        {
+            if (!service.IsAssignableFrom(implementation))
+            {
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
+                    paramName);
+            }
+        }
+
+        internal static void IsNotAnAmbiguousType(Type type, string paramName)
+        {
+            if (AmbiguousTypes.Contains(type))
+            {
+                throw new ArgumentException(StringResources.TypeIsAmbiguous(type), paramName);
             }
         }
     }

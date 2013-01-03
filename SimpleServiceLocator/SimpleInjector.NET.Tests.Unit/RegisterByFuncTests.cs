@@ -76,7 +76,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(ActivationException))]
-        public void GetInstanceByKey_RegisteredWithFuncReturningNull_ThrowsException()
+        public void GetInstance_RegisteredWithFuncReturningNull_ThrowsException()
         {
             // Arrange
             var container = new Container();
@@ -84,6 +84,28 @@
 
             // Act
             container.GetInstance<IUserRepository>();
+        }
+        
+        [TestMethod]
+        public void GetInstance_SubTypeRegisteredWithFuncReturningNull_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+            container.Register<IUserRepository>(() => null);
+
+            try
+            {
+                // Act
+                container.GetInstance<RealUserService>();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "The registered delegate for type IUserRepository returned null."),
+                    "Actual: " + ex.Message);
+            }
         }
 
         [TestMethod]

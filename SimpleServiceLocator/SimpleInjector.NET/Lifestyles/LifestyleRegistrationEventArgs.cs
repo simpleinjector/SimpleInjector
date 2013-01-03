@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -23,25 +23,17 @@
 */
 #endregion
 
-namespace SimpleInjector.InstanceProducers
+namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Linq.Expressions;
 
-    internal sealed class FuncInstanceProducer<TService> : InstanceProducer where TService : class
+    public class LifestyleRegistrationEventArgs : EventArgs
     {
-        private readonly Func<TService> instanceCreator;
-
-        internal FuncInstanceProducer(Func<TService> instanceCreator) : base(typeof(TService))
+        internal LifestyleRegistrationEventArgs(Container container)
         {
-            this.instanceCreator = instanceCreator;
+            this.Container = container;
         }
 
-        protected override Expression BuildExpressionCore()
-        {
-            // By returning an expression that directly invokes the Func<T> we gain a bit of performance, but
-            // the exception message will be less clear when the instanceCreator fails.
-            return Expression.Invoke(Expression.Constant(this.instanceCreator), new Expression[0]);
-        }
+        public Container Container { get; private set; }
     }
 }

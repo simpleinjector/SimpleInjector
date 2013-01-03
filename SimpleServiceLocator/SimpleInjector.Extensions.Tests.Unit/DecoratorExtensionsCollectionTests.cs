@@ -119,8 +119,13 @@
             // Assert
             Assert.IsInstanceOfType(decorator, typeof(RealCommandCommandHandlerDecorator));
 
-            Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler,
-                ((RealCommandCommandHandlerDecorator)decorator).Decorated));
+            var decoratedInstance = ((RealCommandCommandHandlerDecorator)decorator).Decorated;
+
+            Assert.IsNotNull(decoratedInstance);
+
+            Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler, decoratedInstance),
+                "Not the same instance. Decorated instance is instance of type: " + 
+                decoratedInstance.GetType().Name);
         }
 
         [TestMethod]

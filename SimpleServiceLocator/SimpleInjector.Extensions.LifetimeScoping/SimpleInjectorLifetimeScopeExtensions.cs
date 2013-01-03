@@ -33,7 +33,7 @@ namespace SimpleInjector
 
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.LifetimeScoping;
-
+    
     /// <summary>
     /// Extension methods for enabling lifetime scoping for the Simple Injector.
     /// </summary>
@@ -106,17 +106,9 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            // Dummy registration. This registration will be replaced later. By explicitly registering the
-            // instance we use allow the container to verify whether TConcrete can be created and if
-            // TConcrete has already been registered or not. Also, the ExpressionBuilt event will only get
-            // raised for types that are registered, and because the type is registered, we can cleverly make
-            // use of the Expression that has already been created by the container for this registration,
-            // saving us from having to build such registration ourselves.
-            container.Register<TConcrete>();
+            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
-
-            ReplaceDummyRegistrationWithLifetimeScope<TConcrete>(container);
         }
 
         /// <summary>
@@ -147,11 +139,9 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>();
+            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
-
-            ReplaceDummyRegistrationWithLifetimeScope<TService>(container);
         }
 
         /// <summary>
@@ -203,11 +193,9 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator);
+            container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
-
-            ReplaceDummyRegistrationWithLifetimeScope<TService>(container, disposeWhenLifetimeScopeEnds);
         }
         
         /// <summary>
@@ -300,67 +288,6 @@ namespace SimpleInjector
             // Otherwise this might lead users to think that they would actually register there
             // transients for disposal, while there's no lifetime scope.
             throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
-        }
-
-        private static void ReplaceDummyRegistrationWithLifetimeScope<TService>(Container container,
-            bool disposeWhenLifetimeScopeEnds = true)
-            where TService : class
-        {
-            var helper = new ReplaceWithLifetimeScopeHelper<TService>(container)
-            {
-                DisposeWhenLifetimeScopeEnds = disposeWhenLifetimeScopeEnds
-            };
-
-            container.ExpressionBuilt += helper.ExpressionBuilt;
-        }
-
-        // This class is thread-safe within the context of a single Container.
-        private sealed class ReplaceWithLifetimeScopeHelper<TService> where TService : class
-        {
-            private readonly Container container;
-            private LifetimeScopeManager manager;
-            private Func<TService> instanceCreator;
-
-            internal ReplaceWithLifetimeScopeHelper(Container container)
-            {
-                this.container = container;
-            }
-
-            internal bool DisposeWhenLifetimeScopeEnds { get; set; }
-
-            internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
-            {
-                if (e.RegisteredServiceType == typeof(TService))
-                {
-                    this.manager = this.container.GetInstance<LifetimeScopeManager>();
-                    this.instanceCreator = Expression.Lambda<Func<TService>>(e.Expression).Compile();
-
-                    Func<TService> scopedInstanceCreator = this.CreateScopedInstance;
-
-                    // Replace the original expression with an invocation of the Func<TService>
-                    e.Expression = Expression.Invoke(Expression.Constant(scopedInstanceCreator));
-                }
-            }
-
-            private TService CreateScopedInstance()
-            {
-                var scope = this.manager.CurrentScope;
-
-                if (scope != null)
-                {
-                    return scope.GetInstance(this.instanceCreator, this.DisposeWhenLifetimeScopeEnds);
-                }
-
-                if (this.container.IsVerifying())
-                {
-                    // Return a transient instance when this method is called during verification
-                    return this.instanceCreator();
-                }
-
-                throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
-                    "'LifetimeScope', but the instance is requested outside the context of a lifetime " +
-                    "scope. Make sure you call container.BeginLifetimeScope() first.");
-            }
         }
     }
 }

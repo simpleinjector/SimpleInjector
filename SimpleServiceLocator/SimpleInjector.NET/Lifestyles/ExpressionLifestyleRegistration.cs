@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -23,34 +23,22 @@
 */
 #endregion
 
-namespace SimpleInjector.InstanceProducers
+namespace SimpleInjector.Lifestyles
 {
-    using System;
     using System.Linq.Expressions;
 
-    internal class ExpressionResolutionInstanceProducer<TService> : InstanceProducer where TService : class
+    internal class ExpressionLifestyleRegistration : LifestyleRegistration
     {
         private readonly Expression expression;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionResolutionInstanceProducer{TService}"/> class.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        public ExpressionResolutionInstanceProducer(Expression expression) : base(typeof(TService))
+        public ExpressionLifestyleRegistration(Expression expression, Container container) : base(container)
         {
             this.expression = expression;
         }
 
-        protected override Expression BuildExpressionCore()
+        public override Expression BuildExpression()
         {
             return this.expression;
-        }
-
-        protected override string BuildErrorWhileBuildingDelegateFromExpressionExceptionMessage(
-            Expression expression, Exception exception)
-        {
-            return StringResources.ErrorWhileBuildingDelegateFromExpressionForUnregisteredTypeEventArgs(
-                this.ServiceType, expression, exception);
         }
     }
 }

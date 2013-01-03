@@ -23,31 +23,18 @@
 */
 #endregion
 
-namespace SimpleInjector.InstanceProducers
+namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-    using System.Diagnostics;
-    using System.Linq.Expressions;
 
-    internal sealed class FuncSingletonInstanceProducer<TService> : InstanceProducer where TService : class
+    internal static class Requires
     {
-        private Func<TService> instanceCreator;
-
-        internal FuncSingletonInstanceProducer(Func<TService> instanceCreator) : base(typeof(TService))
+        internal static void IsNotNull(object instance, string paramName)
         {
-            this.instanceCreator = instanceCreator;
-        }
-
-        protected override Expression BuildExpressionCore()
-        {
-            var instance = this.instanceCreator();
-
             if (instance == null)
             {
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(TService)));
+                throw new ArgumentNullException(paramName);
             }
-
-            return Expression.Constant(instance, this.ServiceType);
         }
     }
 }

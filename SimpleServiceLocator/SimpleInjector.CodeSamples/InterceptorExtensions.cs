@@ -66,11 +66,14 @@
             RequiresIsNotNull(container, "container");
             RequiresIsNotNull(predicate, "predicate");
 
+            container.Options.ConstructorResolutionBehavior.GetConstructor(typeof(TInterceptor), 
+                typeof(TInterceptor));
+
             var interceptWith = new InterceptionHelper(container)
             {
                 BuildInterceptorExpression = 
                     () => BuildInterceptorExpression<TInterceptor>(container),
-                Predicate = type => type.IsInterface && predicate(type)
+                Predicate = type => predicate(type)
             };
 
             container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
@@ -88,7 +91,7 @@
             {
                 BuildInterceptorExpression = 
                     () => Expression.Invoke(Expression.Constant(interceptorCreator)),
-                Predicate = type => type.IsInterface && predicate(type)
+                Predicate = type => predicate(type)
             };
 
             container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
@@ -105,7 +108,7 @@
             var interceptWith = new InterceptionHelper(container)
             {
                 BuildInterceptorExpression = () => Expression.Constant(interceptor),
-                Predicate = type => type.IsInterface && predicate(type)
+                Predicate = predicate
             };
 
             container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
@@ -113,15 +116,14 @@
 
         [DebuggerStepThrough]
         private static Expression BuildInterceptorExpression<TInterceptor>(Container container)
+            where TInterceptor : class
         {
             var interceptorRegistration = container.GetRegistration(typeof(TInterceptor));
 
             if (interceptorRegistration == null)
             {
-                throw new ActivationException(string.Format(
-                    "No registration for interceptor type {0} " +
-                    "could be found and an implicit registration could not be made.", 
-                    typeof(TInterceptor)));
+                // This will throw an ActivationException
+                container.GetInstance<TInterceptor>();
             }
 
             return interceptorRegistration.BuildExpression();
@@ -198,7 +200,6 @@
                             e.Expression),
                         e.RegisteredServiceType);
 
-                // Optimization for singletons.
                 if (e.Expression is ConstantExpression && interceptor is ConstantExpression)
                 {
                     return Expression.Constant(CreateInstance(proxyExpression),
@@ -227,6 +228,7 @@
             return (T)CreateProxy(typeof(T), interceptor, realInstance);
         }
 
+        [DebuggerStepThrough]
         public static object CreateProxy(Type serviceType, IInterceptor interceptor, 
             object realInstance)
         {
@@ -240,6 +242,7 @@
             private object realInstance;
             private IInterceptor interceptor;
 
+            [DebuggerStepThrough]
             public InterceptorProxy(Type classToProxy, object realInstance, 
                 IInterceptor interceptor)
                 : base(classToProxy)

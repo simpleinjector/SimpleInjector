@@ -62,15 +62,6 @@ namespace SimpleInjector
                 "{2}", serviceType.ToFriendlyName(), expression, exception.Message);
         }
 
-        internal static string ErrorWhileBuildingDelegateFromExpressionForUnregisteredTypeEventArgs(
-            Type serviceType, Expression expression, Exception exception)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Error occurred while trying to build a delegate for type {0} using the expression \"{1}\" " +
-                "that was supplied by calling the UnregisteredTypeEventArgs.Register(Expression) method. {2}",
-                serviceType.ToFriendlyName(), expression, exception.Message);
-        }
-
         internal static string DelegateForTypeThrewAnException(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -267,6 +258,37 @@ namespace SimpleInjector
                 "that the container does not have to inject any dependencies of this type by injecting a " +
                 "different type.",
                 serviceType.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsNotAReferenceType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is not a reference type. Only reference types are supported.",
+                type.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsAnOpenGenericType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is an open generic type. Use the RegisterOpenGeneric or " +
+                "RegisterManyForOpenGeneric extension method for registering open generic types.",
+                type.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' does not {1} '{2}'.",
+                implementation.ToFriendlyName(), 
+                service.IsInterface ? "implement" : "inherit from",
+                service.ToFriendlyName());
+        }
+
+        internal static string TheInitializersCouldNotBeApplied(Type type, Exception innerException)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The initializer(s) for type {0} could not be applied. {1}",
+                type.ToFriendlyName(), innerException.Message);
         }
     }
 }

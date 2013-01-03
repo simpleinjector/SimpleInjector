@@ -33,8 +33,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.InstanceProducers;
-
+    
     /// <summary>
     /// Helper methods for the container.
     /// </summary>
@@ -46,6 +45,23 @@ namespace SimpleInjector
             "Expression = {BuildExpression().ToString()}";
 
         private static readonly MethodInfo GetInstanceOfT = GetContainerMethod(c => c.GetInstance<object>());
+
+        internal static NewExpression BuildNewExpression(Container container, Type serviceType, 
+            Type implemenationType)
+        {
+            var resolutionBehavior = container.Options.ConstructorResolutionBehavior;
+
+            ConstructorInfo constructor =
+                resolutionBehavior.GetConstructor(serviceType, implemenationType);
+
+            var injectionBehavior = container.Options.ConstructorInjectionBehavior;
+
+            var parameters =
+                from parameter in constructor.GetParameters()
+                select injectionBehavior.BuildParameterExpression(parameter);
+
+            return Expression.New(constructor, parameters.ToArray());
+        }
 
         internal static string ToFriendlyName(this Type type)
         {
@@ -68,32 +84,6 @@ namespace SimpleInjector
             var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
 
             return name + "<" + string.Join(", ", argumentNames) + ">";
-        }
-
-        internal static InstanceProducer CreateTransientInstanceProducerFor(Type concreteType)
-        {
-            Type instanceProducerType =
-                typeof(ConcreteTransientInstanceProducer<>).MakeGenericType(concreteType);
-
-            var genericGetInstanceMethod = GetInstanceOfT.MakeGenericMethod(instanceProducerType);
-
-            try
-            {
-                var factory = new Container();
-
-                // HACK: Because of the security level of Silverlight applications, we can't create an
-                // transient instance producer using reflection; it is an internal type. We can however, abuse
-                // the container.GetInstance<T> method to create a new instance, because GetInstance<T> is 
-                // public :-). 
-                // Here we call: "factory.GetInstance<ConcreteTransientInstanceProducer<[TConcrete]>>()".
-                return (InstanceProducer)genericGetInstanceMethod.Invoke(factory, null);
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ActivationException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(concreteType, ex), ex);
-            }
         }
 
         internal static IEnumerable<T> MakeReadOnly<T>(this IEnumerable<T> collection)
@@ -193,15 +183,14 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>Return a list of all base types T inherits, all interfaces T implements and T itself.</summary>
-        /// <typeparam name="T">The type for get the type hierarchy from.</typeparam>
-        /// <returns>A list of type objects.</returns>
-        internal static Type[] GetTypeHierarchyFor<T>()
+        // Return a list of all base types T inherits, all interfaces T implements and T itself.
+        internal static Type[] GetTypeHierarchyFor(Type type)
         {
-            List<Type> types = new List<Type>();
-            types.Add(typeof(T));
-            types.AddRange(GetBaseTypes(typeof(T)));
-            types.AddRange(typeof(T).GetInterfaces());
+            var types = new List<Type>();
+
+            types.Add(type);
+            types.AddRange(GetBaseTypes(type));
+            types.AddRange(type.GetInterfaces());
 
             return types.ToArray();
         }
@@ -220,6 +209,12 @@ namespace SimpleInjector
                 new ParameterExpression[] { objParameter });
 
             return instanceInitializer.Compile();
+        }
+
+        internal static MethodInfo GetContainerMethod(Expression<Action<Container>> methodCall)
+        {
+            var body = methodCall.Body as MethodCallExpression;
+            return body.Method.GetGenericMethodDefinition();
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)
@@ -248,12 +243,6 @@ namespace SimpleInjector
             {
                 yield return item;
             }
-        }
-
-        private static MethodInfo GetContainerMethod(Expression<Action<Container>> methodCall)
-        {
-            var body = methodCall.Body as MethodCallExpression;
-            return body.Method.GetGenericMethodDefinition();
         }
 
         private static Type[] GetGenericArguments(Type type)

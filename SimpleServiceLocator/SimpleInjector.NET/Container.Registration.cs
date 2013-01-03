@@ -32,8 +32,10 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
+
     using SimpleInjector.Advanced;
-    using SimpleInjector.InstanceProducers;
+    using SimpleInjector.Lifestyles;
 
 #if DEBUG
     /// <summary>
@@ -42,8 +44,6 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
-
         private bool verifying;
 
         /// <summary>
@@ -267,6 +267,23 @@ namespace SimpleInjector
             }
         }
 
+        public event EventHandler<ExpressionBuildingEventArgs> ExpressionBuilding
+        {
+            add
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.expressionBuilding += value;
+            }
+
+            remove
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.expressionBuilding -= value;
+            }
+        }
+
         internal bool IsVerifying
         {
             get
@@ -307,9 +324,10 @@ namespace SimpleInjector
             "overloads also take a generic T.")]
         public void Register<TConcrete>() where TConcrete : class
         {
+            Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
-            this.AddRegistration(new ConcreteTransientInstanceProducer<TConcrete>(), "TConcrete");
+            this.Register<TConcrete, TConcrete>(Lifestyle.Transient);
         }
 
         /// <summary>
@@ -330,10 +348,11 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
                 "TImplementation");
 
-            this.AddRegistration(new TransientInstanceProducer<TService, TImplementation>(), "TService");
+            this.Register<TService, TImplementation>(Lifestyle.Transient);
         }
 
         /// <summary>
@@ -349,8 +368,9 @@ namespace SimpleInjector
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            this.AddRegistration(new FuncInstanceProducer<TService>(instanceCreator), "TService");
+            this.Register<TService>(instanceCreator, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -369,13 +389,10 @@ namespace SimpleInjector
             "overloads also take a generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
+            Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
 
-            var instanceProducer = new ConcreteTransientInstanceProducer<TConcrete> { Container = this };
-
-            Func<TConcrete> instanceCreator = () => (TConcrete)instanceProducer.GetInstance();
-
-            this.AddRegistration(new FuncSingletonInstanceProducer<TConcrete>(instanceCreator), "TConcrete");
+            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -398,14 +415,11 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
                 "TImplementation");
 
-            var producer = new TransientInstanceProducer<TService, TImplementation> { Container = this };
-
-            Func<TService> instanceCreator = () => (TService)producer.GetInstance();
-
-            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator), "TService");
+            this.Register<TService, TImplementation>(Lifestyle.Singleton);
         }
 
         /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
@@ -420,8 +434,11 @@ namespace SimpleInjector
         public void RegisterSingle<TService>(TService instance) where TService : class
         {
             Requires.IsNotNull(instance, "instance");
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            this.AddRegistration(new SingletonInstanceProducer<TService>(instance), "TService");
+            var registration = SingletonLifestyle.CreateRegistration(typeof(TService), instance, this);
+
+            this.AddRegistration(typeof(TService), registration);
         }
 
         /// <summary>
@@ -441,8 +458,57 @@ namespace SimpleInjector
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            this.AddRegistration(new FuncSingletonInstanceProducer<TService>(instanceCreator), "TService");
+            this.Register<TService>(instanceCreator, Lifestyle.Singleton);
+        }
+
+        public void Register<TService, TImplementation>(Lifestyle lifestyle)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            lifestyle.OnRegistration(this);
+
+            var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
+
+            this.AddRegistration(typeof(TService), registration);
+        }
+
+        public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
+            where TService : class
+        {
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            lifestyle.OnRegistration(this);
+
+            var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
+
+            this.AddRegistration(typeof(TService), registration);
+        }
+
+        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsReferenceType(implementationType, "implementationType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(implementationType, "implementationType");
+            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType, 
+                "implementationType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            lifestyle.OnRegistration(this);
+
+            var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+
+            this.AddRegistration(serviceType, registration);
         }
 
         /// <summary>
@@ -603,13 +669,16 @@ namespace SimpleInjector
         public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
         {
             Requires.IsNotNull(collection, "collection");
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
             this.ThrowWhenCollectionTypeAlreadyRegistered<TService>();
 
             var readOnlyCollection = collection.MakeReadOnly();
 
-            this.AddRegistration(new SingletonInstanceProducer<IEnumerable<TService>>(readOnlyCollection), 
-                "TService");
+            var registration = 
+                SingletonLifestyle.CreateRegistration(typeof(IEnumerable<TService>), readOnlyCollection, this);
+
+            this.AddRegistration(typeof(IEnumerable<TService>), registration);
 
             this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
         }
@@ -695,15 +764,12 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        private void AddRegistration(InstanceProducer registration, string serviceTypeArgumentName)
+        private void AddRegistration(Type key, LifestyleRegistration registration)
         {
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(registration.ServiceType);
-            this.ThrowWhenTypeIsAmbiguous(registration.ServiceType, serviceTypeArgumentName);
+            this.ThrowWhenTypeAlreadyRegistered(key);
 
-            registration.Container = this;
-
-            this.registrations[registration.ServiceType] = registration;
+            this.registrations[key] = new InstanceProducer(key, registration);
         }
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
@@ -721,14 +787,6 @@ namespace SimpleInjector
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
-            }
-        }
-
-        private void ThrowWhenTypeIsAmbiguous(Type type, string argumentName)
-        {
-            if (AmbiguousTypes.Contains(type))
-            {
-                throw new ArgumentException(StringResources.TypeIsAmbiguous(type), argumentName);
             }
         }
 
@@ -755,9 +813,9 @@ namespace SimpleInjector
             }
         }
 
-        private Action<T>[] GetInstanceInitializersFor<T>()
+        private Action<T>[] GetInstanceInitializersFor<T>(Type type)
         {
-            var typeHierarchy = Helpers.GetTypeHierarchyFor<T>();
+            var typeHierarchy = Helpers.GetTypeHierarchyFor(type);
 
             return (
                 from instanceInitializer in this.instanceInitializers

@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     public interface ILogger
     {
@@ -1197,6 +1198,106 @@
             var decoratee = ((TransactionHandlerDecorator<RealCommand>)decorator2).Decorated;
 
             Assert.IsInstanceOfType(decoratee, typeof(StubCommandHandler));
+        }
+        
+        [TestMethod]
+        public void HybridLifestyleRegistration_WithDecorator_DecoratesTheInstance()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(RealCommandHandlerDecorator));
+        }
+
+        [TestMethod]
+        public void HybridLifestyleRegistration_WithTransientDecorator_AppliesTransientDecorator()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // Act
+            var handler1 = container.GetInstance<ICommandHandler<RealCommand>>();
+            var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(handler1, handler2), "Decorator should be transient.");
+        }
+        
+        [TestMethod]
+        public void HybridLifestyleRegistration_WithTransientDecorator_DoesNotApplyDecoratorMultipleTimes()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // Act
+            var handler = (RealCommandHandlerDecorator)container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler.Decorated, typeof(StubCommandHandler));
+        }
+
+        [TestMethod]
+        public void HybridLifestyleRegistration_WithTransientDecorator_LeavesTheLifestyleInTact1()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // Act
+            var handler1 = (RealCommandHandlerDecorator)container.GetInstance<ICommandHandler<RealCommand>>();
+            var handler2 = (RealCommandHandlerDecorator)container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(handler1.Decorated, handler2.Decorated), 
+                "The wrapped instance should have the expected lifestyle (singleton in this case).");
+        }
+
+        [TestMethod]
+        public void HybridLifestyleRegistration_WithTransientDecorator_LeavesTheLifestyleInTact2()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Transient, Lifestyle.Transient);
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // Act
+            var handler1 = (RealCommandHandlerDecorator)container.GetInstance<ICommandHandler<RealCommand>>();
+            var handler2 = (RealCommandHandlerDecorator)container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(handler1.Decorated, handler2.Decorated),
+                "The wrapped instance should have the expected lifestyle (transient in this case).");
         }
     }
 

@@ -29,7 +29,6 @@ namespace SimpleInjector.Advanced
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.InstanceProducers;
 
     [DebuggerDisplay("{GetType().Name}")]
     internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior

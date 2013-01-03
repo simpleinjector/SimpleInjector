@@ -57,10 +57,10 @@ namespace SimpleInjector
         /// <value>The indication whether the event has been handled.</value>
         public bool Handled
         {
-            get { return this.InstanceCreator != null; }
+            get { return this.Expression != null; }
         }
         
-        internal object InstanceCreator { get; private set; }
+        internal Expression Expression { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type
@@ -83,11 +83,16 @@ namespace SimpleInjector
 
             if (this.Handled)
             {
-                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
-                    this.UnregisteredServiceType));
+                throw new ActivationException(
+                    StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
+                        this.UnregisteredServiceType));
             }
 
-            this.InstanceCreator = instanceCreator;
+            this.Expression = 
+                Expression.Convert(
+                    Expression.Invoke(
+                        Expression.Constant(instanceCreator), new Expression[0]),
+                    this.UnregisteredServiceType);
         }
 
         /// <summary>
@@ -118,7 +123,7 @@ namespace SimpleInjector
                     this.UnregisteredServiceType));
             }
 
-            this.InstanceCreator = expression;
+            this.Expression = expression;
         }
     }
 }

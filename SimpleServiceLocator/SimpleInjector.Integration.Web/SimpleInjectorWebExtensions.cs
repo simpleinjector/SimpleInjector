@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq.Expressions;
     using System.Web;
 
     using SimpleInjector.Integration.Web;
@@ -66,15 +65,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            // Register the type as transient. This prevents it from being registered twice and allows us to 
-            // hook onto the ExpressionBuilt event, and allows us to use the error checking of the container.
-            // The container will validate directly whether the TConcrete is a constructable type.
-            container.Register<TConcrete>();
-
-            // By registering an ExpressionBuilt event we use the ability of the container to create an
-            // Expression tree that auto-wires that instance, since calling GetInstance<TConcrete> would cause
-            // an stack overflow exception.
-            ReplaceRegistrationWithPerWebRequestBehavior<TConcrete>(container);
+            container.Register<TConcrete, TConcrete>(PerWebRequestLifestyle.Dispose);
         }
 
         /// <summary>
@@ -107,9 +98,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            container.Register<TService, TImplementation>();
-
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container);
+            container.Register<TService, TImplementation>(PerWebRequestLifestyle.Dispose);
         }
 
         /// <summary>
@@ -130,20 +119,20 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
-            RegisterPerWebRequest(container, instanceCreator, disposeWhenWebRequestEnds: true);
+            RegisterPerWebRequest(container, instanceCreator, disposeInstanceWhenWebRequestEnds: true);
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>
         /// and the returned instance will be reused for the duration of a single web request and ensures that,
         /// if the returned instance implements <see cref="IDisposable"/>, and
-        /// <paramref name="disposeWhenWebRequestEnds"/> is set to <b>true</b>, that instance will get
+        /// <paramref name="disposeInstanceWhenWebRequestEnds"/> is set to <b>true</b>, that instance will get
         /// disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="disposeWhenWebRequestEnds">If set to <c>true</c>, the instance will get disposed
+        /// <param name="disposeInstanceWhenWebRequestEnds">If set to <c>true</c>, the instance will get disposed
         /// when it implements <see cref="IDisposable"/> at the end of the web request.</param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
@@ -152,7 +141,7 @@ namespace SimpleInjector
         /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
         public static void RegisterPerWebRequest<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenWebRequestEnds) where TService : class
+            Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {
             if (container == null)
             {
@@ -164,9 +153,8 @@ namespace SimpleInjector
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            container.Register<TService>(instanceCreator);
-
-            ReplaceRegistrationWithPerWebRequestBehavior<TService>(container, disposeWhenWebRequestEnds);
+            container.Register<TService>(instanceCreator, 
+                new PerWebRequestLifestyle(disposeInstanceWhenWebRequestEnds));
         }
 
         /// <summary>
@@ -232,35 +220,6 @@ namespace SimpleInjector
                 actions.ForEach(action => action());
                 context.Items[key] = null;
             }
-        }
-
-        private static void ReplaceRegistrationWithPerWebRequestBehavior<TService>(
-            Container container, bool disposeWhenRequestEnds = true)
-            where TService : class
-        {
-            // In case of calling RegisterPerWebRequest<TConcrete>, the e.Expression contains a 
-            // "new TConcrete(...)" call, where that TConcrete is auto-wired by the container. There is no 
-            // other way than using ExpressionBuilt to get this auto-wired instance, since calling the
-            // GetInstance<TConcrete> would cause a recursive call and causes a stack overflow. Although using 
-            // ExpressionBuilt is not needed for RegisterPerWebRequest<TService, TImpl> and
-            // RegisterPerWebRequest<TService>(Func<TService>), we use this same method, since this keeps the
-            // behavior of these overloads in sync.
-            container.ExpressionBuilt += (sender, e) =>
-            {
-                if (e.RegisteredServiceType == typeof(TService))
-                {
-                    // Extract a Func<T> delegate for creating the transient TConcrete.
-                    var transientInstanceCreator = Expression.Lambda<Func<TService>>(
-                        e.Expression, new ParameterExpression[0]).Compile();
-
-                    var instanceCreator = new PerWebRequestInstanceCreator<TService>(container,
-                        transientInstanceCreator, disposeWhenRequestEnds);
-
-                    // Swap the original expression so that the lifetime becomes a per-web-request.
-                    e.Expression = Expression.Call(Expression.Constant(instanceCreator),
-                        instanceCreator.GetType().GetMethod("GetInstance"));
-                }
-            };
         }
     }
 }

@@ -26,103 +26,140 @@
 namespace SimpleInjector.Integration.Web
 {
     using System;
+    using System.Linq.Expressions;
     using System.Web;
 
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
-    /// <summary>
-    /// Helper class that allows caching instances returned from the supplied <see cref="Func{TService}"/>
-    /// delegate during the lifetime of the web request.
-    /// </summary>
-    /// <typeparam name="TService">The service type to return.</typeparam>
-    public sealed class PerWebRequestInstanceCreator<TService> where TService : class
+    public sealed class PerWebRequestLifestyle : Lifestyle
     {
-        private readonly Container container;
-        private readonly Func<TService> instanceCreator;
-        private readonly bool disposeWhenRequestEnds;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PerWebRequestInstanceCreator{TService}"/> class.
-        /// </summary>
-        /// <param name="container">The container instance.</param>
-        /// <param name="instanceCreator">The delagate that creates the instance.</param>
-        /// <param name="disposeWhenRequestEnds">Indicates whether the created instance should be disposed
-        /// on the end on the web request.</param>
-        public PerWebRequestInstanceCreator(Container container, Func<TService> instanceCreator,
-            bool disposeWhenRequestEnds)
+        internal static readonly PerWebRequestLifestyle Dispose = new PerWebRequestLifestyle(true);
+        internal static readonly PerWebRequestLifestyle Disposeless = new PerWebRequestLifestyle(false);
+
+        private readonly bool dispose;
+
+        public PerWebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds = true)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
-
-            this.container = container;
-            this.instanceCreator = instanceCreator;
-            this.disposeWhenRequestEnds = disposeWhenRequestEnds;
+            this.dispose = disposeInstanceWhenWebRequestEnds;
         }
 
-        /// <summary>
-        /// Gets the instance that is cached during the lifetime of the web request.
-        /// </summary>
-        /// <returns>A new or cached instance.</returns>
-        public TService GetInstance()
+        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(
+            Container container)
         {
-            // This method needs to be public, because the RegisterPerWebRequest extension methods build a
-            // MethodCallExpression using this method, and this would fail in partial trust when the method is 
-            // not public.
-            var context = HttpContext.Current;
-
-            if (context == null)
+            return new PerWebRequestLifestyleRegistration<TService, TImplementation>(container)
             {
-                if (this.container.IsVerifying())
+                Dispose = this.dispose
+            };
+        }
+
+        public override LifestyleRegistration CreateRegistration<TService>(
+            Func<TService> instanceCreator, Container container)
+        {
+            return new PerWebRequestLifestyleRegistration<TService>(container)
+            {
+                InstanceCreator = instanceCreator,
+                Dispose = this.dispose
+            };
+        }
+
+        private class PerWebRequestLifestyleRegistration<TService>
+            : PerWebRequestLifestyleRegistration<TService, TService>
+            where TService : class
+        {
+            public PerWebRequestLifestyleRegistration(Container container) : base(container)
+            {
+            }
+
+            public Func<TService> InstanceCreator { get; set; }
+
+            public override Func<TService> BuildTransientInstanceCreator()
+            {
+                return this.BuildTransientDelegate(this.InstanceCreator);
+            }
+        }
+
+        private class PerWebRequestLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+            where TService : class
+            where TImplementation : class, TService
+        {
+            private readonly object key = new object();
+
+            private Func<TService> instanceCreator;
+
+            public PerWebRequestLifestyleRegistration(Container container) : base(container)
+            {
+            }
+
+            public bool Dispose { get; set; }
+
+            public override Expression BuildExpression()
+            {
+                if (this.instanceCreator == null)
+                {
+                    this.instanceCreator = this.BuildTransientInstanceCreator();
+                }
+
+                return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
+            }
+
+            public virtual Func<TService> BuildTransientInstanceCreator()
+            {
+                return this.BuildTransientDelegate<TService, TImplementation>();
+            }
+
+            public TService GetInstance()
+            {
+                // This method needs to be public, because the BuildExpression extension methods build a
+                // MethodCallExpression using this method, and this would fail in partial trust when the 
+                // method is not public.
+                var context = HttpContext.Current;
+
+                if (context == null)
+                {
+                    return this.GetInstanceWithoutContext();
+                }
+
+                TService instance = (TService)context.Items[this.key];
+
+                if (instance == null)
+                {
+                    context.Items[this.key] = instance = this.instanceCreator();
+
+                    this.RegisterForDisposal(instance);
+                }
+
+                return instance;
+            }
+
+            private TService GetInstanceWithoutContext()
+            {
+                if (this.Container.IsVerifying())
                 {
                     // Return a transient instance when this method is called during verification
                     return this.instanceCreator();
                 }
 
                 throw new ActivationException("The " + typeof(TService).FullName + " is registered as " +
-                    "'PerWebRequest', but the instance is requested outside the context of a HttpContext (" +
-                    "HttpContext.Current is null). Make sure instances using this lifestyle are not " + 
-                    "resolved during the application initialization phase and when running on a background " +
-                    "thread. For resolving instances on background threads, try registering this instance " + 
-                    "as 'Per Lifetime Scope': http://bit.ly/N1s8hN.");
+                    "'PerWebRequest', but the instance is requested outside the context of a " +
+                    "HttpContext (HttpContext.Current is null). Make sure instances using this " +
+                    "lifestyle are not resolved during the application initialization phase and when " +
+                    "running on a background thread. For resolving instances on background threads, " +
+                    "try registering this instance as 'Per Lifetime Scope': http://bit.ly/N1s8hN.");
             }
 
-            TService instance = (TService)context.Items[this.GetType()];
-
-            if (instance == null)
+            private void RegisterForDisposal(TService instance)
             {
-                instance = this.CreateInstance(context);
-            }
-
-            return instance;
-        }
-
-        private TService CreateInstance(HttpContext context)
-        {
-            TService instance = this.instanceCreator();
-
-            context.Items[this.GetType()] = instance;
-
-            if (this.disposeWhenRequestEnds)
-            {
-                var disposable = instance as IDisposable;
-
-                if (disposable != null)
+                if (this.Dispose)
                 {
-                    SimpleInjectorWebExtensions.RegisterDelegateForEndWebRequest(context, () =>
+                    var disposableInstance = instance as IDisposable;
+
+                    if (disposableInstance != null)
                     {
-                        disposable.Dispose();
-                    });
+                        SimpleInjectorWebExtensions.RegisterForDisposal(disposableInstance);
+                    }
                 }
             }
-
-            return instance;
         }
     }
 }

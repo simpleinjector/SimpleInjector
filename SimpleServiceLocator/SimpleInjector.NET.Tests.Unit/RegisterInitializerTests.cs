@@ -223,42 +223,99 @@
         }
 
         [TestMethod]
-        public void GetInstance_OnInstanceNotCreatedByTheContainer1_DoesNotCallInitializer()
+        public void GetInstance_CalledMultipleTimesOnOnInstanceRegisteredAsSingleInstance_CallsTheInitializerJustOnce()
         {
             // Arrange
-            bool delegateCalled = false;
+            int actualNumberOfCalls = 0;
+
             var container = new Container();
 
-            container.RegisterInitializer<ICommand>(c => { delegateCalled = true; });
+            container.RegisterInitializer<ICommand>(c => { actualNumberOfCalls++; });
 
             container.RegisterSingle<ICommand>(new ConcreteCommand());
 
             // Act
+            // Request the instance 4 times
+            container.GetInstance<ICommand>();
+            container.GetInstance<ICommand>();
+            container.GetInstance<ICommand>();
             container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(delegateCalled, "The instance initializer should not be called on types that " +
-                "are created outside of the control of the container.");
+            Assert.AreEqual(1, actualNumberOfCalls,
+                "The container will even call the initializer on instances that are passed in from the " +
+                "outside, but in the case of RegisterSingle, the initializer should only be called once.");
         }
 
         [TestMethod]
-        public void GetInstance_OnInstanceNotCreatedByTheContainer2_DoesNotCallInitializer()
+        public void GetInstance_RequestingATransientTypeThatIsRegisteredUsingADelegate_NeverCallsTheInitializerForTheImplementation()
         {
             // Arrange
-            bool delegateCalled = false;
+            bool initializerWasCalled = false;
+
             var container = new Container();
 
-            container.RegisterInitializer<ICommand>(c => { delegateCalled = true; });
+            container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
-            var singleton = new ConcreteCommand();
-            container.Register<ICommand>(() => singleton);
+            container.Register<ICommand>(() => new ConcreteCommand());
 
             // Act
             container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(delegateCalled, "The instance initializer should not be called on types that " +
-                "are created outside of the control of the container.");
+            Assert.IsFalse(initializerWasCalled,
+                "Since only ICommand is 'staticly' available information, the initializer for " + 
+                "ConcreteCommand should never fire. The performance hit would be too big.");
+        }
+
+        [TestMethod]
+        public void GetInstance_RequestingASingletonTypeThatIsRegisteredUsingADelegate_NeverCallsTheInitializerForTheImplementation()
+        {
+            // Arrange
+            bool initializerWasCalled = false;
+
+            var container = new Container();
+
+            container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
+
+            container.RegisterSingle<ICommand>(() => new ConcreteCommand());
+
+            // Act
+            container.GetInstance<ICommand>();
+
+            // Assert
+            Assert.IsFalse(initializerWasCalled,
+                "Since only ICommand is 'staticly' available information, the initializer for " +
+                "ConcreteCommand should never fire. Although the performance hit would be a one-time hit, " +
+                "users would expect this behavior to be the same as when registering a transient.");
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnOnInstanceRegisteredAsSingleFunc_CallsTheInitializerJustOnce()
+        {
+            // Arrange
+            int expectedTimesDelegateGetsCalled = 4;
+            int actualTimesDelegateGotCalled = 0;
+
+            var container = new Container();
+
+            container.RegisterInitializer<ICommand>(c => { actualTimesDelegateGotCalled++; });
+
+            var singleton = new ConcreteCommand();
+
+            container.Register<ICommand>(() => singleton);
+
+            // Act
+            container.GetInstance<ICommand>();
+            container.GetInstance<ICommand>();
+            container.GetInstance<ICommand>();
+            container.GetInstance<ICommand>();
+
+            // Assert
+            Assert.AreEqual(expectedTimesDelegateGetsCalled, actualTimesDelegateGotCalled,
+                "The container will even call the initializer on instances that are passed in from the " +
+                "outside, and since the delegate is registered as transient, the initializer should be " +
+                "called each time.");
         }
 
         [TestMethod]

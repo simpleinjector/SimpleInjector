@@ -13,6 +13,36 @@
         }
 
         [TestMethod]
+        public void GetInstance_RegistrationUsingLifetimeScopeLifestyle_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+            }
+        }
+        
+        [TestMethod]
+        public void GetInstance_RegistrationUsingFuncLifetimeScopeLifestyle_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand>(() => new ConcreteCommand(), new LifetimeScopeLifestyle());
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+            }
+        }
+
+        [TestMethod]
         public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrations_Succeeds()
         {
             // Arrange
@@ -558,6 +588,52 @@
         public void RegisterLifetimeScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()
         {
             SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(new Container(), null);
+        }
+        
+        [TestMethod]
+        public void GetInstance_LifetimeScopedInstanceWithInitializer_CallsInitializerOncePerLifetimeScope()
+        {
+            // Arrange
+            int initializerCallCount = 0;
+
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+
+            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
+        }
+
+        [TestMethod]
+        public void GetInstance_LifetimeScopedFuncInstanceWithInitializer_CallsInitializerOncePerLifetimeScope()
+        {
+            // Arrange
+            int initializerCallCount = 0;
+
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
+
+            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
         }
 
         [TestMethod]
