@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    // http://simpleinjector.codeplex.com/discussions/353520
     using System;
     using System.Diagnostics;
     using System.Globalization;
@@ -22,6 +23,7 @@
 
         private bool IsCalledDuringRegistrationPhase
         {
+            [DebuggerStepThrough]
             get { return !this.container.IsLocked(); }
         }
 
@@ -38,6 +40,7 @@
             throw new ActivationException(this.BuildExceptionMessage(implementationType));
         }
 
+        [DebuggerStepThrough]
         private ConstructorInfo GetConstructorOrNull(Type type)
         {
             // We prevent calling GetRegistration during the registration phase, because at this point not
@@ -59,6 +62,7 @@
                 this.CanBuildParameterExpression(parameter);
         }
 
+        [DebuggerStepThrough]
         private bool CanBuildParameterExpression(ParameterInfo parameter)
         {
             try
@@ -72,6 +76,7 @@
             }
         }
 
+        [DebuggerStepThrough]
         private string BuildExceptionMessage(Type type)
         {
             if (!type.GetConstructors().Any())
