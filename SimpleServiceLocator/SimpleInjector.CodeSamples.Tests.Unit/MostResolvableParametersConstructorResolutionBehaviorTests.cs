@@ -1,9 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-
+    using System.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Extensions;
 
     [TestClass]
@@ -128,6 +127,30 @@
 
             // Act
             container.GetInstance<IValidator<int>>();
+        }
+        
+        [TestMethod]
+        public void GetInstance_ContainerWithOverriddenConstructorInjectionBehavior_ResolvesInstanceSuccessfully()
+        {
+            // Arrange
+            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
+
+            Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
+
+            // The ConnectionStringsConvention overrides the ConstructorInjectionBehavior and allows resolving
+            // constructor arguments of type string that are postfixed with 'ConnectionString'.
+            container.Options.RegisterParameterConvention(new ConnectionStringsConvention());
+
+            // Act
+            // TypeWithConnectionStringConstructorArgument contains 1 ctor with a 'string cs1ConnectionString'
+            // argument. 'cs1' is available as key in app.config/connectionStrings.
+            // The call to GetInstance will fail when the MostResolvableParametersConstructorResolutionBehavior
+            // does not correctly callback to the ConstructorInjectionBehavior to check whether the type
+            // can be resolved.
+            var instance = container.GetInstance<TypeWithConnectionStringConstructorArgument>();
+
+            // Assert
+            Assert.AreEqual(expectedConnectionString, instance.ConnectionString);
         }
 
         [TestMethod]
@@ -296,8 +319,21 @@
             }
         }
 
+        public class TypeWithConnectionStringConstructorArgument
+        {
+            // "cs1" is a connection string in the app.config of this test project.
+            public TypeWithConnectionStringConstructorArgument(string cs1ConnectionString)
+            {
+                this.ConnectionString = cs1ConnectionString;
+            }
+
+            public string ConnectionString { get; private set; }
+        }
+
+
         public class MultipleCtorNullValidator<T> : IValidator<T>
         {
+
             public MultipleCtorNullValidator(ICommand command)
             {
             }

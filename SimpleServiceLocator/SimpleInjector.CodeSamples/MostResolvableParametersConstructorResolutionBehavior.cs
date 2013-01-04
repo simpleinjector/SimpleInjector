@@ -47,10 +47,29 @@
                 from ctor in type.GetConstructors()
                 let parameters = ctor.GetParameters()
                 orderby parameters.Length descending
-                where this.IsCalledDuringRegistrationPhase ||
-                    parameters.All(p => this.container.GetRegistration(p.ParameterType) != null)
+                where this.IsCalledDuringRegistrationPhase || parameters.All(this.CanBeResolved)
                 select ctor)
                 .FirstOrDefault();
+        }
+
+        [DebuggerStepThrough]
+        private bool CanBeResolved(ParameterInfo parameter)
+        {
+            return this.container.GetRegistration(parameter.ParameterType) != null ||
+                this.CanBuildParameterExpression(parameter);
+        }
+
+        private bool CanBuildParameterExpression(ParameterInfo parameter)
+        {
+            try
+            {
+                this.container.Options.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+                return true;
+            }
+            catch (ActivationException)
+            {
+                return false;
+            }
         }
 
         private string BuildExceptionMessage(Type type)
