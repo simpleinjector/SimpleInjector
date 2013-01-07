@@ -30,6 +30,7 @@ namespace SimpleInjector.Extensions
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
+using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Represents the method that will called to register one or multiple concrete. non-generic
@@ -80,8 +81,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
-                AccessibilityOption.PublicTypesOnly);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, 
+                Lifestyle.Transient, AccessibilityOption.PublicTypesOnly);
         }
 
         /// <summary>
@@ -104,7 +105,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
             container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
-                AccessibilityOption.PublicTypesOnly);
+                Lifestyle.Transient, AccessibilityOption.PublicTypesOnly);
         }
 
 #if !SILVERLIGHT
@@ -130,7 +131,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility,
+            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility, Lifestyle.Transient, 
                 (IEnumerable<Assembly>)assemblies);
         }
 
@@ -156,7 +157,114 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
+                Lifestyle.Transient, accessibility);
+        }
+#endif
+
+        /// <summary>
+        /// Registers all concrete, non-generic, publicly exposed types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="lifestyle">The lifestyle that will be used for the registration of the types.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="lifestyle"/> or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, Lifestyle lifestyle, params Assembly[] assemblies)
+        {
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle,
+                AccessibilityOption.PublicTypesOnly);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="lifestyle">The lifestyle that will be used for the registration of the types.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="lifestyle"/> or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Assembly> assemblies)
+        {
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle,
+                AccessibilityOption.PublicTypesOnly);
+        }
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/>
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
+        /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
+        /// <param name="lifestyle">The lifestyle that will be used for the registration of the types.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="lifestyle"/> or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same closed generic 
+        /// version of the given <paramref name="openGenericServiceType"/>.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, AccessibilityOption accessibility, Lifestyle lifestyle, 
+            params Assembly[] assemblies)
+        {
+            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility, lifestyle,
+                (IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> 
+        /// that are located in the given <paramref name="assemblies"/> that implement the given 
+        /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
+        /// <param name="lifestyle">The lifestyle that will be used for the registration of the types.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>,
+        /// <paramref name="openGenericServiceType"/>, <paramref name="lifestyle"/> or 
+        /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
+        /// <paramref name="accessibility"/> contains an invalid value.</exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, AccessibilityOption accessibility, Lifestyle lifestyle, 
+            IEnumerable<Assembly> assemblies)
+        {
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle, 
+                accessibility);
         }
 #endif
 
@@ -681,12 +789,16 @@ namespace SimpleInjector.Extensions
 #endif
 
         private static void RegisterManyForOpenGenericInternal(this Container container,
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle,
+            AccessibilityOption accessibility)
         {
+            Requires.IsNotNull(container, "container"); 
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
                 RequiresSingleImplementation(closedServiceType, implementations);
-                container.Register(closedServiceType, implementations.Single());
+                container.Register(closedServiceType, implementations.Single(), lifestyle);
             };
 
             RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, accessibility, callback);
