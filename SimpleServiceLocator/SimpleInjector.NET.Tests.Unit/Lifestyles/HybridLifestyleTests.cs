@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,7 +12,7 @@
     public class HybridLifestyleTests
     {
         [TestMethod]
-        public void BuildExpression_WithHybridLifestyle_BuildsExpectedExpressions()
+        public void BuildExpression_WithHybridLifestyle_BuildsExpectedExpression()
         {
             // Arrange
             var hybrid = new HybridLifestyle(() => false, Lifestyle.Transient, Lifestyle.Singleton);
@@ -31,6 +32,31 @@
                     Convert(new SqlUserRepository()), 
                     Convert(value(SimpleInjector.Tests.Unit.SqlUserRepository)))".TrimInside(),
                 expression);
+        }
+
+        [TestMethod]
+        public void BuildExpression_WithHybridLifestyleAndRegisteredDelegate_BuildsExpectedExpression()
+        {
+            // Arrange
+            var hybrid = new HybridLifestyle(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+
+            var container = new Container();
+
+            container.Register<IUserRepository>(() => new SqlUserRepository(), hybrid);
+
+            var registration = container.GetRegistration(typeof(IUserRepository));
+
+            // Act
+            var expression = registration.BuildExpression().ToString();
+
+            // Assert
+            Assert.IsTrue(expression.ToString().StartsWith(
+                "IIF(Invoke(value(System.Func`1[System.Boolean])), Convert("),
+                "Actual: " + expression.ToString());
+
+            Assert.IsTrue(expression.ToString().EndsWith(
+                "Convert(value(SimpleInjector.Tests.Unit.SqlUserRepository)))"),
+                "Actual: " + expression.ToString());
         }
 
         [TestMethod]
@@ -212,6 +238,50 @@
                     Convert(new SqlUserRepository()), 
                     Convert(new SqlUserRepository()))".TrimInside(),
                 expression.ToString());
+        }
+
+        [TestMethod]
+        public void CreateRegistration_Always_ReturnsARegistrationThatWrapsTheOriginalLifestyle()
+        {
+            // Arrange
+            var expectedLifestyle = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Transient);
+
+            var container = new Container();
+
+            // Act
+            var registration =
+                expectedLifestyle.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+
+            // Assert
+            Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
+        }
+
+        [TestMethod]
+        public void Relationships_HybridRegistrationWithOneDependency_ReturnsThatDependencyWithExpectedLifestyle()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            var hybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+
+            // RealUserService depends on IUserRepository
+            container.Register<UserServiceBase, RealUserService>(hybrid);
+
+            var serviceRegistration = container.GetRegistration(typeof(UserServiceBase));
+
+            // Verify triggers the building of the relationship list.
+            container.Verify();
+
+            // Act
+            var repositoryRelationship = serviceRegistration.GetRelationships().Single();
+
+            // Assert
+            Assert.AreEqual(hybrid, repositoryRelationship.Lifestyle,
+                "Even though the transient and singleton lifestyles build the list, the hybrid lifestyle" +
+                "must merge the two lists two one and use it's own lifestyle since the the real lifestyle " +
+                "is not singleton or transient, but hybrid");
         }
     }
 }

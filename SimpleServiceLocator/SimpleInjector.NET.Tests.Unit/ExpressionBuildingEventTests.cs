@@ -607,6 +607,63 @@
             }
         }
 
+        [TestMethod]
+        public void GetInstance_ExpressionBuildingChangedTheRegisterSingleRegistrationToReturnNull_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                e.Expression = Expression.Constant(null, typeof(SqlUserRepository));
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(IUserRepository));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "The registered delegate for type IUserRepository returned null.", ex);
+            }
+        }
+        
+        [TestMethod]
+        public void GetInstance_ExpressionBuildingChangedExpressionInAnIncompatibleWay_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                e.Expression = Expression.Constant("some string", typeof(string));
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance(typeof(IUserRepository));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "Error occurred while trying to build a delegate for type IUserRepository using " + 
+                    "the expression", ex);
+            }
+        }
+
         public class Order
         {
         }

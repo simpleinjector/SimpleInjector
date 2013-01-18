@@ -55,18 +55,11 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public DecoratableEnumerable(IEnumerable<Expression> expressions)
+        public DecoratableEnumerable(Container container, IEnumerable<Expression> expressions)
         {
-            this.contexts = (
-                from expression in expressions
-                select new DecoratorPredicateContext
-                {
-                    ServiceType = typeof(TService),
-                    ImplementationType = Helpers.DetermineImplementationType(expression, typeof(TService)),
-                    Expression = expression,
-                    AppliedDecorators = DecoratorPredicateContext.EmptyAppliedDecorators,
-                })
-                .ToArray();
+            this.container = container;
+            this.contexts = 
+                DecoratorPredicateContext.CreateFromExpressions(container, typeof(TService), expressions);
         }
 
         public DecoratorPredicateContext[] GetDecoratorPredicateContexts()
@@ -96,8 +89,8 @@ namespace SimpleInjector.Extensions.Decorators
             this.BuildContexts();
 
             this.instanceCreators = (
-                from expression in this.contexts
-                let lambda = Expression.Lambda<Func<TService>>(expression.Expression)
+                from context in this.contexts
+                let lambda = Expression.Lambda<Func<TService>>(context.Expression)
                 let instanceCreator = lambda.Compile()
                 select instanceCreator)
                 .ToArray();
@@ -110,13 +103,8 @@ namespace SimpleInjector.Extensions.Decorators
                 this.contexts = (
                     from implementationType in this.serviceTypes
                     let producer = this.GetRegistration(implementationType)
-                    select new DecoratorPredicateContext
-                    {
-                        ServiceType = typeof(TService),
-                        ImplementationType = implementationType,
-                        Expression = producer.BuildExpression(),
-                        AppliedDecorators = DecoratorPredicateContext.EmptyAppliedDecorators
-                    })
+                    select DecoratorPredicateContext.CreateFromExpression(this.container, producer.ServiceType, 
+                        implementationType, producer.BuildExpression()))
                     .ToArray();
             }
         }
@@ -129,7 +117,7 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        private IInstanceProducer GetRegistration(Type serviceType)
+        private InstanceProducer GetRegistration(Type serviceType)
         {
             var producer = this.container.GetRegistration(serviceType);
 

@@ -33,6 +33,9 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
 
+    using SimpleInjector.Advanced;
+using SimpleInjector.Analysis;
+
     internal static class DecoratorHelpers
     {
         private static readonly MethodInfo EnumerableSelectMethod =
@@ -86,13 +89,13 @@ namespace SimpleInjector.Extensions.Decorators
                 new object[] { contexts });
         }
 
-        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
-            IEnumerable<Expression> expressions)
+        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType, 
+            Container container, IEnumerable<Expression> expressions)
         {
             Type allInstancesEnumerableType = typeof(DecoratableEnumerable<>).MakeGenericType(serviceType);
 
             return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
-                new object[] { expressions });
+                new object[] { container, expressions });
         }
 
         internal static bool IsDecoratableEnumerableExpression(Expression enumerableExpression)
@@ -105,7 +108,7 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         internal static IDecoratableEnumerable ConvertToDecoratableEnumerable(Type serviceType,
-            object enumerable)
+            Container container, object enumerable)
         {
             // The RegisterAll<TService>(TService[]) method in the core library registers a collection that
             // implements IEnumerable<Expression>, especially for use here.
@@ -113,7 +116,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (expressions != null)
             {
-                enumerable = DecoratorHelpers.CreateDecoratableEnumerable(serviceType, expressions);
+                enumerable = DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, expressions);
             }
 
             return enumerable as IDecoratableEnumerable;

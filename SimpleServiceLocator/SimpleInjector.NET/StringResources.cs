@@ -27,9 +27,10 @@ namespace SimpleInjector
 {
     using System;
     using System.Globalization;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -45,13 +46,6 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} returned null.", serviceType.ToFriendlyName());
-        }
-
-        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Error occurred while trying to get an instance of type {0}.",
-                serviceType.ToFriendlyName());
         }
 
         internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType,
@@ -100,12 +94,26 @@ namespace SimpleInjector
         internal static string TypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered " +
-                "and the container is currently not configured to allow overriding registrations. " +
-                "To allow overriding the current registration, please create the container using the " +
-                "constructor overload that takes a {1} instance and set the " +
-                "AllowOverridingRegistrations property to true.",
-                serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
+                "Type {0} has already been registered and the container is currently not configured to " +
+                "allow overriding registrations. To allow overriding the current registration, please set " +
+                "the Container.Options.AllowOverridingRegistrations to true.",
+                serviceType.ToFriendlyName());
+        }
+
+        internal static string TypeAlreadyRegisteredAndContainerAlreadyVerified(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Type {0} has already been registered and can't be overridden, because Verify() has " +
+                "already been called. To allow overriding the current registration, please make sure " +
+                "Verify() is called after this registration.",
+                serviceType.ToFriendlyName());
+        }
+
+        internal static string ResolveUnregisteredTypeCalledButContainerAlreadyVerified(string eventName)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Registering a {0} event is not allowed after Verify() has been called on the container. " + 
+                "Please make sure any call to {0} is made before any call to Verify().", eventName);
         }
 
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
@@ -170,33 +178,6 @@ namespace SimpleInjector
                 "the same service type: {0}. Make sure only one of the registered handlers calls the " +
                 "ResolveUnregisteredType.Register method for a given service type.",
                 unregisteredServiceType.ToFriendlyName());
-        }
-
-        internal static string DelegateRegisteredUsingResolveUnregisteredTypeThatThrewAnException(
-            Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
-                "to the {0} service type, registered a delegate that threw an exception.",
-                serviceType.ToFriendlyName());
-        }
-
-        internal static string DelegateRegisteredUsingResolveUnregisteredTypeThatReturnedNull(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
-                "to the {0} service type, registered a delegate that returned a null reference.",
-                serviceType.ToFriendlyName());
-        }
-
-        internal static string DelegateRegisteredUsingResolveUnregisteredTypeReturnedAnUnassignableFrom(
-            Type serviceType, Type actualType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The delegate that was hooked to the ResolveUnregisteredType event and responded " +
-                "to the {0} service type, registered a delegate that created an instance of type {1} that " +
-                "can not be cast to the specified service type.",
-                serviceType.ToFriendlyName(), actualType.ToFriendlyName());
         }
 
         internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
@@ -290,5 +271,38 @@ namespace SimpleInjector
                 "The initializer(s) for type {0} could not be applied. {1}",
                 type.ToFriendlyName(), innerException.Message);
         }
+
+        internal static string ConstructorInjectionBehaviorReturnedNull(
+            IConstructorInjectionBehavior injectionBehavior, ParameterInfo parameter)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The {0} that was registered through Container.Options.ConstructorInjectionBehavior " +
+                "returned a null reference after its BuildParameterExpression(ParameterInfo) method was " +
+                "supplied with the argument of type {1} with name '{2}' from the constructor of type {3}. " +
+                "{4}.BuildParameterExpression implementations should never return null, but should throw " +
+                "an {5} with an expressive message instead.",
+                injectionBehavior.GetType().Namespace + "." + injectionBehavior.GetType().ToFriendlyName(),
+                parameter.ParameterType.ToFriendlyName(), parameter.Name,
+                parameter.Member.DeclaringType.ToFriendlyName(),
+                typeof(IConstructorInjectionBehavior).Name,
+                typeof(ActivationException).FullName);
+        }
+
+        internal static string RegistrationReturnedNullFromBuildExpression(
+            Registration lifestyleRegistration)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The {0} for the {1} returned a null reference from its BuildExpression method.",
+                lifestyleRegistration.GetType().ToFriendlyName(),
+                lifestyleRegistration.Lifestyle.GetType().ToFriendlyName());
+        }
+
+        internal static string CanNotCallBuildParameterExpressionContainerOptionsNotPartOfContainer()
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The ContainerOptions instance for this ConstructorInjectionBehavior is not part of a " +
+                "Container instance. Please make sure the ContainerOptions instance is supplied as " +
+                "argument to the constructor of a Container.");
+        }
     }
-}
+}   

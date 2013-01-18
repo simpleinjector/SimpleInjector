@@ -8,6 +8,7 @@
     using System.Linq.Expressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.
@@ -18,11 +19,6 @@
         public interface INonGenericService
         {
             void DoSomething();
-        }
-
-        public interface ICommandHandler<TCommand>
-        {
-            void Handle(TCommand command);
         }
 
         [TestMethod]
@@ -1256,13 +1252,114 @@
             Assert.IsInstanceOfType(decoratee, typeof(RealCommandCommandHandler));
         }
 
+        [TestMethod]
+        public void RegisterAll_ContainerUncontrolledSingletons_InitializesThoseSingletonsOnce()
+        {
+            // Arrange
+            var containerUncontrolledSingletonHandlers = new ICommandHandler<RealCommand>[]
+            {
+                new StubCommandHandler(), new RealCommandHandler()
+            };
+
+            var actualInitializedHandlers = new List<ICommandHandler<RealCommand>>();
+
+            var container = new Container();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledSingletonHandlers);
+
+            container.RegisterInitializer<ICommandHandler<RealCommand>>(handler =>
+            {
+                actualInitializedHandlers.Add(handler);
+            });
+
+            // Act
+            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, actualInitializedHandlers.Count, "The handlers are expected to be initialized.");
+            Assert.IsFalse(actualInitializedHandlers.Except(containerUncontrolledSingletonHandlers).Any(),
+                "Both handlers are expected to be initialized.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_ContainerControlledCollectionWithDecorator_ContainsExpectedListOfRelationships()
+        {
+            // Arrange
+            var expectedRelationship1 = new RelationshipInfo
+            {
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(StubCommandHandler), Lifestyle.Transient)
+            };
+
+            var expectedRelationship2 = new RelationshipInfo
+            {
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(RealCommandHandler), Lifestyle.Transient)
+            };
+
+            var container = new Container();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                typeof(StubCommandHandler),
+                typeof(RealCommandHandler));
+
+            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.Verify();
+
+            // Act
+            var relationships =
+                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>)).GetRelationships();
+
+            // Assert
+            Assert.AreEqual(2, relationships.Length);
+            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
+            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship2.Equals(actual)));
+        }
+
+        [TestMethod]
+        public void MethodUnderTest_ContainerUncontrolled_Scenario_Behavior()
+        {
+            // Arrange
+            var expectedRelationship = new RelationshipInfo
+            {
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), UnknownLifestyle.Instance)
+            };
+
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
+                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
+
+            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.Verify();
+
+            // Act
+            var relationships =
+                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>)).GetRelationships();
+
+            // Assert
+            Assert.AreEqual(1, relationships.Length);
+            Assert.IsTrue(expectedRelationship.Equals(relationships[0]));
+        }
+
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(
             ActivationException ex)
         {
             AssertThat.StringContains(@"
                 impossible for the container to generate a 
-                Func<DecoratorExtensionsCollectionTests+ICommandHandler<DecoratorExtensionsCollectionTests+RealCommand>> 
+                Func<ICommandHandler<RealCommand>> 
                 for injection into the DecoratorExtensionsCollectionTests+AsyncCommandHandlerProxy<T> decorator"
                 .TrimInside(),
                 ex.Message);
@@ -1315,10 +1412,6 @@
             {
                 this.DecoratedService.DoSomething();
             }
-        }
-
-        public class RealCommand
-        {
         }
 
         public class NullCommandHandler<T> : ICommandHandler<T>

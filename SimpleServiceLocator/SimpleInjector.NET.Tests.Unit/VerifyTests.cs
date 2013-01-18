@@ -5,6 +5,8 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SimpleInjector.Extensions;
+
     [TestClass]
     public class VerifyTests
     {
@@ -197,6 +199,130 @@
 
             // Act
             container.Verify();
+        }
+        
+        [TestMethod]
+        public void Verify_GetRegistrationCalledOnUnregisteredAbstractType_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // This call forces the registration of a null reference to speed up performance.
+            container.GetRegistration(typeof(IUserRepository));
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Register_WithAnOverrideCalledAfterACallToVerify_FailsWithTheExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.Register<IUserRepository, SqlUserRepository>();
+            
+            container.Verify();
+
+            try
+            {
+                // Act
+                container.RegisterSingle<IUserRepository, SqlUserRepository>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    Type IUserRepository has already been registered and can't be overridden, because Verify()
+                    has already been called. To allow overriding the current registration, please make sure
+                    Verify() is called after this registration.".TrimInside(), ex);
+            }
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredType_CalledAfterACallToVerify_FailsWithTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Verify();
+
+            try
+            {
+                // Act
+                container.ResolveUnregisteredType += (s, e) => { };
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    Registering a ResolveUnregisteredType event is not allowed after Verify() has been called
+                    on the container. Please make sure any call to ResolveUnregisteredType is made before any
+                    call to Verify().".TrimInside(), ex);
+            }
+        }
+
+        [TestMethod]
+        public void ExpressionBuilding_CalledAfterACallToVerify_FailsWithTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Verify();
+
+            try
+            {
+                // Act
+                container.ExpressionBuilding += (s, e) => { };
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    Registering a ExpressionBuilding event is not allowed after Verify() has been called
+                    on the container. Please make sure any call to ExpressionBuilding is made before any
+                    call to Verify().".TrimInside(), ex);
+            }
+        }
+
+        [TestMethod]
+        public void ExpressionBuilt_CalledAfterACallToVerify_FailsWithTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Verify();
+
+            try
+            {
+                // Act
+                container.ExpressionBuilt += (s, e) => { };
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    Registering a ExpressionBuilt event is not allowed after Verify() has been called
+                    on the container. Please make sure any call to ExpressionBuilt is made before any
+                    call to Verify().".TrimInside(), ex);
+            }
+        }
+
+        private sealed class PluginDecorator : IPlugin
+        {
+            public PluginDecorator(IPlugin plugin)
+            {
+            }
         }
     }
 }

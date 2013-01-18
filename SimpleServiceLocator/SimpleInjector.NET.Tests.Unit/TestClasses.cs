@@ -68,9 +68,12 @@
     {
         public UserController(UserServiceBase userService)
         {
+            this.UserService = userService;
         }
 
         public int UserKarmaOffset { get; set; }
+
+        public UserServiceBase UserService { get; private set; }
     }
 
     public class ConcreteTypeWithConcreteTypeConstructorArgument

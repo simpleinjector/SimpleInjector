@@ -78,6 +78,8 @@
     <Compile Include="Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Decorators\DecoratorHelpers.cs" />
+    <Compile Include="Decorators\DecoratorInfo.cs" />
+    <Compile Include="Decorators\ExpressionRegistration.cs" />
     <Compile Include="Decorators\IDecoratableEnumerable.cs" />
     <Compile Include="Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
     <Compile Include="Decorators\ServiceDecoratorExpressionInterceptor.cs" />

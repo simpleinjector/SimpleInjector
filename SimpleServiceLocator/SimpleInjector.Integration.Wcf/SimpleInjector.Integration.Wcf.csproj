@@ -53,7 +53,7 @@
     <Reference Include="System.ServiceModel.Activation" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PerWcfOperationLifestyle.cs" />
+    <Compile Include="WcfOperationLifestyle.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="WcfOperationScope.cs" />
     <Compile Include="WcfOperationScopeManager.cs" />

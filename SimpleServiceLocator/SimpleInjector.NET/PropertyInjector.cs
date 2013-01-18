@@ -48,8 +48,6 @@ namespace SimpleInjector
 
         private readonly Container container;
 
-        // This class builds a list of delegates where each delegate injects at most 3 properties (on .NET 3.5)
-        // or at most 7 properties (on .NET 4.0 and up).
         private Action<object>[] injectors;
 
         internal PropertyInjector(Container container, Type type)
@@ -178,10 +176,6 @@ namespace SimpleInjector
                 case 2:
                     generator.Emit(OpCodes.Ldarg_3);
                     break;
-
-                default:
-                    generator.Emit(OpCodes.Ldarg_S, local);
-                    break;
             }
 
             generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
@@ -217,7 +211,7 @@ namespace SimpleInjector
         private Action<object> CompileInjectionDelegateWithProducers(Delegate injectionDelegate,
             PropertyInfo[] properties)
         {
-            IEnumerable<IInstanceProducer> producers =
+            var producers =
                 from property in properties
                 select this.container.GetRegistration(property.PropertyType);
 

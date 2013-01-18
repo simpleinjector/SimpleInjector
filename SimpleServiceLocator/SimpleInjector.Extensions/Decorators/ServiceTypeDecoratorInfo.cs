@@ -27,17 +27,45 @@ namespace SimpleInjector.Extensions.Decorators
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
 
     internal sealed class ServiceTypeDecoratorInfo
     {
-        public ServiceTypeDecoratorInfo(Type implementationType)
+        private readonly Type registeredServiceType;
+        private readonly List<DecoratorInfo> appliedDecorators = new List<DecoratorInfo>();
+
+        internal ServiceTypeDecoratorInfo(Type registeredServiceType, Type implementationType, 
+            InstanceProducer originalProducer)
         {
+            this.registeredServiceType = registeredServiceType;
             this.ImplementationType = implementationType;
-            this.AppliedDecorators = new List<Type>();
+            this.OriginalProducer = originalProducer;
         }
 
-        public Type ImplementationType { get; private set; }
+        internal Type ImplementationType { get; private set; }
 
-        public List<Type> AppliedDecorators { get; private set; }
+        internal InstanceProducer OriginalProducer { get; private set; }
+
+        internal IEnumerable<DecoratorInfo> AppliedDecorators 
+        {
+            get { return this.appliedDecorators; }
+        }
+
+        internal InstanceProducer GetCurrentInstanceProducer()
+        {
+            return this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
+        }
+
+        internal void AddAppliedDecorator(Type decoratorType, DecoratorExpressionInterceptor interceptor,
+            Expression decoratedExpression)
+        {
+            var registration =
+                new ExpressionRegistration(decoratedExpression, interceptor.Lifestyle, interceptor.Container);
+
+            var producer = new InstanceProducer(this.registeredServiceType, registration);
+            
+            this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));
+        }
     }
 }

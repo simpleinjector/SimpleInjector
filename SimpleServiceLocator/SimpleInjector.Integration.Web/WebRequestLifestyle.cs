@@ -32,31 +32,35 @@ namespace SimpleInjector.Integration.Web
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
-    public sealed class PerWebRequestLifestyle : Lifestyle
+    public sealed class WebRequestLifestyle : Lifestyle
     {
-        internal static readonly PerWebRequestLifestyle Dispose = new PerWebRequestLifestyle(true);
-        internal static readonly PerWebRequestLifestyle Disposeless = new PerWebRequestLifestyle(false);
+        internal static readonly WebRequestLifestyle Dispose = new WebRequestLifestyle(true);
+        internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
         private readonly bool dispose;
 
-        public PerWebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds = true)
+        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds = true) : base("Web Request")
         {
             this.dispose = disposeInstanceWhenWebRequestEnds;
         }
 
-        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(
-            Container container)
+        protected override int Length
         {
-            return new PerWebRequestLifestyleRegistration<TService, TImplementation>(container)
+            get { return 300; }
+        }
+
+        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        {
+            return new WebRequestRegistration<TService, TImplementation>(this, container)
             {
                 Dispose = this.dispose
             };
         }
 
-        public override LifestyleRegistration CreateRegistration<TService>(
-            Func<TService> instanceCreator, Container container)
+        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+            Container container)
         {
-            return new PerWebRequestLifestyleRegistration<TService>(container)
+            return new PerWebRequestLifestyleRegistration<TService>(this, container)
             {
                 InstanceCreator = instanceCreator,
                 Dispose = this.dispose
@@ -64,10 +68,11 @@ namespace SimpleInjector.Integration.Web
         }
 
         private class PerWebRequestLifestyleRegistration<TService>
-            : PerWebRequestLifestyleRegistration<TService, TService>
+            : WebRequestRegistration<TService, TService>
             where TService : class
         {
-            public PerWebRequestLifestyleRegistration(Container container) : base(container)
+            public PerWebRequestLifestyleRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 
@@ -79,7 +84,7 @@ namespace SimpleInjector.Integration.Web
             }
         }
 
-        private class PerWebRequestLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+        private class WebRequestRegistration<TService, TImplementation> : Registration
             where TService : class
             where TImplementation : class, TService
         {
@@ -87,7 +92,8 @@ namespace SimpleInjector.Integration.Web
 
             private Func<TService> instanceCreator;
 
-            public PerWebRequestLifestyleRegistration(Container container) : base(container)
+            public WebRequestRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 

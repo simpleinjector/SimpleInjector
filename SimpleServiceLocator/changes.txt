@@ -8,18 +8,41 @@ Version vFuture
 		-[Core] Lifestyle and LifestyleRegistration classes added. These classes allow implementing custom
 		 lifestyle management.
 		-[Core] Register overloads added that take an Lifetyle as argument.
-		-[Core] ExpressionBuilding event added.
+		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
+		 expression is build that creates a new instance, but before instance initializers and lifestyle
+		 caching gets added.
+		 before the lifestyle
 		-[Core] HybridLifestyle added to allow registering hybrid lifestyles.
+		-[Integration.Web] WebRequestLifestyle has been added.
+		-[Integration.Wcf] WcfOperationLifestyle has been added.
+		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
+		-[Extensions] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
 
 	Breaking changes:
-		-[Core] ExpressionBuilt code get called twice. The first call to ExpressionBuilt is now prevented and
-		 the new ExpressionBuilding event handles this.
 		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
 		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). This could
 		 lead to inconsistent behavior or performance issues if the Func<T> delegate implements its own 
 		 caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
+		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
+		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
+		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
+		 in case a type got registered using RegisterSingle<A, B>(). The new ExpressionBuilding event will
+		 now handle the first call and will do this in a more reliable manner.
+		-[Core] The Container.GetInitializer<TService>() method has been removed from the container. The
+		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
+		 SimpleInjector.Advanced namespace. (work item 18349).
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
-		 PerWebRequestLifestyle can be used instead.
+		 WebRequestLifestyle can be used instead.
+
+	Bug fixes:
+		-[Extensions] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event
+		 that was triggered twice for singletons. (work item 19110)
+		-[Extensions.LifetimeScoping] Registration order of RegisterDecorator and RegisterLifetimeScope
+		 mattered for the lifetime op the decorator. (work item 19120)
+		-[Integration.Web] Registration order of RegisterDecorator and RegisterPerWebRequest mattered for the 
+		 lifetime op the decorator. (work item 19120)
+		-[Integration.Wcf] Registration order of RegisterDecorator and RegisterPerWcfOperation mattered for the 
+		 lifetime op the decorator. (work item 19120)
 
 
 Version vNext

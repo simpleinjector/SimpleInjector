@@ -331,28 +331,6 @@ namespace SimpleInjector.Extensions
             SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { castedCollection }));
         }
 
-        private static void SafeInvoke(Type serviceType, Type implementation, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, implementation, ex);
-            }
-            catch (TargetInvocationException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    throw ex.InnerException;
-                }
-
-                throw;
-            }
-        }
-
         private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
             Type implementation, MemberAccessException innerException)
         {

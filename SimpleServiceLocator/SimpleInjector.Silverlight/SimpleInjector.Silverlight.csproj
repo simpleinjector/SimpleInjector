@@ -101,6 +101,33 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\ContainerDebugView.cs">
+      <Link>Analysis\ContainerDebugView.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\DebuggerViewItem.cs">
+      <Link>Analysis\DebuggerViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\IContainerAnalyzer.cs">
+      <Link>Analysis\IContainerAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\KnownDependencyCollection.cs">
+      <Link>Analysis\KnownDependencyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\KnownRelationship.cs">
+      <Link>Analysis\KnownRelationship.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\LifestyleMismatchServices.cs">
+      <Link>Analysis\LifestyleMismatchServices.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\PotentialLifestyleMismatchContainerAnalyzer.cs">
+      <Link>Analysis\PotentialLifestyleMismatchContainerAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\TypeGeneralizer.cs">
+      <Link>Analysis\TypeGeneralizer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Analysis\VerificationError.cs">
+      <Link>Analysis\VerificationError.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
     </Compile>
@@ -131,26 +158,29 @@
     <Compile Include="..\SimpleInjector.NET\IInstanceProducer.cs">
       <Link>IInstanceProducer.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\InstanceProducers\InstanceProducer.cs">
-      <Link>InstanceProducers\InstanceProducer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyle.cs">
+      <Link>Lifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Lifestyles\ExpressionLifestyleRegistration.cs">
-      <Link>Lifestyles\ExpressionLifestyleRegistration.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\ExpressionRegistration.cs">
+      <Link>Lifestyles\ExpressionRegistration.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridLifestyle.cs">
       <Link>Lifestyles\HybridLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Lifestyles\Lifestyle.cs">
-      <Link>Lifestyles\Lifestyle.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\LifestyleRegistrationEventArgs.cs">
+      <Link>Lifestyles\LifestyleRegistrationEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Lifestyles\LifestyleRegistration.cs">
-      <Link>Lifestyles\LifestyleRegistration.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\Registration.cs">
+      <Link>Lifestyles\Registration.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\SingletonLifestyle.cs">
       <Link>Lifestyles\SingletonLifestyle.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\TransientLifestyle.cs">
       <Link>Lifestyles\TransientLifestyle.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\UnknownLifestyle.cs">
+      <Link>Lifestyles\UnknownLifestyle.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
@@ -164,7 +194,6 @@
     <Compile Include="..\SimpleInjector.NET\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
-    <Compile Include="Lifestyles\LifestyleRegistrationEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

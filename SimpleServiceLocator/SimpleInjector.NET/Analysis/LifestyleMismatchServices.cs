@@ -23,22 +23,29 @@
 */
 #endregion
 
-namespace SimpleInjector.Lifestyles
+namespace SimpleInjector.Analysis
 {
-    using System.Linq.Expressions;
+    using System;
 
-    internal class ExpressionLifestyleRegistration : LifestyleRegistration
+    using SimpleInjector.Lifestyles;
+
+    internal static class LifestyleMismatchServices
     {
-        private readonly Expression expression;
-
-        public ExpressionLifestyleRegistration(Expression expression, Container container) : base(container)
+        internal static bool DependencyHasPossibleLifestyleMismatch(KnownRelationship relationship)
         {
-            this.expression = expression;
-        }
+            Lifestyle componentLifestyle = relationship.Lifestyle;
+            Lifestyle dependencyLifestyle = relationship.Dependency.Lifestyle;
 
-        public override Expression BuildExpression()
-        {
-            return this.expression;
+            // If the lifestyles are the same instance, we consider them valid, even though in theory
+            // an hybrid lifestyle could screw things up. In practice this would be very unlikely, since
+            // the Func<bool> test delegate would typically return the same value within a given context.
+            if (object.ReferenceEquals(componentLifestyle, dependencyLifestyle) &&
+                componentLifestyle != UnknownLifestyle.Instance)
+            {
+                return false;
+            }
+
+            return componentLifestyle.ComponentLength > dependencyLifestyle.DependencyLength;
         }
     }
 }

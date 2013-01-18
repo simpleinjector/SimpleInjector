@@ -26,9 +26,12 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -38,14 +41,21 @@ namespace SimpleInjector.Extensions
     /// to be applied and it allows users to examine the given instance to see whether the decorator should
     /// be applied or not.
     /// </summary>
-    [DebuggerDisplay("DecoratorPredicateContext (ServiceType: {Helpers.ToFriendlyName(ServiceType),nq}, ImplementationType: {Helpers.ToFriendlyName(ImplementationType),nq}, Expression: {Expression})")]
+    [DebuggerDisplay("DecoratorPredicateContext (ServiceType = {Helpers.ToFriendlyName(ServiceType),nq}, " + 
+        "ImplementationType = {Helpers.ToFriendlyName(ImplementationType),nq})")]
     public sealed class DecoratorPredicateContext
     {
-        internal static readonly ReadOnlyCollection<Type> EmptyAppliedDecorators =
+        internal static readonly ReadOnlyCollection<Type> NoDecorators = 
             new ReadOnlyCollection<Type>(Type.EmptyTypes);
 
-        internal DecoratorPredicateContext()
+        internal DecoratorPredicateContext(Type serviceType, Type implementationType,
+            ReadOnlyCollection<Type> appliedDecorators, Expression expression, InstanceProducer registration)
         {
+            this.ServiceType = serviceType;
+            this.ImplementationType = implementationType;
+            this.AppliedDecorators = appliedDecorators;
+            this.Expression = expression;
+            this.Registration = registration;
         }
 
         /// <summary>
@@ -53,7 +63,7 @@ namespace SimpleInjector.Extensions
         /// service type will be returned, even if other decorators have already been applied to this type.
         /// </summary>
         /// <value>The closed generic service type.</value>
-        public Type ServiceType { get; internal set; }
+        public Type ServiceType { get; private set; }
 
         /// <summary>
         /// Gets the type of the implementation that is created by the container and for which the decorator
@@ -62,19 +72,70 @@ namespace SimpleInjector.Extensions
         /// determined. In that case the closed generic service type will be returned.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType { get; internal set; }
+        public Type ImplementationType { get; private set; }
 
         /// <summary>
         /// Gets the list of the types of decorators that have already been applied to this instance.
         /// </summary>
         /// <value>The applied decorators.</value>
-        public ReadOnlyCollection<Type> AppliedDecorators { get; internal set; }
+        public ReadOnlyCollection<Type> AppliedDecorators { get; private set; }
 
         /// <summary>
         /// Gets the current <see cref="Expression"/> object that describes the intention to create a new
         /// instance with its currently applied decorators.
         /// </summary>
         /// <value>The current expression that is about to be decorated.</value>
-        public Expression Expression { get; internal set; }
+        public Expression Expression { get; private set; }
+
+        internal InstanceProducer Registration { get; private set; }
+
+        internal static DecoratorPredicateContext[] CreateFromExpressions(Container container, Type serviceType,
+            IEnumerable<Expression> expressions)
+        {
+            return (
+                from expression in expressions
+                select DecoratorPredicateContext.CreateFromExpression(container, serviceType, expression))
+                .ToArray();
+        }
+
+        internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType, 
+            Expression expression)
+        {
+            Type implementationType = Helpers.DetermineImplementationType(expression, serviceType);
+
+            return CreateFromExpression(container, serviceType, implementationType, expression);
+        }
+        
+        internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType, 
+            Type implementationType, Expression expression)
+        {
+            var lifestyle = Helpers.DetermineLifestyle(expression);
+            var registration = new ExpressionRegistration(expression, lifestyle, container);
+
+            // This producer will never be part of the container, but can still be used for analysis.
+            var fakeProducer = new InstanceProducer(serviceType, registration);
+
+            return new DecoratorPredicateContext(serviceType, implementationType,
+                DecoratorPredicateContext.NoDecorators, expression, fakeProducer);
+        }
+
+        internal DecoratorPredicateContext Decorate(Type decoratorType, Expression decoratedExpression,
+            InstanceProducer newRegistration)
+        {
+            var list = this.AppliedDecorators.ToList();
+            list.Add(decoratorType);
+
+            return new DecoratorPredicateContext(this.ServiceType, this.ImplementationType,
+                list.AsReadOnly(), decoratedExpression, newRegistration);
+        }
+
+        internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
+            ServiceTypeDecoratorInfo info)
+        {
+            var appliedDecorators = info.AppliedDecorators.Select(d => d.DecoratorType).ToList().AsReadOnly();
+
+            return new DecoratorPredicateContext(serviceType, info.ImplementationType, appliedDecorators, 
+                expression, info.GetCurrentInstanceProducer());
+        }
     }
 }

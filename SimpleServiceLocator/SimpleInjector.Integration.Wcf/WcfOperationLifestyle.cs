@@ -31,27 +31,39 @@ namespace SimpleInjector.Integration.Wcf
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
-    public class PerWcfOperationLifestyle : Lifestyle
+    public class WcfOperationLifestyle : Lifestyle
     {
-        internal static readonly PerWcfOperationLifestyle WithDisposal = new PerWcfOperationLifestyle(true);
-        internal static readonly PerWcfOperationLifestyle NoDisposal = new PerWcfOperationLifestyle(false);
+        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle(true);
+        internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
         private readonly bool disposeInstanceWhenOperationEnds;
 
-        public PerWcfOperationLifestyle(bool disposeInstanceWhenOperationEnds = true)
+        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds = true) : base("WCF Operation")
         {
             this.disposeInstanceWhenOperationEnds = disposeInstanceWhenOperationEnds;
         }
 
-        public override LifestyleRegistration CreateRegistration<TService>(Func<TService> instanceCreator, 
-            Container container)
+        protected override int Length
         {
-            throw new NotImplementedException();
+            get { return 250; }
         }
 
-        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(Container container)
+        public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
-            throw new NotImplementedException();
+            return new WcfOperationRegistration<TService, TImplementation>(this, container)
+            {
+                Dispose = this.disposeInstanceWhenOperationEnds
+            };
+        }
+
+        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+            Container container)
+        {
+            return new PerWcfOperationLifestyleRegistration<TService>(this, container)
+            {
+                Dispose = this.disposeInstanceWhenOperationEnds,
+                InstanceCreator = instanceCreator
+            };
         }
 
         protected override void OnRegistration(LifestyleRegistrationEventArgs e)
@@ -60,15 +72,15 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         private sealed class PerWcfOperationLifestyleRegistration<TService>
-            : PerWcfOperationLifestyleRegistration<TService, TService>
+            : WcfOperationRegistration<TService, TService>
             where TService : class
         {
-            internal PerWcfOperationLifestyleRegistration(Container container)
-                : base(container)
+            internal PerWcfOperationLifestyleRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 
-            public Func<TService> InstanceCreator { get; set; }
+            internal Func<TService> InstanceCreator { get; set; }
 
             protected override Func<TService> BuildInstanceCreator()
             {
@@ -76,19 +88,19 @@ namespace SimpleInjector.Integration.Wcf
             }
         }
 
-        private class PerWcfOperationLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+        private class WcfOperationRegistration<TService, TImplementation> : Registration
             where TService : class
             where TImplementation : class, TService
         {
             private Func<TService> instanceCreator;
             private WcfOperationScopeManager manager;
 
-            internal PerWcfOperationLifestyleRegistration(Container container)
-                : base(container)
+            internal WcfOperationRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 
-            public bool Dispose { get; set; }
+            internal bool Dispose { get; set; }
 
             public override Expression BuildExpression()
             {

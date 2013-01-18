@@ -28,11 +28,13 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Helper methods for the extensions.
@@ -111,6 +113,24 @@ namespace SimpleInjector.Extensions
 
             // Implementation type can not be determined.
             return registeredServiceType;
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
+            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
+        internal static Lifestyle DetermineLifestyle(Expression expression)
+        {
+            if (IsSingletonExpression(expression))
+            {
+                return Lifestyle.Singleton;
+            }
+
+            if (IsTransientExpression(expression))
+            {
+                return Lifestyle.Transient;
+            }
+
+            // Implementation type can not be determined.
+            return UnknownLifestyle.Instance;
         }
 
         internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
@@ -223,6 +243,14 @@ namespace SimpleInjector.Extensions
             return errorMessage == null;
         }
 
+        internal static void AddRange<T>(this Collection<T> collection, IEnumerable<T> range)
+        {
+            foreach (var item in range)
+            {
+                collection.Add(item);
+            }
+        }
+
         private static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
         {
             var thisType = new[] { type };
@@ -265,6 +293,31 @@ namespace SimpleInjector.Extensions
             return argumentOfTypeAndOuterType
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
+        }
+
+        private static bool IsSingletonExpression(Expression expression)
+        {
+            return expression is ConstantExpression;
+        }
+
+        private static bool IsTransientExpression(Expression expression)
+        {
+            if (expression is NewExpression)
+            {
+                // Transient without initializers.
+                return true;
+            }
+
+            var invocation = expression as InvocationExpression;
+
+            if (invocation != null && invocation.Expression is ConstantExpression &&
+                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
+            {
+                // Transient with initializers.
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -202,8 +202,8 @@ namespace SimpleInjector.Extensions
         /// <summary>Resolves a given open generic type.</summary>
         private sealed class UnregisteredOpenGenericResolver
         {
-            private readonly Dictionary<Type, LifestyleRegistration> lifestyleRegistrationCache =
-                new Dictionary<Type, LifestyleRegistration>();
+            private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
+                new Dictionary<Type, Registration>();
 
             internal Type OpenGenericServiceType { get; set; }
 
@@ -226,19 +226,28 @@ namespace SimpleInjector.Extensions
 
                 if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
                 {
-                    var expression =
-                        this.BuildExpression(e.UnregisteredServiceType, results.ClosedGenericImplementation);
-
-                    // TODO: Should we be able to apply an ILifestyleExpressionProducer instead of an Expression?
-                    e.Register(expression);
+                    this.RegisterType(e, results.ClosedGenericImplementation);
                 }
             }
 
-            private Expression BuildExpression(Type serviceType, Type implementationType)
+            private void RegisterType(UnregisteredTypeEventArgs e, Type closedGenericImplementation)
+            {
+                var registration =
+                    this.GetRegistrationFromCache(e.UnregisteredServiceType, closedGenericImplementation);
+
+                this.ThrowWhenExpressionCanNotBeBuilt(registration, closedGenericImplementation);
+
+                e.Register(registration);
+            }
+
+            private void ThrowWhenExpressionCanNotBeBuilt(Registration registration, Type implementationType)
             {
                 try
                 {
-                    return this.GetLifestyleRegistrationFor(serviceType, implementationType).BuildExpression();
+                    // The core library will also throw a quite expressive exception if we don't do it here,
+                    // but we can do better and explain that the type is registered as open generic type
+                    // (instead of it being registered using open generic batch registration).
+                    registration.BuildExpression();
                 }
                 catch (Exception ex)
                 {
@@ -247,18 +256,17 @@ namespace SimpleInjector.Extensions
                 }
             }
 
-            private LifestyleRegistration GetLifestyleRegistrationFor(Type serviceType, Type implementationType)
+            private Registration GetRegistrationFromCache(Type serviceType, Type implementationType)
             {
                 // We must cache the returned lifestyles to prevent any multi-threading issues in case the
                 // returned lifestyle does some caching internally (as the singleton lifestyle does).
                 lock (this.lifestyleRegistrationCache)
                 {
-                    LifestyleRegistration registration;
+                    Registration registration;
 
                     if (!this.lifestyleRegistrationCache.TryGetValue(serviceType, out registration))
                     {
-                        registration = 
-                            this.Lifestyle.CreateRegistration(serviceType, implementationType, this.Container);
+                        registration = this.GetRegistration(serviceType, implementationType);
 
                         // TODO: Find out whether serviceType as key is enough or whether we need both the
                         // serviceType and implementationType as the key.
@@ -266,6 +274,18 @@ namespace SimpleInjector.Extensions
                     }
 
                     return registration;
+                }
+            }
+
+            private Registration GetRegistration(Type serviceType, Type implementationType)
+            {
+                try
+                {
+                    return this.Lifestyle.CreateRegistration(serviceType, implementationType, this.Container);
+                }
+                catch (ArgumentException ex)
+                {
+                    throw new ActivationException(ex.Message);
                 }
             }
         }

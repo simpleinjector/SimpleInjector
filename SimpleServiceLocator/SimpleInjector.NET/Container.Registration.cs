@@ -33,8 +33,8 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using SimpleInjector.Advanced;
+    using SimpleInjector.Analysis;
     using SimpleInjector.Lifestyles;
 
 #if DEBUG
@@ -44,8 +44,6 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        private bool verifying;
-
         /// <summary>
         /// Occurs when an instance of a type is requested that has not been registered, allowing resolution
         /// of unregistered types.
@@ -134,14 +132,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ResolveUnregisteredType");
 
                 this.resolveUnregisteredType += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ResolveUnregisteredType");
 
                 this.resolveUnregisteredType -= value;
             }
@@ -254,14 +252,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilt");
 
                 this.expressionBuilt += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilt");
 
                 this.expressionBuilt -= value;
             }
@@ -271,37 +269,16 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilding");
 
                 this.expressionBuilding += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilding");
 
                 this.expressionBuilding -= value;
-            }
-        }
-
-        internal bool IsVerifying
-        {
-            get
-            {
-                // By using a lock, we have the certainty that all threads will see the new value for 
-                // 'verifying' immediately.
-                lock (this.locker)
-                {
-                    return this.verifying;
-                }
-            }
-
-            private set
-            {
-                lock (this.locker)
-                {
-                    this.verifying = value;
-                }
             }
         }
 
@@ -705,7 +682,7 @@ namespace SimpleInjector
                 throw new ArgumentException("The collection may not contain null references.", "singletons");
             }
 
-            this.RegisterAll<TService>(new DecoratableEnumerable<TService>(singletons));
+            this.RegisterAll<TService>(new DecoratableSingletonCollection<TService>(this, singletons));
         }
 
         /// <summary>
@@ -716,7 +693,6 @@ namespace SimpleInjector
         /// invalid.</exception>
         public void Verify()
         {
-            bool wasLocked = this.locked;
             this.IsVerifying = true;
 
             try
@@ -726,8 +702,8 @@ namespace SimpleInjector
             }
             finally
             {
-                this.locked = wasLocked;
                 this.IsVerifying = false;
+                this.verified = true;
             }
         }
 
@@ -764,7 +740,53 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        private void AddRegistration(Type key, LifestyleRegistration registration)
+        internal IEnumerable<VerificationError> GetVerificationErrorsForRegistrations()
+        {
+            foreach (var pair in this.registrations)
+            {
+                InstanceProducer producer = pair.Value;
+
+                if (producer != null)
+                {
+                    Exception exception;
+
+                    if (!producer.Verify(out exception))
+                    {
+                        yield return new VerificationError(producer, exception);
+                    }
+                }
+            }
+        }
+
+        internal IEnumerable<VerificationError> GetVerificationErrorsForCollections()
+        {
+            foreach (var pair in this.collectionsToValidate)
+            {
+                Type serviceType = pair.Key;
+                IEnumerable collection = pair.Value;
+
+                Exception exception = null;
+
+                try
+                {
+                    Helpers.ThrowWhenCollectionCanNotBeIterated(collection, serviceType);
+                    Helpers.ThrowWhenCollectionContainsNullArguments(collection, serviceType);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+
+                if (exception != null)
+                {
+                    var producer = this.registrations[typeof(IEnumerable<>).MakeGenericType(serviceType)];
+
+                    yield return new VerificationError(producer, exception);
+                }
+            }
+        }
+
+        private void AddRegistration(Type key, Registration registration)
         {
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(key);
@@ -774,9 +796,18 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (!this.Options.AllowOverridingRegistrations && this.registrations.ContainsKey(type))
+            if (this.registrations.ContainsKey(type))
             {
-                throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
+                if (!this.Options.AllowOverridingRegistrations)
+                {
+                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
+                }
+
+                if (this.verified)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.TypeAlreadyRegisteredAndContainerAlreadyVerified(type));
+                }
             }
         }
 
@@ -790,14 +821,28 @@ namespace SimpleInjector
             }
         }
 
+        private void ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified(string eventName)
+        {
+            this.ThrowWhenContainerIsLocked();
+
+            if (this.verified)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ResolveUnregisteredTypeCalledButContainerAlreadyVerified(eventName));
+            }
+        }
+
         private void ValidateRegistrations()
         {
             foreach (var pair in this.registrations)
             {
-                Type serviceType = pair.Key;
-                IInstanceProducer producer = pair.Value;
+                InstanceProducer producer = pair.Value;
 
-                producer.Verify(serviceType);
+                // The producer can be null.
+                if (producer != null)
+                {
+                    producer.Verify();
+                }
             }
         }
 
@@ -848,19 +893,90 @@ namespace SimpleInjector
 
         // This class is a trick to allow the SimpleInjector.Extensions library to correctly wrap these
         // instances with decorators (it uses the IEnumerable<Expression>).
-        private sealed class DecoratableEnumerable<TService> : ReadOnlyCollection<TService>,
-            IEnumerable<Expression>
+        private sealed class DecoratableSingletonCollection<TService> 
+            : DecoratableSingletonCollectionBase<TService>, IEnumerable<Expression>
         {
-            internal DecoratableEnumerable(TService[] services)
-                : base(services.ToArray())
+            internal DecoratableSingletonCollection(Container container, TService[] services)
+                : base(container, services)
             {
             }
 
             IEnumerator<Expression> IEnumerable<Expression>.GetEnumerator()
             {
-                foreach (TService service in this)
+                foreach (var item in this.Items)
                 {
-                    yield return Expression.Constant(service);
+                    yield return Expression.Constant(item.Instance);
+                }
+            }
+        }
+
+        private abstract class DecoratableSingletonCollectionBase<TService> : IEnumerable<TService>
+        {
+            protected readonly DecoratableSingleton[] Items;
+
+            protected DecoratableSingletonCollectionBase(Container container, TService[] instances)
+            {
+                this.Items = (
+                    from instance in instances
+                    select new DecoratableSingleton(instance, container))
+                    .ToArray();
+            }
+
+            public IEnumerator<TService> GetEnumerator()
+            {
+                for (int i = 0; i < this.Items.Length; i++)
+                {
+                    yield return this.Items[i].Instance;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+
+            protected sealed class DecoratableSingleton
+            {
+                private readonly TService instance;
+                private readonly Container container;
+                private bool initialized;
+
+                public DecoratableSingleton(TService instance, Container container)
+                {
+                    this.instance = instance;
+                    this.container = container;
+                    this.initialized = false;
+                }
+
+                public TService Instance
+                {
+                    get
+                    {
+                        if (!this.initialized)
+                        {
+                            lock (this)
+                            {
+                                if (!this.initialized)
+                                {
+                                    this.Initialize(this.instance);
+
+                                    this.initialized = true;
+                                }
+                            }
+                        }
+
+                        return this.instance;
+                    }
+                }
+
+                private void Initialize(TService instance)
+                {
+                    var initializer = this.container.GetInitializer<TService>();
+
+                    if (initializer != null)
+                    {
+                        initializer(instance);
+                    }
                 }
             }
         }

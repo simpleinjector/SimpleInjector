@@ -329,11 +329,9 @@
 
             public string ConnectionString { get; private set; }
         }
-
-
+        
         public class MultipleCtorNullValidator<T> : IValidator<T>
         {
-
             public MultipleCtorNullValidator(ICommand command)
             {
             }

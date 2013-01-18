@@ -27,6 +27,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Linq.Expressions;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Provides data for and interaction with the 
@@ -57,10 +58,12 @@ namespace SimpleInjector
         /// <value>The indication whether the event has been handled.</value>
         public bool Handled
         {
-            get { return this.Expression != null; }
+            get { return this.Expression != null || this.Registration != null; }
         }
         
         internal Expression Expression { get; private set; }
+
+        internal Registration Registration { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type
@@ -98,11 +101,38 @@ namespace SimpleInjector
         /// <summary>
         /// Registers an <see cref="Expression"/> that describes the creation of instances of the type
         /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The delegate
-        /// will be caches and future requests will directly call that expression.
+        /// will be cached and future requests will directly use that expression or the compiled delegate.
         /// </summary>
+        /// <remarks>
+        /// NOTE: If possible, use the <see cref="Register(Registration)">Register(Registration)</see> overload,
+        /// since this allows the analysis services to determine any configuration errors on the lifestyle of
+        /// the registration.
+        /// </remarks>
         /// <param name="expression">The expression that describes the creation of instances of the type
         /// expressed by the <see cref="UnregisteredServiceType"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="expression"/> is a
+        /// null reference.</exception>
+        /// <exception cref="ActivationException">Thrown when multiple observers that have registered to
+        /// the <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event
+        /// called this method for the same type.</exception>
+        public void Register(Expression expression)
+        {
+            Requires.IsNotNull(expression, "expression");
+
+            this.RequiresNotHandled();
+
+            this.Expression = expression;
+        }
+
+        /// <summary>
+        /// Registers a <see cref="Registration"/> that describes the creation of instances of the type
+        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The 
+        /// registration will be cached and future requests will directly call unon that registration, the
+        /// expression that it generates or the delegate that gets compiled from that expression.
+        /// </summary>
+        /// <param name="registration">The registration that describes the creation of instances according to
+        /// the registration's lifestyle of the type expressed by the <see cref="UnregisteredServiceType"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="registration"/> is a
         /// null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="expression"/> is a
         /// not exactly of type <see cref="Func{T}"/> where T equals the <see cref="UnregisteredServiceType"/>.
@@ -110,20 +140,23 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when multiple observers that have registered to
         /// the <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event
         /// called this method for the same type.</exception>
-        public void Register(Expression expression)
+        public void Register(Registration registration)
         {
-            if (expression == null)
-            {
-                throw new ArgumentNullException("expression");
-            }
+            Requires.IsNotNull(registration, "registration");
 
+            this.RequiresNotHandled();
+
+            this.Registration = registration;
+        }
+
+        private void RequiresNotHandled()
+        {
             if (this.Handled)
             {
-                throw new ActivationException(StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
-                    this.UnregisteredServiceType));
+                throw new ActivationException(
+                    StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
+                        this.UnregisteredServiceType));
             }
-
-            this.Expression = expression;
         }
     }
 }

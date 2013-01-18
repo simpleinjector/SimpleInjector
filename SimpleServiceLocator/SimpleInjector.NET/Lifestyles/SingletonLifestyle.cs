@@ -30,48 +30,48 @@ namespace SimpleInjector.Lifestyles
     
     internal sealed class SingletonLifestyle : Lifestyle
     {
-        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(
+        internal SingletonLifestyle() : base("Singleton")
+        {
+        }
+
+        protected override int Length
+        {
+            get { return 1000; }
+        }
+
+        public override Registration CreateRegistration<TService, TImplementation>(
             Container container)
         {
             Requires.IsNotNull(container, "container");
 
-            return new SingletonLifestyleRegistration<TService, TImplementation>(container);
+            return new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
         }
 
-        public override LifestyleRegistration CreateRegistration<TService>(
+        public override Registration CreateRegistration<TService>(
             Func<TService> instanceCreator, Container container)
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");
 
-            return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, container);
+            return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
         }
 
-        internal static LifestyleRegistration CreateRegistration(Type serviceType, object instance, 
+        internal static Registration CreateRegistration(Type serviceType, object instance, 
             Container container)
         {
-            return new SingletonLifestyleRegistration(serviceType, instance, container);
+            return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 
+                container);
         }
 
-        private static Expression BuildConstantExpression<TService>(Func<TService> getInstance)
-        {
-            var instance = getInstance();
-
-            if (instance == null)
-            {
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(TService)));
-            }
-
-            return Expression.Constant(instance, typeof(TService));
-        }
-
-        private sealed class SingletonLifestyleRegistration : LifestyleRegistration
+        private sealed class SingletonInstanceLifestyleRegistration : Registration
         {
             private readonly Type serviceType;
             private readonly object instance;
+            private bool initializerRan;
 
-            internal SingletonLifestyleRegistration(Type serviceType, object instance, Container container)
-                : base(container)
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, object instance, Lifestyle lifestyle, 
+                Container container)
+                : base(lifestyle, container)
             {
                 this.serviceType = serviceType;
                 this.instance = instance;
@@ -79,13 +79,32 @@ namespace SimpleInjector.Lifestyles
 
             public override Expression BuildExpression()
             {
-                // The lock in InstanceProducer.BuildExpression ensures this expression is built just once and
-                // therefore only runs the initializer once.
-                this.RunInitializer();
+                this.EnsureInitializerHasRun();
 
                 var constantExpression = Expression.Constant(this.instance, this.serviceType);
 
-                return this.InterceptExpression(this.serviceType, constantExpression);
+                return this.InterceptInstanceCreation(this.serviceType, constantExpression);
+            }
+
+            private void EnsureInitializerHasRun()
+            {
+                // Since the instance is supplied from the outside, we have to run the initializer ourself.
+                // The base class can't do this for us.
+                if (!this.initializerRan)
+                {
+                    // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
+                    // we want to be very sure that this instance will never be initialized more than once,
+                    // because of the possible side effects that this might cause in user code.
+                    lock (this)
+                    {
+                        if (!this.initializerRan)
+                        {
+                            this.RunInitializer();
+
+                            this.initializerRan = true;
+                        }
+                    }
+                }
             }
 
             private void RunInitializer()
@@ -95,42 +114,100 @@ namespace SimpleInjector.Lifestyles
                 if (initializer != null)
                 {
                     initializer(this.instance);
-                }
+                }            
             }
         }
 
-        private sealed class SingletonFuncLifestyleRegistration<TService> : LifestyleRegistration
+        private sealed class SingletonFuncLifestyleRegistration<TService> 
+            : SingletonLifestyleRegistrationBase<TService>
             where TService : class
         {
-            private readonly Func<TService> instanceCreator;
+            private Func<TService> instanceCreator;
 
-            internal SingletonFuncLifestyleRegistration(Func<TService> instanceCreator, Container container)
-                : base(container)
+            internal SingletonFuncLifestyleRegistration(Func<TService> instanceCreator, Lifestyle lifestyle,
+                Container container)
+                : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Expression BuildExpression()
+            protected override TService CreateInstance()
             {
-                var getInstance = this.BuildTransientDelegate<TService>(this.instanceCreator);
+                var instance = this.BuildTransientDelegate<TService>(this.instanceCreator)();
 
-                return SingletonLifestyle.BuildConstantExpression<TService>(getInstance);
+                if (instance != null)
+                {
+                    // Clear the instance producer. It is not needed anymore (save up some memory).
+                    this.instanceCreator = null;
+                }
+
+                return instance;
             }
         }
 
-        private class SingletonLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+        private class SingletonLifestyleRegistration<TService, TImplementation>
+            : SingletonLifestyleRegistrationBase<TService>
             where TImplementation : class, TService
             where TService : class
         {
-            public SingletonLifestyleRegistration(Container container) : base(container)
+            public SingletonLifestyleRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
+            {
+            }
+
+            protected override TService CreateInstance()
+            {
+                return this.BuildTransientDelegate<TService, TImplementation>()();
+            }
+        }
+
+        private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
+            where TService : class
+        {
+            private TService instance;
+
+            protected SingletonLifestyleRegistrationBase(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 
             public override Expression BuildExpression()
             {
-                var getInstance = this.BuildTransientDelegate<TService, TImplementation>();
+                return Expression.Constant(this.GetInstance(), typeof(TService));
+            }
 
-                return SingletonLifestyle.BuildConstantExpression<TService>(getInstance);
+            protected abstract TService CreateInstance();
+
+            private TService GetInstance()
+            {
+                // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
+                // we want to be very sure that there will never be more than one instance of a singleton
+                // created.
+                if (this.instance == null)
+                {
+                    lock (this)
+                    {
+                        if (this.instance == null)
+                        {
+                            var instance = this.CreateInstance();
+
+                            EnsureInstanceIsNotNull(instance);
+
+                            this.instance = instance;
+                        }
+                    }
+                }
+
+                return this.instance;
+            }
+
+            private static void EnsureInstanceIsNotNull(object instance)
+            {
+                if (instance == null)
+                {
+                    throw new ActivationException(
+                        StringResources.DelegateForTypeReturnedNull(typeof(TService)));
+                }
             }
         }
     }

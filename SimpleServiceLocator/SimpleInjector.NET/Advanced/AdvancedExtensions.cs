@@ -26,6 +26,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <summary>
@@ -59,6 +60,30 @@ namespace SimpleInjector.Advanced
             Requires.IsNotNull(container, "container");
 
             return container.IsVerifying;
+        }
+
+        /// <summary>
+        /// Builds up an <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
+        /// are registered using <see cref="Container.RegisterInitializer{T}">RegisterInitializer</see> and
+        /// that apply to the given <typeparamref name="TService"/> (including delegates that are registered
+        /// for interfaces <typeparamref name="TService"/> implements and base types that 
+        /// <typeparamref name="TService"/> inherits from). <b>Null</b> will be returned when no delegates are
+        /// registered that apply to this type.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <remarks>
+        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
+        /// critical path of the application.
+        /// </remarks>
+        /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
+        /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "We need to return a Action<TService> and we therefore need the generic type param.")]
+        public static Action<TService> GetInitializer<TService>(this Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            return container.GetInitializer<TService>();
         }
 
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)

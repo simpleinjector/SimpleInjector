@@ -1,9 +1,11 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Analysis;
 
     [TestClass]
     public class ExpressionBuiltEventTests
@@ -495,11 +497,28 @@
         public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
-            var eventArgs =
-                new ExpressionBuiltEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
+            var container = new Container();
 
-            // Act
-            eventArgs.Expression = null;
+            container.Register<IPlugin, PluginImpl>();
+
+            container.ExpressionBuilt += (s, e) =>
+            {
+                // Act
+                e.Expression = null;
+            };
+
+            try
+            {
+                // Act
+                container.GetInstance<IPlugin>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (Exception ex)
+            {
+                throw ex.GetExceptionChain().Last();
+            }
         }
 
         [TestMethod]
@@ -531,6 +550,51 @@
                     "Error occurred while trying to build a delegate for type IUserRepository",
                     ex.Message, "Exception message was not descriptive.");
             }
+        }
+
+        [TestMethod]
+        public void KnownRelationships_AddingNullValue_ThrowsExpectedException()
+        {
+            // Arrange
+            KnownRelationship invalidRelationship = null;
+
+            var container = new Container();
+
+            container.ExpressionBuilt += (s, e) =>
+            {
+                // Assert
+                AssertThat.Throws<ArgumentNullException>(() => e.KnownRelationships.Add(invalidRelationship));
+            };
+
+            // Act
+            container.GetInstance<SqlUserRepository>();
+        }
+
+        [TestMethod]
+        public void KnownRelationships_InsertingNullValue_ThrowsExpectedException()
+        {
+            // Arrange
+            KnownRelationship invalidRelationship = null;
+
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+            container.Register<FakeUserService>();
+
+            container.ExpressionBuilt += (s, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(FakeUserService))
+                {
+                    Assert.AreEqual(1, e.KnownRelationships.Count, "Test setup failed.");
+
+                    // Assert
+                    AssertThat.Throws<ArgumentNullException>(
+                        () => e.KnownRelationships.Insert(0, invalidRelationship));
+                }               
+            };
+
+            // Act
+            container.GetInstance<FakeUserService>();
         }
 
         public class Order

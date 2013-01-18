@@ -26,8 +26,13 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector.Analysis;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Provides data for and interaction with the 
@@ -35,10 +40,12 @@ namespace SimpleInjector
     /// the <see cref="Container"/>. An observer can change the 
     /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the registered type.
     /// </summary>
-    [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: {SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]
+    [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: " + 
+        "{SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;
+        private Lifestyle lifestyle;
 
         /// <summary>Initializes a new instance of the <see cref="ExpressionBuiltEventArgs"/> class.</summary>
         /// <param name="registeredServiceType">Type of the registered service.</param>
@@ -71,5 +78,32 @@ namespace SimpleInjector
                 this.expression = value;
             }
         }
+
+        // TODO: Instead of registering Lifestyle and Expression, we might simplify things by allowing
+        // a Registration to be registered.
+        /// <summary>Gets or sets the current lifestyle of the registration.</summary>
+        /// <value>The original lifestyle of the registration.</value>
+        public Lifestyle Lifestyle
+        {
+            get
+            {
+                return this.lifestyle;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, "value");
+
+                this.lifestyle = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list dependencies of the registration that are currently known. This collection can be
+        /// altered to reflect the situation when the 
+        /// <see cref="ExpressionBuiltEventArgs.Expression">Expression</see> property has been replaced.
+        /// </summary>
+        /// <value>The list dependencies of the registration that are currently known.</value>
+        public Collection<KnownRelationship> KnownRelationships { get; internal set; }
     }
 }

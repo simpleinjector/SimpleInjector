@@ -26,28 +26,67 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
-    
-    public abstract class LifestyleRegistration
-    {
-        protected LifestyleRegistration(Container container)
-        {
-            Requires.IsNotNull(container, "container");
+    using System.Reflection;
 
+    using SimpleInjector.Analysis;
+
+    public abstract class Registration
+    {
+        private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
+
+        protected Registration(Lifestyle lifestyle, Container container)
+        {
+            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(container, "container");
+            
+            this.Lifestyle = lifestyle;
             this.Container = container;
         }
+
+        public Lifestyle Lifestyle { get; private set; }
 
         protected internal Container Container { get; private set; }
 
         public abstract Expression BuildExpression();
 
-        internal Expression InterceptExpression(Type serviceType, Expression expression)
+        internal KnownRelationship[] GetRelationships()
         {
-            var e = new ExpressionBuildingEventArgs(serviceType, expression);
+            lock (this.dependencies)
+            {
+                return this.dependencies.ToArray();
+            }
+        }
+
+        internal void ReplaceRelationships(IEnumerable<KnownRelationship> dependencies)
+        {
+            lock (this.dependencies)
+            {
+                this.dependencies.Clear();
+
+                dependencies.ToList().ForEach(dependency => this.dependencies.Add(dependency));
+            }
+        }
+
+        internal Expression InterceptInstanceCreation(Type serviceType, Expression instanceCreatorExpression)
+        {
+            var e = new ExpressionBuildingEventArgs(serviceType, instanceCreatorExpression);
 
             this.Container.OnExpressionBuilding(e);
 
             return e.Expression;
+        }
+
+        protected void AddRelationship(KnownRelationship relationship) 
+        {
+            Requires.IsNotNull(relationship, "relationship");
+
+            lock (this.dependencies)
+            {
+                this.dependencies.Add(relationship);
+            }
         }
 
         protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
@@ -97,10 +136,54 @@ namespace SimpleInjector.Lifestyles
             where TImplementation : class, TService
             where TService : class
         {
-            Expression expression = 
-                Helpers.BuildNewExpression(this.Container, typeof(TService), typeof(TImplementation));
+            Expression expression = this.BuildNewExpression(typeof(TService), typeof(TImplementation));
 
             expression = this.InterceptAndWrapInitializer<TService, TImplementation>(expression);
+
+            return expression;
+        }
+
+        private NewExpression BuildNewExpression(Type serviceType, Type implemenationType)
+        {
+            var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
+
+            ConstructorInfo constructor = resolutionBehavior.GetConstructor(serviceType, implemenationType);
+
+            var parameters =
+                from parameter in constructor.GetParameters()
+                select this.BuildParameterExpression(serviceType, parameter);
+
+            this.AddConstructorParametersAsKnownRelationship(constructor);
+            
+            return Expression.New(constructor, parameters.ToArray());
+        }
+
+        private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
+        {
+            var relationships =
+                from parameter in constructor.GetParameters()
+                let producer = this.Container.GetRegistrationEvenIfInvalid(parameter.ParameterType)
+                where producer != null
+                select new KnownRelationship(
+                    parameter.Member.DeclaringType, this.Lifestyle, producer);
+
+            foreach (var relationship in relationships)
+            {
+                this.AddRelationship(relationship);
+            }
+        }
+
+        private Expression BuildParameterExpression(Type serviceType, ParameterInfo parameter)
+        {
+            var injectionBehavior = this.Container.Options.ConstructorInjectionBehavior;
+
+            var expression = injectionBehavior.BuildParameterExpression(parameter);
+
+            if (expression == null)
+            {
+                throw new ActivationException(
+                    StringResources.ConstructorInjectionBehaviorReturnedNull(injectionBehavior, parameter));
+            }
 
             return expression;
         }
@@ -109,7 +192,7 @@ namespace SimpleInjector.Lifestyles
             where TImplementation : class, TService
             where TService : class
         {
-            expression = this.InterceptExpression(typeof(TService), expression);
+            expression = this.InterceptInstanceCreation(typeof(TService), expression);
 
             expression = this.WrapWithInitializer<TService, TImplementation>(expression);
 

@@ -74,8 +74,7 @@
             catch (InvalidOperationException ex)
             {
                 // Assert
-                AssertThat.ExceptionMessageContains("ContainerOptions", ex);
-                AssertThat.ExceptionMessageContains("AllowOverridingRegistrations", ex);
+                AssertThat.ExceptionMessageContains("Container.Options.AllowOverridingRegistrations", ex);
             }
         }
 
@@ -319,6 +318,26 @@
                     "ConstructorInjectionBehavior property cannot be changed after the first registration",
                     ex);
             }
+        }
+
+        [TestMethod]
+        public void BuildParameterExpression_CalledOnConstructorInjectionBehaviorWhenOptionsIsNotPartOfAContainer_ThrowsExpectedException()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            var parameter = 
+                typeof(ClassWithContainerAsDependency).GetConstructors().First().GetParameters().First();
+            
+            // Act
+            Action action = () => options.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The ContainerOptions instance for this ConstructorInjectionBehavior is not part of a Container
+                instance. Please make sure the ContainerOptions instance is supplied as argument to the 
+                constructor of a Container.".TrimInside(), 
+                action);
         }
 
         public sealed class ClassWithContainerAsDependency

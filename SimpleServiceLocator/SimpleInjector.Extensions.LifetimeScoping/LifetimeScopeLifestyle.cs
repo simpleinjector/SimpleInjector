@@ -38,24 +38,29 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         private readonly bool disposeInstanceWhenLifetimeScopeEnds;
 
-        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds = true)
+        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds = true) 
+            : base("Lifetime Scope")
         {
             this.disposeInstanceWhenLifetimeScopeEnds = disposeInstanceWhenLifetimeScopeEnds;
         }
 
-        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(
-            Container container)
+        protected override int Length
         {
-            return new LifetimeScopeLifestyleRegistration<TService, TImplementation>(container)
+            get { return 100; }
+        }
+
+        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        {
+            return new LifetimeScopeRegistration<TService, TImplementation>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds
             };
         }
 
-        public override LifestyleRegistration CreateRegistration<TService>(
-            Func<TService> instanceCreator, Container container)
+        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+            Container container)
         {
-            return new LifetimeScopeLifestyleRegistration<TService>(container)
+            return new LifetimeScopeRegistration<TService>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds,
                 InstanceCreator = instanceCreator
@@ -67,11 +72,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(e.Container);
         }
 
-        private sealed class LifetimeScopeLifestyleRegistration<TService>
-            : LifetimeScopeLifestyleRegistration<TService, TService>
+        private sealed class LifetimeScopeRegistration<TService> : LifetimeScopeRegistration<TService, TService>
             where TService : class
         {
-            internal LifetimeScopeLifestyleRegistration(Container container) : base(container)
+            internal LifetimeScopeRegistration(Lifestyle lifestyle, Container container) 
+                : base(lifestyle, container)
             {
             }
 
@@ -83,18 +88,19 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
         }
 
-        private class LifetimeScopeLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+        private class LifetimeScopeRegistration<TService, TImplementation> : Registration
             where TService : class
             where TImplementation : class, TService
         {
             private Func<TService> instanceCreator;
             private LifetimeScopeManager manager;
 
-            internal LifetimeScopeLifestyleRegistration(Container container) : base(container)
+            internal LifetimeScopeRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 
-            public bool Dispose { get; set; }
+            internal bool Dispose { get; set; }
 
             public override Expression BuildExpression()
             {

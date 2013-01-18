@@ -23,38 +23,65 @@
 */
 #endregion
 
-namespace SimpleInjector.Lifestyles
+namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
-    
+
+    using SimpleInjector.Lifestyles;
+
+    [DebuggerDisplay("{Name,nq}")]
     public abstract class Lifestyle
     {
         public static readonly Lifestyle Transient = new TransientLifestyle();
+
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
         private static readonly MethodInfo OpenCreateRegistrationTServiceTImplementationMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object, object>(null));
 
-        private static readonly MethodInfo OpenCreateRegistrationTServiceMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
-
-        protected Lifestyle()
+        protected Lifestyle(string name)
         {
+            Requires.IsNotNull(name, "name");
+
+            if (name == string.Empty)
+            {
+                throw new ArgumentException("Value can not be empty.", "name");
+            }
+
+            this.Name = name;
+        }
+
+        public string Name { get; private set; }
+
+        internal virtual int ComponentLength 
+        {
+            get { return this.Length; }
+        }
+
+        internal virtual int DependencyLength 
+        {
+            get { return this.Length; }
+        }
+
+        protected abstract int Length
+        {
+            get;
         }
 
         // TODO: Make virtual to make implementing a lifestyle easier.
-        public abstract LifestyleRegistration CreateRegistration<TService, TImplementation>(
+        public abstract Registration CreateRegistration<TService, TImplementation>(
             Container container)
             where TImplementation : class, TService
             where TService : class;
 
-        public abstract LifestyleRegistration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        public abstract Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
             where TService : class;
 
-        public LifestyleRegistration CreateRegistration(Type serviceType, Type implementationType,
+        public Registration CreateRegistration(Type serviceType, Type implementationType,
             Container container)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -72,7 +99,7 @@ namespace SimpleInjector.Lifestyles
 
             try
             {
-                return (LifestyleRegistration)
+                return (Registration)
                     closedCreateRegistrationMethod.Invoke(this, new object[] { container });
             }
             catch (MemberAccessException ex)

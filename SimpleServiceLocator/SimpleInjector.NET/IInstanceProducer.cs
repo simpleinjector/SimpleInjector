@@ -26,27 +26,269 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
 
-    /// <summary>Contract for types that produce instances.</summary>
-    public interface IInstanceProducer
+    using SimpleInjector.Analysis;
+    using SimpleInjector.Lifestyles;
+
+    /// <summary>Produces instances for a given registration.</summary>
+    [DebuggerDisplay(
+        "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
+        "Lifestyle = {Lifestyle.Name,nq}")]
+    public sealed class InstanceProducer
     {
+        private readonly object locker = new object();
+        private readonly Registration registration;
+
+        private CyclicDependencyValidator validator;
+        private Func<object> instanceCreator;
+        private Expression expression;
+        private bool? isValid = true;
+        private Lifestyle overriddenLifestyle;
+
+        public InstanceProducer(Type serviceType, Registration registration)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registration, "registration");
+
+            this.ServiceType = serviceType;
+            this.registration = registration;
+
+            this.Initialize();
+        }
+
+        public Lifestyle Lifestyle
+        {
+            get { return this.overriddenLifestyle ?? this.registration.Lifestyle; }
+        }
+
         /// <summary>Gets the service type for which this producer produces instances.</summary>
         /// <value>A <see cref="Type"/> instance.</value>
-        Type ServiceType { get; }
+        public Type ServiceType { get; private set; }
 
-        /// <summary>Produces an instance.</summary>
-        /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = 
-            "A property is not appropriate, because get instance could possibly be a heavy operation.")]
-        object GetInstance();
+        // Flag that indicates that this type is created by the container (concrete or collection) or resolved
+        // using unregistered type resolution.
+        internal bool IsAutoResolved { get; set; }
+
+        // Will only return false when the type is a concrete unregistered type that was automatically added
+        // by the container, while the expression can not be generated.
+        // Types that are registered upfront are always considered to be valid, while unregistered types must
+        // be validated. The reason for this is that we must prevent the container to throw an exception when
+        // GetRegistration() is called for an unregistered (concrete) type that can not be resolved.
+        internal bool IsValid
+        {
+            get
+            {
+                if (this.isValid == null)
+                {
+                    this.isValid = this.CanBuildExpression();
+                }
+
+                return this.isValid.Value;
+            }
+        }
+
+        public KnownRelationship[] GetRelationships()
+        {
+            return this.registration.GetRelationships();
+        }
 
         /// <summary>
         /// Builds an expression that expresses the intent to get an instance by the current producer.
         /// </summary>
         /// <returns>An Expression.</returns>
-        Expression BuildExpression();
+        public Expression BuildExpression()
+        {
+            this.validator.CheckForRecursiveCalls();
+
+            try
+            {
+                this.expression = this.BuildExpressionOrGetFromCache();
+
+                this.RemoveValidator();
+
+                return this.expression;
+            }
+            catch (Exception ex)
+            {
+                this.validator.Reset();
+
+                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
+
+                throw;
+            }
+        }
+
+        /// <summary>Produces an instance.</summary>
+        /// <returns>An instance. Will never return null.</returns>
+        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
+            "A property is not appropriate, because get instance could possibly be a heavy operation.")]
+        public object GetInstance()
+        {
+            this.validator.CheckForRecursiveCalls();
+
+            object instance;
+
+            try
+            {
+                if (this.instanceCreator == null)
+                {
+                    this.instanceCreator = this.BuildInstanceCreator();
+                }
+
+                instance = this.instanceCreator();
+
+                this.RemoveValidator();
+            }
+            catch (Exception ex)
+            {
+                this.validator.Reset();
+
+                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
+
+                throw;
+            }
+
+            if (instance == null)
+            {
+                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
+            }
+
+            return instance;
+        }
+
+        internal void ClearCache()
+        {
+            // Clearing the cache will force the Expression and Func<T> to be rebuilt when an instance is
+            // requested and will retrigger any ExpressionBuilding and ExpressionBuilt event again. Clearing
+            // the cache is only meant to be used by the debugger analysis services.
+            this.expression = null;
+            this.instanceCreator = null;
+            this.overriddenLifestyle = null;
+            this.registration.ReplaceRelationships(Enumerable.Empty<KnownRelationship>());
+
+            this.Initialize();
+        }
+
+        internal void EnsureTypeWillBeExplicitlyVerified()
+        {
+            this.isValid = null;
+        }
+
+        private Func<object> BuildInstanceCreator()
+        {
+            // Don't do recursive checks. The GetInstance() already does that.
+            var expression = this.BuildExpressionOrGetFromCache();
+
+            try
+            {
+                var newInstanceMethod = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
+
+                return newInstanceMethod.Compile();
+            }
+            catch (Exception ex)
+            {
+                string message =
+                    StringResources.ErrorWhileBuildingDelegateFromExpression(this.ServiceType, expression, ex);
+
+                throw new ActivationException(message, ex);
+            }
+        }
+
+        private Expression BuildExpressionOrGetFromCache()
+        {
+            // We must lock the container, because not locking could lead to race conditions.
+            this.registration.Container.LockContainer();
+
+            // Prevent the Expression from being built more than once on this InstanceProducer. Note that this
+            // still means that the expression can be created multiple times for a single service type, because
+            // the container does not guarantee that a single InstanceProducer is created, just as the
+            // ResolveUnregisteredType event can be called multiple times for a single service type.
+            if (this.expression == null)
+            {
+                lock (this.locker)
+                {
+                    if (this.expression == null)
+                    {
+                        this.expression = this.BuildExpressionWithInterception();
+                    }
+                }
+            }
+
+            return this.expression;
+        }
+
+        private Expression BuildExpressionWithInterception()
+        {
+            var expression = this.registration.BuildExpression();
+
+            if (expression == null)
+            {
+                throw new ActivationException(StringResources.RegistrationReturnedNullFromBuildExpression(
+                    this.registration));
+            }
+
+            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
+
+            e.Lifestyle = this.Lifestyle;
+
+            e.KnownRelationships = new KnownDependencyCollection(this.registration.GetRelationships().ToList());
+
+            this.registration.Container.OnExpressionBuilt(e);
+
+            this.registration.ReplaceRelationships(e.KnownRelationships);
+
+            this.overriddenLifestyle = e.Lifestyle;
+
+            return e.Expression;
+        }
+
+        private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
+        {
+            string exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
+
+            // Prevent wrapping duplicate exceptions.
+            if (!innerException.Message.StartsWith(exceptionMessage, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
+            }
+        }
+
+        // This method will be inlined by the JIT.
+        private void RemoveValidator()
+        {
+            // No recursive calls detected, we can remove the validator to increase performance.
+            // We first check for null, because this is faster. Every time we write, the CPU has to send
+            // the new value to all the other CPUs. We only nullify the validator while using the GetInstance
+            // method, because the BuildExpression will only be called a limited amount of time.
+            if (this.validator != null)
+            {
+                this.validator = null;
+            }
+        }
+
+        private bool CanBuildExpression()
+        {
+            try
+            {
+                // Test if the instance can be made.
+                this.BuildExpression();
+
+                return true;
+            }
+            catch (ActivationException)
+            {
+                return false;
+            }
+        }
+        
+        private void Initialize()
+        {
+            this.validator = new CyclicDependencyValidator(this.ServiceType);
+        }
     }
 }

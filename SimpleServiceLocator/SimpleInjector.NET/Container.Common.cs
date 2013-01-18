@@ -29,12 +29,18 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+
+    using SimpleInjector.Analysis;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
+#if !SILVERLIGHT
+    [DebuggerTypeProxy(typeof(ContainerDebugView))]
+#endif
     public partial class Container
     {
         private readonly object locker = new object();
@@ -44,7 +50,14 @@ namespace SimpleInjector
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
 
+        // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
+
+        // Flag to signal that the container's configuration is currently being verified.
+        private bool verifying;
+
+        // Flag to signal that the container's configuration has been verified (at least once).
+        private bool verified;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding = (s, e) => { };
@@ -101,6 +114,27 @@ namespace SimpleInjector
             get { return this.registrations.Count > 1; }
         }
 
+        internal bool IsVerifying
+        {
+            get
+            {
+                // By using a lock, we have the certainty that all threads will see the new value for 
+                // 'verifying' immediately.
+                lock (this.locker)
+                {
+                    return this.verifying;
+                }
+            }
+
+            set
+            {
+                lock (this.locker)
+                {
+                    this.verifying = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
         /// types, and all implictly registered instances. Implicit registrations are  all concrete 
@@ -129,7 +163,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
-        public IInstanceProducer[] GetCurrentRegistrations()
+        public InstanceProducer[] GetCurrentRegistrations()
         {
             // We must lock, because not locking could lead to race conditions.
             this.LockContainer();
@@ -140,7 +174,6 @@ namespace SimpleInjector
                 where registration != null
                 where registration.IsValid
                 select registration)
-                .Cast<IInstanceProducer>()
                 .ToArray();
         }
 
@@ -199,6 +232,46 @@ namespace SimpleInjector
         internal void OnExpressionBuilt(ExpressionBuiltEventArgs e)
         {
             this.expressionBuilt(this, e);
+        }
+
+        // This method is for analysis purposes only.
+        internal void ClearCache()
+        {
+            this.ThrowWhenContainerIsLocked();
+
+            var registrationsExplicitlyMadeByTheUser = (
+                from pair in this.registrations
+                where pair.Value != null
+                where !pair.Value.IsAutoResolved
+                select pair)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            foreach (var registration in registrationsExplicitlyMadeByTheUser.Values)
+            {
+                registration.ClearCache();
+            }
+
+            // Remove the the invalid and auto resolved registrations by replacing the original dictionary.
+            this.registrations = registrationsExplicitlyMadeByTheUser;
+        }
+
+        /// <summary>Prevents any new registrations to be made to the container.</summary>
+        internal void LockContainer()
+        {
+            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+            // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
+            if (!this.locked)
+            {
+                lock (this.locker)
+                {
+                    // Only lock the container when we're currently not verifying. Registrations should be
+                    // able to be made after registration.
+                    if (!this.verifying)
+                    {
+                        this.locked = true;
+                    }
+                }
+            }
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>

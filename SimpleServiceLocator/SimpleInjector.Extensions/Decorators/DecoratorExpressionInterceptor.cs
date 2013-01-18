@@ -31,6 +31,8 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Analysis;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Hooks into the building process and adds a decorator if needed.
@@ -44,9 +46,14 @@ namespace SimpleInjector.Extensions.Decorators
             this.data = data;
         }
 
-        protected Container Container
+        internal Container Container
         {
             get { return this.data.Container; }
+        }
+
+        internal Lifestyle Lifestyle
+        {
+            get { return this.data.Singleton ? Lifestyle.Singleton : Lifestyle.Transient; }
         }
 
         // The service type definition (possibly open generic).
@@ -64,11 +71,6 @@ namespace SimpleInjector.Extensions.Decorators
         protected Predicate<DecoratorPredicateContext> Predicate
         {
             get { return this.data.Predicate; }
-        }
-
-        protected bool Singleton
-        {
-            get { return this.data.Singleton; }
         }
 
         protected abstract Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
@@ -99,26 +101,35 @@ namespace SimpleInjector.Extensions.Decorators
                 return true;
             }
 
-            if (this.ServiceTypeDefinition.IsGenericTypeDefinitionOf(serviceType))
+            if (!this.ServiceTypeDefinition.IsGenericTypeDefinitionOf(serviceType))
             {
-                var results = this.BuildClosedGenericImplementation(serviceType);
-
-                if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
-                {
-                    return false;
-                }
-
-                decoratorType = results.ClosedGenericImplementation;
-
-                return true;
+                return false;
             }
 
-            return false;
+            var results = this.BuildClosedGenericImplementation(serviceType);
+
+            if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
+            {
+                return false;
+            }
+
+            decoratorType = results.ClosedGenericImplementation;
+
+            return true;
+        }
+
+        protected bool SatisfiesPredicate(Type registeredServiceType, Expression expression, Lifestyle lifestyle)
+        {
+            var context = this.CreatePredicateContext(registeredServiceType, expression, lifestyle);
+
+            return this.SatisfiesPredicate(context);
         }
 
         protected bool SatisfiesPredicate(ExpressionBuiltEventArgs e)
         {
-            return this.SatisfiesPredicate(this.CreatePredicateContext(e));
+            var context = this.CreatePredicateContext(e.RegisteredServiceType, e.Expression, e.Lifestyle);
+
+            return this.SatisfiesPredicate(context);
         }
 
         protected bool SatisfiesPredicate(DecoratorPredicateContext context)
@@ -128,44 +139,92 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
         {
-            return this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType);
+            return this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType, e.Lifestyle);
         }
 
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression expression, Type registeredServiceType)
+        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression, 
+            Type registeredServiceType, Lifestyle lifestyle)
+        {
+            var producer =
+                new InstanceProducer(registeredServiceType,
+                    new ExpressionRegistration(originalExpression, lifestyle, this.Container));
+
+            return this.GetServiceTypeInfo(originalExpression, registeredServiceType, producer);
+        }
+
+        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
+            Type registeredServiceType, InstanceProducer producer)
         {
             Dictionary<Type, ServiceTypeDecoratorInfo> predicateCache = this.GetServiceTypePredicateCache();
 
             if (!predicateCache.ContainsKey(registeredServiceType))
             {
-                Type implementationType = Helpers.DetermineImplementationType(expression, registeredServiceType);
+                Type implementationType = 
+                    Helpers.DetermineImplementationType(originalExpression, registeredServiceType);
 
-                predicateCache[registeredServiceType] = new ServiceTypeDecoratorInfo(implementationType);
+                predicateCache[registeredServiceType] =
+                    new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);
             }
 
             return predicateCache[registeredServiceType];
         }
 
-        protected Expression[] BuildParameters(Type decoratorType, ExpressionBuiltEventArgs e)
+        protected Expression[] BuildParameters(ConstructorInfo constructor, ExpressionBuiltEventArgs e)
         {
-            ConstructorInfo constructor = 
-                this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
-
-            var dependencyParameters =
+            var parameterExpressions =
                 from dependencyParameter in constructor.GetParameters()
                 select this.BuildExpressionForDependencyParameter(dependencyParameter, e);
 
             try
             {
-                return dependencyParameters.ToArray();
+                return parameterExpressions.ToArray();
             }
             catch (ActivationException ex)
             {
                 // Build a more expressive exception message.
                 string message =
-                    StringResources.ErrorWhileTryingToGetInstanceOfType(decoratorType, ex.Message);
+                    StringResources.ErrorWhileTryingToGetInstanceOfType(constructor.DeclaringType, ex.Message);
 
                 throw new ActivationException(message, ex);
             }
+        }
+
+        protected KnownRelationship[] GetKnownDecoratorRelationships(ConstructorInfo decoratorConstructor, 
+            Type registeredServiceType, InstanceProducer decoratee)
+        {
+            var decorateeRelationships =
+                this.GetDecorateeRelationships(decoratorConstructor, registeredServiceType, decoratee);
+
+            var normalRelationships = this.GetNormalRelationships(decoratorConstructor, registeredServiceType);
+
+            return normalRelationships.Union(decorateeRelationships).ToArray();
+        }
+
+        private IEnumerable<KnownRelationship> GetNormalRelationships(ConstructorInfo constructor,
+            Type registeredServiceType)
+        {
+            return
+                from parameter in constructor.GetParameters()
+                where !IsExpressionForDecorateeDependency(parameter, registeredServiceType)
+                where !IsDecorateeFactoryParameter(parameter, registeredServiceType)
+                let parameterProducer = this.Container.GetRegistration(parameter.ParameterType)
+                where parameterProducer != null
+                select new KnownRelationship(
+                    implementationType: constructor.DeclaringType,
+                    lifestyle: this.Lifestyle,
+                    dependency: parameterProducer);
+        }
+
+        private IEnumerable<KnownRelationship> GetDecorateeRelationships(ConstructorInfo constructor, 
+            Type registeredServiceType, InstanceProducer decoratee)
+        {
+            return
+                from parameter in constructor.GetParameters()
+                where IsExpressionForDecorateeDependency(parameter, registeredServiceType)
+                select new KnownRelationship(
+                    implementationType: constructor.DeclaringType,
+                    lifestyle: this.Lifestyle,
+                    dependency: decoratee);
         }
 
         protected static bool IsDecorateeFactoryParameter(ParameterInfo parameter, Type serviceType)
@@ -182,17 +241,12 @@ namespace SimpleInjector.Extensions.Decorators
             return builder.BuildClosedGenericImplementation();
         }
 
-        private DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
+        private DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType, 
+            Expression expression, Lifestyle lifestyle)
         {
-            var info = this.GetServiceTypeInfo(e);
+            var info = this.GetServiceTypeInfo(expression, registeredServiceType, lifestyle);
 
-            return new DecoratorPredicateContext
-            {
-                ServiceType = e.RegisteredServiceType,
-                ImplementationType = info.ImplementationType,
-                AppliedDecorators = info.AppliedDecorators.ToList().AsReadOnly(),
-                Expression = e.Expression,
-            };
+            return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 
         private Dictionary<Type, ServiceTypeDecoratorInfo> GetServiceTypePredicateCache()
@@ -227,7 +281,7 @@ namespace SimpleInjector.Extensions.Decorators
         private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
             ExpressionBuiltEventArgs e)
         {
-            if (parameter.ParameterType == e.RegisteredServiceType)
+            if (IsExpressionForDecorateeDependency(parameter, e.RegisteredServiceType))
             {
                 return e.Expression;
             }
@@ -235,13 +289,16 @@ namespace SimpleInjector.Extensions.Decorators
             return null;
         }
 
+        private static bool IsExpressionForDecorateeDependency(ParameterInfo parameter, Type registeredServiceType)
+        {
+            return parameter.ParameterType == registeredServiceType;
+        }
+
         // The constructor parameter in which the factory for creating decorated instances should be injected.
         private static Expression BuildExpressionForDecorateeFactoryDependencyParameter(
             ParameterInfo parameter, ExpressionBuiltEventArgs e)
         {
-            bool isDecoratorFactoryParameter = IsDecorateeFactoryParameter(parameter, e.RegisteredServiceType);
-
-            if (isDecoratorFactoryParameter)
+            if (IsDecorateeFactoryParameter(parameter, e.RegisteredServiceType))
             {
                 var instanceCreator =
                     Expression.Lambda(Expression.Convert(e.Expression, e.RegisteredServiceType)).Compile();

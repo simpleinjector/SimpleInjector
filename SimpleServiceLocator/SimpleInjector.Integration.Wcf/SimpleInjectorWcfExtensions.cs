@@ -32,7 +32,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using System.ServiceModel;
-    using SimpleInjector.Extensions;
+
     using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Integration.Wcf;
 
@@ -79,9 +79,9 @@ namespace SimpleInjector
                 where typeIsWcfServiceType
                 select type;
 
-            foreach (var serviceType in serviceTypes)
+            foreach (Type serviceType in serviceTypes)
             {
-                container.Register(serviceType);
+                container.Register(serviceType, serviceType, Lifestyle.Transient);
             }
         }
 
@@ -145,7 +145,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TConcrete, TConcrete>(PerWcfOperationLifestyle.WithDisposal);
+            container.Register<TConcrete, TConcrete>(WcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>(PerWcfOperationLifestyle.WithDisposal);
+            container.Register<TService, TImplementation>(WcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator, PerWcfOperationLifestyle.WithDisposal);
+            container.Register<TService>(instanceCreator, WcfOperationLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             container.Register<TService>(instanceCreator, disposeWhenRequestEnds ? 
-                PerWcfOperationLifestyle.WithDisposal : PerWcfOperationLifestyle.NoDisposal);
+                WcfOperationLifestyle.WithDisposal : WcfOperationLifestyle.NoDisposal);
         }
 
         /// <summary>

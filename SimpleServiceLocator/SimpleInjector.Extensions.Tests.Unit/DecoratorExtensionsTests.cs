@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Analysis;
     using SimpleInjector.Lifestyles;
 
     public interface ILogger
@@ -1299,6 +1300,221 @@
             Assert.IsFalse(object.ReferenceEquals(handler1.Decorated, handler2.Decorated),
                 "The wrapped instance should have the expected lifestyle (transient in this case).");
         }
+        
+        [TestMethod]
+        public void GetRegistration_TransientInstanceDecoratedWithTransientDecorator_ContainsTheExpectedRelationship()
+        {
+            // Arrange
+            var expectedRelationship = new RelationshipInfo
+            {
+                Lifestyle = Lifestyle.Transient,
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+            };
+
+            var container = new Container();
+
+            // StubCommandHandler has no dependencies.
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+
+            // RealCommandHandlerDecorator only has ICommandHandler<RealCommand> as dependency.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.Verify();
+
+            // Act
+            var actualRelationship = container.GetRegistration(typeof(ICommandHandler<RealCommand>))
+                .GetRelationships()
+                .Single();
+
+            // Assert
+            Assert.IsTrue(expectedRelationship.Equals(actualRelationship));
+        }
+
+        [TestMethod]
+        public void GetRegistration_TransientInstanceDecoratedWithSingletonDecorator_ContainsTheExpectedRelationship()
+        {
+            // Arrange
+            var expectedRelationship = new RelationshipInfo
+            {
+                Lifestyle = Lifestyle.Singleton,
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+            };
+
+            var container = new Container();
+
+            // StubCommandHandler has no dependencies.
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+
+            // RealCommandHandlerDecorator only has ICommandHandler<RealCommand> as dependency.
+            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.Verify();
+
+            // Act
+            var actualRelationship = container.GetRegistration(typeof(ICommandHandler<RealCommand>))
+                .GetRelationships()
+                .Single();
+
+            // Assert
+            Assert.IsTrue(expectedRelationship.Equals(actualRelationship));
+        }
+
+        [TestMethod]
+        public void GetRegistration_DecoratorWithNormalDependency_ContainsTheExpectedRelationship()
+        {
+            // Arrange
+            var expectedRelationship1 = new RelationshipInfo
+            {
+                ImplementationType = typeof(LoggingHandlerDecorator1<RealCommand>),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(ILogger), Lifestyle.Singleton)
+            };
+
+            var expectedRelationship2 = new RelationshipInfo
+            {
+                ImplementationType = typeof(LoggingHandlerDecorator1<RealCommand>),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+            };
+            
+            var container = new Container();
+
+            container.RegisterSingle<ILogger, FakeLogger>();
+
+            // StubCommandHandler has no dependencies.
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+
+            // LoggingHandlerDecorator1 takes a dependency on ILogger.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
+
+            container.Verify();
+
+            // Act
+            var relationships = 
+                container.GetRegistration(typeof(ICommandHandler<RealCommand>)).GetRelationships();
+
+            // Assert
+            // I'm too lazy to split this up in two tests :-)
+            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
+            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship2.Equals(actual)));
+        }
+        
+        [TestMethod]
+        public void GetRegistration_SingletonInstanceWithTransientDecoratorWithSingletonDecorator_ContainsExpectedRelationships()
+        {
+            // Arrange
+            var expectedRelationship1 = new RelationshipInfo
+            {
+                ImplementationType = typeof(TransactionHandlerDecorator<RealCommand>),
+                Lifestyle = Lifestyle.Singleton,
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+            };
+
+            var expectedRelationship2 = new RelationshipInfo
+            {
+                ImplementationType = typeof(RealCommandHandlerDecorator),
+                Lifestyle = Lifestyle.Transient,
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Singleton)
+            };
+
+            var container = new Container();
+
+            container.RegisterSingle<ILogger, FakeLogger>();
+
+            // StubCommandHandler has no dependencies.
+            container.RegisterSingle<ICommandHandler<RealCommand>, StubCommandHandler>();
+
+            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            // TransactionHandlerDecorator<T> only takes a dependency on ICommandHandler<T>
+            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+
+            container.Verify();
+
+            // Act
+            var relationships =
+                container.GetRegistration(typeof(ICommandHandler<RealCommand>)).GetRelationships();
+
+            // Assert
+            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
+        }
+        
+        [TestMethod]
+        public void Lifestyle_TransientRegistrationDecoratedWithSingletonDecorator_GetsLifestyleOfDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
+            
+            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+
+            var registration = container.GetRegistration(typeof(ICommandHandler<RealCommand>));
+
+            // Act
+            container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Singleton, registration.Lifestyle);
+        }
+
+        [TestMethod]
+        public void Lifestyle_SingletonRegistrationDecoratedWithTransientDecorator_GetsLifestyleOfDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+
+            var registration = container.GetRegistration(typeof(ICommandHandler<RealCommand>));
+
+            // Act
+            container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+    }
+
+    public class RelationshipInfo
+    {
+        public Type ImplementationType { get; set; }
+
+        public Lifestyle Lifestyle { get; set; }
+        
+        public DependencyInfo Dependency { get; set; }
+
+        public static bool EqualsTo(RelationshipInfo info, KnownRelationship other)
+        {
+            return
+                info.ImplementationType == other.ImplementationType &&
+                info.Lifestyle == other.Lifestyle &&
+                info.Dependency.ServiceType == other.Dependency.ServiceType &&
+                info.Dependency.Lifestyle == other.Dependency.Lifestyle;
+        }
+
+        public bool Equals(KnownRelationship other)
+        {
+            return EqualsTo(this, other);
+        }
+    }
+
+    public class DependencyInfo
+    {
+        public DependencyInfo(Type serviceType, Lifestyle lifestyle)
+        {
+            this.ServiceType = serviceType;
+            this.Lifestyle = lifestyle;
+        }
+
+        public Type ServiceType { get; private set; }
+
+        public Lifestyle Lifestyle { get; private set; }
     }
 
     public sealed class FakeLogger : ILogger

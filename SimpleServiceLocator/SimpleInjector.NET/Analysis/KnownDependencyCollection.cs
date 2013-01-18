@@ -23,17 +23,29 @@
 */
 #endregion
 
-namespace SimpleInjector.Lifestyles
+namespace SimpleInjector.Analysis
 {
-    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
-    public class LifestyleRegistrationEventArgs : EventArgs
+    internal sealed class KnownDependencyCollection : Collection<KnownRelationship>
     {
-        internal LifestyleRegistrationEventArgs(Container container)
+        internal KnownDependencyCollection(List<KnownRelationship> relationships) : base(relationships)
         {
-            this.Container = container;
         }
 
-        public Container Container { get; private set; }
+        protected override void InsertItem(int index, KnownRelationship item)
+        {
+            Requires.IsNotNull(item, "item");
+
+            base.InsertItem(index, item);
+        }
+
+        protected override void SetItem(int index, KnownRelationship item)
+        {
+            Requires.IsNotNull(item, "item");
+
+            base.SetItem(index, item);
+        }
     }
 }

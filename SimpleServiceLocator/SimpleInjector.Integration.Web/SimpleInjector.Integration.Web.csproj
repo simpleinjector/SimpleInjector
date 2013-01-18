@@ -50,7 +50,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PerWebRequestInstanceCreator.cs" />
+    <Compile Include="WebRequestLifestyle.cs" />
     <Compile Include="SimpleInjectorWebExtensions.cs" />
     <Compile Include="SimpleInjectorWebInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

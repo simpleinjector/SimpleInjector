@@ -31,6 +31,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Analysis;
 
     // This class allows decorating collections of services with elements that are created by the container. 
     // Collections are registered using the following methods:
@@ -59,48 +60,64 @@ namespace SimpleInjector.Extensions.Decorators
         {
             if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(e.RegisteredServiceType))
             {
-                var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
-
-                Type decoratorType;
-
                 if (DecoratorHelpers.IsDecoratableEnumerableExpression(e.Expression))
                 {
+                    var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
+
+                    Type decoratorType;
+
                     // We don't check the predicate here; that is done for each element individually.
                     if (this.MustDecorate(serviceType, out decoratorType))
                     {
-                        e.Expression = this.BuildDecoratorExpression(e, serviceType, decoratorType);
+                        this.ApplyDecorator(serviceType, decoratorType, e);
                     }
                 }
             }
         }
 
-        private Expression BuildDecoratorExpression(ExpressionBuiltEventArgs e, Type serviceType, 
-            Type decoratorType)
+        private void ApplyDecorator(Type serviceType, Type decoratorType, ExpressionBuiltEventArgs e)
+        {
+            var decoratorConstructor = this.ResolutionBehavior.GetConstructor(serviceType, decoratorType);
+
+            IEnumerable<KnownRelationship> foundRelationships;
+
+            e.Expression = 
+                this.BuildDecoratorExpression(e, serviceType, decoratorConstructor, out foundRelationships);
+
+            // Adding known relationships allows the configuration to be analysed for errors.
+            e.KnownRelationships.AddRange(foundRelationships);
+        }
+
+        private Expression BuildDecoratorExpression(ExpressionBuiltEventArgs e, Type serviceType,
+            ConstructorInfo decoratorConstructor, out IEnumerable<KnownRelationship> foundRelationships)
         {
             var decoratableCollection = ((ConstantExpression)e.Expression).Value;
 
-            IDecoratableEnumerable decoratables =
-                DecoratorHelpers.ConvertToDecoratableEnumerable(serviceType, decoratableCollection);
+            IDecoratableEnumerable decoratables = DecoratorHelpers.ConvertToDecoratableEnumerable(
+                serviceType, this.Container, decoratableCollection);
 
-            return this.BuildDecoratorExpression(serviceType, decoratorType, decoratables);
+            return this.BuildDecoratorExpression(serviceType, decoratorConstructor, decoratables, 
+                out foundRelationships);
         }
 
-        private Expression BuildDecoratorExpression(Type serviceType, Type decoratorType,
-            IDecoratableEnumerable collection)
+        private Expression BuildDecoratorExpression(Type serviceType, ConstructorInfo decoratorConstructor,
+            IDecoratableEnumerable collection, out IEnumerable<KnownRelationship> foundRelationships)
         {
+            foundRelationships = Enumerable.Empty<KnownRelationship>();
+
             // When we're dealing with a Singleton decorator, we must cache the list, because other theads
             // could create another 'singleton' instance of this decorator. But since this list is at this 
-            // currently just a list of Expressions (returned as constant), we can always cache this list, 
-            // even if the decorator is transient. This cache is an instance list, since it is specific to the 
-            // current decorator registration.
+            // point currently just a list of Expressions (returned as constant), we can always cache this 
+            // list, even if the decorator is transient. This cache is an instance list, since it is specific 
+            // to the current decorator registration.
             lock (this.decoratableEnumerables)
             {
                 IDecoratableEnumerable decoratedCollection;
 
                 if (!this.decoratableEnumerables.TryGetValue(serviceType, out decoratedCollection))
                 {
-                    decoratedCollection = 
-                        this.BuildDecoratableEnumerable(serviceType, decoratorType, collection);
+                    decoratedCollection = this.BuildDecoratableEnumerable(serviceType, decoratorConstructor,
+                        collection, out foundRelationships);
 
                     this.decoratableEnumerables[serviceType] = decoratedCollection;
                 }
@@ -109,17 +126,35 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        private IDecoratableEnumerable BuildDecoratableEnumerable(Type serviceType, Type decoratorType,
-            IDecoratableEnumerable originalDecoratables)
+        private IDecoratableEnumerable BuildDecoratableEnumerable(Type serviceType, 
+            ConstructorInfo decoratorCtor, IDecoratableEnumerable originalDecoratables,
+            out IEnumerable<KnownRelationship> foundRelationships)
         {
-            var decoratorConstructor = this.ResolutionBehavior.GetConstructor(serviceType, decoratorType);
-
-            IEnumerable<DecoratorPredicateContext> predicateContexts =
+            var contexts = (
                 from context in originalDecoratables.GetDecoratorPredicateContexts()
-                let decoratedContext = this.DecorateContext(context, serviceType, decoratorConstructor)
-                select this.SatisfiesPredicate(context) ? decoratedContext : context;
+                let decoratedContext = this.DecorateContext(context, serviceType, decoratorCtor)
+                let predicateIsSatisfied = this.SatisfiesPredicate(context)
+                select new 
+                { 
+                    IsDecorated = predicateIsSatisfied, 
+                    Context = predicateIsSatisfied ? decoratedContext : context,
+                    OriginalContext = context
+                })
+                .ToArray();
 
-            return DecoratorHelpers.CreateDecoratableEnumerable(serviceType, predicateContexts.ToArray());
+            var decoratedContexts = contexts.Where(c => c.IsDecorated).Select(c => c.Context);
+
+            foundRelationships = (
+                from context in contexts
+                where context.IsDecorated
+                let dependency = context.OriginalContext.Registration
+                from relationship in this.GetKnownDecoratorRelationships(decoratorCtor, serviceType, dependency)
+                select relationship)
+                .ToArray();
+
+            var allContexts = contexts.Select(c => c.Context).ToArray();
+
+            return DecoratorHelpers.CreateDecoratableEnumerable(serviceType, allContexts);
         }
 
         private DecoratorPredicateContext DecorateContext(DecoratorPredicateContext predicateContext,
@@ -129,19 +164,14 @@ namespace SimpleInjector.Extensions.Decorators
 
             var e = new ExpressionBuiltEventArgs(serviceType, predicateContext.Expression);
 
-            var parameters = this.BuildParameters(decoratorType, e);
+            var parameters = this.BuildParameters(decoratorConstructor, e);
 
-            var appliedDecorators = predicateContext.AppliedDecorators.ToList();
+            var decoratedExpression = this.BuildDecoratorExpression(decoratorConstructor, parameters);
 
-            appliedDecorators.Add(decoratorType);
+            var registration = new ExpressionRegistration(decoratedExpression, this.Lifestyle, this.Container);
+            var producer = new InstanceProducer(serviceType, registration);
 
-            return new DecoratorPredicateContext
-            {
-                ServiceType = predicateContext.ServiceType,
-                ImplementationType = predicateContext.ImplementationType,
-                Expression = this.BuildDecoratorExpression(decoratorConstructor, parameters),
-                AppliedDecorators = appliedDecorators.AsReadOnly()
-            };
+            return predicateContext.Decorate(decoratorType, decoratedExpression, producer);
         }
 
         private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
@@ -150,7 +180,7 @@ namespace SimpleInjector.Extensions.Decorators
             Expression expression =
                 DecoratorHelpers.BuildDecoratorExpression(this.Container, decoratorConstructor, parameters);
 
-            if (this.Singleton)
+            if (this.Lifestyle == Lifestyle.Singleton)
             {
                 // This method is called inside the lock of the 
                 // BuildDecoratorEnumerableExpressionBasedOnDecoratableEnumerable method, which ensures that

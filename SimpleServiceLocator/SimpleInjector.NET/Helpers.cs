@@ -39,29 +39,7 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
-        internal const string InstanceProviderDebuggerDisplayString =
-            "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
-            "Producer = {SimpleInjector.Helpers.ToFriendlyName(GetType()),nq}, " +
-            "Expression = {BuildExpression().ToString()}";
-
         private static readonly MethodInfo GetInstanceOfT = GetContainerMethod(c => c.GetInstance<object>());
-
-        internal static NewExpression BuildNewExpression(Container container, Type serviceType, 
-            Type implemenationType)
-        {
-            var resolutionBehavior = container.Options.ConstructorResolutionBehavior;
-
-            ConstructorInfo constructor =
-                resolutionBehavior.GetConstructor(serviceType, implemenationType);
-
-            var injectionBehavior = container.Options.ConstructorInjectionBehavior;
-
-            var parameters =
-                from parameter in constructor.GetParameters()
-                select injectionBehavior.BuildParameterExpression(parameter);
-
-            return Expression.New(constructor, parameters.ToArray());
-        }
 
         internal static string ToFriendlyName(this Type type)
         {
@@ -102,8 +80,24 @@ namespace SimpleInjector
             }
         }
 
+        internal static bool Verify(this InstanceProducer instanceProducer, out Exception exception)
+        {
+            try
+            {
+                instanceProducer.GetInstance();
+
+                exception = null;
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            return exception == null;
+        }
+
         // Throws an InvalidOperationException on failure.
-        internal static void Verify(this IInstanceProducer instanceProducer, Type serviceType)
+        internal static void Verify(this InstanceProducer instanceProducer)
         {
             try
             {
@@ -116,8 +110,8 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidCreatingInstanceFailed(serviceType, ex), ex);
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    instanceProducer.ServiceType, ex), ex);
             }
         }
 

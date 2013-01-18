@@ -30,7 +30,7 @@ namespace SimpleInjector.Advanced
     using System.Linq.Expressions;
     using System.Reflection;
 
-    [DebuggerDisplay("{GetType().Name}")]
+    [DebuggerDisplay("{GetType().Name,nq}")]
     internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior
     {
         // By supplying a delegate for the retrieval of the container, the ContainerOptions can create and 
@@ -47,19 +47,33 @@ namespace SimpleInjector.Advanced
         {
             Requires.IsNotNull(parameter, "parameter");
 
+            InstanceProducer producer = this.GetInstanceProducerFor(parameter);
+            
+            // When the instance producer is invalid, this call will fail with an expressive exception.
+            return producer.BuildExpression();
+        }
+
+        private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
+        {
+            InstanceProducer producer = null;
+
             Container container = this.getContainer();
 
-            InstanceProducer producer =
-                container == null ? null : container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
-
-            if (producer != null)
+            if (container == null)
             {
-                // When the instance producer is invalid, this call will fail with an expressive exception.
-                return producer.BuildExpression();
+                throw new InvalidOperationException(
+                    StringResources.CanNotCallBuildParameterExpressionContainerOptionsNotPartOfContainer());
             }
 
-            throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
-                parameter.Member.DeclaringType, parameter));
+            producer = container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
+            
+            if (producer == null)
+            {
+                throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
+                    parameter.Member.DeclaringType, parameter));
+            }
+
+            return producer;
         }
     }
 }

@@ -41,9 +41,6 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
-        private static readonly MethodInfo GenericGetInitializerMethod =
-            Helpers.GetContainerMethod(container => container.GetInitializer<object>());
-
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <returns>The requested service instance.</returns>
@@ -185,7 +182,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
-        public IInstanceProducer GetRegistration(Type serviceType)
+        public InstanceProducer GetRegistration(Type serviceType)
         {
             return this.GetRegistration(serviceType, throwOnFailure: false);
         }
@@ -215,7 +212,7 @@ namespace SimpleInjector
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         //// Yippie, we broke a framework design guideline rule here :-).
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
-        public IInstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
+        public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
             // We must lock, because not locking could lead to incorrect behavior, since we are triggering the
             // building of Expression trees here and allowing to change the container afterwards, could screw 
@@ -261,23 +258,7 @@ namespace SimpleInjector
             propertyInjector.Inject(instance);
         }
 
-        /// <summary>
-        /// Builds up an <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
-        /// are registered using <see cref="Container.RegisterInitializer{T}">RegisterInitializer</see> and
-        /// that apply to the given <typeparamref name="TService"/> (including delegates that are registered
-        /// for interfaces <typeparamref name="TService"/> implements and base types that 
-        /// <typeparamref name="TService"/> inherits from). <b>Null</b> will be returned when no delegates are
-        /// registered that apply to this type.
-        /// </summary>
-        /// <remarks>
-        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
-        /// critical path of the application.
-        /// </remarks>
-        /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
-        /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "We need to return a Action<TService> and we therefore need the generic type param.")]
-        public Action<TService> GetInitializer<TService>()
+        internal Action<TService> GetInitializer<TService>()
         {
             return this.GetInitializer<TService>(typeof(TService));
         }
@@ -292,10 +273,7 @@ namespace SimpleInjector
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
             Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
 
-            var producer = this.GetInstanceProducerForType(serviceType, buildProducer);
-
-            // Prevent returning invalid producers
-            return producer;
+            return this.GetInstanceProducerForType(serviceType, buildProducer);
         }
 
         private Action<TService> GetInitializer<TService>(Type serviceType)
@@ -328,13 +306,13 @@ namespace SimpleInjector
             this.propertyInjectorCache = copy;
         }
 
-        private IInstanceProducer GetInstanceProducerForType<TService>() where TService : class
+        private InstanceProducer GetInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType<TService>();
             return this.GetInstanceProducerForType(typeof(TService), buildProducer);
         }
 
-        private IInstanceProducer GetInstanceProducerForType(Type serviceType)
+        private InstanceProducer GetInstanceProducerForType(Type serviceType)
         {
             Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
             return this.GetInstanceProducerForType(serviceType, buildProducer);
@@ -365,17 +343,17 @@ namespace SimpleInjector
 
         private object GetInstanceForType<TService>() where TService : class
         {
-            IInstanceProducer producer = this.GetInstanceProducerForType<TService>();
+            InstanceProducer producer = this.GetInstanceProducerForType<TService>();
             return this.GetInstanceFromProducer(producer, typeof(TService));
         }
 
         private object GetInstanceForType(Type serviceType)
         {
-            IInstanceProducer producer = this.GetInstanceProducerForType(serviceType);
+            InstanceProducer producer = this.GetInstanceProducerForType(serviceType);
             return this.GetInstanceFromProducer(producer, serviceType);
         }
 
-        private object GetInstanceFromProducer(IInstanceProducer instanceProducer, Type serviceType)
+        private object GetInstanceFromProducer(InstanceProducer instanceProducer, Type serviceType)
         {
             if (instanceProducer == null)
             {
@@ -431,20 +409,18 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType,
             Func<InstanceProducer> buildInstanceProducerForConcreteType)
         {
-            InstanceProducer instanceProducer =
-                this.BuildInstanceProducerThroughUnregisteredTypeResolution(serviceType);
+            var producer =
+                this.BuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
+                this.BuildInstanceProducerForCollection(serviceType) ??
+                buildInstanceProducerForConcreteType();
 
-            if (instanceProducer == null)
+            if (producer != null)
             {
-                instanceProducer = this.BuildInstanceProducerForCollection(serviceType);
+                // Flag that this producer is resolved by the container or using unregistered type resolution.
+                producer.IsAutoResolved = true;
             }
 
-            if (instanceProducer == null)
-            {
-                instanceProducer = buildInstanceProducerForConcreteType();
-            }
-
-            return instanceProducer;
+            return producer;
         }
 
         private InstanceProducer BuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
@@ -455,7 +431,10 @@ namespace SimpleInjector
 
             if (e.Handled)
             {
-                return new InstanceProducer(serviceType, new ExpressionLifestyleRegistration(e.Expression, this));
+                var registration = 
+                    e.Registration ?? new ExpressionRegistration(e.Expression, this);
+
+                return new InstanceProducer(serviceType, registration);
             }
             else
             {
@@ -502,7 +481,7 @@ namespace SimpleInjector
                 var registration = Lifestyle.Transient.CreateRegistration<TConcrete, TConcrete>(this);
                 var producer = new InstanceProducer(typeof(TConcrete), registration);
                     
-                producer.FlagAsConcreteTypeThatHasBeenResolvedThroughUnregisteredTypeResolution();
+                producer.EnsureTypeWillBeExplicitlyVerified();
 
                 return producer;
             }
@@ -519,7 +498,7 @@ namespace SimpleInjector
 
                 var producer = new InstanceProducer(concreteType, registration);
 
-                producer.FlagAsConcreteTypeThatHasBeenResolvedThroughUnregisteredTypeResolution();
+                producer.EnsureTypeWillBeExplicitlyVerified();
 
                 return producer;
             }
@@ -549,20 +528,6 @@ namespace SimpleInjector
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.registrations = snapshotCopy;
-        }
-
-        /// <summary>Prevents any new registrations to be made to the container.</summary>
-        private void LockContainer()
-        {
-            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-            // immediately.
-            if (!this.locked)
-            {
-                lock (this.locker)
-                {
-                    this.locked = true;
-                }
-            }
         }
 
         private static IEnumerable<object> ToGenericEnumerable(IEnumerable enumerable)

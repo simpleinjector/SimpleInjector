@@ -108,6 +108,12 @@
     <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorHelpers.cs">
       <Link>Decorators\DecoratorHelpers.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorInfo.cs">
+      <Link>Decorators\DecoratorInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions\Decorators\ExpressionRegistration.cs">
+      <Link>Decorators\ExpressionRegistration.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.Extensions\Decorators\IDecoratableEnumerable.cs">
       <Link>Decorators\IDecoratableEnumerable.cs</Link>
     </Compile>

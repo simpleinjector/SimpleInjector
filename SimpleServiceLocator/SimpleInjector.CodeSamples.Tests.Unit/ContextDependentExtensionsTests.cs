@@ -1,8 +1,10 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
-    using System;
     using System.Runtime.Remoting.Proxies;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
 
     [TestClass]
@@ -218,11 +220,78 @@
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
+        [TestMethod]
+        public void DecoratedInstance_DecoratorDependingOnContextDependencyResolvedAsRootType_AppliesContextCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
+            container.Register<IService, ServiceThatDependsOnRepository>();
+
+            container.RegisterDecorator(typeof(IService), typeof(ServiceDecoratorWithLoggerDependency));
+
+            // Act
+            var decorator = (ServiceDecoratorWithLoggerDependency)container.GetInstance<IService>();
+
+            // Assert
+            Assert.AreEqual(typeof(IService), decorator.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(ServiceDecoratorWithLoggerDependency), decorator.Logger.Context.ImplementationType);
+        }
+
+        [TestMethod]
+        public void DecoratedInstance_DecoratorDependingOnContextDependencyResolvedAsSubType_AppliesContextCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
+            container.Register<IService, ServiceThatDependsOnRepository>();
+
+            container.RegisterDecorator(typeof(IService), typeof(ServiceDecoratorWithLoggerDependency));
+
+            // Act
+            var controller = container.GetInstance<ControllerDependingOnService>();
+
+            var decorator = (ServiceDecoratorWithLoggerDependency)controller.Service;
+
+            // Assert
+            Assert.AreEqual(typeof(IService), decorator.Logger.Context.ServiceType);
+            Assert.AreEqual(typeof(ServiceDecoratorWithLoggerDependency), decorator.Logger.Context.ImplementationType);
+        }
+
         private static void Assert_IsIntercepted(object proxy)
         {
             RealProxy realProxy = System.Runtime.Remoting.RemotingServices.GetRealProxy(proxy);
 
             Assert.IsNotNull(realProxy, "The given " + proxy.GetType().Name + " is not a proxy.");
+        }
+
+        public sealed class ControllerDependingOnService
+        {
+            public ControllerDependingOnService(IService service)
+            {
+                this.Service = service;
+            }
+
+            public IService Service { get; private set; }
+        }
+
+        public sealed class ServiceDecoratorWithLoggerDependency : IService
+        {
+            public ServiceDecoratorWithLoggerDependency(IService decorated, ILogger logger)
+            {
+                this.Decorated = decorated;
+                this.Logger = logger;
+            }
+
+            public IService Decorated { get; private set; }
+
+            public ILogger Logger { get; private set; }
         }
 
         public sealed class ServiceThatDependsOnRepository : IService
@@ -261,7 +330,7 @@
             public DependencyContext Context { get; private set; }
         }
 
-        private sealed class FakeInterceptor : IInterceptor
+        public sealed class FakeInterceptor : IInterceptor
         {
             public void Intercept(IInvocation invocation)
             {

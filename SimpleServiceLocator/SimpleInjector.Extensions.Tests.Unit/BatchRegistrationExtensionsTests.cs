@@ -6,6 +6,7 @@
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class BatchRegistrationExtensionsTests
@@ -182,6 +183,91 @@
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
+        }
+
+#if !SILVERLIGHT
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle1()
+        {
+            // Arrange
+            var container = new Container();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
+                AccessibilityOption.PublicTypesOnly, Lifestyle.Transient,
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl1 = container.GetInstance<IService<int, string>>();
+            var impl2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreNotEqual(impl1, impl2, "The types should be registered as transient.");
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle2()
+        {
+            // Arrange
+            var container = new Container();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
+                AccessibilityOption.PublicTypesOnly, Lifestyle.Singleton,
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl1 = container.GetInstance<IService<int, string>>();
+            var impl2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
+        }
+#endif
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle3()
+        {
+            // Arrange
+            var container = new Container();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient,
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl1 = container.GetInstance<IService<int, string>>();
+            var impl2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreNotEqual(impl1, impl2, "The types should be registered as transient.");
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle4()
+        {
+            // Arrange
+            var container = new Container();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton,
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl1 = container.GetInstance<IService<int, string>>();
+            var impl2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle5()
+        {
+            // Arrange
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+
+            var container = new Container();
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton, assemblies);
+
+            // Act
+            var impl1 = container.GetInstance<IService<int, string>>();
+            var impl2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
         }
 
         [TestMethod]

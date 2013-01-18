@@ -28,32 +28,42 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Linq.Expressions;
     
-    internal sealed class TransientLifestyle : Lifestyle
+    public sealed class TransientLifestyle : Lifestyle
     {
-        public override LifestyleRegistration CreateRegistration<TService, TImplementation>(
+        internal TransientLifestyle() : base("Transient")
+        {
+        }
+
+        protected override int Length
+        {
+            get { return 1; }
+        }
+
+        public override Registration CreateRegistration<TService, TImplementation>(
             Container container)
         {
             Requires.IsNotNull(container, "container");
 
-            return new TransientLifestyleRegistration<TService, TImplementation>(container);
+            return new TransientLifestyleRegistration<TService, TImplementation>(this, container);
         }
 
-        public override LifestyleRegistration CreateRegistration<TService>(
+        public override Registration CreateRegistration<TService>(
             Func<TService> instanceCreator, Container container)
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");
 
-            return new TransientLifestyleRegistration<TService>(container, instanceCreator);
+            return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
         }
 
-        private sealed class TransientLifestyleRegistration<TService> : LifestyleRegistration
+        private sealed class TransientLifestyleRegistration<TService> : Registration
             where TService : class
         {
             private readonly Func<TService> instanceCreator;
 
-            public TransientLifestyleRegistration(Container container, Func<TService> instanceCreator)
-                : base(container)
+            public TransientLifestyleRegistration(Lifestyle lifestyle, Container container, 
+                Func<TService> instanceCreator)
+                : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;
             }
@@ -64,12 +74,12 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private class TransientLifestyleRegistration<TService, TImplementation> : LifestyleRegistration
+        private class TransientLifestyleRegistration<TService, TImplementation> : Registration
             where TImplementation : class, TService
             where TService : class
         {
-            internal TransientLifestyleRegistration(Container container)
-                : base(container)
+            internal TransientLifestyleRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
             {
             }
 

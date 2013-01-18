@@ -4,6 +4,7 @@
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     public interface IStruct<T> where T : struct
     {
@@ -92,6 +93,38 @@
 
             // Assert
             Assert.AreNotEqual(instance1, instance2, "Transient objects are expected to be returned.");
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_WithValidArguments_RespectsGivenLifestyle1()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Transient);
+
+            // Act
+            var instance1 = container.GetInstance<IService<int, string>>();
+            var instance2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreNotEqual(instance1, instance2, "Transient objects are expected to be returned.");
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_WithValidArguments_RespectsGivenLifestyle2()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
+
+            // Act
+            var instance1 = container.GetInstance<IService<int, string>>();
+            var instance2 = container.GetInstance<IService<int, string>>();
+
+            // Assert
+            Assert.AreEqual(instance1, instance2, "Singleton object is expected to be returned.");
         }
 
         [TestMethod]
@@ -616,17 +649,16 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains(@"
+                AssertThat.ExceptionMessageContains(@"
                     There was an error in the registration of open generic type IDoStuff<T>. 
                     Failed to build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
-                    ex.Message);
+                    ex);
 
-                AssertThat.StringContains(@"                                                                     
+                AssertThat.ExceptionMessageContains(@"                                                                     
                     The constructor of the type DefaultStuffDoer<Boolean> 
                     contains the parameter of type IService<Boolean, Int32> with name 'service' that 
-                    is not registered."
-                    .TrimInside(),
-                    ex.Message);
+                    is not registered.".TrimInside(),
+                    ex);
             }
         }
 

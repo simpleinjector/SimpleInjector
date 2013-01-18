@@ -27,6 +27,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -66,6 +67,8 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
+
+[assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
     Target = "SimpleInjector",

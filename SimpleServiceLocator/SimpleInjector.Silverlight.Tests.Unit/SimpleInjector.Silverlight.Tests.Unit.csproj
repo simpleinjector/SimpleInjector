@@ -104,6 +104,21 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorVerificationBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorVerificationBehaviorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\ContainerDebugViewTests.cs">
+      <Link>Analysis\ContainerDebugViewTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\KnownDependencyTests.cs">
+      <Link>Analysis\KnownDependencyTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\LifestyleMismatchServicesTests.cs">
+      <Link>Analysis\LifestyleMismatchServicesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\PotentialLifestyleMismatchContainerAnalyzerTests.cs">
+      <Link>Analysis\PotentialLifestyleMismatchContainerAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\TypeGeneralizerTests.cs">
+      <Link>Analysis\TypeGeneralizerTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AssertThat.cs">
       <Link>AssertThat.cs</Link>
     </Compile>
@@ -136,6 +151,18 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\InjectPropertiesTests.cs">
       <Link>InjectPropertiesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\InstanceProducerTests.cs">
+      <Link>InstanceProducerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Lifestyles\HybridLifestyleTests.cs">
+      <Link>Lifestyles\HybridLifestyleTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Lifestyles\LifestyleRegistrationTests.cs">
+      <Link>Lifestyles\LifestyleRegistrationTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\LifestyleTests.cs">
+      <Link>LifestyleTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterAllTests.cs">
       <Link>RegisterAllTests.cs</Link>
@@ -200,14 +227,16 @@
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj">
+      <Project>{97ef1e1a-a4a7-4496-8551-4ffe7234be9c}</Project>
+      <Name>SimpleInjector.Extensions.Silverlight</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
       <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
       <Name>SimpleInjector.Silverlight</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

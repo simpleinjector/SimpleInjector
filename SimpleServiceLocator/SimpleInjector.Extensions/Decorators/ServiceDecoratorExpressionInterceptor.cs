@@ -68,27 +68,59 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (this.MustDecorate(e.RegisteredServiceType, out decoratorType) && this.SatisfiesPredicate(e))
             {
-                e.Expression = this.BuildDecoratorExpression(decoratorType, e);
-
-                // Add the decorator to the list of applied decorator. This way users can use this
-                // information in the predicate of the next decorator they add.
-                this.GetServiceTypeInfo(e).AppliedDecorators.Add(decoratorType);
+                this.ApplyDecorator(decoratorType, e);
             }
         }
 
-        private Expression BuildDecoratorExpression(Type decoratorType, ExpressionBuiltEventArgs e)
+        private void ApplyDecorator(Type decoratorType, ExpressionBuiltEventArgs e)
         {
-            var parameters = this.BuildParameters(decoratorType, e);
+            var constructor = this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
 
-            ConstructorInfo constructor = 
-                this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
+            e.Expression = this.BuildDecoratorExpression(constructor, e);
 
-            Expression decoratorExpression = 
-                DecoratorHelpers.BuildDecoratorExpression(this.Container, constructor, parameters);
+            e.Lifestyle = this.Lifestyle;
 
-            if (this.Singleton)
+            var info = this.GetServiceTypeInfo(e);
+
+            this.AddKnownDecoratorRelationships(constructor, e);
+
+            this.AddAppliedDecorator(decoratorType, e);
+        }
+
+        private void AddKnownDecoratorRelationships(ConstructorInfo constructor, ExpressionBuiltEventArgs e)
+        {
+            var info = this.GetServiceTypeInfo(e);
+
+            var decoratee = info.GetCurrentInstanceProducer();
+
+            // Must be called before the current decorator is added to the list of applied decorators
+            var relationships = 
+                this.GetKnownDecoratorRelationships(constructor, e.RegisteredServiceType, decoratee);
+
+            e.KnownRelationships.AddRange(relationships);
+        }
+
+        private void AddAppliedDecorator(Type decoratorType, ExpressionBuiltEventArgs e)
+        {
+            var info = this.GetServiceTypeInfo(e);
+
+            // Add the decorator to the list of applied decorators. This way users can use this information in 
+            // the predicate of the next decorator they add.
+            info.AddAppliedDecorator(decoratorType, this, e.Expression);
+        }
+
+        private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor, 
+            ExpressionBuiltEventArgs e)
+        {
+            var parameters = this.BuildParameters(decoratorConstructor, e);
+
+            Expression decoratorExpression =
+                DecoratorHelpers.BuildDecoratorExpression(this.Container, decoratorConstructor, parameters);
+
+            if (this.Lifestyle == Lifestyle.Singleton)
             {
-                var singleton = this.GetSingletonDecorator(decoratorType, decoratorExpression);
+                var singleton = 
+                    this.GetSingletonDecorator(decoratorConstructor.DeclaringType, decoratorExpression);
 
                 return Expression.Constant(singleton);
             }
