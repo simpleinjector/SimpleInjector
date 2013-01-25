@@ -1,11 +1,8 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Lifestyles;
+
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class InstanceProducerTests
@@ -22,7 +19,7 @@
             registration.GetInstance();
 
             // Assert
-            Assert.IsTrue(container.IsLocked);
+            Assert.IsTrue(container.IsLocked());
         }
 
         [TestMethod]
@@ -37,7 +34,7 @@
             registration.BuildExpression();
 
             // Assert
-            Assert.IsTrue(container.IsLocked);
+            Assert.IsTrue(container.IsLocked());
         }
 
         [TestMethod]

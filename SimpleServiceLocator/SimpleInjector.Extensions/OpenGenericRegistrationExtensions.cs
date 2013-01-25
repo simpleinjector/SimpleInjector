@@ -268,8 +268,6 @@ namespace SimpleInjector.Extensions
                     {
                         registration = this.GetRegistration(serviceType, implementationType);
 
-                        // TODO: Find out whether serviceType as key is enough or whether we need both the
-                        // serviceType and implementationType as the key.
                         this.lifestyleRegistrationCache[serviceType] = registration;
                     }
 

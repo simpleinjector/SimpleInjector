@@ -320,7 +320,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains("The Container can't be changed"),
+                Assert.IsTrue(ex.Message.Contains("The container can't be changed"),
                     "Actual: " + ex.Message);
             }
         }

@@ -5,7 +5,8 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Analysis;
     using SimpleInjector.Lifestyles;
-
+        
+#if DEBUG
     [TestClass]
     public class LifestyleMismatchServicesTests
     {
@@ -426,4 +427,5 @@
             return Lifestyle.Transient.CreateRegistration<TService>(instanceCreator, container);
         }
     }
+#endif
 }

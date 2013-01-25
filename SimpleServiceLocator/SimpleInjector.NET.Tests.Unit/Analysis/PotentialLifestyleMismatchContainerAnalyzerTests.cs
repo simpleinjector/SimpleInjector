@@ -4,6 +4,7 @@
 
     using SimpleInjector.Analysis;
 
+#if DEBUG
     [TestClass]
     public class PotentialLifestyleMismatchContainerAnalyzerTests
     {
@@ -68,4 +69,5 @@
             Assert.AreEqual("2 potential mismatches for 2 services.", item.Description);
         }
     }
+#endif
 }

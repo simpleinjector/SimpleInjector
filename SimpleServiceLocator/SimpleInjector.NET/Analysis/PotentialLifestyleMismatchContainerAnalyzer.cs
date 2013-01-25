@@ -29,9 +29,8 @@ namespace SimpleInjector.Analysis
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using SimpleInjector.Lifestyles;
 
-    internal class PotentialLifestyleMismatchContainerAnalyzer : IContainerAnalyzer
+    internal sealed class PotentialLifestyleMismatchContainerAnalyzer : IContainerAnalyzer
     {
         private const string DebuggerViewName = "Potential Lifestyle Mismatches";
 

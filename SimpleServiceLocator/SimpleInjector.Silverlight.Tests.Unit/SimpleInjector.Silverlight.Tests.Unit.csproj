@@ -104,20 +104,8 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorVerificationBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorVerificationBehaviorTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\ContainerDebugViewTests.cs">
-      <Link>Analysis\ContainerDebugViewTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\KnownDependencyTests.cs">
       <Link>Analysis\KnownDependencyTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\LifestyleMismatchServicesTests.cs">
-      <Link>Analysis\LifestyleMismatchServicesTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\PotentialLifestyleMismatchContainerAnalyzerTests.cs">
-      <Link>Analysis\PotentialLifestyleMismatchContainerAnalyzerTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\TypeGeneralizerTests.cs">
-      <Link>Analysis\TypeGeneralizerTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AssertThat.cs">
       <Link>AssertThat.cs</Link>

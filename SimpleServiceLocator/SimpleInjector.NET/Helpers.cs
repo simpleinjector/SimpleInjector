@@ -80,11 +80,11 @@ namespace SimpleInjector
             }
         }
 
-        internal static bool Verify(this InstanceProducer instanceProducer, out Exception exception)
+        internal static bool VerifyBuildExpression(this InstanceProducer instanceProducer, out Exception exception)
         {
             try
             {
-                instanceProducer.GetInstance();
+                instanceProducer.BuildExpression();
 
                 exception = null;
             }

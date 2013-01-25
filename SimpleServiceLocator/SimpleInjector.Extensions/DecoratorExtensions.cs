@@ -26,9 +26,12 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Lifestyles;
+    using System.Linq;
 
     /// <summary>
     /// Extension methods for applying decorators.

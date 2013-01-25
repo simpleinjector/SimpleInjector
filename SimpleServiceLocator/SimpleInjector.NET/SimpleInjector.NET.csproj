@@ -55,7 +55,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\NET\SimpleInjector.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -74,10 +75,10 @@
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
     <Compile Include="Analysis\ContainerDebugView.cs" />
     <Compile Include="Analysis\DebuggerViewItem.cs" />
+    <Compile Include="Analysis\GeneralWarningsContainerAnalyzer.cs" />
     <Compile Include="Analysis\IContainerAnalyzer.cs" />
     <Compile Include="Analysis\KnownDependencyCollection.cs" />
     <Compile Include="Analysis\TypeGeneralizer.cs" />
-    <Compile Include="Analysis\VerificationError.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />

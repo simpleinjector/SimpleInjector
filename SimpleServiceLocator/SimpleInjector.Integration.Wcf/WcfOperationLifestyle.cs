@@ -33,6 +33,8 @@ namespace SimpleInjector.Integration.Wcf
 
     public class WcfOperationLifestyle : Lifestyle
     {
+        public static readonly Lifestyle Instance = WithDisposal;
+
         internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle(true);
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
@@ -59,7 +61,7 @@ namespace SimpleInjector.Integration.Wcf
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            return new PerWcfOperationLifestyleRegistration<TService>(this, container)
+            return new PerWcfOperationRegistration<TService>(this, container)
             {
                 Dispose = this.disposeInstanceWhenOperationEnds,
                 InstanceCreator = instanceCreator
@@ -71,11 +73,11 @@ namespace SimpleInjector.Integration.Wcf
             SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(e.Container);
         }
 
-        private sealed class PerWcfOperationLifestyleRegistration<TService>
+        private sealed class PerWcfOperationRegistration<TService>
             : WcfOperationRegistration<TService, TService>
             where TService : class
         {
-            internal PerWcfOperationLifestyleRegistration(Lifestyle lifestyle, Container container)
+            internal PerWcfOperationRegistration(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
             }

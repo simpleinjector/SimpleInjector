@@ -34,7 +34,8 @@ namespace SimpleInjector.Integration.Web
 
     public sealed class WebRequestLifestyle : Lifestyle
     {
-        internal static readonly WebRequestLifestyle Dispose = new WebRequestLifestyle(true);
+        public static readonly Lifestyle Instance = new WebRequestLifestyle(true);
+
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
         private readonly bool dispose;
@@ -60,18 +61,17 @@ namespace SimpleInjector.Integration.Web
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            return new PerWebRequestLifestyleRegistration<TService>(this, container)
+            return new WebRequestRegistration<TService>(this, container)
             {
                 InstanceCreator = instanceCreator,
                 Dispose = this.dispose
             };
         }
 
-        private class PerWebRequestLifestyleRegistration<TService>
-            : WebRequestRegistration<TService, TService>
+        private class WebRequestRegistration<TService> : WebRequestRegistration<TService, TService>
             where TService : class
         {
-            public PerWebRequestLifestyleRegistration(Lifestyle lifestyle, Container container)
+            public WebRequestRegistration(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
             }

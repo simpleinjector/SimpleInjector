@@ -57,7 +57,7 @@ namespace SimpleInjector
         private bool verifying;
 
         // Flag to signal that the container's configuration has been verified (at least once).
-        private bool verified;
+        private bool succesfullyVerified;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding = (s, e) => { };
@@ -126,13 +126,18 @@ namespace SimpleInjector
                 }
             }
 
-            set
+            private set
             {
                 lock (this.locker)
                 {
                     this.verifying = value;
                 }
             }
+        }
+
+        internal bool SuccesfullyVerified
+        {
+            get { return this.succesfullyVerified; }
         }
 
         /// <summary>
@@ -233,28 +238,7 @@ namespace SimpleInjector
         {
             this.expressionBuilt(this, e);
         }
-
-        // This method is for analysis purposes only.
-        internal void ClearCache()
-        {
-            this.ThrowWhenContainerIsLocked();
-
-            var registrationsExplicitlyMadeByTheUser = (
-                from pair in this.registrations
-                where pair.Value != null
-                where !pair.Value.IsAutoResolved
-                select pair)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
-
-            foreach (var registration in registrationsExplicitlyMadeByTheUser.Values)
-            {
-                registration.ClearCache();
-            }
-
-            // Remove the the invalid and auto resolved registrations by replacing the original dictionary.
-            this.registrations = registrationsExplicitlyMadeByTheUser;
-        }
-
+        
         /// <summary>Prevents any new registrations to be made to the container.</summary>
         internal void LockContainer()
         {
@@ -264,12 +248,7 @@ namespace SimpleInjector
             {
                 lock (this.locker)
                 {
-                    // Only lock the container when we're currently not verifying. Registrations should be
-                    // able to be made after registration.
-                    if (!this.verifying)
-                    {
-                        this.locked = true;
-                    }
+                    this.locked = true;
                 }
             }
         }

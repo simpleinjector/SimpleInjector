@@ -66,7 +66,10 @@ namespace SimpleInjector.Lifestyles
             {
                 this.dependencies.Clear();
 
-                dependencies.ToList().ForEach(dependency => this.dependencies.Add(dependency));
+                foreach (var dependency in dependencies)
+                {
+                    this.dependencies.Add(dependency);
+                };
             }
         }
 

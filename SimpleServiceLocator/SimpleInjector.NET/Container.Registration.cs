@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Analysis;
     using SimpleInjector.Lifestyles;
@@ -132,14 +133,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ResolveUnregisteredType");
+                this.ThrowWhenContainerIsLocked();
 
                 this.resolveUnregisteredType += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ResolveUnregisteredType");
+                this.ThrowWhenContainerIsLocked();
 
                 this.resolveUnregisteredType -= value;
             }
@@ -252,14 +253,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilt");
+                this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilt += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilt");
+                this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilt -= value;
             }
@@ -269,14 +270,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilding");
+                this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilding += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified("ExpressionBuilding");
+                this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilding -= value;
             }
@@ -699,11 +700,11 @@ namespace SimpleInjector
             {
                 this.ValidateRegistrations();
                 this.ValidateRegisteredCollections();
+                this.succesfullyVerified = true;
             }
             finally
             {
                 this.IsVerifying = false;
-                this.verified = true;
             }
         }
 
@@ -715,8 +716,7 @@ namespace SimpleInjector
             {
                 if (this.locked)
                 {
-                    throw new InvalidOperationException(
-                        StringResources.ContainerCanNotBeChangedAfterUse(this.GetType()));
+                    throw new InvalidOperationException(StringResources.ContainerCanNotBeChangedAfterUse());
                 }
             }
         }
@@ -740,52 +740,6 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        internal IEnumerable<VerificationError> GetVerificationErrorsForRegistrations()
-        {
-            foreach (var pair in this.registrations)
-            {
-                InstanceProducer producer = pair.Value;
-
-                if (producer != null)
-                {
-                    Exception exception;
-
-                    if (!producer.Verify(out exception))
-                    {
-                        yield return new VerificationError(producer, exception);
-                    }
-                }
-            }
-        }
-
-        internal IEnumerable<VerificationError> GetVerificationErrorsForCollections()
-        {
-            foreach (var pair in this.collectionsToValidate)
-            {
-                Type serviceType = pair.Key;
-                IEnumerable collection = pair.Value;
-
-                Exception exception = null;
-
-                try
-                {
-                    Helpers.ThrowWhenCollectionCanNotBeIterated(collection, serviceType);
-                    Helpers.ThrowWhenCollectionContainsNullArguments(collection, serviceType);
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                }
-
-                if (exception != null)
-                {
-                    var producer = this.registrations[typeof(IEnumerable<>).MakeGenericType(serviceType)];
-
-                    yield return new VerificationError(producer, exception);
-                }
-            }
-        }
-
         private void AddRegistration(Type key, Registration registration)
         {
             this.ThrowWhenContainerIsLocked();
@@ -802,12 +756,6 @@ namespace SimpleInjector
                 {
                     throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
                 }
-
-                if (this.verified)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.TypeAlreadyRegisteredAndContainerAlreadyVerified(type));
-                }
             }
         }
 
@@ -818,17 +766,6 @@ namespace SimpleInjector
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
-            }
-        }
-
-        private void ThrowWhenContainerIsLockedOrWhenCallingEventWhenVerified(string eventName)
-        {
-            this.ThrowWhenContainerIsLocked();
-
-            if (this.verified)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ResolveUnregisteredTypeCalledButContainerAlreadyVerified(eventName));
             }
         }
 

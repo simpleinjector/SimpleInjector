@@ -7,7 +7,8 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Analysis;
-
+        
+#if DEBUG
     [TestClass]
     public class TypeGeneralizerTests
     {
@@ -137,4 +138,5 @@
             Assert.AreEqual(expectedType, actualType);
         }
     }
+#endif
 }

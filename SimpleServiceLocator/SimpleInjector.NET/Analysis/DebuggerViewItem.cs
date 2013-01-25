@@ -35,7 +35,7 @@ namespace SimpleInjector.Analysis
     [DebuggerDisplay("{Description,nq}", Name = "{Name,nq}")]
     internal class DebuggerViewItem
     {
-        public DebuggerViewItem(string name, string description, object value)
+        public DebuggerViewItem(string name, string description, object value = null)
         {
             this.Name = name;
             this.Description = description;

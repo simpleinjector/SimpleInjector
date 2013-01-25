@@ -21,36 +21,6 @@
         }
 
         [TestMethod]
-        public void Verify_Never_LocksContainer1()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Verify();
-
-            // Act
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
-        }
-
-        [TestMethod]
-        public void Verify_Never_LocksContainer2()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<ITimeProvider>(() =>
-            {
-                // Sneaky call back into the container.
-                return container.GetInstance<RealTimeProvider>();
-            });
-
-            container.Verify();
-
-            // Act
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
-        }
-
-        [TestMethod]
         public void Verify_CalledMultipleTimes_Succeeds()
         {
             // Arrange
@@ -60,14 +30,12 @@
 
             container.Verify();
 
-            container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
-
             // Act
             container.Verify();
         }
 
         [TestMethod]
-        public void Verify_CalledAfterGetInstance_DoesNotUnlockTheContainer()
+        public void Verify_CalledAfterGetInstance_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -77,31 +45,6 @@
             container.GetInstance<IUserRepository>();
 
             container.Verify();
-
-            try
-            {
-                // Act
-                container.Register<ITimeProvider, RealTimeProvider>();
-
-                Assert.Fail("The container was expected to stay locked.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("Container can't be changed"), "Actual: " + ex.Message);
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "Registration of a type after validation should fail, because the container should be locked down.")]
-        public void Verify_WithEmptyConfiguration_ThrowsException()
-        {
-            // Arrange
-            var container = new Container();
-            container.RegisterSingle<RealUserService>();
-            container.Verify();
-
-            // Act
-            container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
         }
 
         [TestMethod]
@@ -236,10 +179,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.ExceptionMessageContains(@"
-                    Type IUserRepository has already been registered and can't be overridden, because Verify()
-                    has already been called. To allow overriding the current registration, please make sure
-                    Verify() is called after this registration.".TrimInside(), ex);
+                AssertThat.ExceptionMessageContains("The container can't be changed", ex);
             }
         }
 
@@ -261,10 +201,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.ExceptionMessageContains(@"
-                    Registering a ResolveUnregisteredType event is not allowed after Verify() has been called
-                    on the container. Please make sure any call to ResolveUnregisteredType is made before any
-                    call to Verify().".TrimInside(), ex);
+                AssertThat.ExceptionMessageContains("The container can't be changed", ex);
             }
         }
 
@@ -286,10 +223,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.ExceptionMessageContains(@"
-                    Registering a ExpressionBuilding event is not allowed after Verify() has been called
-                    on the container. Please make sure any call to ExpressionBuilding is made before any
-                    call to Verify().".TrimInside(), ex);
+                AssertThat.ExceptionMessageContains("The container can't be changed", ex);
             }
         }
 
@@ -311,10 +245,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                AssertThat.ExceptionMessageContains(@"
-                    Registering a ExpressionBuilt event is not allowed after Verify() has been called
-                    on the container. Please make sure any call to ExpressionBuilt is made before any
-                    call to Verify().".TrimInside(), ex);
+                AssertThat.ExceptionMessageContains("The container can't be changed", ex);
             }
         }
 

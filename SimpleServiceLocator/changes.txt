@@ -19,6 +19,7 @@ Version vFuture
 		-[Extensions] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
 
 	Breaking changes:
+		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
 		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
 		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). This could
 		 lead to inconsistent behavior or performance issues if the Func<T> delegate implements its own 

@@ -68,7 +68,9 @@ using System.Security;
 
 [assembly: AllowPartiallyTrustedCallers]
 
+#if DEBUG
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
+#endif
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
     Target = "SimpleInjector",

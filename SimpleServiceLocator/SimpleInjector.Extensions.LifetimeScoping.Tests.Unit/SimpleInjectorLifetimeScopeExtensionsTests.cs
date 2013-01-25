@@ -550,7 +550,7 @@
             }
             catch (InvalidOperationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains("The Container can't be changed"),
+                Assert.IsTrue(ex.Message.Contains("The container can't be changed"),
                     "Actual: " + ex.Message);
             }
         }
@@ -634,66 +634,6 @@
 
             // Assert
             Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScope_CalledAfterVerifyWithAllowOverridingRegistrationsSetToTrue_ShouldResolveAsExpected()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.AllowOverridingRegistrations = true;
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            container.Verify();
-
-            // Act
-            // This call should not replace the registrered LifetimeScopeManager. If it was changed, this test
-            // will fail.
-            container.RegisterLifetimeScope<IDisposable, DisposableCommand>();
-
-            ICommand command1, command2;
-
-            using (container.BeginLifetimeScope())
-            {
-                // Resolve the registration that was made before the call to Verify
-                command1 = container.GetInstance<ICommand>();
-                command2 = container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(command1, command2));
-        }
-
-        [TestMethod]
-        public void EnableLifetimeScoping_CalledAfterVerifyWithAllowOverridingRegistrationsSetToTrue_ShouldResolveAsExpected()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.AllowOverridingRegistrations = true;
-            
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            container.Verify();
-
-            // Act
-            // This call should not replace the registrered LifetimeScopeManager. If it was changed, this test
-            // will fail.
-            container.EnableLifetimeScoping();
-
-            ICommand command1, command2;
-
-            using (container.BeginLifetimeScope())
-            {
-                // Resolve the registration that was made before the call to Verify
-                command1 = container.GetInstance<ICommand>();
-                command2 = container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(command1, command2));
         }
 
         [TestMethod]

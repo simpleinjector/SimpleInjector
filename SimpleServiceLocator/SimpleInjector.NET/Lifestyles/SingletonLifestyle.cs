@@ -133,15 +133,7 @@ namespace SimpleInjector.Lifestyles
 
             protected override TService CreateInstance()
             {
-                var instance = this.BuildTransientDelegate<TService>(this.instanceCreator)();
-
-                if (instance != null)
-                {
-                    // Clear the instance producer. It is not needed anymore (save up some memory).
-                    this.instanceCreator = null;
-                }
-
-                return instance;
+                return this.BuildTransientDelegate<TService>(this.instanceCreator)();
             }
         }
 

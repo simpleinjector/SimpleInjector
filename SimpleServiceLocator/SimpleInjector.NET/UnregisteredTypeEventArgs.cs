@@ -134,7 +134,7 @@ namespace SimpleInjector
         /// the registration's lifestyle of the type expressed by the <see cref="UnregisteredServiceType"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="registration"/> is a
         /// null reference.</exception>
-        /// <exception cref="ArgumentException">Thrown when the <paramref name="expression"/> is a
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="registration"/> is a
         /// not exactly of type <see cref="Func{T}"/> where T equals the <see cref="UnregisteredServiceType"/>.
         /// </exception>
         /// <exception cref="ActivationException">Thrown when multiple observers that have registered to

@@ -68,7 +68,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AspNetIntegrationExtensions.cs" />
     <Compile Include="MostParametersConstructorResolutionBehavior.cs" />
     <Compile Include="MostResolvableParametersConstructorResolutionBehavior.cs" />
     <Compile Include="ConstructorRegistrationExtensions.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CollectionRegistrationExtensions.cs" />
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
-    <Compile Include="PerWebRequestRegistrationsExtensions.cs" />
     <Compile Include="RegisterAttributeFilterProvider.cs" />
     <Compile Include="ResolvingExtensions.cs" />
     <Compile Include="ResolvingFactoriesExtensions.cs" />

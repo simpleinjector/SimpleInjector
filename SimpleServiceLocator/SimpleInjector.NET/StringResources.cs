@@ -35,11 +35,10 @@ namespace SimpleInjector
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static string ContainerCanNotBeChangedAfterUse(Type containerType)
+        internal static string ContainerCanNotBeChangedAfterUse()
         {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The {0} can't be changed after the first call to GetInstance and GetAllInstances.",
-                containerType.Name);
+            return "The container can't be changed after the first call to GetInstance, GetAllInstances " +
+                "and Verify.";
         }
 
         internal static string DelegateForTypeReturnedNull(Type serviceType)
@@ -98,22 +97,6 @@ namespace SimpleInjector
                 "allow overriding registrations. To allow overriding the current registration, please set " +
                 "the Container.Options.AllowOverridingRegistrations to true.",
                 serviceType.ToFriendlyName());
-        }
-
-        internal static string TypeAlreadyRegisteredAndContainerAlreadyVerified(Type serviceType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered and can't be overridden, because Verify() has " +
-                "already been called. To allow overriding the current registration, please make sure " +
-                "Verify() is called after this registration.",
-                serviceType.ToFriendlyName());
-        }
-
-        internal static string ResolveUnregisteredTypeCalledButContainerAlreadyVerified(string eventName)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Registering a {0} event is not allowed after Verify() has been called on the container. " + 
-                "Please make sure any call to {0} is made before any call to Verify().", eventName);
         }
 
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)

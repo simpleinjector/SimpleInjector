@@ -67,7 +67,8 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\Silverlight\SimpleInjector.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -101,32 +102,11 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\ContainerDebugView.cs">
-      <Link>Analysis\ContainerDebugView.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\DebuggerViewItem.cs">
-      <Link>Analysis\DebuggerViewItem.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\IContainerAnalyzer.cs">
-      <Link>Analysis\IContainerAnalyzer.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Analysis\KnownDependencyCollection.cs">
       <Link>Analysis\KnownDependencyCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Analysis\KnownRelationship.cs">
       <Link>Analysis\KnownRelationship.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\LifestyleMismatchServices.cs">
-      <Link>Analysis\LifestyleMismatchServices.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\PotentialLifestyleMismatchContainerAnalyzer.cs">
-      <Link>Analysis\PotentialLifestyleMismatchContainerAnalyzer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\TypeGeneralizer.cs">
-      <Link>Analysis\TypeGeneralizer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Analysis\VerificationError.cs">
-      <Link>Analysis\VerificationError.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>

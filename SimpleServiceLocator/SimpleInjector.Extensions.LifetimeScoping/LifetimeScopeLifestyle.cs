@@ -33,6 +33,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
     public sealed class LifetimeScopeLifestyle : Lifestyle
     {
+        public static readonly Lifestyle Instance = WithDisposal;
+
         internal static readonly LifetimeScopeLifestyle WithDisposal = new LifetimeScopeLifestyle(true);
         internal static readonly LifetimeScopeLifestyle NoDisposal = new LifetimeScopeLifestyle(false);
 

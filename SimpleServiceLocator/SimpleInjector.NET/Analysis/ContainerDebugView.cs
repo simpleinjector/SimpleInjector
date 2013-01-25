@@ -35,13 +35,14 @@ namespace SimpleInjector.Analysis
         private static IEnumerable<IContainerAnalyzer> analyzers;
 
         private Container container;
-        private InstanceProducer[] registrations;
 
         static ContainerDebugView()
         {
             analyzers = new IContainerAnalyzer[]
             {
-                new PotentialLifestyleMismatchContainerAnalyzer()
+                new PotentialLifestyleMismatchContainerAnalyzer(),
+                new GeneralWarningsContainerAnalyzer(),
+                new RegistrationsContainerAnalyzer()
             };
         }
 
@@ -49,35 +50,27 @@ namespace SimpleInjector.Analysis
         {
             this.container = container;
 
-            container.IsVerifying = true;
+            if (!this.container.SuccesfullyVerified)
+            {
+                this.Items = new[]
+                {
+                    new DebuggerViewItem(
+                        name: "How To View Analysis Info",
+                        description: "Analysis info is available in this debug view after Verify() is " + 
+                            "called on this container instance.")
+                };
+
+                return;
+            }
 
             try
             {
-                this.Items = this.GetVerificationErrorResults() ?? this.GetAnalysisResults();
+                this.Items = this.GetAnalysisResults().ToArray();
             }
             catch (Exception ex)
             {
                 this.Items = GetDebuggerTypeProxyFailureResults(ex);
             }
-            finally
-            {
-                try
-                {
-                    this.Initialize();
-                }
-                finally
-                {
-                    container.IsVerifying = false;
-
-                    this.ClearCache();
-                }
-            }
-        }
-
-        [DebuggerDisplay("Count = {Registrations.Length}")]
-        public InstanceProducer[] Registrations
-        {
-            get { return this.registrations; }
         }
 
         public ContainerOptions Options
@@ -88,32 +81,6 @@ namespace SimpleInjector.Analysis
         [DebuggerDisplay("")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public DebuggerViewItem[] Items { get; private set; }
-
-        private DebuggerViewItem[] GetVerificationErrorResults()
-        {
-            var errors = this.container
-                .GetVerificationErrorsForRegistrations()
-                .Union(
-                    this.container.GetVerificationErrorsForCollections())
-                .ToArray();
-
-            return errors.Any() ? new[] { CreateErrorsDebuggerViewItem(errors) } : null;
-        }
-
-        private static DebuggerViewItem CreateErrorsDebuggerViewItem(VerificationError[] errors)
-        {
-            var errorViews = (
-                from error in errors
-                select new DebuggerViewItem(
-                    error.Registration.ServiceType.ToFriendlyName(),
-                    error.Exception.Message,
-                    error.Exception))
-                .ToArray();
-
-            string description = errors.Length == 1 ? errors[0].Exception.Message : errors.Length + " errors.";
-
-            return new DebuggerViewItem("Configuration Errors", description, errorViews);
-        }
 
         private DebuggerViewItem[] GetAnalysisResults()
         {
@@ -134,19 +101,16 @@ namespace SimpleInjector.Analysis
             };
         }
 
-        private void Initialize()
+        private sealed class RegistrationsContainerAnalyzer : IContainerAnalyzer
         {
-            this.registrations = this.container.GetCurrentRegistrations();
-        }
-
-        private void ClearCache()
-        {
-            if (!this.container.IsLocked)
+            public DebuggerViewItem Analyse(Container container)
             {
-                // We must clear the cache (this removes any cached delegates and expressions). Compiled
-                // delegates contain information about how to create their dependencies and since this
-                // could still be changed, we could corrupt the container's configuration.
-                this.container.ClearCache();
+                var registrations = container.GetCurrentRegistrations();
+
+                return new DebuggerViewItem(
+                    name: "Registrations",
+                    description: "Count = " + registrations.Length,
+                    value: registrations);
             }
         }
     }

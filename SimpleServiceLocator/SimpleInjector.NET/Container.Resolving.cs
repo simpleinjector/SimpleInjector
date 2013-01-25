@@ -393,7 +393,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteType<TService>();
+                () => this.BuildInstanceProducerForConcreteUnregisteredType<TService>();
 
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
@@ -401,7 +401,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType)
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteType(serviceType);
+                () => this.BuildInstanceProducerForConcreteUnregisteredType(serviceType);
 
             return this.BuildInstanceProducerForType(serviceType, buildInstanceProducerForConcreteType);
         }
@@ -409,18 +409,10 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType,
             Func<InstanceProducer> buildInstanceProducerForConcreteType)
         {
-            var producer =
+            return
                 this.BuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
                 this.BuildInstanceProducerForCollection(serviceType) ??
                 buildInstanceProducerForConcreteType();
-
-            if (producer != null)
-            {
-                // Flag that this producer is resolved by the container or using unregistered type resolution.
-                producer.IsAutoResolved = true;
-            }
-
-            return producer;
         }
 
         private InstanceProducer BuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
@@ -434,7 +426,10 @@ namespace SimpleInjector
                 var registration = 
                     e.Registration ?? new ExpressionRegistration(e.Expression, this);
 
-                return new InstanceProducer(serviceType, registration);
+                return new InstanceProducer(serviceType, registration)
+                {
+                    IsBuiltThroughUnregisteredTypeResolution = true
+                };
             }
             else
             {
@@ -455,7 +450,12 @@ namespace SimpleInjector
                 // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
                 // it up). This means that we will must always return an empty set and we will do this by
                 // registering a SingletonInstanceProducer with an empty array of that type.
-                return this.BuildEmptyCollectionInstanceProducer(serviceType);
+                var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
+
+                // Flag that this producer is resolved by the container or using unregistered type resolution.
+                producer.IsContainerAutoRegistered = true;
+
+                return producer;
             }
             else
             {
@@ -473,37 +473,43 @@ namespace SimpleInjector
                 SingletonLifestyle.CreateRegistration(enumerableType, emptyArray, this));
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType<TConcrete>()
+        private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
             where TConcrete : class
         {
             if (this.IsConcreteConstructableType(typeof(TConcrete)))
             {
                 var registration = Lifestyle.Transient.CreateRegistration<TConcrete, TConcrete>(this);
-                var producer = new InstanceProducer(typeof(TConcrete), registration);
-                    
-                producer.EnsureTypeWillBeExplicitlyVerified();
 
-                return producer;
+                return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
             }
 
             return null;
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteType(Type concreteType)
+        private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType)
         {
             if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
                 this.IsConcreteConstructableType(concreteType))
             {
                 var registration = Lifestyle.Transient.CreateRegistration(concreteType, concreteType, this);
 
-                var producer = new InstanceProducer(concreteType, registration);
-
-                producer.EnsureTypeWillBeExplicitlyVerified();
-
-                return producer;
+                return BuildInstanceProducerForConcreteUnregisteredType(concreteType, registration);
             }
 
             return null;
+        }
+
+        private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType, 
+            Registration registration)
+        {
+            var producer = new InstanceProducer(concreteType, registration);
+
+            producer.EnsureTypeWillBeExplicitlyVerified();
+
+            // Flag that this producer is resolved by the container or using unregistered type resolution.
+            producer.IsContainerAutoRegistered = true;
+
+            return producer;
         }
 
         private bool IsConcreteConstructableType(Type concreteType)

@@ -57,7 +57,7 @@ namespace SimpleInjector
             this.ServiceType = serviceType;
             this.registration = registration;
 
-            this.Initialize();
+            this.validator = new CyclicDependencyValidator(this.ServiceType);
         }
 
         public Lifestyle Lifestyle
@@ -71,7 +71,9 @@ namespace SimpleInjector
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
-        internal bool IsAutoResolved { get; set; }
+        internal bool IsContainerAutoRegistered { get; set; }
+
+        internal bool IsBuiltThroughUnregisteredTypeResolution { get; set; }
 
         // Will only return false when the type is a concrete unregistered type that was automatically added
         // by the container, while the expression can not be generated.
@@ -94,32 +96,6 @@ namespace SimpleInjector
         public KnownRelationship[] GetRelationships()
         {
             return this.registration.GetRelationships();
-        }
-
-        /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer.
-        /// </summary>
-        /// <returns>An Expression.</returns>
-        public Expression BuildExpression()
-        {
-            this.validator.CheckForRecursiveCalls();
-
-            try
-            {
-                this.expression = this.BuildExpressionOrGetFromCache();
-
-                this.RemoveValidator();
-
-                return this.expression;
-            }
-            catch (Exception ex)
-            {
-                this.validator.Reset();
-
-                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
-
-                throw;
-            }
         }
 
         /// <summary>Produces an instance.</summary>
@@ -161,17 +137,30 @@ namespace SimpleInjector
             return instance;
         }
 
-        internal void ClearCache()
+        /// <summary>
+        /// Builds an expression that expresses the intent to get an instance by the current producer.
+        /// </summary>
+        /// <returns>An Expression.</returns>
+        public Expression BuildExpression()
         {
-            // Clearing the cache will force the Expression and Func<T> to be rebuilt when an instance is
-            // requested and will retrigger any ExpressionBuilding and ExpressionBuilt event again. Clearing
-            // the cache is only meant to be used by the debugger analysis services.
-            this.expression = null;
-            this.instanceCreator = null;
-            this.overriddenLifestyle = null;
-            this.registration.ReplaceRelationships(Enumerable.Empty<KnownRelationship>());
+            this.validator.CheckForRecursiveCalls();
 
-            this.Initialize();
+            try
+            {
+                this.expression = this.BuildExpressionOrGetFromCache();
+
+                this.RemoveValidator();
+
+                return this.expression;
+            }
+            catch (Exception ex)
+            {
+                this.validator.Reset();
+
+                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
+
+                throw;
+            }
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
@@ -284,11 +273,6 @@ namespace SimpleInjector
             {
                 return false;
             }
-        }
-        
-        private void Initialize()
-        {
-            this.validator = new CyclicDependencyValidator(this.ServiceType);
         }
     }
 }

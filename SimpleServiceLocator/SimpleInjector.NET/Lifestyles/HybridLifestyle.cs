@@ -27,9 +27,9 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
+
     using SimpleInjector.Analysis;
 
     public class HybridLifestyle : Lifestyle
