@@ -325,7 +325,6 @@ copy  bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\Sim
 copy  bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %named_version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Extensions} %named_version_Extensions%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Web} %named_version_Integration_Web%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %named_version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip"
@@ -339,7 +338,6 @@ copy  bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleI
 copy  bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version_Extensions} %named_version_Extensions%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\13850374b87d467da12f21ca32dac632.psmdcp {version} %named_version_Integration_Wcf%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.%named_version_Integration_Wcf%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.%named_version_Integration_Wcf%.zip" "*.nupkg"

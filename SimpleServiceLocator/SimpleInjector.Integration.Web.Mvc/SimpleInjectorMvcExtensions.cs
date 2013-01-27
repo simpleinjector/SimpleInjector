@@ -33,7 +33,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Web.Compilation;
     using System.Web.Mvc;
-    using SimpleInjector.Extensions;
+
     using SimpleInjector.Integration.Web.Mvc;
 
     /// <summary>
@@ -105,7 +105,7 @@ namespace SimpleInjector
 
             foreach (var controllerType in controllerTypes)
             {
-                container.Register(controllerType);
+                container.Register(controllerType, controllerType, Lifestyle.Transient);
             }
         }
     }

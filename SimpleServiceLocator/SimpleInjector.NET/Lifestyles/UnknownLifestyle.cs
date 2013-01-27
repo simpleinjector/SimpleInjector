@@ -27,11 +27,9 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
 
-    public sealed class UnknownLifestyle : Lifestyle
+    internal sealed class UnknownLifestyle : Lifestyle
     {
-        public static readonly Lifestyle Instance = new UnknownLifestyle();
-
-        private UnknownLifestyle() : base("Unknown")
+        internal UnknownLifestyle() : base("Unknown")
         {
         }
 

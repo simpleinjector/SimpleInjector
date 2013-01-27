@@ -12,15 +12,15 @@
         [TestMethod]
         public void Instance_Always_ReturnsAValue()
         {
-            Assert.IsNotNull(UnknownLifestyle.Instance);
+            Assert.IsNotNull(Lifestyle.Unknown);
         }
 
         [TestMethod]
         public void Instance_Always_ReturnsTheSameInstance()
         {
             // Act
-            var instance1 = UnknownLifestyle.Instance;
-            var instance2 = UnknownLifestyle.Instance;
+            var instance1 = Lifestyle.Unknown;
+            var instance2 = Lifestyle.Unknown;
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "For performance and correctness, " + 
@@ -31,13 +31,13 @@
         [TestMethod]
         public void ComponentLength_Always_ReturnsTheSameLengthAsTheSingletonLifestyle()
         {
-            Assert.AreEqual(Lifestyle.Singleton.ComponentLength, UnknownLifestyle.Instance.ComponentLength);
+            Assert.AreEqual(Lifestyle.Singleton.ComponentLength, Lifestyle.Unknown.ComponentLength);
         }
 
         [TestMethod]
         public void DependencyLength_Always_ReturnsTheSameLengthAsTheTransientLifestyle()
         {
-            Assert.AreEqual(Lifestyle.Transient.ComponentLength, UnknownLifestyle.Instance.DependencyLength);
+            Assert.AreEqual(Lifestyle.Transient.ComponentLength, Lifestyle.Unknown.DependencyLength);
         }
 #endif
 
@@ -50,7 +50,7 @@
             try
             {
                 // Act
-                UnknownLifestyle.Instance.CreateRegistration<object, string>(container);
+                Lifestyle.Unknown.CreateRegistration<object, string>(container);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -71,7 +71,7 @@
             try
             {
                 // Act
-                UnknownLifestyle.Instance.CreateRegistration<IDisposable>(() => null, container);
+                Lifestyle.Unknown.CreateRegistration<IDisposable>(() => null, container);
 
                 // Assert
                 Assert.Fail("Exception expected.");

@@ -26,7 +26,9 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
@@ -227,14 +229,14 @@ namespace SimpleInjector
         internal static string SuppliedTypeIsNotAReferenceType(Type type)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied type '{0}' is not a reference type. Only reference types are supported.",
+                "The supplied type {0} is not a reference type. Only reference types are supported.",
                 type.ToFriendlyName());
         }
 
         internal static string SuppliedTypeIsAnOpenGenericType(Type type)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied type '{0}' is an open generic type. Use the RegisterOpenGeneric or " +
+                "The supplied type {0} is an open generic type. Use the RegisterOpenGeneric or " +
                 "RegisterManyForOpenGeneric extension method for registering open generic types.",
                 type.ToFriendlyName());
         }
@@ -242,7 +244,7 @@ namespace SimpleInjector
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied type '{0}' does not {1} '{2}'.",
+                "The supplied type {0} does not {1} {2}.",
                 implementation.ToFriendlyName(), 
                 service.IsInterface ? "implement" : "inherit from",
                 service.ToFriendlyName());
@@ -287,5 +289,112 @@ namespace SimpleInjector
                 "Container instance. Please make sure the ContainerOptions instance is supplied as " +
                 "argument to the constructor of a Container.");
         }
+        
+        internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
+            Type[] implementations)
+        {
+            var typeDescription =
+                string.Join(", ", implementations.Select(type => type.ToFriendlyName()).ToArray());
+
+            return string.Format(CultureInfo.InvariantCulture,
+                    "There are {0} types that represent the closed generic type {1}. Types: {2}. " +
+                    "Either remove one of the types or use an overload that takes an {3} delegate, " +
+                    "which allows you to define the way these types should be registered.",
+                    implementations.Length, closedServiceType.ToFriendlyName(), typeDescription,
+                    typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name);
+        }
+
+        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, string message)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Error occurred while trying to get an instance of type {0}. {1}",
+                serviceType.ToFriendlyName(), message);
+        }
+
+        internal static string ErrorInRegisterOpenGenericRegistration(Type openGenericServiceType,
+            Type closedGenericImplementation, string message)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "There was an error in the registration of open generic type {0}. " +
+                "Failed to build a registration for type {1}. {2}",
+                openGenericServiceType.ToFriendlyName(), closedGenericImplementation.ToFriendlyName(),
+                message);
+        }
+
+        internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
+                "decorator, that will be wrapped around instances of the collection of {0} instances, " +
+                "because the registration hasn't been made using one of the RegisterAll overloads that " +
+                "take a list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is " +
+                "impossible for the container to determine its lifestyle, which makes it impossible to " +
+                "generate a Func<T>. Either switch to one of the other RegisterAll overloads, or don't " +
+                "use a decorator that depends on a Func<T> for injecting the decoratee.",
+                serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
+        }
+        
+        internal static string SuppliedTypeIsNotAnOpenGenericType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type {0} is not an open generic type.", type.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed()
+        {
+            return
+                "Registering a closed generic service type with an open generic decorator is not " +
+                "supported. Instead, register the service type as open generic, and the decorator as " +
+                "closed generic type.";
+        }
+
+        internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
+            Type serviceType, int numberOfServiceTypeDependencies)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to use {0} as a decorator, its constructor should have a " +
+                "single argument of type {1} or Func<{1}>, but it currently has {2}.",
+                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+        }
+
+        internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
+            IEnumerable<Type> validConstructorArgumentTypes)
+        {
+            var validConstructorArgumentFuncTypes =
+                from type in validConstructorArgumentTypes
+                select typeof(Func<>).MakeGenericType(type);
+
+            var friendlyValidTypes =
+                from type in validConstructorArgumentTypes.Concat(validConstructorArgumentFuncTypes)
+                select type.ToFriendlyName();
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to use {0} as a decorator, its constructor should have an " +
+                "argument of one of the following types: {1}.",
+                decoratorType.ToFriendlyName(), string.Join(", ", friendlyValidTypes.ToArray()));
+        }
+
+        internal static string DecoratorContainsUnresolvableTypeArguments(Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied decorator {0} contains unresolvable type arguments. " +
+                "The type would never be resolved and is therefore not suited to be used as decorator.",
+                decoratorType.ToFriendlyName());
+        }
+        
+        internal static string DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(Type serviceType,
+            Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied decorator {0} is an open generic type definition, while the supplied " +
+                "service type {1} is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+        }
+        
+        internal static string ValueIsInvalidForEnumType(int value, Type enumType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The value {0} is invalid for Enum-type {1}.",
+                value, enumType.ToFriendlyName());
+        }
     }
-}   
+}

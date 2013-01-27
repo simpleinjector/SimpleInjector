@@ -208,13 +208,81 @@
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterAll_WithNullArgument_ThrowsException()
+        public void RegisterAllParamsT_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = new Container();
 
+            IUserRepository[] repositories = null;
+
             // Act
-            container.RegisterAll<IUserRepository>(null);
+            container.RegisterAll<IUserRepository>(repositories);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterAllParamsType_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type[] repositoryTypes = null;
+
+            // Act
+            container.RegisterAll<IUserRepository>(repositoryTypes);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterAllIEnumerableT_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<IUserRepository> repositories = null;
+
+            // Act
+            container.RegisterAll<IUserRepository>(repositories);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterAllIEnumerableType_WithNullArgument_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<Type> repositoryTypes = null;
+
+            // Act
+            container.RegisterAll<IUserRepository>(repositoryTypes);
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithListOfTypes_ThrowsExpressiveExceptionExplainingAboutAmbiguity()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterAll(new[] { typeof(IUserRepository) });
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    @"You are trying to register Type as a service type, 
+                      but registering this type is not allowed to be registered"
+                    .TrimInside(),
+                    ex,
+                    "This call is expected to fail, since C# overload resolution will select the " + 
+                    "RegisterAll<TService> overload where TService is Type, which is unlikely what the " +
+                    "use intended. We should throw an exception instead.");
+            }
         }
 
         [TestMethod]

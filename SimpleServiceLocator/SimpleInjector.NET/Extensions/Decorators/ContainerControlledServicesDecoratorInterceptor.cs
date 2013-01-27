@@ -81,7 +81,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             IEnumerable<KnownRelationship> foundRelationships;
 
-            e.Expression = 
+            e.Expression =
                 this.BuildDecoratorExpression(e, serviceType, decoratorConstructor, out foundRelationships);
 
             // Adding known relationships allows the configuration to be analysed for errors.
@@ -96,7 +96,7 @@ namespace SimpleInjector.Extensions.Decorators
             IDecoratableEnumerable decoratables = DecoratorHelpers.ConvertToDecoratableEnumerable(
                 serviceType, this.Container, decoratableCollection);
 
-            return this.BuildDecoratorExpression(serviceType, decoratorConstructor, decoratables, 
+            return this.BuildDecoratorExpression(serviceType, decoratorConstructor, decoratables,
                 out foundRelationships);
         }
 
@@ -126,7 +126,7 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        private IDecoratableEnumerable BuildDecoratableEnumerable(Type serviceType, 
+        private IDecoratableEnumerable BuildDecoratableEnumerable(Type serviceType,
             ConstructorInfo decoratorCtor, IDecoratableEnumerable originalDecoratables,
             out IEnumerable<KnownRelationship> foundRelationships)
         {
@@ -134,9 +134,9 @@ namespace SimpleInjector.Extensions.Decorators
                 from context in originalDecoratables.GetDecoratorPredicateContexts()
                 let decoratedContext = this.DecorateContext(context, serviceType, decoratorCtor)
                 let predicateIsSatisfied = this.SatisfiesPredicate(context)
-                select new 
-                { 
-                    IsDecorated = predicateIsSatisfied, 
+                select new
+                {
+                    IsDecorated = predicateIsSatisfied,
                     Context = predicateIsSatisfied ? decoratedContext : context,
                     OriginalContext = context
                 })

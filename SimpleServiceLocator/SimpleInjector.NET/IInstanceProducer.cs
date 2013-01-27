@@ -73,8 +73,6 @@ namespace SimpleInjector
         // using unregistered type resolution.
         internal bool IsContainerAutoRegistered { get; set; }
 
-        internal bool IsBuiltThroughUnregisteredTypeResolution { get; set; }
-
         // Will only return false when the type is a concrete unregistered type that was automatically added
         // by the container, while the expression can not be generated.
         // Types that are registered upfront are always considered to be valid, while unregistered types must
@@ -93,7 +91,7 @@ namespace SimpleInjector
             }
         }
 
-        public KnownRelationship[] GetRelationships()
+        internal KnownRelationship[] GetRelationships()
         {
             return this.registration.GetRelationships();
         }

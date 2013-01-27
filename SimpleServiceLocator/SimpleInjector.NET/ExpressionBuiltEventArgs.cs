@@ -104,6 +104,6 @@ namespace SimpleInjector
         /// <see cref="ExpressionBuiltEventArgs.Expression">Expression</see> property has been replaced.
         /// </summary>
         /// <value>The list dependencies of the registration that are currently known.</value>
-        public Collection<KnownRelationship> KnownRelationships { get; internal set; }
+        internal Collection<KnownRelationship> KnownRelationships { get; set; }
     }
 }

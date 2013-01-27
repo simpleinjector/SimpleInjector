@@ -85,62 +85,11 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions\DecoratorExtensions.cs">
-      <Link>DecoratorExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\DecoratorPredicateContext.cs">
-      <Link>DecoratorPredicateContext.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs">
-      <Link>Decorators\ContainerControlledServicesDecoratorInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
-      <Link>Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratableEnumerable.cs">
-      <Link>Decorators\DecoratableEnumerable.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptor.cs">
-      <Link>Decorators\DecoratorExpressionInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorExpressionInterceptorData.cs">
-      <Link>Decorators\DecoratorExpressionInterceptorData.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorHelpers.cs">
-      <Link>Decorators\DecoratorHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\DecoratorInfo.cs">
-      <Link>Decorators\DecoratorInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ExpressionRegistration.cs">
-      <Link>Decorators\ExpressionRegistration.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\IDecoratableEnumerable.cs">
-      <Link>Decorators\IDecoratableEnumerable.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
-      <Link>Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Decorators\ServiceTypeDecoratorInfo.cs">
-      <Link>Decorators\ServiceTypeDecoratorInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\GenericArgumentFinder.cs">
-      <Link>GenericArgumentFinder.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\GenericTypeBuilder.cs">
-      <Link>GenericTypeBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.Extensions\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.Extensions\NonGenericRegistrationsExtensions.cs">
       <Link>NonGenericRegistrationsExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\OpenGenericBatchRegistrationExtensions.cs">
-      <Link>OpenGenericBatchRegistrationExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\OpenGenericRegistrationExtensions.cs">
-      <Link>OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.Extensions\Requires.cs">
       <Link>Requires.cs</Link>

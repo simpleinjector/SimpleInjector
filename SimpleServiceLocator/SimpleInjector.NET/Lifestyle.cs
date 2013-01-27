@@ -27,34 +27,45 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using SimpleInjector.Lifestyles;
 
     [DebuggerDisplay("{Name,nq}")]
     public abstract class Lifestyle
     {
+        /// <summary>
+        /// A new instance of the specified service type is created every time it is requested or injected.
+        /// </summary>
         public static readonly Lifestyle Transient = new TransientLifestyle();
 
+        /// <summary>
+        /// Ensures that only one instance of the specified service type is created within the context of the
+        /// given container instance.
+        /// </summary>
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
+
+        internal static readonly Lifestyle Unknown = new UnknownLifestyle();
 
         private static readonly MethodInfo OpenCreateRegistrationTServiceTImplementationMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object, object>(null));
+        private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
+            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
+
+        private readonly string name;
 
         protected Lifestyle(string name)
         {
-            Requires.IsNotNull(name, "name");
+            Requires.IsNotNullOrEmpty(name, "name");
 
-            if (name == string.Empty)
-            {
-                throw new ArgumentException("Value can not be empty.", "name");
-            }
-
-            this.Name = name;
+            this.name = name;
         }
 
-        public string Name { get; private set; }
+        public string Name 
+        { 
+            get { return this.name; } 
+        }
 
         internal virtual int ComponentLength 
         {
@@ -72,8 +83,10 @@ namespace SimpleInjector
         }
 
         // TODO: Make virtual to make implementing a lifestyle easier.
-        public abstract Registration CreateRegistration<TService, TImplementation>(
-            Container container)
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " + 
+                            "be created using the non-generic overloads in a sandbox.")]
+        public abstract Registration CreateRegistration<TService, TImplementation>(Container container)
             where TImplementation : class, TService
             where TService : class;
 
@@ -114,6 +127,38 @@ namespace SimpleInjector
             }
         }
 
+        public Registration CreateRegistration(Type serviceType, Func<object> instanceCreator,
+            Container container)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, "container");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+
+            var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceFuncMethod
+                .MakeGenericMethod(serviceType);
+
+            try
+            {
+                // Build the following delegate: () => (ServiceType)instanceCreator();
+                var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
+                
+                return (Registration)closedCreateRegistrationMethod.Invoke(this, 
+                    new object[] { typeSafeInstanceCreator, container });
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                throw new ArgumentException(
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex),
+#if !SILVERLIGHT
+                    "serviceType",
+#endif
+                    ex);
+            }
+        }
+
         internal void OnRegistration(Container container)
         {
             this.OnRegistration(new LifestyleRegistrationEventArgs(container));
@@ -121,6 +166,21 @@ namespace SimpleInjector
 
         protected virtual void OnRegistration(LifestyleRegistrationEventArgs e)
         {
+        }
+
+        private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
+        {
+            // Build the following delegate: () => (ServiceType)instanceCreator();
+            var invocationExpression =
+                Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]);
+
+            var convertExpression = Expression.Convert(invocationExpression, serviceType);
+
+            var parameters = new ParameterExpression[0];
+
+            // This might throw an MemberAccessException when serviceType is internal while we're running in
+            // a Silverlight sandbox.
+            return Expression.Lambda(convertExpression, parameters).Compile();
         }
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)

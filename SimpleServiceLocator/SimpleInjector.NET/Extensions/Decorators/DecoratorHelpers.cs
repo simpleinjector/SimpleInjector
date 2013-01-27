@@ -34,12 +34,12 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Reflection;
 
     using SimpleInjector.Advanced;
-using SimpleInjector.Analysis;
+    using SimpleInjector.Analysis;
 
     internal static class DecoratorHelpers
     {
         private static readonly MethodInfo EnumerableSelectMethod =
-            Helpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
+            ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
 
         // This method must be public because of restrictions of the Silverlight Sandbox.
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
@@ -89,7 +89,7 @@ using SimpleInjector.Analysis;
                 new object[] { contexts });
         }
 
-        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType, 
+        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
             Container container, IEnumerable<Expression> expressions)
         {
             Type allInstancesEnumerableType = typeof(DecoratableEnumerable<>).MakeGenericType(serviceType);

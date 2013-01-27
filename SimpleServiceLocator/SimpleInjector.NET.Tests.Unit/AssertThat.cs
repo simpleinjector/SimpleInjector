@@ -104,6 +104,15 @@
 #endif
         }
 
+        internal static void AreEqual(Type expectedType, Type actualType, string message = null)
+        {
+            if (expectedType != actualType)
+            {
+                Assert.Fail(string.Format("Expected: {0}. Actual: {1}. {2}",
+                    Helpers.ToFriendlyName(expectedType), Helpers.ToFriendlyName(actualType), message));
+            }
+        }
+
         internal static void StringContains(string expectedMessage, string actualMessage, string assertMessage)
         {
             if (expectedMessage == null)

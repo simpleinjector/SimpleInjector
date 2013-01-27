@@ -395,19 +395,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterAll_NullContainer_ThrowsException()
-        {
-            // Arrange
-            var instance = new InternalImplOfPublicService(null);
-
-            Container invalidContainer = null;
-
-            // Act
-            invalidContainer.RegisterAll(typeof(IPublicService), new IPublicService[] { instance });
-        }
-
-        [TestMethod]
         public void RegisterAll_WithValidCollectionOfImplementations_Succeeds()
         {
             // Arrange
@@ -715,8 +702,8 @@
         public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage = "The supplied type 'IDisposable' does not inherit from or implement " +
-                "'NonGenericRegistrationsExtensionsTests+IPublicService'.";
+            string expectedMessage = "The supplied type IDisposable does not implement " +
+                "NonGenericRegistrationsExtensionsTests+IPublicService.";
 
             var container = new Container();
 

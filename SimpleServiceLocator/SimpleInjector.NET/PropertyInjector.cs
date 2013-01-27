@@ -159,8 +159,6 @@ namespace SimpleInjector
 
         private static void EmitInjectionOfProperty(ILGenerator generator, PropertyInfo property, int index)
         {
-            var local = generator.DeclareLocal(property.PropertyType);
-
             generator.Emit(OpCodes.Ldarg_0);
 
             switch (index)

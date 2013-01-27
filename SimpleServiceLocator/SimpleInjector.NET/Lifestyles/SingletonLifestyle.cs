@@ -55,8 +55,8 @@ namespace SimpleInjector.Lifestyles
 
             return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
         }
-
-        internal static Registration CreateRegistration(Type serviceType, object instance, 
+        
+        internal static Registration CreateRegistrationForSingleInstance(Type serviceType, object instance, 
             Container container)
         {
             return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 

@@ -39,8 +39,6 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
-        private static readonly MethodInfo GetInstanceOfT = GetContainerMethod(c => c.GetInstance<object>());
-
         internal static string ToFriendlyName(this Type type)
         {
             string name = type.Name;
@@ -79,23 +77,7 @@ namespace SimpleInjector
                 return CreateReadOnlyCollection(collection);
             }
         }
-
-        internal static bool VerifyBuildExpression(this InstanceProducer instanceProducer, out Exception exception)
-        {
-            try
-            {
-                instanceProducer.BuildExpression();
-
-                exception = null;
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-
-            return exception == null;
-        }
-
+        
         // Throws an InvalidOperationException on failure.
         internal static void Verify(this InstanceProducer instanceProducer)
         {
@@ -205,10 +187,26 @@ namespace SimpleInjector
             return instanceInitializer.Compile();
         }
 
-        internal static MethodInfo GetContainerMethod(Expression<Action<Container>> methodCall)
+        internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
-            var body = methodCall.Body as MethodCallExpression;
-            return body.Method.GetGenericMethodDefinition();
+            IEnumerable castedCollection;
+
+            if (typeof(IEnumerable<>).MakeGenericType(resultType).IsAssignableFrom(collection.GetType()))
+            {
+                // The collection is a IEnumerable<[ServiceType]>. We can simply cast it. 
+                // Better for performance
+                castedCollection = collection;
+            }
+            else
+            {
+                // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
+                // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
+                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
+
+                castedCollection = (IEnumerable)castMethod.Invoke(null, new[] { collection });
+            }
+
+            return castedCollection;
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)

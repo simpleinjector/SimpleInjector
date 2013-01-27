@@ -54,7 +54,7 @@ namespace SimpleInjector.Lifestyles
                 return Lifestyle.Transient;
             }
 
-            return UnknownLifestyle.Instance;
+            return Lifestyle.Unknown;
         }
     }
 }

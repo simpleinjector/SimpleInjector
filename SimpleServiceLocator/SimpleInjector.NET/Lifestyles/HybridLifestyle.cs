@@ -27,6 +27,7 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
 
@@ -68,6 +69,8 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "See base.CreateRegistration for more info.")]
         public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
             Requires.IsNotNull(container, "container");

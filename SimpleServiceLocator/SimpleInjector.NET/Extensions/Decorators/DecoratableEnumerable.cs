@@ -58,7 +58,7 @@ namespace SimpleInjector.Extensions.Decorators
         public DecoratableEnumerable(Container container, IEnumerable<Expression> expressions)
         {
             this.container = container;
-            this.contexts = 
+            this.contexts =
                 DecoratorPredicateContext.CreateFromExpressions(container, typeof(TService), expressions);
         }
 
@@ -103,7 +103,7 @@ namespace SimpleInjector.Extensions.Decorators
                 this.contexts = (
                     from implementationType in this.serviceTypes
                     let producer = this.GetRegistration(implementationType)
-                    select DecoratorPredicateContext.CreateFromExpression(this.container, producer.ServiceType, 
+                    select DecoratorPredicateContext.CreateFromExpression(this.container, producer.ServiceType,
                         implementationType, producer.BuildExpression()))
                     .ToArray();
             }

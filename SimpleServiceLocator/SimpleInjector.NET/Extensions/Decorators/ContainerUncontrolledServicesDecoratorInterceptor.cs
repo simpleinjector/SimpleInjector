@@ -87,17 +87,17 @@ namespace SimpleInjector.Extensions.Decorators
 
         private void ApplyDecorator(ExpressionBuiltEventArgs e, Type serviceType, Type decoratorType)
         {
-            ConstructorInfo decoratorConstructor = 
+            ConstructorInfo decoratorConstructor =
                 this.ResolutionBehavior.GetConstructor(serviceType, decoratorType);
 
-            var serviceInfo = this.GetServiceTypeInfo(e.Expression, serviceType, UnknownLifestyle.Instance);
+            var serviceInfo = this.GetServiceTypeInfo(e.Expression, serviceType, Lifestyle.Unknown);
 
-            var decoratedExpression = 
+            var decoratedExpression =
                 this.BuildDecoratorExpression(serviceType, decoratorConstructor, e.Expression);
 
-            var relationships = this.GetKnownDecoratorRelationships(decoratorConstructor, serviceType, 
+            var relationships = this.GetKnownDecoratorRelationships(decoratorConstructor, serviceType,
                 serviceInfo.GetCurrentInstanceProducer());
-            
+
             e.Expression = decoratedExpression;
 
             // Add the decorator to the list of applied decorator. This way users can use this
@@ -114,19 +114,19 @@ namespace SimpleInjector.Extensions.Decorators
             // have defined.
             var expression = Expression.Constant(null, serviceType);
 
-            return this.SatisfiesPredicate(serviceType, expression, UnknownLifestyle.Instance);
+            return this.SatisfiesPredicate(serviceType, expression, Lifestyle.Unknown);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
             Justification = "This is not a performance critical path.")]
-        private Expression BuildDecoratorExpression(Type serviceType, ConstructorInfo decoratorConstructor, 
+        private Expression BuildDecoratorExpression(Type serviceType, ConstructorInfo decoratorConstructor,
             Expression originalExpression)
         {
             this.ThrowWhenDecoratorNeedsAFunc(serviceType, decoratorConstructor);
 
             ParameterExpression parameter = Expression.Parameter(serviceType, "service");
 
-            var parameters = 
+            var parameters =
                 this.BuildParameters(decoratorConstructor, new ExpressionBuiltEventArgs(serviceType, parameter));
 
             Delegate wrapInstanceWithDecorator =
@@ -193,7 +193,7 @@ namespace SimpleInjector.Extensions.Decorators
                 Func<IEnumerable> collectionCreator = () =>
                 {
                     Array array = ToArray(serviceType, decoratedCollection);
-                    return Helpers.MakeReadOnly(serviceType, array);
+                    return ExtensionHelpers.MakeReadOnly(serviceType, array);
                 };
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(serviceType, collectionCreator);
@@ -219,7 +219,7 @@ namespace SimpleInjector.Extensions.Decorators
                     Delegate lambda = Expression.Lambda(funcType, callExpression).Compile();
                     var decoratedCollection = (IEnumerable)lambda.DynamicInvoke();
                     Array array = ToArray(serviceType, decoratedCollection);
-                    return Helpers.MakeReadOnly(serviceType, array);
+                    return ExtensionHelpers.MakeReadOnly(serviceType, array);
                 };
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(serviceType, collectionCreator);

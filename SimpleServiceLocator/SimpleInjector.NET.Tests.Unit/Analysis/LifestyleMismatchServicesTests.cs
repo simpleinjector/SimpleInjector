@@ -183,7 +183,7 @@
         public void DependencyHasPossibleLifestyleMismatch_TransientToUnknown_DoesNotReportAMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyles.Unknown);
+            var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyle.Unknown);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -196,7 +196,7 @@
         public void DependencyHasPossibleLifestyleMismatch_UnknownToTransient_ReportsMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyles.Unknown, child: Lifestyle.Transient);
+            var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyle.Transient);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -209,7 +209,7 @@
         public void DependencyHasPossibleLifestyleMismatch_SingletonToUnknown_ReportsMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyles.Unknown);
+            var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyle.Unknown);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -222,7 +222,7 @@
         public void DependencyHasPossibleLifestyleMismatch_UnknownToSingleton_DoesNotReportAMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyles.Unknown, child: Lifestyle.Singleton);
+            var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyle.Singleton);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -235,7 +235,7 @@
         public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToUnknown_ReportsMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyles.Unknown);
+            var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Unknown);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -249,7 +249,7 @@
         public void DependencyHasPossibleLifestyleMismatch_UnknownToLifetimeScope_ReportsMismatch()
         {
             // Arrange
-            var dependency = CreateRelationship(parent: Lifestyles.Unknown, child: Lifestyles.LifetimeScope);
+            var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyles.LifetimeScope);
 
             // Act
             bool result = LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency);
@@ -399,7 +399,7 @@
             internal static Lifestyle LifetimeScope = new FakeLifestyle("Lifetime Scope", 100);
             internal static Lifestyle WcfOperation = new FakeLifestyle("WCF Operation", 250);
             internal static Lifestyle WebRequest = new FakeLifestyle("Web Request", 300);
-            internal static Lifestyle Unknown = UnknownLifestyle.Instance;
+            // internal static Lifestyle Unknown = Lifestyle.Unknown;
         }
     }
     

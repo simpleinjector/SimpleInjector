@@ -26,32 +26,17 @@
 namespace SimpleInjector.Extensions
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Helper methods for the extensions.
     /// </summary>
     internal static class Helpers
     {
-        // This method name does not describe what it does, but since the C# compiler will create a iterator
-        // type named after this method, it allows us to return a type that has a nice name that will show up
-        // during debugging.
-        public static IEnumerable<T> ReadOnlyCollection<T>(T[] collection)
-        {
-            for (int index = 0; index < collection.Length; index++)
-            {
-                yield return collection[index];
-            }
-        }
-
         internal static string ToFriendlyName(this Type type)
         {
             string name = type.Name;
@@ -73,79 +58,7 @@ namespace SimpleInjector.Extensions
             var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
 
             return name + "<" + string.Join(", ", argumentNames) + ">";
-        }
-
-        internal static IEnumerable MakeReadOnly(Type elementType, Array collection)
-        {
-            var readOnlyCollection = typeof(Helpers).GetMethod("ReadOnlyCollection")
-                .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { collection });
-
-            return (IEnumerable)readOnlyCollection;
-        }
-
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
-        internal static Type DetermineImplementationType(Expression expression, Type registeredServiceType)
-        {
-            if (expression is ConstantExpression)
-            {
-                var constantExpression = (ConstantExpression)expression;
-
-                object singleton = constantExpression.Value;
-                return singleton == null ? constantExpression.Type : singleton.GetType();
-            }
-
-            if (expression is NewExpression)
-            {
-                // Transient without initializers.
-                return ((NewExpression)expression).Constructor.DeclaringType;
-            }
-
-            var invocation = expression as InvocationExpression;
-
-            if (invocation != null && invocation.Expression is ConstantExpression &&
-                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
-            {
-                // Transient with initializers.
-                return ((NewExpression)invocation.Arguments[0]).Constructor.DeclaringType;
-            }
-
-            // Implementation type can not be determined.
-            return registeredServiceType;
-        }
-
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
-        internal static Lifestyle DetermineLifestyle(Expression expression)
-        {
-            if (IsSingletonExpression(expression))
-            {
-                return Lifestyle.Singleton;
-            }
-
-            if (IsTransientExpression(expression))
-            {
-                return Lifestyle.Transient;
-            }
-
-            // Implementation type can not be determined.
-            return UnknownLifestyle.Instance;
-        }
-
-        internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
-        {
-            var body = methodCall.Body as MethodCallExpression;
-
-            return body.Method.GetGenericMethodDefinition();
-        }
-
-        internal static MethodInfo GetGenericMethod(Expression<Action<Container>> methodCall)
-        {
-            var body = methodCall.Body as MethodCallExpression;
-
-            return body.Method.GetGenericMethodDefinition();
-        }
+        }     
 
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
@@ -160,101 +73,9 @@ namespace SimpleInjector.Extensions
             return GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
         }
 
-        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType)
-        {
-            return GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
-        }
-
-        internal static bool IsConcreteType(Type type)
-        {
-            return !type.IsAbstract && !type.ContainsGenericParameters;
-        }
-
-        internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly,
-            AccessibilityOption accessibility)
-        {
-            try
-            {
-                if (accessibility == AccessibilityOption.AllTypes)
-                {
-                    return assembly.GetTypes();
-                }
-                else
-                {
-                    return assembly.GetExportedTypes();
-                }
-            }
-            catch (NotSupportedException)
-            {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
-                // Assembly and it would be safe to skip this exception.
-                return Enumerable.Empty<Type>();
-            }
-        }
-
-        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition,
-            Type typeToCheck)
-        {
-            if (!typeToCheck.IsGenericType)
-            {
-                return false;
-            }
-
-            if (typeToCheck.GetGenericTypeDefinition() != genericTypeDefinition)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        internal static bool IsGenericArgument(this Type type)
-        {
-            return type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
-        }
-
         internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
         {
             return type.GetInterfaces().Concat(type.GetBaseTypes());
-        }
-
-        internal static bool IsConstructableType(this Container container, Type serviceType,
-            Type implementationType, out string errorMessage)
-        {
-            errorMessage = null;
-
-            var resolutionBehavior = container.Options.ConstructorResolutionBehavior;
-            var verificationBehavior = container.Options.ConstructorVerificationBehavior;
-
-            try
-            {
-                var constructor = resolutionBehavior.GetConstructor(serviceType, implementationType);
-
-                foreach (var parameter in constructor.GetParameters())
-                {
-                    verificationBehavior.Verify(parameter);
-                }
-            }
-            catch (ActivationException ex)
-            {
-                errorMessage = ex.Message;
-            }
-
-            return errorMessage == null;
-        }
-
-        internal static void AddRange<T>(this Collection<T> collection, IEnumerable<T> range)
-        {
-            foreach (var item in range)
-            {
-                collection.Add(item);
-            }
-        }
-
-        private static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
-        {
-            var thisType = new[] { type };
-            return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
 
         private static IEnumerable<Type> GetBaseTypes(this Type type)
@@ -293,31 +114,6 @@ namespace SimpleInjector.Extensions
             return argumentOfTypeAndOuterType
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
-        }
-
-        private static bool IsSingletonExpression(Expression expression)
-        {
-            return expression is ConstantExpression;
-        }
-
-        private static bool IsTransientExpression(Expression expression)
-        {
-            if (expression is NewExpression)
-            {
-                // Transient without initializers.
-                return true;
-            }
-
-            var invocation = expression as InvocationExpression;
-
-            if (invocation != null && invocation.Expression is ConstantExpression &&
-                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
-            {
-                // Transient with initializers.
-                return true;
-            }
-
-            return false;
         }
     }
 }

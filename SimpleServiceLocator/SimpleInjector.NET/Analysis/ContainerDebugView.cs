@@ -28,24 +28,25 @@ namespace SimpleInjector.Analysis
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     internal sealed class ContainerDebugView
     {
-        private static IEnumerable<IContainerAnalyzer> analyzers;
+        private static IEnumerable<IContainerAnalyzer> analyzers = new IContainerAnalyzer[]
+        {
+            new PotentialLifestyleMismatchContainerAnalyzer(),
+            new GeneralWarningsContainerAnalyzer(),
+            new RegistrationsContainerAnalyzer()
+        };
 
         private Container container;
-
-        static ContainerDebugView()
-        {
-            analyzers = new IContainerAnalyzer[]
-            {
-                new PotentialLifestyleMismatchContainerAnalyzer(),
-                new GeneralWarningsContainerAnalyzer(),
-                new RegistrationsContainerAnalyzer()
-            };
-        }
-
+        
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = 
+                "We must catch all exceptions here, because this constructor is called by the Visual " +
+                "Studio debugger and it won't hide any failure in case of an exception. We catch and show " +
+                "the exception in the debug view instead.")]
         public ContainerDebugView(Container container)
         {
             this.container = container;

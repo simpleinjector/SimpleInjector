@@ -34,6 +34,8 @@ Version vFuture
 		 SimpleInjector.Advanced namespace. (work item 18349).
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
+		-[Extensions] RegisterAll, RegisterDecorator, RegistereOpenGeneric, and RegisterManyForOpenGeneric
+		 extension methods have been moved to the core library.
 
 	Bug fixes:
 		-[Extensions] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event

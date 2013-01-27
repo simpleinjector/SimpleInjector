@@ -423,13 +423,9 @@ namespace SimpleInjector
 
             if (e.Handled)
             {
-                var registration = 
-                    e.Registration ?? new ExpressionRegistration(e.Expression, this);
+                var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
 
-                return new InstanceProducer(serviceType, registration)
-                {
-                    IsBuiltThroughUnregisteredTypeResolution = true
-                };
+                return new InstanceProducer(serviceType, registration);
             }
             else
             {
@@ -470,7 +466,7 @@ namespace SimpleInjector
             var emptyArray = Array.CreateInstance(elementType, 0);
 
             return new InstanceProducer(enumerableType,
-                SingletonLifestyle.CreateRegistration(enumerableType, emptyArray, this));
+                SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableType, emptyArray, this));
         }
 
         private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType<TConcrete>()

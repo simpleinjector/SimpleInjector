@@ -32,26 +32,14 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+
     using SimpleInjector.Extensions.Decorators;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Extension methods with non-generic method overloads.
     /// </summary>
     public static class NonGenericRegistrationsExtensions
     {
-        private static readonly MethodInfo RegisterByFuncMethod =
-            Helpers.GetGenericMethod(c => c.Register<object>((Func<object>)null));
-
-        private static readonly MethodInfo RegisterAllMethod =
-            Helpers.GetGenericMethod(c => c.RegisterAll<object>((IEnumerable<object>)null));
-
-        private static readonly MethodInfo RegisterSingleByFunc =
-            Helpers.GetGenericMethod(c => c.RegisterSingle<object>((Func<object>)null));
-
-        private static readonly MethodInfo RegisterSingleByT =
-            Helpers.GetGenericMethod(c => c.RegisterSingle<object>((object)null));
-
         /// <summary>
         /// Registers that the same instance of type <paramref name="implementation"/> will be returned every 
         /// time a <paramref name="serviceType"/> type is requested. If <paramref name="serviceType"/> and
@@ -89,20 +77,8 @@ namespace SimpleInjector.Extensions
             Func<object> instanceCreator)
         {
             Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.TypeIsReferenceType(serviceType, "serviceType");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
-            SafeInvoke(serviceType, "serviceType", () =>
-            {
-                // Build the following delegate: () => (ServiceType)instanceCreator();
-                var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
-
-                var method = RegisterSingleByFunc.MakeGenericMethod(serviceType);
-
-                method.Invoke(container, new[] { typeSafeInstanceCreator });
-            });
+            container.Register(serviceType, instanceCreator, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -121,15 +97,9 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instance, "instance");
-
-            Requires.TypeIsReferenceType(serviceType, "serviceType");
-            Requires.TypeIsReferenceType(instance.GetType(), "instance");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
-            var method = RegisterSingleByT.MakeGenericMethod(serviceType);
-
-            SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { instance }));
+            container.Register(serviceType, () => instance, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -186,215 +156,8 @@ namespace SimpleInjector.Extensions
         public static void Register(this Container container, Type serviceType, Func<object> instanceCreator)
         {
             Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.TypeIsReferenceType(serviceType, "serviceType");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
 
-            SafeInvoke(serviceType, "serviceType", () =>
-            {
-                // Build the following delegate: () => (ServiceType)instanceCreator();
-                var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
-
-                var method = RegisterByFuncMethod.MakeGenericMethod(serviceType);
-
-                method.Invoke(container, new[] { typeSafeInstanceCreator });
-            });
-        }
-
-        /// <summary>
-        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
-        /// </summary>
-        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
-        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
-        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
-        /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A method without the type parameter already exists. This extension method " +
-                "is more intuitive to developers.")]
-        public static void RegisterAll<TService>(this Container container, params Type[] serviceTypes)
-        {
-            RegisterAll(container, typeof(TService), serviceTypes);
-        }
-
-        /// <summary>
-        /// Registers a collection of instances of <paramref name="serviceTypes"/> to be returned when
-        /// a collection of <typeparamref name="TService"/> objects is requested.
-        /// </summary>
-        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
-        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
-        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
-        /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A method without the type parameter already exists. This extension method " +
-                "is more intuitive to developers.")]
-        public static void RegisterAll<TService>(this Container container, IEnumerable<Type> serviceTypes)
-        {
-            RegisterAll(container, typeof(TService), serviceTypes);
-        }
-
-        /// <summary>
-        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
-        /// </summary>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
-        /// (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
-        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
-        /// </exception>
-        public static void RegisterAll(this Container container, Type serviceType,
-            IEnumerable<Type> serviceTypes)
-        {
-            // Make a copy for correctness and performance.
-            Type[] types = serviceTypes != null ? serviceTypes.ToArray() : null;
-
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(types, "serviceTypes");
-            Requires.DoesNotContainNullValues(types, "serviceTypes");
-            Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
-                typeCanBeServiceType: true);
-
-            IDecoratableEnumerable enumerable =
-                DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, types);
-
-            RegisterAll(container, serviceType, enumerable);
-        }
-
-        /// <summary>
-        /// Registers a <paramref name="collection"/> of elements of type <paramref name="serviceType"/>.
-        /// </summary>
-        /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="collection">The collection of items to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
-        /// VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
-        /// open generic type.</exception>
-        public static void RegisterAll(this Container container, Type serviceType, IEnumerable collection)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(collection, "collection");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
-
-            RegisterAllInternal(container, serviceType, collection);
-        }
-
-        private static void RegisterAllInternal(Container container, Type serviceType, IEnumerable collection)
-        {
-            object castedCollection;
-
-            if (typeof(IEnumerable<>).MakeGenericType(serviceType).IsAssignableFrom(collection.GetType()))
-            {
-                // The collection is a IEnumerable<[ServiceType]>. We can simply cast it. 
-                // Better for performance
-                castedCollection = collection;
-            }
-            else
-            {
-                // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
-                // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
-                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(serviceType);
-
-                castedCollection = castMethod.Invoke(null, new[] { collection });
-            }
-
-            var method = RegisterAllMethod.MakeGenericMethod(serviceType);
-
-            SafeInvoke(serviceType, "serviceType", () => method.Invoke(container, new[] { castedCollection }));
-        }
-
-        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
-            Type implementation, MemberAccessException innerException)
-        {
-            if (!serviceType.IsPublic)
-            {
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, innerException,
-                     "serviceType");
-            }
-            else
-            {
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(implementation, innerException,
-                     "implementation");
-            }
-        }
-
-        private static void SafeInvoke(Type serviceType, string paramName, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                ThrowUnableToResolveTypeDueToSecurityConfigurationException(serviceType, ex, paramName);
-            }
-            catch (TargetInvocationException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    throw ex.InnerException;
-                }
-
-                throw;
-            }
-        }
-
-        // Gets called when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-        private static void ThrowUnableToResolveTypeDueToSecurityConfigurationException(Type serviceType,
-            MemberAccessException innerException, string paramName)
-        {
-            string exceptionMessage =
-                StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, innerException);
-
-#if SILVERLIGHT
-            throw new ArgumentException(exceptionMessage, paramName);
-#else
-            throw new ArgumentException(exceptionMessage, paramName, innerException);
-#endif
-        }
-
-        private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
-        {
-            // Build the following delegate: () => (ServiceType)instanceCreator();
-            var invocationExpression =
-                Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]);
-
-            var convertExpression = Expression.Convert(invocationExpression, serviceType);
-
-            var parameters = new ParameterExpression[0];
-
-            // This might throw an MemberAccessException when serviceType is internal while we're running in
-            // a Silverlight sandbox.
-            return Expression.Lambda(convertExpression, parameters).Compile();
-        }
+            container.Register(serviceType, instanceCreator, Lifestyle.Transient);
+        }       
     }
 }

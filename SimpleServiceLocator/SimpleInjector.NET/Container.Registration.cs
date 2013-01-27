@@ -28,14 +28,12 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Threading;
+
     using SimpleInjector.Advanced;
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
 #if DEBUG
@@ -414,7 +412,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            var registration = SingletonLifestyle.CreateRegistration(typeof(TService), instance, this);
+            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(typeof(TService), instance, this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -441,6 +439,8 @@ namespace SimpleInjector
             this.Register<TService>(instanceCreator, Lifestyle.Singleton);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Any other design would be inappropriate.")]
         public void Register<TService, TImplementation>(Lifestyle lifestyle)
             where TImplementation : class, TService
             where TService : class
@@ -485,6 +485,24 @@ namespace SimpleInjector
             lifestyle.OnRegistration(this);
 
             var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+
+            this.AddRegistration(serviceType, registration);
+        }
+
+        public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            lifestyle.OnRegistration(this);
+
+            var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
             this.AddRegistration(serviceType, registration);
         }
@@ -649,12 +667,12 @@ namespace SimpleInjector
             Requires.IsNotNull(collection, "collection");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            this.ThrowWhenCollectionTypeAlreadyRegistered<TService>();
+            this.ThrowWhenCollectionTypeAlreadyRegistered(typeof(TService));
 
             var readOnlyCollection = collection.MakeReadOnly();
 
-            var registration = 
-                SingletonLifestyle.CreateRegistration(typeof(IEnumerable<TService>), readOnlyCollection, this);
+            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(
+                typeof(IEnumerable<TService>), readOnlyCollection, this);
 
             this.AddRegistration(typeof(IEnumerable<TService>), registration);
 
@@ -678,13 +696,141 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(singletons, "singletons");
 
-            if (singletons.Any(element => element == null))
-            {
-                throw new ArgumentException("The collection may not contain null references.", "singletons");
-            }
+            Requires.DoesNotContainNullValues(singletons, "singletons");
 
             this.RegisterAll<TService>(new DecoratableSingletonCollection<TService>(this, singletons));
         }
+
+        /// <summary>
+        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
+        /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
+        /// requested. On enumeration the container is called for each type in the list.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
+        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "A method without the type parameter already exists. This extension method " +
+                "is more intuitive to developers.")]
+        public void RegisterAll<TService>(params Type[] serviceTypes)
+        {
+            this.RegisterAll(typeof(TService), serviceTypes);
+        }
+
+        /// <summary>
+        /// Registers a collection of instances of <paramref name="serviceTypes"/> to be returned when
+        /// a collection of <typeparamref name="TService"/> objects is requested.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
+        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "A method without the type parameter already exists. This extension method " +
+                "is more intuitive to developers.")]
+        public void RegisterAll<TService>(IEnumerable<Type> serviceTypes)
+        {
+            this.RegisterAll(typeof(TService), serviceTypes);
+        }
+
+        /// <summary>
+        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
+        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
+        /// requested. On enumeration the container is called for each type in the list.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
+        /// (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
+        public void RegisterAll(Type serviceType, IEnumerable<Type> serviceTypes)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(serviceTypes, "serviceTypes");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+
+            // Make a copy for correctness and performance.
+            Type[] types = serviceTypes.ToArray();
+
+            Requires.DoesNotContainNullValues(types, "serviceTypes");
+            Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
+            Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
+                typeCanBeServiceType: true);
+
+            IDecoratableEnumerable enumerable =
+                DecoratorHelpers.CreateDecoratableEnumerable(serviceType, this, types);
+
+            this.RegisterAllInternal(serviceType, enumerable);
+        }
+
+        /// <summary>
+        /// Registers a <paramref name="collection"/> of elements of type <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="collection">The collection of items to register.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
+        /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
+        public void RegisterAll(Type serviceType, IEnumerable collection)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(collection, "collection");
+            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+
+            try
+            {
+                this.RegisterAllInternal(serviceType, collection.Cast<object>().MakeReadOnly());
+            }
+            catch (MemberAccessException ex)
+            {
+                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+                throw new ArgumentException(
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex),
+#if !SILVERLIGHT
+                    "serviceType",
+#endif
+                    ex);
+            }
+        }
+
+        private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
+        {
+            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
+            
+            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
+
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableServiceType, 
+                castedCollection, this);
+
+            this.AddRegistration(enumerableServiceType, registration);
+
+            this.collectionsToValidate[serviceType] = readOnlyCollection;
+        }
+
+
 
         /// <summary>
         /// Verifies the <b>Container</b>. This method will call all registered delegates, 
@@ -759,13 +905,13 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowWhenCollectionTypeAlreadyRegistered<TItem>()
+        private void ThrowWhenCollectionTypeAlreadyRegistered(Type itemType)
         {
             if (!this.Options.AllowOverridingRegistrations &&
-                this.registrations.ContainsKey(typeof(IEnumerable<TItem>)))
+                this.registrations.ContainsKey(typeof(IEnumerable<>).MakeGenericType(itemType)))
             {
                 throw new InvalidOperationException(
-                    StringResources.CollectionTypeAlreadyRegistered(typeof(TItem)));
+                    StringResources.CollectionTypeAlreadyRegistered(itemType));
             }
         }
 

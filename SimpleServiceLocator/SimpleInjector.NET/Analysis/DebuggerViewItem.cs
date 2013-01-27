@@ -25,12 +25,8 @@
 
 namespace SimpleInjector.Analysis
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
-
-    using SimpleInjector.Lifestyles;
+    using System.Diagnostics.CodeAnalysis;
 
     [DebuggerDisplay("{Description,nq}", Name = "{Name,nq}")]
     internal class DebuggerViewItem
@@ -44,10 +40,14 @@ namespace SimpleInjector.Analysis
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public object Description { get; private set; }
-
+        
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", 
+            Justification="Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Name { get; private set; }
 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public object Value { get; private set; }
     }

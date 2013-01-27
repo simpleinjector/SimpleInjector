@@ -10,7 +10,6 @@
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
       <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Extensions" version="{version_Extensions}" />
       <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
     </dependencies>
     <frameworkAssemblies>

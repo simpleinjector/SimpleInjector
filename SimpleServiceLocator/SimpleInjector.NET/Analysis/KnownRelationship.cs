@@ -34,7 +34,7 @@ namespace SimpleInjector.Analysis
         "Lifestyle = {Lifestyle.Name,nq}, " +
         "Dependency = \\{ServiceType = {SimpleInjector.Helpers.ToFriendlyName(Dependency.ServiceType),nq}, " +
             "Lifestyle = {Dependency.Lifestyle.Name,nq}\\}")]
-    public sealed class KnownRelationship : IEquatable<KnownRelationship>
+    internal sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
         public KnownRelationship(Type implementationType, Lifestyle lifestyle, 
             InstanceProducer dependency)

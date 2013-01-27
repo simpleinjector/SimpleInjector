@@ -82,7 +82,13 @@
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="Analysis\KnownDependencyTests.cs" />
     <Compile Include="Analysis\LifestyleMismatchServicesTests.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
+    <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
+    <Compile Include="Extensions\DecoratorExtensionsCollectionTests.cs" />
+    <Compile Include="Extensions\DecoratorExtensionsTests.cs" />
+    <Compile Include="Extensions\OpenGenericRegistrationExtensionsTests.cs" />
+    <Compile Include="Extensions\TestClasses.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
     <Compile Include="GetInstanceTests.cs" />
     <Compile Include="GetRegistrationTests.cs" />
@@ -114,10 +120,6 @@
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{ca5a8a13-aa2c-4c21-80e3-98452a94cff7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>

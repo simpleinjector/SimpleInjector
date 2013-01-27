@@ -27,6 +27,7 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -82,7 +83,7 @@ namespace SimpleInjector.Lifestyles
             return e.Expression;
         }
 
-        protected void AddRelationship(KnownRelationship relationship) 
+        internal void AddRelationship(KnownRelationship relationship) 
         {
             Requires.IsNotNull(relationship, "relationship");
 
@@ -104,6 +105,9 @@ namespace SimpleInjector.Lifestyles
             return BuildDelegate<TService>(expression);
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
+                            "be created using the non-generic overloads in a sandbox.")]
         protected Func<TService> BuildTransientDelegate<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -135,6 +139,9 @@ namespace SimpleInjector.Lifestyles
             return expression;
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
+                            "be created using the non-generic overloads in a sandbox.")]
         protected Expression BuildTransientExpression<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -152,12 +159,12 @@ namespace SimpleInjector.Lifestyles
 
             ConstructorInfo constructor = resolutionBehavior.GetConstructor(serviceType, implemenationType);
 
+            this.AddConstructorParametersAsKnownRelationship(constructor);
+
             var parameters =
                 from parameter in constructor.GetParameters()
-                select this.BuildParameterExpression(serviceType, parameter);
+                select this.BuildParameterExpression(parameter);
 
-            this.AddConstructorParametersAsKnownRelationship(constructor);
-            
             return Expression.New(constructor, parameters.ToArray());
         }
 
@@ -176,7 +183,7 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private Expression BuildParameterExpression(Type serviceType, ParameterInfo parameter)
+        private Expression BuildParameterExpression(ParameterInfo parameter)
         {
             var injectionBehavior = this.Container.Options.ConstructorInjectionBehavior;
 

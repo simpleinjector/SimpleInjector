@@ -35,7 +35,7 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Type registeredServiceType;
         private readonly List<DecoratorInfo> appliedDecorators = new List<DecoratorInfo>();
 
-        internal ServiceTypeDecoratorInfo(Type registeredServiceType, Type implementationType, 
+        internal ServiceTypeDecoratorInfo(Type registeredServiceType, Type implementationType,
             InstanceProducer originalProducer)
         {
             this.registeredServiceType = registeredServiceType;
@@ -47,7 +47,7 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal InstanceProducer OriginalProducer { get; private set; }
 
-        internal IEnumerable<DecoratorInfo> AppliedDecorators 
+        internal IEnumerable<DecoratorInfo> AppliedDecorators
         {
             get { return this.appliedDecorators; }
         }
@@ -64,7 +64,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new ExpressionRegistration(decoratedExpression, interceptor.Lifestyle, interceptor.Container);
 
             var producer = new InstanceProducer(this.registeredServiceType, registration);
-            
+
             this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));
         }
     }

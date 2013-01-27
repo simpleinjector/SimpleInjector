@@ -85,7 +85,7 @@ namespace SimpleInjector
 
             foreach (var concreteType in concreteTypes)
             {
-                container.Register(concreteType);
+                container.Register(concreteType, concreteType, Lifestyle.Transient);
             }
         }
 

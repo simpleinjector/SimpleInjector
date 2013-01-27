@@ -40,7 +40,7 @@ namespace SimpleInjector.Analysis
             // an hybrid lifestyle could screw things up. In practice this would be very unlikely, since
             // the Func<bool> test delegate would typically return the same value within a given context.
             if (object.ReferenceEquals(componentLifestyle, dependencyLifestyle) &&
-                componentLifestyle != UnknownLifestyle.Instance)
+                componentLifestyle != Lifestyle.Unknown)
             {
                 return false;
             }

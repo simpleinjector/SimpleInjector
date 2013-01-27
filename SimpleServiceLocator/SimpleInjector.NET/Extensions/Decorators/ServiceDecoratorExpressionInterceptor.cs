@@ -80,8 +80,6 @@ namespace SimpleInjector.Extensions.Decorators
 
             e.Lifestyle = this.Lifestyle;
 
-            var info = this.GetServiceTypeInfo(e);
-
             this.AddKnownDecoratorRelationships(constructor, e);
 
             this.AddAppliedDecorator(decoratorType, e);
@@ -94,7 +92,7 @@ namespace SimpleInjector.Extensions.Decorators
             var decoratee = info.GetCurrentInstanceProducer();
 
             // Must be called before the current decorator is added to the list of applied decorators
-            var relationships = 
+            var relationships =
                 this.GetKnownDecoratorRelationships(constructor, e.RegisteredServiceType, decoratee);
 
             e.KnownRelationships.AddRange(relationships);
@@ -109,7 +107,7 @@ namespace SimpleInjector.Extensions.Decorators
             info.AddAppliedDecorator(decoratorType, this, e.Expression);
         }
 
-        private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor, 
+        private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
             ExpressionBuiltEventArgs e)
         {
             var parameters = this.BuildParameters(decoratorConstructor, e);
@@ -119,13 +117,13 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
-                var singleton = 
+                var singleton =
                     this.GetSingletonDecorator(decoratorConstructor.DeclaringType, decoratorExpression);
 
                 return Expression.Constant(singleton);
             }
 
-            return decoratorExpression;           
+            return decoratorExpression;
         }
 
         private object GetSingletonDecorator(Type decoratorType, Expression decoratorExpression)

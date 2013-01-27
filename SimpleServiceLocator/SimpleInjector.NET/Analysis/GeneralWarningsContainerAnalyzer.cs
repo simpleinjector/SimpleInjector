@@ -25,7 +25,6 @@
 
 namespace SimpleInjector.Analysis
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -47,10 +46,7 @@ namespace SimpleInjector.Analysis
 
             if (!analysisResults.Any())
             {
-                return new DebuggerViewItem(
-                    "Configuration warnings",
-                    "No warnings detected.",
-                    null);
+                return new DebuggerViewItem("Configuration warnings", "No warnings detected.");
             }
             else if (analysisResults.Length == 1)
             {
@@ -58,73 +54,9 @@ namespace SimpleInjector.Analysis
             }
             else
             {
-                return new DebuggerViewItem(
-                    "Configuration warnings",
-                    "See list below for all warnings.",
+                return new DebuggerViewItem("Configuration warnings", "See list below for all warnings.",
                     analysisResults);
             }
-        }
-    }
-
-    internal sealed class AutoRegisteredContainerAnalyzer : IContainerAnalyzer
-    {
-        public DebuggerViewItem Analyse(Container container)
-        {
-            var registrations = container.GetCurrentRegistrations();
-
-            var autoRegisteredServices = new HashSet<Type>((
-                from producer in container.GetCurrentRegistrations()
-                where producer.IsContainerAutoRegistered
-                select producer.ServiceType));
-
-            var registrationsThatDependOnAnUnregisteredType = (
-                from registration in registrations
-                from relationship in registration.GetRelationships()
-                where autoRegisteredServices.Contains(relationship.Dependency.ServiceType)
-                group relationship by registration into relationshipGroup
-                select new 
-                { 
-                    Registration = relationshipGroup.Key, 
-                    Relationships = relationshipGroup.ToArray() 
-                })
-                .ToArray();
-
-            if (!registrationsThatDependOnAnUnregisteredType.Any())
-            {
-                return null;
-            }
-            else
-            {
-                var unregisteredTypeViewItems = (
-                    from item in registrationsThatDependOnAnUnregisteredType
-                    select BuildUnregisteredTypeViewItem(item.Registration, item.Relationships))
-                    .ToArray();
-
-                return new DebuggerViewItem(
-                    "Unregistered Types",
-                    autoRegisteredServices.Count + " container-registered services have been detected.", 
-                    unregisteredTypeViewItems);
-            }
-        }
-
-        private static DebuggerViewItem BuildUnregisteredTypeViewItem(InstanceProducer registration, 
-            KnownRelationship[] relationships)
-        {
-            string description;
-
-            if (relationships.Length == 1)
-            {
-                description =
-                    registration.ServiceType.ToFriendlyName() + " depends on onregistered type " +
-                    relationships.Single().Dependency.ServiceType.ToFriendlyName();
-            }
-            else
-            {
-                description = registration.ServiceType.ToFriendlyName() + " depends on " +
-                    relationships.Length + " unregistered types.";
-            }
-
-            return new DebuggerViewItem(registration.ServiceType.ToFriendlyName(), description, relationships);
         }
     }
 }

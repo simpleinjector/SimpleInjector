@@ -26,6 +26,7 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     
     public sealed class TransientLifestyle : Lifestyle
@@ -39,16 +40,17 @@ namespace SimpleInjector.Lifestyles
             get { return 1; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(
-            Container container)
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "See base.CreateRegistration for more info.")]
+        public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
             Requires.IsNotNull(container, "container");
 
             return new TransientLifestyleRegistration<TService, TImplementation>(this, container);
         }
 
-        public override Registration CreateRegistration<TService>(
-            Func<TService> instanceCreator, Container container)
+        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+            Container container)
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");

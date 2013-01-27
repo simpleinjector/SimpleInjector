@@ -142,7 +142,7 @@ namespace SimpleInjector.Extensions.Decorators
             return this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType, e.Lifestyle);
         }
 
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression, 
+        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             Type registeredServiceType, Lifestyle lifestyle)
         {
             var producer =
@@ -159,8 +159,8 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (!predicateCache.ContainsKey(registeredServiceType))
             {
-                Type implementationType = 
-                    Helpers.DetermineImplementationType(originalExpression, registeredServiceType);
+                Type implementationType =
+                    ExtensionHelpers.DetermineImplementationType(originalExpression, registeredServiceType);
 
                 predicateCache[registeredServiceType] =
                     new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);
@@ -189,7 +189,7 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        protected KnownRelationship[] GetKnownDecoratorRelationships(ConstructorInfo decoratorConstructor, 
+        protected KnownRelationship[] GetKnownDecoratorRelationships(ConstructorInfo decoratorConstructor,
             Type registeredServiceType, InstanceProducer decoratee)
         {
             var decorateeRelationships =
@@ -215,7 +215,7 @@ namespace SimpleInjector.Extensions.Decorators
                     dependency: parameterProducer);
         }
 
-        private IEnumerable<KnownRelationship> GetDecorateeRelationships(ConstructorInfo constructor, 
+        private IEnumerable<KnownRelationship> GetDecorateeRelationships(ConstructorInfo constructor,
             Type registeredServiceType, InstanceProducer decoratee)
         {
             return
@@ -241,7 +241,7 @@ namespace SimpleInjector.Extensions.Decorators
             return builder.BuildClosedGenericImplementation();
         }
 
-        private DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType, 
+        private DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType,
             Expression expression, Lifestyle lifestyle)
         {
             var info = this.GetServiceTypeInfo(expression, registeredServiceType, lifestyle);
