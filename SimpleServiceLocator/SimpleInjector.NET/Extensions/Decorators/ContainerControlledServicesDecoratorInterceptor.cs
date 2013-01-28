@@ -49,11 +49,9 @@ namespace SimpleInjector.Extensions.Decorators
         {
         }
 
-        protected override Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            ThreadStaticServiceTypePredicateCache
+        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
         }
 
         internal void Decorate(object sender, ExpressionBuiltEventArgs e)

@@ -45,6 +45,7 @@ namespace SimpleInjector
     {
         private readonly object locker = new object();
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
+        private readonly IDictionary items = new Dictionary<object, object>();
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
         private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
@@ -85,7 +86,7 @@ namespace SimpleInjector
                 throw new ArgumentException(StringResources.ContainerOptionsBelongsToAnotherContainer(),
                     "options");
             }
-
+            
             options.Container = this;
             this.Options = options;
 
@@ -95,6 +96,11 @@ namespace SimpleInjector
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
+
+        internal IDictionary Items
+        {
+            get { return this.items; }
+        }
 
         internal bool IsLocked
         {

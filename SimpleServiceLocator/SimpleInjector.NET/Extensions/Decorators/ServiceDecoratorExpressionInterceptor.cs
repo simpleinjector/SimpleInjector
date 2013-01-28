@@ -29,37 +29,26 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading;
 
     internal sealed class ServiceDecoratorExpressionInterceptor : DecoratorExpressionInterceptor
     {
+        private static readonly object ContainerItemsKeyAndLock = new object();
+
         // Cache for decorators when the decorator is registered as singleton. Since all decoration requests
         // for the registration of that decorator will go through the same instance, we can (or must)
         // define this dictionary as instance field (not as static or thread-static). When a decorator is
         // registered 
         private readonly Dictionary<Type, object> singletonDecorators = new Dictionary<Type, object>();
 
-        // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
-        // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
-        // get raised by multiple threads at the same time (especially for types resolved using
-        // unregistered type resolution) and using the same dictionary could lead to duplicate entries
-        // in the ServiceTypeDecoratorInfo.AppliedDecorators list. Because the ExpressionBuilt event gets 
-        // raised and all delegates registered to that event will get called on the same thread and before
-        // an InstanceProducer stores the Expression, we can safely store this information in a 
-        // thread-static field.
-        [ThreadStatic]
-        private static Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            threadStaticServiceTypePredicateCache;
-
         internal ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
             : base(data)
         {
         }
 
-        protected override Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            ThreadStaticServiceTypePredicateCache
+        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
-            get { return threadStaticServiceTypePredicateCache; }
-            set { threadStaticServiceTypePredicateCache = value; }
+            get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
         }
 
         internal void Decorate(object sender, ExpressionBuiltEventArgs e)

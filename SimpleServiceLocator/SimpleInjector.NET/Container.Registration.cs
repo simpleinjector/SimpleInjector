@@ -830,8 +830,6 @@ namespace SimpleInjector
             this.collectionsToValidate[serviceType] = readOnlyCollection;
         }
 
-
-
         /// <summary>
         /// Verifies the <b>Container</b>. This method will call all registered delegates, 
         /// iterate registered collections and throws an exception if there was an error.

@@ -26,13 +26,14 @@
 namespace SimpleInjector.Extensions.Decorators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Analysis;
-    using SimpleInjector.Lifestyles;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
+using SimpleInjector.Advanced;
+using SimpleInjector.Analysis;
+using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Hooks into the building process and adds a decorator if needed.
@@ -73,11 +74,39 @@ namespace SimpleInjector.Extensions.Decorators
             get { return this.data.Predicate; }
         }
 
-        protected abstract Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            ThreadStaticServiceTypePredicateCache
+        protected abstract Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get;
-            set;
+        }
+
+        // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
+        // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
+        // get raised by multiple threads at the same time (especially for types resolved using
+        // unregistered type resolution) and using the same dictionary could lead to duplicate entries
+        // in the ServiceTypeDecoratorInfo.AppliedDecorators list. Because the ExpressionBuilt event gets 
+        // raised and all delegates registered to that event will get called on the same thread and before
+        // an InstanceProducer stores the Expression, we can safely store this information in a 
+        // thread-static field.
+        // The key for retrieving the threadLocal value is supplied by the caller. This way both the 
+        // DecoratorExpressionInterceptor and the ContainerUncontrolledServiceDecoratorInterceptor can have
+        // their own dictionary. This is needed because they both use the same key, but store different
+        // information.
+        protected Dictionary<Type, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(
+            object key)
+        {
+            lock (key)
+            {
+                var threadLocal = 
+                    (ThreadLocal<Dictionary<Type, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
+
+                if (threadLocal == null)
+                {
+                    threadLocal = new ThreadLocal<Dictionary<Type, ServiceTypeDecoratorInfo>>();
+                    this.Container.SetItem(key, threadLocal);
+                }
+
+                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<Type,ServiceTypeDecoratorInfo>());
+            }
         }
 
         protected IConstructorResolutionBehavior ResolutionBehavior
@@ -155,7 +184,7 @@ namespace SimpleInjector.Extensions.Decorators
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             Type registeredServiceType, InstanceProducer producer)
         {
-            Dictionary<Type, ServiceTypeDecoratorInfo> predicateCache = this.GetServiceTypePredicateCache();
+            var predicateCache = this.ThreadStaticServiceTypePredicateCache;
 
             if (!predicateCache.ContainsKey(registeredServiceType))
             {
@@ -247,25 +276,6 @@ namespace SimpleInjector.Extensions.Decorators
             var info = this.GetServiceTypeInfo(expression, registeredServiceType, lifestyle);
 
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
-        }
-
-        private Dictionary<Type, ServiceTypeDecoratorInfo> GetServiceTypePredicateCache()
-        {
-            var predicateCache = this.ThreadStaticServiceTypePredicateCache;
-
-            if (predicateCache == null)
-            {
-                predicateCache = new Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>();
-
-                this.ThreadStaticServiceTypePredicateCache = predicateCache;
-            }
-
-            if (!predicateCache.ContainsKey(this.Container))
-            {
-                predicateCache[this.Container] = new Dictionary<Type, ServiceTypeDecoratorInfo>();
-            }
-
-            return predicateCache[this.Container];
         }
 
         private Expression BuildExpressionForDependencyParameter(ParameterInfo parameter,

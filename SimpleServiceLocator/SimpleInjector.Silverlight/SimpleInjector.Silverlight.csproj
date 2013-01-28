@@ -229,6 +229,7 @@
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SilverlightSpecific\ThreadLocal.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

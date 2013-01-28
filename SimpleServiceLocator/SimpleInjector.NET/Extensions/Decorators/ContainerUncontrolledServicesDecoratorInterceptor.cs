@@ -32,7 +32,6 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.Lifestyles;
 
     // This class allows decorating collections of services with elements that are created out of the control
     // of the container. Collections are registered using the following methods:
@@ -41,15 +40,7 @@ namespace SimpleInjector.Extensions.Decorators
     // -RegisterAll(this Container container, Type serviceType, IEnumerable collection).
     internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
-        // NOTE: We have a memory leak here, in the situation when many containers are newed up.
-        // Store a ServiceTypeDecoratorInfo object per closed service type. This list must be shared across
-        // all decorators that get applied within the same container. We need a dictionary per thread, since 
-        // the ExpressionBuilt event can get raised by multiple threads at the same time (especially for types 
-        // resolved using unregistered type resolution) and using the same dictionary could lead to duplicate 
-        // entries in the ServiceTypeDecoratorInfo.AppliedDecorators list.
-        [ThreadStatic]
-        private static Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            threadStaticServiceTypePredicateCache;
+        private static readonly object containerItemsKeyAndLock = new object();
 
         private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollections =
             new Dictionary<Type, IEnumerable>();
@@ -59,11 +50,9 @@ namespace SimpleInjector.Extensions.Decorators
         {
         }
 
-        protected override Dictionary<Container, Dictionary<Type, ServiceTypeDecoratorInfo>>
-            ThreadStaticServiceTypePredicateCache
+        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
-            get { return threadStaticServiceTypePredicateCache; }
-            set { threadStaticServiceTypePredicateCache = value; }
+            get { return this.GetThreadStaticServiceTypePredicateCacheByKey(containerItemsKeyAndLock); }
         }
 
         internal void Decorate(object sender, ExpressionBuiltEventArgs e)

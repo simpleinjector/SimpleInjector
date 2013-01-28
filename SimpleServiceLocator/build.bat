@@ -67,23 +67,23 @@ copy "Shared Assemblies\*.*" %targetPathNet%\*.*
 
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=Release /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\CommonServiceLocator.SimpleInjectorAdapter.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%numeric_version_Core% /out:%targetPathNet%\CommonServiceLocator.SimpleInjectorAdapter.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\CommonServiceLocator.SimpleInjectorAdapter.dll /keyfile:SimpleInjector.snk
 
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions\SimpleInjector.Extensions.csproj" /nologo /p:Configuration=%configuration%
 ren %targetPathNet%\SimpleInjector.Extensions.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%numeric_version_Extensions% /out:%targetPathNet%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Extensions% /out:%targetPathNet%\SimpleInjector.Extensions.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:Configuration=%configuration%
 ren %targetPathNet%\SimpleInjector.Packaging.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%numeric_version_Packaging% /out:%targetPathNet%\SimpleInjector.Packaging.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Packaging% /out:%targetPathNet%\SimpleInjector.Packaging.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
@@ -98,7 +98,7 @@ del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.WebForms.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll /keyfile:SimpleInjector.snk
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"

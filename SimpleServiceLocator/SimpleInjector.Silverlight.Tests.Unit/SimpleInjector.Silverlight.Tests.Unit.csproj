@@ -104,6 +104,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorVerificationBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorVerificationBehaviorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\AmbiguousTypesTests.cs">
+      <Link>AmbiguousTypesTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\KnownDependencyTests.cs">
       <Link>Analysis\KnownDependencyTests.cs</Link>
     </Compile>
@@ -212,7 +215,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\VerifyTests.cs">
       <Link>VerifyTests.cs</Link>
     </Compile>
-    <Compile Include="AmbiguousTypesTests.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
