@@ -32,6 +32,7 @@ namespace SimpleInjector
 
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Extensions.Decorators;
 
     internal static class Requires
     {
@@ -217,17 +218,6 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
-            string paramName)
-        {
-            IConstructorResolutionBehavior behavior = container.Options.ConstructorResolutionBehavior;
-            ConstructorInfo decoratorConstructor = behavior.GetConstructor(serviceType, decoratorType);
-
-            DecoratesServiceType(decoratorType, decoratorConstructor, serviceType, paramName);
-
-            DecoratesBaseTypes(decoratorType, decoratorConstructor, serviceType, paramName);
-        }
-
         internal static void IsValidValue(AccessibilityOption accessibility, string paramName)
         {
             if (accessibility != AccessibilityOption.AllTypes &&
@@ -239,81 +229,60 @@ namespace SimpleInjector
             }
         }
 
-        private static void DecoratesServiceType(Type decoratorType, ConstructorInfo decoratorConstructor,
-            Type serviceType, string paramName)
+        internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
+            string paramName)
         {
-            var validServiceTypeArguments =
-                from parameter in decoratorConstructor.GetParameters()
-                where
-                    IsDecorateeDependencyParameter(parameter.ParameterType, serviceType) ||
-                    IsDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType)
-                select parameter;
+            ConstructorInfo decoratorConstructor = 
+                container.Options.ConstructorResolutionBehavior.GetConstructor(serviceType, decoratorType);
 
-            int numberOfServiceTypeDependencies = validServiceTypeArguments.Count();
+            Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
+            Requires.DecoratesBaseTypes(serviceType, decoratorConstructor, paramName);
+        }
 
-            if (numberOfServiceTypeDependencies != 1)
+        private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor, 
+            string paramName)
+        {
+            bool decoratesServiceType = DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
+
+            if (!decoratesServiceType)
             {
-                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                    decoratorType, serviceType, numberOfServiceTypeDependencies);
-
-                throw new ArgumentException(message, paramName);
+                ThrowMustDecorateServiceType(serviceType, decoratorConstructor, paramName);
             }
         }
 
-        private static void DecoratesBaseTypes(Type decoratorType, ConstructorInfo decoratorConstructor,
-            Type serviceType, string paramName)
+        private static void ThrowMustDecorateServiceType(Type serviceType, 
+            ConstructorInfo decoratorConstructor, string paramName)
         {
-            var baseTypes = (
-                from baseType in decoratorType.GetBaseTypesAndInterfaces()
-                where IsDecorateeDependencyParameter(baseType, serviceType)
-                select baseType)
-                .ToArray();
+            int numberOfServiceTypeDependencies =
+                DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, decoratorConstructor);
 
-            var constructorParameters = decoratorConstructor.GetParameters();
+            string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
+                decoratorConstructor.DeclaringType, serviceType, numberOfServiceTypeDependencies);
 
-            // For a type to be a decorator, one of its constructor parameter types must exactly match with
-            // one of the interfaces it implements or base types it inherits from.
-            var decoratorParameters =
-                from baseType in baseTypes
-                from parameter in constructorParameters
-                where parameter.ParameterType == baseType ||
-                    parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType)
-                select parameter;
+            throw new ArgumentException(message, paramName);
+        }
+        
+        private static void DecoratesBaseTypes(Type serviceType, ConstructorInfo decoratorConstructor, 
+            string paramName)
+        {
+            bool decoratesBaseTypes = 
+                DecoratorHelpers.DecoratesBaseTypes(serviceType, decoratorConstructor);
 
-            if (!decoratorParameters.Any())
+            if (!decoratesBaseTypes)
             {
-                string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                    decoratorType, baseTypes);
-
-                throw new ArgumentException(message, paramName);
+                ThrowMustDecorateBaseType(serviceType, decoratorConstructor.DeclaringType, paramName);
             }
         }
 
-        // Checks if the given parameterType can function as the decorated instance of the given service type.
-        private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
+        private static void ThrowMustDecorateBaseType(Type serviceType, Type decoratorType, string paramName)
         {
-            if (!parameterType.IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
-            {
-                return false;
-            }
+            var validConstructorArgumentTypes =
+                DecoratorHelpers.GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorType);
 
-            Type funcArgumentType = parameterType.GetGenericArguments()[0];
+            string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
+                decoratorType, validConstructorArgumentTypes);
 
-            return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
-        }
-
-        // Checks if the given parameterType can function as the decorated instance of the given service type.
-        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType)
-        {
-            if (parameterType == serviceType)
-            {
-                return true;
-            }
-
-            return
-                serviceType.IsGenericType &&
-                parameterType.IsGenericType &&
-                serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
+            throw new ArgumentException(message, paramName);
         }
     }
 }

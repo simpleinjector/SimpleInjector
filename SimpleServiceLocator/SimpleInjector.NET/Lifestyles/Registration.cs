@@ -70,7 +70,7 @@ namespace SimpleInjector.Lifestyles
                 foreach (var dependency in dependencies)
                 {
                     this.dependencies.Add(dependency);
-                };
+                }
             }
         }
 

@@ -5,7 +5,7 @@
     // ConditionalWeakTable<TKey, TValue>.
     public class ThreadLocalValue
     {
-        public object Value;
+        public object Value { get; set; }
     }
 }
 
@@ -43,13 +43,14 @@ namespace System.Threading
                 
                 if (weakTable == null || weakTable.TryGetValue(this, out threadLocalValue) == false)
                 {
-                    var value = valueCreator();
+                    var value = this.valueCreator();
                     this.Value = value;
                     return value;
                 }
 
                 return (T)threadLocalValue.Value;
             }
+
             set
             {
                 var weakTable = threadStaticWeakTable;

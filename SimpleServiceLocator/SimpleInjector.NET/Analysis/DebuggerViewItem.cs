@@ -42,7 +42,7 @@ namespace SimpleInjector.Analysis
         public object Description { get; private set; }
         
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", 
-            Justification="Called by the Visual Studio debugger.")]
+            Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Name { get; private set; }
 

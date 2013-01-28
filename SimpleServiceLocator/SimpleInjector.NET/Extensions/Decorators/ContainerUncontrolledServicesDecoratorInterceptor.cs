@@ -40,7 +40,7 @@ namespace SimpleInjector.Extensions.Decorators
     // -RegisterAll(this Container container, Type serviceType, IEnumerable collection).
     internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
-        private static readonly object containerItemsKeyAndLock = new object();
+        private static readonly object ContainerItemsKeyAndLock = new object();
 
         private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollections =
             new Dictionary<Type, IEnumerable>();
@@ -52,7 +52,7 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
-            get { return this.GetThreadStaticServiceTypePredicateCacheByKey(containerItemsKeyAndLock); }
+            get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
         }
 
         internal void Decorate(object sender, ExpressionBuiltEventArgs e)

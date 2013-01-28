@@ -98,12 +98,6 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>
-        /// Gets the list dependencies of the registration that are currently known. This collection can be
-        /// altered to reflect the situation when the 
-        /// <see cref="ExpressionBuiltEventArgs.Expression">Expression</see> property has been replaced.
-        /// </summary>
-        /// <value>The list dependencies of the registration that are currently known.</value>
         internal Collection<KnownRelationship> KnownRelationships { get; set; }
     }
 }

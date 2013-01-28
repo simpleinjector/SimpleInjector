@@ -806,22 +806,6 @@ namespace SimpleInjector
             }
         }
 
-        private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
-        {
-            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
-            
-            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
-
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableServiceType, 
-                castedCollection, this);
-
-            this.AddRegistration(enumerableServiceType, registration);
-
-            this.collectionsToValidate[serviceType] = readOnlyCollection;
-        }
-
         /// <summary>
         /// Verifies the <b>Container</b>. This method will call all registered delegates, 
         /// iterate registered collections and throws an exception if there was an error.
@@ -874,6 +858,22 @@ namespace SimpleInjector
             }
 
             return errorMessage == null;
+        }
+
+        private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
+        {
+            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
+
+            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
+
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableServiceType,
+                castedCollection, this);
+
+            this.AddRegistration(enumerableServiceType, registration);
+
+            this.collectionsToValidate[serviceType] = readOnlyCollection;
         }
 
         private void AddRegistration(Type key, Registration registration)

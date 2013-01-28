@@ -35,10 +35,10 @@ namespace SimpleInjector.Analysis
         {
             var registrations = container.GetCurrentRegistrations();
 
-            var autoRegisteredServices = new HashSet<Type>((
+            var autoRegisteredServices = new HashSet<Type>(
                 from producer in container.GetCurrentRegistrations()
                 where producer.IsContainerAutoRegistered
-                select producer.ServiceType));
+                select producer.ServiceType);
 
             var registrationsThatDependOnAnUnregisteredType = (
                 from registration in registrations

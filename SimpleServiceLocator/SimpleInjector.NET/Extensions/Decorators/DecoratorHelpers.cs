@@ -168,5 +168,81 @@ namespace SimpleInjector.Extensions.Decorators
 
             return expression;
         }
+
+        internal static bool DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor)
+        {
+            int numberOfServiceTypeDependencies =
+                GetNumberOfServiceTypeDependencies(serviceType, decoratorConstructor);
+
+            return numberOfServiceTypeDependencies == 1;
+        }
+
+        internal static int GetNumberOfServiceTypeDependencies(Type serviceType,
+            ConstructorInfo decoratorConstructor)
+        {
+            var validServiceTypeArguments =
+                from parameter in decoratorConstructor.GetParameters()
+                where
+                    IsDecorateeDependencyParameter(parameter.ParameterType, serviceType) ||
+                    IsDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType)
+                select parameter;
+
+            return validServiceTypeArguments.Count();
+        }
+
+        internal static bool DecoratesBaseTypes(Type serviceType, ConstructorInfo decoratorConstructor)
+        {
+            var baseTypes = GetValidDecoratorConstructorArgumentTypes(serviceType,
+                decoratorConstructor.DeclaringType);
+
+            var constructorParameters = decoratorConstructor.GetParameters();
+
+            // For a type to be a decorator, one of its constructor parameter types must exactly match with
+            // one of the interfaces it implements or base types it inherits from.
+            var decoratorParameters =
+                from baseType in baseTypes
+                from parameter in constructorParameters
+                where parameter.ParameterType == baseType ||
+                    parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType)
+                select parameter;
+
+            return decoratorParameters.Any();
+        }
+
+        internal static Type[] GetValidDecoratorConstructorArgumentTypes(Type serviceType, Type decoratorType)
+        {
+            return (
+                from baseType in decoratorType.GetBaseTypesAndInterfaces()
+                where IsDecorateeDependencyParameter(baseType, serviceType)
+                select baseType)
+                .ToArray();
+        }
+
+        // Checks if the given parameterType can function as the decorated instance of the given service type.
+        private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
+        {
+            if (!parameterType.IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
+            {
+                return false;
+            }
+
+            Type funcArgumentType = parameterType.GetGenericArguments()[0];
+
+            return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
+        }
+
+        // Checks if the given parameterType can function as the decorated instance of the given service type.
+        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType)
+        {
+            if (parameterType == serviceType)
+            {
+                return true;
+            }
+
+            return
+                serviceType.IsGenericType &&
+                parameterType.IsGenericType &&
+                serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
+        }
     }
 }

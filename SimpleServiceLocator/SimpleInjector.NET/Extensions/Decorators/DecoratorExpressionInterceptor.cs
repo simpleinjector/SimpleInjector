@@ -79,6 +79,16 @@ using SimpleInjector.Lifestyles;
             get;
         }
 
+        protected IConstructorResolutionBehavior ResolutionBehavior
+        {
+            get { return this.Container.Options.ConstructorResolutionBehavior; }
+        }
+
+        private IConstructorInjectionBehavior InjectionBehavior
+        {
+            get { return this.Container.Options.ConstructorInjectionBehavior; }
+        }
+
         // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
         // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
         // get raised by multiple threads at the same time (especially for types resolved using
@@ -96,7 +106,7 @@ using SimpleInjector.Lifestyles;
         {
             lock (key)
             {
-                var threadLocal = 
+                var threadLocal =
                     (ThreadLocal<Dictionary<Type, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
 
                 if (threadLocal == null)
@@ -105,18 +115,8 @@ using SimpleInjector.Lifestyles;
                     this.Container.SetItem(key, threadLocal);
                 }
 
-                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<Type,ServiceTypeDecoratorInfo>());
+                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<Type, ServiceTypeDecoratorInfo>());
             }
-        }
-
-        protected IConstructorResolutionBehavior ResolutionBehavior
-        {
-            get { return this.Container.Options.ConstructorResolutionBehavior; }
-        }
-
-        private IConstructorInjectionBehavior InjectionBehavior
-        {
-            get { return this.Container.Options.ConstructorInjectionBehavior; }
         }
 
         protected bool MustDecorate(Type serviceType, out Type decoratorType)

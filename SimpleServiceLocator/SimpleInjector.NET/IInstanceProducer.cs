@@ -91,11 +91,6 @@ namespace SimpleInjector
             }
         }
 
-        internal KnownRelationship[] GetRelationships()
-        {
-            return this.registration.GetRelationships();
-        }
-
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
@@ -159,6 +154,11 @@ namespace SimpleInjector
 
                 throw;
             }
+        }
+
+        internal KnownRelationship[] GetRelationships()
+        {
+            return this.registration.GetRelationships();
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
