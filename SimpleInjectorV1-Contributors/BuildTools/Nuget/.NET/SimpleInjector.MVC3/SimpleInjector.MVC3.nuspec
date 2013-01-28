@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <version>{version}</version>
+    <authors>S. van Deursen</authors>
+    <owners>S. van Deursen</owners>
+    <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
+    <projectUrl>http://simpleinjector.codeplex.com/</projectUrl>
+    <iconUrl>http://simpleinjector.cuttingedge.it/SimpleInjector.ico</iconUrl>
+    <dependencies>
+      <dependency id="WebActivator" version="1.4.4" />
+      <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="SimpleInjector.Extensions" version="{version_Extensions}" />
+      <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
+    </frameworkAssemblies>
+    <id>SimpleInjector.MVC3</id>
+    <title>Simple Injector MVC3 Integration</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Extension for Simple Injector providing integration with ASP.NET MVC3.</description>
+    <summary>Extension for Simple Injector providing integration with ASP.NET MVC3.</summary>
+    <releaseNotes></releaseNotes>
+    <copyright>2011 S. van Deursen</copyright>
+    <language>en-US</language>
+    <tags>simpleinjector MVC MVC3 architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver ControllerFactory</tags>
+  </metadata>
+</package>
