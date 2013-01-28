@@ -53,6 +53,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
+            this.EnableLifetimeScoping(container);
+
             return new LifetimeScopeRegistration<TService, TImplementation>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds
@@ -62,6 +64,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {
+            this.EnableLifetimeScoping(container);
+
             return new LifetimeScopeRegistration<TService>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds,
@@ -69,9 +73,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             };
         }
 
-        protected override void OnRegistration(LifestyleRegistrationEventArgs e)
+        private void EnableLifetimeScoping(Container container)
         {
-            SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(e.Container);
+            try
+            {
+                SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(container);
+            }
+            catch (InvalidOperationException)
+            {
+                // Thrown when the container is locked.
+            }
         }
 
         private sealed class LifetimeScopeRegistration<TService> : LifetimeScopeRegistration<TService, TService>

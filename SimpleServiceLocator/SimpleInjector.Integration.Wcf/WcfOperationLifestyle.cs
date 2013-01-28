@@ -52,6 +52,8 @@ namespace SimpleInjector.Integration.Wcf
 
         public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
+            this.EnablePerWcfOperationLifestyle(container);
+
             return new WcfOperationRegistration<TService, TImplementation>(this, container)
             {
                 Dispose = this.disposeInstanceWhenOperationEnds
@@ -61,6 +63,8 @@ namespace SimpleInjector.Integration.Wcf
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {
+            this.EnablePerWcfOperationLifestyle(container);
+
             return new PerWcfOperationRegistration<TService>(this, container)
             {
                 Dispose = this.disposeInstanceWhenOperationEnds,
@@ -68,9 +72,16 @@ namespace SimpleInjector.Integration.Wcf
             };
         }
 
-        protected override void OnRegistration(LifestyleRegistrationEventArgs e)
+        private void EnablePerWcfOperationLifestyle(Container container)
         {
-            SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(e.Container);
+            try
+            {
+                SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
+            }
+            catch (InvalidOperationException)
+            {
+                // Thrown when the container is locked.
+            }
         }
 
         private sealed class PerWcfOperationRegistration<TService>

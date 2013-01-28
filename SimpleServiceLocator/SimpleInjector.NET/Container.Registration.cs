@@ -447,8 +447,6 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
 
-            lifestyle.OnRegistration(this);
-
             var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
 
             this.AddRegistration(typeof(TService), registration);
@@ -459,8 +457,6 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(lifestyle, "lifestyle");
-
-            lifestyle.OnRegistration(this);
 
             var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
 
@@ -482,8 +478,6 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
-            lifestyle.OnRegistration(this);
-
             var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
 
             this.AddRegistration(serviceType, registration);
@@ -499,8 +493,6 @@ namespace SimpleInjector
             Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
-
-            lifestyle.OnRegistration(this);
 
             var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 

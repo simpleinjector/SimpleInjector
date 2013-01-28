@@ -159,15 +159,6 @@ namespace SimpleInjector
             }
         }
 
-        internal void OnRegistration(Container container)
-        {
-            this.OnRegistration(new LifestyleRegistrationEventArgs(container));
-        }
-
-        protected virtual void OnRegistration(LifestyleRegistrationEventArgs e)
-        {
-        }
-
         private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
         {
             // Build the following delegate: () => (ServiceType)instanceCreator();
