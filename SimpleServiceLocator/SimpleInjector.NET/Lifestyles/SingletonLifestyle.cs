@@ -77,6 +77,11 @@ namespace SimpleInjector.Lifestyles
                 this.instance = instance;
             }
 
+            public override Type ImplementationType
+            {
+                get { return this.instance.GetType(); }
+            }
+
             public override Expression BuildExpression()
             {
                 this.EnsureInitializerHasRun();
@@ -131,6 +136,11 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator = instanceCreator;
             }
 
+            public override Type ImplementationType
+            {
+                get { return typeof(TService); }
+            }
+
             protected override TService CreateInstance()
             {
                 return this.BuildTransientDelegate<TService>(this.instanceCreator)();
@@ -145,6 +155,11 @@ namespace SimpleInjector.Lifestyles
             public SingletonLifestyleRegistration(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
+            }
+
+            public override Type ImplementationType
+            {
+                get { return typeof(TImplementation); }
             }
 
             protected override TService CreateInstance()

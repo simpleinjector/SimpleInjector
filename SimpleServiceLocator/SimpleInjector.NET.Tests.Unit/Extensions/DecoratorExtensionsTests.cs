@@ -1305,6 +1305,7 @@
                 "The wrapped instance should have the expected lifestyle (transient in this case).");
         }
 
+#if DEBUG
         [TestMethod]
         public void GetRegistration_TransientInstanceDecoratedWithTransientDecorator_ContainsTheExpectedRelationship()
         {
@@ -1445,6 +1446,7 @@
             // Assert
             Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
         }
+#endif
 
         [TestMethod]
         public void Lifestyle_TransientRegistrationDecoratedWithSingletonDecorator_GetsLifestyleOfDecorator()
@@ -1807,6 +1809,7 @@
         }
     }
 
+#if DEBUG
     internal class RelationshipInfo
     {
         public Type ImplementationType { get; set; }
@@ -1829,4 +1832,5 @@
             return EqualsTo(this, other);
         }
     }
+#endif
 }

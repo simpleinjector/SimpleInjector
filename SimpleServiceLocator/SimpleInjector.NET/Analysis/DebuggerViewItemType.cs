@@ -23,27 +23,22 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.Decorators
+namespace SimpleInjector.Analysis
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
-    using SimpleInjector.Lifestyles;
 
-    internal sealed class ExpressionRegistration : Registration
+    internal class DebuggerViewItemType
     {
-        private readonly Expression expression;
-
-        internal ExpressionRegistration(Expression expression, Lifestyle lifestyle, Container container)
-            : base(lifestyle, container)
+        public DebuggerViewItemType(Type type, DebuggerViewItem item)
         {
-            this.expression = expression;
+            this.Type = type;
+            this.Item = item;
         }
 
-        public override Expression BuildExpression()
-        {
-            return this.expression;
-        }
+        public Type Type { get; private set; }
+
+        public DebuggerViewItem Item { get; private set; }
     }
 }

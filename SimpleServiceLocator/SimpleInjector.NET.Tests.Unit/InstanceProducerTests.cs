@@ -37,6 +37,7 @@
             Assert.IsTrue(container.IsLocked());
         }
 
+#if DEBUG
         [TestMethod]
         public void GetRelationships_AfterVerification_ReturnsTheExpectedRelationships()
         {
@@ -58,5 +59,6 @@
             Assert.AreEqual(Lifestyle.Transient, relationships[0].Lifestyle);
             Assert.AreEqual(typeof(IUserRepository), relationships[0].Dependency.ServiceType);
         }
+#endif
     }
 }

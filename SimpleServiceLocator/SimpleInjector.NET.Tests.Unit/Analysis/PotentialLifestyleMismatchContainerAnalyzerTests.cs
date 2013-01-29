@@ -9,7 +9,7 @@
     public class PotentialLifestyleMismatchContainerAnalyzerTests
     {
         [TestMethod]
-        public void Analyse_Always_ReturnsAnItemWithThePotentialLifestyleMismatchesName()
+        public void Analyse_ValidConfiguration_ReturnsNull()
         {
             // Arrange
             var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
@@ -18,7 +18,29 @@
             var item = analyzer.Analyse(new Container());
 
             // Assert
-            Assert.IsNotNull(item);
+            Assert.IsNull(item, 
+                "By returning null, the results can be hidden by the GeneralWarningsContainerAnalyzer.");
+        }
+
+        [TestMethod]
+        public void Analyse_ContainerWithOneMismatch_ReturnsItemWithExpectedName()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, InMemoryUserRepository>();
+
+            // RealUserService depends on IUserRepository
+            container.RegisterSingle<RealUserService>();
+
+            var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
+
+            container.Verify();
+
+            // Act
+            var item = analyzer.Analyse(container);
+
+            // Assert
             Assert.AreEqual("Potential Lifestyle Mismatches", item.Name);
         }
 
@@ -41,7 +63,7 @@
             var item = analyzer.Analyse(container);
 
             // Assert
-            Assert.AreEqual("1 potential mismatches for 1 services.", item.Description);
+            Assert.AreEqual("1 possible mismatch for 1 service.", item.Description);
         }
 
         [TestMethod]
@@ -66,7 +88,7 @@
             var item = analyzer.Analyse(container);
 
             // Assert
-            Assert.AreEqual("2 potential mismatches for 2 services.", item.Description);
+            Assert.AreEqual("2 possible mismatches for 2 services.", item.Description);
         }
     }
 #endif

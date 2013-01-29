@@ -93,7 +93,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(decoratorType, this, e.Expression);
+            info.AddAppliedDecorator(decoratorType, info.ImplementationType, this, e.Expression);
         }
 
         private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,

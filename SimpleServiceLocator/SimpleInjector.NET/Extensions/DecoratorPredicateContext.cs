@@ -32,6 +32,7 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -110,7 +111,7 @@ namespace SimpleInjector.Extensions
             Type implementationType, Expression expression)
         {
             var lifestyle = ExtensionHelpers.DetermineLifestyle(expression);
-            var registration = new ExpressionRegistration(expression, lifestyle, container);
+            var registration = new ExpressionRegistration(expression, implementationType, lifestyle, container);
 
             // This producer will never be part of the container, but can still be used for analysis.
             var fakeProducer = new InstanceProducer(serviceType, registration);

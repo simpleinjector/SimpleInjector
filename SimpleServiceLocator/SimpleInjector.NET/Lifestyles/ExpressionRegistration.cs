@@ -25,21 +25,40 @@
 
 namespace SimpleInjector.Lifestyles
 {
+    using System;
     using System.Linq.Expressions;
 
     internal sealed class ExpressionRegistration : Registration
     {
         private readonly Expression expression;
+        private Type implementationType;
 
-        public ExpressionRegistration(Expression expression, Container container)
-            : base(GetLifestyleFor(expression), container)
+        internal ExpressionRegistration(Expression expression, Container container)
+            : this(expression, GetImplementationTypeFor(expression), GetLifestyleFor(expression), container)
+        {
+        }
+
+        internal ExpressionRegistration(Expression expression, Type implementationType, Lifestyle lifestyle, 
+            Container container)
+            : base(lifestyle, container)
         {
             this.expression = expression;
+            this.implementationType = implementationType;
+        }
+
+        public override Type ImplementationType
+        {
+            get { return this.implementationType; }
         }
 
         public override Expression BuildExpression()
         {
             return this.expression;
+        }
+
+        internal void SetImplementationType(Type implementationType)
+        {
+            this.implementationType = implementationType;
         }
 
         private static Lifestyle GetLifestyleFor(Expression expression)
@@ -55,6 +74,21 @@ namespace SimpleInjector.Lifestyles
             }
 
             return Lifestyle.Unknown;
+        }
+
+        private static Type GetImplementationTypeFor(Expression expression)
+        {
+            if (expression is ConstantExpression)
+            {
+                return ((ConstantExpression)expression).Type;
+            }
+
+            if (expression is NewExpression)
+            {
+                return ((NewExpression)expression).Constructor.DeclaringType;
+            }
+
+            return null;
         }
     }
 }

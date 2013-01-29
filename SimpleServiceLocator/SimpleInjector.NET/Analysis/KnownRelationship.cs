@@ -48,6 +48,7 @@ namespace SimpleInjector.Analysis
             this.Dependency = dependency;
         }
 
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
         public Type ImplementationType { get; private set; }
 
         public Lifestyle Lifestyle { get; private set; }

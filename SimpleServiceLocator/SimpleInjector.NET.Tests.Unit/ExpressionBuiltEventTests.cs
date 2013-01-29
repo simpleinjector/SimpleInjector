@@ -552,6 +552,7 @@
             }
         }
 
+#if DEBUG
         [TestMethod]
         public void KnownRelationships_AddingNullValue_ThrowsExpectedException()
         {
@@ -596,6 +597,7 @@
             // Act
             container.GetInstance<FakeUserService>();
         }
+#endif
 
         public class Order
         {

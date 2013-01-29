@@ -109,7 +109,7 @@
             if (expectedType != actualType)
             {
                 Assert.Fail(string.Format("Expected: {0}. Actual: {1}. {2}",
-                    Helpers.ToFriendlyName(expectedType), Helpers.ToFriendlyName(actualType), message));
+                    ToFriendlyName(expectedType), ToFriendlyName(actualType), message));
             }
         }
 
@@ -177,6 +177,15 @@
 
                 exception = exception.InnerException;
             }
+        }
+
+        private static string ToFriendlyName(Type type)
+        {
+#if DEBUG
+            return Helpers.ToFriendlyName(type);
+#else
+            return type.FullName;
+#endif
         }
     }
 }

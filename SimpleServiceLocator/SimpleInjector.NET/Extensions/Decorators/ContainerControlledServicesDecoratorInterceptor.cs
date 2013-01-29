@@ -32,6 +32,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Analysis;
+    using SimpleInjector.Lifestyles;
 
     // This class allows decorating collections of services with elements that are created by the container. 
     // Collections are registered using the following methods:
@@ -166,7 +167,9 @@ namespace SimpleInjector.Extensions.Decorators
 
             var decoratedExpression = this.BuildDecoratorExpression(decoratorConstructor, parameters);
 
-            var registration = new ExpressionRegistration(decoratedExpression, this.Lifestyle, this.Container);
+            var registration = new ExpressionRegistration(decoratedExpression, 
+                predicateContext.ImplementationType, this.Lifestyle, this.Container);
+
             var producer = new InstanceProducer(serviceType, registration);
 
             return predicateContext.Decorate(decoratorType, decoratedExpression, producer);

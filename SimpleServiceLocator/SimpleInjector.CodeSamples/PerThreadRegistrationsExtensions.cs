@@ -105,6 +105,11 @@
             {
             }
 
+            public override Type ImplementationType
+            {
+                get { return typeof(TImplementation); }
+            }
+
             public override Expression BuildExpression()
             {
                 if (this.instanceCreator == null)

@@ -19,7 +19,7 @@
 
             var invalidLifestyle = new FakeLifestyle();
             
-            var invalidRegistration = new ExpressionRegistration(invalidLifestyle, container)
+            var invalidRegistration = new FakeRegistration(invalidLifestyle, container)
             {
                 ExpressionToReturn = null
             };
@@ -39,7 +39,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "The ExpressionRegistration for the FakeLifestyle returned a null reference " + 
+                    "The FakeRegistration for the FakeLifestyle returned a null reference " + 
                     "from its BuildExpression method.", ex);
             }
         }
@@ -72,11 +72,16 @@
         }
     }
 
-    internal sealed class ExpressionRegistration : Registration
+    internal sealed class FakeRegistration : Registration
     {
-        public ExpressionRegistration(Lifestyle lifestyle, Container container) 
+        public FakeRegistration(Lifestyle lifestyle, Container container) 
             : base(lifestyle, container)
         {
+        }
+
+        public override Type ImplementationType
+        {
+            get { throw new NotImplementedException(); }
         }
 
         public Expression ExpressionToReturn { get; set; }

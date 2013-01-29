@@ -75,7 +75,7 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(container, "container");
 
-            return new HybridRegistration(typeof(TService), this.Test,
+            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.Test,
                 this.TrueLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this.FalseLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this, container);
@@ -86,7 +86,7 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(container, "container");
 
-            return new HybridRegistration(typeof(TService), this.Test,
+            return new HybridRegistration(typeof(TService), typeof(TService), this.Test,
                 this.TrueLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this.FalseLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this, container);
@@ -107,18 +107,26 @@ namespace SimpleInjector.Lifestyles
         private sealed class HybridRegistration : Registration
         {
             private readonly Type serviceType;
+            private readonly Type implementationType;
             private readonly Func<bool> test;
             private readonly Registration trueRegistration;
             private readonly Registration falseRegistration;
 
-            public HybridRegistration(Type serviceType, Func<bool> test, Registration trueRegistration,
-                Registration falseRegistration, Lifestyle lifestyle, Container container)
+            public HybridRegistration(Type serviceType, Type implementationType, Func<bool> test, 
+                Registration trueRegistration, Registration falseRegistration, 
+                Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
                 this.serviceType = serviceType;
+                this.implementationType = implementationType;
                 this.test = test;
                 this.trueRegistration = trueRegistration;
                 this.falseRegistration = falseRegistration;
+            }
+
+            public override Type ImplementationType 
+            {
+                get { return this.implementationType; }
             }
 
             public override Expression BuildExpression()

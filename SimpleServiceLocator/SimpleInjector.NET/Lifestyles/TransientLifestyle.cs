@@ -70,6 +70,11 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator = instanceCreator;
             }
 
+            public override Type ImplementationType
+            {
+                get { return typeof(TService); }
+            }
+
             public override Expression BuildExpression()
             {
                 return this.BuildTransientExpression<TService>(this.instanceCreator);
@@ -83,6 +88,11 @@ namespace SimpleInjector.Lifestyles
             internal TransientLifestyleRegistration(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
+            }
+
+            public override Type ImplementationType
+            {
+                get { return typeof(TImplementation); }
             }
 
             public override Expression BuildExpression()

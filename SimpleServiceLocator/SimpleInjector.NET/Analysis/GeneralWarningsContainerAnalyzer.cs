@@ -32,11 +32,15 @@ namespace SimpleInjector.Analysis
     {
         internal GeneralWarningsContainerAnalyzer()
         {
-            this.Add(new AutoRegisteredContainerAnalyzer());
+            this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
+            this.Add(new ContainerRegisteredContainerAnalyzer());
+            this.Add(new ShortCircuitContainerAnalyzer());
         }
 
         public DebuggerViewItem Analyse(Container container)
         {
+            const string WarningsName = "Configuration Warnings";
+
             var analysisResults = (
                 from analyzer in this
                 let result = analyzer.Analyse(container)
@@ -46,7 +50,7 @@ namespace SimpleInjector.Analysis
 
             if (!analysisResults.Any())
             {
-                return new DebuggerViewItem("Configuration warnings", "No warnings detected.");
+                return new DebuggerViewItem(WarningsName, "No warnings detected.");
             }
             else if (analysisResults.Length == 1)
             {
@@ -54,7 +58,7 @@ namespace SimpleInjector.Analysis
             }
             else
             {
-                return new DebuggerViewItem("Configuration warnings", "See list below for all warnings.",
+                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
                     analysisResults);
             }
         }

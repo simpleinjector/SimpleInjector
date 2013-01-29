@@ -113,6 +113,11 @@ namespace SimpleInjector.Integration.Wcf
             {
             }
 
+            public override Type ImplementationType
+            {
+                get { return typeof(TImplementation); }
+            }
+
             internal bool Dispose { get; set; }
 
             public override Expression BuildExpression()

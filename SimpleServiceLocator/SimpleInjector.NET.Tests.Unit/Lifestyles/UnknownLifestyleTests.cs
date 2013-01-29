@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit.Lifestyles
+﻿#if DEBUG
+namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
 
@@ -27,7 +28,6 @@
                 "the Instance field must always return the same instance.");
         }
 
-#if DEBUG
         [TestMethod]
         public void ComponentLength_Always_ReturnsTheSameLengthAsTheSingletonLifestyle()
         {
@@ -39,7 +39,6 @@
         {
             Assert.AreEqual(Lifestyle.Transient.ComponentLength, Lifestyle.Unknown.DependencyLength);
         }
-#endif
 
         [TestMethod]
         public void CreateRegistrationTServiceTImplementation_Always_ThrowsException()
@@ -84,3 +83,4 @@
         }
     }
 }
+#endif

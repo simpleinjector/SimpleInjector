@@ -9,6 +9,54 @@
     using SimpleInjector.Analysis;
     using SimpleInjector.Extensions;
 
+#if !SILVERLIGHT
+
+    public interface ILogger
+    {
+    }
+
+    public interface ISomeGeneric<T>
+    {
+    }
+
+    public interface IDoThings<T>
+    {
+    }
+
+    public class ConcreteShizzle
+    {
+    }
+
+    public class FakeLogger : ILogger
+    {
+        public FakeLogger(ConcreteShizzle shizzle, ConcreteThing thing)
+        {
+        }
+    }
+
+    public interface IConcreteThing 
+    {
+    }
+
+    public class ConcreteThing : IConcreteThing 
+    { 
+    }
+    
+    public class SomeGeneric<T> : ISomeGeneric<T>
+    {
+        public SomeGeneric(ILogger logger, IComparable bla, ConcreteThing thing)
+        {
+        }
+    }
+
+    public class ThingDoer<T> : IDoThings<T>
+    {
+        public ThingDoer(ILogger logger, IComparable foo)
+        {
+        }
+    }
+#endif
+
 #if DEBUG
     [TestClass]
     public class ContainerDebugViewTests
@@ -131,37 +179,31 @@
             // Arrange
             var container = new Container();
 
+            // Forces a lifestyle mismatch
+            container.RegisterSingle<ILogger, FakeLogger>();
+
             container.Verify();
 
             // Act
             var debugView = new ContainerDebugView(container);
 
+            var warningsItem = debugView.Items.Single(item => item.Name == "Configuration Warnings");
+
+            var items = warningsItem.Value as DebuggerViewItem[];
+
             // Assert
-            Assert.IsTrue(debugView.Items.Any(item => item.Name == "Potential Lifestyle Mismatches"));
+            Assert.IsTrue(items.Any(item => item.Name == "Potential Lifestyle Mismatches"));
         }
 
 #if !SILVERLIGHT
-
-        public interface ILogger 
-        { 
-        }
-
-        public class ConcreteShizzle 
-        { 
-        }
-
-        public class FakeLogger : ILogger 
-        {
-            public FakeLogger(ConcreteShizzle shizzle)
-            {
-            }
-        }
 
         [TestMethod]
         public void MethodUnderTest_Scenario_Behavior()
         {
             // Arrange
             var container = new Container();
+
+            container.Register<IConcreteThing, ConcreteThing>(Lifestyle.Singleton);
 
             container.Register<ILogger, FakeLogger>(Lifestyle.Transient);
             container.Register<IComparable>(() => 4);
@@ -176,9 +218,8 @@
                 where !type.IsGenericTypeDefinition
                 select type;
 
-            this.RegisterAll(container, allTypes.Take(1000));
-
-            // new ContainerDebugView(container);
+            this.RegisterAll(container, allTypes.Take(100));
+                        
             var watch = Stopwatch.StartNew();
 
             Parallel.ForEach(container.GetCurrentRegistrations(), registration =>
@@ -188,6 +229,8 @@
 
             var ms1 = watch.ElapsedMilliseconds;
             container.Verify();
+
+            // new ContainerDebugView(container);
             var ms2 = watch.ElapsedMilliseconds;
 
             Console.WriteLine();
@@ -212,6 +255,7 @@
             }
         }
 
+        [DebuggerStepThrough]
         public static void Register<T>(Container container)
         {
             container.Register<ISomeGeneric<T>, SomeGeneric<T>>(Lifestyle.Singleton);
@@ -219,27 +263,6 @@
             container.Register<IDoThings<T>, ThingDoer<T>>(Lifestyle.Singleton);
         }       
 
-        public interface ISomeGeneric<T>
-        {
-        }
-
-        public interface IDoThings<T>
-        {
-        }
-
-        public class SomeGeneric<T> : ISomeGeneric<T>
-        {
-            public SomeGeneric(ILogger logger, IComparable bla)
-            {
-            }
-        }
-
-        public class ThingDoer<T> : IDoThings<T>
-        {
-            public ThingDoer(ILogger logger, IComparable foo)
-            {
-            }
-        }
 #endif
 
         public class UserRepositoryDecorator : IUserRepository

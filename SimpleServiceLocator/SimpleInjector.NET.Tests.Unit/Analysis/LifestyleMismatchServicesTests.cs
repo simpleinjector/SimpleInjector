@@ -377,6 +377,11 @@
             {
             }
 
+            public override Type ImplementationType
+            {
+                get { throw new NotImplementedException(); }
+            }
+
             public override Expression BuildExpression()
             {
                 throw new NotImplementedException();

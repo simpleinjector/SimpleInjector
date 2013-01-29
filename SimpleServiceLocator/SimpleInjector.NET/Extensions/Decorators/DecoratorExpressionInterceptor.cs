@@ -174,15 +174,27 @@ using SimpleInjector.Lifestyles;
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             Type registeredServiceType, Lifestyle lifestyle)
         {
-            var producer =
-                new InstanceProducer(registeredServiceType,
-                    new ExpressionRegistration(originalExpression, lifestyle, this.Container));
+            ExpressionRegistration registration = null;
 
-            return this.GetServiceTypeInfo(originalExpression, registeredServiceType, producer);
+            Func<InstanceProducer> producerBuilder = () =>
+            {
+                registration = new ExpressionRegistration(originalExpression, null, lifestyle, this.Container);
+
+                return new InstanceProducer(registeredServiceType, registration);
+            };
+
+            var info = this.GetServiceTypeInfo(originalExpression, registeredServiceType, producerBuilder);
+
+            if (registration != null)
+            {
+                registration.SetImplementationType(info.ImplementationType);
+            }
+
+            return info;
         }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            Type registeredServiceType, InstanceProducer producer)
+            Type registeredServiceType, Func<InstanceProducer> producerBuilder)
         {
             var predicateCache = this.ThreadStaticServiceTypePredicateCache;
 
@@ -190,6 +202,8 @@ using SimpleInjector.Lifestyles;
             {
                 Type implementationType =
                     ExtensionHelpers.DetermineImplementationType(originalExpression, registeredServiceType);
+
+                var producer = producerBuilder();
 
                 predicateCache[registeredServiceType] =
                     new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);

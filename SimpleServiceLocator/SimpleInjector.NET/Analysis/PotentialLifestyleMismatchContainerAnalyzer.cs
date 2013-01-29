@@ -25,7 +25,6 @@
 
 namespace SimpleInjector.Analysis
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -44,118 +43,71 @@ namespace SimpleInjector.Analysis
                 from producer in container.GetCurrentRegistrations()
                 from dependency in producer.GetRelationships()
                 where LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency)
-                select new ProducerRelationshipPair(producer, dependency))
+                select new DebuggerViewItemType(producer.ServiceType, BuildMismatchViewItem(dependency)))
                 .ToArray();
 
             if (!mismatches.Any())
             {
-                return new DebuggerViewItem(DebuggerViewName, "No possible mismatches found.", null);
-            }
-            else
-            {
-                var serviceCount = mismatches.Select(m => m.Producer.ServiceType).Distinct().Count();
-
-                return new DebuggerViewItem(
-                    DebuggerViewName,
-                    mismatches.Count() + " potential mismatches for " + serviceCount + " services.",
-                    BuildViews(mismatches));
-            }
-        }
-
-        private static DebuggerViewItem[] BuildViews(IEnumerable<ProducerRelationshipPair> mismatches,
-            int level = 0)
-        {
-            return (
-                from mismatch in mismatches
-                let serviceType = mismatch.Producer.ServiceType
-                group mismatch by MakeTypePartiallyGenericUpToLevel(serviceType, level) into mismatchGroup
-                select BuildGroupedViewForGroupType(mismatchGroup.Key, mismatchGroup, level))
-                .ToArray();
-        }
-
-        private static Type MakeTypePartiallyGenericUpToLevel(Type serviceType, int level)
-        {
-            return TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(serviceType, level);
-        }
-
-        private static DebuggerViewItem BuildGroupedViewForGroupType(Type groupType,
-            IEnumerable<ProducerRelationshipPair> mismatches, int level)
-        {
-            if (groupType.ContainsGenericParameters)
-            {
-                return BuildGenericTypeGroupView(groupType, mismatches, level);
-            }
-            else
-            {
-                return BuildSingleInstanceView(groupType, mismatches);
-            }
-        }
-
-        private static DebuggerViewItem BuildGenericTypeGroupView(Type groupType, 
-            IEnumerable<ProducerRelationshipPair> mismatches, int level)
-        {
-            DebuggerViewItem[] views = BuildViews(mismatches, level + 1);
-
-            if (views.Length == 1)
-            {
-                // This flatterns the hierarcy when there is just one item in the group.
-                return views[0];
+                return null;
             }
 
-            var mismatchCount = mismatches.Count();
-            var serviceCount = mismatches.Select(m => m.Producer.ServiceType).Distinct().Count();
+            var serviceCount = mismatches.Select(m => m.Type).Distinct().Count();
 
             return new DebuggerViewItem(
-                name: Helpers.ToFriendlyName(groupType),
-                description: mismatchCount + " possible mismatches for " + serviceCount + " services.",
-                value: views);
+                "Potential Lifestyle Mismatches", 
+                DescribeGroup(mismatches),
+                GroupMismatches(mismatches));
         }
 
-        private static DebuggerViewItem BuildSingleInstanceView(Type serviceType,
-            IEnumerable<ProducerRelationshipPair> mismatches)
+        private static DebuggerViewItem[] GroupMismatches(DebuggerViewItemType[] mismatches)
         {
-            var mismatchViews = (
-                from mismatch in mismatches
-                select BuildMismatchView(mismatch))
-                .ToArray();
+            var grouper = new DebuggerViewItemGenericTypeGrouper(DescribeGroup, DescribeItem);
 
-            string description = mismatchViews.Length == 1 ? (string)mismatchViews[0].Description :
-                mismatchViews.Length + " possible mismatches.";
-
-            return new DebuggerViewItem(
-                name: Helpers.ToFriendlyName(serviceType),
-                description: description,
-                value: mismatchViews);
+            return grouper.Group(mismatches);
         }
 
-        private static DebuggerViewItem BuildMismatchView(ProducerRelationshipPair mismatch)
+        private static string DescribeGroup(IEnumerable<DebuggerViewItemType> group)
         {
-            string description = BuildRelationshipDescription(mismatch.Relationship);
+            var mismatchCount = group.Count();
+            var serviceCount = group.Select(item => item.Type).Distinct().Count();
 
-            return new DebuggerViewItem("Mismatch", description, mismatch.Relationship);
+            return 
+                mismatchCount + " possible " + MismatchPlural(mismatchCount) +  
+                " for " + serviceCount + " " + ServicePlural(serviceCount) + ".";
+        }
+
+        private static string ServicePlural(int number)
+        {
+            return "service" + (number != 1 ? "s" : string.Empty);
+        }
+
+        private static string MismatchPlural(int number)
+        {
+            return "mismatch" + (number != 1 ? "es" : string.Empty);
+        }
+
+        private static string DescribeItem(IEnumerable<DebuggerViewItem> item)
+        {
+            int count = item.Count();
+
+            return count + " possible " + MismatchPlural(count) + ".";
+        }
+
+        private static DebuggerViewItem BuildMismatchViewItem(KnownRelationship relationship)
+        {
+            string description = BuildRelationshipDescription(relationship);
+
+            return new DebuggerViewItem("Mismatch", description, relationship);
         }
 
         private static string BuildRelationshipDescription(KnownRelationship relationship)
         {
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "{0} ({1}) depends on {2} ({3}).",
                 Helpers.ToFriendlyName(relationship.ImplementationType),
                 relationship.Lifestyle.Name,
                 Helpers.ToFriendlyName(relationship.Dependency.ServiceType),
                 relationship.Dependency.Lifestyle.Name);
-        }
-
-        private sealed class ProducerRelationshipPair
-        {
-            public ProducerRelationshipPair(InstanceProducer producer, KnownRelationship relationship)
-            {
-                this.Producer = producer;
-                this.Relationship = relationship;
-            }
-
-            public InstanceProducer Producer { get; private set; }
-
-            public KnownRelationship Relationship { get; private set; }
         }
     }
 }

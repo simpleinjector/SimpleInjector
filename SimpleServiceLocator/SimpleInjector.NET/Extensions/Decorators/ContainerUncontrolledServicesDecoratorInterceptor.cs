@@ -91,7 +91,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceInfo.AddAppliedDecorator(decoratorType, this, decoratedExpression);
+            serviceInfo.AddAppliedDecorator(decoratorType, serviceType, this, decoratedExpression);
 
             e.KnownRelationships.AddRange(relationships);
         }

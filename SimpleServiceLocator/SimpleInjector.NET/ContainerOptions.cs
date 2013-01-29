@@ -26,6 +26,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics;
     using SimpleInjector.Advanced;
 
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
@@ -57,8 +58,13 @@ namespace SimpleInjector
     /// </example>
     public class ContainerOptions
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorVerificationBehavior verificationBehavior;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorInjectionBehavior injectionBehavior;
 
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
@@ -136,6 +142,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal Container Container { get; set; }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)

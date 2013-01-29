@@ -73,9 +73,12 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
-    <Compile Include="Analysis\AutoRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Analysis\ContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Analysis\ShortCircuitContainerAnalyzer.cs" />
     <Compile Include="Analysis\ContainerDebugView.cs" />
     <Compile Include="Analysis\DebuggerViewItem.cs" />
+    <Compile Include="Analysis\DebuggerViewItemGenericTypeGrouper.cs" />
+    <Compile Include="Analysis\DebuggerViewItemType.cs" />
     <Compile Include="Analysis\GeneralWarningsContainerAnalyzer.cs" />
     <Compile Include="Analysis\IContainerAnalyzer.cs" />
     <Compile Include="Analysis\KnownDependencyCollection.cs" />
@@ -96,7 +99,6 @@
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
-    <Compile Include="Extensions\Decorators\ExpressionRegistration.cs" />
     <Compile Include="Extensions\Decorators\IDecoratableEnumerable.cs" />
     <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
@@ -110,7 +112,6 @@
     <Compile Include="Analysis\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
     <Compile Include="Lifestyles\Registration.cs" />
-    <Compile Include="Lifestyles\LifestyleRegistrationEventArgs.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />
     <Compile Include="Lifestyles\TransientLifestyle.cs" />
     <Compile Include="Lifestyles\UnknownLifestyle.cs" />

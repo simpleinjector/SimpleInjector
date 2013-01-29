@@ -159,9 +159,6 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInfo.cs">
       <Link>Extensions\Decorators\DecoratorInfo.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ExpressionRegistration.cs">
-      <Link>Extensions\Decorators\ExpressionRegistration.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IDecoratableEnumerable.cs">
       <Link>Extensions\Decorators\IDecoratableEnumerable.cs</Link>
     </Compile>
@@ -201,9 +198,6 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridLifestyle.cs">
       <Link>Lifestyles\HybridLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Lifestyles\LifestyleRegistrationEventArgs.cs">
-      <Link>Lifestyles\LifestyleRegistrationEventArgs.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\Registration.cs">
       <Link>Lifestyles\Registration.cs</Link>
     </Compile>
@@ -230,6 +224,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilverlightSpecific\ThreadLocal.cs" />
+    <Compile Include="SilverlightSpecific\ThreadLocalValue.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

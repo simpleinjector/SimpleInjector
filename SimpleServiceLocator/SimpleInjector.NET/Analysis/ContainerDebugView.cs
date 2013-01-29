@@ -33,13 +33,14 @@ namespace SimpleInjector.Analysis
 
     internal sealed class ContainerDebugView
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static IEnumerable<IContainerAnalyzer> analyzers = new IContainerAnalyzer[]
         {
-            new PotentialLifestyleMismatchContainerAnalyzer(),
             new GeneralWarningsContainerAnalyzer(),
             new RegistrationsContainerAnalyzer()
         };
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Container container;
         
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",

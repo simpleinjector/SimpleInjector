@@ -46,6 +46,8 @@ namespace SimpleInjector.Lifestyles
             this.Lifestyle = lifestyle;
             this.Container = container;
         }
+        
+        public abstract Type ImplementationType { get; }
 
         public Lifestyle Lifestyle { get; private set; }
 

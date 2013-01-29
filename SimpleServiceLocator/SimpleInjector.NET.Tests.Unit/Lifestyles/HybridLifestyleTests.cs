@@ -256,6 +256,7 @@
             Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
         }
 
+#if DEBUG
         [TestMethod]
         public void Relationships_HybridRegistrationWithOneDependency_ReturnsThatDependencyWithExpectedLifestyle()
         {
@@ -283,5 +284,6 @@
                 "must merge the two lists two one and use it's own lifestyle since the the real lifestyle " +
                 "is not singleton or transient, but hybrid");
         }
+#endif
     }
 }

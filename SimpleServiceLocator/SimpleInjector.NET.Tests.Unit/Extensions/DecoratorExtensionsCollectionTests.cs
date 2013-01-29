@@ -1282,6 +1282,7 @@
                 "Both handlers are expected to be initialized.");
         }
 
+#if DEBUG
         [TestMethod]
         public void GetRegistration_ContainerControlledCollectionWithDecorator_ContainsExpectedListOfRelationships()
         {
@@ -1352,6 +1353,7 @@
             Assert.AreEqual(1, relationships.Length);
             Assert.IsTrue(expectedRelationship.Equals(relationships[0]));
         }
+#endif
 
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(

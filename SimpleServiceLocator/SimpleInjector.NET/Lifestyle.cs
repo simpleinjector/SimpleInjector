@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
+
     using SimpleInjector.Lifestyles;
 
     [DebuggerDisplay("{Name,nq}")]
@@ -46,13 +47,18 @@ namespace SimpleInjector
         /// </summary>
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal static readonly Lifestyle Unknown = new UnknownLifestyle();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceTImplementationMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object, object>(null));
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly string name;
 
         protected Lifestyle(string name)
@@ -67,11 +73,13 @@ namespace SimpleInjector
             get { return this.name; } 
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal virtual int ComponentLength 
         {
             get { return this.Length; }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal virtual int DependencyLength 
         {
             get { return this.Length; }
