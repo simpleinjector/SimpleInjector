@@ -32,6 +32,8 @@ Version vFuture
 		-[Core] The Container.GetInitializer<TService>() method has been removed from the container. The
 		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
 		 SimpleInjector.Advanced namespace. (work item 18349).
+		-[Core] The types System.Type and System.String are considered ambiguous and are now disallowed from
+		 being registered directly. An exception is thrown when this happens.
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
 		-[Extensions/Core] RegisterAll, RegisterDecorator, RegistereOpenGeneric, and RegisterManyForOpenGeneric
