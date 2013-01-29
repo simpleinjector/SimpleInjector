@@ -1,12 +1,12 @@
 ﻿namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class DefaultConstructorResolutionBehaviorTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetConstructor_WithNullArgument1_ThrowsException()
         {
@@ -17,7 +17,7 @@
             behavior.GetConstructor(null, typeof(TypeWithSinglePublicDefaultConstructor));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetConstructor_WithNullArgument2_ThrowsException()
         {
@@ -28,7 +28,7 @@
             behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor), null);
         }
 
-        [TestMethod]
+        [Test]
         public void IsRegistrationPhase_InstancesResolvedFromTheContainer_ReturnsFalse()
         {
             // Arrange
@@ -42,7 +42,7 @@
             Assert.IsNotNull(constructor, "The constructor was expected to be returned.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetConstructor_TypeWithMultiplePublicConstructors_ThrowsExpectedException()
         {
             // Arrange
@@ -65,7 +65,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetConstructor_TypeWithSingleInternalConstructor_ThrowsExpectedException()
         {
             // Arrange

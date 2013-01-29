@@ -3,9 +3,9 @@
     using System;
     using System.Linq.Expressions;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class ExpressionBuiltEventTests
     {
         public interface IValidator<T>
@@ -19,7 +19,7 @@
         }
 
         // NOTE: This test is the example code of the XML documentation of the Container.ExpressionBuilt event.
-        [TestMethod]
+        [Test]
         public void TestExpressionBuilt()
         {
             // Arrange
@@ -52,11 +52,11 @@
             var customerValidator = container.GetInstance<IValidator<Customer>>();
 
             // Assert
-            Assert.IsInstanceOfType(orderValidator, typeof(MonitoringValidator<Order>));
-            Assert.IsInstanceOfType(customerValidator, typeof(MonitoringValidator<Customer>));
+            Assert.That(orderValidator, Is.InstanceOf<MonitoringValidator<Order>>());
+            Assert.That(customerValidator, Is.InstanceOf<MonitoringValidator<Customer>>());
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ExpressionReplacedOnRootType_ReturnsTheExpectedTypeAndLifeStyle()
         {
             // Arrange
@@ -79,12 +79,12 @@
             var actual2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(actual1, typeof(InMemoryUserRepository));
+            Assert.That(actual1, Is.InstanceOf<InMemoryUserRepository>());
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ExpressionReplacedOnNonRootType_ReturnsTheExpectedTypeAndLifeStyle()
         {
             // Arrange
@@ -107,12 +107,12 @@
             var actual2 = container.GetInstance<RealUserService>().Repository;
 
             // Assert
-            Assert.IsInstanceOfType(actual1, typeof(InMemoryUserRepository));
+            Assert.That(actual1, Is.InstanceOf<InMemoryUserRepository>());
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredTransientWithInterceptor_CallsEventOnce()
         {
             // Arrange
@@ -138,7 +138,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnServiceType_CallsEventOnce()
         {
             // Arrange
@@ -166,7 +166,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredTransientWithInterceptorAndInitializerOnImplementation_CallsEventOnce()
         {
             // Arrange
@@ -194,7 +194,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredTransientWithInterceptor_EventArgsContainsAnExpression()
         {
             // Arrange
@@ -212,7 +212,7 @@
             container.GetInstance<IUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledMultipleTimesOnTypeRegisteredTransientWithInterceptor_CallsEventOnce()
         {
             // Arrange
@@ -239,7 +239,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredSingletonWithInterceptor_CallsEventTwice()
         {
             // Arrange
@@ -267,7 +267,7 @@
                 "once when the ConstantExpression gets built.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredFuncWithInterceptor_CallsEventOnce()
         {
             // Arrange
@@ -293,7 +293,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteTypeWithInterceptor_CallsEventOnce()
         {
             // Arrange
@@ -317,7 +317,7 @@
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledOnMultipleTypesThatDependOnAInterceptedType_CallsEventOnce()
         {
             // Arrange
@@ -346,7 +346,7 @@
                 "The event is expected to called just once for the IUserRepository for performance reasons.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledOnInterceptedTypeAndTypeThatDependsOnTheInterceptedType_CallsEventOnce()
         {
             // Arrange
@@ -376,9 +376,9 @@
                 "The event is expected to called just once for the IUserRepository for performance reasons.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException),
-            "Registration of an event after the container is locked is illegal.")]
+            UserMessage = "Registration of an event after the container is locked is illegal.")]
         public void AddExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -393,9 +393,9 @@
             container.ExpressionBuilt += (s, e) => { };
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException),
-            "Removal of an event after the container is locked is illegal.")]
+           UserMessage = "Removal of an event after the container is locked is illegal.")]
         public void RemoveExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -410,7 +410,7 @@
             container.ResolveUnregisteredType -= (s, e) => { };
         }
 
-        [TestMethod]
+        [Test]
         public void RemoveExpressionBuilt_BeforeContainerHasBeenLocked_Succeeds()
         {
             // Arrange
@@ -436,7 +436,7 @@
             Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
@@ -448,7 +448,7 @@
             eventArgs.Expression = null;
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ExpressionBuiltWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange

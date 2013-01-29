@@ -3,13 +3,13 @@
     using System;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterByFuncTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -20,8 +20,8 @@
             container.Register<UserServiceBase>(() => new FakeUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterByFunc_CalledAfterRegisterSingleOnSameType_ThrowsException()
         {
             // Arrange
@@ -32,8 +32,8 @@
             container.Register<IUserRepository>(() => new InMemoryUserRepository());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetInstance.")]
         public void RegisterByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -45,8 +45,8 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetAllInstances.")]
         public void RegisterByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -61,7 +61,7 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterByFunc_WithNullArgument_ThrowsException()
         {
@@ -74,7 +74,7 @@
             container.Register<IUserRepository>(invalidInstanceCreator);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstanceByKey_RegisteredWithFuncReturningNull_ThrowsException()
         {
@@ -86,7 +86,7 @@
             container.GetInstance<IUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegister_Succeeds()
         {
             // Arrange
@@ -100,7 +100,7 @@
             container.GetInstance<RealUserService>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ThrowingDelegateRegisteredUsingRegisterByFunc_ThrowsActivationExceptionWithExpectedInnerException()
         {
             // Arrange

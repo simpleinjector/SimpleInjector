@@ -1,11 +1,11 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class ConsistencyTests
     {
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledFromMultipleThreads_Succeeds()
         {
             // Arrange

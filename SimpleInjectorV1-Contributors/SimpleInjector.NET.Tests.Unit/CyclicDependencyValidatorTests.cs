@@ -3,9 +3,9 @@
     using System;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class CyclicDependencyValidatorTests
     {
         private interface IOne
@@ -16,7 +16,7 @@
         {
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTypeDependingOnItself_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
@@ -42,7 +42,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_Throws()
         {
             // Arrange
@@ -62,7 +62,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_AlsoFailsOnConsecutiveCalls()
         {
             // Arrange
@@ -91,7 +91,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfViaASingletonType_Throws()
         {
             // Arrange
@@ -114,7 +114,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaTransientType_Throws()
         {
             // Arrange
@@ -137,7 +137,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaSingletonType_Throws()
         {
             // Arrange
@@ -161,7 +161,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
             // Arrange
@@ -185,7 +185,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
             // Arrange
@@ -209,7 +209,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
         {
             // Arrange
@@ -232,7 +232,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingTypeDependingDirectlyOnItselfThroughDelegateRegistration_Throws()
         {
             // Arrange
@@ -254,7 +254,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledSimultaneouslyToRequestTheSameType_ShouldNotTriggerTheRecursionProtection()
         {
             // Arrange
@@ -279,7 +279,7 @@
             Assert_FinishedWithoutExceptions(thread3);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledMultipleTimesOnRegisteredTypeWithFailingDelegate_WillAlwaysFailWithTheSameException()
         {
             // Arrange
@@ -318,7 +318,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RecursiveDependencyInTransientInitializer_ThrowsMeaningfulError()
         {
             // Arrange
@@ -348,7 +348,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledMultipleTimesOnAnInvalidRegistrationOfSingletonFunc_ShouldNeverTriggerACyclicDependencyError()
         {
             // Arrange

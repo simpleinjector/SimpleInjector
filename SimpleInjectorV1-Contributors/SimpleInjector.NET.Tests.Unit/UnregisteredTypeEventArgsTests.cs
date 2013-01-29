@@ -3,12 +3,12 @@
     using System;
     using System.Linq.Expressions;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class UnregisteredTypeEventArgsTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterFunc_WithNullArgument_ThrowsException()
         {
@@ -21,7 +21,7 @@
             e.Register(invalidFunc);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterExpression_WithNullArgument_ThrowsException()
         {
@@ -34,7 +34,7 @@
             e.Register(invalidExpression);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void RegisterExpression_CalledTwice_ThrowsException()
         {
@@ -47,7 +47,7 @@
             e.Register(Expression.Constant(null));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void RegisterFunc_CalledTwice_ThrowsException()
         {
@@ -60,7 +60,7 @@
             e.Register(() => null);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void RegisterExpression_CalledAfterCallingRegisterFun_ThrowsException()
         {
@@ -73,7 +73,7 @@
             e.Register(Expression.Constant(null));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void RegisterFunc_CalledAfterCallingRegisterExpression_ThrowsException()
         {

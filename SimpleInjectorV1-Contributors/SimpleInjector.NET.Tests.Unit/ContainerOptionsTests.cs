@@ -4,13 +4,13 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
     using SimpleInjector.Advanced;
 
-    [TestClass]
+    [TestFixture]
     public class ContainerOptionsTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ContainerConstructor_SuppliedWithNullContainerOptionsArgument_ThrowsException()
         {
@@ -21,7 +21,7 @@
             new Container(invalidOptions);
         }
 
-        [TestMethod]
+        [Test]
         public void AllowOverridingRegistrations_WhenNotSet_IsFalse()
         {
             // Arrange
@@ -32,7 +32,7 @@
                 "The default value must be false, because this is the behavior users will expect.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringRegistrations()
         {
@@ -55,7 +55,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         public void AllowOverridingRegistrations_SetToFalse_ContainerThrowsExpectedExceptionMessage()
         {
             // Arrange
@@ -79,7 +79,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringRegistrations()
         {
             // Arrange
@@ -94,11 +94,10 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(container.GetInstance<IUserRepository>(), typeof(InMemoryUserRepository),
-                "The registration was not overridden properly.");
+            Assert.IsInstanceOf<InMemoryUserRepository>(container.GetInstance<IUserRepository>(), "The registration was not overridden properly.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringCollections()
         {
@@ -121,7 +120,7 @@
             container.RegisterAll<IUserRepository>(new InMemoryUserRepository());
         }
 
-        [TestMethod]
+        [Test]
         public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringCollections()
         {
             // Arrange
@@ -137,12 +136,12 @@
 
             // Assert
             var instance = container.GetAllInstances<IUserRepository>().Single();
-            Assert.IsInstanceOfType(instance, typeof(InMemoryUserRepository));
+            Assert.That(instance, Is.InstanceOf<InMemoryUserRepository>());
         }
 
         // NOTE: There was a bug in the framework. The container did not selfregister when the overloaded
         // constructor with the ContainerOptions was used. This test proves this bug.
-        [TestMethod]
+        [Test]
         public void ContainerWithOptions_ResolvingATypeThatDependsOnTheContainer_ContainerInjectsItself()
         {
             // Arrange
@@ -155,7 +154,7 @@
             Assert.AreEqual(container, instance.Container);
         }
 
-        [TestMethod]
+        [Test]
         public void ContainerWithOptions_SuppliedWithAnInstanceThatAlreadyBelongsToAnotherContainer_ThrowsExpectedException()
         {
             // Arrange
@@ -178,7 +177,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorResolutionBehavior_SetWithNullValue_ThrowsException()
         {
@@ -189,7 +188,7 @@
             options.ConstructorResolutionBehavior = null;
         }
 
-        [TestMethod]
+        [Test]
         public void ConstructorResolutionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
@@ -207,7 +206,7 @@
                 "The set_ConstructorResolutionBehavior did not work.");
         }
 
-        [TestMethod]
+        [Test]
         public void ConstructorResolutionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
@@ -235,7 +234,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ConstructorResolutionBehavior_ChangedAfterFirstCallToGetInstance_Fails()
         {
             // Arrange
@@ -264,7 +263,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorInjectionBehavior_SetWithNullValue_ThrowsException()
         {
@@ -275,7 +274,7 @@
             options.ConstructorInjectionBehavior = null;
         }
 
-        [TestMethod]
+        [Test]
         public void ConstructorInjectionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
@@ -293,7 +292,7 @@
                 "The set_ConstructorInjectionBehavior did not work.");
         }
 
-        [TestMethod]
+        [Test]
         public void ConstructorInjectionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange

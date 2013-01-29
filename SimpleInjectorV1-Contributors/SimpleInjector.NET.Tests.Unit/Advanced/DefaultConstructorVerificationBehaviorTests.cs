@@ -2,12 +2,12 @@
 {
     using System;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class DefaultConstructorVerificationBehaviorTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorVerificationBehavior_SetWithNullValue_ThrowsException()
         {
@@ -18,7 +18,7 @@
             options.ConstructorVerificationBehavior = null;
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_TValueTypeParameter_ThrowsExpectedException()
         {
             // Arrange
@@ -50,7 +50,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_StringTypeParameter_ThrowsExpectedException()
         {
             // Arrange

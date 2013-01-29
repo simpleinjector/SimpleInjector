@@ -2,12 +2,12 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterConcreteTests
     {
-        [TestMethod]
+        [Test]
         public void Register_RegisteringAConcreteType_ReturnAnInstance()
         {
             // Arrange
@@ -23,7 +23,7 @@
             Assert.IsNotNull(service, "The container should not return null.");
         }
 
-        [TestMethod]
+        [Test]
         public void Register_RegisteringAConcreteType_AlwaysReturnsANewInstance()
         {
             // Arrange
@@ -40,7 +40,7 @@
             Assert.IsFalse(object.ReferenceEquals(s1, s2), "Always a new instance was expected to be returned.");
         }
 
-        [TestMethod]
+        [Test]
         public void Register_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedMessage()
         {
             // Arrange
@@ -57,12 +57,12 @@
             }
             catch (ArgumentException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No subtype was expected.");
+                Assert.IsInstanceOf<ArgumentException>(ex,  "No subtype was expected.");
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Register_AbstractTypeWithSinglePublicConstructor_ThrowsExpectedException()
         {
             // Arrange
@@ -86,7 +86,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Register_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedParamName()
         {
             // Arrange
@@ -107,7 +107,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Register_WithIncompleteSingletonRegistration_Succeeds()
         {
             // Arrange

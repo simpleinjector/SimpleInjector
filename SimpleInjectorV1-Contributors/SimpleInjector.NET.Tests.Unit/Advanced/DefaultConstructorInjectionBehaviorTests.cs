@@ -2,12 +2,12 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class DefaultConstructorInjectionBehaviorTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void BuildParameterExpression_WithNullArgument_ThrowsExpectedException()
         {

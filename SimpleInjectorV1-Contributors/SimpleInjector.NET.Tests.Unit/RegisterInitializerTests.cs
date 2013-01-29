@@ -2,9 +2,9 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterInitializerTests
     {
         private interface ICommand
@@ -14,7 +14,7 @@
             void Execute();
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterInitializer_WithValidInitializer_Succeeds()
         {
             // Arrange
@@ -24,7 +24,7 @@
             container.RegisterInitializer<IUserRepository>(repistoryToInitialize => { });
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterInitializer_WithNullArgument_ThrowsExpectedException()
         {
@@ -37,7 +37,7 @@
             container.RegisterInitializer<IUserRepository>(invalidInstanceInitializer);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RequestingInstanceRegisteredWithGenericRegister_CallsTheCorrespondingInitializer()
         {
             // Arrange
@@ -56,7 +56,7 @@
             Assert.IsTrue(initializerWasCalled, "The initializer was never called.");
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterInitializer_RegisteredTwiceForTheSameServiceType_CallsBothInitializers()
         {
             // Arrange
@@ -76,7 +76,7 @@
             Assert.IsTrue(secondInitializerWasCalled, "The second initializer was never called.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterInitializer_CalledOnALockedContainer_ThrowsExceptedException()
         {
@@ -90,7 +90,7 @@
             container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { });
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnUnregisteredTypeThatInheritsFromRegisteredServiceType_InitializesCorrectly()
         {
             // Arrange
@@ -108,7 +108,7 @@
             Assert.IsTrue(command.SendAsynchronously, "The instance was not initialized correctly.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnUnregisteredTypeWithDependency_InitializesDependencyCorrectly()
         {
             // Arrange
@@ -131,7 +131,7 @@
             Assert.IsTrue(command.SendAsynchronously, "The instance was not initialized correctly.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnUnregisteredTypeThatImplementsMultipleRegisteredServiceTypes_InitializesCorrectly()
         {
             // Arrange
@@ -158,7 +158,7 @@
             Assert.IsNotNull(command.Clock, "Instance initializer for CommandBase was not executed.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredSingletonThatInheritsFromRegisteredServiceType_InitializesCorrectly()
         {
             // Arrange
@@ -178,7 +178,7 @@
             Assert.IsTrue(command.SendAsynchronously, "The instance was not initialized correctly.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnUnregisteredTypeThatInheritsFromRegisteredServiceType_CallsInitializerForEachInstance()
         {
             // Arrange
@@ -197,7 +197,7 @@
             Assert.IsTrue(command.SendAsynchronously, "The instance was not initialized correctly.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_RegisteredSingletonThatInheritsFromRegisteredServiceType_CallInitializerOnlyOnce()
         {
             // Arrange
@@ -222,7 +222,7 @@
                 "The initializer was expected to be called just once for singletons.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnInstanceNotCreatedByTheContainer1_DoesNotCallInitializer()
         {
             // Arrange
@@ -241,7 +241,7 @@
                 "are created outside of the control of the container.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnInstanceNotCreatedByTheContainer2_DoesNotCallInitializer()
         {
             // Arrange
@@ -261,7 +261,7 @@
                 "are created outside of the control of the container.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnTypeCreatedByTheContainer_InitializesInstance()
         {
             // Arrange
@@ -281,7 +281,7 @@
                 "are created within the control of the container.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_MultipleRegisteredInitializers_RunsInitializersInOrderOfRegistration()
         {
             // Arrange

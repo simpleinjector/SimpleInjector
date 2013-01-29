@@ -1,11 +1,12 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿
+namespace SimpleInjector.Tests.Unit
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class ActivationExceptionTests
     {
-        [TestMethod]
+        [Test]
         public void Ctor_Always_Succeeds()
         {
             // Act

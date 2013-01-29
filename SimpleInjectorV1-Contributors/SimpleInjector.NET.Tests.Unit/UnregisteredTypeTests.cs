@@ -2,12 +2,12 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class UnregisteredTypeTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType_ThrowsException()
         {
@@ -18,7 +18,7 @@
             container.GetInstance<IUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType2_ThrowsException()
         {
@@ -32,7 +32,7 @@
             container.GetInstance<IUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType3_ThrowsException()
         {
@@ -45,7 +45,7 @@
             container.GetInstance(typeof(IUserRepository));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredValueType_ThrowsException()
         {
@@ -56,7 +56,7 @@
             container.GetInstance(typeof(int));
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteType_CanStillBeCreated()
         {
             // Arrange
@@ -71,7 +71,7 @@
             Assert.IsNotNull(instance);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteType_AlwaysReturnsANewInstance()
         {
             // Arrange
@@ -86,7 +86,7 @@
             Assert.AreNotEqual(instance1, instance2, "Values should reference different instances.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteTypeWithConcreteConstructorArguments_CanStillBeCreated()
         {
             // Arrange
@@ -101,7 +101,7 @@
             Assert.IsNotNull(instance);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsException()
         {
             // Arrange
@@ -124,7 +124,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithNameOfType()
         {
             // Arrange
@@ -146,7 +146,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
@@ -172,7 +172,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteTypeWithConstructorWithInvalidArguments_ThrowsException()
         {
             // Arrange
@@ -210,7 +210,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithUnregisteredGenericTypeDefinition_ThrowsException()
         {
             // Arrange
@@ -230,7 +230,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnConcreteTypeWithConstructorArgumentOfResolvableType_Succeeds()
         {
             // Arrange
@@ -249,7 +249,7 @@
             container.GetInstance<RealUserService>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnConcreteTypeWithValueTypeConstructorArgument_FailsWithExpectedException()
         {
             // Arrange
@@ -274,7 +274,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnConcreteTypeWithStringConstructorArgument_FailsWithExpectedException()
         {
             // Arrange
@@ -297,7 +297,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithErrorInNestedDependency_ThrowsExceptionThatContainsAllTypes()
         {
             // Arrange

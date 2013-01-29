@@ -3,12 +3,12 @@
     using System;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterSingleByFuncTests
     {
-        [TestMethod]
+        [Test]
         public void RegisterSingleByFunc_WithValidArgument_Succeeds()
         {
             // Arrange
@@ -19,7 +19,7 @@
             container.RegisterSingle<IUserRepository>(validDelegate);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByFunc_WithNullArgument_ThrowsException()
         {
@@ -31,7 +31,7 @@
             container.RegisterSingle<IUserRepository>(invalidDelegate);
         }
 
-        [TestMethod]
+        [Test]
         public void Validate_ValidRegisterSingleByFuncRegistration_Succeeds()
         {
             // Arrange
@@ -43,7 +43,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         public void Validate_InValidRegisterSingleByFuncRegistration_ThrowsExpectedExceptionMessage()
         {
             // Arrange
@@ -67,8 +67,8 @@
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterSingleByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -79,8 +79,8 @@
             container.RegisterSingle<IUserRepository>(() => new InMemoryUserRepository());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterSingleByFunc_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
@@ -91,8 +91,8 @@
             container.RegisterSingle<UserServiceBase>(() => new FakeUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetInstance.")]
         public void RegisterSingleByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -104,8 +104,8 @@
             container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetAllInstances.")]
         public void RegisterSingleByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -120,7 +120,7 @@
             container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleByFunc_RegisteringDelegate_WillNotCallTheDelegate()
         {
             // Arrange
@@ -141,7 +141,7 @@
                 "that are not yet registered. Users are allowed to register dependent objects in random order.");
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleByFunc_CallingGetInstanceMultipleTimes_WillOnlyCallDelegateOnce()
         {
             // Arrange
@@ -166,7 +166,7 @@
                 "only get called once during the lifetime of the application. Not more.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingleFunc_Succeeds()
         {
             // Arrange
@@ -180,7 +180,7 @@
             container.GetInstance<RealUserService>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFuncOfRootType_ThrowsActivationExceptionWithExpectedInnerException()
         {
             // Arrange
@@ -207,7 +207,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
         {
             // Arrange
@@ -232,7 +232,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_DelegateReturningNullRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
         {
             // Arrange

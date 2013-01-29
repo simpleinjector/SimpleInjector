@@ -6,12 +6,12 @@
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterAllTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllTService_WithNullArgument_ThrowsException()
         {
@@ -24,7 +24,7 @@
             container.RegisterAll<IPlugin>(plugins);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_TypeWithEnumerableAsConstructorArguments_InjectsExpectedTypes()
         {
             // Arrange
@@ -40,7 +40,7 @@
             Assert.AreEqual(3, manager.Plugins.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EnumerableTypeRegisteredWithRegisterSingle_InjectsExpectedTypes()
         {
             // Arrange
@@ -59,7 +59,7 @@
             Assert.AreEqual(3, manager.Plugins.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ConcreteTypeWithEnumerableArgumentOfUnregisteredType_InjectsZeroInstances()
         {
             // Arrange
@@ -74,7 +74,7 @@
             Assert.AreEqual(0, manager.Plugins.Length);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingle_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
@@ -87,7 +87,7 @@
             container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Register_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
@@ -100,7 +100,7 @@
             container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_WithEnumerableCalledAfterRegisterSingleWithSameType_Fails()
         {
@@ -113,7 +113,7 @@
             container.RegisterAll<IPlugin>(new PluginImpl());
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_WithEnumerableCalledAfterRegisterWithSameType_Fails()
         {
@@ -126,7 +126,7 @@
             container.RegisterAll<IPlugin>(new PluginImpl());
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_ListRegisteredUsingEnumerable_ReturnsExpectedList()
         {
             // Arrange
@@ -148,7 +148,7 @@
             Assert.AreEqual(2, repositories.Count(), "Collection is expected to contain two values.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_ListRegisteredUsingParams_ReturnsExpectedList()
         {
             // Arrange
@@ -164,7 +164,7 @@
             Assert.AreEqual(2, repositories.Count(), "Collection is expected to contain two values.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_NoInstancesRegistered_ReturnsEmptyCollection()
         {
             // Arrange
@@ -180,8 +180,8 @@
                 "enumerator of length 0 instead of throwing an exception.");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetInstance.")]
         public void RegisterAll_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -193,8 +193,8 @@
             container.RegisterAll<IUserRepository>(new IUserRepository[0]);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetAllInstances.")]
         public void RegisterAll_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -206,7 +206,7 @@
             container.RegisterAll<IUserRepository>(new IUserRepository[0]);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAll_WithNullArgument_ThrowsException()
         {
@@ -217,7 +217,7 @@
             container.RegisterAll<IUserRepository>(null);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_CalledTwiceOnSameType_ThrowsException()
         {
@@ -230,7 +230,7 @@
             container.RegisterAll<IUserRepository>(repositories);
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstancesNonGeneric_WithoutAnRegistration_ReturnsAnEmptyCollection()
         {
             // Arrange
@@ -243,7 +243,7 @@
             Assert.AreEqual(0, repositories.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstancesNonGeneric_WithValidRegistration_ReturnsCollectionWithExpectedElements()
         {
             // Arrange
@@ -256,11 +256,11 @@
 
             // Assert
             Assert.AreEqual(2, repositories.Length);
-            Assert.IsInstanceOfType(repositories[0], typeof(InMemoryUserRepository));
-            Assert.IsInstanceOfType(repositories[1], typeof(SqlUserRepository));
+            Assert.That(repositories[0], Is.InstanceOf<InMemoryUserRepository>());
+            Assert.That(repositories[1], Is.InstanceOf<SqlUserRepository>());
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_InvalidDelegateRegistered_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
@@ -287,7 +287,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithArrayRegistered_DoesNotReturnAnArray()
         {
             // Arrange
@@ -302,7 +302,7 @@
             Assert_IsNotAMutableCollection(collection);
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithArrayRegistered_DoesNotAllowChangesToTheOriginalArray()
         {
             // Arrange
@@ -321,7 +321,7 @@
             Assert.IsNotNull(collection[0], "RegisterAll<T>(T[]) did not make a copy of the supplied array.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithListRegistered_DoesNotReturnAnArray()
         {
             // Arrange
@@ -336,7 +336,7 @@
             Assert_IsNotAMutableCollection(collection);
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithCollectionRegistered_DoesNotReturnAnArray()
         {
             // Arrange
@@ -351,7 +351,7 @@
             Assert_IsNotAMutableCollection(collection);
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithArray_ReturnsSameInstanceOnEachCall()
         {
             // Arrange
@@ -368,7 +368,7 @@
                 "For performance reasons, GetAllInstances<T> should always return the same instance.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnATypeThatDependsOnACollectionThatIsRegisteredWithRegisterByFunc_CollectionShouldNotBeTreatedAsASingleton()
         {
             // Arrange
@@ -396,7 +396,7 @@
                 "singleton.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnATypeThatDependsOnACollectionThatIsNotRegistered_SameInstanceInjectedEachTime()
         {
             // Arrange
@@ -413,7 +413,7 @@
                 "every time. This saves performance.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void RegisterAllTService_RegisteredCollectionWithNullElements_ThrowsException()
         {
@@ -434,9 +434,9 @@
                 return;
             }
 
-            Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
-            Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);
-            Assert.IsNotInstanceOfType(collection, typeof(ICollection<T>), assertMessage);
+            Assert.IsNotInstanceOf<T[]>(collection, assertMessage);
+            Assert.IsNotInstanceOf<IList>(collection, assertMessage);
+            Assert.IsNotInstanceOf<ICollection<T>>(collection, assertMessage);
         }
 
         private sealed class LeftEnumerable<T> : IEnumerable<T>

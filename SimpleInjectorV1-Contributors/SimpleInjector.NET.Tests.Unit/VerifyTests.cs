@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class VerifyTests
     {
-        [TestMethod]
+        [Test]
         public void Verify_WithEmptyConfiguration_Succeeds()
         {
             // Arrange
@@ -18,7 +18,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_Never_LocksContainer1()
         {
             // Arrange
@@ -30,7 +30,7 @@
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_Never_LocksContainer2()
         {
             // Arrange
@@ -48,7 +48,7 @@
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_CalledMultipleTimes_Succeeds()
         {
             // Arrange
@@ -64,7 +64,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_CalledAfterGetInstance_DoesNotUnlockTheContainer()
         {
             // Arrange
@@ -89,8 +89,8 @@
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "Registration of a type after validation should fail, because the container should be locked down.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "Registration of a type after validation should fail, because the container should be locked down.")]
         public void Verify_WithEmptyConfiguration_ThrowsException()
         {
             // Arrange
@@ -102,8 +102,8 @@
             container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "An exception was expected because the configuration is invalid without registering an IUserRepository.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "An exception was expected because the configuration is invalid without registering an IUserRepository.")]
         public void Verify_WithDependantTypeNotRegistered_ThrowsException()
         {
             // Arrange
@@ -116,7 +116,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_WithFailingFunc_ThrowsException()
         {
@@ -131,7 +131,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_RegisteredCollectionWithValidElements_Succeeds()
         {
             // Arrange
@@ -142,7 +142,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         public void Verify_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
@@ -168,7 +168,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_FailingCollection_ThrowsException()
         {
@@ -186,7 +186,7 @@
             container.Verify();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_RegisterCalledWithFuncReturningNullInstances_ThrowsExpectedException()
         {

@@ -2,12 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class GetInstanceTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstanceByType_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
@@ -18,7 +18,7 @@
             container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceByType_CalledOnRegisteredButInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
@@ -44,7 +44,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceByType_CalledOnUnregisteredConcreteButInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
@@ -68,7 +68,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceGeneric_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
@@ -92,7 +92,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstanceGeneric_CalledOnRegisteredInvalidServiceType_ThrowsActivationException()
         {
@@ -105,7 +105,7 @@
             container.GetInstance<ServiceWithUnregisteredDependencies>();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetInstance_OnObjectWhileUnregistered_ThrowsActivationException()
         {
@@ -116,7 +116,7 @@
             container.GetInstance<object>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstanceType_DeeplyNestedGenericTypeWithInternalConstructor_ThrowsExceptionWithProperFriendlyTypeName()
         {
             // Arrange
@@ -138,7 +138,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithNastyOpenGenericType_ThrowsExpectedException()
         {
             // Arrange
@@ -159,7 +159,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_WithOpenGenericEnumerableType_ThrowsExpectedException()
         {
             // Arrange

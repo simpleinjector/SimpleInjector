@@ -5,12 +5,12 @@
     using System.Linq;
     using System.Text;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterSingleByGenericArgumentTests
     {
-        [TestMethod]
+        [Test]
         public void RegisterSingleByGenericArgument_WithValidGenericArguments_Succeeds()
         {
             // Arrange
@@ -20,7 +20,7 @@
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnRegisteredType_ReturnsInstanceOfExpectedType()
         {
             // Arrange
@@ -32,10 +32,10 @@
             var instance = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+            Assert.IsInstanceOf<SqlUserRepository>(instance);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnRegisteredType_ReturnsANewInstanceOnEachCall()
         {
             // Arrange
@@ -52,7 +52,7 @@
                 "return singleton objects.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleByGenericArgument_GenericArgumentOfInvalidType_ThrowsException()
         {
@@ -63,7 +63,7 @@
             container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleByGenericArgument_GenericArgumentOfInvalidType_ThrowsExceptionWithExpectedParam()
         {
             // Arrange
@@ -85,7 +85,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingleByGenericArgument_CalledAfterTheContainerWasLocked_ThrowsException()
         {

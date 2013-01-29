@@ -2,12 +2,12 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class GetServiceTests
     {
-        [TestMethod]
+        [Test]
         public void GetService_RequestingARegisteredType_ReturnsExpectedInstance()
         {
             // Arrange
@@ -25,7 +25,7 @@
                 "not return the expected instance.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetService_RequestingANonregisteredType_ReturnsNull()
         {
             // Arrange
@@ -39,7 +39,7 @@
                 "null when no registration is found.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetService_RequestingANonregisteredType2_ReturnsNull()
         {
             // Arrange
@@ -53,7 +53,7 @@
                 "null when no registration is found.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetService_RequestingANonregisteredType3_ReturnsNull()
         {
             // Arrange
@@ -67,7 +67,7 @@
                 "null when no registration is found.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetService_RequestingANonregisteredType_WillNotSuppressErrorsThrownFromUnregisteredTypeResolution()
         {
@@ -88,7 +88,7 @@
             var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
         }
 
-        [TestMethod]
+        [Test]
         public void GetService_RequestingAUnregisteredTypeTwice_ReturnsNullSecondTime()
         {
             // Arrange
@@ -104,7 +104,7 @@
                 "null when no registration is found.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetService_RequestedOnUnregisteredInvalidType_ReturnsNull()
         {
             // Arrange
@@ -119,7 +119,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ActivationException))]
         public void GetService_RequestedOnRegisteredInvalidType_ReturnsInstance()
         {

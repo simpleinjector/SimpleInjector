@@ -2,14 +2,14 @@
 {
     using System;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
     using SimpleInjector.Advanced;
 
-    [TestClass]
+    [TestFixture]
     public class AdvancedExtensionsTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IsLocked_WithNullArgument_ThrowsException()
         {

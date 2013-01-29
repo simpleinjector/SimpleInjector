@@ -4,12 +4,12 @@
     using System.Globalization;
     using System.Reflection;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class AmbiguousTypesTests
     {
-        [TestMethod]
+        [Test]
         public void RegisterFunc_SuppliedWithAmbiguousTypeString_ThrowsExpectedException()
         {
             // Arrange
@@ -22,7 +22,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterFunc_SuppliedWithAmbiguousTypeType_ThrowsExpectedException()
         {
             // Arrange
@@ -35,7 +35,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleFunc_SuppliedWithAmbiguousType_ThrowsExpectedException()
         {
             // Arrange
@@ -48,7 +48,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleValue_SuppliedWithAmbiguousType_ThrowsExpectedException()
         {
             // Arrange
@@ -61,7 +61,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterFunc_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange
@@ -75,7 +75,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleFunc_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange
@@ -89,7 +89,7 @@
             });
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingleValue_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange

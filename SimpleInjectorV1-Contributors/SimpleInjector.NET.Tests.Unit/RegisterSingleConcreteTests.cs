@@ -3,12 +3,12 @@
     using System;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterSingleConcreteTests
     {
-        [TestMethod]
+        [Test]
         public void RegisterSingle_RegisteringAConcreteType_ReturnAnInstance()
         {
             // Arrange
@@ -24,7 +24,7 @@
             Assert.IsNotNull(userService, "The container should not return null.");
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingle_RegisteringAConcreteType_AlwaysReturnsSameInstance()
         {
             // Arrange
@@ -41,7 +41,7 @@
             Assert.IsTrue(object.ReferenceEquals(s1, s2), "Always the same instance was expected to be returned.");
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingle_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedMessage()
         {
             // Arrange
@@ -58,12 +58,12 @@
             }
             catch (ArgumentException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No subtype was expected.");
+                Assert.IsInstanceOf<ArgumentException>(ex, "No subtype was expected.");
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingle_RegisteringANonConcreteType_ThrowsAnArgumentExceptionWithExpectedParamName()
         {
             // Arrange
@@ -84,7 +84,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void RegisterSingle_WithIncompleteSingletonRegistration_Succeeds()
         {
             // Arrange

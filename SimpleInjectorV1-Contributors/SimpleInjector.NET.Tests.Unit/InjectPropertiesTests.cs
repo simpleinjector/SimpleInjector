@@ -3,13 +3,13 @@
     using System;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
     
     /// <content>Tests for injecting properties.</content>
-    [TestClass]
+    [TestFixture]
     public partial class InjectPropertiesTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void InjectProperties_NullInstance_ThrowsExpectedException()
         {
@@ -22,7 +22,7 @@
             container.InjectProperties(instance);
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_WithEmptyContainer_DoesNotInjectAnything()
         {
             // Arrange
@@ -41,7 +41,7 @@
             Assert.IsNull(instance.InternalUserService, "UserService property was expected to be null.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_ContainerWithRegistrationForASingleProperty_DoesInjectSingleProperty()
         {
             // Arrange
@@ -58,7 +58,7 @@
             Assert.IsNotNull(instance.TimeProvider, "TimeProvider property was expected to be set.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeThatMapsToMultipleProperties_InjectsDoesInjectBothProperties()
         {
             // Arrange
@@ -76,7 +76,7 @@
             Assert.IsNotNull(instance.Plugin2, "Plugin2 property was expected to be set.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeWithThreeMappableProperties_InjectsDoesInjectAllThreeProperties()
         {
             // Arrange
@@ -98,7 +98,7 @@
 
         // This test is important, because the PropertyInjector class splits the injection of a class with
         // many properties into multiple delegates.
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeWithManyMappableProperties_Succeeds()
         {
             // Arrange
@@ -121,7 +121,7 @@
                 "Uninjected properties: " + string.Join(", ", uninjectedProperties.ToArray()));
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeForReadOnlyProperty_DoesNotInjectProperty()
         {
             // Arrange
@@ -138,7 +138,7 @@
             Assert.IsNull(instance.ReadOnlyRepository, "Repository property was expected to be null.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeWithInternalProperty_DoesNotInjectThatInternalProperty()
         {
             // Arrange
@@ -155,7 +155,7 @@
             Assert.IsNull(instance.InternalUserService, "UserService property was expected to be null.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeRegisteredWithUnregisteredTypeResolution_InjectsThatType()
         {
             // Arrange
@@ -182,7 +182,7 @@
                 "of the registered unregistered type resolution event.");
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeWithNotInjectableDependency_DoesNotInjectThatProperty()
         {
             // Arrange
@@ -197,7 +197,7 @@
             Assert.IsNull(instance.NotInjectableDependency);
         }
 
-        [TestMethod]
+        [Test]
         public void InjectProperties_TypeWithNotInjectableDependency_DoesInjectOtherProperties()
         {
             // Arrange
@@ -215,7 +215,7 @@
         }
 
 #if !SILVERLIGHT
-        [TestMethod]
+        [Test]
         public void InjectProperties_OnUserControlWithMoreThanTwoInjectableDependencies_Succeeds()
         {
             // Arrange

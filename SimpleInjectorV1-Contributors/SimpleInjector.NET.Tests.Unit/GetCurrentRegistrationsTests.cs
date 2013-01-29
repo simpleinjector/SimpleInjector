@@ -4,12 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class GetCurrentRegistrationsTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetCurrentRegistrations_Always_LocksTheContainer()
         {
@@ -22,7 +22,7 @@
             container.Register<ITimeProvider, RealTimeProvider>();
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_TransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -38,7 +38,7 @@
             Assert.AreEqual(1, registations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_TransientConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -54,7 +54,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_FuncTransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -70,7 +70,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_ImplicitlyRegisteredTransientInstance_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -86,7 +86,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_SingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -102,7 +102,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_SingleConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -118,7 +118,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_FuncSingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -134,7 +134,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_SingleInstanceRegisteredByObject_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -150,7 +150,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_InstanceResolvedUsingUnregisteredTypeResolution_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -171,7 +171,7 @@
             Assert.AreEqual(1, registrations.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void GetCurrentRegistrations_InvalidTypeRequestedFromGetRegistration_InvalidTypeIsNotReturned()
         {
             // Arrange

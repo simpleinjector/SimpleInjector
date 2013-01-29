@@ -5,12 +5,12 @@
     using System.Linq;
     using System.Text;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class RegisterSingleByInstanceTests
     {
-        [TestMethod]
+        [Test]
         public void RegisterSingleByInstance_WithValidType_ContainerAlwaysReturnsSameInstance()
         {
             // Arrange
@@ -26,7 +26,7 @@
             Assert.AreEqual(instance1, instance2, "Values should reference the same instance.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByInstance_WithNullArgument_ThrowsException()
         {
@@ -38,8 +38,8 @@
             container.RegisterSingle<IUserRepository>(invalidInstance);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterSingleByInstance_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -50,8 +50,8 @@
             container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "A certain type can only be registered once.")]
         public void RegisterSingleByInstance_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
@@ -62,8 +62,8 @@
             container.RegisterSingle<UserServiceBase>(new FakeUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetInstance.")]
         public void RegisterSingleByInstance_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -75,8 +75,8 @@
             container.RegisterSingle<UserServiceBase>(new RealUserService(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), UserMessage = "The container should get locked after a call to GetAllInstances.")]
         public void RegisterSingleByInstance_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -91,7 +91,7 @@
             container.RegisterSingle<UserServiceBase>(new RealUserService(null));
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingle_Succeeds()
         {
             // Arrange

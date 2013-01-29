@@ -4,12 +4,12 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class ResolveUnregisteredTypeEventTests
     {
-        [TestMethod]
+        [Test]
         public void GetInstance_WithEventRegistered_RegistersExpectedDelegate()
         {
             // Arrange
@@ -35,7 +35,7 @@
                 "The container did not return the expected instance.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_MultipleDelegatesHookedUpToEvent_FailsWhenBothDelegatesRegisterSameServiceType()
         {
             // Arrange
@@ -61,7 +61,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithUnregisteredType_InvokesEvent()
         {
             // Arrange
@@ -86,7 +86,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithConcreteType_InvokesEventsBeforeTryingToCreateTheConcreteType()
         {
             // Arrange
@@ -107,7 +107,7 @@
                 "trying to create a concrete type.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_UnregisteredConcreteTypeWithUnregistedDependencies_ThrowsExpectedException()
         {
             // Arrange
@@ -137,7 +137,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_WithConcreteUncreatableType_ResolvesTypeUsingEvent()
         {
             // Arrange
@@ -162,9 +162,9 @@
             Assert.AreEqual(expectedInstance, actualInstance);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException),
-            "Registration of an event after the container is locked is illegal.")]
+           UserMessage = "Registration of an event after the container is locked is illegal.")]
         public void AddResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -179,9 +179,9 @@
             container.ResolveUnregisteredType += (s, e) => { };
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException),
-            "Removal of an event after the container is locked is illegal.")]
+            UserMessage = "Removal of an event after the container is locked is illegal.")]
         public void RemoveResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -196,7 +196,7 @@
             container.ResolveUnregisteredType -= (s, e) => { };
         }
 
-        [TestMethod]
+        [Test]
         public void RemoveResolveUnregisteredType_BeforeContainerHasBeenLocked_Succeeds()
         {
             // Arrange
@@ -230,7 +230,7 @@
             Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_CalledMultipleTimesEventRegistered_WillCallEventJustOnce()
         {
             // Arrange
@@ -255,7 +255,7 @@
                 "dictionary (for performance).");
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_MultipleDelegatesHookedUpToEvent_CallsAllDelegates()
         {
             // Arrange
@@ -282,7 +282,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredThatThrowsException_ThrowsAnDescriptiveException()
         {
             // Arrange
@@ -311,7 +311,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredForNonRootTypeThatThrowsException_ThrowsAnDescriptiveException()
         {
             // Arrange
@@ -342,7 +342,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange
@@ -376,7 +376,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredThatThrowsException_ThrowsExceptionWithExpectedInnerException()
         {
             // Arrange
@@ -405,7 +405,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredThatReturnsNull_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
@@ -434,7 +434,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_EventRegisteredThatReturnsANonAssignableType_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
@@ -469,7 +469,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstances_OnUnregisteredType_TriggersUnregisteredTypeResolution()
         {
             // Arrange
@@ -492,7 +492,7 @@
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
-        [TestMethod]
+        [Test]
         public void GetAllInstancesByType_OnUnregisteredType_TriggersUnregisteredTypeResolution()
         {
             Dictionary<Type, object> o = new Dictionary<Type, object>(40);
@@ -518,7 +518,7 @@
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnUnregisteredCollection_TriggersUnregisteredTypeResolution()
         {
             // Arrange
@@ -541,7 +541,7 @@
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
-        [TestMethod]
+        [Test]
         public void GetInstance_OnInstanceDependingOnAnUnregisteredCollection_TriggersUnregisteredTypeResolution()
         {
             // Arrange

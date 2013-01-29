@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class GetRegistrationTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetRegistration_Always_LocksTheContainer1()
         {
@@ -27,7 +27,7 @@
                 "always lock the container for reasons of correctness.");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetRegistration_Always_LocksTheContainer2()
         {
@@ -46,7 +46,7 @@
                 "always lock the container for reasons of correctness.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_TransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -61,7 +61,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_TransientConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -76,7 +76,7 @@
             Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_FuncTransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -91,7 +91,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_ImplicitlyRegisteredTransientInstance_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -106,7 +106,7 @@
             Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_SingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -121,7 +121,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_SingleConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -136,7 +136,7 @@
             Assert.AreEqual(typeof(RealTimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_FuncSingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -151,7 +151,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_SingleInstanceRegisteredByObject_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -166,7 +166,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_InstanceResolvedUsingUnregisteredTypeResolution_ReturnsExpectedRegistration()
         {
             // Arrange
@@ -186,7 +186,7 @@
             Assert.AreEqual(typeof(ITimeProvider), provider.ServiceType);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnUnregisteredUnconstructableType_ReturnsNull()
         {
             // Arrange
@@ -199,7 +199,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistrationDontThrowOnFailure_OnUnregisteredUnconstructableType_ReturnsNull()
         {
             // Arrange
@@ -212,7 +212,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistrationDoThrowOnFailure_OnUnregisteredUnconstructableType_Throws()
         {
             // Arrange
@@ -232,7 +232,7 @@
             }
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnOnregisteredString_ReturnsNull()
         {
             // Arrange
@@ -245,7 +245,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnValueType_ReturnsNull()
         {
             // Arrange
@@ -258,7 +258,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnInvalidUnregisteredType_ReturnsNull()
         {
             // Arrange
@@ -271,7 +271,7 @@
             Assert.IsNull(registration, "IInstanceProducer returned.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnInvalidButRegisteredType_ReturnsThatRegistration()
         {
             // Arrange
@@ -287,7 +287,7 @@
                 "InstanceProducer since it is explicitly registered by the user.");
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_OnOpenGenericType_ReturnsNull()
         {
             // Arrange
@@ -300,7 +300,7 @@
             Assert.IsNull(registration);
         }
 
-        [TestMethod]
+        [Test]
         public void GetRegistration_DeeplyNestedGenericTypeWithInternalConstructor_ReturnsNull()
         {
             // Arrange
