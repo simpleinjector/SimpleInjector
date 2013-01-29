@@ -46,27 +46,7 @@
             var decorator = (NonGenericServiceDecorator)service;
 
             Assert.IsInstanceOfType(decorator.DecoratedService, typeof(RealNonGenericService));
-        }
-        
-        [TestMethod]
-        public void GetInstance_OnDecoratedNonGenericSingleton_ReturnsTheDecoratedService()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterSingle<INonGenericService, RealNonGenericService>();
-            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
-
-            // Act
-            var service = container.GetInstance<INonGenericService>();
-
-            // Assert
-            Assert.IsInstanceOfType(service, typeof(NonGenericServiceDecorator));
-
-            var decorator = (NonGenericServiceDecorator)service;
-
-            Assert.IsInstanceOfType(decorator.DecoratedService, typeof(RealNonGenericService));
-        }
+        }       
 
         [TestMethod]
         public void GetInstance_SingleInstanceWrappedByATransientDecorator_ReturnsANewDecoratorEveryTime()
