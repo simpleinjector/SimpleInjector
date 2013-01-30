@@ -1,5 +1,4 @@
-﻿
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using NUnit.Framework;
 
