@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET", "SimpleInjector.NET\SimpleInjector.NET.csproj", "{83D30544-08CE-4DBC-B849-89C840A95F73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET.Tests.Unit", "SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj", "{2AF0709D-B9B6-42C2-9B04-3097C69E384F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2AF0709D-B9B6-42C2-9B04-3097C69E384F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AF0709D-B9B6-42C2-9B04-3097C69E384F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AF0709D-B9B6-42C2-9B04-3097C69E384F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AF0709D-B9B6-42C2-9B04-3097C69E384F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D30544-08CE-4DBC-B849-89C840A95F73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D30544-08CE-4DBC-B849-89C840A95F73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D30544-08CE-4DBC-B849-89C840A95F73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D30544-08CE-4DBC-B849-89C840A95F73}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = SimpleInjector.NET\SimpleInjector.NET.csproj
+	EndGlobalSection
+EndGlobal
