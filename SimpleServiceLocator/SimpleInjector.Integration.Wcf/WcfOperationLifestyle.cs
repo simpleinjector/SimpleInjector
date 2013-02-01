@@ -33,9 +33,8 @@ namespace SimpleInjector.Integration.Wcf
 
     public class WcfOperationLifestyle : Lifestyle
     {
-        public static readonly Lifestyle Instance = WithDisposal;
+        public static readonly Lifestyle Instance = new WcfOperationLifestyle(true);
 
-        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle(true);
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
         private readonly bool disposeInstanceWhenOperationEnds;

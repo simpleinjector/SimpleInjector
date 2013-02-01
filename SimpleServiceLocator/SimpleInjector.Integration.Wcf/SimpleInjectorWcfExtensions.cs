@@ -145,7 +145,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TConcrete, TConcrete>(WcfOperationLifestyle.WithDisposal);
+            container.Register<TConcrete, TConcrete>(WcfOperationLifestyle.Instance);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>(WcfOperationLifestyle.WithDisposal);
+            container.Register<TService, TImplementation>(WcfOperationLifestyle.Instance);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator, WcfOperationLifestyle.WithDisposal);
+            container.Register<TService>(instanceCreator, WcfOperationLifestyle.Instance);
         }
 
         /// <summary>
@@ -228,8 +228,10 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator, disposeWhenRequestEnds ? 
-                WcfOperationLifestyle.WithDisposal : WcfOperationLifestyle.NoDisposal);
+            var lifestyle = 
+                disposeWhenRequestEnds ? WcfOperationLifestyle.Instance : WcfOperationLifestyle.NoDisposal;
+
+            container.Register<TService>(instanceCreator, lifestyle);
         }
 
         /// <summary>

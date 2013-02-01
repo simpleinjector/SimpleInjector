@@ -33,6 +33,11 @@ namespace SimpleInjector
 
     using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// Instances returned from the container can be cached. This caching is called Object Lifetime Management.
+    /// Instances can be cached indefinately using the <see cref="Singleton"/> lifestyle, or never using the
+    /// <see cref="Transient"/> lifestyle. 
+    /// </summary>
     [DebuggerDisplay("{Name,nq}")]
     public abstract class Lifestyle
     {
@@ -43,7 +48,8 @@ namespace SimpleInjector
 
         /// <summary>
         /// Ensures that only one instance of the specified service type is created within the context of the
-        /// given container instance.
+        /// given container instance. In a multi-threaded applications, implementations registered using this
+        /// lifestyle must be thread-safe.
         /// </summary>
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
