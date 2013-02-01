@@ -104,5 +104,93 @@
             // Act
             container.GetInstance<RealUserService>();
         }
+
+
+        [TestMethod]
+        public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            object impl = new SqlUserRepository();
+
+            // Act
+            container.RegisterSingle(typeof(IUserRepository), impl);
+
+            // Assert
+            Assert.AreEqual(impl, container.GetInstance<IUserRepository>(),
+                "GetInstance should return the instance registered using RegisterSingle.");
+        }
+
+        [TestMethod]
+        public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceAlwaysReturnsSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            object impl = new SqlUserRepository();
+
+            // Act
+            container.RegisterSingle(typeof(IUserRepository), impl);
+
+            var instance1 = container.GetInstance<IUserRepository>();
+            var instance2 = container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisterSingleByInstanceNonGeneric_ImplementationNoDescendantOfServiceType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            object impl = new List<int>();
+
+            // Act
+            container.RegisterSingle(typeof(IUserRepository), impl);
+        }
+
+        [TestMethod]
+        public void RegisterSingleByInstanceNonGeneric_InstanceOfSameTypeAsService_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            object impl = new List<int>();
+
+            // Act
+            container.RegisterSingle(impl.GetType(), impl);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterSingleByInstanceNonGeneric_NullServiceType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidServiceType = null;
+            object validInstance = new SqlUserRepository();
+
+            // Act
+            container.RegisterSingle(invalidServiceType, validInstance);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterSingleByInstanceNonGeneric_NullInstance_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type validServiceType = typeof(IUserRepository);
+            object invalidInstance = null;
+
+            // Act
+            container.RegisterSingle(validServiceType, invalidInstance);
+        }
     }
 }

@@ -85,18 +85,6 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions\Helpers.cs">
-      <Link>Helpers.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\NonGenericRegistrationsExtensions.cs">
-      <Link>NonGenericRegistrationsExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\Requires.cs">
-      <Link>Requires.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions\StringResources.cs">
-      <Link>StringResources.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -92,6 +92,9 @@
     <Reference Include="system" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\ActivationExceptionTests.cs">
+      <Link>ActivationExceptionTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\AdvancedExtensionsTests.cs">
       <Link>Advanced\AdvancedExtensionsTests.cs</Link>
     </Compile>
@@ -182,6 +185,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterByGenericArgumentTests.cs">
       <Link>RegisterByGenericArgumentTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterByTypeTests.cs">
+      <Link>RegisterByTypeTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterConcreteTests.cs">
       <Link>RegisterConcreteTests.cs</Link>
     </Compile>
@@ -196,6 +202,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByInstanceTests.cs">
       <Link>RegisterSingleByInstanceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByTypeNonGenericTests.cs">
+      <Link>RegisterSingleByTypeNonGenericTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleConcreteTests.cs">
       <Link>RegisterSingleConcreteTests.cs</Link>

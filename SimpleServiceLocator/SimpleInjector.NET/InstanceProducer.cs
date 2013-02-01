@@ -35,30 +35,18 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>Produces instances for a given registration.</summary>
+    [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay(
         "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
         "Lifestyle = {Lifestyle.Name,nq}")]
     public sealed class InstanceProducer
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly object locker = new object();
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Registration registration;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private CyclicDependencyValidator validator;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<object> instanceCreator;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Expression expression;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool? isValid = true;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Lifestyle overriddenLifestyle;
 
         public InstanceProducer(Type serviceType, Registration registration)
@@ -79,10 +67,8 @@ namespace SimpleInjector
 
         /// <summary>Gets the service type for which this producer produces instances.</summary>
         /// <value>A <see cref="Type"/> instance.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
         public Type ServiceType { get; private set; }
 
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
         internal Type ImplementationType
         {
             get { return this.registration.ImplementationType ?? this.ServiceType; }
@@ -90,7 +76,6 @@ namespace SimpleInjector
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal bool IsContainerAutoRegistered { get; set; }
 
         // Will only return false when the type is a concrete unregistered type that was automatically added
@@ -98,7 +83,6 @@ namespace SimpleInjector
         // Types that are registered upfront are always considered to be valid, while unregistered types must
         // be validated. The reason for this is that we must prevent the container to throw an exception when
         // GetRegistration() is called for an unregistered (concrete) type that can not be resolved.
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal bool IsValid
         {
             get
@@ -291,6 +275,30 @@ namespace SimpleInjector
             catch (ActivationException)
             {
                 return false;
+            }
+        }
+
+        internal sealed class InstanceProducerDebugView
+        {
+            private readonly InstanceProducer instanceProducer;
+
+            internal InstanceProducerDebugView(InstanceProducer instanceProducer)
+            {
+                this.instanceProducer = instanceProducer;
+            }
+
+            public Lifestyle Lifestyle
+            {
+                get { return this.instanceProducer.Lifestyle; }
+            }
+
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
+            public Type ServiceType { get; private set; }
+
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
+            public Type ImplementationType
+            {
+                get { return this.instanceProducer.ImplementationType; }
             }
         }
     }

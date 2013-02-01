@@ -122,9 +122,68 @@
             container.Register<UserController>();
         }
 
+
+        [TestMethod]
+        public void RegisterConcrete_ValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register(typeof(SqlUserRepository));
+
+            // Assert
+            var instance = container.GetInstance(typeof(SqlUserRepository));
+
+            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterConcrete_NullConcrete_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidConcrete = null;
+
+            // Act
+            container.Register(invalidConcrete);
+        }
+
+        [TestMethod]
+        public void RegisterConcrete_ConcreteIsNotAConstructableType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidConcrete = typeof(ServiceImplWithTwoConstructors);
+
+            try
+            {
+                // Act
+                container.Register(invalidConcrete);
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("it should contain exactly one public constructor"));
+            }
+        }
+
         public abstract class AbstractTypeWithSinglePublicConstructor
         {
             public AbstractTypeWithSinglePublicConstructor()
+            {
+            }
+        }
+        
+        public sealed class ServiceImplWithTwoConstructors
+        {
+            public ServiceImplWithTwoConstructors()
+            {
+            }
+
+            public ServiceImplWithTwoConstructors(IDisposable dependency)
             {
             }
         }

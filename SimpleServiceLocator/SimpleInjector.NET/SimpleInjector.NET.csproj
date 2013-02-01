@@ -120,7 +120,7 @@
     <Compile Include="Container.Resolving.cs" />
     <Compile Include="Container.Common.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="IInstanceProducer.cs" />
+    <Compile Include="InstanceProducer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="StringResources.cs" />

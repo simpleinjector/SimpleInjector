@@ -11,6 +11,10 @@
     [TestClass]
     public class RegisterAllTests
     {
+        private interface IGenericDictionary<T> : IDictionary
+        {
+        }
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllTService_WithNullArgument_ThrowsException()
@@ -490,6 +494,171 @@
 
             // Act
             container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithOpenGenericType_FailsWithExpectedExceptionMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterAll<IDictionary>(new[] { typeof(IGenericDictionary<>) });
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("open generic type"), "Actual: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidCollectionOfServices_Succeeds()
+        {
+            // Arrange
+            var instance = new SqlUserRepository();
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll(typeof(IUserRepository), new IUserRepository[] { instance });
+
+            // Assert
+            var instances = container.GetAllInstances<IUserRepository>();
+
+            Assert.AreEqual(1, instances.Count());
+            Assert.AreEqual(instance, instances.First());
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidObjectCollectionOfServices_Succeeds()
+        {
+            // Arrange
+            var instance = new SqlUserRepository();
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll(typeof(IUserRepository), new object[] { instance });
+
+            // Assert
+            var instances = container.GetAllInstances<IUserRepository>();
+
+            Assert.AreEqual(1, instances.Count());
+            Assert.AreEqual(instance, instances.First());
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidCollectionOfImplementations_Succeeds()
+        {
+            // Arrange
+            var instance = new SqlUserRepository();
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll(typeof(IUserRepository), new SqlUserRepository[] { instance });
+
+            // Assert
+            var instances = container.GetAllInstances<IUserRepository>();
+
+            Assert.AreEqual(1, instances.Count());
+            Assert.AreEqual(instance, instances.First());
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidListOfTypes_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            // IServiceEx is a valid registration, because it could be registered.
+            container.RegisterAll<IUserRepository>(new[] { typeof(SqlUserRepository), typeof(IUserRepository) });
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidEnumeableOfTypes_Succeeds()
+        {
+            // Arrange
+            IEnumerable<Type> types = new[] { typeof(SqlUserRepository) };
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IUserRepository>(types);
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithValidParamListOfTypes_Succeeds()
+        {
+            // Arrange
+            Type[] types = new[] { typeof(SqlUserRepository) };
+
+            var container = new Container();
+
+            // Act
+            container.RegisterAll<IUserRepository>(types);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegisteringValidListOfTypesWithRegisterAll_ReturnsExpectedList()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IUserRepository>(new[] { typeof(SqlUserRepository) });
+
+            // Act
+            container.Verify();
+
+            var list = container.GetAllInstances<IUserRepository>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, list.Length);
+            Assert.IsInstanceOfType(list[0], typeof(SqlUserRepository));
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
+        {
+            // Arrange
+            string expectedMessage = "The supplied type IDisposable does not implement IUserRepository.";
+
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.RegisterAll<IUserRepository>(new[]
+                { 
+                    typeof(SqlUserRepository), 
+                    typeof(IDisposable) 
+                });
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(expectedMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterAll_RegisteringATypeThatEqualsTheRegisteredServiceType_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>();
+
+            // Act
+            // Registers a type that references the registration above.
+            container.RegisterAll<IUserRepository>(typeof(SqlUserRepository), typeof(IUserRepository));
         }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)

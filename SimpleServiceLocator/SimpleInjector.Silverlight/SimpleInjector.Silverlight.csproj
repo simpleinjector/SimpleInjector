@@ -186,8 +186,8 @@
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\IInstanceProducer.cs">
-      <Link>IInstanceProducer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducer.cs">
+      <Link>InstanceProducer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyle.cs">
       <Link>Lifestyle.cs</Link>

@@ -92,20 +92,10 @@
     <Reference Include="system" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\AssertThat.cs">
-      <Link>AssertThat.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\EnumerableExtensions.cs">
-      <Link>EnumerableExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.Tests.Unit\NonGenericRegistrationsExtensionsTests.cs">
-      <Link>NonGenericRegistrationsExtensionsTests.cs</Link>
-    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NonGenericRegistrationsExtensionsTests.Silverlight.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

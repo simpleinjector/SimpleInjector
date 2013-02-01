@@ -248,7 +248,48 @@
                 AssertThat.ExceptionMessageContains("The container can't be changed", ex);
             }
         }
+        
+        [TestMethod]
+        public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedException = "No registration for type IUserRepository could be found.";
 
+            var container = new Container();
+
+            var types = new[] { typeof(SqlUserRepository), typeof(IUserRepository) };
+
+            container.RegisterAll<IUserRepository>(types);
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                string actualMessage = ex.Message;
+
+                string exceptionInfo = string.Empty;
+
+                Exception exception = ex;
+
+                while (exception != null)
+                {
+                    exceptionInfo +=
+                        exception.GetType().FullName + Environment.NewLine +
+                        exception.Message + Environment.NewLine +
+                        exception.StackTrace + Environment.NewLine + Environment.NewLine;
+
+                    exception = exception.InnerException;
+                }
+
+                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);
+            }
+        }
+        
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)

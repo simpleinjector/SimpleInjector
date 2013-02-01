@@ -146,5 +146,37 @@
                     "thrown ActivationException.");
             }
         }
+        
+        [TestMethod]
+        public void RegisterByFunc_ValidArguments_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type validServiceType = typeof(IUserRepository);
+            Func<object> instanceCreator = () => new SqlUserRepository();
+
+            // Act
+            container.Register(validServiceType, instanceCreator);
+
+            // Assert
+            var instance = container.GetInstance(validServiceType);
+
+            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterByFunc_NullInstanceCreator_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type validServiceType = typeof(IUserRepository);
+            Func<object> invalidInstanceCreator = null;
+
+            // Act
+            container.Register(validServiceType, invalidInstanceCreator);
+        }
     }
 }

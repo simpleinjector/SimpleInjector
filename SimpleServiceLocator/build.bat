@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.0.0
-set prereleasePostfix=alpha2
+set prereleasePostfix=beta2
 set buildNumber=0
 
 
@@ -139,12 +139,22 @@ echo BUILD DOCUMENTATION
 mkdir Help
 mkdir Help.Asm
 
+REM SimpleInjector.Extensions is an empty stub now
+REM copy bin\NET\SimpleInjector.Extensions.dll Help.Asm\SimpleInjector.Extensions.dll
+REM copy bin\NET\SimpleInjector.Extensions.xml Help.Asm\SimpleInjector.Extensions.xml
+
 copy bin\NET\SimpleInjector.dll Help.Asm\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Help.Asm\SimpleInjector.xml
-copy bin\NET\SimpleInjector.Extensions.dll Help.Asm\SimpleInjector.Extensions.dll
-copy bin\NET\SimpleInjector.Extensions.xml Help.Asm\SimpleInjector.Extensions.xml
 copy bin\NET\SimpleInjector.Packaging.dll Help.Asm\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Help.Asm\SimpleInjector.Packaging.xml
+copy bin\NET\SimpleInjector.Integration.Web.dll Help.Asm\SimpleInjector.Integration.Web.dll
+copy bin\NET\SimpleInjector.Integration.Web.xml Help.Asm\SimpleInjector.Integration.Web.xml
+copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Help.Asm\SimpleInjector.Integration.Web.Mvc.dll
+copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Help.Asm\SimpleInjector.Integration.Web.Mvc.xml
+copy bin\NET\SimpleInjector.Integration.Wcf.dll Help.Asm\SimpleInjector.Integration.Wcf.dll
+copy bin\NET\SimpleInjector.Integration.Wcf.xml Help.Asm\SimpleInjector.Integration.Wcf.xml
+copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Help.Asm\SimpleInjector.Extensions.LifetimeScoping.dll
+copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Help.Asm\SimpleInjector.Extensions.LifetimeScoping.xml
 
 
 
@@ -195,8 +205,8 @@ copy bin\NET\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET40\CommonS
 copy bin\NET\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
 mkdir Releases\temp\NET40\Extensions
-copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.dll
-copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.xml
+REM copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.dll
+REM copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.xml
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
@@ -228,8 +238,8 @@ copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\tem
 copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
 copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 mkdir Releases\temp\Extensions
-copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
-copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
+REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
+REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Silverlight Runtime Library v%named_version%.zip"
 rmdir Releases\temp /s /q
 
@@ -348,8 +358,8 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy  bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.dll Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.dll
-copy  bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.xml Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.xml
+copy  bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy  bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.xml
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\b0dd4e78d398462ead742df1961bccc2.psmdcp {version} %named_version_Core%

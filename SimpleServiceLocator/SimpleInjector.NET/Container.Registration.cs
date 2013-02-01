@@ -348,6 +348,55 @@ namespace SimpleInjector
 
             this.Register<TService>(instanceCreator, Lifestyle.Transient);
         }
+        
+        /// <summary>
+        /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it 
+        /// is requested (transient).
+        /// </summary>
+        /// <param name="concreteType">The concrete type that will be registered.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null 
+        /// references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents an 
+        /// open generic type or is a type that can not be created by the container.
+        /// </exception>
+        public void Register(Type concreteType)
+        {
+            Requires.IsNotNull(concreteType, "concreteType");
+
+            this.Register(concreteType, concreteType, Lifestyle.Transient);
+        }
+
+        /// <summary>
+        /// Registers that a new instance of <paramref name="implementation"/> will be returned every time a
+        /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and 
+        /// <paramref name="implementation"/> represent the same type, the type is registered by itself.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="implementation">The actual type that will be returned when requested.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
+        /// <paramref name="implementation"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
+        /// no sub type from <paramref name="serviceType"/> (or the same type), or one of them represents an 
+        /// open generic type.
+        /// </exception>
+        public void Register(Type serviceType, Type implementation)
+        {
+            this.Register(serviceType, implementation, Lifestyle.Transient);
+        }
+
+        /// <summary>
+        /// Registers the specified delegate that allows returning instances of <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
+        public void Register(Type serviceType, Func<object> instanceCreator)
+        {
+            this.Register(serviceType, instanceCreator, Lifestyle.Transient);
+        }     
 
         /// <summary>
         /// Registers a single concrete instance that will be constructed using constructor injection. 
@@ -438,7 +487,60 @@ namespace SimpleInjector
 
             this.Register<TService>(instanceCreator, Lifestyle.Singleton);
         }
+        
+        /// <summary>
+        /// Registers that the same instance of type <paramref name="implementation"/> will be returned every 
+        /// time a <paramref name="serviceType"/> type is requested. If <paramref name="serviceType"/> and
+        /// <paramref name="implementation"/> represent the same type, the type is registered by itself.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="implementation">The actual type that will be returned when requested.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/> or <paramref name="implementation"/> are null references (Nothing in
+        /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
+        /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
+        /// type.</exception>
+        public void RegisterSingle(Type serviceType, Type implementation)
+        {
+            this.Register(serviceType, implementation, Lifestyle.Singleton);
+        }
 
+        /// <summary>
+        /// Registers the specified delegate that allows constructing a single <paramref name="serviceType"/> 
+        /// instance. The container will call this delegate at most once during the lifetime of the application.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instanceCreator">The delegate that will be used for creating that single instance.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
+        /// generic type.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> are null references (Nothing in
+        /// VB).</exception>
+        public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
+        {
+            this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
+        }
+
+        /// <summary>
+        /// Registers a single instance. This <paramref name="instance"/> must be thread-safe.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="serviceType"/> or <paramref name="instance"/> are null references (Nothing in
+        /// VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
+        /// no sub type from <paramref name="serviceType"/>.</exception>
+        public void RegisterSingle(Type serviceType, object instance)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(instance, "instance");
+            Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
+
+            this.Register(serviceType, () => instance, Lifestyle.Singleton);
+        }
+        
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Any other design would be inappropriate.")]
         public void Register<TService, TImplementation>(Lifestyle lifestyle)

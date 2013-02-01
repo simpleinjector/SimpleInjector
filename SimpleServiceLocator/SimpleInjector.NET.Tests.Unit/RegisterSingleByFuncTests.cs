@@ -255,5 +255,51 @@
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
+
+                [TestMethod]
+        public void RegisterSingleByFuncNonGeneric_ValidArguments_GetInstanceAlwaysReturnsSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            Func<object> instanceCreator = () => new SqlUserRepository();
+
+            // Act
+            container.RegisterSingle(typeof(IUserRepository), instanceCreator);
+
+            var instance1 = container.GetInstance<IUserRepository>();
+            var instance2 = container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterSingleByFuncNonGeneric_NullServiceType_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type invalidServiceType = null;
+            Func<object> validInstanceCreator = () => new SqlUserRepository();
+
+            // Act
+            container.RegisterSingle(invalidServiceType, validInstanceCreator);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RegisterSingleByFuncNonGeneric_NullInstanceCreator_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            Type validServiceType = typeof(IUserRepository);
+            Func<object> invalidInstanceCreator = null;
+
+            // Act
+            container.RegisterSingle(validServiceType, invalidInstanceCreator);
+        }
     }
 }
