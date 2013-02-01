@@ -13,7 +13,7 @@
     <id>SimpleInjector.Packaging</id>
     <title>Simple Injector Packaging</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Adds support for packaging sets of related services to allow registering them together.</description>
+    <description>Adds support for packaging sets of related services to allow registering them together. Consumers can implement the IPackage interface and use the RegisterPackages extension method to dynamically add registrations in the supplied list of assemblies.</description>
     <summary>Adds support for packaging sets of related services to allow registering them together.</summary>
     <copyright>S. van Deursen 2012</copyright>
     <language>en-US</language>

@@ -13,6 +13,7 @@ namespace $rootnamespace$.App_Start
         /// <summary>Initialize the container and register it as MVC3 Dependency Resolver.</summary>
         public static void Initialize()
         {
+            // Did you know the container can diagnose your configuration? Go to: http://bit.ly/YINd6R.
             var container = new Container();
             
             InitializeContainer(container);
@@ -21,7 +22,7 @@ namespace $rootnamespace$.App_Start
             
             container.RegisterMvcAttributeFilterProvider();
        
-            // Using Entity Framework? Please read this: http://simpleinjector.codeplex.com/discussions/363935
+            // Using Entity Framework? Please visit the following page: http://bit.ly/W7qxc4
             container.Verify();
             
             DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
@@ -29,11 +30,6 @@ namespace $rootnamespace$.App_Start
      
         private static void InitializeContainer(Container container)
         {
-            // Please note that if you updated the SimpleInjector.MVC3 package from a previous version, this
-            // SimpleInjectorInitializer class replaces the previous SimpleInjectorMVC3 class. You should
-            // move the registrations from the old SimpleInjectorMVC3.InitializeContainer to this method,
-            // and remove the SimpleInjectorMVC3 and SimpleInjectorMVC3Extensions class from the App_Start
-            // folder.
 #error Register your services here (remove this line).
 
             // For instance:

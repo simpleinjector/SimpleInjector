@@ -5,24 +5,24 @@
     <authors>S. van Deursen</authors>
     <owners>S. van Deursen</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
-    <projectUrl>http://simpleinjector.codeplex.com/</projectUrl>
+    <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=MVC%20Integration</projectUrl>
     <iconUrl>http://simpleinjector.cuttingedge.it/SimpleInjector.ico</iconUrl>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
       <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
+      <dependency id="SimpleInjector.Integration.Web.Mvc" version="{version_Integration_Mvc}" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
     </frameworkAssemblies>
     <id>SimpleInjector.MVC3</id>
-    <title>Simple Injector MVC3 Integration</title>
+    <title>Simple Injector MVC Integration Quick Start</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Extension for Simple Injector providing integration with ASP.NET MVC3.</description>
-    <summary>Extension for Simple Injector providing integration with ASP.NET MVC3.</summary>
+    <description>Quick Start for Simple Injector ASP.NET MVC integration. This package adds the needed dependencies and code examples to get started quickly with Simple Injector in an MVC application.</description>
+    <summary>Quick Start for Simple Injector ASP.NET MVC integration.</summary>
     <releaseNotes></releaseNotes>
     <copyright>2011 S. van Deursen</copyright>
     <language>en-US</language>
-    <tags>simpleinjector MVC MVC3 architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver ControllerFactory</tags>
+    <tags>quick start simpleinjector MVC MVC3 architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver ControllerFactory</tags>
   </metadata>
 </package>

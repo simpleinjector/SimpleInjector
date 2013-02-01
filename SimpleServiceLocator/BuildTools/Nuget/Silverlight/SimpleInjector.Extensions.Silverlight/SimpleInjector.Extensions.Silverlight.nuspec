@@ -13,8 +13,12 @@
     <id>SimpleInjector.Extensions.Silverlight</id>
     <title>Simple Injector Extensions for Silverlight</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Extensions for the Simple Injector Inversion of Control library for Silverlight. The Extensions project adds advanced capabilities, such as batch registration and registration of open generic types.</description>
-    <summary>Extensions for the Simple Injector Inversion of Control library for Silverlight. The Extensions project adds advanced capabilities, such as batch registration and registration of open generic types.</summary>
+    <description>
+      This package contains no logic and is included for backwards compatibility.
+    </description>
+    <summary>
+      This package contains no logic and is included for backwards compatibility.
+    </summary>
     <releaseNotes />
     <copyright>S. van Deursen 2011</copyright>
     <language>en-US</language>
