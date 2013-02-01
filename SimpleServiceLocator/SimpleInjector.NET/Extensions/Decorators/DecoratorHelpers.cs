@@ -34,7 +34,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Reflection;
 
     using SimpleInjector.Advanced;
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
 
     internal static class DecoratorHelpers
     {

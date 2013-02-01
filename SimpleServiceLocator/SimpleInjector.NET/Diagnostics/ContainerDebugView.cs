@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Collections.Generic;
@@ -57,7 +57,7 @@ namespace SimpleInjector.Analysis
                 this.Items = new[]
                 {
                     new DebuggerViewItem(
-                        name: "How To View Analysis Info",
+                        name: "How To View Diagnostic Info",
                         description: "Analysis info is available in this debug view after Verify() is " + 
                             "called on this container instance.")
                 };

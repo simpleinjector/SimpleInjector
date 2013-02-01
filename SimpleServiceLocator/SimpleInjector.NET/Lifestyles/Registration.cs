@@ -32,7 +32,7 @@ namespace SimpleInjector.Lifestyles
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
 
     public abstract class Registration
     {

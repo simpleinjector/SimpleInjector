@@ -23,44 +23,29 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections.ObjectModel;
 
-    internal sealed class GeneralWarningsContainerAnalyzer : List<IContainerAnalyzer>, IContainerAnalyzer
+    internal sealed class KnownRelationshipCollection : Collection<KnownRelationship>
     {
-        internal GeneralWarningsContainerAnalyzer()
+        internal KnownRelationshipCollection(List<KnownRelationship> relationships) : base(relationships)
         {
-            this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
-            this.Add(new ContainerRegisteredContainerAnalyzer());
-            this.Add(new ShortCircuitContainerAnalyzer());
         }
 
-        public DebuggerViewItem Analyse(Container container)
+        protected override void InsertItem(int index, KnownRelationship item)
         {
-            const string WarningsName = "Configuration Warnings";
+            Requires.IsNotNull(item, "item");
 
-            var analysisResults = (
-                from analyzer in this
-                let result = analyzer.Analyse(container)
-                where result != null
-                select result)
-                .ToArray();
+            base.InsertItem(index, item);
+        }
 
-            if (!analysisResults.Any())
-            {
-                return new DebuggerViewItem(WarningsName, "No warnings detected.");
-            }
-            else if (analysisResults.Length == 1)
-            {
-                return analysisResults.Single();
-            }
-            else
-            {
-                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
-                    analysisResults);
-            }
+        protected override void SetItem(int index, KnownRelationship item)
+        {
+            Requires.IsNotNull(item, "item");
+
+            base.SetItem(index, item);
         }
     }
 }

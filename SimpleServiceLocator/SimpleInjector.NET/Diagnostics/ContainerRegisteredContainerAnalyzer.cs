@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Collections;

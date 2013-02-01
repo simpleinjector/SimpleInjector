@@ -31,7 +31,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>Produces instances for a given registration.</summary>
@@ -228,7 +228,7 @@ namespace SimpleInjector
 
             e.Lifestyle = this.Lifestyle;
 
-            e.KnownRelationships = new KnownDependencyCollection(this.registration.GetRelationships().ToList());
+            e.KnownRelationships = new KnownRelationshipCollection(this.registration.GetRelationships().ToList());
 
             this.registration.Container.OnExpressionBuilt(e);
 

@@ -26,13 +26,11 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Linq;
     using System.Linq.Expressions;
-    using SimpleInjector.Analysis;
-    using SimpleInjector.Lifestyles;
+
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// Provides data for and interaction with the 

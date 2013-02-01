@@ -1,8 +1,8 @@
-﻿namespace SimpleInjector.Tests.Unit.Analysis
+﻿namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
 
 #if DEBUG
     [TestClass]

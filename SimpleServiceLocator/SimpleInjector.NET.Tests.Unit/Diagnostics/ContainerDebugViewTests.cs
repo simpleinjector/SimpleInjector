@@ -1,13 +1,15 @@
-﻿namespace SimpleInjector.Tests.Unit.Analysis
+﻿namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Analysis;
-    using SimpleInjector.Extensions;
+    
+    using SimpleInjector.Diagnostics;
+
 
 #if !SILVERLIGHT
 

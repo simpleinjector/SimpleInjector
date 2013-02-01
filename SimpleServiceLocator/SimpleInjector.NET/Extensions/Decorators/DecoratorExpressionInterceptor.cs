@@ -26,14 +26,14 @@
 namespace SimpleInjector.Extensions.Decorators
 {
     using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Threading;
-using SimpleInjector.Advanced;
-using SimpleInjector.Analysis;
-using SimpleInjector.Lifestyles;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using System.Threading;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Hooks into the building process and adds a decorator if needed.

@@ -7,7 +7,7 @@
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
 

@@ -31,7 +31,7 @@ namespace SimpleInjector.Lifestyles
     using System.Linq;
     using System.Linq.Expressions;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
 
     public class HybridLifestyle : Lifestyle
     {

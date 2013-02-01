@@ -23,22 +23,10 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    internal class DebuggerViewItemType
+    internal interface IContainerAnalyzer
     {
-        public DebuggerViewItemType(Type type, DebuggerViewItem item)
-        {
-            this.Type = type;
-            this.Item = item;
-        }
-
-        public Type Type { get; private set; }
-
-        public DebuggerViewItem Item { get; private set; }
+        DebuggerViewItem Analyse(Container container);
     }
 }

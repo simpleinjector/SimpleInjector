@@ -23,41 +23,22 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
-    internal static class TypeGeneralizer
+    internal class DebuggerViewItemType
     {
-        // This method takes generic type and returns a 'partially' generic type definition of that same type,
-        // where all generic arguments up to the given nesting level. This allows us to group generic types
-        // by their partial generic type definition, which allows a much nicer user experience.
-        internal static Type MakeTypePartiallyGenericUpToLevel(Type type, int nestingLevel)
+        public DebuggerViewItemType(Type type, DebuggerViewItem item)
         {
-            // example given type: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>>
-            // level 0 returns: IEnumerable<T>
-            // level 1 returns: IEnumerable<IQueryProcessor<TQuery, TResult>>
-            // level 2 returns: IEnumerable<IQueryProcessor<MyQuery<T>, int[]>
-            // level 3 returns: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>
-            // level 4 returns: !type.ContainsGenericParameters
-            if (!type.IsGenericType)
-            {
-                return type;
-            }
-
-            if (nestingLevel == 0)
-            {
-                return type.GetGenericTypeDefinition();
-            }
-
-            var arguments =
-                from argument in type.GetGenericArguments()
-                select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1);
-
-            return type.GetGenericTypeDefinition().MakeGenericType(arguments.ToArray());
+            this.Type = type;
+            this.Item = item;
         }
+
+        public Type Type { get; private set; }
+
+        public DebuggerViewItem Item { get; private set; }
     }
 }

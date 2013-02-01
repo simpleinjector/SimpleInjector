@@ -33,7 +33,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
-    using SimpleInjector.Analysis;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.

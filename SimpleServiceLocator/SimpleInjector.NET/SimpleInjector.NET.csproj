@@ -73,21 +73,21 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
-    <Compile Include="Analysis\ContainerRegisteredContainerAnalyzer.cs" />
-    <Compile Include="Analysis\ShortCircuitContainerAnalyzer.cs" />
-    <Compile Include="Analysis\ContainerDebugView.cs" />
-    <Compile Include="Analysis\DebuggerViewItem.cs" />
-    <Compile Include="Analysis\DebuggerViewItemGenericTypeGrouper.cs" />
-    <Compile Include="Analysis\DebuggerViewItemType.cs" />
-    <Compile Include="Analysis\GeneralWarningsContainerAnalyzer.cs" />
-    <Compile Include="Analysis\IContainerAnalyzer.cs" />
-    <Compile Include="Analysis\KnownDependencyCollection.cs" />
-    <Compile Include="Analysis\TypeGeneralizer.cs" />
+    <Compile Include="Diagnostics\ContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\ShortCircuitContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\ContainerDebugView.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItem.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItemGenericTypeGrouper.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItemType.cs" />
+    <Compile Include="Diagnostics\GeneralWarningsContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\IContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\KnownRelationshipCollection.cs" />
+    <Compile Include="Diagnostics\TypeGeneralizer.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
-    <Compile Include="Analysis\LifestyleMismatchServices.cs" />
-    <Compile Include="Analysis\PotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\LifestyleMismatchServices.cs" />
+    <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzer.cs" />
     <Compile Include="ExpressionBuildingEventArgs.cs" />
     <Compile Include="ExpressionBuiltEventArgs.cs" />
     <Compile Include="Extensions\DecoratorExtensions.cs" />
@@ -109,7 +109,7 @@
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />
     <Compile Include="Lifestyles\HybridLifestyle.cs" />
-    <Compile Include="Analysis\KnownRelationship.cs" />
+    <Compile Include="Diagnostics\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
     <Compile Include="Lifestyles\Registration.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />
@@ -129,7 +129,9 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Analysis\" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

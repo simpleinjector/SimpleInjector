@@ -5,7 +5,8 @@
     using System.Linq.Expressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Analysis;
+
+    using SimpleInjector.Diagnostics;
 
     [TestClass]
     public class ExpressionBuiltEventTests

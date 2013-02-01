@@ -1,12 +1,11 @@
 ﻿#if DEBUG
-namespace SimpleInjector.Tests.Unit.Analysis
+namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using System;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Analysis;
-    using SimpleInjector.Lifestyles;
+    using SimpleInjector.Diagnostics;
 
     [TestClass]
     public class KnownDependencyTests

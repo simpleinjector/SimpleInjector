@@ -23,29 +23,41 @@
 */
 #endregion
 
-namespace SimpleInjector.Analysis
+namespace SimpleInjector.Diagnostics
 {
+    using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Text;
 
-    internal sealed class KnownDependencyCollection : Collection<KnownRelationship>
+    internal static class TypeGeneralizer
     {
-        internal KnownDependencyCollection(List<KnownRelationship> relationships) : base(relationships)
+        // This method takes generic type and returns a 'partially' generic type definition of that same type,
+        // where all generic arguments up to the given nesting level. This allows us to group generic types
+        // by their partial generic type definition, which allows a much nicer user experience.
+        internal static Type MakeTypePartiallyGenericUpToLevel(Type type, int nestingLevel)
         {
-        }
+            // example given type: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>>
+            // level 0 returns: IEnumerable<T>
+            // level 1 returns: IEnumerable<IQueryProcessor<TQuery, TResult>>
+            // level 2 returns: IEnumerable<IQueryProcessor<MyQuery<T>, int[]>
+            // level 3 returns: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>
+            // level 4 returns: !type.ContainsGenericParameters
+            if (!type.IsGenericType)
+            {
+                return type;
+            }
 
-        protected override void InsertItem(int index, KnownRelationship item)
-        {
-            Requires.IsNotNull(item, "item");
+            if (nestingLevel == 0)
+            {
+                return type.GetGenericTypeDefinition();
+            }
 
-            base.InsertItem(index, item);
-        }
+            var arguments =
+                from argument in type.GetGenericArguments()
+                select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1);
 
-        protected override void SetItem(int index, KnownRelationship item)
-        {
-            Requires.IsNotNull(item, "item");
-
-            base.SetItem(index, item);
+            return type.GetGenericTypeDefinition().MakeGenericType(arguments.ToArray());
         }
     }
 }
