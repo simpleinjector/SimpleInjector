@@ -29,9 +29,9 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
-
     using SimpleInjector.Packaging;
 
     /// <summary>
@@ -49,7 +49,11 @@ namespace SimpleInjector
         /// reference.</exception>
         public static void RegisterPackages(this Container container)
         {
-            RegisterPackages(container, AppDomain.CurrentDomain.GetAssemblies());
+            var assemblies = 
+                AppDomain.CurrentDomain.GetAssemblies()
+                .Where(assembly => !assembly.IsDynamic);
+
+            RegisterPackages(container, assemblies);
         }
 
         /// <summary>
@@ -73,12 +77,21 @@ namespace SimpleInjector
                 throw new ArgumentNullException("assemblies");
             }
 
-            var packages =
+            var packageTypes = (
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
                 where typeof(IPackage).IsAssignableFrom(type)
-                where type.GetConstructor(Type.EmptyTypes) != null
-                select Activator.CreateInstance(type) as IPackage;
+                where !type.IsAbstract
+                where !type.IsGenericTypeDefinition
+                select type)
+                .ToArray();
+
+            RequiresPackageTypesHaveDefaultConstructor(packageTypes);
+            
+            var packages = (
+                from type in packageTypes
+                select CreatePackage(type))
+                .ToArray();
 
             foreach (var package in packages)
             {
@@ -97,6 +110,32 @@ namespace SimpleInjector
                 // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
                 // Assembly and it would be safe to skip this exception.
                 return Enumerable.Empty<Type>();
+            }
+        }
+
+        private static void RequiresPackageTypesHaveDefaultConstructor(Type[] packageTypes)
+        {
+            var invalidPackageType =
+                packageTypes.FirstOrDefault(type => type.GetConstructor(Type.EmptyTypes) == null);
+
+            if (invalidPackageType != null)
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    "The type {0} does not contain a default (public parameterless) constructor. Packages " +
+                    "must have a default constructor.", invalidPackageType.FullName));
+            }
+        }
+
+        private static IPackage CreatePackage(Type packageType)
+        {
+            try
+            {
+                return (IPackage)Activator.CreateInstance(packageType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    "The creation of package type {0} failed. " + ex.Message), ex);
             }
         }
     }
