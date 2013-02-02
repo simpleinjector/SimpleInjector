@@ -113,8 +113,6 @@
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
         }
 
-
-
         [TestMethod]
         public void RegisterSingleByTypeNonGeneric_OpenGenericServiceType_ThrowsExpectedException()
         {

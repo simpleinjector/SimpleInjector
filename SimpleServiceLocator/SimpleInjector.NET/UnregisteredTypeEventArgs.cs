@@ -27,6 +27,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Linq.Expressions;
+
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -84,12 +85,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("instanceCreator");
             }
 
-            if (this.Handled)
-            {
-                throw new ActivationException(
-                    StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
-                        this.UnregisteredServiceType));
-            }
+            this.RequiresNotHandled();
 
             this.Expression = 
                 Expression.Convert(

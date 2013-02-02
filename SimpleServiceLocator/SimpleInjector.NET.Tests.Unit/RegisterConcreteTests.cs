@@ -121,8 +121,7 @@
             // Registration should succeed even though IUserRepository is not registered yet.
             container.Register<UserController>();
         }
-
-
+        
         [TestMethod]
         public void RegisterConcrete_ValidArguments_Succeeds()
         {

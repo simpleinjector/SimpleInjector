@@ -9,8 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     
     using SimpleInjector.Diagnostics;
-
-
+    
 #if !SILVERLIGHT
 
     public interface ILogger

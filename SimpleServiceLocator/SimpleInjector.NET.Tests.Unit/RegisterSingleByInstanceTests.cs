@@ -104,8 +104,7 @@
             // Act
             container.GetInstance<RealUserService>();
         }
-
-
+        
         [TestMethod]
         public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
         {

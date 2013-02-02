@@ -110,9 +110,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AmbiguousTypesTests.cs">
       <Link>AmbiguousTypesTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Analysis\KnownDependencyTests.cs">
-      <Link>Analysis\KnownDependencyTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AssertThat.cs">
       <Link>AssertThat.cs</Link>
     </Compile>
@@ -124,6 +121,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\CyclicDependencyValidatorTests.cs">
       <Link>CyclicDependencyValidatorTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\KnownDependencyTests.cs">
+      <Link>Diagnostics\KnownDependencyTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\EnumerableExtensions.cs">
       <Link>EnumerableExtensions.cs</Link>
