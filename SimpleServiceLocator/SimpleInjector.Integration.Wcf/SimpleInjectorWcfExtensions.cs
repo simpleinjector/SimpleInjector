@@ -305,6 +305,8 @@ namespace SimpleInjector
 
         private static bool IsWcfServiceType(Type type)
         {
+            bool typeIsDecorated = type.GetCustomAttributes(typeof(ServiceContractAttribute), true).Any();
+
             bool typesInterfacesAreDecorated = (
                 from @interface in type.GetInterfaces()
                 where @interface.IsPublic
@@ -312,7 +314,7 @@ namespace SimpleInjector
                 select @interface)
                 .Any();
 
-            return typesInterfacesAreDecorated;
+            return typeIsDecorated || typesInterfacesAreDecorated;
         }
     }
 }
