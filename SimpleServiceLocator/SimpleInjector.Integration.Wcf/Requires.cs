@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.LifetimeScoping
+namespace SimpleInjector.Integration.Wcf
 {
     using System;
 

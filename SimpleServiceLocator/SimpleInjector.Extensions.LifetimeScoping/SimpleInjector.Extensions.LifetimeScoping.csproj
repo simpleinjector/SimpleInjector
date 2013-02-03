@@ -34,8 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SimpleInjector, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

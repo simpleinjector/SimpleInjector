@@ -36,8 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\bin\NET\SimpleInjector.Integration.Wcf.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SimpleInjector, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

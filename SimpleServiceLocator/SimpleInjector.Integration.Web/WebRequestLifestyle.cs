@@ -32,24 +32,48 @@ namespace SimpleInjector.Integration.Web
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// Defines a lifestyle that caches instances during the execution of a single HTTP Web Request.
+    /// Instances created by this lifestyle can be disposed when the web request ends. 
+    /// </summary>
     public sealed class WebRequestLifestyle : Lifestyle
     {
+        /// <summary>
+        /// A default <see cref="WebRequestLifestyle"/> instance that can be used for registering components
+        /// per web request. This instance will ensure created instance get disposed after the web request
+        /// ends.
+        /// </summary>
         public static readonly Lifestyle Instance = new WebRequestLifestyle(true);
 
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
         private readonly bool dispose;
 
+        /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class.</summary>
+        /// <param name="disposeInstanceWhenWebRequestEnds">
+        /// Specifies whether the created and cached instance will be disposed after the execution of the web
+        /// request ended and when the created object implements <see cref="IDisposable"/>. 
+        /// </param>
         public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds = true) : base("Web Request")
         {
             this.dispose = disposeInstanceWhenWebRequestEnds;
         }
 
+        /// <summary>Gets the length of the lifestyle.</summary>
         protected override int Length
         {
             get { return 300; }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
             return new WebRequestRegistration<TService, TImplementation>(this, container)
@@ -58,6 +82,16 @@ namespace SimpleInjector.Integration.Web
             };
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator"></param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {

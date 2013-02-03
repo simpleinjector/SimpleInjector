@@ -28,7 +28,10 @@ namespace SimpleInjector.Integration.Web
     using System.Web;
 
     /// <summary>
-    /// Simple Injector web integration Http Module.
+    /// Simple Injector web integration HTTP Module. This module is registered automatically by ASP.NET when
+    /// the assembly of this class is included in the application's bin folder. The module will trigger the
+    /// disposing of created instances that are flagged as needing to be disposed at the end of the web 
+    /// request.
     /// </summary>
     public sealed class SimpleInjectorHttpModule : IHttpModule
     {

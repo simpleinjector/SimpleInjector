@@ -33,7 +33,6 @@ namespace SimpleInjector
     using System.Reflection;
     using System.ServiceModel;
 
-    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Integration.Wcf;
 
     /// <summary>
@@ -70,13 +69,7 @@ namespace SimpleInjector
                 from type in assembly.GetExportedTypes()
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
-                let typeIsWcfServiceType = (
-                    from @interface in type.GetInterfaces()
-                    where @interface.IsPublic
-                    where @interface.GetCustomAttributes(typeof(ServiceContractAttribute), true).Any()
-                    select @interface)
-                    .Any()
-                where typeIsWcfServiceType
+                where IsWcfServiceType(type)
                 select type;
 
             foreach (Type serviceType in serviceTypes)
@@ -308,6 +301,18 @@ namespace SimpleInjector
             // might see this as a design flaw, but since this feature is implemented on top of the core 
             // library (instead of being written inside of the core library), there is no other option.
             throw new InvalidOperationException(WcfScopingIsNotEnabledExceptionMessage);
+        }
+
+        private static bool IsWcfServiceType(Type type)
+        {
+            bool typesInterfacesAreDecorated = (
+                from @interface in type.GetInterfaces()
+                where @interface.IsPublic
+                where @interface.GetCustomAttributes(typeof(ServiceContractAttribute), true).Any()
+                select @interface)
+                .Any();
+
+            return typesInterfacesAreDecorated;
         }
     }
 }

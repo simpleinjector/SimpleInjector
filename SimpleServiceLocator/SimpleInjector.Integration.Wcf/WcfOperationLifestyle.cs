@@ -31,24 +31,47 @@ namespace SimpleInjector.Integration.Wcf
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
+    /// </summary>
     public class WcfOperationLifestyle : Lifestyle
     {
+        /// <summary>
+        /// A default <see cref="WcfOperationLifestyle"/> instance that can be used for registering components
+        /// per WCF Operation. This instance will ensure created instance get disposed after the WCF operation
+        /// ends.
+        /// </summary>
         public static readonly Lifestyle Instance = new WcfOperationLifestyle(true);
 
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
         private readonly bool disposeInstanceWhenOperationEnds;
 
+        /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class.</summary>
+        /// <param name="disposeInstanceWhenOperationEnds">
+        /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
+        /// operation ended and when the created object implements <see cref="IDisposable"/>. 
+        /// </param>
         public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds = true) : base("WCF Operation")
         {
             this.disposeInstanceWhenOperationEnds = disposeInstanceWhenOperationEnds;
         }
 
+        /// <summary>Gets the length of the lifestyle.</summary>
         protected override int Length
         {
             get { return 250; }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         public override Registration CreateRegistration<TService, TImplementation>(Container container)
         {
             this.EnablePerWcfOperationLifestyle(container);
@@ -59,6 +82,16 @@ namespace SimpleInjector.Integration.Wcf
             };
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator"></param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
         {
