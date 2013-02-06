@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     // http://simpleinjector.codeplex.com/wikipage?title=ContextDependentExtensions
-    // NOTE: You need .NET 4.0 to be able to use this code.
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -11,19 +10,47 @@
     [DebuggerDisplay("DependencyContext (ServiceType: {ServiceType}, ImplementationType: {ImplementationType})")]
     public class DependencyContext
     {
-        internal static readonly DependencyContext Root =
-            new DependencyContext(null, null);
+        internal static readonly DependencyContext Root = new DependencyContext();
 
-        internal DependencyContext(Type serviceType,
-            Type implementationType)
+        internal DependencyContext(Type serviceType, Type implementationType, DependencyContext parent)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
+            this.Parent = parent;
+        }
+
+        private DependencyContext()
+        {
         }
 
         public Type ServiceType { get; private set; }
 
         public Type ImplementationType { get; private set; }
+
+        public DependencyContext Parent { get; private set; }
+
+        internal DependencyContext AddParent(Type serviceType, Type implementationType)
+        {
+            if (this == Root)
+            {
+                return new DependencyContext(serviceType, implementationType, null);
+            }
+
+            return new DependencyContext(
+                this.ServiceType, 
+                this.ImplementationType,
+                this.CreateNewParent(serviceType, implementationType));
+        }
+
+        private DependencyContext CreateNewParent(Type serviceType, Type implementationType)
+        {
+            if (this.Parent == null)
+            {
+                return new DependencyContext(serviceType, implementationType, null);
+            }
+
+            return this.Parent.AddParent(serviceType, implementationType);
+        }
     }
 
     public static class ContextDependentExtensions
@@ -39,7 +66,7 @@
             }
 
             // By using the ResolveUnregisteredType event we can
-            // exactly control which which expression is built.
+            // exactly control which expression is built.
             container.ResolveUnregisteredType += (sender, e) =>
             {
                 if (e.UnregisteredServiceType == typeof(TService))
@@ -68,55 +95,40 @@
             };
         }
 
-        private sealed class DependencyContextRewriter
-            : ExpressionVisitor
+        private sealed class DependencyContextRewriter : ExpressionVisitor
         {
-            private readonly List<Expression> parents =
-                new List<Expression>();
-
             public object ContextBasedFactory { get; set; }
 
             public Type ServiceType { get; set; }
 
             public Expression OriginalExpression { get; set; }
 
+            private Type ImplementationType
+            {
+                get 
+                {
+                    var newExpression = this.OriginalExpression as NewExpression;
+
+                    return newExpression != null ? newExpression.Constructor.DeclaringType : this.ServiceType;
+                }
+            }
+
             protected override Expression VisitInvocation(
                 InvocationExpression node)
             {
-                if (this.IsRootTypeContextRegistration(node))
+                var expression = node.Expression as ConstantExpression;
+
+                if (expression == null || !object.ReferenceEquals(expression.Value, this.ContextBasedFactory))
                 {
-                    var parent = this.OriginalExpression as NewExpression;
-
-                    var context = new DependencyContext(
-                        this.ServiceType, 
-                        parent != null ? parent.Type : this.ServiceType);
-
-                    return Expression.Invoke(
-                        Expression.Constant(this.ContextBasedFactory),
-                        Expression.Constant(context));
+                    return node;
                 }
 
-                return base.VisitInvocation(node);
-            }
+                var contextExpression = (ConstantExpression)node.Arguments[0];
+                var context = (DependencyContext)contextExpression.Value;
 
-            private bool IsRootTypeContextRegistration(
-                InvocationExpression node)
-            {
-                if (!(node.Expression is ConstantExpression) ||
-                    node.Arguments.Count != 1 ||
-                    !(node.Arguments[0] is ConstantExpression))
-                {
-                    return false;
-                }
-
-                var target =
-                    ((ConstantExpression)node.Expression).Value;
-
-                var value =
-                    ((ConstantExpression)node.Arguments[0]).Value;
-
-                return target == this.ContextBasedFactory &&
-                    value == DependencyContext.Root;
+                return Expression.Invoke(
+                    Expression.Constant(this.ContextBasedFactory),
+                    Expression.Constant(context.AddParent(this.ServiceType, this.ImplementationType)));
             }
         }
     }

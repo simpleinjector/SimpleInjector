@@ -38,6 +38,7 @@
             // Assert
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
+            Assert.IsNull(handler.Logger.Context.Parent);
         }
 
         [TestMethod]
@@ -110,6 +111,36 @@
 
             Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
+
+            Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ServiceType);
+            Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ImplementationType);           
+            Assert.IsNull(logger.Context.Parent.Parent);
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeWithContextMultipleLevelsWithAllSingletons_GetsInjectedWithExpectedContext()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+
+            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+
+            container.RegisterSingle<IService, ServiceThatDependsOnRepository>();
+
+            // Act
+            var service = container.GetInstance<IService>() as ServiceThatDependsOnRepository;
+
+            // Assert
+            var logger = service.InjectedRepository.Logger;
+
+            Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
+            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
+
+            Assert.AreEqual(typeof(IService), logger.Context.Parent.ServiceType);
+            Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ImplementationType);
+            Assert.IsNull(logger.Context.Parent.Parent);
         }
 
         [TestMethod]
