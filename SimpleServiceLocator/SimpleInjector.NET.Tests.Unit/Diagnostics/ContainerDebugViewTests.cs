@@ -142,7 +142,7 @@
 
             // Assert
             Assert.AreEqual(1, debugView.Items.Length);
-            Assert.AreEqual("How To View Analysis Info", debugView.Items.Single().Name);
+            Assert.AreEqual("How To View Diagnostic Info", debugView.Items.Single().Name);
             Assert.AreEqual(
                 "Analysis info is available in this debug view after Verify() is " +
                 "called on this container instance.", 
@@ -171,7 +171,7 @@
 
             // Assert
             Assert.AreEqual(1, debugView.Items.Length);
-            Assert.AreEqual("How To View Analysis Info", debugView.Items.Single().Name);
+            Assert.AreEqual("How To View Diagnostic Info", debugView.Items.Single().Name);
         }
 
         [TestMethod]

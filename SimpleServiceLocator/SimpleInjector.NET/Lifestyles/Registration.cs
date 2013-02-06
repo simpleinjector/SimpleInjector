@@ -38,6 +38,8 @@ namespace SimpleInjector.Lifestyles
     {
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
 
+        private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
+
         protected Registration(Lifestyle lifestyle, Container container)
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
@@ -95,6 +97,14 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
+        // This method should only be called by the Lifestyle base class.
+        internal void SetParameterOverrides(IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+        {
+            this.overriddenParameters = overriddenParameters.ToDictionary(
+                p => p.Item1,
+                p => new OverriddenParameter(Expression.Constant(null, p.Item1.ParameterType), p.Item2));
+        }
+
         protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -103,7 +113,7 @@ namespace SimpleInjector.Lifestyles
             Expression expression = this.BuildTransientExpression<TService>(instanceCreator);
 
             // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
-            // but I don't feel like protecting us against such an obscure thing.
+            // but I don't feel like protecting us against such an obscure user bug.
             return BuildDelegate<TService>(expression);
         }
 
@@ -152,7 +162,7 @@ namespace SimpleInjector.Lifestyles
 
             expression = this.InterceptAndWrapInitializer<TService, TImplementation>(expression);
 
-            return expression;
+            return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
         }
 
         private NewExpression BuildNewExpression(Type serviceType, Type implemenationType)
@@ -165,9 +175,33 @@ namespace SimpleInjector.Lifestyles
 
             var parameters =
                 from parameter in constructor.GetParameters()
-                select this.BuildParameterExpression(parameter);
+                let placeHolder = this.GetOverriddenParameter(parameter).PlaceHolder
+                select placeHolder ?? this.BuildParameterExpression(parameter);
 
             return Expression.New(constructor, parameters.ToArray());
+        }
+
+        private Expression ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(Expression expression)
+        {
+            if (this.overriddenParameters != null)
+            {
+                foreach (var value in this.overriddenParameters.Values)
+                {
+                    expression = SubExpressionReplacer.Replace(expression, value.PlaceHolder, value.Expression);
+                }
+            }
+
+            return expression;
+        }
+
+        private OverriddenParameter GetOverriddenParameter(ParameterInfo parameter)
+        {
+            if (this.overriddenParameters != null && this.overriddenParameters.ContainsKey(parameter))
+            {
+                return this.overriddenParameters[parameter];
+            }
+
+            return new OverriddenParameter();
         }
 
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
@@ -279,6 +313,67 @@ namespace SimpleInjector.Lifestyles
             }
 
             return instance;
+        }
+        
+        private struct OverriddenParameter
+        {
+            private readonly ConstantExpression placeHolder;
+            private readonly Expression expression;
+
+            public OverriddenParameter(ConstantExpression placeHolder, Expression expression)
+            {
+                this.placeHolder = placeHolder;
+                this.expression = expression;
+            }
+
+            // A placeholder is a fake expression that we inject into the NewExpression. After the 
+            // NewExpression is created, it is ran through the ExpressionBuilding interception. By using
+            // placeholders instead of the real overridden expressions we prevent those expressions from
+            // being processed twice by the ExpressionBuilding event (since we expect the supplied expressions
+            // to already be processed). After the event has ran we replace the placeholders with the real
+            // expressions again (using an ExpressionVisitor).
+            internal ConstantExpression PlaceHolder 
+            { 
+                get { return this.placeHolder; } 
+            }
+
+            internal Expression Expression 
+            {
+                get { return this.expression; }
+            }
+        }
+
+        // Searches an expression for a specific sub expression and replaces that sub expression with a
+        // different supplied expression.
+        private sealed class SubExpressionReplacer : ExpressionVisitor
+        {
+            private readonly ConstantExpression subExpressionToFind;
+            private readonly Expression replacementExpression;
+
+            private SubExpressionReplacer(ConstantExpression subExpressionToFind,
+                Expression replacementExpression)
+            {
+                this.subExpressionToFind = subExpressionToFind;
+                this.replacementExpression = replacementExpression;
+            }
+
+            public override Expression Visit(Expression node)
+            {
+                return base.Visit(node);
+            }
+
+            internal static Expression Replace(Expression expressionToAlter,
+                ConstantExpression subExpressionToFind, Expression replacementExpression)
+            {
+                var visitor = new SubExpressionReplacer(subExpressionToFind, replacementExpression);
+
+                return visitor.Visit(expressionToAlter);
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                return node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
+            }
         }
     }
 }

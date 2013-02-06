@@ -461,7 +461,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(typeof(TService), instance, this);
+            var registration = Lifestyle.Singleton.CreateRegistration(typeof(TService), () => instance, this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -765,8 +765,8 @@ namespace SimpleInjector
 
             var readOnlyCollection = collection.MakeReadOnly();
 
-            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(
-                typeof(IEnumerable<TService>), readOnlyCollection, this);
+            var registration = Lifestyle.Singleton.CreateRegistration(
+                typeof(IEnumerable<TService>), () => readOnlyCollection, this);
 
             this.AddRegistration(typeof(IEnumerable<TService>), registration);
 
@@ -970,8 +970,8 @@ namespace SimpleInjector
 
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            var registration = SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableServiceType,
-                castedCollection, this);
+            var registration = Lifestyle.Singleton.CreateRegistration(enumerableServiceType,
+                () => castedCollection, this);
 
             this.AddRegistration(enumerableServiceType, registration);
 

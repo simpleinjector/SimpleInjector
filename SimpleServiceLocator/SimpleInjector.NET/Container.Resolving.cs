@@ -466,7 +466,7 @@ namespace SimpleInjector
             var emptyArray = Array.CreateInstance(elementType, 0);
 
             return new InstanceProducer(enumerableType,
-                SingletonLifestyle.CreateRegistrationForSingleInstance(enumerableType, emptyArray, this));
+                Lifestyle.Singleton.CreateRegistration(enumerableType, () => emptyArray, this));
         }
 
         private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType<TConcrete>()

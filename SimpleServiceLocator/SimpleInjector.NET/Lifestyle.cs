@@ -26,6 +26,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
@@ -42,14 +43,18 @@ namespace SimpleInjector
     public abstract class Lifestyle
     {
         /// <summary>
-        /// A new instance of the specified service type is created every time it is requested or injected.
+        /// The lifestyle instance that doesn't cache instances. A new instance of the specified
+        /// component is created every time the registered service it is requested or injected.
         /// </summary>
         public static readonly Lifestyle Transient = new TransientLifestyle();
 
         /// <summary>
-        /// Ensures that only one instance of the specified service type is created within the context of the
-        /// given container instance. In a multi-threaded applications, implementations registered using this
-        /// lifestyle must be thread-safe.
+        /// The lifestyle that caches components during the lifetime of the <see cref="Container"/> instance
+        /// and guarantees that only a single instance of that component is created for that instance. Since
+        /// general use is to create a single <b>Container</b> instance for the lifetime of the application /
+        /// AppDomain, this would mean that only a single instance of that component would exist during the
+        /// lifetime of the application. In a multi-threaded applications, implementations registered using 
+        /// this lifestyle must be thread-safe.
         /// </summary>
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
@@ -67,6 +72,10 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly string name;
 
+        /// <summary>Initializes a new instance of the <see cref="Lifestyle"/> class.</summary>
+        /// <param name="name">The user friendly name of this lifestyle.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
+        /// or an empty string.</exception>
         protected Lifestyle(string name)
         {
             Requires.IsNotNullOrEmpty(name, "name");
@@ -74,6 +83,7 @@ namespace SimpleInjector
             this.name = name;
         }
 
+        /// <summary>Gets the user friendly name of this lifestyle.</summary>
         public string Name 
         { 
             get { return this.name; } 
@@ -91,12 +101,25 @@ namespace SimpleInjector
             get { return this.Length; }
         }
 
+        /// <summary>
+        /// Gets the length of the lifestyle. Implementers must implement this property. The diagnostic
+        /// services use this value to compare lifestyles with each other to determine lifestyle 
+        /// misconfigurations.
+        /// </summary>
         protected abstract int Length
         {
             get;
         }
 
-        // TODO: Make virtual to make implementing a lifestyle easier.
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Supplying the generic type arguments is needed, since internal types can not " + 
                             "be created using the non-generic overloads in a sandbox.")]
@@ -104,6 +127,17 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class;
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         public abstract Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
             Container container)
             where TService : class;
@@ -171,6 +205,16 @@ namespace SimpleInjector
 #endif
                     ex);
             }
+        }
+
+        internal Registration CreateRegistration(Type serviceType, Type implementationType,
+            Container container, IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+        {
+            var registration = this.CreateRegistration(serviceType, implementationType, container);
+
+            registration.SetParameterOverrides(overriddenParameters);
+
+            return registration;
         }
 
         private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)

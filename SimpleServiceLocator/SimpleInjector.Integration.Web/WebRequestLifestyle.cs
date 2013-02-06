@@ -114,7 +114,7 @@ namespace SimpleInjector.Integration.Web
 
             public override Func<TService> BuildTransientInstanceCreator()
             {
-                return this.BuildTransientDelegate(this.InstanceCreator);
+                return this.BuildTransientDelegate<TService>(this.InstanceCreator);
             }
         }
 

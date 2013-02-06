@@ -406,7 +406,6 @@
             internal static Lifestyle LifetimeScope = new FakeLifestyle("Lifetime Scope", 100);
             internal static Lifestyle WcfOperation = new FakeLifestyle("WCF Operation", 250);
             internal static Lifestyle WebRequest = new FakeLifestyle("Web Request", 300);
-            // internal static Lifestyle Unknown = Lifestyle.Unknown;
         }
     }
     

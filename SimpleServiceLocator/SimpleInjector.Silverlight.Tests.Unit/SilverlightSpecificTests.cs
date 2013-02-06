@@ -7,6 +7,9 @@
     [TestClass]
     public class SilverlightSpecificTests
     {
+        private const string ExpectedSandboxFailureExpectedMessage = "Explicitly register the type using " +
+            "one of the generic 'Register' overloads or consider making it public.";
+
         public interface IPublicService
         {
         }
@@ -83,9 +86,6 @@
             // Act
             container.GetInstance<InternalOuterTypeDependingOnConcrete>();
         }
-
-        private const string ExpectedSandboxFailureExpectedMessage = "Explicitly register the type using " +
-    "one of the generic 'Register' overloads or consider making it public.";
 
         [TestMethod]
         public void RegisterSingleByType_RegisteringAnInternalType_ThrowsExpectedException()

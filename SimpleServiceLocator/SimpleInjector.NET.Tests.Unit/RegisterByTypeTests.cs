@@ -6,7 +6,6 @@
     [TestClass]
     public class RegisterByTypeTests
     {
-
         [TestMethod]
         public void RegisterByType_ValidArguments_Succeeds()
         {

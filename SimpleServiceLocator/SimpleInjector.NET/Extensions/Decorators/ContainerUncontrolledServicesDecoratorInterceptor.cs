@@ -153,7 +153,7 @@ namespace SimpleInjector.Extensions.Decorators
         {
             return (
                 from parameter in decoratorConstructor.GetParameters()
-                where IsDecorateeFactoryParameter(parameter, serviceType)
+                where IsDecorateeFactoryDependencyParameter(parameter, serviceType)
                 select parameter)
                 .Any();
         }

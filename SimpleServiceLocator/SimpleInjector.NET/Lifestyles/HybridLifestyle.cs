@@ -33,6 +33,13 @@ namespace SimpleInjector.Lifestyles
 
     using SimpleInjector.Diagnostics;
 
+    /// <summary>
+    /// The <see cref="HybridLifestyle"/> allows mixing two lifestyles in a single registration. Based on
+    /// the supplied selection delegate the hybrid lifestyle will redirect the creation of the instance to
+    /// the correct lifestyle. The result of the selection delegate will not be cached; it is invoked each
+    /// time an instance is requested or injected. By nesting <see cref="HybridLifestyle"/> and number of 
+    /// lifestyles can be mixed.
+    /// </summary>
     public class HybridLifestyle : Lifestyle
     {
         public HybridLifestyle(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
@@ -50,6 +57,7 @@ namespace SimpleInjector.Lifestyles
         // TODO: Is this naming right?
         public Func<bool> Test { get; private set; }
 
+        // TODO: Is this naming right?
         public Lifestyle TrueLifestyle { get; private set; }
 
         public Lifestyle FalseLifestyle { get; private set; }

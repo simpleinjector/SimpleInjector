@@ -248,8 +248,7 @@ namespace SimpleInjector.Extensions.Decorators
         {
             return
                 from parameter in constructor.GetParameters()
-                where !IsExpressionForDecorateeDependency(parameter, registeredServiceType)
-                where !IsDecorateeFactoryParameter(parameter, registeredServiceType)
+                where !IsDecorateeParameter(parameter, registeredServiceType)
                 let parameterProducer = this.Container.GetRegistration(parameter.ParameterType)
                 where parameterProducer != null
                 select new KnownRelationship(
@@ -263,14 +262,20 @@ namespace SimpleInjector.Extensions.Decorators
         {
             return
                 from parameter in constructor.GetParameters()
-                where IsExpressionForDecorateeDependency(parameter, registeredServiceType)
+                where IsDecorateeDependencyParameter(parameter, registeredServiceType)
                 select new KnownRelationship(
                     implementationType: constructor.DeclaringType,
                     lifestyle: this.Lifestyle,
                     dependency: decoratee);
         }
 
-        protected static bool IsDecorateeFactoryParameter(ParameterInfo parameter, Type serviceType)
+        protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)
+        {
+            return IsDecorateeDependencyParameter(parameter, registeredServiceType) ||
+                IsDecorateeFactoryDependencyParameter(parameter, registeredServiceType);
+        }
+
+        protected static bool IsDecorateeFactoryDependencyParameter(ParameterInfo parameter, Type serviceType)
         {
             return parameter.ParameterType.IsGenericType &&
                 parameter.ParameterType.GetGenericTypeDefinition() == typeof(Func<>) &&
@@ -296,16 +301,24 @@ namespace SimpleInjector.Extensions.Decorators
             ExpressionBuiltEventArgs e)
         {
             return
+                BuildExpressionForDecorateeDependencyParameterOrNull(parameter, e) ??
+                this.BuildExpressionForNormalDependencyParameter(parameter);
+        }
+
+        protected static Expression BuildExpressionForDecorateeDependencyParameterOrNull(
+            ParameterInfo parameter, ExpressionBuiltEventArgs e)
+        {
+            return
                 BuildExpressionForDecorateeDependencyParameter(parameter, e) ??
                 BuildExpressionForDecorateeFactoryDependencyParameter(parameter, e) ??
-                this.BuildExpressionForNormalDependencyParameter(parameter);
+                null;
         }
 
         // The constructor parameter in which the decorated instance should be injected.
         private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
             ExpressionBuiltEventArgs e)
         {
-            if (IsExpressionForDecorateeDependency(parameter, e.RegisteredServiceType))
+            if (IsDecorateeDependencyParameter(parameter, e.RegisteredServiceType))
             {
                 return e.Expression;
             }
@@ -313,7 +326,7 @@ namespace SimpleInjector.Extensions.Decorators
             return null;
         }
 
-        private static bool IsExpressionForDecorateeDependency(ParameterInfo parameter, Type registeredServiceType)
+        private static bool IsDecorateeDependencyParameter(ParameterInfo parameter, Type registeredServiceType)
         {
             return parameter.ParameterType == registeredServiceType;
         }
@@ -322,7 +335,7 @@ namespace SimpleInjector.Extensions.Decorators
         private static Expression BuildExpressionForDecorateeFactoryDependencyParameter(
             ParameterInfo parameter, ExpressionBuiltEventArgs e)
         {
-            if (IsDecorateeFactoryParameter(parameter, e.RegisteredServiceType))
+            if (IsDecorateeFactoryDependencyParameter(parameter, e.RegisteredServiceType))
             {
                 var instanceCreator =
                     Expression.Lambda(Expression.Convert(e.Expression, e.RegisteredServiceType)).Compile();

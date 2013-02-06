@@ -27,9 +27,11 @@ namespace SimpleInjector.Extensions.Decorators
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
+    using SimpleInjector.Lifestyles;
 
     internal sealed class ServiceDecoratorExpressionInterceptor : DecoratorExpressionInterceptor
     {
@@ -39,7 +41,7 @@ namespace SimpleInjector.Extensions.Decorators
         // for the registration of that decorator will go through the same instance, we can (or must)
         // define this dictionary as instance field (not as static or thread-static). When a decorator is
         // registered 
-        private readonly Dictionary<Type, object> singletonDecorators = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, Registration> registrations = new Dictionary<Type, Registration>();
 
         internal ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
             : base(data)
@@ -99,35 +101,60 @@ namespace SimpleInjector.Extensions.Decorators
         private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
             ExpressionBuiltEventArgs e)
         {
-            var parameters = this.BuildParameters(decoratorConstructor, e);
+            var decorateeParameter = (
+                from parameter in decoratorConstructor.GetParameters()
+                where IsDecorateeParameter(parameter, e.RegisteredServiceType)
+                select parameter)
+                .Single();
+            
+            var decorateeExpression = 
+                BuildExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, e);
 
-            Expression decoratorExpression =
-                DecoratorHelpers.BuildDecoratorExpression(this.Container, decoratorConstructor, parameters);
+            var registration = this.CreateRegistrationFromCache(e, decoratorConstructor);
 
-            if (this.Lifestyle == Lifestyle.Singleton)
-            {
-                var singleton =
-                    this.GetSingletonDecorator(decoratorConstructor.DeclaringType, decoratorExpression);
-
-                return Expression.Constant(singleton);
-            }
-
-            return decoratorExpression;
+            // By creating the decorator using a Lifestyle Registration the decorator can be completely
+            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied and it
+            // can be wrapped with an initializer.
+            return registration.BuildExpression();
         }
 
-        private object GetSingletonDecorator(Type decoratorType, Expression decoratorExpression)
+        private Registration CreateRegistrationFromCache(ExpressionBuiltEventArgs e, 
+            ConstructorInfo decoratorConstructor)
         {
-            object singleton;
+            Registration registration;
 
-            lock (this.singletonDecorators)
+            // Ensure that the registration for the decorator is created only once to prevent the possibility
+            // of multiple instances being created when dealing lifestyles that cache an instance within the
+            // Registration instance itself (such as the Singleton lifestyle does).
+            lock (this.registrations)
             {
-                if (!this.singletonDecorators.TryGetValue(decoratorType, out singleton))
+                if (!this.registrations.TryGetValue(e.RegisteredServiceType, out registration))
                 {
-                    this.singletonDecorators[decoratorType] = singleton = decoratorExpression.Invoke();
+                    registration = this.CreateRegistration(e, decoratorConstructor);
+
+                    this.registrations[e.RegisteredServiceType] = registration;
                 }
             }
 
-            return singleton;
+            return registration;
+        }
+
+        private Registration CreateRegistration(ExpressionBuiltEventArgs e, 
+            ConstructorInfo decoratorConstructor)
+        {
+            ParameterInfo decorateeParameter = (
+                from parameter in decoratorConstructor.GetParameters()
+                where IsDecorateeParameter(parameter, e.RegisteredServiceType)
+                select parameter)
+                .Single();
+
+            Expression decorateeExpression =
+                BuildExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, e);
+
+            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
+
+            return this.Lifestyle.CreateRegistration(e.RegisteredServiceType, 
+                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);         
         }
     }
 }
