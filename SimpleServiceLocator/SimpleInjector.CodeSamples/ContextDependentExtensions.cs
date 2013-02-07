@@ -12,11 +12,10 @@
     {
         internal static readonly DependencyContext Root = new DependencyContext();
 
-        internal DependencyContext(Type serviceType, Type implementationType, DependencyContext parent)
+        internal DependencyContext(Type serviceType, Type implementationType)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
-            this.Parent = parent;
         }
 
         private DependencyContext()
@@ -26,31 +25,6 @@
         public Type ServiceType { get; private set; }
 
         public Type ImplementationType { get; private set; }
-
-        public DependencyContext Parent { get; private set; }
-
-        internal DependencyContext AddParent(Type serviceType, Type implementationType)
-        {
-            if (this == Root)
-            {
-                return new DependencyContext(serviceType, implementationType, null);
-            }
-
-            return new DependencyContext(
-                this.ServiceType, 
-                this.ImplementationType,
-                this.CreateNewParent(serviceType, implementationType));
-        }
-
-        private DependencyContext CreateNewParent(Type serviceType, Type implementationType)
-        {
-            if (this.Parent == null)
-            {
-                return new DependencyContext(serviceType, implementationType, null);
-            }
-
-            return this.Parent.AddParent(serviceType, implementationType);
-        }
     }
 
     public static class ContextDependentExtensions
@@ -88,7 +62,7 @@
                 {
                     ContextBasedFactory = contextBasedFactory,
                     ServiceType = e.RegisteredServiceType,
-                    OriginalExpression = e.Expression
+                    Expression = e.Expression
                 };
 
                 e.Expression = rewriter.Visit(e.Expression);
@@ -97,38 +71,61 @@
 
         private sealed class DependencyContextRewriter : ExpressionVisitor
         {
-            public object ContextBasedFactory { get; set; }
+            internal object ContextBasedFactory { get; set; }
 
-            public Type ServiceType { get; set; }
+            internal Type ServiceType { get; set; }
 
-            public Expression OriginalExpression { get; set; }
+            internal Expression Expression { get; set; }
 
-            private Type ImplementationType
+            internal Type ImplementationType
             {
                 get 
                 {
-                    var newExpression = this.OriginalExpression as NewExpression;
+                    var expression = this.Expression as NewExpression;
 
-                    return newExpression != null ? newExpression.Constructor.DeclaringType : this.ServiceType;
+                    if (expression != null)
+                    {
+                        return expression.Constructor.DeclaringType;
+                    }
+
+                    return this.ServiceType;
                 }
             }
 
             protected override Expression VisitInvocation(
                 InvocationExpression node)
             {
-                var expression = node.Expression as ConstantExpression;
-
-                if (expression == null || !object.ReferenceEquals(expression.Value, this.ContextBasedFactory))
+                if (!this.IsRootedContextBasedFactory(node))
                 {
                     return node;
+                }
+
+                return Expression.Invoke(
+                    Expression.Constant(this.ContextBasedFactory),
+                    Expression.Constant(
+                        new DependencyContext(
+                            this.ServiceType, 
+                            this.ImplementationType)));
+            }
+
+            private bool IsRootedContextBasedFactory(InvocationExpression node)
+            {
+                var expression = node.Expression as ConstantExpression;
+
+                if (expression == null)
+                {
+                    return false;
+                }
+
+                if (!object.ReferenceEquals(expression.Value, this.ContextBasedFactory))
+                {
+                    return false;
                 }
 
                 var contextExpression = (ConstantExpression)node.Arguments[0];
                 var context = (DependencyContext)contextExpression.Value;
 
-                return Expression.Invoke(
-                    Expression.Constant(this.ContextBasedFactory),
-                    Expression.Constant(context.AddParent(this.ServiceType, this.ImplementationType)));
+                return context == DependencyContext.Root;
             }
         }
     }
