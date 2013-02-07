@@ -1,11 +1,10 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
-    using System.Runtime.Remoting.Proxies;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Lifestyles;
+    using System;
+using System.Runtime.Remoting.Proxies;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SimpleInjector.Extensions;
+using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ContextDependentExtensionsTests
@@ -25,12 +24,25 @@
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void RegisterWithContext_CalledForAlreadyRegisteredService_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, ContextualLogger>();
+
+            // Act
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+        }
+
+        [TestMethod]
         public void GetInstance_ResolvingAConcreteTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             // Act
             var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
@@ -47,7 +59,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.RegisterInitializer<RepositoryThatDependsOnLogger>(_ => { });
 
@@ -65,7 +77,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -83,10 +95,10 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             // Act
-            var logger = container.GetInstance<ILogger>() as ContectualLogger;
+            var logger = container.GetInstance<ILogger>() as ContextualLogger;
 
             // Assert
             Assert.AreEqual(null, logger.Context.ServiceType);
@@ -99,7 +111,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -123,7 +135,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -155,7 +167,7 @@
             // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -176,7 +188,7 @@
 
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -200,7 +212,7 @@
             // an interesting test.
             container.InterceptWith<FakeInterceptor>(type => type == typeof(ILogger));
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -219,7 +231,7 @@
 
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
 
@@ -239,7 +251,7 @@
 
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
 
@@ -257,7 +269,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
             container.Register<IService, ServiceThatDependsOnRepository>();
@@ -278,7 +290,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContectualLogger(context));
+            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
             container.Register<IService, ServiceThatDependsOnRepository>();
@@ -331,12 +343,12 @@
                 ConcreteCommand justAnExtraArgumentToMakeUsFindBugsFaster)
             {
                 this.InjectedRepository = (RepositoryThatDependsOnLogger)repository;
-                this.InjectedLogger = (ContectualLogger)logger;
+                this.InjectedLogger = (ContextualLogger)logger;
             }
 
             public RepositoryThatDependsOnLogger InjectedRepository { get; private set; }
 
-            public ContectualLogger InjectedLogger { get; private set; }
+            public ContextualLogger InjectedLogger { get; private set; }
         }
 
         public sealed class RepositoryThatDependsOnLogger : IRepository
@@ -349,9 +361,9 @@
             public ILogger Logger { get; private set; }
         }
 
-        public sealed class ContectualLogger : ILogger
+        public sealed class ContextualLogger : ILogger
         {
-            public ContectualLogger(DependencyContext context)
+            public ContextualLogger(DependencyContext context)
             {
                 Assert.IsNotNull(context, "context should not be null.");
 

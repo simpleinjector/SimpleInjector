@@ -2,7 +2,6 @@
 {
     // http://simpleinjector.codeplex.com/wikipage?title=ContextDependentExtensions
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using SimpleInjector;
@@ -10,9 +9,11 @@
     [DebuggerDisplay("DependencyContext (ServiceType: {ServiceType}, ImplementationType: {ImplementationType})")]
     public class DependencyContext
     {
-        internal static readonly DependencyContext Root = new DependencyContext();
+        internal static readonly DependencyContext Root = 
+            new DependencyContext();
 
-        internal DependencyContext(Type serviceType, Type implementationType)
+        internal DependencyContext(Type serviceType, 
+            Type implementationType)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
@@ -39,41 +40,37 @@
                 throw new ArgumentNullException("contextBasedFactory");
             }
 
-            // By using the ResolveUnregisteredType event we can
-            // exactly control which expression is built.
-            container.ResolveUnregisteredType += (sender, e) =>
-            {
-                if (e.UnregisteredServiceType == typeof(TService))
-                {
-                    // () => contextBasedFactory(DependencyContext.Root)
-                    var expression = Expression.Invoke(
-                        Expression.Constant(contextBasedFactory),
-                        Expression.Constant(DependencyContext.Root));
+            Func<TService> rootFactory = 
+                () => contextBasedFactory(DependencyContext.Root);
 
-                    e.Register(expression);
-                }
-            };
+            container.Register<TService>(rootFactory, Lifestyle.Transient);
 
             // Allow the Func<DependencyContext, TService> to be 
-            // injected into transient parent types.
+            // injected into parent types.
             container.ExpressionBuilding += (sender, e) =>
             {
-                var rewriter = new DependencyContextRewriter
+                if (e.RegisteredServiceType != typeof(TService))
                 {
-                    ContextBasedFactory = contextBasedFactory,
-                    ServiceType = e.RegisteredServiceType,
-                    Expression = e.Expression
-                };
+                    var rewriter = new DependencyContextRewriter
+                    {
+                        ServiceType = e.RegisteredServiceType,
+                        ContextBasedFactory = contextBasedFactory,
+                        RootFactory = rootFactory,
+                        Expression = e.Expression
+                    };
 
-                e.Expression = rewriter.Visit(e.Expression);
+                    e.Expression = rewriter.Visit(e.Expression);
+                }
             };
         }
 
         private sealed class DependencyContextRewriter : ExpressionVisitor
         {
+            internal Type ServiceType { get; set; }
+
             internal object ContextBasedFactory { get; set; }
 
-            internal Type ServiceType { get; set; }
+            internal object RootFactory { get; set; }
 
             internal Expression Expression { get; set; }
 
@@ -97,7 +94,7 @@
             {
                 if (!this.IsRootedContextBasedFactory(node))
                 {
-                    return node;
+                    return base.VisitInvocation(node);
                 }
 
                 return Expression.Invoke(
@@ -117,15 +114,7 @@
                     return false;
                 }
 
-                if (!object.ReferenceEquals(expression.Value, this.ContextBasedFactory))
-                {
-                    return false;
-                }
-
-                var contextExpression = (ConstantExpression)node.Arguments[0];
-                var context = (DependencyContext)contextExpression.Value;
-
-                return context == DependencyContext.Root;
+                return object.ReferenceEquals(expression.Value, this.RootFactory);
             }
         }
     }
