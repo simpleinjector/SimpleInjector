@@ -765,6 +765,42 @@
         }
 
         [TestMethod]
+        public void GetRelationships_OnAPartiallyDecoratedCollection_ReturnsTheExpectedRelationships()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                typeof(RealCommandCommandHandler),
+                typeof(DefaultCommandHandler<RealCommand>),
+                typeof(NullCommandHandler<RealCommand>));
+
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(TransactionalCommandHandlerDecorator<>),
+                c => c.ImplementationType != typeof(NullCommandHandler<RealCommand>));
+
+            // Act
+            container.Verify();
+
+            var relationships = container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>))
+                .GetRelationships();
+
+            // Assert
+            Assert.AreEqual(2, relationships.Length);
+
+            var real = relationships[0];
+
+            Assert.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), real.ImplementationType);
+            Assert.AreEqual(typeof(RealCommandCommandHandler), real.Dependency.ServiceType);
+
+            var @default = relationships[1];
+
+            Assert.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), @default.ImplementationType);
+            Assert.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ServiceType);
+        }
+        
+        [TestMethod]
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesAllInstancesThatShouldBeDecorated()
         {
             // Arrange
@@ -1249,7 +1285,7 @@
 
             var decoratee = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator2).Decorated;
 
-            Assert.IsInstanceOfType(decoratee, typeof(RealCommandCommandHandler));
+            Assert.AreEqual(typeof(RealCommandCommandHandler).ToFriendlyName(), decoratee.GetType().ToFriendlyName());
         }
 
         [TestMethod]
@@ -1323,7 +1359,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_ContainerUncontrolled_Scenario_Behavior()
+        public void GetRegistration_ContainerUncontrolledCollectionWithDecorator_ContainsExpectedListOfRelationships()
         {
             // Arrange
             var expectedRelationship = new RelationshipInfo
@@ -1354,6 +1390,77 @@
             Assert.IsTrue(expectedRelationship.Equals(relationships[0]));
         }
 #endif
+        
+        [TestMethod]
+        public void GetInstance_ContainerControlledCollectionWithDecorator_DecoratorGoesThroughCompletePipeLineIncludingExpressionBuilding()
+        {
+            // Arrange
+            var typesBuilding = new List<Type>();
+
+            var container = new Container();
+
+            var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
+            
+            container.RegisterAll<ICommandHandler<RealCommand>>(typesToRegister);
+
+            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.Expression is NewExpression)
+                {
+                    typesBuilding.Add(((NewExpression)e.Expression).Constructor.DeclaringType);
+                }
+            };
+
+            // Act
+            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+
+            // Assert
+            var decorators = typesBuilding.Where(type => type == typeof(RealCommandHandlerDecorator)).ToArray();
+
+            Assert.AreEqual(typesToRegister.Length, decorators.Length,
+                "The decorator is expected to go through the complete pipeline, including " +
+                "ExpressionBuilding. Since the collection is container controlled the ExpressionBuilding " +
+                "should be called for each type in the collection.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ContainerUncontrolledCollectionWithDecorator_DecoratorGoesThroughCompletePipeLineIncludingExpressionBuilding()
+        {
+            // Arrange
+            var typesBuilding = new List<Type>();
+
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
+                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
+
+            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.Expression is NewExpression)
+                {
+                    typesBuilding.Add(((NewExpression)e.Expression).Constructor.DeclaringType);
+                }
+            };
+
+            // Act
+            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+
+            // Assert
+            var decorators = typesBuilding.Where(type => type == typeof(RealCommandHandlerDecorator)).ToArray();
+
+            Assert.AreEqual(1, decorators.Length,
+                "The decorator is expected to go through the complete pipeline, including " +
+                "ExpressionBuilding. Since the collection is container uncontrolled the ExpressionBuilding " +
+                "should be called once for the complete collection.");
+        }
 
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(

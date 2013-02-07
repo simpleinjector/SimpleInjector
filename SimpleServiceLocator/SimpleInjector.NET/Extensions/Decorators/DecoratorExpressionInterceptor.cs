@@ -212,26 +212,6 @@ namespace SimpleInjector.Extensions.Decorators
             return predicateCache[registeredServiceType];
         }
 
-        protected Expression[] BuildParameters(ConstructorInfo constructor, ExpressionBuiltEventArgs e)
-        {
-            var parameterExpressions =
-                from dependencyParameter in constructor.GetParameters()
-                select this.BuildExpressionForDependencyParameter(dependencyParameter, e);
-
-            try
-            {
-                return parameterExpressions.ToArray();
-            }
-            catch (ActivationException ex)
-            {
-                // Build a more expressive exception message.
-                string message =
-                    StringResources.ErrorWhileTryingToGetInstanceOfType(constructor.DeclaringType, ex.Message);
-
-                throw new ActivationException(message, ex);
-            }
-        }
-
         protected KnownRelationship[] GetKnownDecoratorRelationships(ConstructorInfo decoratorConstructor,
             Type registeredServiceType, InstanceProducer decoratee)
         {
@@ -241,6 +221,20 @@ namespace SimpleInjector.Extensions.Decorators
             var normalRelationships = this.GetNormalRelationships(decoratorConstructor, registeredServiceType);
 
             return normalRelationships.Union(decorateeRelationships).ToArray();
+        }
+        
+        protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
+            Expression decorateeExpression)
+        {
+            ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
+
+            decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(
+                decorateeParameter, serviceType, decorateeExpression);
+
+            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
+
+            return this.Lifestyle.CreateRegistration(serviceType,
+                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
 
         private IEnumerable<KnownRelationship> GetNormalRelationships(ConstructorInfo constructor,
@@ -300,27 +294,39 @@ namespace SimpleInjector.Extensions.Decorators
         private Expression BuildExpressionForDependencyParameter(ParameterInfo parameter,
             ExpressionBuiltEventArgs e)
         {
+            var serviceType = e.RegisteredServiceType;
+
             return
-                BuildExpressionForDecorateeDependencyParameterOrNull(parameter, e) ??
+                GetExpressionForDecorateeDependencyParameterOrNull(parameter, serviceType, e.Expression) ??
                 this.BuildExpressionForNormalDependencyParameter(parameter);
         }
 
-        protected static Expression BuildExpressionForDecorateeDependencyParameterOrNull(
-            ParameterInfo parameter, ExpressionBuiltEventArgs e)
+        protected static Expression GetExpressionForDecorateeDependencyParameterOrNull(
+            ParameterInfo parameter, Type serviceType, Expression expression)
         {
             return
-                BuildExpressionForDecorateeDependencyParameter(parameter, e) ??
-                BuildExpressionForDecorateeFactoryDependencyParameter(parameter, e) ??
+                BuildExpressionForDecorateeDependencyParameter(parameter, serviceType, expression) ??
+                BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
                 null;
+        }
+        
+        protected static ParameterInfo GetDecorateeParameter(Type serviceType, 
+            ConstructorInfo decoratorConstructor)
+        {
+            return (
+                from parameter in decoratorConstructor.GetParameters()
+                where IsDecorateeParameter(parameter, serviceType)
+                select parameter)
+                .Single();
         }
 
         // The constructor parameter in which the decorated instance should be injected.
         private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
-            ExpressionBuiltEventArgs e)
+            Type serviceType, Expression expression)
         {
-            if (IsDecorateeDependencyParameter(parameter, e.RegisteredServiceType))
+            if (IsDecorateeDependencyParameter(parameter, serviceType))
             {
-                return e.Expression;
+                return expression;
             }
 
             return null;
@@ -333,12 +339,12 @@ namespace SimpleInjector.Extensions.Decorators
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
         private static Expression BuildExpressionForDecorateeFactoryDependencyParameter(
-            ParameterInfo parameter, ExpressionBuiltEventArgs e)
+            ParameterInfo parameter, Type serviceType, Expression expression)
         {
-            if (IsDecorateeFactoryDependencyParameter(parameter, e.RegisteredServiceType))
+            if (IsDecorateeFactoryDependencyParameter(parameter, serviceType))
             {
                 var instanceCreator =
-                    Expression.Lambda(Expression.Convert(e.Expression, e.RegisteredServiceType)).Compile();
+                    Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
 
                 return Expression.Constant(instanceCreator);
             }

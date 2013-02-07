@@ -33,6 +33,8 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
 
+    using SimpleInjector.Lifestyles;
+
     // This class allows decorating collections of services with elements that are created out of the control
     // of the container. Collections are registered using the following methods:
     // -RegisterAll<TService>(IEnumerable<TService> collection)
@@ -109,31 +111,51 @@ namespace SimpleInjector.Extensions.Decorators
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
             Justification = "This is not a performance critical path.")]
         private Expression BuildDecoratorExpression(Type serviceType, ConstructorInfo decoratorConstructor,
-            Expression originalExpression)
+            Expression originalEnumerableExpression)
         {
             this.ThrowWhenDecoratorNeedsAFunc(serviceType, decoratorConstructor);
+            this.ThrownWhenLifestyleIsNotTransientOrSingleton();
 
-            ParameterExpression parameter = Expression.Parameter(serviceType, "service");
+            ParameterExpression parameter = Expression.Parameter(serviceType, "decoratee");
 
-            var parameters =
-                this.BuildParameters(decoratorConstructor, new ExpressionBuiltEventArgs(serviceType, parameter));
+            Registration registration = 
+                this.CreateRegistrationForUncontrolledCollection(serviceType, decoratorConstructor, parameter);
 
-            Delegate wrapInstanceWithDecorator =
-                BuildDecoratorWrapper(serviceType, decoratorConstructor, parameter, parameters)
+            Expression parameterizedDecoratorExpression = registration.BuildExpression();
+
+            Delegate wrapInstanceWithDecorator = 
+                BuildDecoratorWrapper(serviceType, parameter, parameterizedDecoratorExpression)
                 .Compile();
 
-            if (originalExpression is ConstantExpression)
+            if (originalEnumerableExpression is ConstantExpression)
             {
                 return this.BuildDecoratorEnumerableExpressionForConstantEnumerable(serviceType,
-                    wrapInstanceWithDecorator, ((ConstantExpression)originalExpression).Value as IEnumerable);
+                    wrapInstanceWithDecorator, 
+                    ((ConstantExpression)originalEnumerableExpression).Value as IEnumerable);
             }
             else
             {
                 return this.BuildDecoratorEnumerableExpressionForNonConstantExpression(serviceType,
-                    wrapInstanceWithDecorator, originalExpression);
+                    wrapInstanceWithDecorator, originalEnumerableExpression);
             }
         }
 
+        private Registration CreateRegistrationForUncontrolledCollection(Type serviceType, 
+            ConstructorInfo decoratorConstructor, Expression decorateeExpression)
+        {
+            ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
+
+            decorateeExpression = 
+                DecoratorExpressionInterceptor.GetExpressionForDecorateeDependencyParameterOrNull(
+                decorateeParameter, serviceType, decorateeExpression);
+
+            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
+
+            // Create the decorator as transient. Caching is applied later on.
+            return Lifestyle.Transient.CreateRegistration(serviceType,
+                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+        }
+        
         private void ThrowWhenDecoratorNeedsAFunc(Type serviceType, ConstructorInfo decoratorConstructor)
         {
             bool needsADecorateeFactory =
@@ -145,6 +167,25 @@ namespace SimpleInjector.Extensions.Decorators
                     StringResources.CantGenerateFuncForDecorator(serviceType, this.DecoratorTypeDefinition);
 
                 throw new ActivationException(message);
+            }
+        }
+
+        private void ThrownWhenLifestyleIsNotTransientOrSingleton()
+        {
+            // Because the user registered an IEnumerable<TService>, this collection can be dynamic in nature,
+            // and the number of elements could change on each enumeration. It's impossible to detect if a
+            // returned element is supposed to be a new element and should get its own new decorator, or if
+            // it is supposed to be an existing element, for which an already cached decorator can be used.
+            // In fact we can't really cache elements as Singleton, but since this was already supported in
+            // the past, we don't want to introduce (yet another) breaking change.
+            if (this.Lifestyle != Lifestyle.Transient && this.Lifestyle != Lifestyle.Singleton)
+            {
+                // We don't have any code coverage for this feature, since the current implementation of
+                // DegisterDecorator only supports Transient and Singleton, but this will probably change in
+                // the future. So this statement is an assertion to prevent me forgetting about this in the
+                // future.
+                throw new NotSupportedException("Lifestyle " + this.Lifestyle.Name + " is not supported " +
+                    "for this type of registration. Only Transient and Singleton lifestyles are supported.");
             }
         }
 
@@ -161,19 +202,18 @@ namespace SimpleInjector.Extensions.Decorators
         // Creates an expression that calls a Func<T, T> delegate that takes in the service and returns
         // that instance, wrapped with the decorator.
         private static LambdaExpression BuildDecoratorWrapper(Type serviceType,
-            ConstructorInfo decoratorConstructor, ParameterExpression parameter, Expression[] parameters)
+            ParameterExpression parameter, Expression decoratorExpression)
         {
             Type funcType = typeof(Func<,>).MakeGenericType(serviceType, serviceType);
 
-            return Expression.Lambda(funcType, Expression.New(decoratorConstructor, parameters),
-                new ParameterExpression[] { parameter });
+            return Expression.Lambda(funcType, decoratorExpression, parameter);
         }
 
         private Expression BuildDecoratorEnumerableExpressionForConstantEnumerable(Type serviceType,
             Delegate wrapInstanceWithDecorator, IEnumerable collection)
         {
             IEnumerable decoratedCollection = collection.Select(serviceType, wrapInstanceWithDecorator);
-
+            
             // Passing the enumerable type is needed when running in the Silverlight sandbox.
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 

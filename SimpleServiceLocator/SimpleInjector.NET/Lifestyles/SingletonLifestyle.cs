@@ -47,8 +47,8 @@ namespace SimpleInjector.Lifestyles
             return new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
         }
 
-        public override Registration CreateRegistration<TService>(
-            Func<TService> instanceCreator, Container container)
+        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+            Container container)
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");
@@ -56,6 +56,82 @@ namespace SimpleInjector.Lifestyles
             return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
         }
 
+        // This method seems somewhat redundant, since the exact same can be achieved by calling
+        // Lifetime.Singleton.CreateRegistration(serviceType, () => instance, container). Calling that method
+        // however, will trigger the ExpressionBuilding event later on where the supplied Expression is an
+        // InvocationExpression calling that internally created Func<TService>. By having this extra method
+        // (and the extra SingletonInstanceLifestyleRegistration class), we can ensure that the
+        // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
+        // anyone handling that event.
+        internal static Registration CreateRegistration(Type serviceType, object instance, Container container)
+        {
+            Requires.IsNotNull(instance, "instance");
+
+            return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 
+                container);
+        }
+
+        private sealed class SingletonInstanceLifestyleRegistration : Registration
+        {
+            private readonly object locker = new object();
+            private readonly Type serviceType;
+            private readonly object instance;
+            private bool initializerRan;
+
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, object instance, 
+                Lifestyle lifestyle, Container container)
+                : base(lifestyle, container)
+            {
+                this.serviceType = serviceType;
+                this.instance = instance;
+            }
+
+            public override Type ImplementationType
+            {
+                get { return this.instance.GetType(); }
+            }
+
+            public override Expression BuildExpression()
+            {
+                this.EnsureInitializerHasRun();
+
+                var constantExpression = Expression.Constant(this.instance, this.serviceType);
+
+                return this.InterceptInstanceCreation(this.serviceType, constantExpression);
+            }
+
+            private void EnsureInitializerHasRun()
+            {
+                // Since the instance is supplied from the outside, we have to run the initializer ourself.
+                // The base class can't do this for us.
+                if (!this.initializerRan)
+                {
+                    // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
+                    // we want to be very sure that this instance will never be initialized more than once,
+                    // because of the possible side effects that this might cause in user code.
+                    lock (this.locker)
+                    {
+                        if (!this.initializerRan)
+                        {
+                            this.RunInitializer();
+
+                            this.initializerRan = true;
+                        }
+                    }
+                }
+            }
+
+            private void RunInitializer()
+            {
+                Action<object> initializer = this.Container.GetInitializer(this.serviceType);
+
+                if (initializer != null)
+                {
+                    initializer(this.instance);
+                }
+            }
+        }
+        
         private sealed class SingletonFuncLifestyleRegistration<TService> 
             : SingletonLifestyleRegistrationBase<TService>
             where TService : class

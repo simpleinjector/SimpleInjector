@@ -60,9 +60,9 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration has been verified (at least once).
         private bool succesfullyVerified;
 
-        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType = (s, e) => { };
-        private EventHandler<ExpressionBuildingEventArgs> expressionBuilding = (s, e) => { };
-        private EventHandler<ExpressionBuiltEventArgs> expressionBuilt = (s, e) => { };
+        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
+        private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
+        private EventHandler<ExpressionBuiltEventArgs> expressionBuilt;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -252,12 +252,18 @@ namespace SimpleInjector
 
         internal void OnExpressionBuilding(ExpressionBuildingEventArgs e)
         {
-            this.expressionBuilding(this, e);
+            if (this.expressionBuilding != null)
+            {
+                this.expressionBuilding(this, e);
+            }
         }
 
         internal void OnExpressionBuilt(ExpressionBuiltEventArgs e)
         {
-            this.expressionBuilt(this, e);
+            if (this.expressionBuilt != null)
+            {
+                this.expressionBuilt(this, e);
+            }
         }
         
         /// <summary>Prevents any new registrations to be made to the container.</summary>

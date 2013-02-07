@@ -1485,6 +1485,31 @@
             // Assert
             Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
         }
+
+        [TestMethod]
+        public void GetInstance_DecoratedInstance_DecoratorGoesThroughCompletePipeLineIncludingExpressionBuilding()
+        {
+            // Arrange
+            var typesBuilding = new List<Type>();
+
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                typesBuilding.Add(((NewExpression)e.Expression).Constructor.DeclaringType);
+            };
+
+            // Act
+            container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsTrue(typesBuilding.Any(type => type == typeof(TransactionHandlerDecorator<RealCommand>)),
+                "The decorator is expected to go through the complete pipeline, including ExpressionBuilding.");
+        }
     }
 
     public class DependencyInfo

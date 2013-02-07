@@ -134,19 +134,18 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
+            Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
+
+            expression = this.InterceptInstanceCreation(typeof(TService), expression);
+            
             // We have to decorate the given instanceCreator to add a null check and throw an expressive
-            // exception when the instanceCreator returned null. By supplying the instanceCreator as argument
-            // to this method, we ensure that the reference to this delegate keeps available in the built
-            // expression tree. This allows the delegate to be searched for and replaced, if needed.
-            // If we would wrap the instanceCreator in another Func<TService>, this reference would not be
-            // visitable in the expression tree and this information would be lost.
-            Func<Func<TService>, TService> safeInstanceCreator = SafeInstanceCreator<TService>;
+            // exception when the instanceCreator returned null. By preventing to polute the expression given
+            // to the ExpressionBuilding event (triggered by the previous call), we wrap the null checker
+            // after the ExpressionBuilding returned. But we need to wrap it before any initializer is ran,
+            // since that could lead to null reference exceptions in user code.
+            expression = this.WrapWithNullChecker<TService>(expression);
 
-            Expression expression = Expression.Invoke(
-                expression: Expression.Constant(safeInstanceCreator), 
-                arguments: Expression.Constant(instanceCreator));
-
-            expression = this.InterceptAndWrapInitializer<TService, TService>(expression);
+            expression = this.WrapWithInitializer<TService, TService>(expression);
 
             return expression;
         }
@@ -160,7 +159,9 @@ namespace SimpleInjector.Lifestyles
         {
             Expression expression = this.BuildNewExpression(typeof(TService), typeof(TImplementation));
 
-            expression = this.InterceptAndWrapInitializer<TService, TImplementation>(expression);
+            expression = this.InterceptInstanceCreation(typeof(TService), expression);
+
+            expression = this.WrapWithInitializer<TService, TImplementation>(expression);
 
             return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
         }
@@ -234,15 +235,11 @@ namespace SimpleInjector.Lifestyles
             return expression;
         }
 
-        private Expression InterceptAndWrapInitializer<TService, TImplementation>(Expression expression)
-            where TImplementation : class, TService
-            where TService : class
+        private Expression WrapWithNullChecker<TService>(Expression expression)
         {
-            expression = this.InterceptInstanceCreation(typeof(TService), expression);
+            Func<TService, TService> nullChecker = ThrowWhenNull<TService>;
 
-            expression = this.WrapWithInitializer<TService, TImplementation>(expression);
-
-            return expression;
+            return Expression.Invoke(Expression.Constant(nullChecker), expression);
         }
 
         private Expression WrapWithInitializer<TService, TImplementation>(Expression expression)
@@ -303,10 +300,8 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private static TService SafeInstanceCreator<TService>(Func<TService> instanceCreator)
+        private static TService ThrowWhenNull<TService>(TService instance)
         {
-            var instance = instanceCreator();
-
             if (instance == null)
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(TService)));

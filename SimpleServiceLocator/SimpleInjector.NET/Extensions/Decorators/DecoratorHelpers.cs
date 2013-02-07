@@ -41,36 +41,6 @@ namespace SimpleInjector.Extensions.Decorators
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
 
-        // This method must be public because of restrictions of the Silverlight Sandbox.
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "The method is called using reflection.")]
-        public static Func<TService, TService> BuildFuncInitializer<TService>(Container container)
-        {
-            Action<TService> instanceInitializer = container.GetInitializer<TService>();
-
-            if (instanceInitializer != null)
-            {
-                return instance =>
-                {
-                    instanceInitializer(instance);
-
-                    return instance;
-                };
-            }
-
-            return null;
-        }
-
-        internal static Delegate GetFuncInitializer(this Container container, Type serviceType)
-        {
-            var instanceInitializer =
-                typeof(DecoratorHelpers).GetMethod("BuildFuncInitializer")
-                .MakeGenericMethod(serviceType)
-                .Invoke(null, new object[] { container });
-
-            return (Delegate)instanceInitializer;
-        }
-
         internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
             Container container, Type[] serviceTypes)
         {
@@ -137,38 +107,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             return Expression.Call(selectMethod, collectionExpression, Expression.Constant(selector));
         }
-
-        internal static ConstantExpression ToConstant(this Expression expression)
-        {
-            return Expression.Constant(expression.Invoke());
-        }
-
-        internal static object Invoke(this Expression expression)
-        {
-            Func<object> instanceCreator = Expression.Lambda<Func<object>>(expression).Compile();
-
-            return instanceCreator();
-        }
-
-        internal static Expression BuildDecoratorExpression(Container container,
-            ConstructorInfo decoratorConstructor, Expression[] parameters)
-        {
-            Type decoratorType = decoratorConstructor.DeclaringType;
-
-            Expression expression = Expression.New(decoratorConstructor, parameters);
-
-            var instanceInitializer = container.GetFuncInitializer(decoratorType);
-
-            if (instanceInitializer != null)
-            {
-                // It's not possible to return a Expression that is as heavily optimized as the
-                // Expression.New simply is, because the instance initializer must be called as well.
-                expression = Expression.Invoke(Expression.Constant(instanceInitializer), expression);
-            }
-
-            return expression;
-        }
-
+        
         internal static bool DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
             int numberOfServiceTypeDependencies =

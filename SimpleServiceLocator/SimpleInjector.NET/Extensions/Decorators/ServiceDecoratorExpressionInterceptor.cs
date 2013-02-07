@@ -107,8 +107,8 @@ namespace SimpleInjector.Extensions.Decorators
                 select parameter)
                 .Single();
             
-            var decorateeExpression = 
-                BuildExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, e);
+            var decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, 
+                e.RegisteredServiceType, e.Expression);
 
             var registration = this.CreateRegistrationFromCache(e, decoratorConstructor);
 
@@ -130,31 +130,14 @@ namespace SimpleInjector.Extensions.Decorators
             {
                 if (!this.registrations.TryGetValue(e.RegisteredServiceType, out registration))
                 {
-                    registration = this.CreateRegistration(e, decoratorConstructor);
+                    registration = 
+                        this.CreateRegistration(e.RegisteredServiceType, decoratorConstructor, e.Expression);
 
                     this.registrations[e.RegisteredServiceType] = registration;
                 }
             }
 
             return registration;
-        }
-
-        private Registration CreateRegistration(ExpressionBuiltEventArgs e, 
-            ConstructorInfo decoratorConstructor)
-        {
-            ParameterInfo decorateeParameter = (
-                from parameter in decoratorConstructor.GetParameters()
-                where IsDecorateeParameter(parameter, e.RegisteredServiceType)
-                select parameter)
-                .Single();
-
-            Expression decorateeExpression =
-                BuildExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, e);
-
-            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
-
-            return this.Lifestyle.CreateRegistration(e.RegisteredServiceType, 
-                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);         
         }
     }
 }

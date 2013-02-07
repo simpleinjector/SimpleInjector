@@ -131,17 +131,15 @@ namespace SimpleInjector.Extensions.Decorators
         {
             var contexts = (
                 from context in originalDecoratables.GetDecoratorPredicateContexts()
-                let decoratedContext = this.DecorateContext(context, serviceType, decoratorCtor)
                 let predicateIsSatisfied = this.SatisfiesPredicate(context)
                 select new
                 {
                     IsDecorated = predicateIsSatisfied,
-                    Context = predicateIsSatisfied ? decoratedContext : context,
-                    OriginalContext = context
+                    OriginalContext = context,
+                    Context = predicateIsSatisfied ? 
+                        this.DecorateContext(context, serviceType, decoratorCtor) : context,
                 })
                 .ToArray();
-
-            var decoratedContexts = contexts.Where(c => c.IsDecorated).Select(c => c.Context);
 
             foundRelationships = (
                 from context in contexts
@@ -163,33 +161,17 @@ namespace SimpleInjector.Extensions.Decorators
 
             var e = new ExpressionBuiltEventArgs(serviceType, predicateContext.Expression);
 
-            var parameters = this.BuildParameters(decoratorConstructor, e);
-
-            var decoratedExpression = this.BuildDecoratorExpression(decoratorConstructor, parameters);
-
-            var registration = new ExpressionRegistration(decoratedExpression, 
-                predicateContext.ImplementationType, this.Lifestyle, this.Container);
+            // CreateRegistration must only be called once per decorated item in the collection, but this is
+            // guaranteed by BuildDecoratorExpression, which simply locks the decoration of the complete
+            // collection.
+            var registration = 
+                this.CreateRegistration(serviceType, decoratorConstructor, predicateContext.Expression);
 
             var producer = new InstanceProducer(serviceType, registration);
 
+            var decoratedExpression = registration.BuildExpression();
+
             return predicateContext.Decorate(decoratorType, decoratedExpression, producer);
-        }
-
-        private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
-            Expression[] parameters)
-        {
-            Expression expression =
-                DecoratorHelpers.BuildDecoratorExpression(this.Container, decoratorConstructor, parameters);
-
-            if (this.Lifestyle == Lifestyle.Singleton)
-            {
-                // This method is called inside the lock of the 
-                // BuildDecoratorEnumerableExpressionBasedOnDecoratableEnumerable method, which ensures that
-                // the instance is created just once.
-                return expression.ToConstant();
-            }
-
-            return expression;
         }
     }
 }

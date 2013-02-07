@@ -458,7 +458,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            var registration = Lifestyle.Singleton.CreateRegistration(typeof(TService), () => instance, this);
+            var registration = SingletonLifestyle.CreateRegistration(typeof(TService), instance, this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -533,7 +533,9 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
-            this.Register(serviceType, () => instance, Lifestyle.Singleton);
+            var registration = SingletonLifestyle.CreateRegistration(serviceType, instance, this);
+
+            this.AddRegistration(serviceType, registration);
         }
         
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",

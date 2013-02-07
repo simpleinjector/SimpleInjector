@@ -419,7 +419,10 @@ namespace SimpleInjector
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
 
-            this.resolveUnregisteredType(this, e);
+            if (this.resolveUnregisteredType != null)
+            {
+                this.resolveUnregisteredType(this, e);
+            }
 
             if (e.Handled)
             {

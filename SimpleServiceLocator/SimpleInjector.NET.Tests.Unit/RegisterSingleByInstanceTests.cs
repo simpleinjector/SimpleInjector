@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Text;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -190,6 +190,52 @@
 
             // Act
             container.RegisterSingle(validServiceType, invalidInstance);
+        }
+
+        [TestMethod]
+        public void GetInstance_ServiceRegisteredUsingRegisterSingleInstanceGeneric_CallsExpressionBuildingWithConstantExpression()
+        {
+            // Arrange
+            var expressionsBuilding = new List<Expression>();
+
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                expressionsBuilding.Add(e.Expression);
+            };
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(1, expressionsBuilding.Count);
+            Assert.IsInstanceOfType(expressionsBuilding.Single(), typeof(ConstantExpression));
+        }
+
+        [TestMethod]
+        public void GetInstance_ServiceRegisteredUsingRegisterSingleInstanceNonGeneric_CallsExpressionBuildingWithConstantExpression()
+        {
+            // Arrange
+            var expressionsBuilding = new List<Expression>();
+
+            var container = new Container();
+
+            container.RegisterSingle(typeof(IUserRepository), new SqlUserRepository());
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                expressionsBuilding.Add(e.Expression);
+            };
+
+            // Act
+            container.GetInstance<IUserRepository>();
+
+            // Assert
+            Assert.AreEqual(1, expressionsBuilding.Count);
+            Assert.IsInstanceOfType(expressionsBuilding.Single(), typeof(ConstantExpression));
         }
     }
 }
