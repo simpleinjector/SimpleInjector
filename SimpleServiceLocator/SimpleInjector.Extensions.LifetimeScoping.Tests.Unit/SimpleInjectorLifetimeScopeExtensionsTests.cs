@@ -1,7 +1,7 @@
 ﻿namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 {
     using System;
-
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -740,6 +740,31 @@
 
                 Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
                     "The decorated instance should be scoped per lifetime. It seems to be transient.");
+            }
+        }
+
+        [TestMethod]
+        public void LifetimeScopeDispose_ExecutedOnDifferentThreadThanItWasStarted_ThrowsExceptionException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            var scope = container.BeginLifetimeScope();
+            try
+            {
+                // Act
+                Task.Factory.StartNew(() => scope.Dispose()).Wait();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (AggregateException ex)
+            {
+                Assert.IsTrue(ex.InnerException.Message.Contains(
+                    "It is not safe to use a LifetimeScope instance across threads."),
+                    "Actual: ", ex.InnerException.Message);
             }
         }
 

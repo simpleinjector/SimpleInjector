@@ -106,7 +106,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.Instance);
+            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
         }
@@ -139,7 +139,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.Instance);
+            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
         }
@@ -193,7 +193,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.Instance);
+            container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.WithDisposal);
 
             container.EnableLifetimeScoping();
         }

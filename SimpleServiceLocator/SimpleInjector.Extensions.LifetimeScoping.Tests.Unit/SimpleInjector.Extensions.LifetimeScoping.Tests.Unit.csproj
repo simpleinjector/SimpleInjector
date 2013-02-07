@@ -49,7 +49,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LifetimeScopeLifestyleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleInjectorLifetimeScopeExtensionsTests.cs" />
   </ItemGroup>

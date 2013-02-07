@@ -41,7 +41,7 @@ namespace SimpleInjector.Integration.Wcf
         /// per WCF Operation. This instance will ensure created instance get disposed after the WCF operation
         /// ends.
         /// </summary>
-        public static readonly Lifestyle Instance = new WcfOperationLifestyle(true);
+        internal static readonly Lifestyle WithDisposal = new WcfOperationLifestyle(true);
 
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 

@@ -43,7 +43,7 @@ namespace SimpleInjector.Integration.Web
         /// per web request. This instance will ensure created instance get disposed after the web request
         /// ends.
         /// </summary>
-        public static readonly Lifestyle Instance = new WebRequestLifestyle(true);
+        internal static readonly Lifestyle WithDisposal = new WebRequestLifestyle(true);
 
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 

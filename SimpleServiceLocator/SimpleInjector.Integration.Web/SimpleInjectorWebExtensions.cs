@@ -65,7 +65,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            container.Register<TConcrete, TConcrete>(WebRequestLifestyle.Instance);
+            container.Register<TConcrete, TConcrete>(WebRequestLifestyle.WithDisposal);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
-            container.Register<TService, TImplementation>(WebRequestLifestyle.Instance);
+            container.Register<TService, TImplementation>(WebRequestLifestyle.WithDisposal);
         }
 
         /// <summary>
