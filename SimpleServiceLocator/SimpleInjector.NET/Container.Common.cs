@@ -97,11 +97,6 @@ namespace SimpleInjector
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
 
-        internal IDictionary Items
-        {
-            get { return this.items; }
-        }
-
         internal bool IsLocked
         {
             get
@@ -233,6 +228,26 @@ namespace SimpleInjector
         public new Type GetType()
         {
             return base.GetType();
+        }
+
+        internal object GetItem(object key)
+        {
+            Requires.IsNotNull(key, "key");
+
+            lock (this.items)
+            {
+                return this.items[key];
+            }
+        }
+
+        internal void SetItem(object key, object item)
+        {
+            Requires.IsNotNull(key, "key");
+
+            lock (this.items)
+            {
+                this.items[key] = item;
+            }
         }
 
         internal void OnExpressionBuilding(ExpressionBuildingEventArgs e)

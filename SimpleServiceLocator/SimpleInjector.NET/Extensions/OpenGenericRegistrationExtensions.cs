@@ -43,56 +43,9 @@ namespace SimpleInjector.Extensions
         /// every time a <paramref name="openGenericServiceType"/> is requested.
         /// </summary>
         /// <example>
-        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
-        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
-        /// The registration ensures a <b>OrderValidator</b> is returned when a 
-        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
-        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
-        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
-        /// <code lang="cs"><![CDATA[
-        /// public interface IValidator<T>
-        /// { 
-        ///     void Validate(T instance);
-        /// }
-        /// 
-        /// public class NullValidator<T> : IValidator<T>
-        /// {
-        ///     public void Validate(T instance)
-        ///     {
-        ///     }
-        /// }
-        /// 
-        /// public class OrderValidator : IValidator<Order>
-        /// {
-        ///     public void Validate(Order instance)
-        ///     {
-        ///         if (instance.Total < 0)
-        ///         {
-        ///             throw new ValidationException("Total can not be negative.");
-        ///         }
-        ///     }
-        /// }
-        /// 
-        /// [TestMethod]
-        /// public static void TestRegisterOpenGeneric()
-        /// {
-        ///     // Arrange
-        ///     var container = new Container();
-        ///     
-        ///     container.Register<IValidator<Order>, OrderValidator>();
-        ///     container.RegisterOpenGeneric(typeof(IValidator<>), typeof(NullValidator<>));
-        ///     
-        ///     // Act
-        ///     var orderValidator = container.GetInstance<IValidator<Order>>();
-        ///     var customerValidator = container.GetInstance<IValidator<Customer>>();
-        ///     var productValidator = container.GetInstance<IValidator<Product>>();
-        /// 
-        ///     // Assert
-        ///     Assert.IsInstanceOfType(orderValidator, typeof(OrderValidator));
-        ///     Assert.IsInstanceOfType(customerValidator, typeof(NullValidator<Customer>));
-        ///     Assert.IsInstanceOfType(productValidator, typeof(NullValidator<Product>));
-        /// }
-        /// ]]></code>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric(Container,Type,Type,Lifestyle)</see>
+        /// overload for an example.
         /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
@@ -109,6 +62,28 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Registers that the same instance of <paramref name="openGenericImplementation"/> will be returned 
         /// every time a <paramref name="openGenericServiceType"/> is requested.
+        /// </summary>
+        /// <example>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric(Container,Type,Type,Lifestyle)</see>
+        /// overload for an example.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances..</param>
+        /// <param name="openGenericImplementation">The definition of the open generic implementation type
+        /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
+        public static void RegisterSingleOpenGeneric(this Container container,
+            Type openGenericServiceType, Type openGenericImplementation)
+        {
+            RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
+                Lifestyle.Singleton);
+        }
+
+        /// <summary>
+        /// Registers that an instance of <paramref name="openGenericImplementation"/> will be returned 
+        /// when a <paramref name="openGenericServiceType"/> is requested. The instance will be cached 
+        /// according to the specified <paramref name="lifestyle"/>.
         /// </summary>
         /// <example>
         /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
@@ -147,8 +122,8 @@ namespace SimpleInjector.Extensions
         ///     // Arrange
         ///     var container = new Container();
         ///     
-        ///     container.RegisterSingle<IValidator<Order>, OrderValidator>();
-        ///     container.RegisterSingleOpenGeneric(typeof(IValidator<>), typeof(NullValidator<>));
+        ///     container.Register<IValidator<Order>, OrderValidator>(Lifestyle.Transient);
+        ///     container.RegisterOpenGeneric(typeof(IValidator<>), typeof(NullValidator<>), Lifestyle.Singleton);
         ///     
         ///     // Act
         ///     var orderValidator = container.GetInstance<IValidator<Order>>();
@@ -164,16 +139,10 @@ namespace SimpleInjector.Extensions
         /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
-        /// used to retrieve instances..</param>
+        /// used to retrieve instances.</param>
         /// <param name="openGenericImplementation">The definition of the open generic implementation type
         /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
-        public static void RegisterSingleOpenGeneric(this Container container,
-            Type openGenericServiceType, Type openGenericImplementation)
-        {
-            RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
-                Lifestyle.Singleton);
-        }
-
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
         {

@@ -146,9 +146,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Occurs after the creation of the <see cref="System.Linq.Expressions.Expression">Expression</see> 
-        /// of a registered type, allowing the created 
-        /// <see cref="System.Linq.Expressions.Expression">Expression</see>  to be replaced. Multiple delegates 
-        /// may handle the same service type.
+        /// of a registered type is complete (the lifestyle has been applied), allowing the created 
+        /// <see cref="System.Linq.Expressions.Expression">Expression</see> to be wrapped, changed, or
+        /// replaced. Multiple delegates may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -157,9 +157,6 @@ namespace SimpleInjector
         /// hooks to the <see cref="ExpressionBuilt"/> event, can change the 
         /// <see cref="ExpressionBuiltEventArgs.Expression" /> property on the 
         /// <see cref="ExpressionBuiltEventArgs"/>, which allows changing the way the type is constructed.
-        /// </para>
-        /// <para>
-        /// This event is called after unregistered types are resolved.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
@@ -495,9 +492,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="implementation">The actual type that will be returned when requested.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="implementation"/> are null references (Nothing in
-        /// VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="implementation"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
         /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
         /// type.</exception>
@@ -514,8 +510,8 @@ namespace SimpleInjector
         /// <param name="instanceCreator">The delegate that will be used for creating that single instance.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
         /// generic type.</exception>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="instanceCreator"/> are null references (Nothing in
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instanceCreator"/> are null references (Nothing in
         /// VB).</exception>
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
@@ -527,9 +523,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="instance"/> are null references (Nothing in
-        /// VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
         public void RegisterSingle(Type serviceType, object instance)

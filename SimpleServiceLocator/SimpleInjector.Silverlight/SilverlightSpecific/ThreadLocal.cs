@@ -1,4 +1,5 @@
-﻿namespace System.Threading
+﻿#pragma warning disable 0618
+namespace System.Threading
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -54,3 +55,4 @@
         }
     }
 }
+#pragma warning restore 0612

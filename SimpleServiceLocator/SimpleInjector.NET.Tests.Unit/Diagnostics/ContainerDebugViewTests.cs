@@ -4,14 +4,13 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
     using SimpleInjector.Diagnostics;
     
 #if !SILVERLIGHT
-
+    
     public interface ILogger
     {
     }
@@ -45,7 +44,7 @@
     
     public class SomeGeneric<T> : ISomeGeneric<T>
     {
-        public SomeGeneric(ILogger logger, IComparable bla, ConcreteThing thing)
+        public SomeGeneric(ILogger logger, IComparable bla, ConcreteThing thing, IDoThings<T> x)
         {
         }
     }
@@ -206,12 +205,17 @@
 
             container.Register<IConcreteThing, ConcreteThing>(Lifestyle.Singleton);
 
-            container.Register<ILogger, FakeLogger>(Lifestyle.Transient);
             container.Register<IComparable>(() => 4);
 
-            container.Register<ISomeGeneric<IEnumerable<int>>, SomeGeneric<IEnumerable<int>>>(Lifestyle.Singleton);
-            container.Register<ISomeGeneric<IEnumerable<double>>, SomeGeneric<IEnumerable<double>>>(Lifestyle.Singleton);
-            container.Register<ISomeGeneric<IEnumerable<long>>, SomeGeneric<IEnumerable<long>>>(Lifestyle.Singleton);
+            container.Register<ILogger, FakeLogger>(Lifestyle.Transient);
+
+            container.Register<ISomeGeneric<IEnumerable<int>>, SomeGeneric<IEnumerable<int>>>(Lifestyle.Transient);
+            container.Register<ISomeGeneric<IEnumerable<double>>, SomeGeneric<IEnumerable<double>>>(Lifestyle.Transient);
+            container.Register<ISomeGeneric<IEnumerable<long>>, SomeGeneric<IEnumerable<long>>>(Lifestyle.Transient);
+
+            container.Register<IDoThings<IEnumerable<int>>, ThingDoer<IEnumerable<int>>>(Lifestyle.Transient);
+            container.Register<IDoThings<IEnumerable<double>>, ThingDoer<IEnumerable<double>>>(Lifestyle.Transient);
+            container.Register<IDoThings<IEnumerable<long>>, ThingDoer<IEnumerable<long>>>(Lifestyle.Transient);
 
             var allTypes =
                 from assembly in AppDomain.CurrentDomain.GetAssemblies()
@@ -219,20 +223,17 @@
                 where !type.IsGenericTypeDefinition
                 select type;
 
-            this.RegisterAll(container, allTypes.Take(100));
+            this.RegisterAll(container, allTypes.Take(1000));
                         
             var watch = Stopwatch.StartNew();
-
-            Parallel.ForEach(container.GetCurrentRegistrations(), registration =>
-            {
-                registration.BuildExpression();
-            });
 
             var ms1 = watch.ElapsedMilliseconds;
             container.Verify();
 
             // new ContainerDebugView(container);
             var ms2 = watch.ElapsedMilliseconds;
+
+            container.GetInstance<ISomeGeneric<int>>();
 
             Console.WriteLine();
 
@@ -259,9 +260,9 @@
         [DebuggerStepThrough]
         public static void Register<T>(Container container)
         {
-            container.Register<ISomeGeneric<T>, SomeGeneric<T>>(Lifestyle.Singleton);
+            container.Register<ISomeGeneric<T>, SomeGeneric<T>>(Lifestyle.Transient);
 
-            container.Register<IDoThings<T>, ThingDoer<T>>(Lifestyle.Singleton);
+            container.Register<IDoThings<T>, ThingDoer<T>>(Lifestyle.Transient);
         }       
 
 #endif

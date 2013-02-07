@@ -86,28 +86,6 @@ namespace SimpleInjector.Advanced
             return container.GetInitializer<TService>();
         }
 
-        public static object GetItem(this Container container, object key)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(key, "key");
-
-            lock (container.Items)
-            {
-                return container.Items[key];
-            }
-        }
-
-        public static void SetItem(this Container container, object key, object item)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(key, "key");
-
-            lock (container.Items)
-            {
-                container.Items[key] = item;
-            }
-        }
-
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)
         {
             foreach (var parameter in constructor.GetParameters())
