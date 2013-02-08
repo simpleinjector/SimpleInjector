@@ -134,27 +134,21 @@
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_RegisteringAnInternalType_ThrowsExpectedException()
+        public void RegisterSingleByInstance_RegisteringAnInternalServiceType_Succeeds()
         {
             // Arrange
-            string expectedMessage = ExpectedSandboxFailureExpectedMessage;
-
             var container = new Container();
 
-            object instance = new InternalServiceImpl(null);
+            object expectedSingleton = new InternalServiceImpl(null);
 
-            try
-            {
-                // Act
-                container.RegisterSingle(typeof(IInternalService), instance);
+            container.RegisterSingle(typeof(IInternalService), expectedSingleton);
 
-                Assert.Fail("The call is expected to fail inside a Silverlight sandbox.");
-            }
-            catch (ArgumentException ex)
-            {
-                // Assert
-                AssertThat.StringContains(expectedMessage, ex.Message);
-            }
+            // Act
+            object actualInstance = container.GetInstance<IInternalService>();
+            container.GetInstance(typeof(IInternalService));
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(expectedSingleton, actualInstance));
         }
 
         [TestMethod]
