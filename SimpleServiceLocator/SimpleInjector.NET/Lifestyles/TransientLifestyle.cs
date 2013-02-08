@@ -29,7 +29,7 @@ namespace SimpleInjector.Lifestyles
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     
-    public sealed class TransientLifestyle : Lifestyle
+    internal sealed class TransientLifestyle : Lifestyle
     {
         internal TransientLifestyle() : base("Transient")
         {

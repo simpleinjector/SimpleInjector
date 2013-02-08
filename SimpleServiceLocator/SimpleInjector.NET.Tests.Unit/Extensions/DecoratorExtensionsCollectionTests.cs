@@ -6,9 +6,10 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Extensions;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.
@@ -764,6 +765,7 @@
             Assert.IsFalse(nullCommandHandlerIsDecorated);
         }
 
+#if DEBUG
         [TestMethod]
         public void GetRelationships_OnAPartiallyDecoratedCollection_ReturnsTheExpectedRelationships()
         {
@@ -799,6 +801,7 @@
             Assert.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), @default.ImplementationType);
             Assert.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ServiceType);
         }
+#endif
         
         [TestMethod]
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesAllInstancesThatShouldBeDecorated()

@@ -72,11 +72,24 @@ namespace SimpleInjector.Lifestyles
             get { return Math.Min(this.TrueLifestyle.DependencyLength, this.FalseLifestyle.DependencyLength); }
         }
 
+        /// <summary>
+        /// The length property is not supported for this lifestyle.
+        /// </summary>
+        /// <exception cref="NotSupportedException">Always thrown.</exception>
         protected override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "See base.CreateRegistration for more info.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
@@ -87,6 +100,17 @@ namespace SimpleInjector.Lifestyles
                 this, container);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {

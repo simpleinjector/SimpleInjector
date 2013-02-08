@@ -49,6 +49,9 @@ namespace SimpleInjector
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
 
+        /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
+        /// <param name="serviceType">The service type for which this instance is created.</param>
+        /// <param name="registration">The <see cref="Registration"/>.</param>
         public InstanceProducer(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -60,6 +63,13 @@ namespace SimpleInjector
             this.validator = new CyclicDependencyValidator(this.ServiceType);
         }
 
+        /// <summary>
+        /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
+        /// lifestyle that is used during the registration. This can happen for instance when the registration
+        /// is changed by an <see cref="Container.ExpressionBuilding">ExpressionBuilding</see> registration or
+        /// gets decorated using the
+        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method.
+        /// </summary>
         public Lifestyle Lifestyle
         {
             get { return this.overriddenLifestyle ?? this.registration.Lifestyle; }

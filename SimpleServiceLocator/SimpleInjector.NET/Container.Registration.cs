@@ -329,7 +329,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>.
+        /// Registers the specified delegate that allows returning transient instances of 
+        /// <typeparamref name="TService"/>. The delegate is expected to always return a new instance on
+        /// each call.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
@@ -396,8 +398,10 @@ namespace SimpleInjector
         }     
 
         /// <summary>
-        /// Registers a single concrete instance that will be constructed using constructor injection. 
-        /// This <typeparamref name="TConcrete"/> must be thread-safe.
+        /// Registers a single concrete instance that will be constructed using constructor injection and will
+        /// be returned when this instance is requested by type <typeparamref name="TConcrete"/>. 
+        /// This <typeparamref name="TConcrete"/> must be thread-safe when working in a multi-threaded 
+        /// environment.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
@@ -418,8 +422,11 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that the same instance of <typeparamref name="TImplementation"/> will be returned every 
-        /// time a <typeparamref name="TService"/> is requested.
+        /// Registers that the same a single instance of type <typeparamref name="TImplementation"/> will be 
+        /// returned every time an <paramref name="serviceType"/> type is requested. If 
+        /// <paramref name="serviceType"/> and <paramref name="implementation"/> represent the same type, the 
+        /// type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe when 
+        /// working in a multi-threaded environment.
         /// </summary>
         /// <typeparam name="TService">
         /// The interface or base type that can be used to retrieve the instances.
@@ -444,7 +451,11 @@ namespace SimpleInjector
             this.Register<TService, TImplementation>(Lifestyle.Singleton);
         }
 
-        /// <summary>Registers a single instance. This <paramref name="instance"/> must be thread-safe.</summary>
+        /// <summary>
+        /// Registers a single instance that will be returned when an instance of type 
+        /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
+        /// when working in a multi-threaded environment.
+        /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
@@ -466,7 +477,8 @@ namespace SimpleInjector
         /// <summary>
         /// Registers the specified delegate that allows constructing a single instance of 
         /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of 
-        /// the application.
+        /// the application. The returned instance must be thread-safe when working in a multi-threaded 
+        /// environment.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating this single
@@ -487,8 +499,10 @@ namespace SimpleInjector
         
         /// <summary>
         /// Registers that the same instance of type <paramref name="implementation"/> will be returned every 
-        /// time a <paramref name="serviceType"/> type is requested. If <paramref name="serviceType"/> and
-        /// <paramref name="implementation"/> represent the same type, the type is registered by itself.
+        /// time an instance of type <paramref name="serviceType"/> type is requested. If 
+        /// <paramref name="serviceType"/> and <paramref name="implementation"/> represent the same type, the 
+        /// type is registered by itself. <paramref name="implementation"/> must be thread-safe when working 
+        /// in a multi-threaded environment.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="implementation">The actual type that will be returned when requested.</param>
@@ -519,7 +533,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a single instance. This <paramref name="instance"/> must be thread-safe.
+        /// Registers a single instance that will be returned when an instance of type 
+        /// <paramref name="serviceType"/> is requested. This <paramref name="instance"/> must be thread-safe
+        /// when working in a multi-threaded environment.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
@@ -537,7 +553,21 @@ namespace SimpleInjector
 
             this.AddRegistration(serviceType, registration);
         }
-        
+
+        /// <summary>
+        /// Registers that an instance of <typeparamref name="TImplementation"/> will be returned when an
+        /// instance of type <typeparamref name="TService"/> is requested. The instance is cached according to 
+        /// the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// type is not a type that can be created by the container.
+        /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Any other design would be inappropriate.")]
         public void Register<TService, TImplementation>(Lifestyle lifestyle)
@@ -551,6 +581,20 @@ namespace SimpleInjector
             this.AddRegistration(typeof(TService), registration);
         }
 
+        /// <summary>
+        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
+        /// type <typeparamref name="TService"/> and will be returned when an instance of type 
+        /// <typeparamref name="TService"/> is requested. The delegate is expected to produce new instances on
+        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
@@ -562,6 +606,26 @@ namespace SimpleInjector
             this.AddRegistration(typeof(TService), registration);
         }
 
+        /// <summary>
+        /// Registers that an instance of type <paramref name="implementationType"/> will be returned when an
+        /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to 
+        /// the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
+        /// <param name="implementationType">The concrete type that will be registered.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <paramref name="serviceType"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <paramref name="implementationType"/>
+        /// type is not a type that can be created by the container, when either <paramref name="serviceType"/>
+        /// or <paramref name="implementationType"/> are open generic types, or when 
+        /// <paramref name="serviceType"/> is not assignable from the <paramref name="implementationType"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -582,6 +646,20 @@ namespace SimpleInjector
             this.AddRegistration(serviceType, registration);
         }
 
+        /// <summary>
+        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
+        /// type <paramref name="serviceType"/> and will be returned when an instance of type 
+        /// <paramref name="serviceType"/> is requested. The delegate is expected to produce new instances on 
+        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve instances.</param>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <paramref name="serviceType"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -822,8 +900,8 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
-        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is

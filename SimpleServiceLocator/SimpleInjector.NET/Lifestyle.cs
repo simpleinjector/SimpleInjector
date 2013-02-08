@@ -157,6 +157,19 @@ namespace SimpleInjector
             return this.CreateRegistrationCore<TService>(instanceCreator, container);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <paramref name="implementationType"/> with the caching as specified by this lifestyle.
+        /// This method might fail when run in a partial trust sandbox when <paramref name="implementationType"/>
+        /// is an internal type.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
+        /// <param name="implementationType">The concrete type that will be registered.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -188,7 +201,19 @@ namespace SimpleInjector
                     ex);
             }
         }
-
+        
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <paramref name="serviceType"/>  using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
+        /// <param name="instanceCreator">The delegate that will be responsible for creating new instances.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(Type serviceType, Func<object> instanceCreator,
             Container container)
         {

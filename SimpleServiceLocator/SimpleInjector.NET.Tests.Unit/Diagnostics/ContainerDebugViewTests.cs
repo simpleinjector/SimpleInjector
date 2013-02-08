@@ -5,9 +5,11 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Lifestyles;
     
 #if !SILVERLIGHT
     
@@ -197,10 +199,22 @@
 
 #if !SILVERLIGHT
 
+        private static long GetUsedMemory()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            return GC.GetTotalMemory(true);
+        }
+
         [TestMethod]
         public void MethodUnderTest_Scenario_Behavior()
         {
             // Arrange
+            long memBefore = GetUsedMemory();
+
             var container = new Container();
 
             container.Register<IConcreteThing, ConcreteThing>(Lifestyle.Singleton);
@@ -233,11 +247,59 @@
             // new ContainerDebugView(container);
             var ms2 = watch.ElapsedMilliseconds;
 
-            container.GetInstance<ISomeGeneric<int>>();
-
             Console.WriteLine();
 
+            //foreach (var reg in container.GetCurrentRegistrations())
+            //{
+            //    // var set = 
+            //        SetField(
+            //            GetField<Registration>(reg, "registration"),
+            //            "dependencies",
+            //            null);
+            //    // set.Clear();
+            //}
+
+            container = null;
+
+            long memAfter = GetUsedMemory();
+
+            long memByContainer = memAfter - memBefore;
+
             Assert.Fail("This is a test.");
+        }
+
+        private static T GetField<T>(object instance, string fieldName)
+        {
+            FieldInfo field = GetFieldInfo(instance.GetType(), fieldName);
+            
+            return (T)field.GetValue(instance);
+        }
+
+        private static void SetField(object instance, string fieldName, object value)
+        {
+            FieldInfo field = GetFieldInfo(instance.GetType(), fieldName);
+
+            field.SetValue(instance, value);
+        }
+
+
+        private static FieldInfo GetFieldInfo(Type type, string fieldName)
+        {
+            FieldInfo field = null;
+
+            while (field == null && type != null && type != typeof(object))
+            {
+                field = type
+                    .GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                type = type.BaseType;
+            }
+
+            if (field == null)
+                throw new ArgumentException("No field " + fieldName + " on type " + type.FullName, "fieldName");
+
+
+            return field;
         }
 
         [DebuggerStepThrough]
