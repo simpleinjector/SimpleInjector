@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vFuture
+Version v2.0 (not released yet)
 	General description:
 
 	New features:
@@ -52,7 +52,7 @@ Version vFuture
 		 lifetime op the decorator. (work item 19120)
 
 
-Version vNext
+Version 1.next (not released yet)
 	General description:
 
 	Bug fixes:
