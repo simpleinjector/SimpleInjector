@@ -39,23 +39,6 @@ namespace SimpleInjector.Lifestyles
             get { return 1000; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(
-            Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
-        }
-
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
-            Container container)
-        {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(container, "container");
-
-            return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
-        }
-
         // This method seems somewhat redundant, since the exact same can be achieved by calling
         // Lifetime.Singleton.CreateRegistration(serviceType, () => instance, container). Calling that method
         // however, will trigger the ExpressionBuilding event later on where the supplied Expression is an
@@ -69,6 +52,18 @@ namespace SimpleInjector.Lifestyles
 
             return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 
                 container);
+        }
+
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(
+            Container container)
+        {
+            return new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
+        }
+
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            Container container)
+        {
+            return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
         }
 
         private sealed class SingletonInstanceLifestyleRegistration : Registration

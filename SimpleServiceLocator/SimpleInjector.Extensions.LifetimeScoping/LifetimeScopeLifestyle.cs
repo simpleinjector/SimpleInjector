@@ -50,7 +50,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             get { return 100; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             this.EnableLifetimeScoping(container);
 
@@ -60,7 +60,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             };
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             this.EnableLifetimeScoping(container);

@@ -74,7 +74,7 @@ namespace SimpleInjector.Integration.Web
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             return new WebRequestRegistration<TService, TImplementation>(this, container)
             {
@@ -92,7 +92,7 @@ namespace SimpleInjector.Integration.Web
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             return new WebRequestRegistration<TService>(this, container)

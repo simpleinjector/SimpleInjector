@@ -48,13 +48,13 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             throw new InvalidOperationException(
                 "The unknown lifestyle does not allow creation of registrations.");
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             throw new InvalidOperationException(

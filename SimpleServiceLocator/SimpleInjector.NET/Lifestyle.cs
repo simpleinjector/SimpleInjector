@@ -120,12 +120,19 @@ namespace SimpleInjector
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
+        /// reference (Nothing in VB).</exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " + 
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
                             "be created using the non-generic overloads in a sandbox.")]
-        public abstract Registration CreateRegistration<TService, TImplementation>(Container container)
+        public Registration CreateRegistration<TService, TImplementation>(Container container)
             where TImplementation : class, TService
-            where TService : class;
+            where TService : class
+        {
+            Requires.IsNotNull(container, "container");
+
+            return this.CreateRegistrationCore<TService, TImplementation>(container);
+        }
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
@@ -138,12 +145,19 @@ namespace SimpleInjector
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        public abstract Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
+        /// <paramref name="container"/> are null references (Nothing in VB).</exception>
+        public Registration CreateRegistration<TService>(Func<TService> instanceCreator,
             Container container)
-            where TService : class;
+            where TService : class
+        {
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, "container");
 
-        public Registration CreateRegistration(Type serviceType, Type implementationType,
-            Container container)
+            return this.CreateRegistrationCore<TService>(instanceCreator, container);
+        }
+
+        public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(implementationType, "implementationType");
@@ -216,6 +230,49 @@ namespace SimpleInjector
 
             return registration;
         }
+        
+        /// <summary>
+        /// When overridden in a derived class, 
+        /// creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <remarks>
+        /// If you are implementing your own lifestyle, override this method to implement the code necessary 
+        /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
+        /// a new <see cref="Registration"/> instance. They should never be cached.
+        /// </remarks>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
+                            "be created using the non-generic overloads in a sandbox.")]
+        protected abstract Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+            where TImplementation : class, TService
+            where TService : class;
+
+        /// <summary>
+        /// When overridden in a derived class, 
+        /// creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <remarks>
+        /// If you are implementing your own lifestyle, override this method to implement the code necessary 
+        /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
+        /// a new <see cref="Registration"/> instance. They should never be cached.
+        /// </remarks>
+        protected abstract Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            Container container)
+            where TService : class;
 
         private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
         {

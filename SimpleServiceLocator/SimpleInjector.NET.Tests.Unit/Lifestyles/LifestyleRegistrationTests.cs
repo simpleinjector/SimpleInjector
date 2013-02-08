@@ -59,13 +59,13 @@
             get { return 1; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(
             Container container)
         {
             return this.RegistrationToReturn;
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             return this.RegistrationToReturn;

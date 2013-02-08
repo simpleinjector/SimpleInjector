@@ -46,29 +46,14 @@
             get { return 500; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
             return new PerThreadRegistration<TService, TImplementation>(this, container);
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, 
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
-
             return new PerThreadRegistration<TService>(this, container)
             {
                 InstanceCreator = instanceCreator

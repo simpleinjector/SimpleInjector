@@ -78,12 +78,13 @@
                 get { throw new NotImplementedException(); }
             }
 
-            public override Registration CreateRegistration<TService, TImplementation>(Container container)
+            protected override Registration CreateRegistrationCore<TService, TImplementation>(
+                Container container)
             {
                 throw new NotImplementedException();
             }
 
-            public override Registration CreateRegistration<TService>(System.Func<TService> instanceCreator, 
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
                 Container container)
             {
                 throw new NotImplementedException();

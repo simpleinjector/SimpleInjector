@@ -423,12 +423,13 @@
             get { return this.length; }
         }
 
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             return Lifestyle.Transient.CreateRegistration<TService, TImplementation>(container);
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator, Container container)
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+            Container container)
         {
             return Lifestyle.Transient.CreateRegistration<TService>(instanceCreator, container);
         }

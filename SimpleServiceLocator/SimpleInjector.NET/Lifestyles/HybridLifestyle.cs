@@ -79,21 +79,17 @@ namespace SimpleInjector.Lifestyles
 
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "See base.CreateRegistration for more info.")]
-        public override Registration CreateRegistration<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            Requires.IsNotNull(container, "container");
-
             return new HybridRegistration(typeof(TService), typeof(TImplementation), this.Test,
                 this.TrueLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this.FalseLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this, container);
         }
 
-        public override Registration CreateRegistration<TService>(Func<TService> instanceCreator,
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            Requires.IsNotNull(container, "container");
-
             return new HybridRegistration(typeof(TService), typeof(TService), this.Test,
                 this.TrueLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this.FalseLifestyle.CreateRegistration<TService>(instanceCreator, container),
