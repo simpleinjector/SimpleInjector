@@ -1,29 +1,35 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version v2.0 (not released yet)
+Version v2.0 (currently released as beta2 on NuGet)
 	General description:
+		This major release adds explicit lifestyle support and Debugger Diagnostic Services to the Core
+		library. The addition of explicit lifestyle support makes it easier to register types in any given
+		lifestyle, and the new HybridLifestyle class makes it really easy to create a registration that mixes
+		any number of lifestyles together. The Diagnostic Services help you to spot common configuration and
+		programming mistakes such as lifestyle mismatches, and short circuited dependencies.
 
 	New features:
-		-[Core] Lifestyle and LifestyleRegistration classes added. These classes allow implementing custom
-		 lifestyle management.
-		-[Core] Register overloads added that take an Lifetyle as argument.
+		-[Core] Debugger Diagnostic Services added to give feedback on possible misconfigurations in the
+		 container. See here for more information: https://simpleinjector.codeplex.com/discussions/431684.
+		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
+		 are Lifestyle.Transient and Lifestyle.Singleton.
+		-[Core] Register overloads added that take Lifetyle as argument.
 		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
-		 expression is build that creates a new instance, but before instance initializers and lifestyle
-		 caching gets added.
-		 before the lifestyle
+		 expression is built that creates a new instance, but before instance initializers and lifestyle
+		 caching gets added to the expression.
 		-[Core] HybridLifestyle added to allow registering hybrid lifestyles.
 		-[Integration.Web] WebRequestLifestyle has been added.
 		-[Integration.Wcf] WcfOperationLifestyle has been added.
 		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
-		-[Core] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Extensions] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
 
 	Breaking changes:
 		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
 		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
-		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). This could
-		 lead to inconsistent behavior or performance issues if the Func<T> delegate implements its own 
-		 caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
+		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). Note that
+		 this could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
+		 own caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
 		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
 		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
 		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
@@ -31,13 +37,16 @@ Version v2.0 (not released yet)
 		 now handle the first call and will do this in a more reliable manner.
 		-[Core] The Container.GetInitializer<TService>() method has been removed from the container. The
 		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
-		 SimpleInjector.Advanced namespace. (work item 18349).
+		 SimpleInjector.Advanced namespace. It's an extension method now. (work item 18349).
 		-[Core] The types System.Type and System.String are considered ambiguous and are now disallowed from
 		 being registered directly. An exception is thrown when this happens.
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
+
+	Changes:
 		-[Extensions/Core] Extensions library has been merged with core library. Extensions library is 
-		 currently empty will be used as NuGet package for backwards compatibility.
+		 currently empty, but will still be used as NuGet package for backwards compatibility for existing
+		 users.
 
 	Bug fixes:
 		-[Core] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event
@@ -48,8 +57,8 @@ Version v2.0 (not released yet)
 		 mattered for the lifetime op the decorator. (work item 19120)
 		-[Integration.Web] Registration order of RegisterDecorator and RegisterPerWebRequest mattered for the 
 		 lifetime op the decorator. (work item 19120)
-		-[Integration.Wcf] Registration order of RegisterDecorator and RegisterPerWcfOperation mattered for the 
-		 lifetime op the decorator. (work item 19120)
+		-[Integration.Wcf] Registration order of RegisterDecorator and RegisterPerWcfOperation mattered for 
+		 the lifetime op the decorator. (work item 19120)
 
 
 Version 1.next (not released yet)
