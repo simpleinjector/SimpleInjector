@@ -2,8 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 using System.Security;
+
+using SimpleInjector.Extensions;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -45,3 +49,10 @@ using System.Security;
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
     Target = "SimpleInjector.Extensions",
     Justification = "Cannot really make up new types just to satisfy this rule.")]
+
+[assembly: TypeForwardedToAttribute(typeof(AccessibilityOption))]
+[assembly: TypeForwardedToAttribute(typeof(BatchRegistrationCallback))]
+[assembly: TypeForwardedToAttribute(typeof(DecoratorExtensions))]
+[assembly: TypeForwardedToAttribute(typeof(DecoratorPredicateContext))]
+[assembly: TypeForwardedToAttribute(typeof(OpenGenericBatchRegistrationExtensions))]
+[assembly: TypeForwardedToAttribute(typeof(OpenGenericRegistrationExtensions))]
