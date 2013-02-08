@@ -16,7 +16,7 @@
     <description>The Lifetime Scoping Extensions package adds an advanced new lifestyle called 'Lifetime Scope', which allows instances to live within an explicitly defined thread-specific scope and get disposed when this scope ends.
     </description>
     <summary>Lifetime scoping extensions for the Simple Injector Inversion of Control library.</summary>
-    <copyright>S. van Deursen 2012</copyright>
+    <copyright>S. van Deursen 2012 - 2013</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator lifestyle lifetime scope scoping</tags>
   </metadata>
