@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2012 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2012 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -31,6 +31,13 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
+    /// <see cref="SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(Container)">BeginLifetimeScope</see>
+    /// method. A scope is thread-specific, each thread should define its own scope. Scopes can be nested and
+    /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
+    /// the created scope gets <see cref="LifetimeScope.Dispose">disposed</see>. 
+    /// </summary>
     public sealed class LifetimeScopeLifestyle : Lifestyle
     {
         internal static readonly Lifestyle WithDisposal = new LifetimeScopeLifestyle(true);
@@ -39,17 +46,33 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         private readonly bool disposeInstanceWhenLifetimeScopeEnds;
 
+        /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class.</summary>
+        /// <param name="disposeInstanceWhenLifetimeScopeEnds">
+        /// Specifies whether the created and cached instance will be disposed when the created 
+        /// <see cref="LifetimeScope"/> instance gets disposed and when the created object implements 
+        /// <see cref="IDisposable"/>. 
+        /// </param>
         public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds = true) 
             : base("Lifetime Scope")
         {
             this.disposeInstanceWhenLifetimeScopeEnds = disposeInstanceWhenLifetimeScopeEnds;
         }
 
+        /// <summary>Gets the length of the lifestyle.</summary>
         protected override int Length
         {
             get { return 100; }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             this.EnableLifetimeScoping(container);
@@ -60,6 +83,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             };
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator"></param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
