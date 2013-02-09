@@ -1,25 +1,69 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class GetCurrentRegistrationsTests
     {
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void GetCurrentRegistrations_Always_LocksTheContainer()
+        public void GetCurrentRegistrations_Never_LocksTheContainer()
         {
             // Arrange
             var container = new Container();
 
+            // In previous versions of the framework a call to Verify() didn't lock the container. This meaned
+            // that GetCurrentRegistrations could return registrations that where automatically registered by
+            // the container (created during the verification process). Since GetCurrentRegistrations can only
+            // return valid registrations, those auto registered registrations have to be checked by building
+            // their expressions. For this we had to lock the container.
+            // In v2, Verify() locks the container. This means that when GetCurrentRegistrations when the
+            // container is not locked, there are no auto registered instances and we won't have to build
+            // any expressions and we therefore don't need to lock.
+            // Still, the container has to be locked when BuildExpression is called on a returned 
+            // InstanceProducer.
             container.GetCurrentRegistrations();
 
             // Act
             container.Register<ITimeProvider, RealTimeProvider>();
+        }
+
+        [TestMethod]
+        public void Verify_Always_LocksTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // This test is a duplicate from the test in the VerifyTests class, but it's essential for the
+            // correctness of GetCurrentRegistrations. That's why it's placed directly after the test that
+            // checks if GetCurrentRegistrations doesn't lock the container. When Verify() doesn't lock the
+            // container, this test will fail, and you're probably reading this because this test failed :-)
+            // Look at the previous test in this class.
+            container.Verify();
+
+            // Act
+            Action action = () => container.Register<ITimeProvider, RealTimeProvider>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "container can't be changed", action);
+        }
+
+        [TestMethod]
+        public void BuildExpression_Always_LocksTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetCurrentRegistrations().First().BuildExpression();
+
+            // Act
+            Action action = () => container.Register<ITimeProvider, RealTimeProvider>();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]

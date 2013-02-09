@@ -47,6 +47,8 @@ Version v2.0 (currently released as beta2 on NuGet)
 		-[Extensions/Core] Extensions library has been merged with core library. Extensions library is 
 		 currently empty, but will still be used as NuGet package for backwards compatibility for existing
 		 users.
+		-[Core] A call to GetCurrentRegistrations() will not lock the container anymore. This allows users
+		 to use this method to query the container during registration.
 
 	Bug fixes:
 		-[Core] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event

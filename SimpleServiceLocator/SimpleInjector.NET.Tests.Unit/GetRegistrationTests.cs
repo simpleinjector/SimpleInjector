@@ -9,7 +9,6 @@
     public class GetRegistrationTests
     {
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void GetRegistration_Always_LocksTheContainer1()
         {
             // Arrange
@@ -17,18 +16,24 @@
 
             container.GetRegistration(typeof(ITimeProvider));
 
-            // Act
-            container.Register<ITimeProvider, RealTimeProvider>();
+            try
+            {
+                // Act
+                container.Register<ITimeProvider, RealTimeProvider>();
 
-            // Assert
-            Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
-                "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
-                "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
-                "always lock the container for reasons of correctness.");
+                // Assert
+                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
+                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
+                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
+                    "always lock the container for reasons of correctness.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains("container can't be changed", ex);
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void GetRegistration_Always_LocksTheContainer2()
         {
             // Arrange
@@ -36,14 +41,53 @@
 
             container.GetRegistration(typeof(ITimeProvider), throwOnFailure: false);
 
-            // Act
-            container.Register<ITimeProvider, RealTimeProvider>();
+            try
+            {
+                // Act
+                container.Register<ITimeProvider, RealTimeProvider>();
 
-            // Assert
-            Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
-                "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
-                "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
-                "always lock the container for reasons of correctness.");
+                // Assert
+                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
+                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
+                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
+                    "always lock the container for reasons of correctness.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains("container can't be changed", ex);
+            }
+        }
+
+        [TestMethod]
+        public void GetRegistration_Always_LocksTheContainer3()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                container.GetRegistration(typeof(ITimeProvider), throwOnFailure: true);
+            }
+            catch
+            {
+                // Exception expected.
+            }
+
+            try
+            {
+                // Act
+                container.Register<ITimeProvider, RealTimeProvider>();
+
+                // Assert
+                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
+                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
+                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
+                    "always lock the container for reasons of correctness.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains("container can't be changed", ex);
+            }
         }
 
         [TestMethod]

@@ -147,33 +147,25 @@ namespace SimpleInjector
         /// unregistered types that have been requested, all types that have been resolved using
         /// unregistered type resolution (using the <see cref="ResolveUnregisteredType"/> event), and
         /// requested unregistered collections. Note that the result of this method may change over time, 
-        /// because of these implicit registrations. Because of this, users should not depend on this method
-        /// as a reliable source of resolving instances. This method is provided for debugging purposes.
+        /// because of these implicit registrations.
         /// </summary>
         /// <remarks>
-        /// <para>
-        /// A call to this method locks the container. No new registrations can be made after a call to this 
-        /// method.
-        /// </para>
         /// <para>
         /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
         /// critical path of the application.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same <b>IInstanceProducer</b>
-        /// instance for a given <see cref="Type"/>. It will however either always return <b>null</b> or
-        /// always return a producer that is able to return the expected instance. Because of this, do not
-        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations"/>
-        /// by reference. The way of comparing lists is by the actual type. The type of each instance is
-        /// guaranteed to be unique in the returned list.
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either 
+        /// always return <b>null</b> or always return a producer that is able to return the expected instance.
+        /// Because of this, do not compare sets of instances returned by different calls to 
+        /// <see cref="GetCurrentRegistrations"/> by reference. The way of comparing lists is by the actual 
+        /// type. The type of each instance is guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
         public InstanceProducer[] GetCurrentRegistrations()
         {
-            // We must lock, because not locking could lead to race conditions.
-            this.LockContainer();
-
             // Filter out the invalid registrations (see the IsValid property for more information).
             return (
                 from registration in this.registrations.Values
@@ -183,8 +175,7 @@ namespace SimpleInjector
                 .ToArray();
         }
 
-        /// <summary>
-        /// Determines whether the specified System.Object is equal to the current System.Object.
+        /// <summary>Determines whether the specified System.Object is equal to the current System.Object.
         /// </summary>
         /// <param name="obj">The System.Object to compare with the current System.Object.</param>
         /// <returns>
