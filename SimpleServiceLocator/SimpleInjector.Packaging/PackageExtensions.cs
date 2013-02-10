@@ -40,9 +40,12 @@ namespace SimpleInjector
     public static class PackageExtensions
     {
         /// <summary>
-        /// Loads all <see cref="IPackage"/> implementations from assemblies that are loaded in the current
-        /// AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
-        /// Note that only publicly exposed classes that contain a public default constructor will be loaded. 
+        /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the 
+        /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
+        /// Note that only publicly exposed classes that contain a public default constructor will be loaded.
+        /// Note that this method will only pick up assemblies that are loaded at that moment in time. A
+        /// more reliable way of registering packages is by explicitly supplying the list of assemblies using
+        /// the <see cref="RegisterPackages(Container, IEnumerable{Assembly})"/> overload.
         /// </summary>
         /// <param name="container">The container to which the packages will be applied to.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null

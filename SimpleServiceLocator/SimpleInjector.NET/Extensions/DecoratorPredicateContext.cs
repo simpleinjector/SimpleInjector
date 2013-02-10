@@ -42,6 +42,11 @@ namespace SimpleInjector.Extensions
     /// to be applied and it allows users to examine the given instance to see whether the decorator should
     /// be applied or not.
     /// </summary>
+    /// <remarks>
+    /// Please see the 
+    /// <see cref="DecoratorExtensions.RegisterDecorator(Container, Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
+    /// method for more information.
+    /// </remarks>
     [DebuggerDisplay("DecoratorPredicateContext (ServiceType = {Helpers.ToFriendlyName(ServiceType),nq}, " +
         "ImplementationType = {Helpers.ToFriendlyName(ImplementationType),nq})")]
     public sealed class DecoratorPredicateContext

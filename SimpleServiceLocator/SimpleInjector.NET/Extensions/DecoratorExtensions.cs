@@ -58,20 +58,19 @@ namespace SimpleInjector.Extensions
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// The registered <paramref name="decoratorType"/> must have a single public constructor. Constructor
-        /// injection will be used on that type, and although it may have many constructor arguments, it must
-        /// have exactly one argument of the type of <paramref name="serviceType"/>, or an argument of type
-        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. An exception will be
-        /// thrown when this is not the case.
+        /// Constructor injection will be used on that type, and although it may have many constructor 
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
+        /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
-        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
-        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
-        /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
-        /// creating instances of the decorated type, according to the lifestyle of that type. This enables
-        /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
-        /// decorated instance within a certain scope (such as a lifetime scope).
+        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, an decorated
+        /// instance will not injected into the <paramref name="decoratorType"/>, but it will inject a 
+        /// <see cref="Func{TResult}"/> that allows creating instances of the decorated type, according to the
+        /// lifestyle of that type. This enables more advanced scenarios, such as executing the decorated 
+        /// types on a different thread, or executing decorated instance within a certain scope (such as a 
+        /// lifetime scope).
         /// </para>
         /// </remarks>
         /// <example>
@@ -267,140 +266,11 @@ namespace SimpleInjector.Extensions
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
         /// decorated instance within a certain scope (such as a lifetime scope).
         /// </para>
+        /// <para>
+        /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
+        /// for more information.
+        /// </para>
         /// </remarks>
-        /// <example>
-        /// The following example shows the definition of a generic <b>ICommandHandler&lt;T&gt;</b> interface,
-        /// a <b>CustomerMovedCommandHandler</b> implementing that interface, and a 
-        /// <b>ValidatorCommandHandlerDecorator&lt;T&gt;</b> that acts as a decorator for that interface.
-        /// <code lang="cs"><![CDATA[
-        /// using System.ComponentModel.DataAnnotations;
-        /// using System.Diagnostics;
-        /// using System.Linq;
-        /// 
-        /// using Microsoft.VisualStudio.TestTools.UnitTesting;
-        /// 
-        /// using SimpleInjector;
-        /// using SimpleInjector.Extensions;
-        /// 
-        /// public interface ICommandHandler<TCommand>
-        /// {
-        ///     void Handle(TCommand command);
-        /// }
-        ///
-        /// public class CustomerMovedCommand
-        /// {
-        ///     [Required]
-        ///     public int CustomerId { get; set; }
-        ///
-        ///     [Required]
-        ///     public Address Address { get; set; }
-        /// }
-        ///
-        /// public class CustomerMovedCommandHandler
-        ///     : ICommandHandler<CustomerMovedCommand>
-        /// {
-        ///     public void Handle(CustomerMovedCommand command)
-        ///     {
-        ///         // some logic
-        ///     }
-        /// }
-        ///
-        /// // Decorator that validates commands before they get executed.
-        /// public class ValidatorCommandHandlerDecorator<TCommand>
-        ///     : ICommandHandler<TCommand>
-        /// {
-        ///     private readonly ICommandHandler<TCommand> decoratedHandler;
-        ///     private readonly Container container;
-        ///
-        ///     public ValidatorCommandHandlerDecorator(
-        ///         ICommandHandler<TCommand> decoratedHandler,
-        ///         Container container)
-        ///     {
-        ///         this.decoratedHandler = decoratedHandler;
-        ///         this.container = container;
-        ///     }
-        ///
-        ///     public void Handle(TCommand command)
-        ///     {
-        ///         this.Validate(command);
-        ///
-        ///         this.decoratedHandler.Handle(command);
-        ///     }
-        ///
-        ///     private void Validate(TCommand command)
-        ///     {
-        ///         var validationContext =
-        ///             new ValidationContext(command, this.container, null);
-        ///
-        ///         Validator.ValidateObject(command, validationContext);
-        ///     }
-        /// }
-        /// 
-        /// // Decorator that measures the time it takes to execute a command.
-        /// public class MonitoringCommandHandlerDecorator<TCommand>
-        ///     : ICommandHandler<TCommand>
-        /// {
-        ///     private readonly ICommandHandler<TCommand> decoratedHandler;
-        ///     private readonly ILogger logger;
-        ///
-        ///     public MonitoringCommandHandlerDecorator(
-        ///         ICommandHandler<TCommand> decoratedHandler,
-        ///         ILogger logger)
-        ///     {
-        ///         this.decoratedHandler = decoratedHandler;
-        ///         this.logger = logger;
-        ///     }
-        ///
-        ///     public void Handle(TCommand command)
-        ///     {
-        ///         var watch = Stopwatch.StartNew();
-        ///
-        ///         this.decoratedHandler.Handle(command);
-        ///
-        ///         this.logger.Log(string.Format("{0} executed in {1} ms.",
-        ///             command.GetType().Name, watch.ElapsedMilliseconds));
-        ///     }
-        /// }
-        /// 
-        /// [TestMethod]
-        /// public static void TestRegisterOpenGenericDecorator()
-        /// {
-        ///     // Arrange
-        ///     var container = new Container();
-        ///
-        ///     container.RegisterSingle<ILogger, DebugLogger>();
-        ///
-        ///     // Search the given assembly and register all concrete types that 
-        ///     // implement ICommandHandler<TCommand>.
-        ///     container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
-        ///         typeof(ICommandHandler<>).Assembly);
-        ///
-        ///     // Wrap all ICommandHandler<TCommand> service types with a decorator
-        ///     // that measures and logs the duration of that handler.
-        ///     container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
-        ///         typeof(MonitoringCommandHandlerDecorator<>));
-        ///
-        ///     // Wrap all ICommandHandler<TCommand> types (in this case it will
-        ///     // wrap the monitoring decorator), but only if the TCommand contains
-        ///     // any properties.
-        ///     container.RegisterOpenGenericDecorator(typeof(ICommandHandler<>),
-        ///         typeof(ValidatorCommandHandlerDecorator<>), context =>
-        ///         {
-        ///             var commandType = context.ServiceType.GetGenericArguments()[0];
-        ///             bool mustDecorate = commandType.GetProperties().Any();
-        ///             return mustDecorate;
-        ///         });
-        ///
-        ///     // Act
-        ///     var handler = 
-        ///         container.GetInstance<ICommandHandler<CustomerMovedCommand>>();
-        ///
-        ///     // Assert
-        ///     Assert.IsInstanceOfType(handler, 
-        ///         typeof(ValidatorCommandHandlerDecorator<CustomerMovedCommand>));
-        /// }
-        /// ]]></code>
-        /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The definition of the open generic service type that will
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
