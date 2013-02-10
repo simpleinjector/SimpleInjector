@@ -19,7 +19,7 @@
 
             var invalidLifestyle = new FakeLifestyle();
             
-            var invalidRegistration = new FakeRegistration(invalidLifestyle, container)
+            var invalidRegistration = new FakeRegistration(invalidLifestyle, container, typeof(RealTimeProvider))
             {
                 ExpressionToReturn = null
             };
@@ -74,14 +74,17 @@
 
     internal sealed class FakeRegistration : Registration
     {
-        public FakeRegistration(Lifestyle lifestyle, Container container) 
+        private readonly Type implementationType;
+
+        public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType) 
             : base(lifestyle, container)
         {
+            this.implementationType = implementationType;
         }
 
         public override Type ImplementationType
         {
-            get { throw new NotImplementedException(); }
+            get { return this.implementationType; }
         }
 
         public Expression ExpressionToReturn { get; set; }
