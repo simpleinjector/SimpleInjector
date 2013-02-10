@@ -17,8 +17,8 @@
         {
             var registration = lifestyle.CreateRegistration<TImplementation, TImplementation>(container);
 
-            container.Register(typeof(TService1), registration);
-            container.Register(typeof(TService2), registration);
+            container.AddRegistration(typeof(TService1), registration);
+            container.AddRegistration(typeof(TService2), registration);
         }
 
         public static void Register<TService1, TService2, TService3, TImplementation>(
@@ -30,9 +30,9 @@
         {
             var registration = lifestyle.CreateRegistration<TImplementation, TImplementation>(container);
 
-            container.Register(typeof(TService1), registration);
-            container.Register(typeof(TService2), registration);
-            container.Register(typeof(TService3), registration);
+            container.AddRegistration(typeof(TService1), registration);
+            container.AddRegistration(typeof(TService2), registration);
+            container.AddRegistration(typeof(TService3), registration);
         }
     }
 }

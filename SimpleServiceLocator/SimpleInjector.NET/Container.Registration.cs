@@ -361,6 +361,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents an 
         /// open generic type or is a type that can not be created by the container.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="concreteType"/> has already been registered.
+        /// </exception>
         public void Register(Type concreteType)
         {
             Requires.IsNotNull(concreteType, "concreteType");
@@ -382,6 +386,10 @@ namespace SimpleInjector
         /// no sub type from <paramref name="serviceType"/> (or the same type), or one of them represents an 
         /// open generic type.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
         public void Register(Type serviceType, Type implementation)
         {
             this.Register(serviceType, implementation, Lifestyle.Transient);
@@ -396,6 +404,10 @@ namespace SimpleInjector
         /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
         public void Register(Type serviceType, Func<object> instanceCreator)
         {
             this.Register(serviceType, instanceCreator, Lifestyle.Transient);
@@ -475,7 +487,7 @@ namespace SimpleInjector
 
             var registration = SingletonLifestyle.CreateRegistration(typeof(TService), instance, this);
 
-            this.Register(typeof(TService), registration);
+            this.AddRegistration(typeof(TService), registration);
         }
 
         /// <summary>
@@ -515,6 +527,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
         /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
         /// type.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
         public void RegisterSingle(Type serviceType, Type implementation)
         {
             this.Register(serviceType, implementation, Lifestyle.Singleton);
@@ -531,6 +547,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
         /// <paramref name="instanceCreator"/> are null references (Nothing in
         /// VB).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
             this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
@@ -547,6 +567,10 @@ namespace SimpleInjector
         /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
         public void RegisterSingle(Type serviceType, object instance)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -557,7 +581,7 @@ namespace SimpleInjector
 
             var registration = SingletonLifestyle.CreateRegistration(serviceType, instance, this);
 
-            this.Register(serviceType, registration);
+            this.AddRegistration(serviceType, registration);
         }
 
         /// <summary>
@@ -586,7 +610,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
 
-            this.Register(typeof(TService), registration);
+            this.AddRegistration(typeof(TService), registration);
         }
 
         /// <summary>
@@ -613,7 +637,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
 
-            this.Register(typeof(TService), registration);
+            this.AddRegistration(typeof(TService), registration);
         }
 
         /// <summary>
@@ -653,7 +677,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
 
-            this.Register(serviceType, registration);
+            this.AddRegistration(serviceType, registration);
         }
 
         /// <summary>
@@ -683,7 +707,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
-            this.Register(serviceType, registration);
+            this.AddRegistration(serviceType, registration);
         }
         
         /// <summary>
@@ -853,7 +877,7 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(
                 typeof(IEnumerable<TService>), () => readOnlyCollection, this);
 
-            this.Register(typeof(IEnumerable<TService>), registration);
+            this.AddRegistration(typeof(IEnumerable<TService>), registration);
 
             this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
         }
@@ -1016,7 +1040,34 @@ namespace SimpleInjector
             }
         }
 
-        public void Register(Type serviceType, Registration registration)
+        /// <summary>
+        /// Adds the <paramref name="registration"/> for the supplied <paramref name="serviceType"/>. This
+        /// method can be used to apply the same <see cref="Registration"/> to multiple different service
+        /// types.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="registration">The registration that should be stored for the given 
+        /// <paramref name="serviceType"/>.</param>
+        /// <example>
+        /// <code lang="cs"><![CDATA[
+        /// var registration = Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
+        /// 
+        /// container.AddRegistration(typeof(IFoo), registration);
+        /// container.AddRegistration(typeof(IBar), registration);
+        /// ]]></code>
+        /// </example>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not a reference
+        /// type, is open generic, is ambiguous, when it is not assignable from the 
+        /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>
+        /// or when the supplied <paramref name="registration"/> is created for a different 
+        /// <see cref="Container"/> instance.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
+        public void AddRegistration(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registration, "registration");
@@ -1079,7 +1130,7 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(enumerableServiceType,
                 () => castedCollection, this);
 
-            this.Register(enumerableServiceType, registration);
+            this.AddRegistration(enumerableServiceType, registration);
 
             this.collectionsToValidate[serviceType] = readOnlyCollection;
         }

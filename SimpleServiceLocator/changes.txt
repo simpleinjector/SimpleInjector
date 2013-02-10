@@ -19,7 +19,7 @@ Version v2.0 (currently released as beta3 on NuGet)
 		 expression is built that creates a new instance, but before instance initializers and lifestyle
 		 caching gets added to the expression.
 		-[Core] HybridLifestyle added to allow registering hybrid lifestyles.
-		-[Core] Register(Type, Registration) overload added to allow directly adding a registration.
+		-[Core] AddRegistration(Type, Registration) method added to allow directly adding a registration.
 		-[Integration.Web] WebRequestLifestyle has been added.
 		-[Integration.Wcf] WcfOperationLifestyle has been added.
 		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
