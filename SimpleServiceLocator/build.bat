@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.0.0
-set prereleasePostfix=beta2
+set prereleasePostfix=beta3
 set buildNumber=0
 
 
@@ -22,7 +22,6 @@ set msbuild32=%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
 set ilmerge=%buildToolsPath%\ILMerge.exe
-set sandcastlegui=%buildToolsPath%\SandcastleGUI.exe
 set replace=%buildToolsPath%\replace.exe
 set compress=CScript %buildToolsPath%\zip.vbs
 set configuration=Release
@@ -135,34 +134,7 @@ del %targetPathSilverlight%\temp.dll
 
 echo BUILD DOCUMENTATION
 
-mkdir Help
-mkdir Help.Asm
-
-REM SimpleInjector.Extensions is an empty stub now
-REM copy bin\NET\SimpleInjector.Extensions.dll Help.Asm\SimpleInjector.Extensions.dll
-REM copy bin\NET\SimpleInjector.Extensions.xml Help.Asm\SimpleInjector.Extensions.xml
-
-copy bin\NET\SimpleInjector.dll Help.Asm\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Help.Asm\SimpleInjector.xml
-copy bin\NET\SimpleInjector.Packaging.dll Help.Asm\SimpleInjector.Packaging.dll
-copy bin\NET\SimpleInjector.Packaging.xml Help.Asm\SimpleInjector.Packaging.xml
-copy bin\NET\SimpleInjector.Integration.Web.dll Help.Asm\SimpleInjector.Integration.Web.dll
-copy bin\NET\SimpleInjector.Integration.Web.xml Help.Asm\SimpleInjector.Integration.Web.xml
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Help.Asm\SimpleInjector.Integration.Web.Mvc.dll
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Help.Asm\SimpleInjector.Integration.Web.Mvc.xml
-copy bin\NET\SimpleInjector.Integration.Wcf.dll Help.Asm\SimpleInjector.Integration.Wcf.dll
-copy bin\NET\SimpleInjector.Integration.Wcf.xml Help.Asm\SimpleInjector.Integration.Wcf.xml
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Help.Asm\SimpleInjector.Extensions.LifetimeScoping.dll
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Help.Asm\SimpleInjector.Extensions.LifetimeScoping.xml
-
-
-
-%sandcastlegui% /document %buildToolsPath%\SimpleInjector.SandcastleGUI
-ren Help\Documentation.chm SimpleInjector.chm
-ren Help\Presentation.css presentation.xxx
-ren Help\presentation.xxx presentation.css
-rmdir Help.Asm /q /s
-
+%msbuild% "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 
 
 mkdir Releases\v%named_version%
@@ -174,6 +146,9 @@ mkdir Releases\v%named_version%\Silverlight\Documentation
 copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\Silverlight\Documentation\SimpleInjector.chm
+del Help\SimpleInjector.chm
+del Help\*.aspx
+%compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
 
 copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml

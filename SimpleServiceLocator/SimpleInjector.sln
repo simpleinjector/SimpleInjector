@@ -105,14 +105,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{D1A45E86-CD79-4F65-AC0B-25A21166B1E9}"
 	ProjectSection(SolutionItems) = preProject
 		build.bat = build.bat
-		BuildTools\builddocs.bat = BuildTools\builddocs.bat
 		BuildTools\DayOfYear.exe = BuildTools\DayOfYear.exe
 		BuildTools\ILMerge.exe = BuildTools\ILMerge.exe
 		BuildTools\ILMerge.exe.config = BuildTools\ILMerge.exe.config
 		BuildTools\replace.exe = BuildTools\replace.exe
-		BuildTools\SandcastleGUI.exe = BuildTools\SandcastleGUI.exe
-		BuildTools\SandcastleGUI.exe.config = BuildTools\SandcastleGUI.exe.config
-		BuildTools\SimpleInjector.SandcastleGUI = BuildTools\SimpleInjector.SandcastleGUI
 		BuildTools\zip.vbs = BuildTools\zip.vbs
 	EndProjectSection
 EndProject
@@ -122,9 +118,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.Silverlight.Tests.Unit", "SimpleInjector.Extensions.Silverlight.Tests\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj", "{8487C652-EF01-4D52-BE56-AC2ADE51C030}"
 EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "SimpleInjector.Documentation", "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj", "{DC974673-A490-4376-BECA-EEDE8A33579B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 22
+		SccNumberOfProjects = 23
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -191,6 +189,9 @@ Global
 		SccProjectUniqueName21 = SimpleInjector.NET\\SimpleInjector.NET.csproj
 		SccProjectName21 = SimpleInjector.NET
 		SccLocalPath21 = SimpleInjector.NET
+		SccProjectUniqueName22 = SimpleInjector.Documentation\\SimpleInjector.Documentation.shfbproj
+		SccProjectName22 = SimpleInjector.Documentation
+		SccLocalPath22 = SimpleInjector.Documentation
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -411,6 +412,14 @@ Global
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
