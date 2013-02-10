@@ -35,8 +35,20 @@ namespace SimpleInjector.Lifestyles
     using SimpleInjector.Diagnostics;
 
     /// <summary>
-    /// TODO
+    /// A <b>Registration</b> implements lifestyle based caching for a single service.
     /// </summary>
+    /// <remarks>
+    /// <see cref="Lifestyle"/> implementations create a new <b>Registration</b> instance for each registered
+    /// service type. <see cref="Expression"/>s returned from the 
+    /// <see cref="Registration.BuildExpression">BuildExpression</see> method can be intercepted by any event
+    /// registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have 
+    /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> applied, and the caching 
+    /// particular to its lifestyle have been applied. Interception using the 
+    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b> 
+    /// be applied.</remarks>
+    /// <example>
+    /// See the <see cref="Lifestyle"/> documentation for an example.
+    /// </example>
     public abstract class Registration
     {
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
@@ -44,10 +56,12 @@ namespace SimpleInjector.Lifestyles
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
 
         /// <summary>
-        /// TODO
+        /// Initializes a new instance of the <see cref="Registration"/> class.
         /// </summary>
-        /// <param name="lifestyle"></param>
-        /// <param name="container"></param>
+        /// <param name="lifestyle">The <see cref="Lifestyle"/> this that created this registration.</param>
+        /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
         protected Registration(Lifestyle lifestyle, Container container)
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
@@ -58,22 +72,23 @@ namespace SimpleInjector.Lifestyles
         }
         
         /// <summary>
-        /// TODO
+        /// Gets the type that this instance will create.
         /// </summary>
         public abstract Type ImplementationType { get; }
 
         /// <summary>
-        /// TODO
+        /// Gets the <see cref="Lifestyle"/> this that created this registration.
         /// </summary>
         public Lifestyle Lifestyle { get; private set; }
 
         /// <summary>
-        /// TODO
+        /// Gets the <see cref="Container"/> instance for this registration.
         /// </summary>
         protected internal Container Container { get; private set; }
 
         /// <summary>
-        /// TODO
+        /// Builds a new <see cref="Expression"/> with the correct caching (according to the specifications of
+        /// its <see cref="Lifestyle"/>) applied.
         /// </summary>
         /// <returns></returns>
         public abstract Expression BuildExpression();
@@ -99,9 +114,10 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        internal Expression InterceptInstanceCreation(Type serviceType, Expression instanceCreatorExpression)
+        internal Expression InterceptInstanceCreation(Type serviceType, Type implementationType,
+            Expression instanceCreatorExpression)
         {
-            var e = new ExpressionBuildingEventArgs(serviceType, instanceCreatorExpression);
+            var e = new ExpressionBuildingEventArgs(serviceType, implementationType, instanceCreatorExpression);
 
             this.Container.OnExpressionBuilding(e);
 
@@ -127,11 +143,18 @@ namespace SimpleInjector.Lifestyles
         }
 
         /// <summary>
-        /// TODO
+        /// Builds a <see cref="Func{T}"/> delegate for the creation of the <typeparamref name="TService"/>
+        /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Func{T}"/> might
+        /// be intercepted by a 
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
+        /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
+        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
+        /// appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="instanceCreator"></param>
-        /// <returns></returns>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="instanceCreator">
+        /// The delegate supplied by the user that allows building or creating new instances.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate.</returns>
         protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -145,29 +168,42 @@ namespace SimpleInjector.Lifestyles
         }
 
         /// <summary>
-        /// TODO
+        /// Builds a <see cref="Func{T}"/> delegate for the creation of <typeparamref name="TImplementation"/>.
+        /// The returned <see cref="Func{T}"/> might be intercepted by a 
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
+        /// and the creation of the <typeparamref name="TImplementation"/> will have been wrapped with a 
+        /// delegate that executes the registered 
+        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> 
+        /// that are appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImplementation"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <returns>A <see cref="Func{T}"/> delegate.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Supplying the generic type arguments is needed, since internal types can not " +
                             "be created using the non-generic overloads in a sandbox.")]
-        protected Func<TService> BuildTransientDelegate<TService, TImplementation>()
+        protected Func<TImplementation> BuildTransientDelegate<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
         {
             Expression expression = this.BuildTransientExpression<TService, TImplementation>();
 
-            return BuildDelegate<TService>(expression);
+            return BuildDelegate<TImplementation>(expression);
         }
 
         /// <summary>
-        /// TODO
+        /// Builds an <see cref="Expression"/> that describes the creation of the <typeparamref name="TService"/>
+        /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Expression"/> might
+        /// be intercepted by a 
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
+        /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
+        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
+        /// appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="instanceCreator"></param>
-        /// <returns></returns>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="instanceCreator">
+        /// The delegate supplied by the user that allows building or creating new instances.</param>
+        /// <returns>An <see cref="Expression"/>.</returns>
         protected Expression BuildTransientExpression<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -175,7 +211,7 @@ namespace SimpleInjector.Lifestyles
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
 
-            expression = this.InterceptInstanceCreation(typeof(TService), expression);
+            expression = this.InterceptInstanceCreation(typeof(TService), typeof(TService), expression);
             
             // We have to decorate the given instanceCreator to add a null check and throw an expressive
             // exception when the instanceCreator returned null. By preventing to polute the expression given
@@ -190,11 +226,17 @@ namespace SimpleInjector.Lifestyles
         }
 
         /// <summary>
-        /// TODO
+        /// Builds an <see cref="Expression"/> that describes the creation of 
+        /// <typeparamref name="TImplementation"/>. The returned <see cref="Expression"/> might be intercepted
+        /// by a <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see>
+        /// event, and the creation of the <typeparamref name="TImplementation"/> will have been wrapped with
+        /// a delegate that executes the registered 
+        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> 
+        /// that are appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImplementation"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <returns>An <see cref="Expression"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Supplying the generic type arguments is needed, since internal types can not " +
                             "be created using the non-generic overloads in a sandbox.")]
@@ -204,7 +246,7 @@ namespace SimpleInjector.Lifestyles
         {
             Expression expression = this.BuildNewExpression(typeof(TService), typeof(TImplementation));
 
-            expression = this.InterceptInstanceCreation(typeof(TService), expression);
+            expression = this.InterceptInstanceCreation(typeof(TService), typeof(TImplementation), expression);
 
             expression = this.WrapWithInitializer<TService, TImplementation>(expression);
 

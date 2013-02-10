@@ -70,11 +70,23 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
             this.disposeInstanceWhenLifetimeScopeEnds = disposeInstanceWhenLifetimeScopeEnds;
         }
-
+        
         /// <summary>Gets the length of the lifestyle.</summary>
         protected override int Length
         {
             get { return 100; }
+        }
+
+        internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)
+        {
+            if (disposeWhenLifetimeScopeEnds)
+            {
+                return LifetimeScopeLifestyle.WithDisposal;
+            }
+            else
+            {
+                return LifetimeScopeLifestyle.NoDisposal;
+            }
         }
 
         /// <summary>

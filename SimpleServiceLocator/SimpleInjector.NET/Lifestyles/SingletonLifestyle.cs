@@ -92,7 +92,7 @@ namespace SimpleInjector.Lifestyles
 
                 var constantExpression = Expression.Constant(this.instance, this.serviceType);
 
-                return this.InterceptInstanceCreation(this.serviceType, constantExpression);
+                return this.InterceptInstanceCreation(this.serviceType, this.serviceType, constantExpression);
             }
 
             private void EnsureInitializerHasRun()

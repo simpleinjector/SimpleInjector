@@ -44,8 +44,9 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
 
-            container.Register(typeof(IService1), registration);
-            container.Register(typeof(IService2), registration);
+            container.AddRegistration(typeof(IService1), registration);
+            container.AddRegistration(typeof(IService2), registration);
+
             container.Register<Controller<int>>();
 
             container.Verify();
@@ -74,8 +75,8 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
 
-            container.Register(typeof(IService1), registration);
-            container.Register(typeof(IService2), registration);
+            container.AddRegistration(typeof(IService1), registration);
+            container.AddRegistration(typeof(IService2), registration);
 
             // Two types in same group
             container.Register<Controller<int>>();

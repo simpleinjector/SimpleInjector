@@ -40,12 +40,11 @@ namespace SimpleInjector
     {
         private Expression expression;
 
-        /// <summary>Initializes a new instance of the <see cref="ExpressionBuildingEventArgs"/> class.</summary>
-        /// <param name="registeredServiceType">Type of the registered service.</param>
-        /// <param name="expression">The registered expression.</param>
-        public ExpressionBuildingEventArgs(Type registeredServiceType, Expression expression)
+        internal ExpressionBuildingEventArgs(Type registeredServiceType, Type knownImplementationType, 
+            Expression expression)
         {
             this.RegisteredServiceType = registeredServiceType;
+            this.KnownImplementationType = knownImplementationType;
 
             this.expression = expression;
         }
@@ -53,6 +52,17 @@ namespace SimpleInjector
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
         public Type RegisteredServiceType { get; private set; }
+
+        /// <summary>
+        /// Gets the type that is known to be returned by the 
+        /// <see cref="ExpressionBuildingEventArgs.Expression">Expression</see> (most often the implementation
+        /// type used in the <b>Register</b> call). This type will be a derivative of
+        /// <see cref="ExpressionBuildingEventArgs.RegisteredServiceType">RegisteredServiceType</see> (or
+        /// or <b>RegisteredServiceType</b> itself). If the <b>Expression</b> is changed, the new expression 
+        /// must also return an instance of type <b>KnownImplementationType</b> or a sub type. 
+        /// This information must be described in the new Expression.
+        /// </summary>
+        public Type KnownImplementationType { get; private set; }
 
         /// <summary>Gets or sets the currently registered <see cref="Expression"/>.</summary>
         /// <value>The current registration.</value>

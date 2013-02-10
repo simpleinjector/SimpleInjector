@@ -39,6 +39,33 @@ namespace SimpleInjector.Extensions
     /// <param name="closedServiceType">The service type that needs to be registered.</param>
     /// <param name="implementations">One or more concrete types that implement the given 
     /// <paramref name="closedServiceType"/>.</param>
+    /// <example>
+    /// <code lang="cs"><![CDATA[
+    /// 
+    /// var container = new Container();
+    /// 
+    /// BatchRegistrationCallback registerAsCollectionAsSingletons = (closedServiceType, implementations) =>
+    /// {
+    ///     foreach (Type implementation in implementations)
+    ///     {
+    ///         container.RegisterSingle(implementation);
+    ///     }
+    ///     
+    ///     container.RegisterAll(closedServiceType, implementations);
+    /// };
+    /// 
+    /// container.RegisterManyForOpenGeneric(
+    ///     typeof(ICommandHandler<>),
+    ///     registerAsCollectionAsSingletons, 
+    ///     typeof(ICommandHandler<>).Assembly);
+    /// ]]></code>
+    /// The <b>BatchRegistrationCallback</b> can be supplied to some overloads of the
+    /// <see cref="OpenGenericBatchRegistrationExtensions">RegisterManyForOpenGeneric</see> extension methods.
+    /// The default behavior of the <b>RegisterManyForOpenGeneric</b> methods is to register a closed generic
+    /// type with the corresponding implementation (and through when multiple implementations are found). The
+    /// given example overrides this default registration by registering the found list of implementations
+    /// (one or more) as collection of singletons for the given closed generic service type.
+    /// </example>
     public delegate void BatchRegistrationCallback(Type closedServiceType, Type[] implementations);
 
 #if !SILVERLIGHT

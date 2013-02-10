@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.0.0
-set prereleasePostfix=beta3
+set prereleasePostfix=beta4
 set buildNumber=0
 
 
@@ -146,9 +146,6 @@ mkdir Releases\v%named_version%\Silverlight\Documentation
 copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\Silverlight\Documentation\SimpleInjector.chm
-del Help\SimpleInjector.chm
-del Help\*.aspx
-%compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
 
 copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
@@ -215,7 +212,15 @@ mkdir Releases\temp\Extensions
 REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
 REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Silverlight Runtime Library v%named_version%.zip"
+
 rmdir Releases\temp /s /q
+
+
+echo ONLINE DOCUMENTATION
+
+del Help\SimpleInjector.chm
+del Help\*.aspx
+%compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
 
 
 echo NUGET PACKAGES .NET

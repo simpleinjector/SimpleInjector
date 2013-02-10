@@ -564,17 +564,21 @@
             Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
         }
 
+#if DEBUG
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ExpressionBuildingEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
-            var eventArgs =
-                new ExpressionBuildingEventArgs(typeof(IPlugin), Expression.Constant(new PluginImpl()));
+            var eventArgs = new ExpressionBuildingEventArgs(
+                typeof(IPlugin),
+                typeof(PluginImpl), 
+                Expression.Constant(new PluginImpl()));
 
             // Act
             eventArgs.Expression = null;
         }
+#endif
 
         [TestMethod]
         public void GetInstance_ExpressionBuildingWithInvalidExpression_ThrowsAnDescriptiveException()
@@ -659,7 +663,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "Error occurred while trying to build a delegate for type IUserRepository using " + 
+                    "Error occurred while trying to build a delegate for type SqlUserRepository using " + 
                     "the expression", ex);
             }
         }
