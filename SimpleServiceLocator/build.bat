@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.0.0
-set prereleasePostfix=beta4
+set prereleasePostfix=-beta4
 set buildNumber=0
 
 
@@ -35,15 +35,15 @@ set v4targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Fram
 
 
 
-set named_version=%version%-%prereleasePostfix%
+set named_version=%version%%prereleasePostfix%
 
-set named_version_Core=%version_Core%-%prereleasePostfix%
-set named_version_Packaging=%version_Packaging%-%prereleasePostfix%
-set named_version_Extensions=%version_Extensions%-%prereleasePostfix%
-set named_version_Integration_Web=%version_Integration_Web%-%prereleasePostfix%
-set named_version_Integration_Mvc=%version_Integration_Mvc%-%prereleasePostfix%
-set named_version_Integration_Wcf=%version_Integration_Wcf%-%prereleasePostfix%
-set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%-%prereleasePostfix%
+set named_version_Core=%version_Core%%prereleasePostfix%
+set named_version_Packaging=%version_Packaging%%prereleasePostfix%
+set named_version_Extensions=%version_Extensions%%prereleasePostfix%
+set named_version_Integration_Web=%version_Integration_Web%%prereleasePostfix%
+set named_version_Integration_Mvc=%version_Integration_Mvc%%prereleasePostfix%
+set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
+set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
 set numeric_version_Packaging=%version_Packaging%.%buildNumber%
@@ -208,7 +208,7 @@ copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\tem
 copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
 copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
 copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
-mkdir Releases\temp\Extensions
+REM mkdir Releases\temp\Extensions
 REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
 REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Silverlight Runtime Library v%named_version%.zip"
