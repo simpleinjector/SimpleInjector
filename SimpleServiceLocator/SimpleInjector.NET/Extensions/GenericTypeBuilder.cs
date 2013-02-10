@@ -40,6 +40,8 @@ namespace SimpleInjector.Extensions
             this.OpenGenericImplementation = openGenericImplementation;
         }
 
+        internal bool SuppressTypeConstraintChecks { get; set; }
+        
         private Type ClosedGenericBaseType { get; set; }
 
         private Type OpenGenericImplementation { get; set; }
@@ -127,7 +129,8 @@ namespace SimpleInjector.Extensions
             {
                 OpenServiceGenericTypeArguments = openGenericServiceType.GetGenericArguments(),
                 ClosedServiceConcreteTypeArguments = this.ClosedGenericBaseType.GetGenericArguments(),
-                OpenGenericImplementationTypeArguments = this.OpenGenericImplementation.GetGenericArguments()
+                OpenGenericImplementationTypeArguments = this.OpenGenericImplementation.GetGenericArguments(),
+                SuppressTypeConstraintChecks = this.SuppressTypeConstraintChecks
             };
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();

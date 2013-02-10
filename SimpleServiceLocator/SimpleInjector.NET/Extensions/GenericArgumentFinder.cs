@@ -44,6 +44,8 @@ namespace SimpleInjector.Extensions
 
         internal IList<Type> OpenGenericImplementationTypeArguments { get; set; }
 
+        internal bool SuppressTypeConstraintChecks { get; set; }
+
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation()
         {
             // The arguments must be in the same order as those of the open implementation.
@@ -63,7 +65,10 @@ namespace SimpleInjector.Extensions
 
             this.ConvertToOpenImplementationArgumentMappings(ref argumentMappings);
 
-            RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
+            if (!this.SuppressTypeConstraintChecks)
+            {
+                RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
+            }
 
             RemoveDuplicateTypeArguments(ref argumentMappings);
 

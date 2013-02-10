@@ -16,6 +16,10 @@
         void Log(string message);
     }
 
+    public interface ISpecialCommand
+    {
+    }
+
     public interface ICommandHandler<TCommand>
     {
         void Handle(TCommand command);
@@ -1510,6 +1514,56 @@
             Assert.IsTrue(typesBuilding.Any(type => type == typeof(TransactionHandlerDecorator<RealCommand>)),
                 "The decorator is expected to go through the complete pipeline, including ExpressionBuilding.");
         }
+
+        [TestMethod]
+        public void RegisterDecorator_DecoratorWithGenericTypeConstraintOtherThanTheClassConstraint_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            // Somehow the "where T : class" always works, while things like "where T : struct" or 
+            // "where T : ISpecialCommand" (used here) doesn't.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(SpecialCommandHandlerDecorator<>));
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_DecoratorWithGenericTypeConstraint_WrapsTypesThatAdhereToTheConstraint()
+        {
+            // Arrange
+            var container = new Container();
+
+            // SpecialCommand implements ISpecialCommand
+            container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
+
+            // SpecialCommandHandlerDecorator has a "where T : ISpecialCommand" constraint.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(SpecialCommandHandlerDecorator<>));
+
+            // Act
+            var specialHandler = container.GetInstance<ICommandHandler<SpecialCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(specialHandler, typeof(SpecialCommandHandlerDecorator<SpecialCommand>));
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_DecoratorWithGenericTypeConstraint_DoesNotWrapTypesThatNotAdhereToTheConstraint()
+        {
+            // Arrange
+            var container = new Container();
+
+            // RealCommand does not implement ISpecialCommand
+            container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+
+            // SpecialCommandHandlerDecorator has a "where T : ISpecialCommand" constraint.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(SpecialCommandHandlerDecorator<>));
+
+            // Act
+            var realHandler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(realHandler, typeof(NullCommandHandler<RealCommand>));
+        }
     }
 
     public class DependencyInfo
@@ -1539,6 +1593,10 @@
     {
     }
 
+    public class SpecialCommand : ISpecialCommand
+    {
+    }
+
     public class MultipleConstructorsCommandHandlerDecorator<T> : ICommandHandler<T>
     {
         public MultipleConstructorsCommandHandlerDecorator()
@@ -1561,6 +1619,13 @@
         {
         }
 
+        public void Handle(T command)
+        {
+        }
+    }
+
+    public class NullCommandHandler<T> : ICommandHandler<T>
+    {
         public void Handle(T command)
         {
         }
@@ -1627,6 +1692,17 @@
 
         public void Handle(T command)
         {
+        }
+    }
+
+    public class SpecialCommandHandlerDecorator<T> : ICommandHandler<T> where T : ISpecialCommand
+    {
+        public SpecialCommandHandlerDecorator(ICommandHandler<T> decorated)
+        {
+        }
+
+        public void Handle(T command)
+        {           
         }
     }
 

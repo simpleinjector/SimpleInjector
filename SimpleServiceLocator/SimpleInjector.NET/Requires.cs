@@ -198,6 +198,12 @@ namespace SimpleInjector
             {
                 var builder = new GenericTypeBuilder(serviceType, decoratorType);
 
+                // Suppressing type constraint checks is needed, because at this point we are not resolving
+                // and we only have the open generic service type and not a closed generic service type. Since
+                // the decoratorType could contain certain generic type constraints, this check would fail
+                // when we didn't suppress checking the type constraints.
+                builder.SuppressTypeConstraintChecks = true;
+
                 if (!builder.ClosedServiceTypeSatisfiesAllTypeConstraints())
                 {
                     string error = StringResources.DecoratorContainsUnresolvableTypeArguments(decoratorType);
