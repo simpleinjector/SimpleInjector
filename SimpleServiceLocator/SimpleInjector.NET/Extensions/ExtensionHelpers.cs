@@ -194,32 +194,7 @@ namespace SimpleInjector.Extensions
         {
             return type.GetInterfaces().Concat(type.GetBaseTypes());
         }
-
-        internal static bool IsConstructableType(this Container container, Type serviceType,
-            Type implementationType, out string errorMessage)
-        {
-            errorMessage = null;
-
-            var resolutionBehavior = container.Options.ConstructorResolutionBehavior;
-            var verificationBehavior = container.Options.ConstructorVerificationBehavior;
-
-            try
-            {
-                var constructor = resolutionBehavior.GetConstructor(serviceType, implementationType);
-
-                foreach (var parameter in constructor.GetParameters())
-                {
-                    verificationBehavior.Verify(parameter);
-                }
-            }
-            catch (ActivationException ex)
-            {
-                errorMessage = ex.Message;
-            }
-
-            return errorMessage == null;
-        }
-
+        
         internal static void AddRange<T>(this Collection<T> collection, IEnumerable<T> range)
         {
             foreach (var item in range)

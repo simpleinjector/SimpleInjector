@@ -33,6 +33,7 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Lifestyles;
 
     internal static class Requires
     {
@@ -245,6 +246,16 @@ namespace SimpleInjector
             Requires.DecoratesBaseTypes(serviceType, decoratorConstructor, paramName);
         }
 
+        internal static void IsRegistrationForThisContainer(Container container, Registration registration,
+            string paramName)
+        {
+            if (!object.ReferenceEquals(container, registration.Container))
+            {
+                string message = StringResources.TheSuppliedRegistrationBelongsToADifferentContainer();
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
         private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor, 
             string paramName)
         {

@@ -75,6 +75,7 @@
     <Compile Include="InterceptorExtensionsTests.cs" />
     <Compile Include="MostParametersConstructorResolutionBehaviorTests.cs" />
     <Compile Include="MostResolvableParametersConstructorResolutionBehaviorTests.cs" />
+    <Compile Include="MultiKeyedRegistrationsExtensionsTests.cs" />
     <Compile Include="ParameterConventionExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CollectionRegistrationExtensionsTests.cs" />

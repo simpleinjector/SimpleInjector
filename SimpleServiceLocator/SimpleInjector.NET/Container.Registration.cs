@@ -364,6 +364,7 @@ namespace SimpleInjector
         public void Register(Type concreteType)
         {
             Requires.IsNotNull(concreteType, "concreteType");
+            Requires.IsNotAnAmbiguousType(concreteType, "concreteType");
 
             this.Register(concreteType, concreteType, Lifestyle.Transient);
         }
@@ -474,7 +475,7 @@ namespace SimpleInjector
 
             var registration = SingletonLifestyle.CreateRegistration(typeof(TService), instance, this);
 
-            this.AddRegistration(typeof(TService), registration);
+            this.Register(typeof(TService), registration);
         }
 
         /// <summary>
@@ -552,9 +553,11 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
 
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
             var registration = SingletonLifestyle.CreateRegistration(serviceType, instance, this);
 
-            this.AddRegistration(serviceType, registration);
+            this.Register(serviceType, registration);
         }
 
         /// <summary>
@@ -579,9 +582,11 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
 
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+
             var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
 
-            this.AddRegistration(typeof(TService), registration);
+            this.Register(typeof(TService), registration);
         }
 
         /// <summary>
@@ -604,9 +609,11 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(lifestyle, "lifestyle");
 
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+
             var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
 
-            this.AddRegistration(typeof(TService), registration);
+            this.Register(typeof(TService), registration);
         }
 
         /// <summary>
@@ -646,7 +653,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
 
-            this.AddRegistration(serviceType, registration);
+            this.Register(serviceType, registration);
         }
 
         /// <summary>
@@ -676,9 +683,9 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
-            this.AddRegistration(serviceType, registration);
+            this.Register(serviceType, registration);
         }
-
+        
         /// <summary>
         /// Registers an <see cref="Action{T}"/> delegate that runs after the creation of instances that
         /// implement or derive from the given <typeparamref name="TService"/>. Please note that only instances
@@ -846,7 +853,7 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(
                 typeof(IEnumerable<TService>), () => readOnlyCollection, this);
 
-            this.AddRegistration(typeof(IEnumerable<TService>), registration);
+            this.Register(typeof(IEnumerable<TService>), registration);
 
             this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
         }
@@ -966,7 +973,10 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(collection, "collection");
+
             Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
             try
             {
@@ -1004,6 +1014,26 @@ namespace SimpleInjector
             {
                 this.IsVerifying = false;
             }
+        }
+
+        public void Register(Type serviceType, Registration registration)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registration, "registration");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            Requires.IsRegistrationForThisContainer(this, registration, "registration");
+            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
+                "registration");
+
+            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenTypeAlreadyRegistered(serviceType);
+
+            this.registrations[serviceType] = new InstanceProducer(serviceType, registration);
         }
 
         internal void ThrowWhenContainerIsLocked()
@@ -1049,17 +1079,9 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(enumerableServiceType,
                 () => castedCollection, this);
 
-            this.AddRegistration(enumerableServiceType, registration);
+            this.Register(enumerableServiceType, registration);
 
             this.collectionsToValidate[serviceType] = readOnlyCollection;
-        }
-
-        private void AddRegistration(Type key, Registration registration)
-        {
-            this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(key);
-
-            this.registrations[key] = new InstanceProducer(key, registration);
         }
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)

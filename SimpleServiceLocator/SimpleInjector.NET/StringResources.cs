@@ -396,5 +396,10 @@ namespace SimpleInjector
                 "The value {0} is invalid for Enum-type {1}.",
                 value, enumType.ToFriendlyName());
         }
+
+        internal static string TheSuppliedRegistrationBelongsToADifferentContainer()
+        {
+            return "The supplied Registration belongs to a different container.";
+        }
     }
 }
