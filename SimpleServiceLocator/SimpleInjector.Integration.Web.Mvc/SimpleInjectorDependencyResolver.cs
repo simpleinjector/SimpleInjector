@@ -29,7 +29,44 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System.Collections.Generic;
     using System.Web.Mvc;
 
-    /// <summary>MVC Dependency resolver for Simple Injector.</summary>
+    /// <summary>MVC <see cref="IDependencyResolver"/> for Simple Injector.</summary>
+    /// <remarks>
+    /// </remarks>
+    /// <example>
+    /// The following example shows the usage of the <b>SimpleInjectorDependencyResolver</b> in an
+    /// MVC application:
+    /// <code lang="cs"><![CDATA[
+    /// public class MvcApplication : System.Web.HttpApplication
+    /// {
+    ///     protected void Application_Start()
+    ///     {
+    ///         var container = new Container();
+    /// 
+    ///         // Make the container registrations, example:
+    ///         // container.Register<IUserRepository, SqlUserRepository>();
+    /// 
+    ///         container.RegisterMvcControllers(Assembly.GetExecutingAssembly());
+    ///         container.RegisterMvcAttributeFilterProvider();
+    ///
+    ///         // Create a new SimpleInjectorDependencyResolver that wraps the,
+    ///         // container, and register that resolver in MVC.
+    ///         System.Web.Mvc.DependencyResolver.SetResolver(
+    ///             new SimpleInjectorDependencyResolver(container));
+    /// 
+    ///         // Normal MVC stuff here
+    ///         AreaRegistration.RegisterAllAreas();
+    /// 
+    ///         RegisterGlobalFilters(GlobalFilters.Filters);
+    ///         RegisterRoutes(RouteTable.Routes);
+    ///     }
+    /// }
+    /// ]]></code>
+    /// The previous example show the use of the 
+    /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcControllers">RegisterMvcControllers</see> and
+    /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider">RegisterMvcAttributeFilterProvider</see>
+    /// extension methods and how the <b>SimpleInjectorDependencyResolver</b> can be used to set the created
+    /// <see cref="Container"/> instance as default dependency resolver in MVC.
+    /// </example>
     public class SimpleInjectorDependencyResolver : IDependencyResolver
     {
         /// <summary>

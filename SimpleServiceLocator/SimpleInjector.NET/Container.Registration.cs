@@ -261,6 +261,9 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public event EventHandler<ExpressionBuildingEventArgs> ExpressionBuilding
         {
             add
@@ -423,10 +426,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that the same a single instance of type <typeparamref name="TImplementation"/> will be 
-        /// returned every time an <paramref name="serviceType"/> type is requested. If 
-        /// <paramref name="serviceType"/> and <paramref name="implementation"/> represent the same type, the 
-        /// type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe when 
-        /// working in a multi-threaded environment.
+        /// returned every time an <typeparamref name="TService"/> type is requested. If 
+        /// <typeparamref name="TService"/> and <typeparamref name="TImplementation"/>  represent the same 
+        /// type, the type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe 
+        /// when working in a multi-threaded environment.
         /// </summary>
         /// <typeparam name="TService">
         /// The interface or base type that can be used to retrieve the instances.
@@ -878,8 +881,8 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or 
-        /// <paramref name="serviceTypes"/> are null references (Nothing in VB).
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
@@ -923,9 +926,8 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="serviceTypes"/> are null references
-        /// (Nothing in VB).
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
         /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
@@ -956,9 +958,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="collection">The collection of items to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/> or <paramref name="collection"/> are null references (Nothing in
-        /// VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         public void RegisterAll(Type serviceType, IEnumerable collection)

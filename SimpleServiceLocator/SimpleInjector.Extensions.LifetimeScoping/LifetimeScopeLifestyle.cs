@@ -38,6 +38,19 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
     /// the created scope gets <see cref="LifetimeScope.Dispose">disposed</see>. 
     /// </summary>
+    /// <example>
+    /// The following example shows the usage of the <b>LifetimeScopeLifestyle</b> class:
+    /// <code lang="cs"><![CDATA[
+    /// var container = new Container();
+    /// 
+    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new LifetimeScopeLifestyle());
+    /// 
+    /// using (container.BeginLifetimeScope())
+    /// {
+    ///     container.GetInstance<IUnitOfWork>();
+    /// }
+    /// ]]></code>
+    /// </example>
     public sealed class LifetimeScopeLifestyle : Lifestyle
     {
         internal static readonly Lifestyle WithDisposal = new LifetimeScopeLifestyle(true);

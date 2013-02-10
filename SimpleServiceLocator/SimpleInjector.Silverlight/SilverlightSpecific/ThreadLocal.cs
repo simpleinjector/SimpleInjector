@@ -2,11 +2,14 @@
 namespace System.Threading
 {
     using System;
+    using System.ComponentModel;
     using System.Runtime.CompilerServices;
+
     using SimpleInjector.Advanced;
 
     // NOTE: Silverlight lacks a ThreadLocal<T>.
     // Source: http://ayende.com/blog/4825 (but fixed to actually work in Silverlight)
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal sealed class ThreadLocal<T>
     {
         [ThreadStatic]

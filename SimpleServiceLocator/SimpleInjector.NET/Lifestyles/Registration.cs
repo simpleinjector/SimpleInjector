@@ -34,12 +34,20 @@ namespace SimpleInjector.Lifestyles
 
     using SimpleInjector.Diagnostics;
 
+    /// <summary>
+    /// TODO
+    /// </summary>
     public abstract class Registration
     {
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
 
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="lifestyle"></param>
+        /// <param name="container"></param>
         protected Registration(Lifestyle lifestyle, Container container)
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
@@ -49,12 +57,25 @@ namespace SimpleInjector.Lifestyles
             this.Container = container;
         }
         
+        /// <summary>
+        /// TODO
+        /// </summary>
         public abstract Type ImplementationType { get; }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public Lifestyle Lifestyle { get; private set; }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         protected internal Container Container { get; private set; }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <returns></returns>
         public abstract Expression BuildExpression();
 
         internal KnownRelationship[] GetRelationships()
@@ -105,6 +126,12 @@ namespace SimpleInjector.Lifestyles
                 p => new OverriddenParameter(Expression.Constant(null, p.Item1.ParameterType), p.Item2));
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="instanceCreator"></param>
+        /// <returns></returns>
         protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -117,6 +144,12 @@ namespace SimpleInjector.Lifestyles
             return BuildDelegate<TService>(expression);
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Supplying the generic type arguments is needed, since internal types can not " +
                             "be created using the non-generic overloads in a sandbox.")]
@@ -129,6 +162,12 @@ namespace SimpleInjector.Lifestyles
             return BuildDelegate<TService>(expression);
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="instanceCreator"></param>
+        /// <returns></returns>
         protected Expression BuildTransientExpression<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -150,6 +189,12 @@ namespace SimpleInjector.Lifestyles
             return expression;
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <returns></returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "Supplying the generic type arguments is needed, since internal types can not " +
                             "be created using the non-generic overloads in a sandbox.")]

@@ -37,11 +37,31 @@ namespace SimpleInjector.Lifestyles
     /// The <see cref="HybridLifestyle"/> allows mixing two lifestyles in a single registration. Based on
     /// the supplied selection delegate the hybrid lifestyle will redirect the creation of the instance to
     /// the correct lifestyle. The result of the selection delegate will not be cached; it is invoked each
-    /// time an instance is requested or injected. By nesting <see cref="HybridLifestyle"/> and number of 
+    /// time an instance is requested or injected. By nesting <see cref="HybridLifestyle"/> any number of 
     /// lifestyles can be mixed.
     /// </summary>
+    /// <example>
+    /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+    /// <b>WebRequestLifestyle</b> and <b>LifetimeScopeLifestyle</b>:
+    /// <code lang="cs"><![CDATA[
+    /// var mixedScopeLifestyle = new HybridLifestyle(
+    ///     () => HttpContext.Current != null,
+    ///     new WebRequestLifestyle(),
+    ///     new LifetimeScopeLifestyle());
+    /// 
+    /// container.Register<ITimeProvider, DefaultTimeProvider>(mixedScopeLifestyle);
+    /// ]]></code>
+    /// </example>
     public class HybridLifestyle : Lifestyle
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HybridLifestyle"/> class.
+        /// </summary>
+        /// <param name="test"></param>
+        /// <param name="trueLifestyle"></param>
+        /// <param name="falseLifestyle"></param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
         public HybridLifestyle(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
             : base("Hybrid " + GetName(trueLifestyle) + " / " + GetName(falseLifestyle))
         {
@@ -55,11 +75,20 @@ namespace SimpleInjector.Lifestyles
         }
 
         // TODO: Is this naming right?
+        /// <summary>
+        /// TODO
+        /// </summary>
         public Func<bool> Test { get; private set; }
 
         // TODO: Is this naming right?
+        /// <summary>
+        /// TODO
+        /// </summary>
         public Lifestyle TrueLifestyle { get; private set; }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public Lifestyle FalseLifestyle { get; private set; }
 
         internal override int ComponentLength

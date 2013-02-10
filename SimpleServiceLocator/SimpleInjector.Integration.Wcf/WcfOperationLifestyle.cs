@@ -34,6 +34,14 @@ namespace SimpleInjector.Integration.Wcf
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
     /// </summary>
+    /// <example>
+    /// The following example shows the usage of the <b>WcfOperationLifestyle</b> class:
+    /// <code lang="cs"><![CDATA[
+    /// var container = new Container();
+    /// 
+    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new WcfOperationLifestyle());
+    /// ]]></code>
+    /// </example>
     public class WcfOperationLifestyle : Lifestyle
     {
         /// <summary>

@@ -32,7 +32,9 @@ namespace SimpleInjector.Integration.Wcf
 
     /// <summary>
     /// Thread and container specific cache for services that are registered with one of the 
-    /// <see cref="SimpleInjectorWcfExtensions">RegisterPerWcfRequest</see> extension method overloads.
+    /// <see cref="SimpleInjectorWcfExtensions">RegisterPerWcfOperation</see> extension method overloads.
+    /// This class is created implicitly and a current instance can be requested by calling
+    /// <see cref="SimpleInjectorWcfExtensions.GetCurrentWcfOperationScope">GetCurrentWcfOperationScope</see>.
     /// </summary>
     public sealed class WcfOperationScope : IDisposable
     {
