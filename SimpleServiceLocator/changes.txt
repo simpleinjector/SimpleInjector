@@ -28,9 +28,11 @@ Version v2.0 (currently released as beta3 on NuGet)
 	Breaking changes:
 		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
 		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
-		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>). Note that
-		 this could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
+		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>) and to
+		 instances registered using RegisterSingle<T>(T) and RegisterSingle(Type, object). Note that this 
+		 could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
 		 own caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
+		 Instead of registering Func<T> delegates to implement custom lifestyle, derive from Lifestyle.
 		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
 		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
 		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
