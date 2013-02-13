@@ -68,6 +68,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExplicitPropertyInjectionExtensions.cs" />
     <Compile Include="MostParametersConstructorResolutionBehavior.cs" />
     <Compile Include="MostResolvableParametersConstructorResolutionBehavior.cs" />
     <Compile Include="ConstructorRegistrationExtensions.cs" />
