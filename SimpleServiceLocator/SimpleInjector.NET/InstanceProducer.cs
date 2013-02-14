@@ -156,11 +156,11 @@ namespace SimpleInjector
 
             try
             {
-                this.expression = this.GetExpressionFromCache();
+                var expression = this.GetExpressionFromCache();
 
                 this.RemoveValidator();
 
-                return this.expression;
+                return expression;
             }
             catch (Exception ex)
             {
@@ -204,9 +204,6 @@ namespace SimpleInjector
 
         private Expression GetExpressionFromCache()
         {
-            // We must lock the container, because not locking could lead to race conditions.
-            this.registration.Container.LockContainer();
-
             // Prevent the Expression from being built more than once on this InstanceProducer. Note that this
             // still means that the expression can be created multiple times for a single service type, because
             // the container does not guarantee that a single InstanceProducer is created, just as the
@@ -217,7 +214,7 @@ namespace SimpleInjector
                 {
                     if (this.expression == null)
                     {
-                        this.expression = this.BuildExpressionWithInterception();
+                        this.expression = this.BuildExpressionInternal();
                     }
                 }
             }
@@ -225,8 +222,11 @@ namespace SimpleInjector
             return this.expression;
         }
 
-        private Expression BuildExpressionWithInterception()
+        private Expression BuildExpressionInternal()
         {
+            // We must lock the container, because not locking could lead to race conditions.
+            this.registration.Container.LockContainer();
+            
             var expression = this.registration.BuildExpression();
 
             if (expression == null)
