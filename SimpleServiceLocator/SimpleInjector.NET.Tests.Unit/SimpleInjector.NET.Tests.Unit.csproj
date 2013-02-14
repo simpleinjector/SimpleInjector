@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationExceptionTests.cs" />
+    <Compile Include="AddRegistrationTests.cs" />
     <Compile Include="Advanced\AdvancedExtensionsTests.cs" />
     <Compile Include="Advanced\DefaultConstructorInjectionBehaviorTests.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehaviorTests.cs" />
