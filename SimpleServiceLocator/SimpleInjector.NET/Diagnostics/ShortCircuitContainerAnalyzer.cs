@@ -157,11 +157,6 @@ namespace SimpleInjector.Diagnostics
             return "component" + (number != 1 ? "s" : string.Empty);
         }
 
-        private static string TypePlural(int number)
-        {
-            return "type" + (number != 1 ? "s" : string.Empty);
-        }
-
         private static string HasPlural(int number)
         {
             return number != 1 ? "have" : "has";

@@ -159,8 +159,6 @@ namespace SimpleInjector.Extensions.Decorators
         {
             Type decoratorType = decoratorConstructor.DeclaringType;
 
-            var e = new ExpressionBuiltEventArgs(serviceType, predicateContext.Expression);
-
             // CreateRegistration must only be called once per decorated item in the collection, but this is
             // guaranteed by BuildDecoratorExpression, which simply locks the decoration of the complete
             // collection.

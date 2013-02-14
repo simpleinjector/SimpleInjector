@@ -43,6 +43,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         // to have it's own set of scopes.
         private readonly ThreadLocal<LifetimeScope> threadLocalScopes = new ThreadLocal<LifetimeScope>();
 
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "autoWiringProtection",
+            Justification = "See comment on IAutoRegistrationProtection interface.")]
         internal LifetimeScopeManager(IAutoRegistrationProtection autoWiringProtection)
         {
         }

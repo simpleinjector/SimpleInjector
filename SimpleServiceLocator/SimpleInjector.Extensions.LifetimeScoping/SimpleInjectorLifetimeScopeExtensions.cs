@@ -195,7 +195,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);
+            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
         }
 
         /// <summary>

@@ -101,15 +101,6 @@ namespace SimpleInjector.Extensions.Decorators
         private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
             ExpressionBuiltEventArgs e)
         {
-            var decorateeParameter = (
-                from parameter in decoratorConstructor.GetParameters()
-                where IsDecorateeParameter(parameter, e.RegisteredServiceType)
-                select parameter)
-                .Single();
-            
-            var decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(decorateeParameter, 
-                e.RegisteredServiceType, e.Expression);
-
             var registration = this.CreateRegistrationFromCache(e, decoratorConstructor);
 
             // By creating the decorator using a Lifestyle Registration the decorator can be completely

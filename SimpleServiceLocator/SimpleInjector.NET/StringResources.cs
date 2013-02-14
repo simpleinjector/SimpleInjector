@@ -304,13 +304,6 @@ namespace SimpleInjector
                     typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name);
         }
 
-        internal static string ErrorWhileTryingToGetInstanceOfType(Type serviceType, string message)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Error occurred while trying to get an instance of type {0}. {1}",
-                serviceType.ToFriendlyName(), message);
-        }
-
         internal static string ErrorInRegisterOpenGenericRegistration(Type openGenericServiceType,
             Type closedGenericImplementation, string message)
         {

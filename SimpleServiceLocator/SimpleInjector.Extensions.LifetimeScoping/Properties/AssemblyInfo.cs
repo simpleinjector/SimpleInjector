@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
@@ -40,3 +41,9 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
+
+[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
+    Scope = "namespace",
+    Target = "SimpleInjector.Extensions.LifetimeScoping",
+    Justification = "We could consider merging this DLL with the core library, but this still leaves us" +
+        "with a namespace with too few types (changing the namespace is a breaking change).")]

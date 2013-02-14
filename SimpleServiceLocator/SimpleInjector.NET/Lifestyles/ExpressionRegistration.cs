@@ -26,6 +26,7 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
 
     internal sealed class ExpressionRegistration : Registration
@@ -76,6 +77,8 @@ namespace SimpleInjector.Lifestyles
             return Lifestyle.Unknown;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
+            Justification = "I don't care. This is not a performance critical path.")]
         private static Type GetImplementationTypeFor(Expression expression)
         {
             if (expression is ConstantExpression)

@@ -44,6 +44,8 @@ namespace SimpleInjector.Integration.Wcf
         // to have it's own set of scopes.
         private readonly ThreadLocal<WcfOperationScope> threadLocalScopes = new ThreadLocal<WcfOperationScope>();
 
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "autoWiringProtection",
+            Justification = "See comment on IAutoRegistrationProtection interface.")]
         internal WcfOperationScopeManager(IAutoRegistrationProtection autoWiringProtection)
         {
         }
@@ -68,7 +70,7 @@ namespace SimpleInjector.Integration.Wcf
         {
             if (this.threadLocalScopes.Value != null)
             {
-                throw new InvalidOperationException("WCF Scopes can not be nested.");
+                throw new InvalidOperationException("WCF scopes can not be nested.");
             }
 
             var scope = new WcfOperationScope(this);
@@ -78,7 +80,7 @@ namespace SimpleInjector.Integration.Wcf
             return scope;
         }
 
-        internal void EndLifetimeScope(WcfOperationScope scope)
+        internal void EndLifetimeScope()
         {
             this.threadLocalScopes.Value = null;
         }

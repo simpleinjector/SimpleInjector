@@ -57,12 +57,19 @@ namespace SimpleInjector.Integration.Web
 
         private readonly bool dispose;
 
+        /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
+        /// will ensure that created and cached instance will be disposed after the execution of the web
+        /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
+        public WebRequestLifestyle() : this(disposeInstanceWhenWebRequestEnds : true)
+        {
+        }
+
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenWebRequestEnds">
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds = true) : base("Web Request")
+        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : base("Web Request")
         {
             this.dispose = disposeInstanceWhenWebRequestEnds;
         }

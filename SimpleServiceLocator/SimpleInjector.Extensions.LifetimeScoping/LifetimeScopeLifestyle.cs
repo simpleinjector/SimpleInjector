@@ -47,7 +47,26 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// 
     /// using (container.BeginLifetimeScope())
     /// {
-    ///     container.GetInstance<IUnitOfWork>();
+    ///     var instance1 = container.GetInstance<IUnitOfWork>();
+    ///     
+    ///     // This call will return the same instance.
+    ///     var instance2 = container.GetInstance<IUnitOfWork>();
+    ///     
+    ///     Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
+    ///     
+    ///     // Create a nested scope.
+    ///     using (container.BeginLifetimeScope())
+    ///     {
+    ///         // A nested scope gets its own instance.
+    ///         var instance3 = container.GetInstance<IUnitOfWork>();
+    /// 
+    ///         Assert.IsFalse(object.ReferenceEquals(instance1, instance3));
+    ///     
+    ///         // This call will return the same instance.
+    ///         var instance4 = container.GetInstance<IUnitOfWork>();
+    ///         
+    ///         Assert.IsTrue(object.ReferenceEquals(instance3, instance4));
+    ///     }
     /// }
     /// ]]></code>
     /// </example>
@@ -59,13 +78,20 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         private readonly bool disposeInstanceWhenLifetimeScopeEnds;
 
+        /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class. The instance
+        /// will ensure that created and cached instance will be disposed after the execution of the web
+        /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
+        public LifetimeScopeLifestyle() : this(disposeInstanceWhenLifetimeScopeEnds: true)
+        {
+        }
+
         /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenLifetimeScopeEnds">
         /// Specifies whether the created and cached instance will be disposed when the created 
         /// <see cref="LifetimeScope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
-        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds = true) 
+        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds) 
             : base("Lifetime Scope")
         {
             this.disposeInstanceWhenLifetimeScopeEnds = disposeInstanceWhenLifetimeScopeEnds;
@@ -79,14 +105,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)
         {
-            if (disposeWhenLifetimeScopeEnds)
-            {
-                return LifetimeScopeLifestyle.WithDisposal;
-            }
-            else
-            {
-                return LifetimeScopeLifestyle.NoDisposal;
-            }
+            return disposeWhenLifetimeScopeEnds ? WithDisposal : NoDisposal;
         }
 
         /// <summary>
@@ -100,7 +119,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            this.EnableLifetimeScoping(container);
+            EnableLifetimeScoping(container);
 
             return new LifetimeScopeRegistration<TService, TImplementation>(this, container)
             {
@@ -121,7 +140,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            this.EnableLifetimeScoping(container);
+            EnableLifetimeScoping(container);
 
             return new LifetimeScopeRegistration<TService>(this, container)
             {
@@ -130,7 +149,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             };
         }
 
-        private void EnableLifetimeScoping(Container container)
+        private static void EnableLifetimeScoping(Container container)
         {
             try
             {

@@ -84,11 +84,6 @@ namespace SimpleInjector.Extensions.Decorators
             get { return this.Container.Options.ConstructorResolutionBehavior; }
         }
 
-        private IConstructorInjectionBehavior InjectionBehavior
-        {
-            get { return this.Container.Options.ConstructorInjectionBehavior; }
-        }
-
         // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
         // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
         // get raised by multiple threads at the same time (especially for types resolved using
@@ -291,16 +286,6 @@ namespace SimpleInjector.Extensions.Decorators
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 
-        private Expression BuildExpressionForDependencyParameter(ParameterInfo parameter,
-            ExpressionBuiltEventArgs e)
-        {
-            var serviceType = e.RegisteredServiceType;
-
-            return
-                GetExpressionForDecorateeDependencyParameterOrNull(parameter, serviceType, e.Expression) ??
-                this.BuildExpressionForNormalDependencyParameter(parameter);
-        }
-
         protected static Expression GetExpressionForDecorateeDependencyParameterOrNull(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
@@ -350,11 +335,6 @@ namespace SimpleInjector.Extensions.Decorators
             }
 
             return null;
-        }
-
-        private Expression BuildExpressionForNormalDependencyParameter(ParameterInfo parameter)
-        {
-            return this.InjectionBehavior.BuildParameterExpression(parameter);
         }
     }
 }

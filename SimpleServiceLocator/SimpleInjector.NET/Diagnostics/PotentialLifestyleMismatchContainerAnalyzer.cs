@@ -51,8 +51,6 @@ namespace SimpleInjector.Diagnostics
                 return null;
             }
 
-            var serviceCount = mismatches.Select(m => m.Type).Distinct().Count();
-
             return new DebuggerViewItem(
                 "Potential Lifestyle Mismatches", 
                 DescribeGroup(mismatches),

@@ -27,6 +27,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading;
 
@@ -94,6 +95,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when <b>Dispose</b> was called on a different
         /// thread than where this instance was constructed.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations",
+            Justification = "This is the only reliable place where we can see that the scope has been " +
+                            "used over multiple threads is here.")]
         public void Dispose()
         {
             if (this.manager != null)
@@ -109,6 +113,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                         this.initialThreadId));
                 }
 
+                // EndLifetimeScope should not be called from a different thread than where it was started.
+                // Calling this method from another thread could remove the wrong scope.
                 this.manager.EndLifetimeScope(this);
 
                 this.manager = null;

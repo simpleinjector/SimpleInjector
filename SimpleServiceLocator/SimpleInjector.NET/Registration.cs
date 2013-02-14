@@ -218,7 +218,7 @@ namespace SimpleInjector
             // to the ExpressionBuilding event (triggered by the previous call), we wrap the null checker
             // after the ExpressionBuilding returned. But we need to wrap it before any initializer is ran,
             // since that could lead to null reference exceptions in user code.
-            expression = this.WrapWithNullChecker<TService>(expression);
+            expression = WrapWithNullChecker<TService>(expression);
 
             expression = this.WrapWithInitializer<TService, TService>(expression);
 
@@ -322,7 +322,7 @@ namespace SimpleInjector
             return expression;
         }
 
-        private Expression WrapWithNullChecker<TService>(Expression expression)
+        private static Expression WrapWithNullChecker<TService>(Expression expression)
         {
             Func<TService, TService> nullChecker = ThrowWhenNull<TService>;
 

@@ -126,14 +126,6 @@ namespace SimpleInjector
             }
         }
 
-        internal static void TypeIsReferenceType(Type type, string paramName)
-        {
-            if (!type.IsClass && !type.IsInterface)
-            {
-                throw new ArgumentException(StringResources.SuppliedTypeIsNotAReferenceType(type), paramName);
-            }
-        }
-
         internal static void DoesNotContainOpenGenericTypes(IEnumerable<Type> serviceTypes, string paramName)
         {
             foreach (var type in serviceTypes)

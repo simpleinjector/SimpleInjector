@@ -53,6 +53,8 @@ namespace SimpleInjector
         /// The lifestyle instance that doesn't cache instances. A new instance of the specified
         /// component is created every time the registered service it is requested or injected.
         /// </summary>
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
+            Justification = "It's not mutable.")]
         public static readonly Lifestyle Transient = new TransientLifestyle();
 
         /// <summary>
@@ -63,6 +65,8 @@ namespace SimpleInjector
         /// lifetime of the application. In a multi-threaded applications, implementations registered using 
         /// this lifestyle must be thread-safe.
         /// </summary>
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", 
+            Justification = "It's not mutable.")]
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -27,6 +27,7 @@ namespace SimpleInjector.Integration.Wcf
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading;
 
@@ -93,6 +94,9 @@ namespace SimpleInjector.Integration.Wcf
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when <b>Dispose</b> was called on a different
         /// thread than where this instance was constructed.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations",
+            Justification = "This is the only reliable place where we can see that the scope has been " +
+                            "used over multiple threads is here.")]
         public void Dispose()
         {
             if (this.manager != null)
@@ -108,7 +112,9 @@ namespace SimpleInjector.Integration.Wcf
                         this.initialThreadId));
                 }
 
-                this.manager.EndLifetimeScope(this);
+                // EndLifetimeScope should not be called from a different thread than where it was started.
+                // Calling this method from another thread could remove the wrong scope.
+                this.manager.EndLifetimeScope();
 
                 this.manager = null;
 

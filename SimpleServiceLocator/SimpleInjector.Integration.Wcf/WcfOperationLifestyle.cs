@@ -26,8 +26,8 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
-
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -54,13 +54,20 @@ namespace SimpleInjector.Integration.Wcf
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
         private readonly bool disposeInstanceWhenOperationEnds;
+        
+        /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
+        /// will ensure that created and cached instance will be disposed after the execution of the web
+        /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
+        public WcfOperationLifestyle() : this(disposeInstanceWhenOperationEnds : true)
+        {
+        }
 
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenOperationEnds">
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
         /// operation ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds = true) : base("WCF Operation")
+        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds) : base("WCF Operation")
         {
             this.disposeInstanceWhenOperationEnds = disposeInstanceWhenOperationEnds;
         }
@@ -80,9 +87,12 @@ namespace SimpleInjector.Integration.Wcf
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
+                            "be created using the non-generic overloads in a sandbox.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            this.EnablePerWcfOperationLifestyle(container);
+            EnablePerWcfOperationLifestyle(container);
 
             return new WcfOperationRegistration<TService, TImplementation>(this, container)
             {
@@ -103,7 +113,7 @@ namespace SimpleInjector.Integration.Wcf
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            this.EnablePerWcfOperationLifestyle(container);
+            EnablePerWcfOperationLifestyle(container);
 
             return new PerWcfOperationRegistration<TService>(this, container)
             {
@@ -112,7 +122,7 @@ namespace SimpleInjector.Integration.Wcf
             };
         }
 
-        private void EnablePerWcfOperationLifestyle(Container container)
+        private static void EnablePerWcfOperationLifestyle(Container container)
         {
             try
             {
