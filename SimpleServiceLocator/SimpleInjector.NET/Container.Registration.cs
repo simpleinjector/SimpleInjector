@@ -44,28 +44,33 @@ namespace SimpleInjector
     public partial class Container
     {
         /// <summary>
-        /// Occurs when an instance of a type is requested that has not been registered, allowing resolution
-        /// of unregistered types.
+        /// Occurs when an instance of a type is requested that has not been registered explicitly, allowing 
+        /// resolution of unregistered types before the container tries to create the type.
         /// </summary>
         /// <remarks>
         /// <para>
         /// The <see cref="ResolveUnregisteredType"/> event is called by the container every time an 
-        /// unregistered type is requested, allowing a developer to do unregistered type resolution. By calling the 
-        /// <see cref="UnregisteredTypeEventArgs.Register(Func{object})">Register</see> method on the
-        /// <see cref="UnregisteredTypeEventArgs"/>, a delegate can be hooked to the container allowing the
-        /// container to retrieve instances of the requested type, and preventing the 
-        /// <see cref="ResolveUnregisteredType"/> event from being called again for the same type.
+        /// unregistered type is requested for the first time, allowing a developer to do unregistered type 
+        /// resolution. By calling the 
+        /// <see cref="UnregisteredTypeEventArgs.Register(Registration)">Register</see> method on the
+        /// <see cref="UnregisteredTypeEventArgs"/>, a <see cref="Registration"/>, <see cref="Expression"/> or
+        /// <see cref="Func{TResult}"/> delegate can be registered allowing the container to retrieve 
+        /// instances of the requested type. This registration is cached and it prevents the 
+        /// <b>ResolveUnregisteredType</b> event from being called again for the same type.
         /// </para>
         /// <para>
-        /// This event is called before resolving concrete unregistered types, allowing a developer to
-        /// intercept the creation of concrete types.
+        /// When no registered event handled the registration of an unregistered type, the container will try
+        /// to create the type when this type is either concrete or is the <see cref="IEnumerable{T}"/>
+        /// interface. Concrete types will be registered with the <see cref="Lifestyle.Transient">Transient</see>
+        /// lifestyle and <see cref="IEnumerable{T}"/> registrations will return an empty collection. When no 
+        /// even handled the registration and the container could not create it, an exception is thrown.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
         /// are executed only once. While the calls to <see cref="ResolveUnregisteredType" /> for a given type
-        /// are finite (and will in most cases happen just once), a container can call the delegate multiple times
-        /// and make parallel calls to the delegate. You must make sure that the code can be called multiple 
-        /// times and is thread-safe.
+        /// are finite (and will in most cases happen just once), a container can call the delegate multiple 
+        /// times and make parallel calls to the delegate. You must make sure that the code can be called 
+        /// multiple times and is thread-safe.
         /// </para>
         /// </remarks>
         /// <example>
@@ -116,7 +121,8 @@ namespace SimpleInjector
         ///     Assert.IsInstanceOfType(customerValidator, typeof(EmptyValidator<Customer>));
         /// }
         /// ]]></code>
-        /// The example above registers a delegate that is fired every time an unregistered type is requested
+        /// <para>
+        /// The example above registers a delegate that is raised every time an unregistered type is requested
         /// from the container. The delegate checks whether the requested type is a closed generic
         /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
         /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
@@ -126,6 +132,16 @@ namespace SimpleInjector
         /// registers a delegate that will return this created instance. The <b>e.Register</b> call
         /// registers the method in the container, preventing the <see cref="ResolveUnregisteredType"/> from
         /// being called again for the exact same service type, preventing any performance penalties.
+        /// </para>
+        /// <para>
+        /// Please note that given example is just an uhhmm... example. In the case of the example the
+        /// <b>EmptyValidator&lt;T&gt;</b> can be registered using of the built-in 
+        /// <see cref="SimpleInjector.Extensions.OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container, Type, Type, Lifestyle)">RegisterOpenGeneric</see> 
+        /// extension methods instead. These extension methods take care of any given generic type constraint
+        /// and allow the implementation to be integrated into the container's pipeline, which allows
+        /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
+        /// <see cref="RegisterInitializer">initializers</see> to be applied.
+        /// </para>
         /// </example>
         public event EventHandler<UnregisteredTypeEventArgs> ResolveUnregisteredType
         {
@@ -145,29 +161,28 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Occurs after the creation of the <see cref="System.Linq.Expressions.Expression">Expression</see> 
-        /// of a registered type is complete (the lifestyle has been applied), allowing the created 
-        /// <see cref="System.Linq.Expressions.Expression">Expression</see> to be wrapped, changed, or
-        /// replaced. Multiple delegates may handle the same service type.
+        /// Occurs after the creation of the <see cref="Expression" /> of a registered type is complete (the 
+        /// lifestyle has been applied), allowing the created <see cref="Expression" /> to be wrapped, 
+        /// changed, or replaced. Multiple delegates may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The <see cref="ExpressionBuilt"/> event is called by the container every time an registered type is 
+        /// The <b>ExpressionBuilt</b> event is called by the container every time an registered type is 
         /// getting compiled, allowing a developer to change the way the type is created. The delegate that
-        /// hooks to the <see cref="ExpressionBuilt"/> event, can change the 
+        /// hooks to the <b>ExpressionBuilt</b> event, can change the 
         /// <see cref="ExpressionBuiltEventArgs.Expression" /> property on the 
         /// <see cref="ExpressionBuiltEventArgs"/>, which allows changing the way the type is constructed.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
-        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a given 
-        /// type are finite (and will in most cases happen just once), a container can call the delegate 
+        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a 
+        /// given type are finite (and will in most cases happen just once), a container can call the delegate 
         /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
         /// called multiple times and is thread-safe.
         /// </para>
         /// </remarks>
         /// <example>
-        /// The following example shows the usage of the <see cref="ExpressionBuilt" /> event:
+        /// The following example shows the usage of the <b>ExpressionBuilt</b> event:
         /// <code lang="cs"><![CDATA[
         /// public interface IValidator<T>
         /// {
@@ -236,13 +251,25 @@ namespace SimpleInjector
         ///     Assert.IsInstanceOfType(customerValidator, typeof(MonitoringValidator<Customer>));
         /// }
         /// ]]></code>
-        /// The example above registers a delegate that is fired every time the container compiles the
+        /// <para>
+        /// The example above registers a delegate that is raised every time the container compiles the
         /// expression for an registered type. The delegate checks whether the requested type is a closed generic
         /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
         /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
         /// will changes the current <see cref="ExpressionBuiltEventArgs.Expression"/> with a new one that creates
         /// a new <b>MonitoringValidator&lt;T&gt;</b> that takes the current validator (and an <b>ILogger</b>)
         /// as an dependency.
+        /// </para>
+        /// <para>
+        /// Please note that given example is just an uhhmm... example. In the case of the example the
+        /// <b>MonitoringValidator&lt;T&gt;</b> is a decorator and instead of manually writing this code that
+        /// many limitations, you can use one of the built-in 
+        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type, Lifestyle)">RegisterDecorator</see> extension methods instead.
+        /// These extension methods take care of any given generic type constraint, allow to register decorators
+        /// conditionally and allow the decorator to be integrated into the container's pipeline, which allows
+        /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
+        /// <see cref="RegisterInitializer">initializers</see> to be applied.
+        /// </para>
         /// </example>
         public event EventHandler<ExpressionBuiltEventArgs> ExpressionBuilt
         {
@@ -261,9 +288,100 @@ namespace SimpleInjector
             }
         }
 
+
         /// <summary>
-        /// TODO
+        /// Occurs directly after the creation of the <see cref="Expression" /> of a registered type is made,
+        /// and before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching
+        /// has been applied, allowing the created <see cref="Expression" /> to be wrapped, changed, or
+        /// replaced. Multiple delegates may handle the same service type.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <b>ExpressionBuilding</b> event is called by the container every time an registered type is 
+        /// getting compiled, allowing a developer to change the way the type is created. The delegate that
+        /// hooks to the <b>ExpressionBuilding</b> event, can change the 
+        /// <see cref="ExpressionBuildingEventArgs.Expression" /> property on the 
+        /// <see cref="ExpressionBuildingEventArgs"/>, which allows changing the way the type is constructed.
+        /// </para>
+        /// <para>
+        /// The exact <see cref="Expression"/> type supplied depends on the type of registration. 
+        /// Registrations that explicitly supply the implementation type (such as 
+        /// <see cref="Register{TService, TImplementation}()">Register&lt;TService, TImplementation&gt;()</see>)
+        /// will result in an <see cref="NewExpression"/>, while registrations that take a delegate (such as
+        /// <see cref="Register{TService}(Func{TService})">Register&lt;TService&gt;(Func&lt;TService&gt;)</see>)
+        /// will result in an <see cref="InvocationExpression"/>. Singletons that are passed in using their
+        /// value (<see cref="RegisterSingle{TService}(TService)">RegisterSingle&lt;TService&gt;(TService)</see>)
+        /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
+        /// might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> property and might
+        /// have supplied an <see cref="Expression"/> of a different type.
+        /// </para>
+        /// <para>
+        /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
+        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a 
+        /// given type are finite (and will in most cases happen just once), a container can call the delegate 
+        /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
+        /// called multiple times and is thread-safe.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// The following example shows the usage of the <b>ExpressionBuilding</b> event:
+        /// <code lang="cs"><![CDATA[
+        /// public class MyInjectPropertyAttribute : Attribute { }
+        /// 
+        /// public static void Bootstrap()
+        /// {
+        ///     var container = new Container();
+        ///     
+        ///     container.ExpressionBuilding += (sender, e) =>
+        ///     {
+        ///         var expression = e.Expression as NewExpression;
+        ///     
+        ///         if (expression != null)
+        ///         {
+        ///             var propertiesToInject =
+        ///                 from property in expression.Constructor.DeclaringType.GetProperties()
+        ///                 where property.GetCustomAttributes(typeof(MyInjectPropertyAttribute), true).Any()
+        ///                 let registration = container.GetRegistration(property.PropertyType, true)
+        ///                 select Tuple.Create(property, registration);
+        ///     
+        ///             if (propertiesToInject.Any())
+        ///             {
+        ///                 Func<object, Tuple<PropertyInfo, InstanceProducer>[], object> injectorDelegate =
+        ///                     (instance, dependencies) =>
+        ///                     {
+        ///                         foreach (var dependency in dependencies)
+        ///                         {
+        ///                             dependency.Item1.SetValue(instance, dependency.Item2.GetInstance(), null);
+        ///                         }
+        ///     
+        ///                         return instance;
+        ///                     };
+        ///     
+        ///                 e.Expression = Expression.Convert(
+        ///                     Expression.Invoke(
+        ///                         Expression.Constant(injectorDelegate),
+        ///                         e.Expression,
+        ///                         Expression.Constant(propertiesToInject.ToArray())),
+        ///                     expression.Constructor.DeclaringType);
+        ///             }
+        ///         }
+        ///     };
+        /// }
+        /// ]]></code>
+        /// <para>
+        /// The example above registers a delegate that is raised every time the container compiles the
+        /// expression for an registered type. The delegate checks if the type contains properties that are
+        /// decorated with the supplied <b>MyInjectPropertyAttribute</b>. If decorated properties are found,
+        /// the given expression is replaced with an expression that injects decorated properties.
+        /// </para>
+        /// <para>
+        /// The example differs from the container's built-in <see cref="InjectProperties"/> method in that
+        /// it will fail when one of the decorated properties can not be injected. The built-in
+        /// <see cref="InjectProperties"/> will look at all properties of a given class and will simply skip
+        /// over any properties that can not be injected, making the use of the <see cref="InjectProperties"/>
+        /// method often verify fragile and error prone.
+        /// </para>
+        /// </example>
         public event EventHandler<ExpressionBuildingEventArgs> ExpressionBuilding
         {
             add
