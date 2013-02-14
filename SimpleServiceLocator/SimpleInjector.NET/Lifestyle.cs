@@ -119,6 +119,60 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
+        /// <paramref name="test"/> delegate the hybrid lifestyle will redirect the creation of the instance
+        /// to the correct lifestyle. The result of the test delegate will not be cached; it is invoked each
+        /// time an instance is requested or injected. By nesting hybrid lifestyles, any number of lifestyles 
+        /// can be mixed.
+        /// </summary>
+        /// <param name="test">The <see cref="Func{bool}"/> delegate that determines which lifestyle should
+        /// be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is returned; the
+        /// <paramref name="falseLifestyle"/> otherwise.</param>
+        /// <param name="trueLifestyle">The lifestyle to use when <paramref name="test"/> returns <b>true</b>.</param>
+        /// <param name="falseLifestyle">The lifestyle to use when <paramref name="test"/> returns <b>false</b>.</param>
+        /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <example>
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// <b>WebRequestLifestyle</b> and <b>LifetimeScopeLifestyle</b>:
+        /// <code lang="cs"><![CDATA[
+        /// // NOTE: WebRequestLifestyle is located in SimpleInjector.Integration.Web.dll.
+        /// // NOTE: LifetimeScopeLifestyle is located in SimpleInjector.Extensions.LifetimeScoping.dll.
+        /// var mixedScopeLifestyle = Lifestyle.Hybrid(
+        ///     () => HttpContext.Current != null,
+        ///     new WebRequestLifestyle(),
+        ///     new LifetimeScopeLifestyle());
+        /// 
+        /// // The created lifestyle can be reused for many registrations.
+        /// container.Register<IUserRepository, SqlUserRepository>(mixedScopeLifestyle);
+        /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
+        /// ]]></code>
+        /// Hybrid lifestyles can be nested:
+        /// <code lang="cs"><![CDATA[
+        /// var mixedLifetimeTransientLifestyle = Lifestyle.Hybrid(
+        ///     () => container.GetCurrentLifetimeScope() != null,
+        ///     new LifetimeScopeLifestyle(),
+        ///     Lifestyle.Transient);
+        /// 
+        /// var mixedScopeLifestyle = Lifestyle.Hybrid(
+        ///     () => HttpContext.Current != null,
+        ///     new WebRequestLifestyle(),
+        ///     mixedLifetimeTransientLifestyle);
+        /// ]]></code>
+        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and 
+        /// Transient.
+        /// </example>
+        public static Lifestyle Hybrid(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        {
+            Requires.IsNotNull(test, "test");
+            Requires.IsNotNull(trueLifestyle, "trueLifestyle");
+            Requires.IsNotNull(falseLifestyle, "falseLifestyle");
+
+            return new HybridLifestyle(test, trueLifestyle, falseLifestyle);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
         /// </summary>

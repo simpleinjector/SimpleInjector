@@ -197,9 +197,6 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridLifestyle.cs">
       <Link>Lifestyles\HybridLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Lifestyles\Registration.cs">
-      <Link>Lifestyles\Registration.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\SingletonLifestyle.cs">
       <Link>Lifestyles\SingletonLifestyle.cs</Link>
     </Compile>
@@ -211,6 +208,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
       <Link>PropertyInjector.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Registration.cs">
+      <Link>Registration.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Requires.cs">
       <Link>Requires.cs</Link>

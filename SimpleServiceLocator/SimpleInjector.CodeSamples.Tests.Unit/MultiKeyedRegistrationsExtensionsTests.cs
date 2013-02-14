@@ -53,7 +53,7 @@
 
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior4()
+        public void Register_WithValidArguments_DoesNotRegisterImplementation()
         {
             // Arrange
             var container = new Container();
@@ -62,13 +62,14 @@
             container.Register<IService1, IService2, ImplementsBothInterfaces>(Lifestyle.Transient);
 
             // Assert
-            Assert.IsFalse(container.GetCurrentRegistrations().Any(r => r.ServiceType == typeof(ImplementsBothInterfaces)));
+            bool implementationRegistered = container.GetCurrentRegistrations()
+                .Any(r => r.ServiceType == typeof(ImplementsBothInterfaces));
+            
+            Assert.IsFalse(implementationRegistered);
         }
-
-
-
+                
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior5()
+        public void Register_AsSingleton_ReturnsTheSameInstanceForBothServices()
         {
             // Arrange
             var container = new Container();
@@ -84,7 +85,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior6()
+        public void GetInstance_CalledMultipleTimesOnSingletonRegistrationWithInitializer_CallsTheInitializerOnce1()
         {
             // Arrange
             const int ExpectedCallCount = 1;
@@ -97,6 +98,7 @@
             container.RegisterInitializer<IService2>(service => { actualCallCount++; });
 
             // Act
+            // Request same service as we have an initializer for.
             container.GetInstance<IService2>();
             container.GetInstance<IService2>();
             container.GetInstance<IService2>();
@@ -106,7 +108,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior7()
+        public void GetInstance_CalledMultipleTimesOnSingletonRegistrationWithInitializer_CallsTheInitializerOnce2()
         {
             // Arrange
             const int ExpectedCallCount = 1;
@@ -119,6 +121,7 @@
             container.RegisterInitializer<IService1>(service => { actualCallCount++; });
 
             // Act
+            // Request a different service as we have an initializer for.
             container.GetInstance<IService2>();
             container.GetInstance<IService2>();
 
@@ -127,7 +130,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior8()
+        public void GetInstance_OnInstanceWithDecorator_AppliesDecorator()
         {
             // Arrange
             var container = new Container();
@@ -142,10 +145,9 @@
             // Assert
             Assert.IsInstanceOfType(service, typeof(Service2Decorator));
         }
-
-
+        
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior9()
+        public void GetInstance_SingletonRegistrationWithTransientDecorator_WrapsThatSingleInstance()
         {
             // Arrange
             var container = new Container();
@@ -159,6 +161,7 @@
             var decorator = (Service2Decorator)container.GetInstance<IService2>();
 
             // Assert
+            Assert.IsNotNull(decorator.DecoratedService);
             Assert.IsTrue(object.ReferenceEquals(service1, decorator.DecoratedService));
         }
 

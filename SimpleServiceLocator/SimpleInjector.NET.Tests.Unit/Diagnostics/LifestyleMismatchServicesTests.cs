@@ -265,7 +265,7 @@
         public void DependencyHasPossibleLifestyleMismatch_HybridToTheSameHybridInstance_DoesNotReportAMismatch()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var dependency = CreateRelationship(parent: hybrid, child: hybrid);
 
@@ -281,8 +281,8 @@
         public void DependencyHasPossibleLifestyleMismatch_ShortHybridToLongHybrid_DoesNotReportAMismatch()
         {
             // Arrange
-            var parentHybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Transient);
-            var childHybrid = new HybridLifestyle(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
+            var parentHybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
+            var childHybrid = Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
 
@@ -297,8 +297,8 @@
         public void DependencyHasPossibleLifestyleMismatch_ShortHybridToLongHybrid_ReportsMismatch()
         {
             // Arrange
-            var parentHybrid = new HybridLifestyle(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
-            var childHybrid = new HybridLifestyle(() => true, Lifestyle.Singleton, Lifestyle.Transient);
+            var parentHybrid = Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
+            var childHybrid = Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Transient);
 
             var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
 
@@ -313,15 +313,15 @@
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient1_ReportsMismatch()
         {
             // Arrange
-            var hybridWithDeeplyNestedSingleton = new HybridLifestyle(() => true,
+            var hybridWithDeeplyNestedSingleton = Lifestyle.Hybrid(() => true,
                 Lifestyle.Transient, 
-                new HybridLifestyle(() => true,
+                Lifestyle.Hybrid(() => true,
                     Lifestyle.Transient, 
-                    new HybridLifestyle(() => true,
+                    Lifestyle.Hybrid(() => true,
                         Lifestyle.Transient, 
-                        new HybridLifestyle(() => true,
+                        Lifestyle.Hybrid(() => true,
                             Lifestyle.Transient, 
-                            new HybridLifestyle(() => true,
+                            Lifestyle.Hybrid(() => true,
                                 Lifestyle.Transient, 
                                 Lifestyle.Singleton)))));
 
@@ -340,15 +340,15 @@
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient2_ReportsMismatch()
         {
             // Arrange
-            var hybridWithDeeplyNestedTransient = new HybridLifestyle(() => true,
+            var hybridWithDeeplyNestedTransient = Lifestyle.Hybrid(() => true,
                 Lifestyle.Singleton,
-                new HybridLifestyle(() => true,
+                Lifestyle.Hybrid(() => true,
                     Lifestyle.Singleton,
-                    new HybridLifestyle(() => true,
+                    Lifestyle.Hybrid(() => true,
                         Lifestyle.Singleton,
-                        new HybridLifestyle(() => true,
+                        Lifestyle.Hybrid(() => true,
                             Lifestyle.Singleton,
-                            new HybridLifestyle(() => true,
+                            Lifestyle.Hybrid(() => true,
                                 Lifestyle.Singleton,
                                 Lifestyle.Transient)))));
 

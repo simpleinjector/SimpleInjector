@@ -209,7 +209,7 @@
             return GC.GetTotalMemory(true);
         }
 
-        [TestMethod]
+        // [TestMethod]
         public void MethodUnderTest_Scenario_Behavior()
         {
             // Arrange

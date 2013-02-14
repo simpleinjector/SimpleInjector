@@ -1213,7 +1213,7 @@
         public void HybridLifestyleRegistration_WithDecorator_DecoratesTheInstance()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = new Container();
 
@@ -1232,7 +1232,7 @@
         public void HybridLifestyleRegistration_WithTransientDecorator_AppliesTransientDecorator()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = new Container();
 
@@ -1252,7 +1252,7 @@
         public void HybridLifestyleRegistration_WithTransientDecorator_DoesNotApplyDecoratorMultipleTimes()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = new Container();
 
@@ -1271,7 +1271,7 @@
         public void HybridLifestyleRegistration_WithTransientDecorator_LeavesTheLifestyleInTact1()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = new Container();
 
@@ -1292,7 +1292,7 @@
         public void HybridLifestyleRegistration_WithTransientDecorator_LeavesTheLifestyleInTact2()
         {
             // Arrange
-            var hybrid = new HybridLifestyle(() => false, Lifestyle.Transient, Lifestyle.Transient);
+            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Transient);
 
             var container = new Container();
 

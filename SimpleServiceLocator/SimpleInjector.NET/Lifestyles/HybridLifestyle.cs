@@ -33,125 +33,57 @@ namespace SimpleInjector.Lifestyles
 
     using SimpleInjector.Diagnostics;
 
-    /// <summary>
-    /// The <see cref="HybridLifestyle"/> allows mixing two lifestyles in a single registration. Based on
-    /// the supplied selection delegate the hybrid lifestyle will redirect the creation of the instance to
-    /// the correct lifestyle. The result of the selection delegate will not be cached; it is invoked each
-    /// time an instance is requested or injected. By nesting <see cref="HybridLifestyle"/> any number of 
-    /// lifestyles can be mixed.
-    /// </summary>
-    /// <example>
-    /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
-    /// <b>WebRequestLifestyle</b> and <b>LifetimeScopeLifestyle</b>:
-    /// <code lang="cs"><![CDATA[
-    /// var mixedScopeLifestyle = new HybridLifestyle(
-    ///     () => HttpContext.Current != null,
-    ///     new WebRequestLifestyle(),
-    ///     new LifetimeScopeLifestyle());
-    /// 
-    /// container.Register<ITimeProvider, DefaultTimeProvider>(mixedScopeLifestyle);
-    /// ]]></code>
-    /// </example>
-    public class HybridLifestyle : Lifestyle
+    internal sealed class HybridLifestyle : Lifestyle
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HybridLifestyle"/> class.
-        /// </summary>
-        /// <param name="test"></param>
-        /// <param name="trueLifestyle"></param>
-        /// <param name="falseLifestyle"></param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
-        public HybridLifestyle(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        private readonly Func<bool> test;
+        private readonly Lifestyle trueLifestyle;
+        private readonly Lifestyle falseLifestyle;
+
+        internal HybridLifestyle(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
             : base("Hybrid " + GetName(trueLifestyle) + " / " + GetName(falseLifestyle))
         {
-            Requires.IsNotNull(test, "test");
-            Requires.IsNotNull(trueLifestyle, "trueLifestyle");
-            Requires.IsNotNull(falseLifestyle, "falseLifestyle");
-
-            this.Test = test;
-            this.TrueLifestyle = trueLifestyle;
-            this.FalseLifestyle = falseLifestyle;
+            this.test = test;
+            this.trueLifestyle = trueLifestyle;
+            this.falseLifestyle = falseLifestyle;
         }
-
-        // TODO: Is this naming right?
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public Func<bool> Test { get; private set; }
-
-        // TODO: Is this naming right?
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public Lifestyle TrueLifestyle { get; private set; }
-
-        /// <summary>
-        /// TODO
-        /// </summary>
-        public Lifestyle FalseLifestyle { get; private set; }
 
         internal override int ComponentLength
         {
-            get { return Math.Max(this.TrueLifestyle.ComponentLength, this.FalseLifestyle.ComponentLength); }
+            get { return Math.Max(this.trueLifestyle.ComponentLength, this.falseLifestyle.ComponentLength); }
         }
 
         internal override int DependencyLength
         {
-            get { return Math.Min(this.TrueLifestyle.DependencyLength, this.FalseLifestyle.DependencyLength); }
+            get { return Math.Min(this.trueLifestyle.DependencyLength, this.falseLifestyle.DependencyLength); }
         }
 
-        /// <summary>
-        /// The length property is not supported for this lifestyle.
-        /// </summary>
-        /// <exception cref="NotSupportedException">Always thrown.</exception>
         protected override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "See base.CreateRegistration for more info.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.Test,
-                this.TrueLifestyle.CreateRegistration<TService, TImplementation>(container),
-                this.FalseLifestyle.CreateRegistration<TService, TImplementation>(container),
+            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.test,
+                this.trueLifestyle.CreateRegistration<TService, TImplementation>(container),
+                this.falseLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this, container);
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TService), this.Test,
-                this.TrueLifestyle.CreateRegistration<TService>(instanceCreator, container),
-                this.FalseLifestyle.CreateRegistration<TService>(instanceCreator, container),
+            return new HybridRegistration(typeof(TService), typeof(TService), this.test,
+                this.trueLifestyle.CreateRegistration<TService>(instanceCreator, container),
+                this.falseLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this, container);
         }
 
         private string GetName()
         {
-            return GetName(this.TrueLifestyle) + " / " + GetName(this.FalseLifestyle);
+            return GetName(this.trueLifestyle) + " / " + GetName(this.falseLifestyle);
         }
 
         private static string GetName(Lifestyle lifestyle)
