@@ -38,6 +38,15 @@ namespace SimpleInjector
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
+    /// <remarks>
+    /// <b>Thread-safety:</b> It is safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
+    /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(Type)"/> and
+    /// <see cref="GetCurrentRegistrations"/> from multiple thread concurrently, but it is <b>unsafe</b> to 
+    /// call any of the <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
+    /// <see cref="ExpressionBuilding"/>, <see cref="ExpressionBuilt"/>, <see cref="ResolveUnregisteredType"/>,
+    /// <see cref="AddRegistration"/> or anything related to registering concurrently. Registration must be 
+    /// done in one single thread.
+    /// </remarks>
 #if !SILVERLIGHT
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
 #endif
@@ -48,8 +57,8 @@ namespace SimpleInjector
         private readonly IDictionary items = new Dictionary<object, object>();
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
-        private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
+        private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
@@ -260,10 +269,10 @@ namespace SimpleInjector
         /// <summary>Prevents any new registrations to be made to the container.</summary>
         internal void LockContainer()
         {
-            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-            // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
             if (!this.locked)
             {
+                // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+                // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
                 lock (this.locker)
                 {
                     this.locked = true;

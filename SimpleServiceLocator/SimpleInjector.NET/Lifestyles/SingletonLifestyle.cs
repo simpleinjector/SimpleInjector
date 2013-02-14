@@ -27,6 +27,7 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Linq.Expressions;
+    using System.Threading;
 
     internal sealed class SingletonLifestyle : Lifestyle
     {
@@ -175,11 +176,16 @@ namespace SimpleInjector.Lifestyles
         private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
             where TService : class
         {
-            private TService instance;
+            private readonly Lazy<TService> instance;
 
             protected SingletonLifestyleRegistrationBase(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
+                // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
+                // we want to be very sure that there will never be more than one instance of a singleton
+                // created. Since the same Registration instance can be used by multipl InstanceProducers,
+                // we absolutely need this protection.
+                this.instance = new Lazy<TService>(this.GetInstance, LazyThreadSafetyMode.ExecutionAndPublication);
             }
 
             public override Expression BuildExpression()
@@ -191,25 +197,11 @@ namespace SimpleInjector.Lifestyles
 
             private TService GetInstance()
             {
-                // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
-                // we want to be very sure that there will never be more than one instance of a singleton
-                // created.
-                if (this.instance == null)
-                {
-                    lock (this)
-                    {
-                        if (this.instance == null)
-                        {
-                            var instance = this.CreateInstance();
+                var instance = this.CreateInstance();
 
-                            EnsureInstanceIsNotNull(instance);
+                EnsureInstanceIsNotNull(instance);
 
-                            this.instance = instance;
-                        }
-                    }
-                }
-
-                return this.instance;
+                return instance;
             }
 
             private static void EnsureInstanceIsNotNull(object instance)

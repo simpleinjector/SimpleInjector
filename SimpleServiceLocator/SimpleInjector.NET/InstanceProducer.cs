@@ -45,7 +45,8 @@ namespace SimpleInjector
         private readonly Registration registration;
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
-        private Expression expression;
+        //private Expression expression;
+        private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
 
@@ -61,6 +62,10 @@ namespace SimpleInjector
             this.registration = registration;
 
             this.validator = new CyclicDependencyValidator(this.ServiceType);
+
+            this.expression = new Lazy<Expression>(
+                () => this.BuildExpressionInternal(),
+                System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         /// <summary>
@@ -156,7 +161,7 @@ namespace SimpleInjector
 
             try
             {
-                var expression = this.GetExpressionFromCache();
+                var expression = this.expression.Value;
 
                 this.RemoveValidator();
 
@@ -185,7 +190,7 @@ namespace SimpleInjector
         private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
-            var expression = this.GetExpressionFromCache();
+            var expression = this.expression.Value;
 
             try
             {
@@ -200,26 +205,6 @@ namespace SimpleInjector
 
                 throw new ActivationException(message, ex);
             }
-        }
-
-        private Expression GetExpressionFromCache()
-        {
-            // Prevent the Expression from being built more than once on this InstanceProducer. Note that this
-            // still means that the expression can be created multiple times for a single service type, because
-            // the container does not guarantee that a single InstanceProducer is created, just as the
-            // ResolveUnregisteredType event can be called multiple times for a single service type.
-            if (this.expression == null)
-            {
-                lock (this.locker)
-                {
-                    if (this.expression == null)
-                    {
-                        this.expression = this.BuildExpressionInternal();
-                    }
-                }
-            }
-
-            return this.expression;
         }
 
         private Expression BuildExpressionInternal()

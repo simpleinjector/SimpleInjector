@@ -31,7 +31,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
-
+    using System.Threading;
     using SimpleInjector.Lifestyles;
 
 #if DEBUG
@@ -302,6 +302,10 @@ namespace SimpleInjector
 
             copy[injector.Type] = injector;
 
+            // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
+            // producer from being added after the snapshot has been made accessible to other threads.
+            Thread.MemoryBarrier();
+
             // Replace the original with the new version that includes the serviceType.
             this.propertyInjectorCache = copy;
         }
@@ -530,6 +534,10 @@ namespace SimpleInjector
             var snapshotCopy = Helpers.MakeCopyOf(snapshot);
 
             snapshotCopy.Add(serviceType, instanceProducer);
+
+            // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
+            // producer from being added after the snapshot has been made accessible to other threads.
+            Thread.MemoryBarrier();
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.registrations = snapshotCopy;
