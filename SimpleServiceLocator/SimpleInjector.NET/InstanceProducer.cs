@@ -156,7 +156,7 @@ namespace SimpleInjector
 
             try
             {
-                this.expression = this.GetExpressionOrGetFromCacheOrBuildExpression();
+                this.expression = this.GetExpressionFromCache();
 
                 this.RemoveValidator();
 
@@ -185,7 +185,7 @@ namespace SimpleInjector
         private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
-            var expression = this.GetExpressionOrGetFromCacheOrBuildExpression();
+            var expression = this.GetExpressionFromCache();
 
             try
             {
@@ -202,7 +202,7 @@ namespace SimpleInjector
             }
         }
 
-        private Expression GetExpressionOrGetFromCacheOrBuildExpression()
+        private Expression GetExpressionFromCache()
         {
             // We must lock the container, because not locking could lead to race conditions.
             this.registration.Container.LockContainer();
