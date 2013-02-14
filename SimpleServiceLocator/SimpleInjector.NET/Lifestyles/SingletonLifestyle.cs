@@ -176,7 +176,7 @@ namespace SimpleInjector.Lifestyles
         private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
             where TService : class
         {
-            private readonly Lazy<TService> instance;
+            private readonly Lazy<TService> lazyInstance;
 
             protected SingletonLifestyleRegistrationBase(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
@@ -185,17 +185,18 @@ namespace SimpleInjector.Lifestyles
                 // we want to be very sure that there will never be more than one instance of a singleton
                 // created. Since the same Registration instance can be used by multipl InstanceProducers,
                 // we absolutely need this protection.
-                this.instance = new Lazy<TService>(this.GetInstance, LazyThreadSafetyMode.ExecutionAndPublication);
+                this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck, 
+                    LazyThreadSafetyMode.ExecutionAndPublication);
             }
 
             public override Expression BuildExpression()
             {
-                return Expression.Constant(this.GetInstance(), typeof(TService));
+                return Expression.Constant(this.lazyInstance.Value, typeof(TService));
             }
 
             protected abstract TService CreateInstance();
 
-            private TService GetInstance()
+            private TService CreateInstanceWithNullCheck()
             {
                 var instance = this.CreateInstance();
 

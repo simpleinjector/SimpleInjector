@@ -41,11 +41,9 @@ namespace SimpleInjector
         "Lifestyle = {Lifestyle.Name,nq}")]
     public sealed class InstanceProducer
     {
-        private readonly object locker = new object();
         private readonly Registration registration;
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
-        //private Expression expression;
         private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
