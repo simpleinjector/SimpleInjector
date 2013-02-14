@@ -73,6 +73,11 @@ namespace SimpleInjector.Integration.Web
             get { return 300; }
         }
 
+        internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
+        {
+            return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
+        }
+
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.

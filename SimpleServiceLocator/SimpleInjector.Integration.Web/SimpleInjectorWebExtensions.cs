@@ -152,9 +152,9 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("instanceCreator");
             }
-
+            
             container.Register<TService>(instanceCreator, 
-                new WebRequestLifestyle(disposeInstanceWhenWebRequestEnds));
+                WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));
         }
 
         /// <summary>
