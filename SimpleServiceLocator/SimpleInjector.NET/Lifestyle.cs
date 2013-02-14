@@ -125,7 +125,7 @@ namespace SimpleInjector
         /// time an instance is requested or injected. By nesting hybrid lifestyles, any number of lifestyles 
         /// can be mixed.
         /// </summary>
-        /// <param name="test">The <see cref="Func{bool}"/> delegate that determines which lifestyle should
+        /// <param name="test">The <see cref="Func{TResult}"/> delegate that determines which lifestyle should
         /// be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is returned; the
         /// <paramref name="falseLifestyle"/> otherwise.</param>
         /// <param name="trueLifestyle">The lifestyle to use when <paramref name="test"/> returns <b>true</b>.</param>
