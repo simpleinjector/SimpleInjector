@@ -43,7 +43,6 @@ using System.Security;
 
 [assembly: AllowPartiallyTrustedCallers]
 
-
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
     Scope = "namespace", 
     Target = "SimpleInjector.Integration.Wcf",
