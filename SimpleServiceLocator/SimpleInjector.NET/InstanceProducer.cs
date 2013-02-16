@@ -30,9 +30,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>Produces instances for a given registration.</summary>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
@@ -194,7 +192,9 @@ namespace SimpleInjector
             {
                 var newInstanceMethod = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
 
-                return newInstanceMethod.Compile();
+                var instanceCreator = newInstanceMethod.Compile();
+
+                return Helpers.OptimizeInstanceCreator(instanceCreator, expression);
             }
             catch (Exception ex)
             {
