@@ -208,6 +208,37 @@ namespace SimpleInjector
 
             return castedCollection;
         }
+        
+        internal static Func<object> OptimizeInstanceCreator(Func<object> instanceCreator, Expression expression)
+        {
+            if (expression is ConstantExpression)
+            {
+                object singleton = instanceCreator();
+
+                // This lambda will be a tiny little bit faster than the instanceCreator.
+                return () => singleton;
+            }
+
+            return instanceCreator;
+        }
+
+        internal static Expression OptimizeExpressionForBuildingDelegate(Expression expression)
+        {
+            // Can't create an Tuple with more than 7 arguments.
+            const int ItemMax = 4;
+
+            var collector = new ConstantCollector();
+            collector.Visit(expression);
+
+            if (collector.Constants.Count > 1)
+            {
+                var constants = collector.Constants.Distinct().Take(ItemMax).ToList();
+
+                return new ConstantTuplizer(constants).Visit(expression);
+            }
+
+            return expression;
+        }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)
         {
@@ -252,6 +283,75 @@ namespace SimpleInjector
             return argumentOfTypeAndOuterType
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
+        }
+
+        private sealed class ConstantCollector : ExpressionVisitor
+        {
+            internal readonly List<ConstantExpression> Constants = new List<ConstantExpression>();
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                if (!node.Type.IsValueType)
+                {
+                    this.Constants.Add(node);
+                }
+
+                return base.VisitConstant(node);
+            }
+        }
+
+        private sealed class ConstantTuplizer : ExpressionVisitor
+        {
+            private static readonly IEnumerable<MethodInfo> TupleCreateMethods = (
+                from method in typeof(Tuple).GetMethods()
+                where method.Name == "Create"
+                select method)
+                .ToArray();
+
+            private readonly ConstantExpression tupleConstant;
+            private readonly List<ConstantExpression> constants;
+            private readonly PropertyInfo[] properties;
+
+            public ConstantTuplizer(List<ConstantExpression> constants)
+            {
+                this.constants = constants;
+                var tuple = CreateTuple(constants);
+                this.tupleConstant = Expression.Constant(tuple);
+                this.properties = (
+                    from property in tuple.GetType().GetProperties()
+                    orderby property.Name
+                    select property)
+                    .ToArray();
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                if (this.constants.Contains(node))
+                {
+                    var property = this.properties[this.constants.IndexOf(node)];
+
+                    return Expression.Convert(Expression.Property(this.tupleConstant, property), node.Type);
+                }
+
+                return base.VisitConstant(node);
+            }
+
+            private static object CreateTuple(List<ConstantExpression> constants)
+            {
+                var constantTypes = constants.Select(c => c.Type).ToArray();
+
+                var createMethodDefinition = (
+                    from method in TupleCreateMethods
+                    where method.GetGenericArguments().Length == constants.Count
+                    select method)
+                    .Single();
+
+                var createMethod = createMethodDefinition.MakeGenericMethod(constantTypes);
+
+                var constantValues = constants.Select(c => c.Value).ToArray();
+                
+                return createMethod.Invoke(null, constantValues);
+            }
         }
     }
 }
