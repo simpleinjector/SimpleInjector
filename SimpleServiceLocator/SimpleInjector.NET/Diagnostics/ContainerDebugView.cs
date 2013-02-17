@@ -52,6 +52,11 @@ namespace SimpleInjector.Diagnostics
         {
             this.container = container;
 
+            this.Initialize();
+        }
+
+        private void Initialize()
+        {
             if (!this.container.SuccesfullyVerified)
             {
                 this.Items = new[]
