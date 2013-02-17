@@ -23,19 +23,26 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
-    using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
+    /// information to spot possible misconfigurations. 
+    /// </summary>
     [DebuggerDisplay(
         "ImplementationType = {SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}, " +
         "Lifestyle = {Lifestyle.Name,nq}, " +
         "Dependency = \\{ServiceType = {SimpleInjector.Helpers.ToFriendlyName(Dependency.ServiceType),nq}, " +
             "Lifestyle = {Dependency.Lifestyle.Name,nq}\\}")]
-    internal sealed class KnownRelationship : IEquatable<KnownRelationship>
+    public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
+        /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
+        /// <param name="implementationType">The implementation type of the parent type.</param>
+        /// <param name="lifestyle">The lifestyle of the parent type.</param>
+        /// <param name="dependency">The type that the parent depends on (it is injected into the parent).</param>
         public KnownRelationship(Type implementationType, Lifestyle lifestyle, 
             InstanceProducer dependency)
         {
@@ -48,13 +55,24 @@ namespace SimpleInjector.Diagnostics
             this.Dependency = dependency;
         }
 
+        /// <summary>
+        /// The implementation type of the parent type of the relationship.
+        /// </summary>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
         public Type ImplementationType { get; private set; }
 
+        /// <summary>
+        /// The lifestyle of the parent type of the relationship.
+        /// </summary>
         public Lifestyle Lifestyle { get; private set; }
 
+        /// <summary>
+        /// The type that the parent depends on (it is injected into the parent).
+        /// </summary>
         public InstanceProducer Dependency { get; private set; }
 
+        /// <summary>Serves as a hash function for a particular type.</summary>
+        /// <returns>A hash code for the current <see cref="KnownRelationship"/>.</returns>
         public override int GetHashCode()
         {
             return
@@ -63,6 +81,13 @@ namespace SimpleInjector.Diagnostics
                 this.Dependency.GetHashCode();
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="KnownRelationship"/> is equal to the current 
+        /// <see cref="KnownRelationship"/>.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <returns>True if the specified <see cref="KnownRelationship"/> is equal to the current 
+        /// <see cref="KnownRelationship"/>; otherwise, false.</returns>
         public bool Equals(KnownRelationship other)
         {
             if (other == null)

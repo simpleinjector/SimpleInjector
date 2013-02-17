@@ -29,8 +29,7 @@ namespace SimpleInjector
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq.Expressions;
-
-    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Provides data for and interaction with the 
@@ -96,6 +95,9 @@ namespace SimpleInjector
             }
         }
 
-        internal Collection<KnownRelationship> KnownRelationships { get; set; }
+        /// <summary>
+        /// The list of currently known relationships. This information is used by the Diagnostics Debug View.
+        /// </summary>
+        public Collection<KnownRelationship> KnownRelationships { get; set; }
     }
 }

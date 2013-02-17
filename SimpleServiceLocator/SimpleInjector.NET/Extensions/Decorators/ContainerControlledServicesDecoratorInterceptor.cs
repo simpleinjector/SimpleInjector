@@ -31,8 +31,8 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.Diagnostics;
-    using SimpleInjector.Lifestyles;
+
+    using SimpleInjector.Advanced;
 
     // This class allows decorating collections of services with elements that are created by the container. 
     // Collections are registered using the following methods:

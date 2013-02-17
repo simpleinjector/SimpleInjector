@@ -27,6 +27,7 @@ namespace SimpleInjector.Diagnostics
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using SimpleInjector.Advanced;
 
     internal sealed class KnownRelationshipCollection : Collection<KnownRelationship>
     {

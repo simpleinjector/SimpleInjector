@@ -26,14 +26,17 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Provides data for and interaction with the 
     /// <see cref="Container.ExpressionBuilding">ExpressionBuilding</see> event of 
     /// the <see cref="Container"/>. An observer can change the 
-    /// <see cref="ExpressionBuildingEventArgs.Expression"/> property to change the registered type.
+    /// <see cref="ExpressionBuildingEventArgs.Expression"/> property to change the component that is 
+    /// currently being built.
     /// </summary>
     [DebuggerDisplay("ExpressionBuildingEventArgs (RegisteredServiceType: {SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]
     public class ExpressionBuildingEventArgs : EventArgs
@@ -41,10 +44,11 @@ namespace SimpleInjector
         private Expression expression;
 
         internal ExpressionBuildingEventArgs(Type registeredServiceType, Type knownImplementationType, 
-            Expression expression)
+            Expression expression, Lifestyle lifestyle)
         {
             this.RegisteredServiceType = registeredServiceType;
             this.KnownImplementationType = knownImplementationType;
+            this.Lifestyle = lifestyle;
 
             this.expression = expression;
         }
@@ -64,6 +68,11 @@ namespace SimpleInjector
         /// </summary>
         public Type KnownImplementationType { get; private set; }
 
+        /// <summary>
+        /// Gets the lifestyle for the component that is currently being built.
+        /// </summary>
+        public Lifestyle Lifestyle { get; private set; }
+
         /// <summary>Gets or sets the currently registered <see cref="Expression"/>.</summary>
         /// <value>The current registration.</value>
         /// <exception cref="ArgumentNullException">Thrown when the supplied value is a null reference.</exception>
@@ -81,5 +90,10 @@ namespace SimpleInjector
                 this.expression = value;
             }
         }
+        
+        /// <summary>
+        /// The list of currently known relationships. This information is used by the Diagnostics Debug View.
+        /// </summary>
+        public Collection<KnownRelationship> KnownRelationships { get; set; }
     }
 }

@@ -3,10 +3,10 @@
     using System;
     using System.Linq;
     using System.Linq.Expressions;
-
+    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class ExpressionBuiltEventTests

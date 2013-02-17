@@ -26,14 +26,15 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Threading;
-    using SimpleInjector.Diagnostics;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
@@ -260,12 +261,24 @@ namespace SimpleInjector
             }
         }
 
-        internal void OnExpressionBuilding(ExpressionBuildingEventArgs e)
+        internal Expression OnExpressionBuilding(Registration registration, Type serviceType, 
+            Type implementationType, Expression instanceCreatorExpression)
         {
             if (this.expressionBuilding != null)
             {
+                var e = new ExpressionBuildingEventArgs(serviceType, implementationType,
+                    instanceCreatorExpression, registration.Lifestyle);
+
+                e.KnownRelationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+
                 this.expressionBuilding(this, e);
+
+                registration.ReplaceRelationships(e.KnownRelationships);
+
+                return e.Expression;
             }
+
+            return instanceCreatorExpression;
         }
 
         internal void OnExpressionBuilt(ExpressionBuiltEventArgs e)

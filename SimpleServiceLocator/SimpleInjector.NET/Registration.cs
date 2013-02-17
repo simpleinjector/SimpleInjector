@@ -31,7 +31,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-
+    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
 
     /// <summary>
@@ -117,11 +117,8 @@ namespace SimpleInjector
         internal Expression InterceptInstanceCreation(Type serviceType, Type implementationType,
             Expression instanceCreatorExpression)
         {
-            var e = new ExpressionBuildingEventArgs(serviceType, implementationType, instanceCreatorExpression);
-
-            this.Container.OnExpressionBuilding(e);
-
-            return e.Expression;
+            return this.Container.OnExpressionBuilding(this, serviceType, implementationType, 
+                instanceCreatorExpression);
         }
 
         internal void AddRelationship(KnownRelationship relationship) 

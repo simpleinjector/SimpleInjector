@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
 
     /// <summary>Produces instances for a given registration.</summary>

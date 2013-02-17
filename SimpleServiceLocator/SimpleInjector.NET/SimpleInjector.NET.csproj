@@ -110,7 +110,7 @@
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />
     <Compile Include="Lifestyles\HybridLifestyle.cs" />
-    <Compile Include="Diagnostics\KnownRelationship.cs" />
+    <Compile Include="Advanced\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />

@@ -28,6 +28,7 @@ namespace SimpleInjector.Diagnostics
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using SimpleInjector.Advanced;
 
     internal sealed class PotentialLifestyleMismatchContainerAnalyzer : IContainerAnalyzer
     {

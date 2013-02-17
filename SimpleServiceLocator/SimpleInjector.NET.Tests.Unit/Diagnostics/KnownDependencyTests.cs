@@ -2,10 +2,10 @@
 namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using System;
-
+    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using SimpleInjector.Diagnostics;
+    
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class KnownDependencyTests

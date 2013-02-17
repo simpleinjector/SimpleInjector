@@ -5,9 +5,9 @@
     
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Lifestyles;
-        
+
 #if DEBUG
     [TestClass]
     public class LifestyleMismatchServicesTests

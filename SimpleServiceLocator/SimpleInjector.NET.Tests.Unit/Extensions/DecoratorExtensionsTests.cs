@@ -7,9 +7,8 @@
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Lifestyles;
 
     public interface ILogger
     {

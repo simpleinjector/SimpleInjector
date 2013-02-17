@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class ExpressionBuildingEventTests
@@ -573,7 +574,8 @@
             var eventArgs = new ExpressionBuildingEventArgs(
                 typeof(IPlugin),
                 typeof(PluginImpl), 
-                Expression.Constant(new PluginImpl()));
+                Expression.Constant(new PluginImpl()),
+                Lifestyle.Transient);
 
             // Act
             eventArgs.Expression = null;
@@ -666,6 +668,36 @@
                     "Error occurred while trying to build a delegate for type SqlUserRepository using " + 
                     "the expression", ex);
             }
+        }
+
+        [TestMethod]
+        public void GetInstance_ExpressionBuildingAddingKnownRelationship_GetRelationshipsContainsThatItem()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.RegisteredServiceType == typeof(IUserRepository))
+                {
+                    e.KnownRelationships.Add(new KnownRelationship(typeof(object), Lifestyle.Transient,
+                        container.GetRegistration(typeof(Container))));
+                }
+            };
+
+            var registration = container.GetRegistration(typeof(IUserRepository));
+
+            // Act
+            registration.GetInstance();
+
+            // Assert
+            var relationship = registration.GetRelationships().Single();
+
+            Assert.AreEqual(typeof(object), relationship.ImplementationType);
+            Assert.AreEqual(Lifestyle.Transient, relationship.Lifestyle);
+            Assert.AreEqual(container.GetRegistration(typeof(Container)), relationship.Dependency);
         }
 
         public class Order

@@ -25,9 +25,7 @@
 
 namespace SimpleInjector.Diagnostics
 {
-    using System;
-
-    using SimpleInjector.Lifestyles;
+    using SimpleInjector.Advanced;
 
     internal static class LifestyleMismatchServices
     {
