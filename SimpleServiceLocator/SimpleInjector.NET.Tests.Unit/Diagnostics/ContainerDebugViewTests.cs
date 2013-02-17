@@ -1,27 +1,15 @@
-﻿namespace SimpleInjector.Tests.Unit.Diagnostics
+﻿#if !SILVERLIGHT
+#if DEBUG
+namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Lifestyles;
-    
-#if !SILVERLIGHT
-    
+
     public interface ILogger
-    {
-    }
-
-    public interface ISomeGeneric<T>
-    {
-    }
-
-    public interface IDoThings<T>
     {
     }
 
@@ -36,30 +24,14 @@
         }
     }
 
-    public interface IConcreteThing 
+    public interface IConcreteThing
     {
     }
 
-    public class ConcreteThing : IConcreteThing 
-    { 
-    }
-    
-    public class SomeGeneric<T> : ISomeGeneric<T>
+    public class ConcreteThing : IConcreteThing
     {
-        public SomeGeneric(ILogger logger, IComparable bla, ConcreteThing thing, IDoThings<T> x)
-        {
-        }
     }
 
-    public class ThingDoer<T> : IDoThings<T>
-    {
-        public ThingDoer(ILogger logger, IComparable foo)
-        {
-        }
-    }
-#endif
-
-#if DEBUG
     [TestClass]
     public class ContainerDebugViewTests
     {
@@ -196,149 +168,7 @@
             // Assert
             Assert.IsTrue(items.Any(item => item.Name == "Potential Lifestyle Mismatches"));
         }
-
-#if !SILVERLIGHT
-
-        private static long GetUsedMemory()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            return GC.GetTotalMemory(true);
-        }
-
-        // [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
-        {
-            // Arrange
-            long memBefore = GetUsedMemory();
-
-            var container = new Container();
-
-            container.Register<IConcreteThing, ConcreteThing>(Lifestyle.Singleton);
-
-            container.Register<IComparable>(() => 4);
-
-            container.Register<ILogger, FakeLogger>(Lifestyle.Transient);
-
-            container.Register<ISomeGeneric<IEnumerable<int>>, SomeGeneric<IEnumerable<int>>>(Lifestyle.Transient);
-            container.Register<ISomeGeneric<IEnumerable<double>>, SomeGeneric<IEnumerable<double>>>(Lifestyle.Transient);
-            container.Register<ISomeGeneric<IEnumerable<long>>, SomeGeneric<IEnumerable<long>>>(Lifestyle.Transient);
-
-            container.Register<IDoThings<IEnumerable<int>>, ThingDoer<IEnumerable<int>>>(Lifestyle.Transient);
-            container.Register<IDoThings<IEnumerable<double>>, ThingDoer<IEnumerable<double>>>(Lifestyle.Transient);
-            container.Register<IDoThings<IEnumerable<long>>, ThingDoer<IEnumerable<long>>>(Lifestyle.Transient);
-
-            var allTypes =
-                from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                from type in assembly.GetExportedTypes()
-                where !type.IsGenericTypeDefinition
-                select type;
-
-            this.RegisterAll(container, allTypes.Take(1000));
-                        
-            var watch = Stopwatch.StartNew();
-
-            var ms1 = watch.ElapsedMilliseconds;
-            container.Verify();
-
-            // new ContainerDebugView(container);
-            var ms2 = watch.ElapsedMilliseconds;
-
-            Console.WriteLine();
-
-            //foreach (var reg in container.GetCurrentRegistrations())
-            //{
-            //    // var set = 
-            //        SetField(
-            //            GetField<Registration>(reg, "registration"),
-            //            "dependencies",
-            //            null);
-            //    // set.Clear();
-            //}
-
-            container = null;
-
-            long memAfter = GetUsedMemory();
-
-            long memByContainer = memAfter - memBefore;
-
-            Assert.Fail("This is a test.");
-        }
-
-        private static T GetField<T>(object instance, string fieldName)
-        {
-            FieldInfo field = GetFieldInfo(instance.GetType(), fieldName);
-            
-            return (T)field.GetValue(instance);
-        }
-
-        private static void SetField(object instance, string fieldName, object value)
-        {
-            FieldInfo field = GetFieldInfo(instance.GetType(), fieldName);
-
-            field.SetValue(instance, value);
-        }
-
-
-        private static FieldInfo GetFieldInfo(Type type, string fieldName)
-        {
-            FieldInfo field = null;
-
-            while (field == null && type != null && type != typeof(object))
-            {
-                field = type
-                    .GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-                type = type.BaseType;
-            }
-
-            if (field == null)
-                throw new ArgumentException("No field " + fieldName + " on type " + type.FullName, "fieldName");
-
-
-            return field;
-        }
-
-        [DebuggerStepThrough]
-        public void RegisterAll(Container container, IEnumerable<Type> types)
-        {
-            var register = this.GetType().GetMethod("Register");
-
-            foreach (var type in types)
-            {
-                try
-                {
-                    register.MakeGenericMethod(type).Invoke(null, new object[] { container });
-                }
-                catch 
-                { 
-                }
-            }
-        }
-
-        [DebuggerStepThrough]
-        public static void Register<T>(Container container)
-        {
-            container.Register<ISomeGeneric<T>, SomeGeneric<T>>(Lifestyle.Transient);
-
-            container.Register<IDoThings<T>, ThingDoer<T>>(Lifestyle.Transient);
-        }       
-
-#endif
-
-        public class UserRepositoryDecorator : IUserRepository
-        {
-            public UserRepositoryDecorator(IUserRepository repository)
-            {
-            }
-
-            public void Delete(int userId)
-            {
-            }
-        }
     }
-#endif
 }
+#endif
+#endif
