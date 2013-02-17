@@ -30,7 +30,7 @@ namespace SimpleInjector.Lifestyles
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-
+    using System.Reflection;
     using SimpleInjector.Diagnostics;
 
     internal sealed class HybridLifestyle : Lifestyle
@@ -130,6 +130,13 @@ namespace SimpleInjector.Lifestyles
                     test: Expression.Invoke(Expression.Constant(this.test)),
                     ifTrue: Expression.Convert(trueExpression, this.serviceType),
                     ifFalse: Expression.Convert(falseExpression, this.serviceType));
+            }
+
+            internal override void SetParameterOverrides(
+                IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+            {
+                this.trueRegistration.SetParameterOverrides(overriddenParameters);
+                this.falseRegistration.SetParameterOverrides(overriddenParameters);
             }
 
             private void AddRelationships()

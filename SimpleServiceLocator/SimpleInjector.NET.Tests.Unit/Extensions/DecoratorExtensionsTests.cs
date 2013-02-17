@@ -1919,7 +1919,7 @@
 
         public DependencyInfo Dependency { get; set; }
 
-        public static bool EqualsTo(RelationshipInfo info, KnownRelationship other)
+        internal static bool EqualsTo(RelationshipInfo info, KnownRelationship other)
         {
             return
                 info.ImplementationType == other.ImplementationType &&
@@ -1928,7 +1928,7 @@
                 info.Dependency.Lifestyle == other.Dependency.Lifestyle;
         }
 
-        public bool Equals(KnownRelationship other)
+        internal bool Equals(KnownRelationship other)
         {
             return EqualsTo(this, other);
         }

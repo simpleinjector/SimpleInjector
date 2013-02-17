@@ -1465,6 +1465,68 @@
                 "should be called once for the complete collection.");
         }
 
+        [TestMethod]
+        public void GetAllInstances_DecoratingContainerControlledCollectionWithHybridLifestyle_AppliesLifestyleCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(typesToRegister);
+
+            var hybridLifestyle = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
+                hybridLifestyle);
+
+            // Act
+            var instance1 = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
+            var instance2 = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
+
+            // Assert
+            Assert.IsInstanceOfType(instance1, typeof(RealCommandHandlerDecorator));
+            Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_DecoratingContainerUncontrolledCollectionWithLifestyleOtherThanTransientAndSingleton_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
+                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
+                Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
+
+            try
+            {
+                // Act
+                container.GetAllInstances<ICommandHandler<RealCommand>>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (Exception ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    You are trying to apply the RealCommandHandlerDecorator decorator with the 
+                    'Hybrid Singleton / Singleton' lifestyle to a collection of type 
+                    ICommandHandler<RealCommand>, but the registered collection is not controlled by the
+                    container."
+                    .TrimInside(), ex);
+
+                AssertThat.ExceptionMessageContains(@"
+                    Since the number of returned items might change on each call, the decorator with this 
+                    lifestyle cannot be applied to the collection. Instead, register the decorator with the 
+                    Transient lifestyle, or use one of the RegisterAll overloads that takes a collection of 
+                    System.Type types."
+                    .TrimInside(), ex);
+            }
+        }
+
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(
             ActivationException ex)

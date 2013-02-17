@@ -287,8 +287,7 @@ namespace SimpleInjector
                 this.expressionBuilt -= value;
             }
         }
-
-
+        
         /// <summary>
         /// Occurs directly after the creation of the <see cref="Expression" /> of a registered type is made,
         /// and before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching

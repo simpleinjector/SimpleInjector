@@ -54,7 +54,7 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal Lifestyle Lifestyle
         {
-            get { return this.data.Singleton ? Lifestyle.Singleton : Lifestyle.Transient; }
+            get { return this.data.Lifestyle; }
         }
 
         // The service type definition (possibly open generic).

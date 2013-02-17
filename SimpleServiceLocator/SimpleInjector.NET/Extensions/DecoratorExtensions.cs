@@ -35,11 +35,145 @@ namespace SimpleInjector.Extensions
     public static class DecoratorExtensions
     {
         /// <summary>
+        /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned and cached with
+        /// the given <paramref name="lifestyle"/>, wrapping the original registered 
+        /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the 
+        /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same 
+        /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic 
+        /// service types.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <b>RegisterOpenGenericDecorator</b> method works by hooking onto the container's
+        /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
+        /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
+        /// decoration of types that are resolved using unregistered type resolution. The
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
+        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>. This allows you to
+        /// use <b>RegisterOpenGenericDecorator</b> on the same service type as <b>RegisterOpenGeneric</b>.
+        /// </para>
+        /// <para>
+        /// Multiple decorators can be applied to the same service type. The order in which they are registered
+        /// is the order they get applied in. This means that the decorator that gets registered first, gets
+        /// applied first, which means that the next registered decorator, will wrap the first decorator, which
+        /// wraps the original service type.
+        /// </para>
+        /// <para>
+        /// Constructor injection will be used on that type, and although it may have many constructor 
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
+        /// An exception will be thrown when this is not the case.
+        /// </para>
+        /// <para>
+        /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
+        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
+        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
+        /// creating instances of the decorated type, according to the lifestyle of that type. This enables
+        /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
+        /// decorated instance within a certain scope (such as a lifetime scope).
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
+        /// for more information.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="serviceType">The definition of the open generic service type that will
+        /// be wrapped by the given <paramref name="decoratorType"/>.</param>
+        /// <param name="decoratorType">The definition of the open generic decorator type that will
+        /// be used to wrap the original service type.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
+        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
+        /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
+        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does 
+        /// not contain a constructor that has exactly one argument of type 
+        /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
+        /// <paramref name="serviceType"/>.</exception>
+        public static void RegisterDecorator(this Container container, Type serviceType, Type decoratorType,
+            Lifestyle lifestyle)
+        {
+            container.RegisterDecoratorCore(serviceType, decoratorType, null, lifestyle);
+        }
+
+        /// <summary>
+        /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned when the supplied
+        /// <paramref name="predicate"/> returns <b>true</b> and cached with the given 
+        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by 
+        /// injecting that service type into the constructor of the supplied <paramref name="decoratorType"/>. 
+        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be 
+        /// applied to both open, closed, and non-generic service types.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <b>RegisterOpenGenericDecorator</b> method works by hooking onto the container's
+        /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
+        /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
+        /// decoration of types that are resolved using unregistered type resolution. The
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
+        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>. This allows you to
+        /// use <b>RegisterOpenGenericDecorator</b> on the same service type as <b>RegisterOpenGeneric</b>.
+        /// </para>
+        /// <para>
+        /// Multiple decorators can be applied to the same service type. The order in which they are registered
+        /// is the order they get applied in. This means that the decorator that gets registered first, gets
+        /// applied first, which means that the next registered decorator, will wrap the first decorator, which
+        /// wraps the original service type.
+        /// </para>
+        /// <para>
+        /// Constructor injection will be used on that type, and although it may have many constructor 
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
+        /// An exception will be thrown when this is not the case.
+        /// </para>
+        /// <para>
+        /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
+        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
+        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
+        /// creating instances of the decorated type, according to the lifestyle of that type. This enables
+        /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
+        /// decorated instance within a certain scope (such as a lifetime scope).
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
+        /// for more information.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="serviceType">The definition of the open generic service type that will
+        /// be wrapped by the given <paramref name="decoratorType"/>.</param>
+        /// <param name="decoratorType">The definition of the open generic decorator type that will
+        /// be used to wrap the original service type.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
+        /// <param name="predicate">The predicate that determines whether the 
+        /// <paramref name="decoratorType"/> must be applied to a service type.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
+        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
+        /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
+        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does 
+        /// not contain a constructor that has exactly one argument of type 
+        /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
+        /// <paramref name="serviceType"/>.</exception>
+        public static void RegisterDecorator(this Container container, Type serviceType, Type decoratorType,
+            Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
+        {
+            Requires.IsNotNull(predicate, "predicate");
+
+            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
+        }
+
+        /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 
         /// original registered <paramref name="serviceType"/>, by injecting that service type into the 
         /// constructor of the supplied <paramref name="decoratorType"/>. Multiple decorators may be applied 
         /// to the same <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and 
-        /// non-generic service types.
+        /// non-generic service types. A new <paramref name="decoratorType"/> will always be returned (the
+        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the 
+        /// wrapped service.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -211,9 +345,7 @@ namespace SimpleInjector.Extensions
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
         /// <param name="decoratorType">The definition of the open generic decorator type that will
         /// be used to wrap the original service type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="decoratorType"/> are null
-        /// references.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/>  is not
         /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or implement 
         /// <paramref name="serviceType"/>, when <paramref name="decoratorType"/> does not
@@ -223,7 +355,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/>.</exception>
         public static void RegisterDecorator(this Container container, Type serviceType, Type decoratorType)
         {
-            container.RegisterDecoratorCore(serviceType, decoratorType, null, singleton: false);
+            container.RegisterDecoratorCore(serviceType, decoratorType, null, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -232,7 +364,9 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the 
         /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same 
         /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic 
-        /// service types.
+        /// service types. A new <paramref name="decoratorType"/> will always be returned (the
+        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the 
+        /// wrapped service.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -251,11 +385,10 @@ namespace SimpleInjector.Extensions
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// The registered <paramref name="decoratorType"/> must have a single public constructor. Constructor
-        /// injection will be used on that type, and although it may have many constructor arguments, it must
-        /// have exactly one argument of the type of <paramref name="serviceType"/>, or an argument of type
-        /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. An exception will be
-        /// thrown when this is not the case.
+        /// Constructor injection will be used on that type, and although it may have many constructor 
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
+        /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
@@ -266,11 +399,11 @@ namespace SimpleInjector.Extensions
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
         /// decorated instance within a certain scope (such as a lifetime scope).
         /// </para>
-        /// <para>
+        /// </remarks>
+        /// <example>
         /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
         /// for more information.
-        /// </para>
-        /// </remarks>
+        /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The definition of the open generic service type that will
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
@@ -278,9 +411,7 @@ namespace SimpleInjector.Extensions
         /// be used to wrap the original service type.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="decoratorType"/> must be applied to a service type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, <paramref name="decoratorType"/>, or
-        /// <paramref name="predicate"/> are null references.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
         /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
         /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
@@ -293,7 +424,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(predicate, "predicate");
 
-            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, singleton: false);
+            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -311,19 +442,17 @@ namespace SimpleInjector.Extensions
         /// injecting <see cref="Func{T}"/> factory methods, which will allow the wrapped service type to get
         /// it's own lifestyle back.
         /// </para>
-        /// <para>
+        /// </remarks>
+        /// <example>
         /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
         /// for more information.
-        /// </para>
-        /// </remarks>
+        /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The definition of the open generic service type that will
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
         /// <param name="decoratorType">The definition of the open generic decorator type that will
         /// be used to wrap the original service type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, or <paramref name="decoratorType"/> are null
-        /// references.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/>  is not
         /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or implement 
         /// <paramref name="serviceType"/>, when <paramref name="decoratorType"/> does not
@@ -334,7 +463,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterSingleDecorator(this Container container, Type serviceType,
             Type decoratorType)
         {
-            container.RegisterDecoratorCore(serviceType, decoratorType, null, singleton: true);
+            container.RegisterDecoratorCore(serviceType, decoratorType, null, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -353,12 +482,11 @@ namespace SimpleInjector.Extensions
         /// injecting <see cref="Func{T}"/> factory methods, which will allow the wrapped service type to get
         /// it's own lifestyle back.
         /// </para>
-        /// <para>
-        /// Please see the 
-        /// <see cref="RegisterDecorator(Container, Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
-        /// method for more information.
-        /// </para>
         /// </remarks>
+        /// <example>
+        /// Please see the <see cref="RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method
+        /// for more information.
+        /// </example>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="serviceType">The definition of the open generic service type that will
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
@@ -366,9 +494,7 @@ namespace SimpleInjector.Extensions
         /// be used to wrap the original service type.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="decoratorType"/> must be applied to a service type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="serviceType"/>, <paramref name="decoratorType"/>, or
-        /// <paramref name="predicate"/> are null references.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
         /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
         /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
@@ -381,27 +507,30 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(predicate, "predicate");
 
-            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, singleton: true);
+            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, Lifestyle.Singleton);
         }
 
         private static void RegisterDecoratorCore(this Container container, Type serviceType,
-            Type decoratorType, Predicate<DecoratorPredicateContext> predicate, bool singleton)
+            Type decoratorType, Predicate<DecoratorPredicateContext> predicate, Lifestyle lifestyle)
         {
-            VerifyMethodArguments(container, serviceType, decoratorType);
+            VerifyMethodArguments(container, serviceType, decoratorType, lifestyle);
 
             var data = new DecoratorExpressionInterceptorData(container, serviceType, decoratorType,
-                predicate, singleton);
+                predicate, lifestyle);
 
             container.ExpressionBuilt += new ServiceDecoratorExpressionInterceptor(data).Decorate;
             container.ExpressionBuilt += new ContainerControlledServicesDecoratorInterceptor(data).Decorate;
             container.ExpressionBuilt += new ContainerUncontrolledServicesDecoratorInterceptor(data).Decorate;
         }
 
-        private static void VerifyMethodArguments(Container container, Type serviceType, Type decoratorType)
+        private static void VerifyMethodArguments(Container container, Type serviceType, Type decoratorType,
+            Lifestyle lifestyle)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(decoratorType, "decoratorType");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, 
                 decoratorType, "serviceType");

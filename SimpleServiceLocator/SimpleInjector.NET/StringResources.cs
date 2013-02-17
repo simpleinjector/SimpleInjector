@@ -394,5 +394,18 @@ namespace SimpleInjector
         {
             return "The supplied Registration belongs to a different container.";
         }
+
+        internal static string CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
+            Type decoratorType, Lifestyle lifestyle, Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "You are trying to apply the {0} decorator with the '{1}' lifestyle to a collection of " +
+                "type {2}, but the registered collection is not controlled by the container. Since the " +
+                "number of returned items might change on each call, the decorator with this lifestyle " +
+                "cannot be applied to the collection. Instead, register the decorator with the Transient " +
+                "lifestyle, or use one of the RegisterAll overloads that takes a collection of " +
+                "System.Type types.",
+                decoratorType.ToFriendlyName(), lifestyle.Name, serviceType.ToFriendlyName());
+        }
     }
 }

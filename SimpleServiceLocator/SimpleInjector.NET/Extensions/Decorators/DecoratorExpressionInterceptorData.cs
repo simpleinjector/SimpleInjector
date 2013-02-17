@@ -30,13 +30,13 @@ namespace SimpleInjector.Extensions.Decorators
     internal sealed class DecoratorExpressionInterceptorData
     {
         public DecoratorExpressionInterceptorData(Container container, Type serviceType, Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate, bool singleton)
+            Predicate<DecoratorPredicateContext> predicate, Lifestyle lifestyle)
         {
             this.Container = container;
             this.ServiceType = serviceType;
             this.DecoratorType = decoratorType;
             this.Predicate = predicate;
-            this.Singleton = singleton;
+            this.Lifestyle = lifestyle;
         }
 
         internal Container Container { get; private set; }
@@ -47,6 +47,6 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal Predicate<DecoratorPredicateContext> Predicate { get; private set; }
 
-        internal bool Singleton { get; private set; }
+        internal Lifestyle Lifestyle { get; private set; }
     }
 }

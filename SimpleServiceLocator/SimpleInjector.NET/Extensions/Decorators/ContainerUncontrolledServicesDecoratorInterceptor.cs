@@ -114,7 +114,7 @@ namespace SimpleInjector.Extensions.Decorators
             Expression originalEnumerableExpression)
         {
             this.ThrowWhenDecoratorNeedsAFunc(serviceType, decoratorConstructor);
-            this.ThrownWhenLifestyleIsNotTransientOrSingleton();
+            this.ThrownWhenLifestyleIsNotSupported(serviceType);
 
             ParameterExpression parameter = Expression.Parameter(serviceType, "decoratee");
 
@@ -170,7 +170,7 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        private void ThrownWhenLifestyleIsNotTransientOrSingleton()
+        private void ThrownWhenLifestyleIsNotSupported(Type serviceType)
         {
             // Because the user registered an IEnumerable<TService>, this collection can be dynamic in nature,
             // and the number of elements could change on each enumeration. It's impossible to detect if a
@@ -179,13 +179,10 @@ namespace SimpleInjector.Extensions.Decorators
             // In fact we can't really cache elements as Singleton, but since this was already supported in
             // the past, we don't want to introduce (yet another) breaking change.
             if (this.Lifestyle != Lifestyle.Transient && this.Lifestyle != Lifestyle.Singleton)
-            {
-                // We don't have any code coverage for this feature, since the current implementation of
-                // DegisterDecorator only supports Transient and Singleton, but this will probably change in
-                // the future. So this statement is an assertion to prevent me forgetting about this in the
-                // future.
-                throw new NotSupportedException("Lifestyle " + this.Lifestyle.Name + " is not supported " +
-                    "for this type of registration. Only Transient and Singleton lifestyles are supported.");
+            {                
+                throw new NotSupportedException(
+                    StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
+                        this.DecoratorTypeDefinition, this.Lifestyle, serviceType));
             }
         }
 

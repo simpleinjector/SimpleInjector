@@ -135,7 +135,7 @@ namespace SimpleInjector
         }
 
         // This method should only be called by the Lifestyle base class.
-        internal void SetParameterOverrides(IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+        internal virtual void SetParameterOverrides(IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
         {
             this.overriddenParameters = overriddenParameters.ToDictionary(
                 p => p.Item1,
