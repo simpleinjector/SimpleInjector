@@ -32,7 +32,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-
+    using System.Threading;
     using SimpleInjector.Diagnostics;
 
     /// <summary>
@@ -52,7 +52,10 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
+        private static long counter;
+
         private readonly object locker = new object();
+        private readonly long containerId;
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
         private readonly IDictionary items = new Dictionary<object, object>();
 
@@ -100,11 +103,18 @@ namespace SimpleInjector
             this.Options = options;
 
             this.RegisterSingle<Container>(this);
+
+            this.containerId = Interlocked.Increment(ref counter);
         }
 
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
+
+        internal bool IsFirst
+        {
+            get { return this.containerId == 1; }
+        }
 
         internal bool IsLocked
         {

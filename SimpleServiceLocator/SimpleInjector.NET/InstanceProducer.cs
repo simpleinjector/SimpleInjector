@@ -190,11 +190,7 @@ namespace SimpleInjector
 
             try
             {
-                var newInstanceMethod = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
-
-                var instanceCreator = newInstanceMethod.Compile();
-
-                return Helpers.OptimizeInstanceCreator(instanceCreator, expression);
+                return Helpers.CompileExpression(this.registration.Container, expression);
             }
             catch (Exception ex)
             {

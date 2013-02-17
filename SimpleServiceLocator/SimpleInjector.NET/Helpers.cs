@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Reflection.Emit;
     
     /// <summary>
     /// Helper methods for the container.
@@ -208,18 +209,41 @@ namespace SimpleInjector
 
             return castedCollection;
         }
-        
-        internal static Func<object> OptimizeInstanceCreator(Func<object> instanceCreator, Expression expression)
+
+        internal static Func<object> CompileExpression(Container container, Expression expression)
         {
+            // Skip compiling if all we need to do is return a singleton.
             if (expression is ConstantExpression)
             {
-                object singleton = instanceCreator();
-
-                // This lambda will be a tiny little bit faster than the instanceCreator.
-                return () => singleton;
+                return CreateConstantOptimizedExpression(expression as ConstantExpression);
             }
 
-            return instanceCreator;
+#if !SILVERLIGHT
+            // In the common case, the developer will only create a single container during the lifetime of
+            // the application (this is the recommended approach). In this case, we can optimize the perf
+            // by compiling delegates in an dynamic assembly. We can't do this when the developer creates
+            // many containers, because this will create a memory leak (dynamic assemblies are never unloaded).
+            if (container.IsFirst)
+            {
+                return CompileOptimizedWithFallback(expression);
+            }
+            else
+            {
+                return CompileUnoptimized(expression);
+            }
+#else
+            // Skip optimization in the Silverlight sandbox. Low memory use is much more important in this
+            // environment.
+            return CompileUnoptimized(expression);
+#endif
+        }
+
+        private static Func<object> CreateConstantOptimizedExpression(ConstantExpression expression)
+        {
+            object singleton = expression.Value;
+
+            // This lambda will be a tiny little bit faster than the instanceCreator.
+            return () => singleton;
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)
@@ -266,5 +290,159 @@ namespace SimpleInjector
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
         }
+
+        
+        private static Func<object> CompileUnoptimized(Expression expression)
+        {
+            return Expression.Lambda<Func<object>>(expression).Compile();
+        }
+
+#if !SILVERLIGHT
+        private static Func<object> CompileOptimizedWithFallback(Expression expression)
+        {
+            Func<object> fastDelete = CompileOptimized(expression);
+            Func<object> fallbackDelegate = null;
+
+            return () =>
+            {
+                if (fallbackDelegate != null)
+                {
+                    return fallbackDelegate();
+                }
+
+                try
+                {
+                    return fastDelete();
+                }
+                catch
+                {
+                    // Sometimes the execution of a dynamic assembly delegate fails. In that case we must
+                    // fallback to the unoptimized behavior.
+                    fallbackDelegate = CompileUnoptimized(expression);
+                    return fallbackDelegate();
+                }
+            };
+        }
+
+        private static Func<object> CompileOptimized(Expression expression)
+        {
+            ConstantExpression[] constantExpressions = GetConstants(expression).Distinct().ToArray();
+
+            if (constantExpressions.Any())
+            {
+                return CompileAsClosure(expression, constantExpressions);
+            }
+            else
+            {
+                return CompileAsStatic(expression);
+            }
+        }
+
+        private static Func<object> CompileAsClosure(Expression originalExpression, 
+            ConstantExpression[] constantExpressions)
+        {
+            // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
+            // to replace them to something that can be compiled: an object[] with constants.
+            var constantsParameter = Expression.Parameter(typeof(object[]), "constants");
+
+            var replacedExpression = 
+                ReplaceConstantsWithArrayLookup(originalExpression, constantExpressions, constantsParameter);
+
+            var lambda = Expression.Lambda<Func<object[], object>>(replacedExpression, constantsParameter);
+
+            var create = CompileDelegateInDynamicAssembly(lambda);
+
+            object[] contants = constantExpressions.Select(c => c.Value).ToArray();
+
+            return () => create(contants);
+        }
+
+        private static Func<object> CompileAsStatic(Expression expression)
+        {
+            var lambda = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
+
+            return CompileDelegateInDynamicAssembly(lambda);
+        }
+
+        private static Expression ReplaceConstantsWithArrayLookup(Expression expression,
+            ConstantExpression[] constants, ParameterExpression constantsParameter)
+        {
+            var indexizer = new ConstantArrayIndexizerVisitor(constants, constantsParameter);
+
+            return indexizer.Visit(expression);
+        }
+
+        private static T CompileDelegateInDynamicAssembly<T>(Expression<T> lambda)
+        {
+            var assemblyName = new AssemblyName("SimpleInjector.Compiled");
+
+            AssemblyBuilder assemblyBuilder =
+                AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+
+            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("SimpleInjector.CompiledModule");
+            TypeBuilder typeBuilder = moduleBuilder.DefineType("DynamicInstanceProducer", TypeAttributes.Public);
+            MethodBuilder methodBuilder = typeBuilder.DefineMethod("GetInstance",
+                MethodAttributes.Static | MethodAttributes.Public);
+
+            lambda.CompileToMethod(methodBuilder);
+
+            Type type = typeBuilder.CreateType();
+
+            return (T)(object)Delegate.CreateDelegate(lambda.Type, type.GetMethod("GetInstance"), true);
+        }
+        
+        private static List<ConstantExpression> GetConstants(Expression expression)
+        {
+            var constantFinder = new ConstantFinderVisitor();
+
+            constantFinder.Visit(expression);
+
+            return constantFinder.Constants;
+        }
+
+        private sealed class ConstantFinderVisitor : ExpressionVisitor
+        {
+            internal readonly List<ConstantExpression> Constants = new List<ConstantExpression>();
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                if (!node.Type.IsPrimitive)
+                {
+                    this.Constants.Add(node);
+                }
+
+                return base.VisitConstant(node);
+            }
+        }
+
+        private sealed class ConstantArrayIndexizerVisitor : ExpressionVisitor
+        {
+            private readonly List<ConstantExpression> constantExpressions;
+            private readonly ParameterExpression constantsParameter;
+
+            public ConstantArrayIndexizerVisitor(ConstantExpression[] constantExpressions,
+                ParameterExpression constantsParameter)
+            {
+                this.constantExpressions = constantExpressions.ToList();
+                this.constantsParameter = constantsParameter;
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                int index = this.constantExpressions.IndexOf(node);
+
+                if (index >= 0)
+                {
+                    return Expression.Convert(
+                        Expression.ArrayIndex(
+                            this.constantsParameter,
+                            Expression.Constant(index, typeof(int))),
+                        node.Type);
+                }
+
+                return base.VisitConstant(node);
+            }
+        }
+#endif
     }
 }
