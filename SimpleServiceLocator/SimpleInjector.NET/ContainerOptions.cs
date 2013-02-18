@@ -129,9 +129,14 @@ namespace SimpleInjector
                 this.injectionBehavior = value;
             }
         }
-
+        
+        /// <summary>
+        /// Gets the container to which this <b>ContainerOptions</b> instance belongs to or <b>null</b> when
+        /// this instance hasn't been applied to a <see cref="Container"/> yet.
+        /// </summary>
+        /// <value>The current <see cref="Container"/>.</value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal Container Container { get; set; }
+        public Container Container { get; internal set; }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
         {
