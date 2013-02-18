@@ -21,7 +21,7 @@
             var container = new Container();
 
             // Act
-            container.AutowireProperties<Attribute>();
+            container.Options.AutowireProperties<Attribute>();
         }
 
         [TestMethod]
@@ -30,7 +30,7 @@
             // Arrange
             var container = new Container();
 
-            container.AutowireProperties<Inject1Attribute>();
+            container.Options.AutowireProperties<Inject1Attribute>();
 
             // Act
             var service = container.GetInstance<ServiceWithoutAttributedProperties>();
@@ -47,7 +47,7 @@
 
             var container = new Container();
 
-            container.AutowireProperties<Inject1Attribute>();
+            container.Options.AutowireProperties<Inject1Attribute>();
 
             container.RegisterSingle<ILogger>(expectedDependency);
 
@@ -66,7 +66,7 @@
 
             var container = new Container();
 
-            container.AutowireProperties<Inject1Attribute>();
+            container.Options.AutowireProperties<Inject1Attribute>();
 
             container.RegisterSingle<ILogger>(expectedDependency);
             
@@ -88,10 +88,10 @@
 
             var container = new Container();
 
-            container.AutowireProperties<Inject2Attribute>();
+            container.Options.AutowireProperties<Inject2Attribute>();
 
             container.RegisterSingle<ILogger>(expectedDependency);
-            
+
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperties>();
 
@@ -110,8 +110,8 @@
         {
             // Arrange
             var container = new Container();
-                        
-            container.AutowireProperties<Inject1Attribute>();
+
+            container.Options.AutowireProperties<Inject1Attribute>();
 
             try
             {
@@ -138,7 +138,7 @@
 
             // This attribute must be applied before RegisterWithContext gets applied, since the registered
             // events adds new 
-            container.AutowireProperties<Inject2Attribute>();
+            container.Options.AutowireProperties<Inject2Attribute>();
 
             container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
                         

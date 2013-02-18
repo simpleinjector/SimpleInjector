@@ -6,44 +6,67 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+
     using SimpleInjector.Advanced;
 
-    public static class ExplicitPropertyInjectionExtensions
+    public static class PropertyInjectionExtensions
     {
-        public static void AutowireProperties<TAttribute>(this Container container)
+        public static void AutowireProperties<TAttribute>(this ContainerOptions options)
             where TAttribute : Attribute
         {
-            Predicate<PropertyInfo> selector = 
+            Predicate<PropertyInfo> propertyFilter = 
                 property => property.GetCustomAttributes(typeof(TAttribute), true).Any();
 
-            AutowireProperties(container, selector);
+            AutowireProperties(options, propertyFilter);
         }
 
-        public static void AutowireProperties(this Container container, Predicate<PropertyInfo> selector)
+        public static void AutowireProperties(this ContainerOptions options,
+            Predicate<PropertyInfo> propertyFilter)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (selector == null)
-            {
-                throw new ArgumentNullException("selector");
-            }
-            
-            EnsureNoRegistrationsHaveBeenMade(container);
-
-            var helper = new PropertyInjectionHelper { Container = container, Selector = selector};
-
-            container.ExpressionBuilding += helper.ReplaceExpression;
+            AutowireProperties(options, type => true, propertyFilter);
         }
         
-        private static void EnsureNoRegistrationsHaveBeenMade(Container container)
+        public static void AutowireProperties(this ContainerOptions options, 
+            Predicate<Type> typeFilter, Predicate<PropertyInfo> propertyFilter)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            if (options.Container == null)
+            {
+                throw new InvalidOperationException("The ContainerOptions must be part of a Container instance.");
+            }
+
+            if (typeFilter == null)
+            {
+                throw new ArgumentNullException("typeFilter");
+            }
+
+            if (propertyFilter == null)
+            {
+                throw new ArgumentNullException("propertyFilter");
+            }
+            
+            EnsureNoRegistrationsHaveBeenMade(options);
+
+            var helper = new PropertyInjectionHelper 
+            { 
+                Container = options.Container, 
+                TypeFilter = typeFilter,
+                PropertyFilter = propertyFilter 
+            };
+
+            options.Container.ExpressionBuilding += helper.ExpressionBuilding;
+        }
+
+        private static void EnsureNoRegistrationsHaveBeenMade(ContainerOptions options)
         {
             try
             {
                 // set_ConstructorResolutionBehavior throws after the first registration.
-                container.Options.ConstructorResolutionBehavior = container.Options.ConstructorResolutionBehavior;
+                options.ConstructorResolutionBehavior = options.ConstructorResolutionBehavior;
             }
             catch (InvalidOperationException)
             {
@@ -82,30 +105,42 @@
                 typeof(Func<,,,,,,,,,,,,,,,,>),
             });
 
-            internal Predicate<PropertyInfo> Selector { get; set; }
+            internal Predicate<Type> TypeFilter { get; set; }
+
+            internal Predicate<PropertyInfo> PropertyFilter { get; set; }
 
             internal Container Container { get; set; }
 
-            public void ReplaceExpression(object sender, ExpressionBuildingEventArgs e)
+            public void ExpressionBuilding(object sender, ExpressionBuildingEventArgs e)
             {
+                if (!this.TypeFilter(e.RegisteredServiceType))
+                {
+                    return;
+                }
+
                 var propertiesToInject = this.GetPropertiesToInject(e.KnownImplementationType);
 
-                if (propertiesToInject.Any())
+                if (propertiesToInject.Length > 0)
                 {
-                    var expressionWithPropertyInjection = 
-                        this.BuildPropertyInjectionExpression(e.KnownImplementationType, e.Expression, 
-                            propertiesToInject);
-
-                    if (e.Expression is ConstantExpression)
-                    {
-                        expressionWithPropertyInjection = MakeConstantAgain(e.Expression as ConstantExpression, 
-                            expressionWithPropertyInjection, e.KnownImplementationType);
-                    }
-
-                    e.Expression = expressionWithPropertyInjection;
-
-                    this.AddKnownRelationships(e, propertiesToInject);
+                    ReplaceExpression(e, propertiesToInject);
                 }
+            }
+
+            private void ReplaceExpression(ExpressionBuildingEventArgs e, PropertyInfo[] propertiesToInject)
+            {
+                var expressionWithPropertyInjection =
+                    this.BuildPropertyInjectionExpression(e.KnownImplementationType, e.Expression,
+                        propertiesToInject);
+
+                if (e.Expression is ConstantExpression)
+                {
+                    expressionWithPropertyInjection = MakeConstantAgain(e.Expression as ConstantExpression,
+                        expressionWithPropertyInjection, e.KnownImplementationType);
+                }
+
+                e.Expression = expressionWithPropertyInjection;
+
+                this.AddKnownRelationships(e, propertiesToInject);
             }
 
             private void AddKnownRelationships(ExpressionBuildingEventArgs e, PropertyInfo[] propertiesToInject)
@@ -128,7 +163,7 @@
 
                 var propertiesWithAttribute = (
                     from property in type.GetProperties(everything)
-                    where this.Selector(property)
+                    where this.PropertyFilter(property)
                     select property)
                     .ToArray();
 
