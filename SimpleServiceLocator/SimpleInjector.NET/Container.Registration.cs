@@ -413,8 +413,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
+            Justification = @"
+                A design without a generic T would be unpractical, because the other overloads also take a 
+                generic T.")]
         public void Register<TConcrete>() where TConcrete : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
@@ -544,8 +545,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
+            Justification = @"
+                A design without a generic T would be unpractical, because the other overloads also take a 
+                generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
@@ -1037,8 +1039,9 @@ namespace SimpleInjector
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A method without the type parameter already exists. This extension method " +
-                "is more intuitive to developers.")]
+            Justification = @"
+                A method without the type parameter already exists. This extension method is more intuitive to
+                developers.")]
         public void RegisterAll<TService>(params Type[] serviceTypes)
         {
             this.RegisterAll(typeof(TService), serviceTypes);
@@ -1059,8 +1062,9 @@ namespace SimpleInjector
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A method without the type parameter already exists. This extension method " +
-                "is more intuitive to developers.")]
+            Justification = @"
+                A method without the type parameter already exists. This extension method is more intuitive to 
+                developers.")]
         public void RegisterAll<TService>(IEnumerable<Type> serviceTypes)
         {
             this.RegisterAll(typeof(TService), serviceTypes);

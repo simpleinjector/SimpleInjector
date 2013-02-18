@@ -311,8 +311,9 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "By using the 'this Container' argument, we allow this extension method to " +
-            "show when using Intellisense over the Container.")]
+            Justification = @"
+                By using the 'this Container' argument, we allow this extension method to show when using 
+                Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
@@ -370,8 +371,9 @@ namespace SimpleInjector.Extensions
         /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
         /// <paramref name="accessibility"/> contains an invalid value.</exception>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "By using the 'this Container' argument, we allow this extension method to " +
-            "show when using Intellisense over the Container.")]
+            Justification = @"
+                By using the 'this Container' argument, we allow this extension method to show when using 
+                Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
@@ -400,8 +402,9 @@ namespace SimpleInjector.Extensions
         /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when 
         /// <paramref name="accessibility"/> contains an invalid value.</exception>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "By using the 'this Container' argument, we allow this extension method to " +
-            "show when using Intellisense over the Container.")]
+            Justification = @"
+                By using the 'this Container' argument, we allow this extension method to show when using 
+                Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
@@ -587,8 +590,9 @@ namespace SimpleInjector.Extensions
         /// closed version of <paramref name="openGenericServiceType"/>.
         /// </exception>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "By using the 'this Container' argument, we allow this extension method to " +
-            "show when using Intellisense over the Container.")]
+            Justification = @"
+                By using the 'this Container' argument, we allow this extension method to show when using 
+                Intellisense over the Container.")]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback, IEnumerable<Type> typesToRegister)
         {

@@ -190,8 +190,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference (Nothing in VB).</exception>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
-                            "be created using the non-generic overloads in a sandbox.")]
+            Justification = @"
+                Supplying the generic type arguments is needed, since internal types can not be created using 
+                the non-generic overloads in a sandbox.")]
         public Registration CreateRegistration<TService, TImplementation>(Container container)
             where TImplementation : class, TService
             where TService : class
@@ -327,8 +328,9 @@ namespace SimpleInjector
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
-                            "be created using the non-generic overloads in a sandbox.")]
+            Justification = @"
+                Supplying the generic type arguments is needed, since internal types can not be created using 
+                the non-generic overloads in a sandbox.")]
         protected abstract Registration CreateRegistrationCore<TService, TImplementation>(Container container)
             where TImplementation : class, TService
             where TService : class;

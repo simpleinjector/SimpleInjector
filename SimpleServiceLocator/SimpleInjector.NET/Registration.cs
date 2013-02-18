@@ -180,8 +180,9 @@ namespace SimpleInjector
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
-                            "be created using the non-generic overloads in a sandbox.")]
+            Justification = @"
+                Supplying the generic type arguments is needed, since internal types can not be created using 
+                the non-generic overloads in a sandbox.")]
         protected Func<TImplementation> BuildTransientDelegate<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -238,8 +239,9 @@ namespace SimpleInjector
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <returns>An <see cref="Expression"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
-                            "be created using the non-generic overloads in a sandbox.")]
+            Justification = @"
+                Supplying the generic type arguments is needed, since internal types can not be created using 
+                the non-generic overloads in a sandbox.")]
         protected Expression BuildTransientExpression<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
