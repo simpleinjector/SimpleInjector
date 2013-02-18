@@ -76,7 +76,6 @@
     <Compile Include="ExpirationExtensions.cs" />
     <Compile Include="ImplicitPropertyInjectionExtensions.cs" />
     <Compile Include="InterceptorExtensions.cs" />
-    <Compile Include="LifetimeScopeExtensions.cs" />
     <Compile Include="MultiKeyedRegistrationsExtensions.cs" />
     <Compile Include="ParameterConventionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

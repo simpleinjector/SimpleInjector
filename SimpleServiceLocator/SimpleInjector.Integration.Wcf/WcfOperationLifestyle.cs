@@ -58,7 +58,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
-        public WcfOperationLifestyle() : this(disposeInstanceWhenOperationEnds : true)
+        public WcfOperationLifestyle() : this(disposeInstanceWhenOperationEnds: true)
         {
         }
 
@@ -73,6 +73,7 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
+        /// <value>The length of the lifestyle.</value>
         protected override int Length
         {
             get { return 250; }
@@ -106,7 +107,8 @@ namespace SimpleInjector.Integration.Wcf
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator"></param>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>

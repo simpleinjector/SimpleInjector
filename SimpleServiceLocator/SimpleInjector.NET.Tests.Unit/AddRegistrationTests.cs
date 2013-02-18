@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class AddRegistrationTests
@@ -30,6 +31,24 @@
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
+        }
+
+        [TestMethod]
+        public void AddRegistration_RegistrationFromAnotherContainer_FailsWithExpectedException()
+        {
+            var container = new Container();
+
+            var otherContainer = new Container();
+
+            var registrationFromAnotherContainer =
+                Lifestyle.Singleton.CreateRegistration<Implementation, Implementation>(otherContainer);
+
+            // Act
+            Action action = 
+                () => container.AddRegistration(typeof(IService1), registrationFromAnotherContainer);
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied Registration belongs to a different container.", action);
         }
 
         public class Implementation : IService1, IService2 

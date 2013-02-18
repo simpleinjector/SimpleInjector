@@ -269,11 +269,17 @@ using SimpleInjector.Diagnostics;
                 var e = new ExpressionBuildingEventArgs(serviceType, implementationType,
                     instanceCreatorExpression, registration.Lifestyle);
 
-                e.KnownRelationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+                var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+
+                e.KnownRelationships = relationships;
 
                 this.expressionBuilding(this, e);
 
-                registration.ReplaceRelationships(e.KnownRelationships);
+                // Optimization.
+                if (relationships.Changed)
+                {
+                    registration.ReplaceRelationships(e.KnownRelationships);
+                }
 
                 return e.Expression;
             }
@@ -281,11 +287,20 @@ using SimpleInjector.Diagnostics;
             return instanceCreatorExpression;
         }
 
-        internal void OnExpressionBuilt(ExpressionBuiltEventArgs e)
+        internal void OnExpressionBuilt(ExpressionBuiltEventArgs e, Registration registration)
         {
             if (this.expressionBuilt != null)
             {
+                var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+
+                e.KnownRelationships = relationships;
+
                 this.expressionBuilt(this, e);
+
+                if (relationships.Changed)
+                {
+                    registration.ReplaceRelationships(e.KnownRelationships);
+                }
             }
         }
         

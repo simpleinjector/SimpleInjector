@@ -13,6 +13,10 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
     {
     }
 
+    public interface IConcreteThing
+    {
+    }
+
     public class ConcreteShizzle
     {
     }
@@ -22,10 +26,6 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public FakeLogger(ConcreteShizzle shizzle, ConcreteThing thing)
         {
         }
-    }
-
-    public interface IConcreteThing
-    {
     }
 
     public class ConcreteThing : IConcreteThing

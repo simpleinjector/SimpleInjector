@@ -74,23 +74,26 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the type that this instance will create.
         /// </summary>
+        /// <value>The type that this instance will create.</value>
         public abstract Type ImplementationType { get; }
 
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> this that created this registration.
         /// </summary>
+        /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
         public Lifestyle Lifestyle { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Container"/> instance for this registration.
         /// </summary>
+        /// <value>The <see cref="Container"/> instance for this registration.</value>
         protected internal Container Container { get; private set; }
 
         /// <summary>
         /// Builds a new <see cref="Expression"/> with the correct caching (according to the specifications of
         /// its <see cref="Lifestyle"/>) applied.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="Expression"/>.</returns>
         public abstract Expression BuildExpression();
 
         internal KnownRelationship[] GetRelationships()

@@ -55,6 +55,17 @@ namespace SimpleInjector.Diagnostics
             this.Initialize();
         }
 
+        public ContainerOptions Options
+        {
+            get { return this.container.Options; }
+        }
+
+        [DebuggerDisplay("")]
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        public DebuggerViewItem[] Items { get; private set; }
+        
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "We can catch the exception. We will show the developer the exception in the debugger.")]
         private void Initialize()
         {
             if (!this.container.SuccesfullyVerified)
@@ -79,15 +90,6 @@ namespace SimpleInjector.Diagnostics
                 this.Items = GetDebuggerTypeProxyFailureResults(ex);
             }
         }
-
-        public ContainerOptions Options
-        {
-            get { return this.container.Options; }
-        }
-
-        [DebuggerDisplay("")]
-        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public DebuggerViewItem[] Items { get; private set; }
 
         private DebuggerViewItem[] GetAnalysisResults()
         {

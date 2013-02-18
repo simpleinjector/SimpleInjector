@@ -1,39 +1,46 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version v2.0 (currently released as beta3 on NuGet)
+Version v2.0 
 	General description:
 		This major release adds explicit lifestyle support and Debugger Diagnostic Services to the Core
 		library. The addition of explicit lifestyle support makes it easier to register types in any given
-		lifestyle, and the new HybridLifestyle class makes it really easy to create a registration that mixes
+		lifestyle, and the Lifestyle.Hybrid makes it really easy to create a registration that mixes
 		any number of lifestyles together. The Diagnostic Services help you to spot common configuration and
 		programming mistakes such as lifestyle mismatches, and short circuited dependencies.
 
 	New features:
-		-[Core] Debugger Diagnostic Services added to give feedback on possible misconfigurations in the
+		-[Core] Diagnostic Debug View added to give feedback on possible misconfigurations in the
 		 container. See here for more information: https://simpleinjector.codeplex.com/discussions/431684.
 		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
-		 are Lifestyle.Transient and Lifestyle.Singleton.
+		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.Hybrid() method to create a custom
+		 hybrid lifestyle. Other lifestyle classes are implemented in the integration and extension
+		 libraries.
 		-[Core] Register overloads added that take Lifetyle as argument.
 		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
 		 expression is built that creates a new instance, but before instance initializers and lifestyle
 		 caching gets added to the expression.
-		-[Core] HybridLifestyle added to allow registering hybrid lifestyles.
 		-[Core] AddRegistration(Type, Registration) method added to allow directly adding a registration.
+		 This allows binding two or more service types to the same implementation.
 		-[Integration.Web] WebRequestLifestyle has been added.
 		-[Integration.Wcf] WcfOperationLifestyle has been added.
 		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
 		-[Extensions] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Extensions] RegisterOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Extensions] RegisterDecorator overloads have been added that allow specifying a lifestyle.
 
 	Breaking changes:
 		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
+		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
+		-[Core] All Func<T> factory delegates registered using one of the Register overloads (such as
+		 Register<T>(Func<T>) are now considered to return transient instances. Custom lifestyles should
+		 applied by supplying a custom Lifestyle implementation.
 		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
 		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>) and to
 		 instances registered using RegisterSingle<T>(T) and RegisterSingle(Type, object). Note that this 
 		 could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
 		 own caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
 		 Instead of registering Func<T> delegates to implement custom lifestyle, derive from Lifestyle.
-		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
 		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
 		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
 		 in case a type got registered using RegisterSingle<A, B>(). The new ExpressionBuilding event will
@@ -42,7 +49,7 @@ Version v2.0 (currently released as beta3 on NuGet)
 		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
 		 SimpleInjector.Advanced namespace. It's an extension method now. (work item 18349).
 		-[Core] The types System.Type and System.String are considered ambiguous and are now disallowed from
-		 being registered directly. An exception is thrown when this happens.
+		 being registered directly. An exception is thrown.
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
 

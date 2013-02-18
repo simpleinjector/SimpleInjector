@@ -68,10 +68,10 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
-        /// is changed by an <see cref="Container.ExpressionBuilding">ExpressionBuilding</see> registration or
-        /// gets decorated using the
-        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type)">RegisterDecorator</see> method.
+        /// is changed by an <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> registration or
+        /// gets <see cref="SimpleInjector.Extensions.DecoratorExtensions">decorated</see>.
         /// </summary>
+        /// <value>The <see cref="Lifestyle"/> for this registration.</value>
         public Lifestyle Lifestyle
         {
             get { return this.overriddenLifestyle ?? this.registration.Lifestyle; }
@@ -134,9 +134,7 @@ namespace SimpleInjector
             {
                 this.validator.Reset();
 
-                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
-
-                throw;
+                throw this.GetErrorForTryingToGetInstanceOfType(ex);
             }
 
             if (instance == null)
@@ -168,9 +166,7 @@ namespace SimpleInjector
             {
                 this.validator.Reset();
 
-                this.ThrowErrorWhileTryingToGetInstanceOfType(ex);
-
-                throw;
+                throw this.GetErrorForTryingToGetInstanceOfType(ex);
             }
         }
 
@@ -219,26 +215,18 @@ namespace SimpleInjector
 
             e.Lifestyle = this.Lifestyle;
 
-            e.KnownRelationships = new KnownRelationshipCollection(this.registration.GetRelationships().ToList());
-
-            this.registration.Container.OnExpressionBuilt(e);
-
-            this.registration.ReplaceRelationships(e.KnownRelationships);
+            this.registration.Container.OnExpressionBuilt(e, this.registration);
 
             this.overriddenLifestyle = e.Lifestyle;
 
             return e.Expression;
         }
 
-        private void ThrowErrorWhileTryingToGetInstanceOfType(Exception innerException)
+        private ActivationException GetErrorForTryingToGetInstanceOfType(Exception innerException)
         {
             string exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
 
-            // Prevent wrapping duplicate exceptions.
-            if (!innerException.Message.StartsWith(exceptionMessage, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
-            }
+            return new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
         }
 
         // This method will be inlined by the JIT.

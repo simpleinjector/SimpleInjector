@@ -670,6 +670,7 @@
             }
         }
 
+#if DEBUG
         [TestMethod]
         public void GetInstance_ExpressionBuildingAddingKnownRelationship_GetRelationshipsContainsThatItem()
         {
@@ -699,6 +700,7 @@
             Assert.AreEqual(Lifestyle.Transient, relationship.Lifestyle);
             Assert.AreEqual(container.GetRegistration(typeof(Container)), relationship.Dependency);
         }
+#endif
 
         public class Order
         {

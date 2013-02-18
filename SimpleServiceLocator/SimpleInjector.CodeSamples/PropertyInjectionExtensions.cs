@@ -77,10 +77,10 @@
 
         private sealed class PropertyInjectionHelper
         {
-            private readonly HashSet<object> initializedSingletons = new HashSet<object>();
-
             private const int MaximumNumberOfFuncArguments = 16;
             private const int MaximumNumberOfPropertiesPerDelegate = MaximumNumberOfFuncArguments - 1;
+
+            private readonly HashSet<object> initializedSingletons = new HashSet<object>();
 
             private static readonly ReadOnlyCollection<Type> FuncTypes = new ReadOnlyCollection<Type>(new Type[]
             {
@@ -122,7 +122,7 @@
 
                 if (propertiesToInject.Length > 0)
                 {
-                    ReplaceExpression(e, propertiesToInject);
+                    this.ReplaceExpression(e, propertiesToInject);
                 }
             }
 
@@ -132,9 +132,11 @@
                     this.BuildPropertyInjectionExpression(e.KnownImplementationType, e.Expression,
                         propertiesToInject);
 
-                if (e.Expression is ConstantExpression)
+                var constantExpression = e.Expression as ConstantExpression;
+
+                if (constantExpression != null)
                 {
-                    expressionWithPropertyInjection = MakeConstantAgain(e.Expression as ConstantExpression,
+                    expressionWithPropertyInjection = this.MakeConstantAgain(constantExpression,
                         expressionWithPropertyInjection, e.KnownImplementationType);
                 }
 

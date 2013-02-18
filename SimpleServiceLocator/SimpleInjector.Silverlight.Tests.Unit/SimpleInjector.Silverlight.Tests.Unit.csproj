@@ -107,6 +107,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorVerificationBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorVerificationBehaviorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\KnownRelationshipTests.cs">
+      <Link>Advanced\KnownRelationshipTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\AmbiguousTypesTests.cs">
       <Link>AmbiguousTypesTests.cs</Link>
     </Compile>
@@ -121,9 +124,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\CyclicDependencyValidatorTests.cs">
       <Link>CyclicDependencyValidatorTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\KnownDependencyTests.cs">
-      <Link>Diagnostics\KnownDependencyTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\EnumerableExtensions.cs">
       <Link>EnumerableExtensions.cs</Link>
@@ -253,7 +253,9 @@
       <Name>SimpleInjector.Silverlight</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

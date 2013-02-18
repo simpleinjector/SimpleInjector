@@ -252,7 +252,7 @@
             {
                 string expectedMessage = "The registered delegate for type IUserRepository returned null.";
 
-                AssertThat.StringContains(expectedMessage, ex.Message);
+                AssertThat.ExceptionMessageContains(expectedMessage, ex);
             }
         }
 

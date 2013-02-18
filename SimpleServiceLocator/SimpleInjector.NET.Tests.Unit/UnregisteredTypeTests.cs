@@ -293,7 +293,7 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(expectedMessage), "Actual message: " + ex.Message);
+                AssertThat.ExceptionMessageContains(expectedMessage, ex);
             }
         }
 

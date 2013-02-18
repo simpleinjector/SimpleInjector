@@ -248,6 +248,7 @@ namespace SimpleInjector
                 throw new ArgumentException(message, paramName);
             }
         }
+
         private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor, 
             string paramName)
         {

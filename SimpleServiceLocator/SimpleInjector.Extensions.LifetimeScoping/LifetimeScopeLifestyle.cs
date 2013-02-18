@@ -98,6 +98,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         }
         
         /// <summary>Gets the length of the lifestyle.</summary>
+        /// <value>The <see cref="Int32"/> representing the length of this lifestyle.</value>
         protected override int Length
         {
             get { return 100; }
@@ -133,7 +134,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator"></param>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>

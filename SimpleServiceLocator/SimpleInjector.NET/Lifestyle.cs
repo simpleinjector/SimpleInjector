@@ -95,6 +95,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Gets the user friendly name of this lifestyle.</summary>
+        /// <value>The user friendly name of this lifestyle.</value>
         public string Name 
         { 
             get { return this.name; } 
@@ -117,6 +118,7 @@ namespace SimpleInjector
         /// services use this value to compare lifestyles with each other to determine lifestyle 
         /// misconfigurations.
         /// </summary>
+        /// <value>The <see cref="Int32"/> representing the length of this lifestyle.</value>
         protected abstract int Length
         {
             get;
@@ -252,21 +254,15 @@ namespace SimpleInjector
 
             try
             {
-                return (Registration)
-                    closedCreateRegistrationMethod.Invoke(this, new object[] { container });
+                return (Registration)closedCreateRegistrationMethod.Invoke(this, new object[] { container });
             }
             catch (MemberAccessException ex)
             {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ArgumentException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(implementationType, ex),
-#if !SILVERLIGHT
-                    "implementationType", 
-#endif
-                    ex);
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(implementationType, ex, 
+                    "implementationType");
             }
         }
-        
+       
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <paramref name="serviceType"/>  using the supplied <paramref name="instanceCreator"/> 
@@ -301,13 +297,7 @@ namespace SimpleInjector
             }
             catch (MemberAccessException ex)
             {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ArgumentException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex),
-#if !SILVERLIGHT
-                    "serviceType",
-#endif
-                    ex);
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(serviceType, ex, "serviceType");
             }
         }
 
@@ -377,6 +367,18 @@ namespace SimpleInjector
             // This might throw an MemberAccessException when serviceType is internal while we're running in
             // a Silverlight sandbox.
             return Expression.Lambda(convertExpression, parameters).Compile();
+        }
+
+        private static ArgumentException BuildUnableToResolveTypeDueToSecurityConfigException(
+            Type type, MemberAccessException innerException, string paramName)
+        {
+            // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
+            return new ArgumentException(
+                StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException),
+#if !SILVERLIGHT
+                paramName,
+#endif
+                innerException);
         }
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)

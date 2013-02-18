@@ -37,8 +37,7 @@
             // Act
             container.GetInstance<IService1>();
         }
-
-
+        
         [TestMethod]
         public void GetInstance_OnSecondServiceType_Succeeds()
         {
@@ -50,8 +49,7 @@
             // Act
             container.GetInstance<IService2>();
         }
-
-
+        
         [TestMethod]
         public void Register_WithValidArguments_DoesNotRegisterImplementation()
         {

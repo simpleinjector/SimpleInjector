@@ -66,11 +66,13 @@ namespace SimpleInjector
         /// must also return an instance of type <b>KnownImplementationType</b> or a sub type. 
         /// This information must be described in the new Expression.
         /// </summary>
+        /// <value>A <see cref="Type"/>.</value>
         public Type KnownImplementationType { get; private set; }
 
         /// <summary>
         /// Gets the lifestyle for the component that is currently being built.
         /// </summary>
+        /// <value>The <see cref="Lifestyle"/>.</value>
         public Lifestyle Lifestyle { get; private set; }
 
         /// <summary>Gets or sets the currently registered <see cref="Expression"/>.</summary>
@@ -92,8 +94,12 @@ namespace SimpleInjector
         }
         
         /// <summary>
-        /// The list of currently known relationships. This information is used by the Diagnostics Debug View.
+        /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
+        /// Debug View. Change the contents of this collection to represent the changes made to the
+        /// <see cref="ExpressionBuildingEventArgs.Expression">Expression</see> property (if any). This allows
+        /// the Diagnostics Debug View to analyse those new relationships as well.
         /// </summary>
-        public Collection<KnownRelationship> KnownRelationships { get; set; }
+        /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
+        public Collection<KnownRelationship> KnownRelationships { get; internal set; }
     }
 }

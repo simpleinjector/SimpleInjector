@@ -55,20 +55,17 @@ namespace SimpleInjector.Advanced
             this.Dependency = dependency;
         }
 
-        /// <summary>
-        /// The implementation type of the parent type of the relationship.
-        /// </summary>
+        /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
+        /// <value>The implementation type of the parent type of the relationship.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
         public Type ImplementationType { get; private set; }
 
-        /// <summary>
-        /// The lifestyle of the parent type of the relationship.
-        /// </summary>
+        /// <summary>Gets the lifestyle of the parent type of the relationship.</summary>
+        /// <value>The lifestyle of the parent type of the relationship.</value>
         public Lifestyle Lifestyle { get; private set; }
 
-        /// <summary>
-        /// The type that the parent depends on (it is injected into the parent).
-        /// </summary>
+        /// <summary>Gets the type that the parent depends on (it is injected into the parent).</summary>
+        /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; private set; }
 
         /// <summary>Serves as a hash function for a particular type.</summary>
@@ -93,6 +90,11 @@ namespace SimpleInjector.Advanced
             if (other == null)
             {
                 return false;
+            }
+
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
             }
 
             return

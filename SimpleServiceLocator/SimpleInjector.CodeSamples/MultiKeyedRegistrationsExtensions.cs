@@ -11,7 +11,7 @@
     {
         public static void Register<TService1, TService2, TImplementation>(
             this Container container, Lifestyle lifestyle)
-            where  TImplementation : class, TService1, TService2
+            where TImplementation : class, TService1, TService2
             where TService1 : class
             where TService2 : class
         {

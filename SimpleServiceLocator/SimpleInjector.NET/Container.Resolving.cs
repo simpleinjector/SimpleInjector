@@ -374,24 +374,22 @@ namespace SimpleInjector
         {
             if (Helpers.IsConcreteType(serviceType))
             {
-                this.ThrowActivationExceptionWhenTypeIsNotConstructable(serviceType);
+                this.ThrowNotConstructableException(serviceType);
             }
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
         }
 
-        private void ThrowActivationExceptionWhenTypeIsNotConstructable(Type concreteType)
+        private void ThrowNotConstructableException(Type concreteType)
         {
             string exceptionMessage;
 
-            bool constructable = this.IsConstructableType(concreteType, concreteType, out exceptionMessage);
+            // Since we are at this point, we know the concreteType is NOT constructable.
+            this.IsConstructableType(concreteType, concreteType, out exceptionMessage);
 
-            if (!constructable)
-            {
-                throw new ActivationException(
-                    StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType)
-                    + exceptionMessage);
-            }
+            throw new ActivationException(
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType)
+                + exceptionMessage);
         }
 
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class

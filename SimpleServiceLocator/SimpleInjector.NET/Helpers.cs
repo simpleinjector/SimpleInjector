@@ -29,6 +29,7 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
@@ -212,30 +213,29 @@ namespace SimpleInjector
 
         internal static Func<object> CompileExpression(Container container, Expression expression)
         {
+            var constantExpression = expression as ConstantExpression;
+
             // Skip compiling if all we need to do is return a singleton.
-            if (expression is ConstantExpression)
+            if (constantExpression != null)
             {
-                return CreateConstantOptimizedExpression(expression as ConstantExpression);
+                return CreateConstantOptimizedExpression(constantExpression);
             }
 
+            // Skip optimization in the Silverlight sandbox. Low memory use is much more important in this
+            // environment.
 #if !SILVERLIGHT
-            // In the common case, the developer will only create a single container during the lifetime of
-            // the application (this is the recommended approach). In this case, we can optimize the perf
-            // by compiling delegates in an dynamic assembly. We can't do this when the developer creates
-            // many containers, because this will create a memory leak (dynamic assemblies are never unloaded).
+            // In the common case, the developer will/should only create a single container during the 
+            // lifetime of the application (this is the recommended approach). In this case, we can optimize
+            // the perf by compiling delegates in an dynamic assembly. We can't do this when the developer 
+            // creates many containers, because this will create a memory leak (dynamic assemblies are never 
+            // unloaded). We might however relax this constraint and optimize the first N container instances.
+            // (where N is configurable)
             if (container.IsFirst)
             {
                 return CompileOptimizedWithFallback(expression);
             }
-            else
-            {
-                return CompileUnoptimized(expression);
-            }
-#else
-            // Skip optimization in the Silverlight sandbox. Low memory use is much more important in this
-            // environment.
-            return CompileUnoptimized(expression);
 #endif
+            return CompileUnoptimized(expression);
         }
 
         private static Func<object> CreateConstantOptimizedExpression(ConstantExpression expression)
@@ -290,14 +290,15 @@ namespace SimpleInjector
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
         }
-
-        
+                
         private static Func<object> CompileUnoptimized(Expression expression)
         {
             return Expression.Lambda<Func<object>>(expression).Compile();
         }
 
 #if !SILVERLIGHT
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "We can skip the exception, because we call the fallbackDelegate.")]
         private static Func<object> CompileOptimizedWithFallback(Expression expression)
         {
             Func<object> fastDelete = CompileOptimized(expression);

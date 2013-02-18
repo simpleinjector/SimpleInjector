@@ -133,7 +133,6 @@
         public void AutoInjectPropertiesWithAttribute_MixedWithRegisterWithContext_ShouldInjectContextualDependency()
         {
             // Arrange
-
             var container = new Container();
 
             // This attribute must be applied before RegisterWithContext gets applied, since the registered
@@ -184,7 +183,6 @@
         {
             public ILogger Logger { get; set; }
         }
-
 
         public class ServiceWithAttributedProperty : IService
         {

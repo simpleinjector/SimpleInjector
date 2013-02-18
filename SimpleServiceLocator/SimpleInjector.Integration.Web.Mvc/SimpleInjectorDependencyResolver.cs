@@ -30,8 +30,6 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System.Web.Mvc;
 
     /// <summary>MVC <see cref="IDependencyResolver"/> for Simple Injector.</summary>
-    /// <remarks>
-    /// </remarks>
     /// <example>
     /// The following example shows the usage of the <b>SimpleInjectorDependencyResolver</b> in an
     /// MVC application:

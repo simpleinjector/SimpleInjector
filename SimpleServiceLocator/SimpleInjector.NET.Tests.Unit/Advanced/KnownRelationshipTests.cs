@@ -1,12 +1,12 @@
 ﻿#if DEBUG
-namespace SimpleInjector.Tests.Unit.Diagnostics
+namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
     
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
-    using SimpleInjector.Advanced;
 
+    using SimpleInjector.Advanced;
+    
     [TestClass]
     public class KnownDependencyTests
     {
@@ -14,20 +14,20 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_WithValidParameters_Succeeds()
         {
             // Arrange
-            var validParameters = ValidKnownDependencyParameters();
+            var validParameters = ValidKnownRelationshipParameters();
 
             // Act
-            CreateKnownDependency(validParameters);
+            CreateKnownRelationship(validParameters);
         }
 
         [TestMethod]
         public void Ctor_WithValidParameters_CreatesInstanceWithExpectedProperties()
         {
             // Arrange
-            var validParameters = ValidKnownDependencyParameters();
+            var validParameters = ValidKnownRelationshipParameters();
 
             // Act
-            var dependency = CreateKnownDependency(validParameters);
+            var dependency = CreateKnownRelationship(validParameters);
 
             // Assert
             Assert.AreEqual(
@@ -49,12 +49,12 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_WithNullParentImplementationType_ThrowsExpectedException()
         {
             // Arrange
-            var invalidParameters = ValidKnownDependencyParameters();
+            var invalidParameters = ValidKnownRelationshipParameters();
 
             invalidParameters.ImplementationType = null;
 
             // Act
-            Action action = () => CreateKnownDependency(invalidParameters);
+            Action action = () => CreateKnownRelationship(invalidParameters);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("implementationType", action);
@@ -64,12 +64,12 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_WithNullParentLifestyle_ThrowsExpectedException()
         {
             // Arrange
-            var invalidParameters = ValidKnownDependencyParameters();
+            var invalidParameters = ValidKnownRelationshipParameters();
 
             invalidParameters.Lifestyle = null;
 
             // Act
-            Action action = () => CreateKnownDependency(invalidParameters);
+            Action action = () => CreateKnownRelationship(invalidParameters);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("lifestyle", action);
@@ -79,18 +79,65 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_WithNullChildRegistration_ThrowsExpectedException()
         {
             // Arrange
-            var invalidParameters = ValidKnownDependencyParameters();
+            var invalidParameters = ValidKnownRelationshipParameters();
 
             invalidParameters.Dependency = null;
 
             // Act
-            Action action = () => CreateKnownDependency(invalidParameters);
+            Action action = () => CreateKnownRelationship(invalidParameters);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("dependency", action);
         }
 
-        private static KnownRelationship CreateKnownDependency(KnownDependencyConstructorParameters paramaters)
+        [TestMethod]
+        public void Equals_ComparedWithNull_ReturnsFalse()
+        {
+            // Arrange
+            var relationship = CreateValidKnownRelationship();
+
+            // Act
+            bool result = relationship.Equals(null);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Equals_ComparedWithSameInstance_ReturnsTrue()
+        {
+            // Arrange
+            var relationship = CreateValidKnownRelationship();
+
+            // Act
+            bool result = relationship.Equals(relationship);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void Equals_ComparedWithOtherObjectWithSameContent_ReturnsTrue()
+        {
+            // Arrange
+            var parameters = ValidKnownRelationshipParameters();
+
+            var relationship = CreateKnownRelationship(parameters);
+            var anotherRelationshipWithSameContent = CreateKnownRelationship(parameters);
+            
+            // Act
+            bool result = relationship.Equals(anotherRelationshipWithSameContent);
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+
+        private static KnownRelationship CreateValidKnownRelationship()
+        {
+            return CreateKnownRelationship(ValidKnownRelationshipParameters());
+        }
+
+        private static KnownRelationship CreateKnownRelationship(KnownDependencyConstructorParameters paramaters)
         {
             return new KnownRelationship(
                 implementationType: paramaters.ImplementationType,
@@ -98,7 +145,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
                 dependency: paramaters.Dependency);
         }
 
-        private static KnownDependencyConstructorParameters ValidKnownDependencyParameters()
+        private static KnownDependencyConstructorParameters ValidKnownRelationshipParameters()
         {
             return new KnownDependencyConstructorParameters
             {

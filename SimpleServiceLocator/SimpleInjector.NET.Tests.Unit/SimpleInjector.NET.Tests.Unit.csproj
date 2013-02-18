@@ -76,13 +76,14 @@
     <Compile Include="Advanced\DefaultConstructorResolutionBehaviorTests.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehaviorTests.cs" />
     <Compile Include="AmbiguousTypesTests.cs" />
+    <Compile Include="ContainerTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
     <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\TypeGeneralizerTests.cs" />
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
-    <Compile Include="Diagnostics\KnownDependencyTests.cs" />
+    <Compile Include="Advanced\KnownRelationshipTests.cs" />
     <Compile Include="Diagnostics\LifestyleMismatchServicesTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />

@@ -76,8 +76,6 @@ namespace SimpleInjector
             }
         }
 
-        // TODO: Instead of registering Lifestyle and Expression, we might simplify things by allowing
-        // a Registration to be registered.
         /// <summary>Gets or sets the current lifestyle of the registration.</summary>
         /// <value>The original lifestyle of the registration.</value>
         public Lifestyle Lifestyle
@@ -96,8 +94,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// The list of currently known relationships. This information is used by the Diagnostics Debug View.
+        /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
+        /// Debug View. Change the contents of this collection to represent the changes made to the
+        /// <see cref="ExpressionBuiltEventArgs.Expression">Expression</see> property (if any). This allows
+        /// the Diagnostics Debug View to analyse those new relationships as well.
         /// </summary>
-        public Collection<KnownRelationship> KnownRelationships { get; set; }
+        /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
+        public Collection<KnownRelationship> KnownRelationships { get; internal set; }
     }
 }
