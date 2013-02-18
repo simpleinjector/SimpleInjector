@@ -371,8 +371,8 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\Silverlight\SimpleInjector.Extensions.Silverlight Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\lib\sl30\SimpleInjector.Extensions.dll
-copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\lib\sl30\SimpleInjector.Extensions.xml
+REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\lib\sl30\SimpleInjector.Extensions.dll
+REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\lib\sl30\SimpleInjector.Extensions.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {version} %named_version_Extensions%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7ed90488e5714295854ab251e2959afe.psmdcp {version} %named_version_Extensions%
