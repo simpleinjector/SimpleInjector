@@ -72,7 +72,7 @@
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
     <Compile Include="ExpirationExtensionsTests.cs" />
-    <Compile Include="ExplicitPropertyInjectionExtensionsTests.cs" />
+    <Compile Include="PropertyInjectionExtensionsTests.cs" />
     <Compile Include="InterceptorExtensionsTests.cs" />
     <Compile Include="MostParametersConstructorResolutionBehaviorTests.cs" />
     <Compile Include="MostResolvableParametersConstructorResolutionBehaviorTests.cs" />

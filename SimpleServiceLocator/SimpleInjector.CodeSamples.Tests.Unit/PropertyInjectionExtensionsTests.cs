@@ -4,7 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class ExplicitPropertyInjectionExtensionsTests
+    public class PropertyInjectionExtensionsTests
     {
         public interface ILogger
         {
@@ -149,6 +149,55 @@
             Assert.AreEqual(
                 typeof(ServiceWithAttributedProperties).Name,
                 ((ContextualLogger)service.Logger1).Context.ImplementationType.Name);
+        }
+
+        [TestMethod]
+        public void AutowireProperty_OnSingleProperty_InjectsThatPropertyAndNothingElse()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.EnablePropertyAutowiring();
+
+            container.Register<ILogger, Logger>();
+
+            container.Register<ServiceWithAttributedProperties>();
+
+            // Act
+            container.AutowireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
+
+            // Assert
+            var service = container.GetInstance<ServiceWithAttributedProperties>();
+
+            Assert.IsNotNull(service.Logger1);
+
+            Assert.IsNull(service.Logger2);
+            Assert.IsNull(service.Logger3);
+            Assert.IsNull(service.Logger4);
+            Assert.IsNull(service.Logger5);
+            Assert.IsNull(service.Logger6);
+            Assert.IsNull(service.Logger7);
+        }
+        
+        [TestMethod]
+        public void AutowireProperty_WithoutACallToEnablePropertyAutowiring_ThrowException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.AutowireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
+
+                // Assert
+                Assert.Fail("Expected exception.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(
+                    ex.Message.Contains("Please call container.Options.EnablePropertyAutowiring() first."));
+            }
         }
 
         public sealed class Inject1Attribute : Attribute

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -11,6 +12,42 @@
 
     public static class PropertyInjectionExtensions
     {
+        private static readonly object registrationsKey = new object();
+
+        [DebuggerStepThrough]
+        public static void EnablePropertyAutowiring(this ContainerOptions options)
+        {
+            EnsureNoRegistrationsHaveBeenMade(options);
+
+            if (options.Container.GetItem(registrationsKey) != null)
+            {
+                throw new InvalidOperationException("EnablePropertyAutowiring should be called just once.");
+            };
+
+            var registrations = new PropertyRegistrations();
+
+            options.Container.SetItem(registrationsKey, registrations);
+
+            // Enable auto-wiring on properties using the PropertyRegistrations.
+            options.AutowireProperties(registrations.WireType, registrations.WireProperty);
+        }
+
+        [DebuggerStepThrough]
+        public static void AutowireProperty<TImplementation>(this Container container,
+            Expression<Func<TImplementation, object>> propertySelector)
+        {
+            var selectedProperty = (PropertyInfo)((MemberExpression)propertySelector.Body).Member;
+
+            if (container.IsLocked())
+            {
+                throw new InvalidOperationException(
+                    "New registrations can't be made after the container was locked.");
+            }
+
+            container.GetPropertyRegistrations().AddProperty(typeof(TImplementation), selectedProperty);
+        }
+        
+        [DebuggerStepThrough]
         public static void AutowireProperties<TAttribute>(this ContainerOptions options)
             where TAttribute : Attribute
         {
@@ -20,12 +57,14 @@
             AutowireProperties(options, propertyFilter);
         }
 
+        [DebuggerStepThrough]
         public static void AutowireProperties(this ContainerOptions options,
             Predicate<PropertyInfo> propertyFilter)
         {
             AutowireProperties(options, type => true, propertyFilter);
         }
-        
+
+        [DebuggerStepThrough]
         public static void AutowireProperties(this ContainerOptions options, 
             Predicate<Type> typeFilter, Predicate<PropertyInfo> propertyFilter)
         {
@@ -61,6 +100,7 @@
             options.Container.ExpressionBuilding += helper.ExpressionBuilding;
         }
 
+        [DebuggerStepThrough]
         private static void EnsureNoRegistrationsHaveBeenMade(ContainerOptions options)
         {
             try
@@ -72,6 +112,46 @@
             {
                 throw new InvalidOperationException(
                     "This method must be called before any registration has been made to the container.");
+            }
+        }
+
+        [DebuggerStepThrough]
+        private static PropertyRegistrations GetPropertyRegistrations(this Container container)
+        {
+            var registrations = (PropertyRegistrations)container.GetItem(registrationsKey);
+
+            if (registrations == null)
+            {
+                throw new InvalidOperationException(
+                    "Please call container.Options.EnablePropertyAutowiring() first.");
+            }
+
+            return registrations;
+        }
+
+        private sealed class PropertyRegistrations
+        {
+            private readonly HashSet<Type> types = new HashSet<Type>();
+            private readonly HashSet<PropertyInfo> properties = new HashSet<PropertyInfo>();
+
+            internal bool WireType(Type type)
+            {
+                return (
+                    from t in this.types
+                    where t.IsAssignableFrom(type)
+                    select t)
+                    .Any();
+            }
+
+            internal bool WireProperty(PropertyInfo property)
+            {
+                return this.properties.Contains(property);
+            }
+
+            internal void AddProperty(Type type, PropertyInfo selectedProperty)
+            {
+                this.types.Add(type);
+                this.properties.Add(selectedProperty);
             }
         }
 
