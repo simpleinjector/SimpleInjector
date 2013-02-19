@@ -36,7 +36,7 @@ namespace SimpleInjector
     using SimpleInjector.Integration.Wcf;
 
     /// <summary>
-    /// Extension methods for enabling lifetime scoping for the Simple Injector.
+    /// Extension methods for integrating Simple Injector with WCF services.
     /// </summary>
     public static class SimpleInjectorWcfExtensions
     {

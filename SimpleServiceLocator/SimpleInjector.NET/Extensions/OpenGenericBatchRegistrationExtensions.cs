@@ -32,7 +32,7 @@ namespace SimpleInjector.Extensions
     using System.Reflection;
 
     /// <summary>
-    /// Represents the method that will called to register one or multiple concrete. non-generic
+    /// Represents the method that will called to register one or multiple concrete non-generic
     /// <paramref name="implementations"/> of the given closed generic type 
     /// <paramref name="closedServiceType"/>.
     /// </summary>
@@ -70,6 +70,7 @@ namespace SimpleInjector.Extensions
 
 #if !SILVERLIGHT
     /// <summary>Defines the accessibility of the types to search.</summary>
+    /// <remarks>This type is not available in Silverlight.</remarks>
     public enum AccessibilityOption
 #else
     internal enum AccessibilityOption
@@ -140,6 +141,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a transient lifetime.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -166,6 +168,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a transient lifetime.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -242,6 +245,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -270,6 +274,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -357,6 +362,7 @@ namespace SimpleInjector.Extensions
         /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -388,6 +394,7 @@ namespace SimpleInjector.Extensions
         /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation of the given <paramref name="openGenericServiceType"/>.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -465,6 +472,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
@@ -490,6 +498,7 @@ namespace SimpleInjector.Extensions
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
+        /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>

@@ -36,8 +36,8 @@ namespace SimpleInjector
 
     /// <summary>
     /// Instances returned from the container can be cached. The <see cref="Container"/> contains several
-    /// overloads of the <b>Register</b> method that take an <b>Lifestyle</b> as argument to define how
-    /// returned instances should be cached. The core library contains two lifestyles out of the box. By
+    /// overloads of the <b>Register</b> method that take a <b>Lifestyle</b> instance as argument to define 
+    /// how returned instances should be cached. The core library contains two lifestyles out of the box. By
     /// supplying <see cref="Lifestyle.Transient">Lifestyle.Transient</see>, the registered instance is not
     /// cached; a new instance is returned every time it is requested or injected. By supplying
     /// <see cref="Lifestyle.Singleton">Lifestyle.Singleton</see> instances can be cached indefinately; only

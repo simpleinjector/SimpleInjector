@@ -29,13 +29,15 @@ namespace SimpleInjector
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq.Expressions;
+
     using SimpleInjector.Advanced;
 
     /// <summary>
     /// Provides data for and interaction with the 
     /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event of 
     /// the <see cref="Container"/>. An observer can change the 
-    /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the registered type.
+    /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the component that is currently 
+    /// being built. 
     /// </summary>
     [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: " + 
         "{SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]

@@ -30,11 +30,11 @@ namespace SimpleInjector.Integration.Web
     using System.Web;
 
     using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single HTTP Web Request.
-    /// Instances created by this lifestyle can be disposed when the web request ends. 
+    /// Unless explicitly stated otherwise, instances created by this lifestyle will be disposed at the end
+    /// of the web request.
     /// </summary>
     /// <example>
     /// The following example shows the usage of the <b>WebRequestLifestyle</b> class:

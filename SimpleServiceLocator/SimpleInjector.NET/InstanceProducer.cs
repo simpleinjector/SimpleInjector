@@ -33,7 +33,11 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
 
-    /// <summary>Produces instances for a given registration.</summary>
+    /// <summary>
+    /// Produces instances for a given registration. Instances of this type are generally created by the
+    /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
+    /// <see cref="Container.GetCurrentRegistrations"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
+    /// </summary>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay(
         "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
