@@ -37,15 +37,16 @@
     <HelpAttributes />
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="True">The SimpleInjector.Extensions namespace contains extension methods for more advanced scenarios such as registering open generic types, batch registration and registration of decorators.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the Lifetime Scope lifestyle. This lifestyle alows users to explicitly begin and end a scope for the current thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web appliactions.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="True">The SimpleInjector.Extensions namespace contains extension methods for more advanced scenarios such as registering open generic types, batch registration and registration of decorators.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the Lifetime Scope lifestyle. This lifestyle alows users to explicitly begin and end a scope for the current thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web appliactions.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
@@ -65,7 +66,7 @@
     <CppCommentsFixup>False</CppCommentsFixup>
     <CleanIntermediates>True</CleanIntermediates>
     <SyntaxFilters>CSharp, VisualBasic</SyntaxFilters>
-    <SdkLinkTarget>Self</SdkLinkTarget>
+    <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>False</RootNamespaceContainer>
     <PresentationStyle>VS2010</PresentationStyle>
     <Preliminary>False</Preliminary>
@@ -78,6 +79,7 @@
     <IncludeFavorites>False</IncludeFavorites>
     <BinaryTOC>True</BinaryTOC>
     <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, ProtectedInternalAsProtected, SealedProtected</VisibleItems>
+    <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional

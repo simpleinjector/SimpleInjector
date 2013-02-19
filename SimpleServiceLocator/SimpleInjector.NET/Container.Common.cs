@@ -26,27 +26,35 @@
 namespace SimpleInjector
 {
     using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using SimpleInjector.Diagnostics;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading;
+
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
     /// <remarks>
-    /// <b>Thread-safety:</b> It is safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
+    /// <para>
+    /// <b>Thread-safety:</b>
+    /// Resolving instances can be done safely from multiple threads concurrently, but registration needs to
+    /// be done from one single thread.
+    /// </para>
+    /// <para> 
+    /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
     /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(Type)"/> and
-    /// <see cref="GetCurrentRegistrations"/> from multiple thread concurrently, but it is <b>unsafe</b> to 
-    /// call any of the <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
+    /// <see cref="GetCurrentRegistrations"/> and anything related to resolving instances from multiple thread 
+    /// concurrently. It is however <b>unsafe</b> to call
+    /// <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
     /// <see cref="ExpressionBuilding"/>, <see cref="ExpressionBuilt"/>, <see cref="ResolveUnregisteredType"/>,
-    /// <see cref="AddRegistration"/> or anything related to registering concurrently. Registration must be 
-    /// done in one single thread.
+    /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
+    /// </para>
     /// </remarks>
 #if !SILVERLIGHT
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
@@ -257,7 +265,14 @@ using SimpleInjector.Diagnostics;
 
             lock (this.items)
             {
-                this.items[key] = item;
+                if (item == null)
+                {
+                    this.items.Remove(key);
+                }
+                else
+                {
+                    this.items[key] = item;
+                }
             }
         }
 

@@ -220,6 +220,11 @@ echo ONLINE DOCUMENTATION
 
 del Help\SimpleInjector.chm
 del Help\*.aspx
+del Help\*.php
+copy Help\Index.html Help\index.tmp
+del Help\Index.html
+copy Help\index.tmp Help\index.htm
+del Help\index.tmp
 %compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
 
 
