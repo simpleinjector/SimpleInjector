@@ -87,6 +87,47 @@ namespace SimpleInjector.Advanced
             return container.GetInitializer<TService>();
         }
 
+        /// <summary>
+        /// Retrieves an item from the container stored by the given <paramref name="key"/> or null when no
+        /// item is stored by that key.
+        /// </summary>
+        /// <remarks>
+        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// percausions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
+        /// </remarks>
+        /// <param name="container">The container.</param>
+        /// <param name="key">The key of the item to retrieve.</param>
+        /// <returns>The stored item or null (Nothing in VB).</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        public static object GetItem(this Container container, object key)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(key, "key");
+
+            return container.GetItem(key);
+        }
+
+        /// <summary>
+        /// Stores an item by the given <paramref name="key"/> in the container. 
+        /// </summary>
+        /// <remarks>
+        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// percausions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
+        /// </remarks>
+        /// <param name="container">The container.</param>
+        /// <param name="key">The key of the item to insert or override.</param>
+        /// <param name="item">The actual item. May be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or
+        /// <paramref name="key"/> is a null reference (Nothing in VB).</exception>
+        public static void SetItem(this Container container, object key, object item)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(key, "key");
+
+            container.SetItem(key, item);
+        }
+
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)
         {
             foreach (var parameter in constructor.GetParameters())
