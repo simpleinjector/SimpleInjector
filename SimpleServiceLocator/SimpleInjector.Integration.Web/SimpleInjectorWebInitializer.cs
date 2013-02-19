@@ -23,7 +23,7 @@
 */
 #endregion
 
-// This attribute will ensure that ASP.NET will call the SimpleInjectorWebInitializer.Initailze method on
+// This attribute will ensure that ASP.NET will call the SimpleInjectorWebInitializer.Initialize method on
 // AppDomain startup.
 [assembly: System.Web.PreApplicationStartMethod(
     typeof(SimpleInjector.Integration.Web.SimpleInjectorWebInitializer),
