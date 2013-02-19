@@ -12,7 +12,7 @@
         public void GetRegistration_Always_LocksTheContainer1()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetRegistration(typeof(ITimeProvider));
 
@@ -37,7 +37,7 @@
         public void GetRegistration_Always_LocksTheContainer2()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetRegistration(typeof(ITimeProvider), throwOnFailure: false);
 
@@ -62,7 +62,7 @@
         public void GetRegistration_Always_LocksTheContainer3()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -94,7 +94,7 @@
         public void GetRegistration_TransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider, RealTimeProvider>();
 
@@ -109,7 +109,7 @@
         public void GetRegistration_TransientConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<RealTimeProvider>();
 
@@ -124,7 +124,7 @@
         public void GetRegistration_FuncTransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider>(() => new RealTimeProvider());
 
@@ -139,7 +139,7 @@
         public void GetRegistration_ImplicitlyRegisteredTransientInstance_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetInstance<RealTimeProvider>();
 
@@ -154,7 +154,7 @@
         public void GetRegistration_SingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
@@ -169,7 +169,7 @@
         public void GetRegistration_SingleConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<RealTimeProvider>();
 
@@ -184,7 +184,7 @@
         public void GetRegistration_FuncSingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider>(() => new RealTimeProvider());
 
@@ -199,7 +199,7 @@
         public void GetRegistration_SingleInstanceRegisteredByObject_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider>(new RealTimeProvider());
 
@@ -214,7 +214,7 @@
         public void GetRegistration_InstanceResolvedUsingUnregisteredTypeResolution_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (sender, e) =>
             {
@@ -234,7 +234,7 @@
         public void GetRegistration_OnUnregisteredUnconstructableType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(IDisposable));
@@ -247,7 +247,7 @@
         public void GetRegistrationDontThrowOnFailure_OnUnregisteredUnconstructableType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(IDisposable), throwOnFailure: false);
@@ -260,7 +260,7 @@
         public void GetRegistrationDoThrowOnFailure_OnUnregisteredUnconstructableType_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -280,7 +280,7 @@
         public void GetRegistration_OnOnregisteredString_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(string));
@@ -293,7 +293,7 @@
         public void GetRegistration_OnValueType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(int));
@@ -306,7 +306,7 @@
         public void GetRegistration_OnInvalidUnregisteredType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(ServiceWithUnregisteredDependencies));
@@ -319,7 +319,7 @@
         public void GetRegistration_OnInvalidButRegisteredType_ReturnsThatRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
@@ -335,7 +335,7 @@
         public void GetRegistration_OnOpenGenericType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(typeof(IEnumerable<>));
@@ -348,7 +348,7 @@
         public void GetRegistration_DeeplyNestedGenericTypeWithInternalConstructor_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration = container.GetRegistration(

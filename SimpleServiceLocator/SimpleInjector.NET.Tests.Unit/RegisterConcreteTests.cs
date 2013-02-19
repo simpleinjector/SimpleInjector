@@ -11,7 +11,7 @@
         public void Register_RegisteringAConcreteType_ReturnAnInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => new SqlUserRepository());
 
             // Act
@@ -27,7 +27,7 @@
         public void Register_RegisteringAConcreteType_AlwaysReturnsANewInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => new SqlUserRepository());
 
             // Act
@@ -46,7 +46,7 @@
             // Arrange
             string expectedMessage = typeof(IUserRepository).Name + " is not a concrete type.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -71,7 +71,7 @@
                 type. Please use one of the other overloads to register this type.
                 ".TrimInside();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -92,7 +92,7 @@
             // Arrange
             string expectedParameterName = "TConcrete";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -111,7 +111,7 @@
         public void Register_WithIncompleteSingletonRegistration_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // RealUserService is dependant on IUserRepository.
             container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
@@ -126,7 +126,7 @@
         public void RegisterConcrete_ValidArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.Register(typeof(SqlUserRepository));
@@ -142,7 +142,7 @@
         public void RegisterConcrete_NullConcrete_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidConcrete = null;
 
@@ -154,7 +154,7 @@
         public void RegisterConcrete_ConcreteIsNotAConstructableType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidConcrete = typeof(ServiceImplWithTwoConstructors);
 

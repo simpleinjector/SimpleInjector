@@ -54,7 +54,7 @@
         public void RegisterOpenGeneric_WithValidArguments_ReturnsExpectedTypeOnGetInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
@@ -69,7 +69,7 @@
         public void RegisterOpenGeneric_WithConcreteType_ReturnsExpectedTypeOnGetInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterOpenGeneric(typeof(ServiceImpl<,>), typeof(ServiceImpl<,>));
@@ -84,7 +84,7 @@
         public void RegisterOpenGeneric_WithValidArguments_ReturnsNewInstanceOnEachRequest()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
@@ -100,7 +100,7 @@
         public void RegisterOpenGeneric_WithValidArguments_RespectsGivenLifestyle1()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Transient);
 
@@ -116,7 +116,7 @@
         public void RegisterOpenGeneric_WithValidArguments_RespectsGivenLifestyle2()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
@@ -133,7 +133,7 @@
         public void RegisterOpenGeneric_WithClosedServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
@@ -144,7 +144,7 @@
         public void RegisterOpenGeneric_WithClosedImplementation_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
@@ -155,7 +155,7 @@
         public void RegisterOpenGeneric_WithNonRelatedTypes_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(Func<,>));
@@ -167,7 +167,7 @@
         public void GetInstance_WithDependedRegisterOpenGenericRegistrations_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
             container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
@@ -185,7 +185,7 @@
         public void RegisterSingleOpenGeneric_WithValidArguments_ReturnsExpectedTypeOnGetInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
@@ -200,7 +200,7 @@
         public void RegisterSingleOpenGeneric_WithValidArguments_ReturnsNewInstanceOnEachRequest()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
@@ -217,7 +217,7 @@
         public void RegisterSingleOpenGeneric_WithClosedServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingleOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
@@ -228,7 +228,7 @@
         public void RegisterSingleOpenGeneric_WithClosedImplementation_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
@@ -239,7 +239,7 @@
         public void RegisterSingleOpenGeneric_WithNonRelatedTypes_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(Func<,>));
@@ -249,7 +249,7 @@
         public void GetInstance_WithDependedRegisterSingleOpenGenericRegistrations_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
             container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
@@ -267,7 +267,7 @@
         public void GetInstance_CalledOnMultipleClosedImplementationsOfTypeRegisteredWithRegisterSingleOpenGeneric_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
 
@@ -280,7 +280,7 @@
         public void GetInstance_OnUnregisteredNonGenericConcreteTypeWithRegisterOpenGenericRegistration_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // RegisterOpenGeneric registers the ResolveUnregisteredType and this event will get raised before
             // trying to resolve an unregistered concrete type. Therefore it is important to check whether
@@ -296,7 +296,7 @@
         public void GetRegistration_TypeSatisfyingGenericWhereConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
 
@@ -314,7 +314,7 @@
         public void GetRegistration_TypeNotSatisfyingGenericWhereConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
 
@@ -330,7 +330,7 @@
         public void GetRegistration_TypeSatistyingGenericWhereConstraintWithStruct_ReturnsExpectedProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
 
@@ -351,7 +351,7 @@
         public void GetRegistration_TypeSatisfyingGenericNewConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
@@ -369,7 +369,7 @@
         public void GetRegistration_TypeNotSatisfyingGenericNewConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
@@ -385,7 +385,7 @@
         public void GetRegistration_TypeSatisfyingGenericClassConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
 
@@ -403,7 +403,7 @@
         public void GetRegistration_TypeNotSatisfyingGenericClassConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
 
@@ -419,7 +419,7 @@
         public void GetRegistration_TypeSatisfyingGenericStructConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
@@ -437,7 +437,7 @@
         public void GetRegistration_TypeNotSatisfyingGenericStructConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
@@ -453,7 +453,7 @@
         public void GetRegistration_TypeNotSatisfyingGenericStructConstraint2_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
@@ -471,7 +471,7 @@
         public void GetRegistration_TypeSatisfyingTrickyGenericConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
 
@@ -489,7 +489,7 @@
         public void GetRegistration_TypeNotSatisfyingTrickyGenericConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
 
@@ -504,7 +504,7 @@
         public void GetRegistration_TypeSatisfyingNastyGenericConstraint_ReturnsInstanceProducer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
 
@@ -523,7 +523,7 @@
         public void GetRegistration_TypeNotSatisfyingNastyGenericConstraint_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
 
@@ -539,7 +539,7 @@
         public void GetInstance_RegisterOpenGenericWithImplementationWithTypeArgumentsSwapped_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithTypesArgsSwapped<,>));
 
@@ -554,7 +554,7 @@
         public void GetRegistration_RegisterOpenGenericWithImplementationWithTypeArgumentThatHasNoMapping_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
 
@@ -570,7 +570,7 @@
         public void GetInstance_RegisterOpenGenericWithImplementationThatContainsTypeArgumentInConstraint_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // NOTE: Foo<T1, T2> contains the constraint 'where T1 : IBar<T2>'.
             container.RegisterOpenGeneric(typeof(IFoo<>), typeof(Foo<,>));
@@ -587,7 +587,7 @@
         public void RegisterOpenGeneric_ImplementationWithMultipleConstructors_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -611,7 +611,7 @@
         public void RegisterSingleOpenGeneric_ImplementationWithMultipleConstructors_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -635,7 +635,7 @@
         public void GetInstance_RegisterOpenGenericWithRegistrationWithMissingDependency_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
             container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
@@ -667,7 +667,7 @@
         public void GetInstance_RegisterSingleOpenGenericWithRegistrationWithMissingDependency_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
             container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
@@ -701,7 +701,7 @@
         public void GetInstance_OnInternalTypeRegisteredAsOpenGeneric_ThrowsDescriptiveExceptionMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(InternalEventHandler<>));
 

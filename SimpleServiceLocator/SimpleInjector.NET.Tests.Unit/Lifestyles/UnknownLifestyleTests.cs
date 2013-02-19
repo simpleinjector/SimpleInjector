@@ -44,7 +44,7 @@ namespace SimpleInjector.Tests.Unit.Lifestyles
         public void CreateRegistrationTServiceTImplementation_Always_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -65,7 +65,7 @@ namespace SimpleInjector.Tests.Unit.Lifestyles
         public void CreateRegistrationTService_Always_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {

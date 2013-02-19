@@ -35,6 +35,7 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
     
     /// <summary>
     /// Helper methods for the container.
@@ -211,8 +212,12 @@ namespace SimpleInjector
             return castedCollection;
         }
 
-        internal static Func<object> CompileExpression(Container container, Expression expression)
+        [System.Security.SecuritySafeCritical]
+        internal static Func<object> CompileExpression(Container container, Expression expression,
+            out object createdInstance)
         {
+            createdInstance = null;
+
             var constantExpression = expression as ConstantExpression;
 
             // Skip compiling if all we need to do is return a singleton.
@@ -223,16 +228,16 @@ namespace SimpleInjector
 
             // Skip optimization in the Silverlight sandbox. Low memory use is much more important in this
             // environment.
-#if !SILVERLIGHT
             // In the common case, the developer will/should only create a single container during the 
             // lifetime of the application (this is the recommended approach). In this case, we can optimize
             // the perf by compiling delegates in an dynamic assembly. We can't do this when the developer 
             // creates many containers, because this will create a memory leak (dynamic assemblies are never 
             // unloaded). We might however relax this constraint and optimize the first N container instances.
             // (where N is configurable)
-            if (container.IsFirst)
+#if !SILVERLIGHT
+            if (container.IsFirst && !ExpressionNeedsAccessToInternals(expression))
             {
-                return CompileOptimizedWithFallback(expression);
+                return CompileOptimizedWithFallback(expression, out createdInstance);
             }
 #endif
             return CompileUnoptimized(expression);
@@ -299,30 +304,26 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileOptimizedWithFallback(Expression expression)
+        private static Func<object> CompileOptimizedWithFallback(Expression expression, 
+            out object createdInstance)
         {
-            Func<object> fastDelete = CompileOptimized(expression);
-            Func<object> fallbackDelegate = null;
+            createdInstance = null;
 
-            return () =>
+            try
             {
-                if (fallbackDelegate != null)
-                {
-                    return fallbackDelegate();
-                }
+                var @delegate = CompileOptimized(expression);
 
-                try
-                {
-                    return fastDelete();
-                }
-                catch
-                {
-                    // Sometimes the execution of a dynamic assembly delegate fails. In that case we must
-                    // fallback to the unoptimized behavior.
-                    fallbackDelegate = CompileUnoptimized(expression);
-                    return fallbackDelegate();
-                }
-            };
+                // Test the creation. Since we're using a dynamically created assembly, we can't create every
+                // delegate we can create using expression.Compile(), so we need to test this. We need to 
+                // store the created instance because we are not allowed to ditch that instance.
+                createdInstance = @delegate();
+
+                return @delegate;
+            }
+            catch
+            {
+                return CompileUnoptimized(expression);
+            }
         }
 
         private static Func<object> CompileOptimized(Expression expression)
@@ -399,6 +400,41 @@ namespace SimpleInjector
             constantFinder.Visit(expression);
 
             return constantFinder.Constants;
+        }
+
+        // This doesn't find all possible cases, but get's us close enough.
+        private static bool ExpressionNeedsAccessToInternals(Expression expression)
+        {
+            var visitor = new InternalUseFinderVisitor();
+            visitor.Visit(expression);
+            return visitor.NeedsAccessToInternals;
+        }
+
+        private sealed class InternalUseFinderVisitor : ExpressionVisitor
+        {
+            public bool NeedsAccessToInternals { get; private set; }
+            
+            protected override Expression VisitNew(NewExpression node)
+            {
+                this.MayAccessExpression(node.Constructor.IsPublic && node.Constructor.DeclaringType.IsPublic);
+
+                return base.VisitNew(node);
+            }
+
+            protected override Expression VisitMethodCall(MethodCallExpression node)
+            {
+                this.MayAccessExpression(node.Method.IsPublic && node.Method.DeclaringType.IsPublic);
+
+                return base.VisitMethodCall(node);
+            }
+
+            private void MayAccessExpression(bool mayAccess)
+            {
+                if (!mayAccess)
+                {
+                    this.NeedsAccessToInternals = true;
+                }
+            }
         }
 
         private sealed class ConstantFinderVisitor : ExpressionVisitor

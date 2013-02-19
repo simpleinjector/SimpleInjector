@@ -18,7 +18,7 @@
         public void RegisterInitializer_WithValidInitializer_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterInitializer<IUserRepository>(repistoryToInitialize => { });
@@ -29,7 +29,7 @@
         public void RegisterInitializer_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Action<IUserRepository> invalidInstanceInitializer = null;
 
@@ -43,7 +43,7 @@
             // Arrange
             bool initializerWasCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -63,7 +63,7 @@
             bool firstInitializerWasCalled = false;
             bool secondInitializerWasCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<IUserRepository>(repository => { firstInitializerWasCalled = true; });
             container.RegisterInitializer<IUserRepository>(repository => { secondInitializerWasCalled = true; });
@@ -81,7 +81,7 @@
         public void RegisterInitializer_CalledOnALockedContainer_ThrowsExceptedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This call locks the container
             container.GetInstance<PluginImpl>();
@@ -94,7 +94,7 @@
         public void GetInstance_OnUnregisteredTypeThatInheritsFromRegisteredServiceType_InitializesCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -112,7 +112,7 @@
         public void GetInstance_OnUnregisteredTypeWithDependency_InitializesDependencyCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -135,7 +135,7 @@
         public void GetInstance_OnUnregisteredTypeThatImplementsMultipleRegisteredServiceTypes_InitializesCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -162,7 +162,7 @@
         public void GetInstance_RegisteredSingletonThatInheritsFromRegisteredServiceType_InitializesCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ConcreteCommand>();
 
@@ -182,7 +182,7 @@
         public void GetInstance_OnUnregisteredTypeThatInheritsFromRegisteredServiceType_CallsInitializerForEachInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -203,7 +203,7 @@
             // Arrange
             int numberOfCalls = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ConcreteCommand>();
 
@@ -228,7 +228,7 @@
             // Arrange
             int actualNumberOfCalls = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(c => { actualNumberOfCalls++; });
 
@@ -253,7 +253,7 @@
             // Arrange
             bool initializerWasCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
@@ -274,7 +274,7 @@
             // Arrange
             bool initializerWasCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
@@ -297,7 +297,7 @@
             int expectedTimesDelegateGetsCalled = 4;
             int actualTimesDelegateGotCalled = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(c => { actualTimesDelegateGotCalled++; });
 
@@ -323,7 +323,7 @@
         {
             // Arrange
             bool delegateCalled = false;
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<CommandBase>(c => { delegateCalled = true; });
 
@@ -347,7 +347,7 @@
             int initializer2Index = 0;
             int initializer3Index = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<ICommand>(c => { initializer1Index = index++; });
             container.RegisterInitializer<ConcreteCommand>(c => { initializer3Index = index++; });

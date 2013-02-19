@@ -17,7 +17,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
@@ -40,7 +40,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository>(() => new SqlUserRepository(), hybrid);
 
@@ -67,7 +67,7 @@
 
             var hybrid = Lifestyle.Hybrid(selectTransient, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
@@ -87,7 +87,7 @@
 
             var hybrid = Lifestyle.Hybrid(selectSingleton, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
@@ -116,7 +116,7 @@
 
             var hybrid = Lifestyle.Hybrid(predicate, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
@@ -153,7 +153,7 @@
             
             var hybrid = Lifestyle.Hybrid(predicate, Lifestyle.Singleton, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
@@ -181,7 +181,7 @@
 
             var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ExpressionBuilding += (s, e) =>
             {
@@ -213,7 +213,7 @@
 
             var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ExpressionBuilt += (s, e) =>
             {
@@ -246,7 +246,7 @@
             // Arrange
             var expectedLifestyle = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var registration =
@@ -261,7 +261,7 @@
         public void Relationships_HybridRegistrationWithOneDependency_ReturnsThatDependencyWithExpectedLifestyle()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 

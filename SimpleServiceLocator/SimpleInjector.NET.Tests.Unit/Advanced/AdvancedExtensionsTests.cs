@@ -21,7 +21,7 @@
         public void GetInitializer_NoInitializerRegisteredForRequestedType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var initializer = AdvancedExtensions.GetInitializer<IDisposable>(container);
@@ -34,7 +34,7 @@
         public void GetInitializer_InitializerRegisteredForRequestedType_ReturnsADelegate()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<IDisposable>(d => { });
 
@@ -51,7 +51,7 @@
             // Arrange
             bool called = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<IDisposable>(d => { called = true; });
 
@@ -71,7 +71,7 @@
             bool called1 = false;
             bool called2 = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<IDisposable>(d => { called1 = true; });
             container.RegisterInitializer<IDisposable>(d => { called2 = true; });
@@ -92,7 +92,7 @@
             // Arrange
             object actualInstance = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<object>(d => { actualInstance = d; });
 

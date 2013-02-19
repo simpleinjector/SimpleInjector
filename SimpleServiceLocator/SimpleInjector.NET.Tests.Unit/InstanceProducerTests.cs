@@ -11,7 +11,7 @@
         public void GetInstance_Always_LocksTheContainer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var registration = container.GetRegistration(typeof(Container));
 
@@ -26,7 +26,7 @@
         public void BuildExpression_Always_LocksTheContainer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var registration = container.GetRegistration(typeof(Container));
 
@@ -42,7 +42,7 @@
         public void GetRelationships_AfterVerification_ReturnsTheExpectedRelationships()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 

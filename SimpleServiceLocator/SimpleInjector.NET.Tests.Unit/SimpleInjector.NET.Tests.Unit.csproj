@@ -57,6 +57,13 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -76,6 +83,7 @@
     <Compile Include="Advanced\DefaultConstructorResolutionBehaviorTests.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehaviorTests.cs" />
     <Compile Include="AmbiguousTypesTests.cs" />
+    <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
     <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />

@@ -11,7 +11,7 @@
         public void RegisterSingleByTypeNonGeneric_ValidRegistration_GetInstanceReturnsExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingle(typeof(IUserRepository), typeof(SqlUserRepository));
@@ -25,7 +25,7 @@
         public void RegisterSingleByTypeNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidServiceType = null;
 
@@ -38,7 +38,7 @@
         public void RegisterSingleByTypeNonGeneric_NullImplementationType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidImplementationType = null;
 
@@ -50,7 +50,7 @@
         public void RegisterSingleByTypeNonGeneric_ValidRegistration_GetInstanceAlwaysReturnsSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             object impl = new SqlUserRepository();
 
@@ -69,7 +69,7 @@
         public void RegisterSingleByTypeNonGeneric_InstanceThatDoesNotImplementServiceType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingle(typeof(IUserRepository), typeof(object));
@@ -79,7 +79,7 @@
         public void RegisterSingleByTypeNonGeneric_ImplementationIsServiceType_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingle(typeof(SqlUserRepository), typeof(SqlUserRepository));
@@ -89,7 +89,7 @@
         public void RegisterSingleByTypeNonGeneric_ImplementationIsServiceType_ImplementationCanBeResolvedByItself()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle(typeof(SqlUserRepository), typeof(SqlUserRepository));
 
@@ -101,7 +101,7 @@
         public void RegisterSingleByTypeNonGeneric_ImplementationIsServiceType_RegistersTheTypeAsSingleton()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle(typeof(SqlUserRepository), typeof(SqlUserRepository));
 
@@ -117,7 +117,7 @@
         public void RegisterSingleByTypeNonGeneric_OpenGenericServiceType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -138,7 +138,7 @@
         public void RegisterSingleByTypeNonGeneric_ValueTypeImplementation_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             try
             {
                 // Act

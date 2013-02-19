@@ -365,7 +365,7 @@
 
         private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child)
         {
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             return new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
@@ -375,7 +375,7 @@
 
         private class DummyRegistration : Registration
         {
-            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, new Container())
+            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, ContainerFactory.New())
             {
             }
 

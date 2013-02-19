@@ -20,7 +20,7 @@
         public void RegisterAllTService_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<IPlugin> plugins = null;
 
@@ -32,7 +32,7 @@
         public void GetInstance_TypeWithEnumerableAsConstructorArguments_InjectsExpectedTypes()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IPlugin>(new PluginImpl(), new PluginImpl(), new PluginImpl());
 
@@ -48,7 +48,7 @@
         public void GetInstance_EnumerableTypeRegisteredWithRegisterSingle_InjectsExpectedTypes()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IPlugin[] plugins = new IPlugin[] { new PluginImpl(), new PluginImpl(), new PluginImpl() };
 
@@ -67,7 +67,7 @@
         public void GetInstance_ConcreteTypeWithEnumerableArgumentOfUnregisteredType_InjectsZeroInstances()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
@@ -83,7 +83,7 @@
         public void RegisterSingle_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IPlugin>(new PluginImpl());
 
@@ -96,7 +96,7 @@
         public void Register_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IPlugin>(new PluginImpl());
 
@@ -109,7 +109,7 @@
         public void RegisterAll_WithEnumerableCalledAfterRegisterSingleWithSameType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
 
@@ -122,7 +122,7 @@
         public void RegisterAll_WithEnumerableCalledAfterRegisterWithSameType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
 
@@ -134,7 +134,7 @@
         public void GetAllInstances_ListRegisteredUsingEnumerable_ReturnsExpectedList()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<IUserRepository> repositoryToRegister = new IUserRepository[] 
             { 
@@ -156,7 +156,7 @@
         public void GetAllInstances_ListRegisteredUsingParams_ReturnsExpectedList()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new InMemoryUserRepository(), new SqlUserRepository());
 
@@ -172,7 +172,7 @@
         public void GetAllInstances_NoInstancesRegistered_ReturnsEmptyCollection()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var repositories = container.GetAllInstances<IUserRepository>();
@@ -189,7 +189,7 @@
         public void RegisterAll_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
@@ -202,7 +202,7 @@
         public void RegisterAll_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             var repositories = container.GetAllInstances<IUserRepository>();
             var count = repositories.Count();
 
@@ -215,7 +215,7 @@
         public void RegisterAllParamsT_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IUserRepository[] repositories = null;
 
@@ -228,7 +228,7 @@
         public void RegisterAllParamsType_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type[] repositoryTypes = null;
 
@@ -241,7 +241,7 @@
         public void RegisterAllIEnumerableT_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<IUserRepository> repositories = null;
 
@@ -254,7 +254,7 @@
         public void RegisterAllIEnumerableType_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<Type> repositoryTypes = null;
 
@@ -266,7 +266,7 @@
         public void RegisterAll_WithListOfTypes_ThrowsExpressiveExceptionExplainingAboutAmbiguity()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -294,7 +294,7 @@
         public void RegisterAll_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             var repositories = new IUserRepository[] { new InMemoryUserRepository(), new SqlUserRepository() };
             container.RegisterAll<IUserRepository>(repositories);
 
@@ -306,7 +306,7 @@
         public void GetAllInstancesNonGeneric_WithoutAnRegistration_ReturnsAnEmptyCollection()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var repositories = container.GetAllInstances(typeof(IUserRepository));
@@ -319,7 +319,7 @@
         public void GetAllInstancesNonGeneric_WithValidRegistration_ReturnsCollectionWithExpectedElements()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new InMemoryUserRepository(), new SqlUserRepository());
 
@@ -339,7 +339,7 @@
             string expectedMessage =
                 "The registered delegate for type IEnumerable<IUserRepository> returned null.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Func<IEnumerable<IUserRepository>> invalidDelegate = () => null;
 
@@ -363,7 +363,7 @@
         public void GetAllInstances_WithArrayRegistered_DoesNotReturnAnArray()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() });
 
@@ -378,7 +378,7 @@
         public void GetAllInstances_WithArrayRegistered_DoesNotAllowChangesToTheOriginalArray()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var repositories = new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() };
 
@@ -397,7 +397,7 @@
         public void GetAllInstances_WithListRegistered_DoesNotReturnAnArray()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new List<IUserRepository> { new SqlUserRepository(), new InMemoryUserRepository() });
 
@@ -412,7 +412,7 @@
         public void GetAllInstances_WithCollectionRegistered_DoesNotReturnAnArray()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new Collection<IUserRepository> { new SqlUserRepository(), new InMemoryUserRepository() });
 
@@ -427,7 +427,7 @@
         public void GetAllInstances_WithArray_ReturnsSameInstanceOnEachCall()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() });
 
@@ -444,7 +444,7 @@
         public void GetInstance_OnATypeThatDependsOnACollectionThatIsRegisteredWithRegisterByFunc_CollectionShouldNotBeTreatedAsASingleton()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<IPlugin> left = new LeftEnumerable<IPlugin>();
             IEnumerable<IPlugin> right = new RightEnumerable<IPlugin>();
@@ -472,7 +472,7 @@
         public void GetInstance_OnATypeThatDependsOnACollectionThatIsNotRegistered_SameInstanceInjectedEachTime()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             // PluginContainer depends on IEnumerable<IPlugin>
@@ -490,7 +490,7 @@
         public void RegisterAllTService_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
@@ -500,7 +500,7 @@
         public void RegisterAll_WithOpenGenericType_FailsWithExpectedExceptionMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -522,7 +522,7 @@
             // Arrange
             var instance = new SqlUserRepository();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll(typeof(IUserRepository), new IUserRepository[] { instance });
@@ -540,7 +540,7 @@
             // Arrange
             var instance = new SqlUserRepository();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll(typeof(IUserRepository), new object[] { instance });
@@ -558,7 +558,7 @@
             // Arrange
             var instance = new SqlUserRepository();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll(typeof(IUserRepository), new SqlUserRepository[] { instance });
@@ -574,7 +574,7 @@
         public void RegisterAll_WithValidListOfTypes_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             // IServiceEx is a valid registration, because it could be registered.
@@ -587,7 +587,7 @@
             // Arrange
             IEnumerable<Type> types = new[] { typeof(SqlUserRepository) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll<IUserRepository>(types);
@@ -599,7 +599,7 @@
             // Arrange
             Type[] types = new[] { typeof(SqlUserRepository) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterAll<IUserRepository>(types);
@@ -609,7 +609,7 @@
         public void GetAllInstances_RegisteringValidListOfTypesWithRegisterAll_ReturnsExpectedList()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<IUserRepository>(new[] { typeof(SqlUserRepository) });
 
@@ -629,7 +629,7 @@
             // Arrange
             string expectedMessage = "The supplied type IDisposable does not implement IUserRepository.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -652,7 +652,7 @@
         public void RegisterAll_RegisteringATypeThatEqualsTheRegisteredServiceType_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 

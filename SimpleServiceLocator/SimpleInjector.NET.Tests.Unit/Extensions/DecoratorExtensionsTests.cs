@@ -40,7 +40,7 @@
         public void GetInstance_OnDecoratedNonGenericType_ReturnsTheDecoratedService()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<INonGenericService, RealNonGenericService>();
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
@@ -60,7 +60,7 @@
         public void GetInstance_OnDecoratedNonGenericSingleton_ReturnsTheDecoratedService()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<INonGenericService, RealNonGenericService>();
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
@@ -80,7 +80,7 @@
         public void GetInstance_SingleInstanceWrappedByATransientDecorator_ReturnsANewDecoratorEveryTime()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<INonGenericService, RealNonGenericService>();
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
@@ -100,7 +100,7 @@
         public void GetInstance_OnDecoratedNonGenericType_DecoratesInstanceWithExpectedLifeTime()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register as transient
             container.Register<INonGenericService, RealNonGenericService>();
@@ -119,7 +119,7 @@
         public void RegisterDecorator_RegisteringAnOpenGenericDecoratorWithANonGenericService_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -144,7 +144,7 @@
         public void GetInstance_OnNonGenericTypeDecoratedWithGenericDecorator_ReturnsTheDecoratedService()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<INonGenericService, RealNonGenericService>();
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator<int>));
@@ -166,7 +166,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
@@ -183,7 +183,7 @@
         public void GetInstance_WithExplicitGenericImplementionRegisteredAsDecoratorThatMatchesTheRequestedService1_ReturnsTheDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -206,7 +206,7 @@
                 type."
                 .TrimInside();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -230,7 +230,7 @@
         public void GetInstance_WithExplicitGenericImplementionRegisteredAsDecoratorThatMatchesTheRequestedService2_ReturnsTheDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -249,7 +249,7 @@
         public void GetInstance_WithExplicitGenericImplementionRegisteredAsDecoratorThatDoesNotMatchTheRequestedService1_ReturnsTheServiceItself()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -268,7 +268,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -285,7 +285,7 @@
         public void GetInstance_NonGenericDecoratorForMatchingClosedGenericServiceType_ReturnsTheNonGenericDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
@@ -305,7 +305,7 @@
         public void GetInstance_NonGenericDecoratorForNonMatchingClosedGenericServiceType_ThrowsAnException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type nonMathcingClosedGenericServiceType = typeof(ICommandHandler<int>);
 
@@ -334,7 +334,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(logger);
 
@@ -355,7 +355,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
 
@@ -375,7 +375,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(logger);
 
@@ -398,7 +398,7 @@
             int expectedItem1Value = 1;
             string expectedItem2Value = "some value";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterInitializer<HandlerDecoratorWithPropertiesBase>(decorator =>
             {
@@ -428,7 +428,7 @@
         public void GetInstance_DecoratorWithMissingDependency_ThrowAnExceptionWithADescriptiveMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -453,7 +453,7 @@
         public void GetInstance_DecoratorPredicateReturnsFalse_DoesNotDecorateInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -470,7 +470,7 @@
         public void GetInstance_DecoratorPredicateReturnsTrue_DecoratesInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -491,7 +491,7 @@
             Type expectedPredicateServiceType = typeof(ICommandHandler<RealCommand>);
             Type actualPredicateServiceType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -515,7 +515,7 @@
             Type expectedPredicateImplementationType = typeof(StubCommandHandler);
             Type actualPredicateImplementationType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -539,7 +539,7 @@
             Type expectedPredicateImplementationType = typeof(StubCommandHandler);
             Type actualPredicateImplementationType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -562,7 +562,7 @@
         public void GetInstance_SingletonDecoratorWithInitializer_ShouldReturnSingleton()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
 
@@ -589,7 +589,7 @@
             Type expectedPredicateImplementationType = typeof(StubCommandHandler);
             Type actualPredicateImplementationType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new StubCommandHandler());
 
@@ -613,7 +613,7 @@
             Type expectedPredicateImplementationType = typeof(ICommandHandler<RealCommand>);
             Type actualPredicateImplementationType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Because we registere a Func<TServiceType> there is no way we can determine the implementation 
             // type. In that case the ImplementationType should equal the ServiceType.
@@ -639,7 +639,7 @@
             Type expectedPredicateImplementationType = typeof(StubCommandHandler);
             Type actualPredicateImplementationType = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -666,7 +666,7 @@
             // Arrange
             Expression actualPredicateExpression = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -690,7 +690,7 @@
             Expression predicateExpressionOnFirstCall = null;
             Expression predicateExpressionOnSecondCall = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -721,7 +721,7 @@
             // Arrange
             IEnumerable<Type> appliedDecorators = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -746,7 +746,7 @@
             // Arrange
             IEnumerable<Type> appliedDecorators = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -773,7 +773,7 @@
             // Arrange
             IEnumerable<Type> appliedDecorators = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -804,7 +804,7 @@
         public void GetInstance_DecoratorThatSatisfiesRequestedTypesTypeConstraints_DecoratesThatInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -822,7 +822,7 @@
         public void GetInstance_DecoratorThatDoesNotSatisfyRequestedTypesTypeConstraints_DoesNotDecorateThatInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
 
@@ -839,7 +839,7 @@
         public void RegisterDecorator_DecoratorWithMultiplePublicConstructors_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -860,7 +860,7 @@
         public void RegisterDecorator_SupplyingTypeThatIsNotADecorator_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -884,7 +884,7 @@
         public void RegisterDecorator_SupplyingAnUnrelatedType_FailsWithExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -905,7 +905,7 @@
         public void RegisterDecorator_SupplyingAConcreteNonGenericType_ShouldSucceed()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -915,7 +915,7 @@
         public void GetInstance_RegisterDecoratorSupplyingAConcreteNonGenericType_ReturnsExpectedDecorator1()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
 
@@ -932,7 +932,7 @@
         public void GetInstance_RegisterDecoratorSupplyingAConcreteNonGenericTypeThatDoesNotMatch_DoesNotReturnThatDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // StructCommandHandler implements ICommandHandler<StructCommand>
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
@@ -951,7 +951,7 @@
         public void GetInstance_RegisterDecoratorSupplyingAConcreteNonGenericType_ReturnsExpectedDecorator2()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
             container.Register<ICommandHandler<StructCommand>, StructCommandHandler>();
@@ -969,7 +969,7 @@
         public void RegisterDecorator_NonGenericDecoratorWithFuncAsConstructorArgument_InjectsAFactoryThatCreatesNewInstancesOfTheDecoratedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<INonGenericService, RealNonGenericService>();
 
@@ -997,7 +997,7 @@
         public void RegisterDecorator_GenericDecoratorWithFuncAsConstructorArgument_InjectsAFactoryThatCreatesNewInstancesOfTheDecoratedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(new FakeLogger());
 
@@ -1030,7 +1030,7 @@
         public void RegisterDecorator_CalledWithDecoratorTypeWithBothAFuncAndADecorateeParameter_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -1053,7 +1053,7 @@
         public void RegisterDecorator_RegisteringAClassThatWrapsADifferentClosedTypeThanItImplements_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -1080,7 +1080,7 @@
         public void RegisterDecorator_RegisteringADecoratorWithAnUnresolvableTypeArgument_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -1106,7 +1106,7 @@
         public void GetInstance_TypeRegisteredWithRegisterSingleDecorator_AlwaysReturnsTheSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<INonGenericService, RealNonGenericService>();
 
@@ -1128,7 +1128,7 @@
         public void GetInstance_TypeRegisteredWithRegisterSingleDecoratorPredicate_AlwaysReturnsTheSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<INonGenericService, RealNonGenericService>();
 
@@ -1151,7 +1151,7 @@
         public void Verify_DecoratorRegisteredThatCanNotBeResolved_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
 
@@ -1179,7 +1179,7 @@
         public void GetInstance_DecoratorRegisteredTwiceAsSingleton_WrapsTheDecorateeTwice()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
@@ -1214,7 +1214,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
 
@@ -1233,7 +1233,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
 
@@ -1253,7 +1253,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
 
@@ -1272,7 +1272,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Singleton, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
 
@@ -1293,7 +1293,7 @@
             // Arrange
             var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Transient);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(hybrid);
 
@@ -1320,7 +1320,7 @@
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // StubCommandHandler has no dependencies.
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
@@ -1350,7 +1350,7 @@
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // StubCommandHandler has no dependencies.
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
@@ -1387,7 +1387,7 @@
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger, FakeLogger>();
 
@@ -1427,7 +1427,7 @@
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Singleton)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger, FakeLogger>();
 
@@ -1455,7 +1455,7 @@
         public void Lifestyle_TransientRegistrationDecoratedWithSingletonDecorator_GetsLifestyleOfDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
 
@@ -1474,7 +1474,7 @@
         public void Lifestyle_SingletonRegistrationDecoratedWithTransientDecorator_GetsLifestyleOfDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
 
@@ -1495,7 +1495,7 @@
             // Arrange
             var typesBuilding = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
 
@@ -1518,7 +1518,7 @@
         public void RegisterDecorator_DecoratorWithGenericTypeConstraintOtherThanTheClassConstraint_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             // Somehow the "where T : class" always works, while things like "where T : struct" or 
@@ -1530,7 +1530,7 @@
         public void RegisterDecorator_DecoratorWithGenericTypeConstraint_WrapsTypesThatAdhereToTheConstraint()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // SpecialCommand implements ISpecialCommand
             container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
@@ -1549,7 +1549,7 @@
         public void RegisterDecorator_DecoratorWithGenericTypeConstraint_DoesNotWrapTypesThatNotAdhereToTheConstraint()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // RealCommand does not implement ISpecialCommand
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();

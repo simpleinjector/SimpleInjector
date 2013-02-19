@@ -12,7 +12,7 @@
         public void GetInstanceByType_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
@@ -22,7 +22,7 @@
         public void GetInstanceByType_CalledOnRegisteredButInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
@@ -48,7 +48,7 @@
         public void GetInstanceByType_CalledOnUnregisteredConcreteButInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -72,7 +72,7 @@
         public void GetInstanceGeneric_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -97,7 +97,7 @@
         public void GetInstanceGeneric_CalledOnRegisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
@@ -110,7 +110,7 @@
         public void GetInstance_OnObjectWhileUnregistered_ThrowsActivationException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.GetInstance<object>();
@@ -120,7 +120,7 @@
         public void GetInstanceType_DeeplyNestedGenericTypeWithInternalConstructor_ThrowsExceptionWithProperFriendlyTypeName()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -142,7 +142,7 @@
         public void GetInstance_WithNastyOpenGenericType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Lazy<Func<TResult>>
             var nastyOpenGenericType = typeof(Lazy<>).MakeGenericType(typeof(Func<>));
@@ -163,7 +163,7 @@
         public void GetAllInstances_WithOpenGenericEnumerableType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {

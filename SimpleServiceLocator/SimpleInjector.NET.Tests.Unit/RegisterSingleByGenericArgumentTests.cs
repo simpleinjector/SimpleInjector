@@ -14,7 +14,7 @@
         public void RegisterSingleByGenericArgument_WithValidGenericArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
@@ -24,7 +24,7 @@
         public void GetInstance_OnRegisteredType_ReturnsInstanceOfExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
 
@@ -39,7 +39,7 @@
         public void GetInstance_OnRegisteredType_ReturnsANewInstanceOnEachCall()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository, InMemoryUserRepository>();
 
@@ -57,7 +57,7 @@
         public void RegisterSingleByGenericArgument_GenericArgumentOfInvalidType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
@@ -69,7 +69,7 @@
             // Arrange
             string expectedParamName = "TImplementation";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -90,7 +90,7 @@
         public void RegisterSingleByGenericArgument_CalledAfterTheContainerWasLocked_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetInstance<PluginManager>();
 

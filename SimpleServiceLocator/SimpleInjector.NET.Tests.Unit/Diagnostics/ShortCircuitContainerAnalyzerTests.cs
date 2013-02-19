@@ -22,7 +22,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_OnValidConfiguratoin_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Verify();
 
@@ -39,7 +39,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_OnConfigurationWithOneShortCircuitedRegistration_ReturnsThatWarning()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
@@ -70,7 +70,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_ShortCircuitedRegistrationWithMultipleTypesInOneGroup_Behavior()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);

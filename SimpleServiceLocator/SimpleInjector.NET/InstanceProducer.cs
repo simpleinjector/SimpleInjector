@@ -123,10 +123,17 @@ namespace SimpleInjector
             {
                 if (this.instanceCreator == null)
                 {
-                    this.instanceCreator = this.BuildInstanceCreator();
-                }
+                    this.instanceCreator = this.BuildInstanceCreator(out instance);
 
-                instance = this.instanceCreator();
+                    if (instance == null)
+                    {
+                        instance = this.instanceCreator();
+                    }
+                }
+                else
+                {
+                    instance = this.instanceCreator();
+                }
 
                 this.RemoveValidator();
             }
@@ -180,14 +187,14 @@ namespace SimpleInjector
             this.isValid = null;
         }
 
-        private Func<object> BuildInstanceCreator()
+        private Func<object> BuildInstanceCreator(out object createdInstance)
         {
             // Don't do recursive checks. The GetInstance() already does that.
             var expression = this.expression.Value;
 
             try
             {
-                return Helpers.CompileExpression(this.registration.Container, expression);
+                return Helpers.CompileExpression(this.registration.Container, expression, out createdInstance);
             }
             catch (Exception ex)
             {

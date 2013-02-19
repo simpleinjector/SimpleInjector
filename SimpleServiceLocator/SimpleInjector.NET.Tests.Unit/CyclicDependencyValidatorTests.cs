@@ -25,7 +25,7 @@
                 indirectly depending on itself."
                 .TrimInside();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -46,7 +46,7 @@
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -66,7 +66,7 @@
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItself_AlsoFailsOnConsecutiveCalls()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -95,7 +95,7 @@
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfViaASingletonType_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
             container.RegisterSingle<B>();
@@ -118,7 +118,7 @@
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaTransientType_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<A>();
 
@@ -141,7 +141,7 @@
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfViaSingletonType_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
             container.RegisterSingle<A>();
@@ -165,7 +165,7 @@
         public void GetInstance_RequestingTransientTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // One depends on ITwo and Two depends on IOne.
             container.Register<IOne, One>();
@@ -189,7 +189,7 @@
         public void GetInstance_RequestingSingletonTypeDependingIndirectlyOnItselfThroughInterfaces_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // One depends on ITwo and Two depends on IOne.
             container.RegisterSingle<IOne, One>();
@@ -213,7 +213,7 @@
         public void GetInstance_RequestingTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
             container.Register<ITwo, Two>();
@@ -236,7 +236,7 @@
         public void GetInstance_RequestingTypeDependingDirectlyOnItselfThroughDelegateRegistration_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IOne>(() => container.GetInstance<IOne>());
 
@@ -258,7 +258,7 @@
         public void GetInstance_CalledSimultaneouslyToRequestTheSameType_ShouldNotTriggerTheRecursionProtection()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository>(() =>
             {
@@ -286,7 +286,7 @@
             string expectedExceptionMessage =
                 "The registered delegate for type IUserRepository threw an exception.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // We let the registered delegate throw an exception.
             container.Register<IUserRepository>(() => { throw new InvalidOperationException(); });
@@ -325,7 +325,7 @@
             string expectedMessage = "The configuration is invalid. The type RealUserService " +
                 "is directly or indirectly depending on itself.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -355,7 +355,7 @@
             string expectedMessage =
                 "The registered delegate for type ITimeProvider threw an exception.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This registration will use a FuncSingletonInstanceProducer under the covers.
             container.RegisterSingle<ITimeProvider>(() => { throw new NullReferenceException(); });

@@ -14,7 +14,7 @@
         public void InjectProperties_NullInstance_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Service instance = null;
 
@@ -26,7 +26,7 @@
         public void InjectProperties_WithEmptyContainer_DoesNotInjectAnything()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var instance = new Service();
 
@@ -45,7 +45,7 @@
         public void InjectProperties_ContainerWithRegistrationForASingleProperty_DoesInjectSingleProperty()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider, RealTimeProvider>();
 
@@ -62,7 +62,7 @@
         public void InjectProperties_TypeThatMapsToMultipleProperties_InjectsDoesInjectBothProperties()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IPlugin, PluginImpl>();
 
@@ -80,7 +80,7 @@
         public void InjectProperties_TypeWithThreeMappableProperties_InjectsDoesInjectAllThreeProperties()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider, RealTimeProvider>();
             container.Register<IPlugin, PluginImpl>();
@@ -102,7 +102,7 @@
         public void InjectProperties_TypeWithManyMappableProperties_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IPlugin, PluginImpl>();
 
@@ -125,7 +125,7 @@
         public void InjectProperties_TypeForReadOnlyProperty_DoesNotInjectProperty()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -142,7 +142,7 @@
         public void InjectProperties_TypeWithInternalProperty_DoesNotInjectThatInternalProperty()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -161,7 +161,7 @@
             // Arrange
             var expectedInstance = new PluginImpl();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (sender, e) =>
             {
@@ -186,7 +186,7 @@
         public void InjectProperties_TypeWithNotInjectableDependency_DoesNotInjectThatProperty()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var instance = new ServiceWithNotInjectableDependency();            
 
@@ -201,7 +201,7 @@
         public void InjectProperties_TypeWithNotInjectableDependency_DoesInjectOtherProperties()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IPlugin, PluginImpl>();
 
@@ -219,7 +219,7 @@
         public void InjectProperties_OnUserControlWithMoreThanTwoInjectableDependencies_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IPlugin>(new PluginImpl());
 

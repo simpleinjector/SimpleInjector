@@ -15,7 +15,7 @@
             var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
 
             // Act
-            var item = analyzer.Analyse(new Container());
+            var item = analyzer.Analyse(ContainerFactory.New());
 
             // Assert
             Assert.IsNull(item, 
@@ -26,7 +26,7 @@
         public void Analyse_ContainerWithOneMismatch_ReturnsItemWithExpectedName()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -48,7 +48,7 @@
         public void Analyse_ContainerWithOneMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -70,7 +70,7 @@
         public void Analyse_ContainerWithTwoMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 

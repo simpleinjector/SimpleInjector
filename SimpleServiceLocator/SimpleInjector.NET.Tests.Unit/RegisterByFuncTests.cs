@@ -13,7 +13,7 @@
         public void RegisterByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
@@ -25,7 +25,7 @@
         public void RegisterByFunc_CalledAfterRegisterSingleOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -37,7 +37,7 @@
         public void RegisterByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
@@ -50,7 +50,7 @@
         public void RegisterByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Only during iterating the collection, will the underlying container be called. This is a
@@ -66,7 +66,7 @@
         public void RegisterByFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Func<IUserRepository> invalidInstanceCreator = null;
 
@@ -79,7 +79,7 @@
         public void GetInstance_RegisteredWithFuncReturningNull_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => null);
 
             // Act
@@ -90,7 +90,7 @@
         public void GetInstance_SubTypeRegisteredWithFuncReturningNull_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => null);
 
             try
@@ -112,7 +112,7 @@
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegister_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This registration will make the DelegateBuilder call the 
             // SingletonInstanceProducer.BuildExpression method.
@@ -128,7 +128,7 @@
             // Arrange
             var expectedInnerException = new InvalidOperationException();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => { throw expectedInnerException; });
 
             try
@@ -151,7 +151,7 @@
         public void RegisterByFunc_ValidArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             Func<object> instanceCreator = () => new SqlUserRepository();
@@ -170,7 +170,7 @@
         public void RegisterByFunc_NullInstanceCreator_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             Func<object> invalidInstanceCreator = null;

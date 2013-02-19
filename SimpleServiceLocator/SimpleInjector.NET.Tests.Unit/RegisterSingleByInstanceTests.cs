@@ -14,7 +14,7 @@
         public void RegisterSingleByInstance_WithValidType_ContainerAlwaysReturnsSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -31,7 +31,7 @@
         public void RegisterSingleByInstance_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             IUserRepository invalidInstance = null;
 
             // Act
@@ -43,7 +43,7 @@
         public void RegisterSingleByInstance_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -55,7 +55,7 @@
         public void RegisterSingleByInstance_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
@@ -67,7 +67,7 @@
         public void RegisterSingleByInstance_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
@@ -80,7 +80,7 @@
         public void RegisterSingleByInstance_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Calling count will iterate the collections. 
@@ -95,7 +95,7 @@
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingle_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This registration will make the DelegateBuilder call the 
             // SingletonInstanceProducer.BuildExpression method.
@@ -109,7 +109,7 @@
         public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             object impl = new SqlUserRepository();
 
@@ -125,7 +125,7 @@
         public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceAlwaysReturnsSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             object impl = new SqlUserRepository();
 
@@ -144,7 +144,7 @@
         public void RegisterSingleByInstanceNonGeneric_ImplementationNoDescendantOfServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             object impl = new List<int>();
 
@@ -156,7 +156,7 @@
         public void RegisterSingleByInstanceNonGeneric_InstanceOfSameTypeAsService_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             object impl = new List<int>();
 
@@ -169,7 +169,7 @@
         public void RegisterSingleByInstanceNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidServiceType = null;
             object validInstance = new SqlUserRepository();
@@ -183,7 +183,7 @@
         public void RegisterSingleByInstanceNonGeneric_NullInstance_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             object invalidInstance = null;
@@ -198,7 +198,7 @@
             // Arrange
             var expressionsBuilding = new List<Expression>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -221,7 +221,7 @@
             // Arrange
             var expressionsBuilding = new List<Expression>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle(typeof(IUserRepository), new SqlUserRepository());
 

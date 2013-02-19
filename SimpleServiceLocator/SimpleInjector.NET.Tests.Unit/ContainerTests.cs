@@ -11,7 +11,7 @@
         public void Equals_OnSameInstance_ReturnsTrue()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var result = container.Equals(container);
@@ -24,8 +24,8 @@
         public void Equals_OnDifferentInstance_ReturnsFalse()
         {
             // Arrange
-            var container1 = new Container();
-            var container2 = new Container();
+            var container1 = ContainerFactory.New();
+            var container2 = ContainerFactory.New();
 
             // Act
             var result = container1.Equals(container2);
@@ -38,7 +38,7 @@
         public void ToString_Always_ReturnsExpectedValue()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             string result = container.ToString();
@@ -51,7 +51,7 @@
         public void GetHashCode_Always_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.GetHashCode();
@@ -61,7 +61,7 @@
         public void GetType_Always_ReturnsTheExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             Type type = container.GetType();

@@ -26,7 +26,7 @@
         public void TestExpressionBuilt()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger, ConsoleLogger>();
             container.Register<IValidator<Order>, OrderValidator>();
@@ -64,7 +64,7 @@
         public void GetInstance_OnInstanceRegisteredAsSingleton_ExpressionBuiltGetsFiredWithConstantExpression()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
 
@@ -92,7 +92,7 @@
             // Arrange
             Expression actualBuiltExpression = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -116,7 +116,7 @@
         public void GetInstance_ExpressionReplacedOnRootType_ReturnsTheExpectedTypeAndLifeStyle()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
@@ -144,7 +144,7 @@
         public void GetInstance_ExpressionReplacedOnNonRootType_ReturnsTheExpectedTypeAndLifeStyle()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register a transient instance
             container.Register<IUserRepository, SqlUserRepository>();
@@ -175,7 +175,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -201,7 +201,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -229,7 +229,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -254,7 +254,7 @@
         public void GetInstance_RegisteredTransientWithInterceptor_EventArgsContainsAnExpression()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -275,7 +275,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -302,7 +302,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository, SqlUserRepository>();
 
@@ -331,7 +331,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
 
@@ -357,7 +357,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ExpressionBuilt += (sender, e) =>
             {
@@ -381,7 +381,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -410,7 +410,7 @@
             int expectedCallCount = 1;
             int actualCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -439,7 +439,7 @@
         public void AddExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -456,7 +456,7 @@
         public void RemoveExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -473,7 +473,7 @@
             // Arrange
             bool handlerCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             EventHandler<ExpressionBuiltEventArgs> handler = (sender, e) =>
             {
@@ -498,7 +498,7 @@
         public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IPlugin, PluginImpl>();
 
@@ -526,7 +526,7 @@
         public void GetInstance_ExpressionBuiltWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -560,7 +560,7 @@
             // Arrange
             KnownRelationship invalidRelationship = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ExpressionBuilt += (s, e) =>
             {
@@ -578,7 +578,7 @@
             // Arrange
             KnownRelationship invalidRelationship = null;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository, SqlUserRepository>();
             container.Register<FakeUserService>();

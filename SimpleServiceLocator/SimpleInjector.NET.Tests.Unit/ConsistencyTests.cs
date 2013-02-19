@@ -11,7 +11,7 @@
             // Arrange
             bool shouldCall = true;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // We 'abuse' ResolveUnregisteredType to simulate multi-threading. ResolveUnregisteredType is 
             // called during GetInstance, but before the IInstanceProvider<Concrete> is added to the

@@ -12,7 +12,7 @@
         public void GetInstance_UnregisteredAbstractType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.GetInstance<IUserRepository>();
@@ -23,7 +23,7 @@
         public void GetInstance_UnregisteredAbstractType2_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This call forces a different code path through the container.
             container.GetRegistration(typeof(IUserRepository));
@@ -37,7 +37,7 @@
         public void GetInstance_UnregisteredAbstractType3_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetRegistration(typeof(IUserRepository));
 
@@ -50,7 +50,7 @@
         public void GetInstance_UnregisteredValueType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.GetInstance(typeof(int));
@@ -60,7 +60,7 @@
         public void GetInstance_UnregisteredConcreteType_CanStillBeCreated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -75,7 +75,7 @@
         public void GetInstance_UnregisteredConcreteType_AlwaysReturnsANewInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -90,7 +90,7 @@
         public void GetInstance_UnregisteredConcreteTypeWithConcreteConstructorArguments_CanStillBeCreated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
@@ -105,7 +105,7 @@
         public void GetInstance_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -128,7 +128,7 @@
         public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithNameOfType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -152,7 +152,7 @@
             // Arrange
             string expectedMessage = "should contain exactly one public constructor, but it has 2.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -176,7 +176,7 @@
         public void GetInstance_UnregisteredConcreteTypeWithConstructorWithInvalidArguments_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -214,7 +214,7 @@
         public void GetInstance_WithUnregisteredGenericTypeDefinition_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -234,7 +234,7 @@
         public void GetInstance_OnConcreteTypeWithConstructorArgumentOfResolvableType_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -257,7 +257,7 @@
                 " parameter 'intParam' of type Int32 which can not be used for constructor " +
                 "injection because it is a value type.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -281,7 +281,7 @@
             string expectedMessage = typeof(ConcreteTypeWithStringConstructorArgument).Name + " contains pa" +
                 "rameter 'stringParam' of type String which can not be used for constructor injection.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -301,7 +301,7 @@
         public void GetInstance_WithErrorInNestedDependency_ThrowsExceptionThatContainsAllTypes()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IUserRepository>(() => { throw new InvalidOperationException("Bla."); });
 

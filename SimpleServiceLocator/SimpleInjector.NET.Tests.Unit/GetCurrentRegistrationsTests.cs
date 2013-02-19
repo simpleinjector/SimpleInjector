@@ -12,7 +12,7 @@
         public void GetCurrentRegistrations_Never_LocksTheContainer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // In previous versions of the framework a call to Verify() didn't lock the container. This meaned
             // that GetCurrentRegistrations could return registrations that where automatically registered by
@@ -34,7 +34,7 @@
         public void Verify_Always_LocksTheContainer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This test is a duplicate from the test in the VerifyTests class, but it's essential for the
             // correctness of GetCurrentRegistrations. That's why it's placed directly after the test that
@@ -55,7 +55,7 @@
         public void BuildExpression_Always_LocksTheContainer()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetCurrentRegistrations().First().BuildExpression();
 
@@ -70,7 +70,7 @@
         public void GetCurrentRegistrations_TransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider, RealTimeProvider>();
 
@@ -86,7 +86,7 @@
         public void GetCurrentRegistrations_TransientConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<RealTimeProvider>();
 
@@ -102,7 +102,7 @@
         public void GetCurrentRegistrations_FuncTransientInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ITimeProvider>(() => new RealTimeProvider());
 
@@ -118,7 +118,7 @@
         public void GetCurrentRegistrations_ImplicitlyRegisteredTransientInstance_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.GetInstance<RealTimeProvider>();
 
@@ -134,7 +134,7 @@
         public void GetCurrentRegistrations_SingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
@@ -150,7 +150,7 @@
         public void GetCurrentRegistrations_SingleConcreteInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<RealTimeProvider>();
 
@@ -166,7 +166,7 @@
         public void GetCurrentRegistrations_FuncSingleInstanceRegistered_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider>(() => new RealTimeProvider());
 
@@ -182,7 +182,7 @@
         public void GetCurrentRegistrations_SingleInstanceRegisteredByObject_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ITimeProvider>(new RealTimeProvider());
 
@@ -198,7 +198,7 @@
         public void GetCurrentRegistrations_InstanceResolvedUsingUnregisteredTypeResolution_ReturnsExpectedRegistration()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (sender, e) =>
             {
@@ -221,7 +221,7 @@
             // Arrange
             Type invalidType = typeof(ServiceWithUnregisteredDependencies);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This will force the creation and caching of the InstanceProducer of the invalidType.
             container.GetRegistration(invalidType);

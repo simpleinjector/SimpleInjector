@@ -13,7 +13,7 @@
         public void RegisterFunc_SuppliedWithAmbiguousTypeString_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
@@ -26,7 +26,7 @@
         public void RegisterFunc_SuppliedWithAmbiguousTypeType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             Assert_RegistrationFailsWithExpectedAmbiguousMessage("Type", () =>
@@ -39,7 +39,7 @@
         public void RegisterSingleFunc_SuppliedWithAmbiguousType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
@@ -52,7 +52,7 @@
         public void RegisterSingleValue_SuppliedWithAmbiguousType_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
@@ -65,7 +65,7 @@
         public void RegisterFunc_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             
             // Assert
             Assert_RegistrationFailsWithExpectedParamName("TService", () =>
@@ -79,7 +79,7 @@
         public void RegisterSingleFunc_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Assert
             Assert_RegistrationFailsWithExpectedParamName("TService", () =>
@@ -93,7 +93,7 @@
         public void RegisterSingleValue_SuppliedWithAmbiguousType_ThrowsExceptionWithExpectedParamName()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Assert
             Assert_RegistrationFailsWithExpectedParamName("TService", () =>

@@ -15,7 +15,7 @@
         public void BuildExpression_ReturningNull_ContainerWillThrowAnExpressiveExceptionMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var invalidLifestyle = new FakeLifestyle();
             

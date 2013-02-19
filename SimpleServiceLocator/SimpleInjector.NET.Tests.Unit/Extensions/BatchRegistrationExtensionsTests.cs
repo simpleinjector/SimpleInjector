@@ -82,7 +82,7 @@
         public void RegisterManyForOpenGeneric_WithClosedGenericType_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<int, int>), Assembly.GetExecutingAssembly());
@@ -92,7 +92,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
@@ -104,7 +104,7 @@
         public void RegisterManyForOpenGenericAccessibilityOptionAndParams_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
@@ -115,7 +115,7 @@
         public void RegisterManyForOpenGenericAccessibilityOptionAndEnumerable_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
@@ -129,7 +129,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType1()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -144,7 +144,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType2()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -159,7 +159,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsTransientInstances()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -174,7 +174,7 @@
         public void RegisterManySinglesForOpenGeneric_WithValidTypeDefinitions_ReturnsSingletonInstances()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -190,7 +190,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle1()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>),
                 AccessibilityOption.PublicTypesOnly, Lifestyle.Transient,
                 Assembly.GetExecutingAssembly());
@@ -207,7 +207,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle2()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>),
                 AccessibilityOption.PublicTypesOnly, Lifestyle.Singleton,
                 Assembly.GetExecutingAssembly());
@@ -225,7 +225,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle3()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient,
                 Assembly.GetExecutingAssembly());
 
@@ -241,7 +241,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle4()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton,
                 Assembly.GetExecutingAssembly());
 
@@ -259,7 +259,7 @@
             // Arrange
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton, assemblies);
 
             // Act
@@ -277,7 +277,7 @@
             // Concrete1 implements IService<string, object>
             IEnumerable<Type> typesToRegister = new[] { typeof(Concrete1) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), typesToRegister);
 
@@ -293,7 +293,7 @@
         public void RegisterManySinglesForOpenGenericEnumerable_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
@@ -305,7 +305,7 @@
         public void RegisterManySinglesForOpenGenericTypeParams_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type[] typesToRegister = new[] { typeof(Concrete1) };
 
@@ -319,7 +319,7 @@
         public void RegisterManySinglesForOpenGenericAccessibilityOptionEnumerable_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
@@ -332,7 +332,7 @@
         public void RegisterManySinglesForOpenGenericAccessibilityOptionParams_WithValidTypeDefinitions_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Assembly[] assemblies = new[] { Assembly.GetExecutingAssembly() };
 
@@ -345,7 +345,7 @@
         public void RegisterManyForOpenGeneric_IncludingInternalTypes_ReturnsExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
                 Assembly.GetExecutingAssembly());
 
@@ -362,7 +362,7 @@
         public void RegisterManyForOpenGeneric_WithInvalidAccessibilityOption_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<,>), (AccessibilityOption)5,
@@ -374,7 +374,7 @@
         public void RegisterManyForOpenGeneric_ExcludingInternalTypes_DoesNotRegisterInternalTypes()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
                 Assembly.GetExecutingAssembly());
 
@@ -387,7 +387,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType3()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -402,7 +402,7 @@
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_ReturnsExpectedType4()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
 
             // Act
@@ -417,7 +417,7 @@
         public void RegisterManyForOpenGeneric_WithMultipleTypeDefinitionsReferencingTheSameInterface_Fails()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -439,7 +439,7 @@
         public void RegisterManyForOpenGeneric_WithMultipleConcreteTypes_RegistersTheExpectedServiceTypes()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(IService<,>), typeof(Concrete1), typeof(Concrete2));
@@ -458,7 +458,7 @@
         public void RegisterManyForOpenGeneric_WithNonInheritableType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var serviceType = typeof(IService<,>);
             var validType = typeof(ServiceImpl<object, string>);
@@ -484,7 +484,7 @@
         public void RegisterManyForOpenGeneric_WithNullAssemblyParamsArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Assembly[] invalidArgument = null;
 
@@ -497,7 +497,7 @@
         public void RegisterManyForOpenGeneric_WithNullAssemblyIEnumerableArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<Assembly> invalidArgument = null;
 
@@ -523,7 +523,7 @@
         public void RegisterManyForOpenGeneric_WithNullTypesToRegister_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var validServiceType = typeof(IService<,>);
             IEnumerable<Type> invalidTypesToRegister = null;
@@ -537,7 +537,7 @@
         public void RegisterManyForOpenGeneric_WithNullOpenGenericServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidServiceType = null;
             IEnumerable<Type> validTypesToRegister = new Type[] { typeof(object) };
@@ -551,7 +551,7 @@
         public void RegisterManyForOpenGeneric_WithNullElementInTypesToRegister_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IService<,>);
             IEnumerable<Type> invalidTypesToRegister = new Type[] { null };
@@ -564,7 +564,7 @@
         public void RegisterManyForOpenGenericAssemblyParams_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
@@ -586,7 +586,7 @@
         public void RegisterManyForOpenGenericAssemblyIEnumerable_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
@@ -611,7 +611,7 @@
         public void RegisterManyForOpenGenericEnumerable_WithValidArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) => { };
 
@@ -626,7 +626,7 @@
         public void RegisterManyForOpenGenericAccessibilityOptionCallbackEnum_WithValidArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) => { };
 
@@ -650,7 +650,7 @@
 
             List<Type> actualClosedServiceTypes = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {

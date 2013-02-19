@@ -12,7 +12,7 @@
         public void RegisterSingle_RegisteringAConcreteType_ReturnAnInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => new SqlUserRepository());
 
             // Act
@@ -28,7 +28,7 @@
         public void RegisterSingle_RegisteringAConcreteType_AlwaysReturnsSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<IUserRepository>(() => new SqlUserRepository());
 
             // Act
@@ -47,7 +47,7 @@
             // Arrange
             string expectedMessage = typeof(IUserRepository).Name + " is not a concrete type.";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -69,7 +69,7 @@
             // Arrange
             string expectedParameterName = "TConcrete";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -88,7 +88,7 @@
         public void RegisterSingle_WithIncompleteSingletonRegistration_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // UserServiceBase dependants on IUserRepository.
             container.RegisterSingle<UserServiceBase>(() => container.GetInstance<RealUserService>());

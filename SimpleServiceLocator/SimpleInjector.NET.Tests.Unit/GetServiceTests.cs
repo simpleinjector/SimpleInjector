@@ -11,7 +11,7 @@
         public void GetService_RequestingARegisteredType_ReturnsExpectedInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedInstance = new InMemoryUserRepository();
 
@@ -29,7 +29,7 @@
         public void GetService_RequestingANonregisteredType_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
@@ -43,7 +43,7 @@
         public void GetService_RequestingANonregisteredType2_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var actualInstance = ((IServiceProvider)container).GetService(typeof(string));
@@ -57,7 +57,7 @@
         public void GetService_RequestingANonregisteredType3_ReturnsNull()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var actualInstance = ((IServiceProvider)container).GetService(typeof(int));
@@ -72,7 +72,7 @@
         public void GetService_RequestingANonregisteredType_WillNotSuppressErrorsThrownFromUnregisteredTypeResolution()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Registration of an event that registers an invalid delegate, should make GetService fail.
             container.ResolveUnregisteredType += (sender, e) =>
@@ -92,7 +92,7 @@
         public void GetService_RequestingAUnregisteredTypeTwice_ReturnsNullSecondTime()
         {
             // Arrange
-            IServiceProvider container = new Container();
+            IServiceProvider container = ContainerFactory.New();
 
             container.GetService(typeof(IUserRepository));
 
@@ -110,7 +110,7 @@
             // Arrange
             Type invalidServiceType = typeof(ServiceWithUnregisteredDependencies);
 
-            IServiceProvider container = new Container();
+            IServiceProvider container = ContainerFactory.New();
 
             // Act
             var registration = container.GetService(invalidServiceType);
@@ -124,7 +124,7 @@
         public void GetService_RequestedOnRegisteredInvalidType_ReturnsInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ServiceWithUnregisteredDependencies>();
 

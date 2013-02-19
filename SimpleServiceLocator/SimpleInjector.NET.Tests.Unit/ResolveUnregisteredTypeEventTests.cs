@@ -15,7 +15,7 @@
             // Arrange
             var expectedInstance = new SqlUserRepository();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -42,7 +42,7 @@
             string expectedMessage = "Multiple observers of the ResolveUnregisteredType event are " +
                 "registering a delegate for the same service type";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) => e.Register(() => new SqlUserRepository());
             container.ResolveUnregisteredType += (s, e) => e.Register(() => new InMemoryUserRepository());
@@ -67,7 +67,7 @@
             // Arrange
             bool eventCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) => { eventCalled = true; };
 
@@ -92,7 +92,7 @@
             // Arrange
             bool eventCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -119,7 +119,7 @@
                 .TrimInside();
 
             // We don't register the required IUserRepository dependency.
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {
@@ -144,7 +144,7 @@
             var expectedInstance = new RealUserService(new SqlUserRepository());
             bool eventCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -168,7 +168,7 @@
         public void AddResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -185,7 +185,7 @@
         public void RemoveResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
@@ -202,7 +202,7 @@
             // Arrange
             bool handlerCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             EventHandler<UnregisteredTypeEventArgs> handler = (sender, e) =>
             {
@@ -237,7 +237,7 @@
             const int ExpectedEventCallCount = 1;
             int actualEventCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -262,7 +262,7 @@
             bool delegate1Called = false;
             bool delegate2Called = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) => delegate1Called = true;
             container.ResolveUnregisteredType += (s, e) => delegate2Called = true;
@@ -286,7 +286,7 @@
         public void GetInstance_EventRegisteredThatThrowsException_ThrowsAnDescriptiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -315,7 +315,7 @@
         public void GetInstance_EventRegisteredForNonRootTypeThatThrowsException_ThrowsAnDescriptiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<UserServiceBase, RealUserService>();
 
@@ -346,7 +346,7 @@
         public void GetInstance_EventRegisteredWithInvalidExpression_ThrowsAnDescriptiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -380,7 +380,7 @@
             // Arrange
             var expectedInnerException = new NullReferenceException();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -407,7 +407,7 @@
         public void GetInstance_EventRegisteredThatReturnsNull_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -435,7 +435,7 @@
         public void GetInstance_EventRegisteredThatReturnsANonAssignableType_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -473,7 +473,7 @@
             // Arrange
             bool resolveUnregisteredTypeWasTriggered = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -499,7 +499,7 @@
             // Arrange
             bool resolveUnregisteredTypeWasTriggered = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -522,7 +522,7 @@
             // Arrange
             bool resolveUnregisteredTypeWasTriggered = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -545,7 +545,7 @@
             // Arrange
             bool resolveUnregisteredTypeWasTriggered = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.ResolveUnregisteredType += (s, e) =>
             {

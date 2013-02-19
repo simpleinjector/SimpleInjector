@@ -26,7 +26,7 @@
         public void GetAllInstances_TypeDecorated1_ReturnsCollectionWithDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the RegisterAll(Type, Type[]) overload.
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
@@ -49,7 +49,7 @@
         public void GetAllInstances_TypeDecorated2_ReturnsCollectionWithDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -74,7 +74,7 @@
         public void GetAllInstances_TypeDecorated3_ReturnsCollectionWithDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -99,7 +99,7 @@
         public void GetAllInstances_TypeDecorated4_ReturnsCollectionWithDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -129,7 +129,7 @@
         public void GetAllInstances_RegistrationThatAlwaysReturnsANewCollectionAndDecorator_ReturnsTransientInstances()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
             // registering collections.
@@ -160,7 +160,7 @@
         public void GetAllInstances_RegistrationThatAlwaysReturnsANewCollectionAndSingletonDecorator_ReturnsSingletons()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
             // registering collections.
@@ -190,7 +190,7 @@
         public void GetAllInstances_TypeDecoratedWithMultipleDecorators_ReturnsCollectionWithDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
 
@@ -214,7 +214,7 @@
         public void GetAllInstances_TypeDecoratedWithTransientDecorator_ReturnsANewInstanceEveryTime()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
 
@@ -239,7 +239,7 @@
         public void GetAllInstances_TypeDecoratedWithFuncDecorator1_InjectsADelegateThatCanCreateThatInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the RegisterAll(Type, Type[]) overload.
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
@@ -264,7 +264,7 @@
         public void GetAllInstances_TypeDecoratedWithFuncDecorator2_InjectsADelegateThatCanCreateThatInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -288,7 +288,7 @@
         public void GetAllInstances_CollectionManuallyRegisteredAndFuncDecoraterRegistered1_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -315,7 +315,7 @@
         public void GetAllInstances_CollectionManuallyRegisteredAndFuncDecoraterRegistered2_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -342,7 +342,7 @@
         public void GetAllInstances_CollectionManuallyRegisteredAndFuncDecoraterRegistered4_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
@@ -370,7 +370,7 @@
         public void GetAllInstances_TypeDecoratedWithFuncDecorator_InjectsADelegateThatReturnsATransientInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -396,7 +396,7 @@
         public void GetAllInstances_DecoratorDecoratedWithFuncDecorator_InjectsADelegateThatCanCreateThatDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -425,7 +425,7 @@
         public void GetAllInstances_NestedFuncDecorators_GetInjectedAsExpected()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -452,7 +452,7 @@
         public void GetAllInstances_FuncDecoratorDecoratedByANormalDecorator_GetInjectedAsExpected()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -475,7 +475,7 @@
         public void GetAllInstances_TypeRegisteredWithRegisterSingleDecorator_AlwaysReturnsTheSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register transient service
             // This is not good practice, since we register a singleton decorator, but just for testing.
@@ -501,7 +501,7 @@
         public void GetAllInstances_TypeRegisteredWithRegisterSingleFuncDecorator_AlwaysReturnsTheSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -529,7 +529,7 @@
         public void GetAllInstances_SingleFuncDecoratorDecoratedWithTransientDecorator_WorksAsExpected()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll(typeof(ICommandHandler<RealCommand>), new[] 
             { 
@@ -560,7 +560,7 @@
         public void GetAllInstances_RegisteredCollectionContainerBothTransientAsSingletons_ResolvesTransientsCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register the NullCommandHandler<RealCommand> as singleton.
             // We do this using the RegisterSingleOpenGeneric, but this is not important for this test.
@@ -594,7 +594,7 @@
         public void GetAllInstances_RegisteredCollectionContainerBothTransientAsSingletons_ResolvesSingletonsCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Register the NullCommandHandler<RealCommand> as singleton.
             container.RegisterSingle<NullCommandHandler<RealCommand>>();
@@ -628,7 +628,7 @@
         public void GetAllInstances_CollectionDecoratedWithSingletonDecorator1_WillNotReturnAMutableType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the RegisterAll<T>(Type[]) overload.
             container.RegisterAll<ICommandHandler<RealCommand>>(typeof(RealCommandCommandHandler));
@@ -650,7 +650,7 @@
         public void GetAllInstances_CollectionDecoratedWithSingletonDecorator2_WillNotReturnAMutableType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the RegisterAll<T>(T[]) overload.
             container.RegisterAll<ICommandHandler<RealCommand>>(new[] { new RealCommandCommandHandler() });
@@ -670,7 +670,7 @@
         public void GetAllInstances_CollectionDecoratedWithSingletonDecorator3_WillNotReturnAMutableType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> handlers = new[] { new RealCommandCommandHandler() };
 
@@ -692,7 +692,7 @@
         public void GetAllInstances_CollectionDecoratedWithSingletonDecorator4_WillNotReturnAMutableType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Use the Register<T>(Func<T>) overload.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
@@ -713,7 +713,7 @@
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesInstancesThatShouldBeDecorated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -740,7 +740,7 @@
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DoesNotDecoratesInstancesThatShouldNotBeDecorated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -770,7 +770,7 @@
         public void GetRelationships_OnAPartiallyDecoratedCollection_ReturnsTheExpectedRelationships()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -807,7 +807,7 @@
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesAllInstancesThatShouldBeDecorated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -845,7 +845,7 @@
         public void GetAllInstances_MultipleDecoratorsRegisteredWithPredicate_DecoratesInstancesThatShouldBeDecorated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -877,7 +877,7 @@
         public void GetAllInstances_MultipleDecoratorsRegisteredWithPredicate2_DecoratesInstancesThatShouldBeDecorated()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -919,7 +919,7 @@
             // Arrange
             int predicateCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -955,7 +955,7 @@
             // Arrange
             int predicateCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(RealCommandCommandHandler),
@@ -998,7 +998,7 @@
         public void GetAllInstances_InstancesRegisteredWithRegisterAllParamsTAndDecorated_InjectsSingletons()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Uses the RegisterAll<T>(params T[]) that explicitly registers a collection of singletons.
             container.RegisterAll<ICommandHandler<RealCommand>>(
@@ -1020,7 +1020,7 @@
         public void GetAllInstances_InstancesRegisteredWithRegisterAllParamsTAndDecorated_SuppliesTheCorrectPredicateContextForEachElement()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var predicateContexts = new List<DecoratorPredicateContext>();
 
@@ -1069,7 +1069,7 @@
         public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecorated_CallsThePredicateJustOnceForTheWholeCollection()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var predicateContexts = new List<DecoratorPredicateContext>();
 
@@ -1116,7 +1116,7 @@
         public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecoratedWithMultipleDecorators_SuppliesThePreviouslyAppliedDecoratorsToThePredicate()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             int predicateCallCount = 0;
 
@@ -1162,7 +1162,7 @@
         public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecoratedWithMultipleDecorators_DoesNotSupplyThePreviousDecoratorWhenItWasNotApplied()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             int predicateCallCount = 0;
 
@@ -1203,7 +1203,7 @@
         public void GetInstance_BothServiceAndCollectionOfServicesRegistered_RegistrationsDontShareTheirPredicateContext()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             int predicateCallCount = 0;
 
@@ -1256,7 +1256,7 @@
         public void GetAllInstances_DecoratorRegisteredTwiceAsSingleton_WrapsTheDecorateeTwice()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
@@ -1302,7 +1302,7 @@
 
             var actualInitializedHandlers = new List<ICommandHandler<RealCommand>>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledSingletonHandlers);
 
@@ -1340,7 +1340,7 @@
                 Dependency = new DependencyInfo(typeof(RealCommandHandler), Lifestyle.Transient)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
                 typeof(StubCommandHandler),
@@ -1372,7 +1372,7 @@
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Unknown)
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
                 new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
@@ -1400,7 +1400,7 @@
             // Arrange
             var typesBuilding = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
             
@@ -1435,7 +1435,7 @@
             // Arrange
             var typesBuilding = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
                 new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
@@ -1469,7 +1469,7 @@
         public void GetAllInstances_DecoratingContainerControlledCollectionWithHybridLifestyle_AppliesLifestyleCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
 
@@ -1493,7 +1493,7 @@
         public void GetAllInstances_DecoratingContainerUncontrolledCollectionWithLifestyleOtherThanTransientAndSingleton_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
                 new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };

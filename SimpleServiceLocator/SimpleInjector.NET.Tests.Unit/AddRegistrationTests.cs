@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
         public void GetInstanceOnTwoKeys_SameSingletonRegistrationForTwoKeys_ReturnsThatSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var registration = Lifestyle.Singleton.CreateRegistration<Implementation, Implementation>(container);
 
@@ -36,9 +36,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
         [TestMethod]
         public void AddRegistration_RegistrationFromAnotherContainer_FailsWithExpectedException()
         {
-            var container = new Container();
+            var container = ContainerFactory.New();
 
-            var otherContainer = new Container();
+            var otherContainer = ContainerFactory.New();
 
             var registrationFromAnotherContainer =
                 Lifestyle.Singleton.CreateRegistration<Implementation, Implementation>(otherContainer);

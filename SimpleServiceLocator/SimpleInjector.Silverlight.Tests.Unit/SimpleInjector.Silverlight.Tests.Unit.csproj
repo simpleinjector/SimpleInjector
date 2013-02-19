@@ -119,6 +119,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ConsistencyTests.cs">
       <Link>ConsistencyTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\ContainerFactory.cs">
+      <Link>ContainerFactory.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ContainerOptionsTests.cs">
       <Link>ContainerOptionsTests.cs</Link>
     </Compile>

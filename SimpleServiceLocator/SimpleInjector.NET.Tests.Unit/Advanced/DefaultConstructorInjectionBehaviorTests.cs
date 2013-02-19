@@ -26,7 +26,7 @@
         public void ConstructorInjectionBehavior_CustomBehaviorThatReturnsNull_ThrowsExpressiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.ConstructorInjectionBehavior = new FakeConstructorInjectionBehavior
             {

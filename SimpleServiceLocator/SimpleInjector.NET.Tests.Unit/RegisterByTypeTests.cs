@@ -10,7 +10,7 @@
         public void RegisterByType_ValidArguments_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             Type validImplementation = typeof(SqlUserRepository);
@@ -29,7 +29,7 @@
         public void RegisterByType_NullServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidServiceType = null;
             Type validImplementation = typeof(SqlUserRepository);
@@ -43,7 +43,7 @@
         public void RegisterByType_NullImplementation_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             Type invalidImplementation = null;
@@ -56,7 +56,7 @@
         public void RegisterByType_ServiceTypeAndImplementationSameType_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type implementation = typeof(SqlUserRepository);
 
@@ -68,7 +68,7 @@
         public void RegisterByType_ImplementationIsServiceType_ImplementationCanBeResolvedByItself()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register(typeof(SqlUserRepository), typeof(SqlUserRepository));
 
@@ -80,7 +80,7 @@
         public void RegisterByType_ImplementationIsServiceType_RegistersTheTypeAsTransient()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register(typeof(SqlUserRepository), typeof(SqlUserRepository));
 

@@ -12,7 +12,7 @@
         public void RegisterSingleByFunc_WithValidArgument_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             Func<IUserRepository> validDelegate = () => new SqlUserRepository();
 
             // Act
@@ -24,7 +24,7 @@
         public void RegisterSingleByFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             Func<IUserRepository> invalidDelegate = null;
 
             // Act
@@ -35,7 +35,7 @@
         public void Validate_ValidRegisterSingleByFuncRegistration_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             Func<IUserRepository> validDelegate = () => new SqlUserRepository();
             container.RegisterSingle<IUserRepository>(validDelegate);
 
@@ -49,7 +49,7 @@
             // Arrange
             string expectedMessage = "The registered delegate for type IUserRepository returned null";
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             Func<IUserRepository> invalidDelegate = () => null;
             container.RegisterSingle<IUserRepository>(invalidDelegate);
 
@@ -72,7 +72,7 @@
         public void RegisterSingleByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
 
             // Act
@@ -84,7 +84,7 @@
         public void RegisterSingleByFunc_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
@@ -96,7 +96,7 @@
         public void RegisterSingleByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(() => new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
@@ -109,7 +109,7 @@
         public void RegisterSingleByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Calling count will iterate the collections. 
@@ -126,7 +126,7 @@
             // Arrange
             int numberOfTimesDelegateWasCalled = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             container.RegisterSingle<IUserRepository>(() =>
@@ -148,7 +148,7 @@
             const int ExpectedNumberOfCalles = 1;
             int actualNumberOfCalls = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(() =>
             {
                 actualNumberOfCalls++;
@@ -170,7 +170,7 @@
         public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingleFunc_Succeeds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This registration will make the DelegateBuilder call the 
             // FuncSingletonInstanceProducer.BuildExpression method.
@@ -186,7 +186,7 @@
             // Arrange
             var expectedInnerException = new InvalidOperationException();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.RegisterSingle<IUserRepository>(() => { throw expectedInnerException; });
 
             try
@@ -211,7 +211,7 @@
         public void GetInstance_ThrowingDelegateRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(() => { throw new Exception("Bla."); });
 
@@ -236,7 +236,7 @@
         public void GetInstance_DelegateReturningNullRegisteredUsingRegisterSingleByFuncOfNonRootType_ThrowsActivationExceptionWithExpectedExceptionMessage()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IUserRepository>(() => null);
 
@@ -260,7 +260,7 @@
         public void RegisterSingleByFuncNonGeneric_ValidArguments_GetInstanceAlwaysReturnsSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Func<object> instanceCreator = () => new SqlUserRepository();
 
@@ -279,7 +279,7 @@
         public void RegisterSingleByFuncNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type invalidServiceType = null;
             Func<object> validInstanceCreator = () => new SqlUserRepository();
@@ -293,7 +293,7 @@
         public void RegisterSingleByFuncNonGeneric_NullInstanceCreator_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             Type validServiceType = typeof(IUserRepository);
             Func<object> invalidInstanceCreator = null;
