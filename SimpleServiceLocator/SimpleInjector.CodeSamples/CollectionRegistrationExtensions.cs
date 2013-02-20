@@ -10,29 +10,38 @@
 
     public static class CollectionRegistrationExtensions
     {
-        public static void AllowToResolveArraysAndLists(this Container container)
+        public static void AllowToResolveArraysAndLists(
+            this Container container)
         {
             container.ResolveUnregisteredType += (sender, e) =>
             {
-                if (e.UnregisteredServiceType.IsArray)
+                var serviceType = e.UnregisteredServiceType;
+
+                if (serviceType.IsArray)
                 {
-                    RegisterArrayResolver(e, container, e.UnregisteredServiceType.GetElementType());
+                    RegisterArrayResolver(e, container, 
+                        serviceType.GetElementType());
                 }
-                else if (e.UnregisteredServiceType.IsGenericType &&
-                    e.UnregisteredServiceType.GetGenericTypeDefinition() == typeof(IList<>))
+                else if (serviceType.IsGenericType &&
+                    serviceType.GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    RegisterArrayResolver(e, container, e.UnregisteredServiceType.GetGenericArguments()[0]);
+                    RegisterArrayResolver(e, container, 
+                        serviceType.GetGenericArguments()[0]);
                 }
             };
         }
 
-        private static void RegisterArrayResolver(UnregisteredTypeEventArgs e, Container container, 
-            Type elementType)
+        private static void RegisterArrayResolver(UnregisteredTypeEventArgs e, 
+            Container container, Type elementType)
         {
-            var producer = container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType));
+            var producer = container.GetRegistration(typeof(IEnumerable<>)
+                .MakeGenericType(elementType));
             var enumerableExpression = producer.BuildExpression();
-            var arrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
-            var arrayExpression = Expression.Call(arrayMethod, enumerableExpression);
+            var arrayMethod = typeof(Enumerable).GetMethod("ToArray")
+                .MakeGenericMethod(elementType);
+            var arrayExpression = 
+                Expression.Call(arrayMethod, enumerableExpression);
+
             e.Register(arrayExpression);
         }
     }
