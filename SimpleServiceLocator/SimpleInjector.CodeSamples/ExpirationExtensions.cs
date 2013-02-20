@@ -2,6 +2,7 @@
 {
     // http://simpleinjector.codeplex.com/wikipage?title=ExpirationExtensionMethod
     using System;
+    using System.Linq.Expressions;
 
     public static class ExpirationExtensions
     {
@@ -10,23 +11,8 @@
             where TService : class
             where TImplementation : class, TService
         {
-            TService instance = null;
-            var syncRoot = new object();
-            var expirationTime = DateTime.MinValue;
-
-            container.Register<TService>(() =>
-            {
-                lock (syncRoot)
-                {
-                    if (expirationTime < DateTime.UtcNow)
-                    {
-                        instance = container.GetInstance<TImplementation>();
-                        expirationTime = DateTime.UtcNow.Add(timeout);
-                    }
-
-                    return instance;
-                }
-            });
+            var lifestyle = CreateExpirationLifestyle(timeout, sliding: false);
+            container.Register<TService, TImplementation>(lifestyle);
         }
 
         public static void RegisterWithSlidingExpiration<TService, TImplementation>(
@@ -34,23 +20,42 @@
             where TService : class
             where TImplementation : class, TService
         {
-            TService instance = null;
-            var syncRoot = new object();
-            var expirationTime = DateTime.MinValue;
+            var lifestyle = CreateExpirationLifestyle(timeout, sliding: true);
+            container.Register<TService, TImplementation>(lifestyle);
+        }
 
-            container.Register<TService>(() =>
+        private static Lifestyle CreateExpirationLifestyle(TimeSpan timeout, bool sliding)
+        {
+            string name = sliding ? "Sliding" : "Absolute";
+
+            return Lifestyle.CreateCustom(name + " Expiration", instanceCreator =>
             {
-                lock (syncRoot)
+                var syncRoot = new object();
+                var expirationTime = DateTime.MinValue;
+                object instance = null;
+
+                return () =>
                 {
-                    if (expirationTime < DateTime.UtcNow)
+                    lock (syncRoot)
                     {
-                        instance = container.GetInstance<TImplementation>();
+                        if (expirationTime < DateTime.UtcNow)
+                        {
+                            instance = instanceCreator();
+
+                            if (!sliding)
+                            {
+                                expirationTime = DateTime.UtcNow.Add(timeout);
+                            }
+                        }
+
+                        if (sliding)
+                        {
+                            expirationTime = DateTime.UtcNow.Add(timeout);
+                        }
+
+                        return instance;
                     }
-
-                    expirationTime = DateTime.UtcNow.Add(timeout);
-
-                    return instance;
-                }
+                };
             });
         }
     }

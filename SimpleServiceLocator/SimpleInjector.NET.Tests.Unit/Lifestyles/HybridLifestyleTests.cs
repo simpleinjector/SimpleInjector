@@ -15,7 +15,7 @@
         public void BuildExpression_WithHybridLifestyle_BuildsExpectedExpression()
         {
             // Arrange
-            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -38,7 +38,7 @@
         public void BuildExpression_WithHybridLifestyleAndRegisteredDelegate_BuildsExpectedExpression()
         {
             // Arrange
-            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -65,7 +65,7 @@
             // Arrange
             Func<bool> selectTransient = () => true;
 
-            var hybrid = Lifestyle.Hybrid(selectTransient, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(selectTransient, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -85,7 +85,7 @@
             // Arrange
             Func<bool> selectSingleton = () => false;
 
-            var hybrid = Lifestyle.Hybrid(selectSingleton, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(selectSingleton, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -114,7 +114,7 @@
                 return pickLeft;
             };
 
-            var hybrid = Lifestyle.Hybrid(predicate, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(predicate, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -151,7 +151,7 @@
                 return pickLeft.Value;
             };
             
-            var hybrid = Lifestyle.Hybrid(predicate, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(predicate, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -179,7 +179,7 @@
             int expectedNumberOfCalls = 2;
             int actualNumberOfCalls = 0;
 
-            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
 
@@ -211,7 +211,7 @@
             int actualNumberOfCalls = 0;
             Expression expression = null;
 
-            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
 
             var container = ContainerFactory.New();
 
@@ -244,7 +244,7 @@
         public void CreateRegistration_Always_ReturnsARegistrationThatWrapsTheOriginalLifestyle()
         {
             // Arrange
-            var expectedLifestyle = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
+            var expectedLifestyle = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Transient);
 
             var container = ContainerFactory.New();
 
@@ -265,7 +265,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             // RealUserService depends on IUserRepository
             container.Register<UserServiceBase, RealUserService>(hybrid);

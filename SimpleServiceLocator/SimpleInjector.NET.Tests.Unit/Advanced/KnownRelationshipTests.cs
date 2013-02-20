@@ -151,7 +151,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             {
                 Lifestyle = Lifestyle.Transient,
                 ImplementationType = typeof(RealTimeProvider),
-                Dependency = (ContainerFactory.New()).GetRegistration(typeof(Container))
+                Dependency = ContainerFactory.New().GetRegistration(typeof(Container))
             };
         }
 

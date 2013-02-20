@@ -12,21 +12,21 @@
 
     public static class PropertyInjectionExtensions
     {
-        private static readonly object registrationsKey = new object();
+        private static readonly object RegistrationsKey = new object();
 
         [DebuggerStepThrough]
         public static void EnablePropertyAutowiring(this ContainerOptions options)
         {
             EnsureNoRegistrationsHaveBeenMade(options);
 
-            if (options.Container.GetItem(registrationsKey) != null)
+            if (options.Container.GetItem(RegistrationsKey) != null)
             {
                 throw new InvalidOperationException("EnablePropertyAutowiring should be called just once.");
-            };
+            }
 
             var registrations = new PropertyRegistrations();
 
-            options.Container.SetItem(registrationsKey, registrations);
+            options.Container.SetItem(RegistrationsKey, registrations);
 
             // Enable auto-wiring on properties using the PropertyRegistrations.
             options.AutowireProperties(registrations.WireType, registrations.WireProperty);
@@ -118,7 +118,7 @@
         [DebuggerStepThrough]
         private static PropertyRegistrations GetPropertyRegistrations(this Container container)
         {
-            var registrations = (PropertyRegistrations)container.GetItem(registrationsKey);
+            var registrations = (PropertyRegistrations)container.GetItem(RegistrationsKey);
 
             if (registrations == null)
             {

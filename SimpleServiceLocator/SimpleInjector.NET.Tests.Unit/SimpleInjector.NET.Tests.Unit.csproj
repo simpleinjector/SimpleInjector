@@ -109,6 +109,7 @@
     <Compile Include="InjectPropertiesTests.cs" />
     <Compile Include="ExpressionBuiltEventTests.cs" />
     <Compile Include="InstanceProducerTests.cs" />
+    <Compile Include="Lifestyles\CustomLifestyleTests.cs" />
     <Compile Include="Lifestyles\HybridLifestyleTests.cs" />
     <Compile Include="LifestyleTests.cs" />
     <Compile Include="Lifestyles\LifestyleRegistrationTests.cs" />

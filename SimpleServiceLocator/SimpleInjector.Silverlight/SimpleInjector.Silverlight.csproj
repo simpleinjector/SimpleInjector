@@ -191,6 +191,9 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyle.cs">
       <Link>Lifestyle.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\CustomLifestyle.cs">
+      <Link>Lifestyles\CustomLifestyle.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\ExpressionRegistration.cs">
       <Link>Lifestyles\ExpressionRegistration.cs</Link>
     </Compile>

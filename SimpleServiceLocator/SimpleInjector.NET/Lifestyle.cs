@@ -35,13 +35,25 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>
+    /// Factory for the creation of a delegate that applies caching to the supplied 
+    /// <paramref name="transientInstanceCreator"/>.
+    /// </summary>
+    /// <param name="transientInstanceCreator">A factory for creating new instances.</param>
+    /// <returns>A factory that returns cached instances.</returns>
+    public delegate Func<object> CreateLifestyleApplier(Func<object> transientInstanceCreator);
+
+    /// <summary>
     /// Instances returned from the container can be cached. The <see cref="Container"/> contains several
     /// overloads of the <b>Register</b> method that take a <b>Lifestyle</b> instance as argument to define 
     /// how returned instances should be cached. The core library contains two lifestyles out of the box. By
     /// supplying <see cref="Lifestyle.Transient">Lifestyle.Transient</see>, the registered instance is not
     /// cached; a new instance is returned every time it is requested or injected. By supplying
     /// <see cref="Lifestyle.Singleton">Lifestyle.Singleton</see> instances can be cached indefinately; only
-    /// a single instance of the registered component will be returned by that container instance.
+    /// a single instance of the registered component will be returned by that container instance. Other
+    /// lifestyles are defined in integration and extension packages. The 
+    /// <see cref="Lifestyle.CreateCustom">CreateCustom</see> method allows defining a custom lifestyle and 
+    /// the <see cref="Lifestyle.CreateHybrid">CreateHybrid</see> method allows creating a lifestle that mixes 
+    /// multiple other lifestyles.
     /// </summary>
     /// <remarks>
     /// This type is abstract and can be overridden to implement a custom lifestyle.
@@ -145,7 +157,7 @@ namespace SimpleInjector
         /// <code lang="cs"><![CDATA[
         /// // NOTE: WebRequestLifestyle is located in SimpleInjector.Integration.Web.dll.
         /// // NOTE: LifetimeScopeLifestyle is located in SimpleInjector.Extensions.LifetimeScoping.dll.
-        /// var mixedScopeLifestyle = Lifestyle.Hybrid(
+        /// var mixedScopeLifestyle = Lifestyle.CreateHybrid(
         ///     () => HttpContext.Current != null,
         ///     new WebRequestLifestyle(),
         ///     new LifetimeScopeLifestyle());
@@ -156,12 +168,12 @@ namespace SimpleInjector
         /// ]]></code>
         /// Hybrid lifestyles can be nested:
         /// <code lang="cs"><![CDATA[
-        /// var mixedLifetimeTransientLifestyle = Lifestyle.Hybrid(
+        /// var mixedLifetimeTransientLifestyle = Lifestyle.CreateHybrid(
         ///     () => container.GetCurrentLifetimeScope() != null,
         ///     new LifetimeScopeLifestyle(),
         ///     Lifestyle.Transient);
         /// 
-        /// var mixedScopeLifestyle = Lifestyle.Hybrid(
+        /// var mixedScopeLifestyle = Lifestyle.CreateHybrid(
         ///     () => HttpContext.Current != null,
         ///     new WebRequestLifestyle(),
         ///     mixedLifetimeTransientLifestyle);
@@ -169,13 +181,83 @@ namespace SimpleInjector
         /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and 
         /// Transient.
         /// </example>
-        public static Lifestyle Hybrid(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        public static Lifestyle CreateHybrid(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
         {
             Requires.IsNotNull(test, "test");
             Requires.IsNotNull(trueLifestyle, "trueLifestyle");
             Requires.IsNotNull(falseLifestyle, "falseLifestyle");
 
             return new HybridLifestyle(test, trueLifestyle, falseLifestyle);
+        }
+        
+        /// <summary>
+        /// Creates a custom lifestyle using the supplied <paramref name="lifestyleApplierFactory"/> delegate.
+        /// </summary>
+        /// <remarks>
+        /// The supplied <paramref name="lifestyleApplierFactory" /> will be called just once per registered 
+        /// service. The supplied <paramref name="lifestyleApplierFactory" /> will be called by the framework
+        /// when the type is resolved for the first time, and the framework will supply the factory with a
+        /// <b>Func&lt;object&gt;</b> for creating new (transient) instances of that type (that might
+        /// have been <see cref="Container.ExpressionBuilding">intercepted</see> and
+        /// <see cref="Container.RegisterInitializer">initializers</see> might have been applied). It is the
+        /// job of the <paramref name="lifestyleApplierFactory" /> to return a <b>Func&lt;object&gt;</b> that
+        /// applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the 
+        /// <paramref name="lifestyleApplierFactory" /> will be stored for that registration (every 
+        /// registration will store its own <b>Func&lt;object&gt;</b> delegate) and this delegate will be
+        /// called everytime the service is resolved (by calling 
+        /// <code>container.GetInstance&lt;TService&gt;</code> or when that service is injected into another
+        /// type). 
+        /// </remarks>
+        /// <param name="name">The name of the lifestyle to create. The name is used to display the lifestyle
+        /// in the debugger.</param>
+        /// <param name="lifestyleApplierFactory">A factory delegate that takes a <b>Func&lt;object&gt;</b> delegate
+        /// that will produce a transient instance and returns a delegate that returns cached instances.</param>
+        /// <returns>A new <see cref="Lifestyle"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is an empty string.</exception>
+        /// <example>
+        /// The following example shows the creation of a lifestyle that caches registered instances for 10
+        /// minutes:
+        /// <code lang="cs"><![CDATA[
+        /// var customLifestyle = Lifestyle.CreateCustom("Absolute 10 Minute Expiration", instanceCreator =>
+        /// {
+        ///     TimeSpan timeout = TimeSpan.FromMinutes(10);
+        ///     var syncRoot = new object();
+        ///     var expirationTime = DateTime.MinValue;
+        ///     object instance = null;
+        /// 
+        ///     // If the application has multiple registrations using this lifestyle, each registration
+        ///     // will get its own Func<object> delegate (created here) and therefore get its own set
+        ///     // of variables as defined above.
+        ///     return () =>
+        ///     {
+        ///         lock (syncRoot)
+        ///         {
+        ///             if (expirationTime < DateTime.UtcNow)
+        ///             {
+        ///                 instance = instanceCreator();
+        ///                 expirationTime = DateTime.UtcNow.Add(timeout);
+        ///             }
+        /// 
+        ///             return instance;
+        ///         }
+        ///     };
+        /// });
+        /// 
+        /// var container = new Container();
+        /// 
+        /// // We can reuse the created lifestyle for multiple registrations.
+        /// container.Register<IService, MyService>(customLifestyle);
+        /// container.Register<AnotherService, MeTwoService>(customLifestyle);
+        /// ]]></code>
+        /// </example>
+        public static Lifestyle CreateCustom(string name, CreateLifestyleApplier lifestyleApplierFactory)
+        {
+            Requires.IsNotNullOrEmpty(name, "name");
+            Requires.IsNotNull(lifestyleApplierFactory, "lifestyleApplierFactory");
+
+            return new CustomLifestyle(name, lifestyleApplierFactory);
         }
 
         /// <summary>

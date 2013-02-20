@@ -18,8 +18,23 @@
         void Validate(T instance);
     }
 
+    public class CommandWithDependency : ICommand
+    {
+        public CommandWithDependency(ILogger logger)
+        {
+        }
+
+        public void Execute()
+        {
+        }
+    }
+
     public class ConcreteCommand : ICommand
     {
+        public ConcreteCommand()
+        {
+        }
+
         public void Execute()
         {
         }

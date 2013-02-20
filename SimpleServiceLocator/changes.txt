@@ -13,8 +13,9 @@ Version v2.0
 		-[Core] Diagnostic Debug View added to give feedback on possible misconfigurations in the
 		 container. See here for more information: https://simpleinjector.codeplex.com/discussions/431684.
 		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
-		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.Hybrid() method to create a custom
-		 hybrid lifestyle. Other lifestyle classes are implemented in the integration and extension
+		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.CreateHybrid() method to create
+		 hybrid lifestyles and a Lifestyle.CreateCustom() method to create a lifestyle based on a name and
+		 a supplied delegate. Other lifestyle classes are implemented in the integration and extension
 		 libraries.
 		-[Core] Register overloads added that take Lifetyle as argument.
 		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the

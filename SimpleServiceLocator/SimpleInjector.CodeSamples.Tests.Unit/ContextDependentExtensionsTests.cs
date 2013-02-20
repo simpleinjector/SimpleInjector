@@ -227,7 +227,7 @@ using SimpleInjector.Lifestyles;
         public void HybridLifestyle_WithContext_AppliesContextCorrectly1()
         {
             // Arrange
-            var hybrid = Lifestyle.Hybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = new Container();
 
@@ -247,7 +247,7 @@ using SimpleInjector.Lifestyles;
         public void HybridLifestyle_WithContext_AppliesContextCorrectly2()
         {
             // Arrange
-            var hybrid = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = new Container();
 

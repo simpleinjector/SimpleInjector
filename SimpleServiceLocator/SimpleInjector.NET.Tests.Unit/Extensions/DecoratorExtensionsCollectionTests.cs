@@ -1475,7 +1475,7 @@
 
             container.RegisterAll<ICommandHandler<RealCommand>>(typesToRegister);
 
-            var hybridLifestyle = Lifestyle.Hybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
+            var hybridLifestyle = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
                 hybridLifestyle);
@@ -1499,7 +1499,7 @@
                 new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
-                Lifestyle.Hybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
+                Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
 
             try
             {
