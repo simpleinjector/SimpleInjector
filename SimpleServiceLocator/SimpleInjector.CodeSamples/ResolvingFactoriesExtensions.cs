@@ -1,15 +1,11 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
 
     public static class ResolvingFactoriesExtensions
     {
-        private interface ILazyBuilder
-        {
-            object NewLazy();
-        }
-
         // This extension method is equivalent to the following registration, for each and every T:
         // container.RegisterSingle<Func<T>>(() => container.GetInstance<T>());
         // This is useful for consumers that need to create multiple instances of a dependency.
@@ -23,15 +19,16 @@
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
-                    var producer = container.GetRegistration(serviceType);
+                    InstanceProducer registration = container.GetRegistration(serviceType);
 
-                    if (producer != null)
+                    if (registration != null)
                     {
-                        var func = typeof(ResolvingFactoriesExtensions).GetMethod("BuildFactory")
-                            .MakeGenericMethod(serviceType)
-                            .Invoke(null, new[] { producer });
+                        Type funcType = typeof(Func<>).MakeGenericType(serviceType);
 
-                        e.Register(() => func);
+                        var factoryDelegate = 
+                            Expression.Lambda(funcType, registration.BuildExpression()).Compile();
+
+                        e.Register(Expression.Constant(factoryDelegate));
                     }
                 }
             };
@@ -51,45 +48,27 @@
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
-                    var producer = container.GetRegistration(serviceType);
+                    InstanceProducer registration = container.GetRegistration(serviceType);
 
-                    if (producer != null)
+                    if (registration != null)
                     {
-                        var lazyBuilder = Activator.CreateInstance(
-                            typeof(LazyBuilder<>).MakeGenericType(serviceType), producer) as ILazyBuilder;
+                        Type funcType = typeof(Func<>).MakeGenericType(serviceType);
+                        Type lazyType = typeof(Lazy<>).MakeGenericType(serviceType);
 
-                        e.Register(() => lazyBuilder.NewLazy());
+                        var factoryDelegate = 
+                            Expression.Lambda(funcType, registration.BuildExpression()).Compile();
+                        
+                        var lazyConstructor = (
+                            from ctor in lazyType.GetConstructors()
+                            where ctor.GetParameters().Length == 1
+                            where ctor.GetParameters()[0].ParameterType == funcType
+                            select ctor)
+                            .Single();
+
+                        e.Register(Expression.New(lazyConstructor, Expression.Constant(factoryDelegate)));
                     }
                 }
             };
-        }
-
-        public static Lazy<T> BuildLazy<T>(InstanceProducer producer)
-        {
-            return new Lazy<T>(BuildFactory<T>(producer));
-        }
-
-        public static Func<T> BuildFactory<T>(InstanceProducer producer)
-        {
-            var factoryExpression = Expression.Lambda<Func<T>>(producer.BuildExpression(),
-                new ParameterExpression[0]);
-
-            return factoryExpression.Compile();
-        }
-
-        public sealed class LazyBuilder<T> : ILazyBuilder
-        {
-            private readonly Func<T> producer;
-
-            public LazyBuilder(InstanceProducer producer)
-            {
-                this.producer = BuildFactory<T>(producer);
-            }
-
-            public object NewLazy()
-            {
-                return new Lazy<T>(this.producer);
-            }
         }
     }
 }
