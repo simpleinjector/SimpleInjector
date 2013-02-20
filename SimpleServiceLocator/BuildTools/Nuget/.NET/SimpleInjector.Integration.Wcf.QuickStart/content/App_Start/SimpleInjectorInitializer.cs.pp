@@ -1,4 +1,4 @@
-[assembly: WebActivator.PreApplicationStartMethod(typeof($rootnamespace$.App_Start.SimpleInjectorInitializer), "Initialize")]
+[assembly: WebActivator.PostApplicationStartMethod(typeof($rootnamespace$.App_Start.SimpleInjectorInitializer), "Initialize")]
 
 namespace $rootnamespace$.App_Start
 {
@@ -19,7 +19,6 @@ namespace $rootnamespace$.App_Start
 
             container.RegisterWcfServices(Assembly.GetExecutingAssembly());
 
-            // Using Entity Framework? Please visit the following page: http://bit.ly/W7qxc4
             container.Verify();
 			
             SimpleInjectorServiceHostFactory.SetContainer(container);

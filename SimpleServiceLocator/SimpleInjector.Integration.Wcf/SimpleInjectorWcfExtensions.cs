@@ -239,8 +239,7 @@ namespace SimpleInjector
         /// container.Register<IService, ServiceImpl>();
         /// container.RegisterInitializer<ServiceImpl>(instance =>
         /// {
-        ///     var scope = container.GetCurrentLifetimeScope()
-        ///     if (scope != null) scope.RegisterForDisposal(instance);
+        ///     container.GetCurrentWcfOperationScope().RegisterForDisposal(instance);
         /// });
         /// ]]></code>
         /// </example>
