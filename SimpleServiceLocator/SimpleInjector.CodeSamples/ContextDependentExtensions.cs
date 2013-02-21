@@ -6,7 +6,9 @@
     using System.Linq.Expressions;
     using SimpleInjector;
 
-    [DebuggerDisplay("DependencyContext (ServiceType: {ServiceType}, ImplementationType: {ImplementationType})")]
+    [DebuggerDisplay(
+        "DependencyContext (ServiceType: {ServiceType}, " + 
+        "ImplementationType: {ImplementationType})")]
     public class DependencyContext
     {
         internal static readonly DependencyContext Root = 
@@ -105,16 +107,19 @@
                             this.ImplementationType)));
             }
 
-            private bool IsRootedContextBasedFactory(InvocationExpression node)
+            private bool IsRootedContextBasedFactory(
+                InvocationExpression node)
             {
-                var expression = node.Expression as ConstantExpression;
+                var expression = 
+                    node.Expression as ConstantExpression;
 
                 if (expression == null)
                 {
                     return false;
                 }
 
-                return object.ReferenceEquals(expression.Value, this.RootFactory);
+                return object.ReferenceEquals(expression.Value, 
+                    this.RootFactory);
             }
         }
     }
