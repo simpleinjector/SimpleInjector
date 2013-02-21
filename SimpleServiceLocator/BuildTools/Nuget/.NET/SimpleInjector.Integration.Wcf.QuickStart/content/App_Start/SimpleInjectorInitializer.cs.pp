@@ -12,7 +12,7 @@ namespace $rootnamespace$.App_Start
         /// <summary>Initialize the container and register it for the WCF ServiceHostFactory.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration? Go to: http://bit.ly/YINd6R.
+            // Did you know the container can diagnose your configuration? Go to: http://bit.ly/YE8OJj.
             var container = new Container();
 
             InitializeContainer(container);
