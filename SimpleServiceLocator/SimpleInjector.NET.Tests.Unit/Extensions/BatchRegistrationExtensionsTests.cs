@@ -3,11 +3,15 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Lifestyles;
 
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector.Extensions;
+
+    // Suppress the Obsolete warnings, since we want to test GetTypesToRegister overloads that are marked obsolete.
+#pragma warning disable 0618
     [TestClass]
     public class BatchRegistrationExtensionsTests
     {
@@ -28,12 +32,12 @@
         [TestMethod]
         public void GetTypesToRegister1_Always_ReturnsAValue()
         {
-            // Act
+            // Arrange
             var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
                 typeof(IService<,>).Assembly);
 
-            // Assert
-            Assert.IsNotNull(result);
+            // Act
+            result.ToArray();
         }
 
         [TestMethod]
@@ -42,24 +46,48 @@
             // Arrange
             IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
 
-            // Act
             var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
                 assemblies);
 
+            // Act
+            result.ToArray();
+        }
+
+        [TestMethod]
+        public void GetTypesToRegister_WithoutContainerArgument_ReturnsDecorators()
+        {
+            // Arrange
+            // Act
+            var types = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
+                typeof(IService<,>), typeof(IService<,>).Assembly);
+
             // Assert
-            Assert.IsNotNull(result);
+            Assert.IsTrue(types.Any(type => type == typeof(ServiceDecorator)), "The decorator was not included.");
+        }
+
+        [TestMethod]
+        public void GetTypesToRegister_WithContainerArgument_ReturnsNoDecorators()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var types = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(container,
+                typeof(IService<,>), typeof(IService<,>).Assembly);
+
+            // Assert
+            Assert.IsFalse(types.Any(type => type == typeof(ServiceDecorator)), "The decorator was included.");
         }
 
 #if !SILVERLIGHT
         [TestMethod]
         public void GetTypesToRegister3_Always_ReturnsAValue()
         {
-            // Act
             var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
                 AccessibilityOption.AllTypes, typeof(IService<,>).Assembly);
 
-            // Assert
-            Assert.IsNotNull(result);
+            // Act
+            result.ToArray();
         }
 
         [TestMethod]
@@ -68,12 +96,11 @@
             // Arrange
             IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
 
-            // Act
             var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
                 AccessibilityOption.AllTypes, assemblies);
 
-            // Assert
-            Assert.IsNotNull(result);
+            // Act
+            result.ToArray();
         }
 #endif
 
@@ -729,6 +756,13 @@
         {
         }
 
+        public class ServiceDecorator : IService<int, object>
+        {
+            public ServiceDecorator(IService<int, object> decorated)
+            {
+            }
+        }
+
         // Internal type.
         private class Concrete4 : IService<decimal, decimal>
         {
@@ -736,4 +770,5 @@
 
         #endregion
     }
+    #pragma warning restore 0618
 }

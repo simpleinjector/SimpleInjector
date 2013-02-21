@@ -107,6 +107,28 @@ namespace SimpleInjector.Extensions.Decorators
 
             return Expression.Call(selectMethod, collectionExpression, Expression.Constant(selector));
         }
+
+        internal static bool IsDecorator(Container container, Type serviceType, Type typeToCheck)
+        {
+            ConstructorInfo constructorToCheck;
+
+            try
+            {
+                constructorToCheck =
+                    container.Options.ConstructorResolutionBehavior.GetConstructor(serviceType, typeToCheck);
+            }
+            catch (ActivationException)
+            {
+                // If the constructor resolution behavior fails, we can't determine whether this type is a
+                // decorator. Since this method is used by batch registration, by returning false the type
+                // will be included in batch registration and at that point GetConstructor is called again
+                // -and will fail again- giving the user the required information.
+                return false;
+            }
+
+            return DecoratesServiceType(serviceType, constructorToCheck) &&
+                DecoratesBaseTypes(serviceType, constructorToCheck);
+        }
         
         internal static bool DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor)
         {

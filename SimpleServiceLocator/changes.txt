@@ -53,6 +53,8 @@ Version v2.0
 		 being registered directly. An exception is thrown.
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
+		-[Extensions/Core] The old OpenGenericBatchRegistrationExtensions.GetTypesToRegister overloads have 
+		 been marked obsolete. There are new overloads that take the Container as an argument.
 
 	Changes:
 		-[Extensions/Core] Extensions library has been merged with core library. Extensions library is 
@@ -60,6 +62,9 @@ Version v2.0
 		 users.
 		-[Core] A call to GetCurrentRegistrations() will not lock the container anymore. This allows users
 		 to use this method to query the container during registration.
+		-[Extensions/Core] RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods
+		 now ignore any found decorator type. This makes it easier to have use batch registration while having
+		 non-generic decorators in the same project.
 
 	Bug fixes:
 		-[Core] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event
