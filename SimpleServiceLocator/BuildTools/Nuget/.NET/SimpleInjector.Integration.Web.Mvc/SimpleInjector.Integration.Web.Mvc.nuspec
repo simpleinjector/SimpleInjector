@@ -6,7 +6,7 @@
     <owners>S. van Deursen</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
     <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=MVC%20Integration</projectUrl>
-    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&DownloadId=627684</iconUrl>
+    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=628541</iconUrl>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
       <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
