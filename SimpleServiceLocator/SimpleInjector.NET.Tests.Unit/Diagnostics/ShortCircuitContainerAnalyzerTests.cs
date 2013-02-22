@@ -7,6 +7,10 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
 
     using SimpleInjector.Diagnostics;
 
+    public interface IUnitOfWork
+    {
+    }
+
     public interface IService1
     {
     }
@@ -37,6 +41,33 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
 
         [TestMethod]
         public void Analyze_OnConfigurationWithOneShortCircuitedRegistration_ReturnsThatWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
+
+            container.Register<HomeController>();
+
+            container.Verify();
+
+            var analyzer = new ShortCircuitContainerAnalyzer();
+
+            // Act
+            var results = analyzer.Analyse(container).Value as DebuggerViewItem[];
+
+            // Assert
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual("HomeController", results[0].Name);
+            Assert.AreEqual(@"
+                HomeController might incorrectly depend on unregistered type MyUnitOfWork 
+                (Transient) instead of IUnitOfWork (Singleton).
+                ".TrimInside(),
+                results[0].Description);
+        }
+
+        [TestMethod]
+        public void Analyze_OnConfigurationWithOneShortCircuitedRegistrationWithTwoPossibleSolutions_ReturnsThatWarning()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -105,6 +136,20 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
     {
         public Controller(ImplementsBothInterfaces concrete)
         {
+        }
+    }
+
+    public class MyUnitOfWork : IUnitOfWork 
+    {
+    }
+
+    public class HomeController
+    {
+        private readonly MyUnitOfWork uow;
+
+        public HomeController(MyUnitOfWork uow)
+        {
+            this.uow = uow;
         }
     }
 }
