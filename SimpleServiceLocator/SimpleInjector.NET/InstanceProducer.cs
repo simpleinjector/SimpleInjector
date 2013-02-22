@@ -282,7 +282,10 @@ namespace SimpleInjector
             }
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
-            public Type ServiceType { get; private set; }
+            public Type ServiceType
+            {
+                get { return this.instanceProducer.ServiceType; }
+            }
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
             public Type ImplementationType
