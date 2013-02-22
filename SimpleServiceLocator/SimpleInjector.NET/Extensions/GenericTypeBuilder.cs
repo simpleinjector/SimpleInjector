@@ -62,6 +62,11 @@ namespace SimpleInjector.Extensions
 
             Type closedGenericImplementation =
                 this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
+            
+            if (closedGenericImplementation == null)
+            {
+                return BuildResult.Invalid();
+            }
 
             return BuildResult.Valid(closedGenericImplementation);
         }
@@ -83,7 +88,16 @@ namespace SimpleInjector.Extensions
             {
                 var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
 
-                return this.OpenGenericImplementation.MakeGenericType(arguments);
+                try
+                {
+                    return this.OpenGenericImplementation.MakeGenericType(arguments);
+                }
+                catch (ArgumentException)
+                {
+                    // This can happen when there is a type constraint that we didn't check. For instance
+                    // the constraint where TIn : TOut is one we cannot check and have to to here (bit ugly).
+                    return null;
+                }
             }
             else
             {

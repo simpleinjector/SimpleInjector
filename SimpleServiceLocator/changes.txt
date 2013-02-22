@@ -26,9 +26,9 @@ Version v2.0
 		-[Integration.Web] WebRequestLifestyle has been added.
 		-[Integration.Wcf] WcfOperationLifestyle has been added.
 		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
-		-[Extensions] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
-		-[Extensions] RegisterOpenGeneric overloads have been added that allow specifying a lifestyle.
-		-[Extensions] RegisterDecorator overloads have been added that allow specifying a lifestyle.
+		-[Core] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Core] RegisterOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Core] RegisterDecorator overloads have been added that allow specifying a lifestyle.
 
 	Breaking changes:
 		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
@@ -53,17 +53,16 @@ Version v2.0
 		 being registered directly. An exception is thrown.
 		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
 		 WebRequestLifestyle can be used instead.
-		-[Extensions/Core] The old OpenGenericBatchRegistrationExtensions.GetTypesToRegister overloads have 
-		 been marked obsolete. There are new overloads that take the Container as an argument.
+		-[Core] The old OpenGenericBatchRegistrationExtensions.GetTypesToRegister overloads have been marked 
+		 obsolete. There are new overloads that take the Container as an argument.
 
 	Changes:
-		-[Extensions/Core] Extensions library has been merged with core library. Extensions library is 
-		 currently empty, but will still be used as NuGet package for backwards compatibility for existing
-		 users.
+		-[Extensions] Extensions library has been merged with core library. Extensions library is currently 
+		 empty, but will still be used as NuGet package for backwards compatibility for existing users.
 		-[Core] A call to GetCurrentRegistrations() will not lock the container anymore. This allows users
 		 to use this method to query the container during registration.
-		-[Extensions/Core] RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods
-		 now ignore any found decorator type. This makes it easier to have use batch registration while having
+		-[Core] RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods now ignore 
+		 any found decorator type. This makes it easier to have use batch registration while having 
 		 non-generic decorators in the same project.
 
 	Bug fixes:
@@ -71,6 +70,7 @@ Version v2.0
 		 that was triggered twice for singletons. (work item 19110)
 		-[Core] Memory leak when using decorators with while creating many Container instances. (work item 
 		 19241)
+		-[Core] RegisterOpenGeneric failed to resolve types that had a "where TOne : TTwo" type constraint.
 		-[Extensions.LifetimeScoping] Registration order of RegisterDecorator and RegisterLifetimeScope
 		 mattered for the lifetime op the decorator. (work item 19120)
 		-[Integration.Web] Registration order of RegisterDecorator and RegisterPerWebRequest mattered for the 

@@ -572,7 +572,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // NOTE: Foo<T1, T2> contains the constraint 'where T1 : IBar<T2>'.
+            // class Baz : IBar<Bar>
+            // class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
             container.RegisterOpenGeneric(typeof(IFoo<>), typeof(Foo<,>));
 
             // Act
@@ -694,6 +695,37 @@
                     .TrimInside(),
                     ex.Message);
             }
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterOpenGenericWithInheritingTypeConstraintsAndMatchingRequest_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
+
+            // Act
+            // Since TIn : TOut and IDisposable : object, GetInstance should succeed.
+            container.GetInstance<IService<IDisposable, object>>();
+        }
+
+        [TestMethod]
+        public void GetRegistration_RegisterOpenGenericWithInheritingTypeConstraintsAndNonMatchingRequest_ReturnsNull()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
+
+            // Act
+            var registration = container.GetRegistration(typeof(IService<object, IDisposable>));
+
+            // Assert
+            Assert.IsNull(registration,
+                "Since TIn : TOut but object does not inherit from IDisposable, GetRegistration should return null.");
         }
 
 #if SILVERLIGHT
@@ -840,6 +872,10 @@
         }
 
         public class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
+        {
+        }
+
+        public class ServiceWhereTInIsTOut<TA, TB> : IService<TA, TB> where TA : TB
         {
         }
 

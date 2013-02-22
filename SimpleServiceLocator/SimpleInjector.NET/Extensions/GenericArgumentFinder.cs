@@ -61,7 +61,8 @@ namespace SimpleInjector.Extensions
             // An Argument mapping is a mapping between a generic type argument and a concrete type. For
             // instance: { Argument = T, ConcreteType = Int32 } is the mapping from generic type argument T
             // to Int32.
-            var argumentMappings = this.GetOpenServiceArgumentToConcreteTypeMappings();
+            IEnumerable<ArgumentMapping> argumentMappings = 
+                this.GetOpenServiceArgumentToConcreteTypeMappings().ToArray();
 
             this.ConvertToOpenImplementationArgumentMappings(ref argumentMappings);
 
@@ -98,16 +99,18 @@ namespace SimpleInjector.Extensions
                 from mapping in mappings
                 from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping)
                 select newMapping)
-                .Distinct();
+                .Distinct()
+                .ToArray();
         }
 
         private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
             ref IEnumerable<ArgumentMapping> mappings)
         {
-            mappings =
+            mappings = (
                 from mapping in mappings
                 where mapping.TypeConstraintsAreSatisfied
-                select mapping;
+                select mapping)
+                .ToArray();
         }
 
         private static void RemoveDuplicateTypeArguments(ref IEnumerable<ArgumentMapping> mappings)
@@ -116,11 +119,12 @@ namespace SimpleInjector.Extensions
             // Int32 and Double), it is impossible to resolve it. Those duplicates will be removed. This means
             // that the open generic implementation is incompatible with the given arguments and will later on
             // prevent a closed generic implementation to be returned.
-            mappings =
+            mappings = (
                 from mapping in mappings
                 group mapping by mapping.Argument into mappingGroup
                 where mappingGroup.Count() == 1
-                select mappingGroup.First();
+                select mappingGroup.First())
+                .ToArray();
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(
@@ -144,7 +148,7 @@ namespace SimpleInjector.Extensions
                     // The argument is not in the type's list, which means that the real type is (or are)
                     // buried in a generic type (i.e. Nullable<KeyValueType<TKey, TValue>>). This can result
                     // in multiple values.
-                    foreach (var arg in this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping))
+                    foreach (var arg in this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping).ToArray())
                     {
                         yield return arg;
                     }
@@ -154,11 +158,19 @@ namespace SimpleInjector.Extensions
 
         private IEnumerable<ArgumentMapping> GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping)
         {
-            return
+            //// If the type itself is a generic parameter such as TKey (and not for instance IBar<TValue>)
+            //// We must skip it, since there is no mappings we can extract from it (while IBar<TValue> could).
+            var constraints =
                 from constraint in mapping.Argument.GetGenericParameterConstraints()
+                where !constraint.IsGenericParameter
+                select constraint;
+
+            return (
+                from constraint in constraints
                 let constraintMapping = new ArgumentMapping(constraint, mapping.ConcreteType)
                 from arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping)
-                select arg;
+                select arg)
+                .ToArray();
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappingsRecursive(
@@ -167,10 +179,11 @@ namespace SimpleInjector.Extensions
             var argumentTypeDefinition = mapping.Argument.GetGenericTypeDefinition();
 
             // Try to get mappings for each type in the type hierarchy that is compatible to the  argument.
-            return
+            return (
                 from type in mapping.ConcreteType.GetTypeBaseTypesAndInterfacesFor(argumentTypeDefinition)
                 from arg in this.ConvertToOpenImplementationArgumentMappingsForType(mapping, type)
-                select arg;
+                select arg)
+                .ToArray();
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappingsForType(
@@ -187,10 +200,11 @@ namespace SimpleInjector.Extensions
                 return Enumerable.Empty<ArgumentMapping>();
             }
 
-            return
-                from subMapping in ArgumentMapping.Zip(arguments, concreteTypes)
-                from arg in this.ConvertToOpenImplementationArgumentMappings(subMapping)
-                select arg;
+            return (
+                from subMapping in ArgumentMapping.Zip(arguments, concreteTypes).ToArray()
+                from arg in this.ConvertToOpenImplementationArgumentMappings(subMapping).ToArray()
+                select arg)
+                .ToArray();
         }
 
         /// <summary>
@@ -198,8 +212,8 @@ namespace SimpleInjector.Extensions
         /// represents.
         /// </summary>
         [DebuggerDisplay(
-            "Argument: {SimpleInjector.Extensions.Helpers.ToFriendlyName(Argument),nq}, " +
-            "ConcreteType: {SimpleInjector.Extensions.Helpers.ToFriendlyName(ConcreteType),nq}, " +
+            "Argument: {SimpleInjector.Helpers.ToFriendlyName(Argument),nq}, " +
+            "ConcreteType: {SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}, " +
             "TypeConstraintsAreSatisfied: {TypeConstraintsAreSatisfied}")]
         private sealed class ArgumentMapping : IEquatable<ArgumentMapping>
         {
@@ -209,8 +223,10 @@ namespace SimpleInjector.Extensions
                 this.ConcreteType = concreteType;
             }
 
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(Argument),nq}")]
             internal Type Argument { get; private set; }
 
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
             internal Type ConcreteType { get; private set; }
 
             internal bool TypeConstraintsAreSatisfied
@@ -322,6 +338,14 @@ namespace SimpleInjector.Extensions
             {
                 if (constraint.IsAssignableFrom(this.Mapping.ConcreteType))
                 {
+                    return true;
+                }
+
+                if (constraint.IsGenericParameter)
+                {
+                    // The constraint is one of the other generic parameters, but this class checks  a single
+                    // mapping, so we cannot check whether this constraint holds. We just return true and
+                    // have to check later on whether this constraint holds.
                     return true;
                 }
 
