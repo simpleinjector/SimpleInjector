@@ -35,14 +35,14 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class HybridLifestyle : Lifestyle
     {
-        private readonly Func<bool> test;
+        private readonly Func<bool> lifestyleSelector;
         private readonly Lifestyle trueLifestyle;
         private readonly Lifestyle falseLifestyle;
 
-        internal HybridLifestyle(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        internal HybridLifestyle(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
             : base("Hybrid " + GetName(trueLifestyle) + " / " + GetName(falseLifestyle))
         {
-            this.test = test;
+            this.lifestyleSelector = lifestyleSelector;
             this.trueLifestyle = trueLifestyle;
             this.falseLifestyle = falseLifestyle;
         }
@@ -66,7 +66,7 @@ namespace SimpleInjector.Lifestyles
             Justification = "See base.CreateRegistration for more info.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.test,
+            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.lifestyleSelector,
                 this.trueLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this.falseLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this, container);
@@ -75,7 +75,7 @@ namespace SimpleInjector.Lifestyles
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TService), this.test,
+            return new HybridRegistration(typeof(TService), typeof(TService), this.lifestyleSelector,
                 this.trueLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this.falseLifestyle.CreateRegistration<TService>(instanceCreator, container),
                 this, container);

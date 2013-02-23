@@ -138,16 +138,19 @@ namespace SimpleInjector
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
-        /// <paramref name="test"/> delegate the hybrid lifestyle will redirect the creation of the instance
-        /// to the correct lifestyle. The result of the test delegate will not be cached; it is invoked each
-        /// time an instance is requested or injected. By nesting hybrid lifestyles, any number of lifestyles 
-        /// can be mixed.
+        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of 
+        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/> 
+        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By 
+        /// nesting hybrid lifestyles, any number of lifestyles can be mixed.
         /// </summary>
-        /// <param name="test">The <see cref="Func{TResult}"/> delegate that determines which lifestyle should
-        /// be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is returned; the
-        /// <paramref name="falseLifestyle"/> otherwise.</param>
-        /// <param name="trueLifestyle">The lifestyle to use when <paramref name="test"/> returns <b>true</b>.</param>
-        /// <param name="falseLifestyle">The lifestyle to use when <paramref name="test"/> returns <b>false</b>.</param>
+        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which 
+        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is 
+        /// returned; the <paramref name="falseLifestyle"/> otherwise. This delegate will be called every
+        /// time an instance needs to be resolved or injected.</param>
+        /// <param name="trueLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// returns <b>true</b>.</param>
+        /// <param name="falseLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// returns <b>false</b>.</param>
         /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
@@ -181,13 +184,14 @@ namespace SimpleInjector
         /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and 
         /// Transient.
         /// </example>
-        public static Lifestyle CreateHybrid(Func<bool> test, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, 
+            Lifestyle falseLifestyle)
         {
-            Requires.IsNotNull(test, "test");
+            Requires.IsNotNull(lifestyleSelector, "lifestyleSelector");
             Requires.IsNotNull(trueLifestyle, "trueLifestyle");
             Requires.IsNotNull(falseLifestyle, "falseLifestyle");
 
-            return new HybridLifestyle(test, trueLifestyle, falseLifestyle);
+            return new HybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
         }
         
         /// <summary>
