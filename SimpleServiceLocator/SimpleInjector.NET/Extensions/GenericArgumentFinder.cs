@@ -44,8 +44,6 @@ namespace SimpleInjector.Extensions
 
         internal IList<Type> OpenGenericImplementationTypeArguments { get; set; }
 
-        internal bool SuppressTypeConstraintChecks { get; set; }
-
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation()
         {
             // The arguments must be in the same order as those of the open implementation.
@@ -65,11 +63,6 @@ namespace SimpleInjector.Extensions
                 this.GetOpenServiceArgumentToConcreteTypeMappings().ToArray();
 
             this.ConvertToOpenImplementationArgumentMappings(ref argumentMappings);
-
-            if (!this.SuppressTypeConstraintChecks)
-            {
-                RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
-            }
 
             RemoveDuplicateTypeArguments(ref argumentMappings);
 
@@ -100,16 +93,6 @@ namespace SimpleInjector.Extensions
                 from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping)
                 select newMapping)
                 .Distinct()
-                .ToArray();
-        }
-
-        private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
-            ref IEnumerable<ArgumentMapping> mappings)
-        {
-            mappings = (
-                from mapping in mappings
-                where mapping.TypeConstraintsAreSatisfied
-                select mapping)
                 .ToArray();
         }
 
@@ -229,11 +212,6 @@ namespace SimpleInjector.Extensions
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
             internal Type ConcreteType { get; private set; }
 
-            internal bool TypeConstraintsAreSatisfied
-            {
-                get { return (new TypeConstraintValidator { Mapping = this }).AreTypeConstraintsSatisfied(); }
-            }
-
             /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
             /// <param name="other">The other to compare to.</param>
             /// <returns>True or false.</returns>
@@ -255,108 +233,6 @@ namespace SimpleInjector.Extensions
                 {
                     yield return new ArgumentMapping(arguments[index], concreteTypes[index]);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Allows validating an ArgumentMapping.
-        /// </summary>
-        private sealed class TypeConstraintValidator
-        {
-            internal ArgumentMapping Mapping { get; set; }
-
-            internal bool AreTypeConstraintsSatisfied()
-            {
-                return this.ParameterSatisfiesNotNullableValueTypeConstraint() &&
-                    this.ParameterSatisfiesDefaultConstructorConstraint() &&
-                    this.ParameterSatisfiesReferenceTypeConstraint() &&
-                    this.ParameterSatisfiesGenericParameterConstraints();
-            }
-
-            private bool ParameterSatisfiesDefaultConstructorConstraint()
-            {
-                if (!this.MappingHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint))
-                {
-                    return true;
-                }
-
-                if (this.Mapping.ConcreteType.IsValueType)
-                {
-                    // Value types always have a default constructor.
-                    return true;
-                }
-
-                bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(Type.EmptyTypes) != null;
-
-                return typeHasDefaultCtor;
-            }
-
-            private bool ParameterSatisfiesReferenceTypeConstraint()
-            {
-                if (!this.MappingHasConstraint(GenericParameterAttributes.ReferenceTypeConstraint))
-                {
-                    return true;
-                }
-
-                return !this.Mapping.ConcreteType.IsValueType;
-            }
-
-            private bool ParameterSatisfiesNotNullableValueTypeConstraint()
-            {
-                if (!this.MappingHasConstraint(GenericParameterAttributes.NotNullableValueTypeConstraint))
-                {
-                    return true;
-                }
-
-                if (!this.Mapping.ConcreteType.IsValueType)
-                {
-                    return false;
-                }
-
-                bool isNullable = this.Mapping.ConcreteType.IsGenericType &&
-                    this.Mapping.ConcreteType.GetGenericTypeDefinition() == typeof(Nullable<>);
-
-                return !isNullable;
-            }
-
-            private bool ParameterSatisfiesGenericParameterConstraints()
-            {
-                var unsatisfiedConstraints =
-                    from constraint in this.Mapping.Argument.GetGenericParameterConstraints()
-                    where !this.MappingIsCompatibleWithTypeConstraint(constraint)
-                    select constraint;
-
-                if (unsatisfiedConstraints.Any())
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            private bool MappingIsCompatibleWithTypeConstraint(Type constraint)
-            {
-                if (constraint.IsAssignableFrom(this.Mapping.ConcreteType))
-                {
-                    return true;
-                }
-
-                if (constraint.IsGenericParameter)
-                {
-                    // The constraint is one of the other generic parameters, but this class checks  a single
-                    // mapping, so we cannot check whether this constraint holds. We just return true and
-                    // have to check later on whether this constraint holds.
-                    return true;
-                }
-
-                return this.Mapping.ConcreteType.GetBaseTypesAndInterfaces()
-                    .Any(type => type.GUID == constraint.GUID);
-            }
-
-            private bool MappingHasConstraint(GenericParameterAttributes constraint)
-            {
-                var constraints = this.Mapping.Argument.GenericParameterAttributes;
-                return (constraints & constraint) != GenericParameterAttributes.None;
             }
         }
     }

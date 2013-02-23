@@ -40,13 +40,11 @@ namespace SimpleInjector.Extensions
             this.OpenGenericImplementation = openGenericImplementation;
         }
 
-        internal bool SuppressTypeConstraintChecks { get; set; }
-        
         private Type ClosedGenericBaseType { get; set; }
 
         private Type OpenGenericImplementation { get; set; }
 
-        internal bool ClosedServiceTypeSatisfiesAllTypeConstraints()
+        internal bool OpenGenericImplementationCanBeAppliedToServiceType()
         {
             return this.FindMatchingOpenGenericServiceType() != null;
         }
@@ -55,20 +53,19 @@ namespace SimpleInjector.Extensions
         {
             var serviceType = this.FindMatchingOpenGenericServiceType();
 
-            if (serviceType == null)
+            if (serviceType != null)
             {
-                return BuildResult.Invalid();
+                Type closedGenericImplementation =
+                    this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
+
+                // closedGenericImplementation will be null when there was a mismatch on type constraints.
+                if (closedGenericImplementation != null)
+                {
+                    return BuildResult.Valid(closedGenericImplementation);
+                }
             }
 
-            Type closedGenericImplementation =
-                this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
-            
-            if (closedGenericImplementation == null)
-            {
-                return BuildResult.Invalid();
-            }
-
-            return BuildResult.Valid(closedGenericImplementation);
+            return BuildResult.Invalid();
         }
 
         private Type FindMatchingOpenGenericServiceType()
@@ -144,7 +141,6 @@ namespace SimpleInjector.Extensions
                 OpenServiceGenericTypeArguments = openGenericServiceType.GetGenericArguments(),
                 ClosedServiceConcreteTypeArguments = this.ClosedGenericBaseType.GetGenericArguments(),
                 OpenGenericImplementationTypeArguments = this.OpenGenericImplementation.GetGenericArguments(),
-                SuppressTypeConstraintChecks = this.SuppressTypeConstraintChecks
             };
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
