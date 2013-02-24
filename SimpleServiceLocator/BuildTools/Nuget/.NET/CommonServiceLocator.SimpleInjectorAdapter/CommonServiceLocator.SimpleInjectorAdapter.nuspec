@@ -6,7 +6,7 @@
     <owners>S. van Deursen</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
     <projectUrl>http://simpleinjector.codeplex.com</projectUrl>
-    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=628541</iconUrl>
+    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
     <dependencies>
       <dependency id="CommonServiceLocator" version="1.0" />
       <dependency id="SimpleInjector" version="{version}" />
