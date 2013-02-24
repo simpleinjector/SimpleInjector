@@ -11,7 +11,7 @@ Version v2.0
 
 	New features:
 		-[Core] Diagnostic Debug View added to give feedback on possible misconfigurations in the
-		 container. See here for more information: https://simpleinjector.codeplex.com/discussions/431684.
+		 container. See here for more information: https://simpleinjector.codeplex.com/wikipage?title=Diagnostics
 		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
 		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.CreateHybrid() method to create
 		 hybrid lifestyles and a Lifestyle.CreateCustom() method to create a lifestyle based on a name and

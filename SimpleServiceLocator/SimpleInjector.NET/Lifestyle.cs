@@ -65,6 +65,23 @@ namespace SimpleInjector
         /// The lifestyle instance that doesn't cache instances. A new instance of the specified
         /// component is created every time the registered service it is requested or injected.
         /// </summary>
+        /// <example>
+        /// The following example registers the <c>SomeServiceImpl</c> implementation for the
+        /// <c>ISomeService</c> service type using the <b>Transient</b> lifestyle:
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// container.Register<ISomeService, SomeServiceImpl>(Lifestyle.Transient);
+        /// ]]></code>
+        /// Note that <b>Transient</b> is the default lifestyle, the previous registration can be reduced to
+        /// the following:
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// // Transient registration.
+        /// container.Register<ISomeService, SomeServiceImpl>();
+        /// ]]></code>
+        /// </example>
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "It's not mutable.")]
         public static readonly Lifestyle Transient = new TransientLifestyle();
@@ -77,6 +94,24 @@ namespace SimpleInjector
         /// lifetime of the application. In a multi-threaded applications, implementations registered using 
         /// this lifestyle must be thread-safe.
         /// </summary>
+        /// <example>
+        /// The following example registers the <c>RealTimeProvider</c> implementation for the
+        /// <c>ITimeProvider</c> service type using the <b>Singleton</b> lifestyle:
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+        /// ]]></code>
+        /// Note that using the 
+        /// <see cref="Container.RegisterSingle{TService, TImplementation}">RegisterSingle</see> method has 
+        /// the same effect:
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// // Singleton registration.
+        /// container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+        /// ]]></code>
+        /// </example>
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", 
             Justification = "It's not mutable.")]
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
@@ -155,8 +190,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <example>
+        /// <para>
         /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
         /// <b>WebRequestLifestyle</b> and <b>LifetimeScopeLifestyle</b>:
+        /// </para>
         /// <code lang="cs"><![CDATA[
         /// // NOTE: WebRequestLifestyle is located in SimpleInjector.Integration.Web.dll.
         /// // NOTE: LifetimeScopeLifestyle is located in SimpleInjector.Extensions.LifetimeScoping.dll.
@@ -169,7 +206,9 @@ namespace SimpleInjector
         /// container.Register<IUserRepository, SqlUserRepository>(mixedScopeLifestyle);
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
         /// ]]></code>
+        /// <para>
         /// Hybrid lifestyles can be nested:
+        /// </para>
         /// <code lang="cs"><![CDATA[
         /// var mixedLifetimeTransientLifestyle = Lifestyle.CreateHybrid(
         ///     () => container.GetCurrentLifetimeScope() != null,
@@ -181,8 +220,10 @@ namespace SimpleInjector
         ///     new WebRequestLifestyle(),
         ///     mixedLifetimeTransientLifestyle);
         /// ]]></code>
+        /// <para>
         /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and 
         /// Transient.
+        /// </para>
         /// </example>
         public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, 
             Lifestyle falseLifestyle)

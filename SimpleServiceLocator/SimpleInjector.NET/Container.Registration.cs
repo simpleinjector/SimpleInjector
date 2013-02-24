@@ -290,9 +290,9 @@ namespace SimpleInjector
         
         /// <summary>
         /// Occurs directly after the creation of the <see cref="Expression" /> of a registered type is made,
-        /// and before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching
-        /// has been applied, allowing the created <see cref="Expression" /> to be wrapped, changed, or
-        /// replaced. Multiple delegates may handle the same service type.
+        /// but before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching
+        /// has been applied, allowing the created <see cref="Expression" /> to be altered. Multiple delegates 
+        /// may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -311,15 +311,16 @@ namespace SimpleInjector
         /// will result in an <see cref="InvocationExpression"/>. Singletons that are passed in using their
         /// value (<see cref="RegisterSingle{TService}(TService)">RegisterSingle&lt;TService&gt;(TService)</see>)
         /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
-        /// might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> property and might
-        /// have supplied an <see cref="Expression"/> of a different type.
+        /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> 
+        /// property and might have supplied an <see cref="Expression"/> of a different type. The order in
+        /// which these events are registered might be of importantance to you.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
-        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a 
-        /// given type are finite (and will in most cases happen just once), a container can call the delegate 
-        /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
-        /// called multiple times and is thread-safe.
+        /// are executed only once per service type. While the calls to registered <b>ExpressionBuilding</b>
+        /// events for a  given type are finite (and will in most cases happen just once), a container can 
+        /// call the delegate multiple times and make parallel calls to the delegate. You must make sure that 
+        /// the code can be called multiple times and is thread-safe.
         /// </para>
         /// </remarks>
         /// <example>
@@ -1171,11 +1172,87 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/>.</param>
         /// <example>
         /// <code lang="cs"><![CDATA[
-        /// var registration = Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
+        /// public interface IFoo { }
+        /// public interface IBar { }
+        /// public class FooBar : IFoo, IBar { }
         /// 
-        /// container.AddRegistration(typeof(IFoo), registration);
-        /// container.AddRegistration(typeof(IBar), registration);
+        /// public void AddRegistration_SuppliedWithSameSingletonRegistrationTwice_ReturnsSameInstance()
+        /// {
+        ///     // Arrange
+        ///     Registration registration =
+        ///         Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
+        /// 
+        ///     container.AddRegistration(typeof(IFoo), registration);
+        ///     container.AddRegistration(typeof(IBar), registration);
+        /// 
+        ///     // Act
+        ///     IFoo foo = container.GetInstance<IFoo>();
+        ///     IBar bar  = container.GetInstance<IBar>();
+        /// 
+        ///     // Assert
+        ///     bool fooAndBareAreTheSameInstance = object.ReferenceEquals(foo, bar);
+        ///     Assert.IsTrue(fooAndBareAreTheSameInstance);
+        /// }
         /// ]]></code>
+        /// <para>
+        /// In the example above a singleton registration is created for type <c>FooBar</c> and this 
+        /// registration is added to the container for each interface (<c>IFoo</c> and <c>IBar</c>) that it
+        /// implements. Since both services use the same singleton registration, requesting those services 
+        /// will result in the return of the same (singleton) instance.
+        /// </para>
+        /// <para>
+        /// <see cref="ExpressionBuilding"/> events are applied to the <see cref="Expression"/> of the
+        /// <see cref="Registration"/> instance and are therefore applied once. <see cref="ExpressionBuilt"/> 
+        /// events on the other hand get applied to the <b>Expression</b> of the <see cref="InstanceProducer"/>.
+        /// Since each <b>AddRegistration</b> gets its own instance producer (that wraps the 
+        /// <b>Registration</b> instance), this means that that <b>ExpressionBuilt</b> events will be 
+        /// applied for each registered service type.
+        /// </para>
+        /// <para>
+        /// The most practical example of this is the use of decorators using one of the 
+        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions">RegisterDecorator</see> overloads 
+        /// (decorator registration use the
+        /// <b>ExpressionBuilt</b> event under the covers). Take a look at the following example:
+        /// </para>
+        /// <code lang="cs"><![CDATA[
+        /// public interface IFoo { }
+        /// public interface IBar { }
+        /// public class FooBar : IFoo, IBar { }
+        /// 
+        /// public class BarDecorator : IBar
+        /// {
+        ///     public BarDecorator(IBar decoratedBar)
+        ///     {
+        ///         this.DecoratedBar = decoratedBar;
+        ///     }
+        ///     
+        ///     public IBar DecoratedBar { get; private set; }
+        /// }
+        /// 
+        /// public void AddRegistration_SameSingletonRegistrationTwiceAndOneDecoratorApplied_ReturnsSameInstance()
+        /// {
+        ///     // Arrange
+        ///     Registration registration =
+        ///         Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
+        /// 
+        ///     container.AddRegistration(typeof(IFoo), registration);
+        ///     container.AddRegistration(typeof(IBar), registration);
+        ///     
+        ///     // Registere a decorator for IBar, but not for IFoo
+        ///     container.RegisterDecorator(typeof(IBar), typeof(BarDecorator));
+        /// 
+        ///     // Act
+        ///     var foo = container.GetInstance<IFoo>();
+        ///     var decorator = container.GetInstance<IBar>() as BarDecorator;
+        ///     var bar = decorator.DecoratedBar;
+        /// 
+        ///     // Assert
+        ///     bool fooAndBareAreTheSameInstance = object.ReferenceEquals(foo, bar);
+        ///     Assert.IsTrue(fooAndBareAreTheSameInstance);
+        /// }
+        /// ]]></code>
+        /// The example shows that the decorator gets applied to <c>IBar</c> but not to <c>IFoo</c>, but that
+        /// the decorated <c>IBar</c> is still the same instance as the resolved <c>IFoo</c> instance.
         /// </example>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
