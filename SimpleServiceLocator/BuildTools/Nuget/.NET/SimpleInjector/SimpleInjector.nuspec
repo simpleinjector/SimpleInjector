@@ -10,7 +10,7 @@
     <id>SimpleInjector</id>
     <title>Simple Injector</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The Simple Injector is an easy-to-use Inversion of Control library for .NET. It solely supports code-based configuration and is an ideal starting point for developers unfamiliar with larger IoC / DI libraries.</description>
+    <description>The goal of Simple Injector is to provide .NET application developers with an easy, flexible, and fast dependency injection framework, that uses best practices to steers developers towards the pit of success.</description>
     <summary>The Simple Injector is an easy-to-use Inversion of Control library for .NET.</summary>
     <copyright>S. van Deursen 2010 - 2013</copyright>
     <language>en-US</language>
