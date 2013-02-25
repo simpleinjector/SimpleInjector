@@ -104,7 +104,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{D1A45E86-CD79-4F65-AC0B-25A21166B1E9}"
 	ProjectSection(SolutionItems) = preProject
 		build.bat = build.bat
-		BuildTools\DayOfYear.exe = BuildTools\DayOfYear.exe
 		BuildTools\ILMerge.exe = BuildTools\ILMerge.exe
 		BuildTools\ILMerge.exe.config = BuildTools\ILMerge.exe.config
 		BuildTools\replace.exe = BuildTools\replace.exe
