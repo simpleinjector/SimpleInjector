@@ -120,9 +120,9 @@ namespace SimpleInjector
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
 
-        internal bool IsFirst
+        internal bool CompileInDynamicAssembly
         {
-            get { return this.containerId == 1; }
+            get { return this.containerId < 5; }
         }
 
         internal bool IsLocked

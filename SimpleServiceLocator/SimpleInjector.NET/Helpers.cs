@@ -212,7 +212,6 @@ namespace SimpleInjector
             return castedCollection;
         }
 
-        [System.Security.SecuritySafeCritical]
         internal static Func<object> CompileExpression(Container container, Expression expression,
             out object createdInstance)
         {
@@ -226,6 +225,7 @@ namespace SimpleInjector
                 return CreateConstantOptimizedExpression(constantExpression);
             }
 
+#if !SILVERLIGHT
             // Skip optimization in the Silverlight sandbox. Low memory use is much more important in this
             // environment.
             // In the common case, the developer will/should only create a single container during the 
@@ -234,13 +234,12 @@ namespace SimpleInjector
             // creates many containers, because this will create a memory leak (dynamic assemblies are never 
             // unloaded). We might however relax this constraint and optimize the first N container instances.
             // (where N is configurable)
-#if !SILVERLIGHT
-            if (container.IsFirst && !ExpressionNeedsAccessToInternals(expression))
+            if (container.CompileInDynamicAssembly && !ExpressionNeedsAccessToInternals(expression))
             {
-                return CompileOptimizedWithFallback(expression, out createdInstance);
+                return CompileInDynamicAssemblyWithFallback(expression, out createdInstance);
             }
 #endif
-            return CompileUnoptimized(expression);
+            return CompileLambda(expression);
         }
 
         private static Func<object> CreateConstantOptimizedExpression(ConstantExpression expression)
@@ -296,7 +295,7 @@ namespace SimpleInjector
                 .ToArray();
         }
                 
-        private static Func<object> CompileUnoptimized(Expression expression)
+        private static Func<object> CompileLambda(Expression expression)
         {
             return Expression.Lambda<Func<object>>(expression).Compile();
         }
@@ -304,14 +303,12 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileOptimizedWithFallback(Expression expression, 
+        private static Func<object> CompileInDynamicAssemblyWithFallback(Expression expression, 
             out object createdInstance)
         {
-            createdInstance = null;
-
             try
             {
-                var @delegate = CompileOptimized(expression);
+                var @delegate = CompileInDynamicAssembly(expression);
 
                 // Test the creation. Since we're using a dynamically created assembly, we can't create every
                 // delegate we can create using expression.Compile(), so we need to test this. We need to 
@@ -322,25 +319,27 @@ namespace SimpleInjector
             }
             catch
             {
-                return CompileUnoptimized(expression);
+                // The fallback
+                createdInstance = null;
+                return CompileLambda(expression);
             }
         }
 
-        private static Func<object> CompileOptimized(Expression expression)
+        private static Func<object> CompileInDynamicAssembly(Expression expression)
         {
             ConstantExpression[] constantExpressions = GetConstants(expression).Distinct().ToArray();
 
             if (constantExpressions.Any())
             {
-                return CompileAsClosure(expression, constantExpressions);
+                return CompileInDynamicAssemblyAsClosure(expression, constantExpressions);
             }
             else
             {
-                return CompileAsStatic(expression);
+                return CompileInDynamicAssemblyAsStatic(expression);
             }
         }
 
-        private static Func<object> CompileAsClosure(Expression originalExpression, 
+        private static Func<object> CompileInDynamicAssemblyAsClosure(Expression originalExpression, 
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
@@ -352,14 +351,14 @@ namespace SimpleInjector
 
             var lambda = Expression.Lambda<Func<object[], object>>(replacedExpression, constantsParameter);
 
-            var create = CompileDelegateInDynamicAssembly(lambda);
+            Func<object[], object> create = CompileDelegateInDynamicAssembly(lambda);
 
             object[] contants = constantExpressions.Select(c => c.Value).ToArray();
 
             return () => create(contants);
         }
 
-        private static Func<object> CompileAsStatic(Expression expression)
+        private static Func<object> CompileInDynamicAssemblyAsStatic(Expression expression)
         {
             var lambda = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
 
