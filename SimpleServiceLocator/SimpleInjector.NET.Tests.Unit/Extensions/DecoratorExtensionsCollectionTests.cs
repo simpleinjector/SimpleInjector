@@ -1601,6 +1601,20 @@
                 "should be added to the registration of the service type.");
         }
         
+        [TestMethod]
+        public void GetAllInstances_DecoratingEmptyCollectionWithLifestyleOtherThanTransientAndSingleton_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
+                Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
+
+            // Act
+            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+        }
+        
+        
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();

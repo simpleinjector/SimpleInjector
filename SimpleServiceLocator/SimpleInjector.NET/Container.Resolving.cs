@@ -30,8 +30,10 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
+    using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
 #if DEBUG
@@ -468,10 +470,12 @@ namespace SimpleInjector
         {
             Type elementType = enumerableType.GetGenericArguments()[0];
 
-            var emptyArray = Array.CreateInstance(elementType, 0);
+            IDecoratableEnumerable enumerable =
+                DecoratorHelpers.CreateDecoratableEnumerable(elementType, this, Type.EmptyTypes);
 
-            return new InstanceProducer(enumerableType,
-                Lifestyle.Singleton.CreateRegistration(enumerableType, () => emptyArray, this));
+            var registration = new ExpressionRegistration(Expression.Constant(enumerable, enumerableType), this);
+
+            return new InstanceProducer(enumerableType, registration);
         }
 
         private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType<TConcrete>()

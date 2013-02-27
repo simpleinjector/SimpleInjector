@@ -7,6 +7,8 @@ Version vNext
 	Bug fixes:
 		-[Core] Custom KnownDependency instances that where added during the interception (ExpressionBuilding)
 		 of a decorator type (RegisterDecorator) where not added to the decorated registration. (work item 19391)
+		-[Core] Decorating empty (unregistered) collections failed when the decorator had a lifestyle different
+		 than transient or singleton. (work item 19400)
 
 
 Version v2.0.0 (v2.0 RTM) 2013-02-25
