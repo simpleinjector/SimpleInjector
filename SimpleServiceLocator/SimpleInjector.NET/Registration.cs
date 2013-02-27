@@ -221,7 +221,7 @@ namespace SimpleInjector
             // since that could lead to null reference exceptions in user code.
             expression = WrapWithNullChecker<TService>(expression);
 
-            expression = this.WrapWithInitializer<TService, TService>(expression);
+            expression = this.WrapWithInitializer<TService>(expression);
 
             return expression;
         }
@@ -250,7 +250,7 @@ namespace SimpleInjector
 
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TImplementation), expression);
 
-            expression = this.WrapWithInitializer<TService, TImplementation>(expression);
+            expression = this.WrapWithInitializer<TImplementation>(expression);
 
             return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
         }
@@ -331,9 +331,8 @@ namespace SimpleInjector
             return Expression.Invoke(Expression.Constant(nullChecker), expression);
         }
 
-        private Expression WrapWithInitializer<TService, TImplementation>(Expression expression)
-            where TImplementation : class, TService
-            where TService : class
+        private Expression WrapWithInitializer<TImplementation>(Expression expression)
+            where TImplementation : class
         {
             Action<TImplementation> instanceInitializer = this.Container.GetInitializer<TImplementation>();
 
