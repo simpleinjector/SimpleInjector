@@ -341,16 +341,15 @@ namespace SimpleInjector
             {
                 // It's not possible to return a Expression that is as heavily optimized as the newExpression
                 // simply is, because the instance initializer must be called as well.
-                return BuildExpressionWithInstanceInitializer<TService, TImplementation>(expression, instanceInitializer);
+                return BuildExpressionWithInstanceInitializer<TImplementation>(expression, instanceInitializer);
             }
 
             return expression;
         }
 
-        private static Expression BuildExpressionWithInstanceInitializer<TService, TImplementation>(
+        private static Expression BuildExpressionWithInstanceInitializer<TImplementation>(
             Expression newExpression, Action<TImplementation> instanceInitializer)
-            where TImplementation : class, TService
-            where TService : class
+            where TImplementation : class
         {
             Func<TImplementation, TImplementation> instanceCreatorWithInitializer = instance =>
             {
