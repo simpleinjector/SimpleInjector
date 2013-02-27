@@ -1563,6 +1563,46 @@
             // Assert
             Assert.IsInstanceOfType(realHandler, typeof(NullCommandHandler<RealCommand>));
         }
+
+        [TestMethod]
+        public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorType_ContainsAddedRelationship()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var expectedRelationship = GetValidRelationship();
+
+            container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+            
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(RealCommandHandlerDecorator))
+                {
+                    e.KnownRelationships.Add(expectedRelationship);
+                }
+            };
+
+            container.Verify();
+
+            // Act
+            var relationships = 
+                container.GetRegistration(typeof(ICommandHandler<RealCommand>)).GetRelationships();
+
+            // Assert
+            Assert.IsTrue(relationships.Contains(expectedRelationship),
+                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "should be added to the registration of the service type.");
+        }
+
+        private static KnownRelationship GetValidRelationship()
+        {
+            var container = new Container();
+
+            return new KnownRelationship(typeof(object), Lifestyle.Transient, 
+                container.GetRegistration(typeof(Container)));
+        }
     }
 
     public class DependencyInfo

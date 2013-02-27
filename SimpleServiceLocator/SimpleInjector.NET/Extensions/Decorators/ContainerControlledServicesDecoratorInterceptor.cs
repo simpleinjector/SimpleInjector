@@ -145,7 +145,9 @@ namespace SimpleInjector.Extensions.Decorators
                 from context in contexts
                 where context.IsDecorated
                 let dependency = context.OriginalContext.Registration
-                from relationship in this.GetKnownDecoratorRelationships(decoratorCtor, serviceType, dependency)
+                let decoratorRegistration = context.Context.Registration.Registration
+                from relationship in this.GetKnownDecoratorRelationships(decoratorRegistration,
+                    decoratorCtor, serviceType, dependency)
                 select relationship)
                 .ToArray();
 

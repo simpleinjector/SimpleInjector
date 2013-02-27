@@ -43,7 +43,6 @@ namespace SimpleInjector
         "Lifestyle = {Lifestyle.Name,nq}")]
     public sealed class InstanceProducer
     {
-        private readonly Registration registration;
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
         private Lazy<Expression> expression;
@@ -59,7 +58,7 @@ namespace SimpleInjector
             Requires.IsNotNull(registration, "registration");
 
             this.ServiceType = serviceType;
-            this.registration = registration;
+            this.Registration = registration;
 
             this.validator = new CyclicDependencyValidator(this.ServiceType);
 
@@ -77,7 +76,7 @@ namespace SimpleInjector
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
         public Lifestyle Lifestyle
         {
-            get { return this.overriddenLifestyle ?? this.registration.Lifestyle; }
+            get { return this.overriddenLifestyle ?? this.Registration.Lifestyle; }
         }
 
         /// <summary>Gets the service type for which this producer produces instances.</summary>
@@ -86,8 +85,10 @@ namespace SimpleInjector
 
         internal Type ImplementationType
         {
-            get { return this.registration.ImplementationType ?? this.ServiceType; }
+            get { return this.Registration.ImplementationType ?? this.ServiceType; }
         }
+
+        internal Registration Registration { get; private set; }
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
@@ -182,7 +183,7 @@ namespace SimpleInjector
 
         internal KnownRelationship[] GetRelationships()
         {
-            return this.registration.GetRelationships();
+            return this.Registration.GetRelationships();
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
@@ -197,7 +198,7 @@ namespace SimpleInjector
 
             try
             {
-                return Helpers.CompileExpression(this.registration.Container, expression, out createdInstance);
+                return Helpers.CompileExpression(this.Registration.Container, expression, out createdInstance);
             }
             catch (Exception ex)
             {
@@ -211,21 +212,21 @@ namespace SimpleInjector
         private Expression BuildExpressionInternal()
         {
             // We must lock the container, because not locking could lead to race conditions.
-            this.registration.Container.LockContainer();
-            
-            var expression = this.registration.BuildExpression();
+            this.Registration.Container.LockContainer();
+
+            var expression = this.Registration.BuildExpression();
 
             if (expression == null)
             {
                 throw new ActivationException(StringResources.RegistrationReturnedNullFromBuildExpression(
-                    this.registration));
+                    this.Registration));
             }
 
             var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
 
             e.Lifestyle = this.Lifestyle;
 
-            this.registration.Container.OnExpressionBuilt(e, this.registration);
+            this.Registration.Container.OnExpressionBuilt(e, this.Registration);
 
             this.overriddenLifestyle = e.Lifestyle;
 

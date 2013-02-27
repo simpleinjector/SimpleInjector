@@ -31,8 +31,8 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
+
     using SimpleInjector.Advanced;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -207,15 +207,18 @@ namespace SimpleInjector.Extensions.Decorators
             return predicateCache[registeredServiceType];
         }
 
-        protected KnownRelationship[] GetKnownDecoratorRelationships(ConstructorInfo decoratorConstructor,
-            Type registeredServiceType, InstanceProducer decoratee)
+        protected KnownRelationship[] GetKnownDecoratorRelationships(Registration decoratorRegistration,
+            ConstructorInfo decoratorConstructor, Type registeredServiceType, InstanceProducer decoratee)
         {
-            var decorateeRelationships =
-                this.GetDecorateeRelationships(decoratorConstructor, registeredServiceType, decoratee);
+            var decorateeRelationship =
+                this.GetDecorateeRelationship(decoratorConstructor, registeredServiceType, decoratee);
 
-            var normalRelationships = this.GetNormalRelationships(decoratorConstructor, registeredServiceType);
+            var normalDependencyRelationships =
+                from relationship in decoratorRegistration.GetRelationships()
+                where relationship.Dependency.ServiceType != registeredServiceType
+                select relationship;
 
-            return normalRelationships.Union(decorateeRelationships).ToArray();
+            return normalDependencyRelationships.Union(decorateeRelationship).ToArray();
         }
         
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
@@ -232,30 +235,17 @@ namespace SimpleInjector.Extensions.Decorators
                 decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
 
-        private IEnumerable<KnownRelationship> GetNormalRelationships(ConstructorInfo constructor,
-            Type registeredServiceType)
-        {
-            return
-                from parameter in constructor.GetParameters()
-                where !IsDecorateeParameter(parameter, registeredServiceType)
-                let parameterProducer = this.Container.GetRegistration(parameter.ParameterType)
-                where parameterProducer != null
-                select new KnownRelationship(
-                    implementationType: constructor.DeclaringType,
-                    lifestyle: this.Lifestyle,
-                    dependency: parameterProducer);
-        }
-
-        private IEnumerable<KnownRelationship> GetDecorateeRelationships(ConstructorInfo constructor,
+        private KnownRelationship GetDecorateeRelationship(ConstructorInfo constructor,
             Type registeredServiceType, InstanceProducer decoratee)
         {
-            return
+            return (
                 from parameter in constructor.GetParameters()
-                where IsDecorateeDependencyParameter(parameter, registeredServiceType)
+                where IsDecorateeParameter(parameter, registeredServiceType)
                 select new KnownRelationship(
                     implementationType: constructor.DeclaringType,
                     lifestyle: this.Lifestyle,
-                    dependency: decoratee);
+                    dependency: decoratee))
+                .Single();
         }
 
         protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)

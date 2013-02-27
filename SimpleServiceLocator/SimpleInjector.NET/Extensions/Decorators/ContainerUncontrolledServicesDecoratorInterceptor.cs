@@ -83,11 +83,13 @@ namespace SimpleInjector.Extensions.Decorators
 
             var serviceInfo = this.GetServiceTypeInfo(e.Expression, serviceType, Lifestyle.Unknown);
 
-            var decoratedExpression =
-                this.BuildDecoratorExpression(serviceType, decoratorConstructor, e.Expression);
+            Registration decoratorRegistration;
 
-            var relationships = this.GetKnownDecoratorRelationships(decoratorConstructor, serviceType,
-                serviceInfo.GetCurrentInstanceProducer());
+            var decoratedExpression = this.BuildDecoratorExpression(serviceType, decoratorConstructor,
+                e.Expression, out decoratorRegistration);
+
+            var relationships = this.GetKnownDecoratorRelationships(decoratorRegistration, 
+                decoratorConstructor, serviceType, serviceInfo.GetCurrentInstanceProducer());
 
             e.Expression = decoratedExpression;
 
@@ -111,17 +113,17 @@ namespace SimpleInjector.Extensions.Decorators
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
             Justification = "This is not a performance critical path.")]
         private Expression BuildDecoratorExpression(Type serviceType, ConstructorInfo decoratorConstructor,
-            Expression originalEnumerableExpression)
+            Expression originalEnumerableExpression, out Registration decoratorRegistration)
         {
             this.ThrowWhenDecoratorNeedsAFunc(serviceType, decoratorConstructor);
             this.ThrownWhenLifestyleIsNotSupported(serviceType);
 
             ParameterExpression parameter = Expression.Parameter(serviceType, "decoratee");
 
-            Registration registration = 
+            decoratorRegistration = 
                 this.CreateRegistrationForUncontrolledCollection(serviceType, decoratorConstructor, parameter);
 
-            Expression parameterizedDecoratorExpression = registration.BuildExpression();
+            Expression parameterizedDecoratorExpression = decoratorRegistration.BuildExpression();
 
             Delegate wrapInstanceWithDecorator = 
                 BuildDecoratorWrapper(serviceType, parameter, parameterizedDecoratorExpression)

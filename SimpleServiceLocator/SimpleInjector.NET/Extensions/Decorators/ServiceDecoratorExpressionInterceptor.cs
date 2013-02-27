@@ -67,24 +67,30 @@ namespace SimpleInjector.Extensions.Decorators
         {
             var constructor = this.ResolutionBehavior.GetConstructor(e.RegisteredServiceType, decoratorType);
 
-            e.Expression = this.BuildDecoratorExpression(constructor, e);
+            // By creating the decorator using a Lifestyle Registration the decorator can be completely
+            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied and it
+            // can be wrapped with an initializer.
+            var registration = this.CreateRegistrationFromCache(e, constructor);
+
+            e.Expression = registration.BuildExpression();
 
             e.Lifestyle = this.Lifestyle;
 
-            this.AddKnownDecoratorRelationships(constructor, e);
+            this.AddKnownDecoratorRelationships(registration, constructor, e);
 
             this.AddAppliedDecorator(decoratorType, e);
         }
 
-        private void AddKnownDecoratorRelationships(ConstructorInfo constructor, ExpressionBuiltEventArgs e)
+        private void AddKnownDecoratorRelationships(Registration decoratorRegistration, 
+            ConstructorInfo decoratorConstructor, ExpressionBuiltEventArgs e)
         {
             var info = this.GetServiceTypeInfo(e);
 
             var decoratee = info.GetCurrentInstanceProducer();
 
             // Must be called before the current decorator is added to the list of applied decorators
-            var relationships =
-                this.GetKnownDecoratorRelationships(constructor, e.RegisteredServiceType, decoratee);
+            var relationships = this.GetKnownDecoratorRelationships(decoratorRegistration, 
+                decoratorConstructor, e.RegisteredServiceType, decoratee);
 
             e.KnownRelationships.AddRange(relationships);
         }
@@ -96,17 +102,6 @@ namespace SimpleInjector.Extensions.Decorators
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(decoratorType, info.ImplementationType, this, e.Expression);
-        }
-
-        private Expression BuildDecoratorExpression(ConstructorInfo decoratorConstructor,
-            ExpressionBuiltEventArgs e)
-        {
-            var registration = this.CreateRegistrationFromCache(e, decoratorConstructor);
-
-            // By creating the decorator using a Lifestyle Registration the decorator can be completely
-            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied and it
-            // can be wrapped with an initializer.
-            return registration.BuildExpression();
         }
 
         private Registration CreateRegistrationFromCache(ExpressionBuiltEventArgs e, 

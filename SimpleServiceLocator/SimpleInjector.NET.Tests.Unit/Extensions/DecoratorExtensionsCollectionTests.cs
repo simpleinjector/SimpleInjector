@@ -6,9 +6,8 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
-    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
 
     /// <summary>
@@ -1498,6 +1497,8 @@
             IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
                 new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
 
+            container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
+
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
                 Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
 
@@ -1525,6 +1526,88 @@
                     System.Type types."
                     .TrimInside(), ex);
             }
+        }
+        
+        [TestMethod]
+        public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForUncontrolledCollection_ContainsAddedRelationship()
+        {
+            // Arrange
+            KnownRelationship expectedRelationship = GetValidRelationship();
+
+            var container = ContainerFactory.New();
+
+            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
+                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(RealCommandHandlerDecorator))
+                {
+                    e.KnownRelationships.Add(expectedRelationship);
+                }
+            };
+
+            container.Verify();
+
+            // Act
+            var commandHandlerCollectionRegistration =
+                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
+
+            var relationships = commandHandlerCollectionRegistration.GetRelationships();
+
+            // Assert
+            Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
+                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "should be added to the registration of the service type.");
+        }
+        
+        [TestMethod]
+        public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForControlledCollection_ContainsAddedRelationship()
+        {
+            // Arrange
+            KnownRelationship expectedRelationship = GetValidRelationship();
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                typeof(StubCommandHandler), 
+                typeof(RealCommandHandler));
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(RealCommandHandlerDecorator))
+                {
+                    e.KnownRelationships.Add(expectedRelationship);
+                }
+            };
+
+            container.Verify();
+
+            // Act
+            var commandHandlerCollectionRegistration =
+                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
+
+            var relationships = commandHandlerCollectionRegistration.GetRelationships();
+
+            // Assert
+            Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
+                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "should be added to the registration of the service type.");
+        }
+        
+        private static KnownRelationship GetValidRelationship()
+        {
+            var container = new Container();
+
+            var dummyRegistration = container.GetRegistration(typeof(Container));
+
+            return new KnownRelationship(typeof(object), Lifestyle.Transient, dummyRegistration);
         }
 
         private static void

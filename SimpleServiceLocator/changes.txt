@@ -1,7 +1,15 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version v2.0 
+Version vNext
+	General description:
+
+	Bug fixes:
+		-[Core] Custom KnownDependency instances that where added during the interception (ExpressionBuilding)
+		 of a decorator type (RegisterDecorator) where not added to the decorated registration. (work item 19391)
+
+
+Version v2.0.0 (v2.0 RTM) 2013-02-25
 	General description:
 		This major release adds explicit lifestyle support and Debugger Diagnostic Services to the Core
 		library. The addition of explicit lifestyle support makes it easier to register types in any given
