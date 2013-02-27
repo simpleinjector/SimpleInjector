@@ -1564,6 +1564,7 @@
             Assert.IsInstanceOfType(realHandler, typeof(NullCommandHandler<RealCommand>));
         }
 
+#if DEBUG
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorType_ContainsAddedRelationship()
         {
@@ -1603,6 +1604,7 @@
             return new KnownRelationship(typeof(object), Lifestyle.Transient, 
                 container.GetRegistration(typeof(Container)));
         }
+#endif
     }
 
     public class DependencyInfo

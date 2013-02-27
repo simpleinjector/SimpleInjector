@@ -1528,6 +1528,7 @@
             }
         }
         
+#if DEBUG
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForUncontrolledCollection_ContainsAddedRelationship()
         {
@@ -1600,7 +1601,8 @@
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
-        
+#endif
+
         [TestMethod]
         public void GetAllInstances_DecoratingEmptyCollectionWithLifestyleOtherThanTransientAndSingleton_Succeeds()
         {
@@ -1614,7 +1616,7 @@
             container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
         }
         
-        
+#if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();
@@ -1623,6 +1625,7 @@
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient, dummyRegistration);
         }
+#endif
 
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(
