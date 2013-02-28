@@ -15,12 +15,14 @@ namespace $rootnamespace$.App_Start
             // Did you know the container can diagnose your configuration? Go to: http://bit.ly/YE8OJj.
             var container = new Container();
 
+            container.EnablePerWcfOperationLifestyle();
+            
             InitializeContainer(container);
 
             container.RegisterWcfServices(Assembly.GetExecutingAssembly());
 
             container.Verify();
-			
+            
             SimpleInjectorServiceHostFactory.SetContainer(container);
 
             // TODO: Add the following attribute to all .svc files:
@@ -32,7 +34,7 @@ namespace $rootnamespace$.App_Start
 #error Register your services here (remove this line).
 
             // For instance:
-            // container.Register<IUserRepository, SqlUserRepository>();
+            // container.RegisterPerWcfOperation<IUserRepository, SqlUserRepository>();
         }
     }
 }

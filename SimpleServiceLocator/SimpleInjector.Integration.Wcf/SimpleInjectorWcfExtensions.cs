@@ -86,7 +86,7 @@ namespace SimpleInjector
         /// <see cref="SimpleInjectorServiceHostFactory.SetContainer"/> method. 
         /// </summary>
         /// <param name="container">The container.</param>
-        public static void EnablePerWcfOperationLifestyle(Container container)
+        public static void EnablePerWcfOperationLifestyle(this Container container)
         {
             Requires.IsNotNull(container, "container");
 

@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version v2.0.1 (v2.0.1 RTM) 2013-02-28
 	General description:
 
 	Bug fixes:
@@ -13,6 +13,7 @@ Version vNext
 		 generic versions of the supplied generic interface, each closed-generic interface got its own
 		 registration, which had the effect of still returning more than one instance of that implementation
 		 within the registered lifestyle. (work item 19384).
+		-[Integration.Wcf] The integration package just didn't work as expected.
 
 
 Version v2.0.0 (v2.0 RTM) 2013-02-25
