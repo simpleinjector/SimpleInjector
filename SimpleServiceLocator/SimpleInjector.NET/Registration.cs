@@ -96,7 +96,12 @@ namespace SimpleInjector
         /// <returns>An <see cref="Expression"/>.</returns>
         public abstract Expression BuildExpression();
 
-        internal KnownRelationship[] GetRelationships()
+        /// <summary>
+        /// Gets the list of <see cref="KnownRelationship"/> instances. Note that the list is only available
+        /// after calling <see cref="BuildExpression"/>.
+        /// </summary>
+        /// <returns>A new array containing the <see cref="KnownRelationship"/> instances.</returns>
+        public KnownRelationship[] GetRelationships()
         {
             lock (this.dependencies)
             {

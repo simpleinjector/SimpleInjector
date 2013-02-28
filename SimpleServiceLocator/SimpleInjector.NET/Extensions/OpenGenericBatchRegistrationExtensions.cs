@@ -199,7 +199,10 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Registers all concrete, non-generic, publicly exposed types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
-        /// with the supplied <paramref name="lifestyle"/>.
+        /// with the supplied <paramref name="lifestyle"/>. When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will point at the same registration and return the same instance based on the caching
+        /// behavior of the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -223,7 +226,10 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
-        /// with the supplied <paramref name="lifestyle"/>.
+        /// with the supplied <paramref name="lifestyle"/>. When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will point at the same registration and return the same instance based on the caching
+        /// behavior of the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -249,6 +255,10 @@ namespace SimpleInjector.Extensions
         /// Registers  all concrete, non-generic types with the given <paramref name="accessibility"/>
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will point at the same registration and return the same instance based on the caching
+        /// behavior of the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
@@ -278,6 +288,10 @@ namespace SimpleInjector.Extensions
         /// Registers all concrete, non-generic types with the given <paramref name="accessibility"/> 
         /// that are located in the given <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will point at the same registration and return the same instance based on the caching
+        /// behavior of the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <remarks><b>This method is not available in Silverlight.</b></remarks>
         /// <param name="container">The container to make the registrations in.</param>
@@ -631,6 +645,9 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
         /// given <paramref name="openGenericServiceType"/> with a singleton lifetime.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will return the exact same instance.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -658,6 +675,9 @@ namespace SimpleInjector.Extensions
         /// <summary>
         /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
         /// given <paramref name="openGenericServiceType"/> with a singleton lifetime.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will return the exact same instance.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -1029,13 +1049,54 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(lifestyle, "lifestyle");
 
+            var typesToRegister = new Dictionary<Type, List<Type>>();
+
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
                 RequiresSingleImplementation(closedServiceType, implementations);
-                container.Register(closedServiceType, implementations.Single(), lifestyle);
+
+                var implementation = implementations.Single();
+
+                Add(typesToRegister, implementation, closedServiceType);
             };
 
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, accessibility, callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, accessibility, 
+                callback);
+
+            RegisterTypes(container, lifestyle, typesToRegister);
+        }
+
+        private static void Add(Dictionary<Type, List<Type>> typesToRegister, Type implementation,
+            Type closedServiceType)
+        {
+            List<Type> closedServiceTypes;
+
+            if (!typesToRegister.TryGetValue(implementation, out closedServiceTypes))
+            {
+                typesToRegister[implementation] = closedServiceTypes = new List<Type>(1);
+            }
+
+            closedServiceTypes.Add(closedServiceType);
+        }
+        
+        private static void RegisterTypes(Container container, Lifestyle lifestyle, 
+            Dictionary<Type, List<Type>> typesToRegister)
+        {
+            foreach (var pair in typesToRegister)
+            {
+                RegisterType(container, lifestyle, implementation: pair.Key, closedServiceTypes: pair.Value);
+            }
+        }
+
+        private static void RegisterType(Container container, Lifestyle lifestyle, Type implementation, 
+            List<Type> closedServiceTypes)
+        {
+            var registration = lifestyle.CreateRegistration(closedServiceTypes[0], implementation, container);
+
+            foreach (var closedServiceType in closedServiceTypes)
+            {
+                container.AddRegistration(closedServiceType, registration);
+            }
         }
 
         private static void RegisterManySinglesForOpenGenericInternal(Container container,

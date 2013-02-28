@@ -15,6 +15,10 @@
     [TestClass]
     public class BatchRegistrationExtensionsTests
     {
+        public interface ICommandHandler<T> 
+        { 
+        }
+
         // This is the open generic interface that will be used as service type.
         public interface IService<TA, TB>
         {
@@ -691,6 +695,42 @@
             Assert_AreEqual(expectedClosedServiceTypes, actualClosedServiceTypes);
         }
 
+        [TestMethod]
+        public void GetInstance_ImplementationWithMultipleInterfaces_ReturnsThatImplementationForEachInterface()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // MultiInterfaceHandler implements two interfaces.
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), Assembly.GetExecutingAssembly());
+
+            // Act
+            var instance1 = container.GetInstance<ICommandHandler<int>>();
+            var instance2 = container.GetInstance<ICommandHandler<double>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance1, typeof(MultiInterfaceHandler));
+            Assert.IsInstanceOfType(instance2, typeof(MultiInterfaceHandler));
+        }
+
+        [TestMethod]
+        public void GetInstance_BatchRegistrationUsingSingletonLifestyle_AlwaysReturnsTheSameInstanceForItsInterfaces()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // MultiInterfaceHandler implements two interfaces.
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), Lifestyle.Singleton,
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var instance1 = container.GetInstance<ICommandHandler<int>>();
+            var instance2 = container.GetInstance<ICommandHandler<double>>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
+        }
+
         private static void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
         {
             Assert.IsNotNull(actualList);
@@ -753,6 +793,10 @@
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and
         // on container.GetInstance<IService<Type, Type>>()
         public class Concrete3 : INonGeneric, IService<Type, Type>
+        {
+        }
+
+        public class MultiInterfaceHandler : ICommandHandler<int>, ICommandHandler<double>
         {
         }
 
