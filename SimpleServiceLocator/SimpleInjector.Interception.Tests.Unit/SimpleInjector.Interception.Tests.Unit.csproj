@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}</ProjectGuid>
+    <ProjectGuid>{8818088E-3979-4A6F-9B19-757D9D37ACC8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleInjector.Integration.Web.Tests.Unit</RootNamespace>
-    <AssemblyName>SimpleInjector.Integration.Web.Tests.Unit</AssemblyName>
+    <RootNamespace>SimpleInjector.Interception.Tests.Unit</RootNamespace>
+    <AssemblyName>SimpleInjector.Interception.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -20,7 +20,6 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +29,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,11 +37,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Web" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -58,18 +57,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="HttpContextScope.cs" />
+    <Compile Include="InterceptorExtesionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleInjectorWebExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions\SimpleInjector.Extensions.csproj">
-      <Project>{ca5a8a13-aa2c-4c21-80e3-98452a94cff7}</Project>
-      <Name>SimpleInjector.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj">
-      <Project>{fb925c19-cda9-44b4-a149-b20e8516a382}</Project>
-      <Name>SimpleInjector.Integration.Web</Name>
+    <ProjectReference Include="..\SimpleInjector.Interception\SimpleInjector.Interception.csproj">
+      <Project>{edf679b8-aced-4da0-bc98-6bb518dcd8fb}</Project>
+      <Name>SimpleInjector.Interception</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
