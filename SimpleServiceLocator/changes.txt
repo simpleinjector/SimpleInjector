@@ -5,7 +5,7 @@ Version vNext
 	
 	New features:
 		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
-		 (which is to not inject any properties).
+		 (which is to not inject any properties). (work item 19389)
 
 
 Version v2.0.1 (v2.0.1 RTM) 2013-02-28

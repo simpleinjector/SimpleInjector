@@ -356,27 +356,26 @@ namespace SimpleInjector
 
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
         {
-            var relationships =
-                from parameter in constructor.GetParameters()
-                let producer = this.Container.GetRegistrationEvenIfInvalid(parameter.ParameterType)
-                where producer != null
-                select new KnownRelationship(
-                    parameter.Member.DeclaringType, this.Lifestyle, producer);
+            var dependencyTypes = constructor.GetParameters().Select(p => p.ParameterType);
 
-            foreach (var relationship in relationships)
-            {
-                this.AddRelationship(relationship);
-            }
+            this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
 
         private void AddPropertiesAsKnownRelationships(Type implementationType, 
             IEnumerable<PropertyInfo> properties)
         {
+            var dependencyTypes = properties.Select(p => p.PropertyType);
+
+            this.AddRelationships(implementationType, dependencyTypes);
+        }
+
+        private void AddRelationships(Type implementationType, IEnumerable<Type> dependencies)
+        {
             var relationships =
-                from property in properties
-                let producer = this.Container.GetRegistrationEvenIfInvalid(property.PropertyType)
-                where producer != null
-                select new KnownRelationship(implementationType, this.Lifestyle, producer);
+                from dependency in dependencies
+                let registration = this.Container.GetRegistrationEvenIfInvalid(dependency)
+                where registration != null
+                select new KnownRelationship(implementationType, this.Lifestyle, registration);
 
             foreach (var relationship in relationships)
             {

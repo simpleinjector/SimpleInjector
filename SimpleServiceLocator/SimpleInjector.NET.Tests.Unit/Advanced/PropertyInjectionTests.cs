@@ -18,7 +18,7 @@
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
             // Act
-            var service = container.GetInstance<ServiceWithPropertyDependency<ITimeProvider>>();
+            var service = container.GetInstance<ServiceWithProperty<ITimeProvider>>();
 
             // Assert
             Assert.IsNotNull(service.Dependency);
@@ -31,7 +31,7 @@
             var container = CreateContainerThatInjectsAllProperties();
 
             // Act
-            Action action = () => container.GetInstance<ServiceWithPropertyDependency<ITimeProvider>>();
+            Action action = () => container.GetInstance<ServiceWithProperty<ITimeProvider>>();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
@@ -39,7 +39,7 @@
                 action);
         }
 
-        public class ServiceWithPropertyDependency<TDependency>
+        public class ServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }
         }
@@ -149,7 +149,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void InjectAllProperties_OnTypeWithLotsOfProperties_InjectsAllProperties()
         {
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
@@ -157,16 +157,13 @@
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
+            // This type has more than 15 properties. This allows us to test the recursive behavior of the
+            // code that builds the injection delegate. It uses Func<T> delegates for this, but there are only
+            // 17 Func delegates (with up to 16 input arguments) so the building has to be stacked recursively.
             var service = container.GetInstance<ServiceWithLotsOfProperties<ITimeProvider>>();
 
             // Assert
-            var uninjectedProperties =
-                from property in service.GetType().GetProperties()
-                let value = property.GetValue(service, null)
-                where value == null
-                select property;
-
-            Assert.IsFalse(uninjectedProperties.Any());
+            Assert_ContainsNoUninjectedProperties(service);
         }
 
         public class ServiceWithLotsOfProperties<TDependency>
@@ -255,6 +252,32 @@
             internal TDependency Dependency { get; private set; }
         }
 
+        [TestMethod]
+        public void InjectAllProperties_OnTypeWithOnePropertyDependency_AddsThatDependencyAsKnownRelationship()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            container.Register<ServiceWithProperty<ITimeProvider>>();
+
+            container.Verify();
+
+            var expectedDependency = container.GetRegistration(typeof(ITimeProvider));
+
+            // Act
+            var relationships =
+                container.GetRegistration(typeof(ServiceWithProperty<ITimeProvider>))
+                .GetRelationships();
+
+            // Assert
+            Assert.AreEqual(1, relationships.Length);
+            Assert.AreEqual(typeof(ServiceWithProperty<ITimeProvider>), relationships[0].ImplementationType);
+            Assert.AreEqual(Lifestyle.Transient, relationships[0].Lifestyle);
+            Assert.AreEqual(expectedDependency, relationships[0].Dependency);
+        }
+
         private static Container CreateContainerThatInjectsAllProperties()
         {
             var container = ContainerFactory.New();
@@ -263,6 +286,18 @@
                 prop => prop.DeclaringType != typeof(RealTimeProvider));
 
             return container;
+        }
+
+        private static void Assert_ContainsNoUninjectedProperties(object instance)
+        {
+            var uninjectedProperties =
+                from property in instance.GetType().GetProperties()
+                let value = property.GetValue(instance, null)
+                where value == null
+                select property;
+
+            Assert.IsFalse(uninjectedProperties.Any(),
+                "Property: " + uninjectedProperties.FirstOrDefault() + " was not injected.");
         }
 
         private class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
