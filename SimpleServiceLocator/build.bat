@@ -1,17 +1,17 @@
 @ECHO OFF
 
-set version=2.0.0
+set version=2.1.0
 set prereleasePostfix=
 set buildNumber=0
 
 
-set version_Core=2.0.0
+set version_Core=%version%
 set version_Packaging=%version_Core%
 set version_Extensions=%version_Core%
-set version_Integration_Web=2.0.0
-set version_Integration_Mvc=2.0.0
-set version_Integration_Wcf=2.0.0
-set version_Extensions_LifetimeScoping=2.0.0
+set version_Integration_Web=%version_Core%
+set version_Integration_Mvc=%version_Core%
+set version_Integration_Wcf=%version_Core%
+set version_Extensions_LifetimeScoping=%version_Core%
 
 
 
@@ -260,8 +260,8 @@ REM copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\lib\net40-client\Si
 %replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {version} %named_version_Extensions%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3b15d35fbc3a4556960337dcd95cf0f4.psmdcp {version} %named_version_Extensions%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip"
-ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip" "*.nupkg"
+REM %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip"
+REM ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -381,6 +381,6 @@ REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\lib\sl30\Si
 %replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {version} %named_version_Extensions%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7ed90488e5714295854ab251e2959afe.psmdcp {version} %named_version_Extensions%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip"
-ren "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip" "*.nupkg"
+REM %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip"
+REM ren "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
