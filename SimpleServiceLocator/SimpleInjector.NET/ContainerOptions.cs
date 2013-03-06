@@ -55,12 +55,16 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorInjectionBehavior injectionBehavior;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IPropertySelectionBehavior propertyBehavior;
+
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         public ContainerOptions()
         {
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
             this.verificationBehavior = new DefaultConstructorVerificationBehavior();
             this.injectionBehavior = new DefaultConstructorInjectionBehavior(() => this.Container);
+            this.propertyBehavior = new DefaultPropertySelectionBehavior();
         }
 
         /// <summary>
@@ -72,6 +76,10 @@ namespace SimpleInjector
 
         /// <summary>Gets or sets the constructor resolution behavior.</summary>
         /// <value>The constructor resolution behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
         public IConstructorResolutionBehavior ConstructorResolutionBehavior
         {
             get
@@ -94,6 +102,10 @@ namespace SimpleInjector
 
         /// <summary>Gets or sets the constructor resolution behavior.</summary>
         /// <value>The constructor resolution behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
         public IConstructorVerificationBehavior ConstructorVerificationBehavior
         {
             get
@@ -113,6 +125,10 @@ namespace SimpleInjector
 
         /// <summary>Gets or sets the constructor injection behavior.</summary>
         /// <value>The constructor injection behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
         public IConstructorInjectionBehavior ConstructorInjectionBehavior
         {
             get
@@ -127,6 +143,29 @@ namespace SimpleInjector
                 this.ThrowWhenContainerHasRegistrations("ConstructorInjectionBehavior");
 
                 this.injectionBehavior = value;
+            }
+        }
+
+        /// <summary>Gets or sets the property selection behavior.</summary>
+        /// <value>The property selection behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public IPropertySelectionBehavior PropertySelectionBehavior
+        {
+            get
+            {
+                return this.propertyBehavior;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, "value");
+
+                this.ThrowWhenContainerHasRegistrations("PropertySelectionBehavior");
+
+                this.propertyBehavior = value;
             }
         }
         

@@ -33,6 +33,9 @@ namespace SimpleInjector.Advanced
     [DebuggerDisplay("{GetType().Name,nq}")]
     internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
+        // NOTE: The serviceType parameter is not used in the default implementation, but can be used by
+        // alternative implementations to generate a proxy type based on the service type and return a
+        // constructor of that proxy instead of returning a constructor of the implementationType.
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
             Requires.IsNotNull(serviceType, "serviceType");

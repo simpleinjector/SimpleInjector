@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -321,6 +322,63 @@
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void PropertyInjectionBehavior_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            // Act
+            options.PropertySelectionBehavior = null;
+        }
+
+        [TestMethod]
+        public void PropertyInjectionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var expectedBehavior = new AlternativePropertyInjectionBehavior();
+
+            var options = new ContainerOptions();
+
+            var container = new Container(options);
+
+            // Act
+            options.PropertySelectionBehavior = expectedBehavior;
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.PropertySelectionBehavior),
+                "The set_PropertySelectionBehavior did not work.");
+        }
+
+        [TestMethod]
+        public void PropertyInjectionBehavior_ChangedAfterFirstRegistration_Fails()
+        {
+            // Arrange
+            var expectedBehavior = new AlternativePropertyInjectionBehavior();
+
+            var options = new ContainerOptions();
+
+            var container = new Container(options);
+
+            container.RegisterSingle<object>("The first registration.");
+
+            try
+            {
+                // Act
+                options.PropertySelectionBehavior = expectedBehavior;
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                AssertThat.ExceptionMessageContains(
+                    "PropertySelectionBehavior property cannot be changed after the first registration",
+                    ex);
+            }
+        }
+
+        [TestMethod]
         public void BuildParameterExpression_CalledOnConstructorInjectionBehaviorWhenOptionsIsNotPartOfAContainer_ThrowsExpectedException()
         {
             // Arrange
@@ -361,6 +419,14 @@
         private sealed class AlternativeConstructorInjectionBehavior : IConstructorInjectionBehavior
         {
             public Expression BuildParameterExpression(ParameterInfo parameter)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private sealed class AlternativePropertyInjectionBehavior : IPropertySelectionBehavior
+        {
+            public bool SelectProperty(Type serviceType, PropertyInfo property)
             {
                 throw new NotImplementedException();
             }

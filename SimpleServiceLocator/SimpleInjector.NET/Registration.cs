@@ -32,7 +32,6 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service.
@@ -51,6 +50,8 @@ namespace SimpleInjector
     /// </example>
     public abstract class Registration
     {
+        private static readonly PropertyInfo[] NoProperties = new PropertyInfo[0];
+
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
 
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
@@ -217,6 +218,8 @@ namespace SimpleInjector
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
 
+            expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TService), expression);
+
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TService), expression);
             
             // We have to decorate the given instanceCreator to add a null check and throw an expressive
@@ -253,6 +256,8 @@ namespace SimpleInjector
         {
             Expression expression = this.BuildNewExpression(typeof(TService), typeof(TImplementation));
 
+            expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TImplementation), expression);
+
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TImplementation), expression);
 
             expression = this.WrapWithInitializer<TImplementation>(expression);
@@ -260,11 +265,11 @@ namespace SimpleInjector
             return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
         }
 
-        private NewExpression BuildNewExpression(Type serviceType, Type implemenationType)
+        private NewExpression BuildNewExpression(Type serviceType, Type implementationType)
         {
             var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
 
-            ConstructorInfo constructor = resolutionBehavior.GetConstructor(serviceType, implemenationType);
+            ConstructorInfo constructor = resolutionBehavior.GetConstructor(serviceType, implementationType);
 
             this.AddConstructorParametersAsKnownRelationship(constructor);
 
@@ -274,6 +279,56 @@ namespace SimpleInjector
                 select placeHolder ?? this.BuildParameterExpression(parameter);
 
             return Expression.New(constructor, parameters.ToArray());
+        }
+
+        // Wraps the expression with a delegate that injects the properties.
+        private Expression WrapWithPropertyInjector(Type serviceType, Type implementationType, 
+            Expression expressionToWrap)
+        {
+            if (this.Container.Options.PropertySelectionBehavior is DefaultPropertySelectionBehavior)
+            {
+                // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
+                return expressionToWrap;
+            }
+
+            return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
+        }
+
+        private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType, 
+            Expression expression)
+        {
+            var properties = this.GetPropertiesToInject(serviceType, implementationType);
+
+            if (properties.Any())
+            {
+                PropertyInjectionHelper.VerifyProperties(properties);
+
+                expression = PropertyInjectionHelper.BuildPropertyInjectionExpression(this.Container,
+                    this.ImplementationType, properties, expression);
+
+                this.AddPropertiesAsKnownRelationships(implementationType, properties);
+            }
+
+            return expression;
+        }
+
+        private PropertyInfo[] GetPropertiesToInject(Type serviceType, Type implementationType)
+        {
+            var propertySelector = this.Container.Options.PropertySelectionBehavior;
+
+            if (propertySelector is DefaultPropertySelectionBehavior)
+            {
+                // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
+                return NoProperties;
+            }
+
+            var candidates = PropertyInjectionHelper.GetCandidateInjectionPropertiesFor(implementationType);
+
+            return (
+                from property in candidates
+                where propertySelector.SelectProperty(serviceType, property)
+                select property)
+                .ToArray();
         }
 
         private Expression ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(Expression expression)
@@ -307,6 +362,21 @@ namespace SimpleInjector
                 where producer != null
                 select new KnownRelationship(
                     parameter.Member.DeclaringType, this.Lifestyle, producer);
+
+            foreach (var relationship in relationships)
+            {
+                this.AddRelationship(relationship);
+            }
+        }
+
+        private void AddPropertiesAsKnownRelationships(Type implementationType, 
+            IEnumerable<PropertyInfo> properties)
+        {
+            var relationships =
+                from property in properties
+                let producer = this.Container.GetRegistrationEvenIfInvalid(property.PropertyType)
+                where producer != null
+                select new KnownRelationship(implementationType, this.Lifestyle, producer);
 
             foreach (var relationship in relationships)
             {

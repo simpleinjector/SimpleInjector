@@ -1,20 +1,47 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     // http://simpleinjector.codeplex.com/wikipage?title=ImplicitPropertyInjectionExtensions
-    using SimpleInjector;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reflection;
+
+    using SimpleInjector.Advanced;
 
     public static class ImplicitPropertyInjectionExtensions
     {
-        public static void AllowImplicitPropertyInjection(this Container container)
+        [DebuggerStepThrough]
+        public static void AutowirePropertiesImplicitly(this ContainerOptions options)
         {
-            container.AllowImplicitPropertyInjectionOn<object>();
+            options.PropertySelectionBehavior =
+                new ImplicitPropertyInjectionBehavior(options.PropertySelectionBehavior, options);
         }
 
-        public static void AllowImplicitPropertyInjectionOn<TService>(
-            this Container container) where TService : class
+        internal sealed class ImplicitPropertyInjectionBehavior : IPropertySelectionBehavior
         {
-            container.RegisterInitializer<TService>(
-                service => container.InjectProperties(service));
+            private readonly IPropertySelectionBehavior baseBehavior;
+            private readonly ContainerOptions options;
+
+            internal ImplicitPropertyInjectionBehavior(IPropertySelectionBehavior baseBehavior,
+                ContainerOptions options)
+            {
+                this.baseBehavior = baseBehavior;
+                this.options = options;
+            }
+
+            [DebuggerStepThrough]
+            public bool SelectProperty(Type serviceType, PropertyInfo property)
+            {
+                return this.IsImplicitInjectableProperty(property) || 
+                    this.baseBehavior.SelectProperty(serviceType, property);
+            }
+
+            private bool IsImplicitInjectableProperty(PropertyInfo property)
+            {
+                return property.CanWrite && property.GetSetMethod() != null &&
+                    this.options.Container.GetRegistration(property.PropertyType, throwOnFailure: false) != null;
+            }
         }
     }
 }

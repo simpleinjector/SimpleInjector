@@ -78,9 +78,12 @@
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\DefaultPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
+    <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\ShortCircuitContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\ContainerDebugView.cs" />

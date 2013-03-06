@@ -35,8 +35,7 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
-    using System.Runtime.CompilerServices;
-    
+
     /// <summary>
     /// Helper methods for the container.
     /// </summary>
@@ -212,7 +211,7 @@ namespace SimpleInjector
             return castedCollection;
         }
 
-        internal static Func<object> CompileExpression(Container container, Expression expression,
+        internal static Func<object> CompileAndExecuteExpression(Container container, Expression expression,
             out object createdInstance)
         {
             createdInstance = null;
@@ -236,11 +235,41 @@ namespace SimpleInjector
             // (where N is configurable)
             if (container.CompileInDynamicAssembly && !ExpressionNeedsAccessToInternals(expression))
             {
-                return CompileInDynamicAssemblyWithFallback(expression, out createdInstance);
+                return CompileAndExecuteInDynamicAssemblyWithFallback(expression, out createdInstance);
             }
 #endif
             return CompileLambda(expression);
         }
+
+        internal static Delegate CompileLambdaInDynamicAssembly(LambdaExpression lambda, string typeName,
+            string methodName)
+        {
+            var assemblyName = new AssemblyName("SimpleInjector.Compiled");
+
+            AssemblyBuilder assemblyBuilder =
+                AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+
+            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("SimpleInjector.CompiledModule");
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public);
+            MethodBuilder methodBuilder = typeBuilder.DefineMethod(methodName,
+                MethodAttributes.Static | MethodAttributes.Public);
+
+            lambda.CompileToMethod(methodBuilder);
+
+            Type type = typeBuilder.CreateType();
+
+            return Delegate.CreateDelegate(lambda.Type, type.GetMethod(methodName), true);
+        }
+
+#if !SILVERLIGHT
+        // This doesn't find all possible cases, but get's us close enough.
+        internal static bool ExpressionNeedsAccessToInternals(Expression expression)
+        {
+            var visitor = new InternalUseFinderVisitor();
+            visitor.Visit(expression);
+            return visitor.NeedsAccessToInternals;
+        }
+#endif
 
         private static Func<object> CreateConstantOptimizedExpression(ConstantExpression expression)
         {
@@ -303,7 +332,7 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileInDynamicAssemblyWithFallback(Expression expression, 
+        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Expression expression, 
             out object createdInstance)
         {
             try
@@ -373,25 +402,12 @@ namespace SimpleInjector
             return indexizer.Visit(expression);
         }
 
-        private static T CompileDelegateInDynamicAssembly<T>(Expression<T> lambda)
+        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda)
         {
-            var assemblyName = new AssemblyName("SimpleInjector.Compiled");
-
-            AssemblyBuilder assemblyBuilder =
-                AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-
-            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("SimpleInjector.CompiledModule");
-            TypeBuilder typeBuilder = moduleBuilder.DefineType("DynamicInstanceProducer", TypeAttributes.Public);
-            MethodBuilder methodBuilder = typeBuilder.DefineMethod("GetInstance",
-                MethodAttributes.Static | MethodAttributes.Public);
-
-            lambda.CompileToMethod(methodBuilder);
-
-            Type type = typeBuilder.CreateType();
-
-            return (T)(object)Delegate.CreateDelegate(lambda.Type, type.GetMethod("GetInstance"), true);
+            return (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda, "DynamicInstanceProducer", 
+                "GetInstance");
         }
-        
+
         private static List<ConstantExpression> GetConstants(Expression expression)
         {
             var constantFinder = new ConstantFinderVisitor();
@@ -401,30 +417,34 @@ namespace SimpleInjector
             return constantFinder.Constants;
         }
 
-        // This doesn't find all possible cases, but get's us close enough.
-        private static bool ExpressionNeedsAccessToInternals(Expression expression)
-        {
-            var visitor = new InternalUseFinderVisitor();
-            visitor.Visit(expression);
-            return visitor.NeedsAccessToInternals;
-        }
-
         private sealed class InternalUseFinderVisitor : ExpressionVisitor
         {
             public bool NeedsAccessToInternals { get; private set; }
             
             protected override Expression VisitNew(NewExpression node)
             {
-                this.MayAccessExpression(node.Constructor.IsPublic && node.Constructor.DeclaringType.IsPublic);
+                this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor.DeclaringType));
 
                 return base.VisitNew(node);
             }
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                this.MayAccessExpression(node.Method.IsPublic && node.Method.DeclaringType.IsPublic);
+                this.MayAccessExpression(node.Method.IsPublic && IsPublic(node.Method.DeclaringType));
 
                 return base.VisitMethodCall(node);
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                var property = node.Member as PropertyInfo;
+
+                if (node.NodeType == ExpressionType.MemberAccess && property != null)
+                {
+                    this.MayAccessExpression(IsPublic(property.DeclaringType) && property.GetSetMethod() != null);
+                }
+
+                return base.VisitMember(node);
             }
 
             private void MayAccessExpression(bool mayAccess)
@@ -433,6 +453,11 @@ namespace SimpleInjector
                 {
                     this.NeedsAccessToInternals = true;
                 }
+            }
+
+            private static bool IsPublic(Type type)
+            {
+                return type.IsPublic || type.IsNestedPublic;
             }
         }
 

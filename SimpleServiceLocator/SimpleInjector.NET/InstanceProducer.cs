@@ -198,7 +198,7 @@ namespace SimpleInjector
 
             try
             {
-                return Helpers.CompileExpression(this.Registration.Container, expression, out createdInstance);
+                return Helpers.CompileAndExecuteExpression(this.Registration.Container, expression, out createdInstance);
             }
             catch (Exception ex)
             {

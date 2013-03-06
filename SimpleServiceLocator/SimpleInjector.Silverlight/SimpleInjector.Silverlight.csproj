@@ -92,6 +92,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorVerificationBehavior.cs">
       <Link>Advanced\DefaultConstructorVerificationBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultPropertySelectionBehavior.cs">
+      <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorInjectionBehavior.cs">
       <Link>Advanced\IConstructorInjectionBehavior.cs</Link>
     </Compile>
@@ -101,8 +104,14 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IPropertySelectionBehavior.cs">
+      <Link>Advanced\IPropertySelectionBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\KnownRelationship.cs">
       <Link>Advanced\KnownRelationship.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
+      <Link>Advanced\PropertyInjectionHelper.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>

@@ -189,14 +189,22 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), innerException.Message);
         }
 
-        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type injectee,
+        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type serviceType,
+            Exception innerException)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Unable to inject properties into type {0}. The security restrictions of your application's " +
+                "sandbox do not permit the injection of one of its properties. Consider making it public. {1}",
+                serviceType.ToFriendlyName(), innerException.Message);
+        }
+
+        internal static string UnableToInjectImplicitPropertiesDueToSecurityConfiguration(Type injectee,
             Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Unable to inject properties into type {0}. The security restrictions of your application's " +
                 "sandbox do not permit the creation of one of its dependencies. Explicitly register that " +
-                "dependency using one of the generic 'Register' overloads or consider making it public. " +
-                "Please see the inner exception for more details about which type caused this failure. {1}",
+                "dependency using one of the generic 'Register' overloads or consider making it public. {1}",
                 injectee.ToFriendlyName(), innerException.Message);
         }
 
@@ -406,6 +414,13 @@ namespace SimpleInjector
                 "lifestyle, or use one of the RegisterAll overloads that takes a collection of " +
                 "System.Type types.",
                 decoratorType.ToFriendlyName(), lifestyle.Name, serviceType.ToFriendlyName());
+        }
+
+        internal static string PropertyHasNoSetter(PropertyInfo property)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Property of type {0} with name '{1}' can't be injected, because it has no set method.",
+                property.PropertyType.ToFriendlyName(), property.Name);
         }
     }
 }

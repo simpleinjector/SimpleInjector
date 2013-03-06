@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -26,26 +26,22 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics;
     using System.Reflection;
 
-    /// <summary>
-    /// Defines the container's behavior for finding a suitable constructor for the creation of a type.
-    /// Set the <see cref="ContainerOptions.ConstructorResolutionBehavior">ConstructorResolutionBehavior</see> 
-    /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
-    /// of the container.
-    /// </summary>
-    public interface IConstructorResolutionBehavior
+    [DebuggerDisplay("{GetType().Name,nq}")]
+    internal sealed class DefaultPropertySelectionBehavior : IPropertySelectionBehavior
     {
-        /// <summary>
-        /// Gets the given <paramref name="implementationType"/>'s constructor that can be used by the 
-        /// container to create that instance.
-        /// </summary>
-        /// <param name="serviceType">Type of the abstraction that is requested.</param>
-        /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
-        /// <returns>
-        /// The <see cref="ConstructorInfo"/>.
-        /// </returns>
-        /// <exception cref="ActivationException">Thrown when no suitable constructor could be found.</exception>
-        ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
+        public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
+        {
+            // The default behavior is to not inject any properties. This has the following rational:
+            // 1. We don't want to do implicit property injection (where all properties are skipped that
+            //    can't be injected), because this leads to a configuration that is hard to verify.
+            // 2. We can't do explicit property injection, because this required users to use a framework
+            //    property and application code should not depend on the DI container.
+            // 3. In general, property injection should not be used, since it may hide the fact that the
+            //    Single Responsibility Principle is violated.
+            return false;
+        }
     }
 }

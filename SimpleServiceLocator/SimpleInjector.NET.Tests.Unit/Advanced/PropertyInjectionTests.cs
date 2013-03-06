@@ -1,0 +1,283 @@
+﻿namespace SimpleInjector.Tests.Unit.Advanced
+{
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Advanced;
+
+    [TestClass]
+    public class PropertyInjectionTests
+    {
+        [TestMethod]
+        public void InjectingAllProperties_OnTypeWithPublicWritableProperty_InjectsPropertyDependency()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            var service = container.GetInstance<ServiceWithPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency);
+        }
+
+        [TestMethod]
+        public void InjectingAllProperties_OnTypeWithPublicWritablePropertyButRegistrationMissing_ThrowsException()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "No registration for type ITimeProvider could be found", 
+                action);
+        }
+
+        public class ServiceWithPropertyDependency<TDependency>
+        {
+            public TDependency Dependency { get; set; }
+        }
+
+        [TestMethod]
+        public void InjectingAllProperties_OnTypeWithReadOnlyProperty_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithReadOnlyPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                Property of type ITimeProvider with name 'Dependency' can't be injected, because it has no 
+                set method.".TrimInside(),
+                action);
+        }
+
+        public class ServiceWithReadOnlyPropertyDependency<TDependency>
+        {
+            public TDependency Dependency
+            {
+                get { return default(TDependency); }
+            }
+        }
+
+        [TestMethod]
+        public void InjectingAllProperties_OnTypeWithPrivateSetterProperty_Succeeds()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            // Quite bizarre, but this even succeeds in the Silverlight sandbox. I don't know why.
+            var service = container.GetInstance<ServiceWithPrivateSetPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency);
+        }
+
+        public class ServiceWithPrivateSetPropertyDependency<TDependency>
+        {
+            public TDependency Dependency { get; private set; }
+        }
+
+        [TestMethod]
+        public void InjectAllProperties_TypeWithStaticProperty_StaticPropertyDoesNotGetInjected()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            var service = container.GetInstance<ServiceWithStaticPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNull(ServiceWithStaticPropertyDependency<ITimeProvider>.Dependency);
+        }
+
+        public class ServiceWithStaticPropertyDependency<TDependency>
+        {
+            public static TDependency Dependency { get; set; }
+        }
+
+        [TestMethod]
+        public void InjectAllProperties_ServiceWithMultiplePropertiesOfSameType_AlwaysInjectNewTransientType()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Transient);
+
+            // Act
+            var service = container.GetInstance<ServiceWithTwoPropertiesOfSameType<ITimeProvider>>();
+
+            // Assert
+            Assert.IsFalse(object.ReferenceEquals(service.Dependency01, service.Dependency02));
+        }
+
+        [TestMethod]
+        public void InjectAllProperties_ServiceWithMultiplePropertiesOfSameType_AlwaysInjectSameSingleton()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var service = container.GetInstance<ServiceWithTwoPropertiesOfSameType<ITimeProvider>>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(service.Dependency01, service.Dependency02));
+        }
+
+        public class ServiceWithTwoPropertiesOfSameType<TDependency>
+        {
+            public TDependency Dependency01 { get; set; }
+
+            public TDependency Dependency02 { get; set; }
+        }
+
+        [TestMethod]
+        public void MethodUnderTest_Scenario_Behavior()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var service = container.GetInstance<ServiceWithLotsOfProperties<ITimeProvider>>();
+
+            // Assert
+            var uninjectedProperties =
+                from property in service.GetType().GetProperties()
+                let value = property.GetValue(service, null)
+                where value == null
+                select property;
+
+            Assert.IsFalse(uninjectedProperties.Any());
+        }
+
+        public class ServiceWithLotsOfProperties<TDependency>
+        {
+            public TDependency Dependency01 { get; set; }
+
+            public TDependency Dependency02 { get; set; }
+
+            public TDependency Dependency03 { get; set; }
+
+            public TDependency Dependency04 { get; set; }
+
+            public TDependency Dependency05 { get; set; }
+
+            public TDependency Dependency06 { get; set; }
+
+            public TDependency Dependency07 { get; set; }
+
+            public TDependency Dependency08 { get; set; }
+
+            public TDependency Dependency09 { get; set; }
+
+            public TDependency Dependency10 { get; set; }
+
+            public TDependency Dependency11 { get; set; }
+
+            public TDependency Dependency12 { get; set; }
+
+            public TDependency Dependency13 { get; set; }
+
+            public TDependency Dependency14 { get; set; }
+
+            public TDependency Dependency15 { get; set; }
+
+            public TDependency Dependency16 { get; set; }
+
+            public TDependency Dependency17 { get; set; }
+
+            public TDependency Dependency18 { get; set; }
+
+            public TDependency Dependency19 { get; set; }
+
+            public TDependency Dependency20 { get; set; }
+        }
+
+#if !SILVERLIGHT
+        [TestMethod]
+        public void InjectingAllProperties_OnPrivateTypeWithPrivateSetterProperty_Succeeds()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            var service = container.GetInstance<PrivateServiceWithPrivateSetPropertyDependency<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency);
+        }
+#else
+        [TestMethod]
+        public void InjectingAllProperties_OnPrivateTypeWithPrivateSetterPropertyInSilverlight_FailsWithDescriptiveMessage()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            try
+            {
+                // Act
+                container.GetInstance<PrivateServiceWithPrivateSetPropertyDependency<ITimeProvider>>();
+            }
+            catch (Exception ex)
+            {
+                AssertThat.ExceptionMessageContains(@"
+                    The security restrictions of your application's sandbox do not permit the injection of 
+                    one of its properties.".TrimInside(), ex);
+            }
+        }
+#endif
+
+        private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
+        {
+            internal TDependency Dependency { get; private set; }
+        }
+
+        private static Container CreateContainerThatInjectsAllProperties()
+        {
+            var container = ContainerFactory.New();
+
+            container.Options.PropertySelectionBehavior = new PredicatePropertySelectionBehavior(
+                prop => prop.DeclaringType != typeof(RealTimeProvider));
+
+            return container;
+        }
+
+        private class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
+        {
+            private readonly Predicate<PropertyInfo> propertySelector;
+
+            public PredicatePropertySelectionBehavior(Predicate<PropertyInfo> propertySelector)
+            {
+                this.propertySelector = propertySelector;
+            }
+
+            public bool SelectProperty(Type serviceType, PropertyInfo property)
+            {
+                return this.propertySelector(property);
+            }
+        }
+    }
+}

@@ -76,7 +76,7 @@ namespace SimpleInjector
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ActivationException(
-                    StringResources.UnableToInjectPropertiesDueToSecurityConfiguration(instance.GetType(), ex),
+                    StringResources.UnableToInjectImplicitPropertiesDueToSecurityConfiguration(instance.GetType(), ex),
                     ex);
             }
         }

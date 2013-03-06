@@ -1,5 +1,12 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version vNext
+	General description:
+	
+	New features:
+		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
+		 (which is to not inject any properties).
+
 
 Version v2.0.1 (v2.0.1 RTM) 2013-02-28
 	General description:

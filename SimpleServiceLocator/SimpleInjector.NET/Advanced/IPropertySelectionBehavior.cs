@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -29,23 +29,19 @@ namespace SimpleInjector.Advanced
     using System.Reflection;
 
     /// <summary>
-    /// Defines the container's behavior for finding a suitable constructor for the creation of a type.
-    /// Set the <see cref="ContainerOptions.ConstructorResolutionBehavior">ConstructorResolutionBehavior</see> 
+    /// Defines the container's behavior for selecting properties to inject during the creation of a type.
+    /// Set the <see cref="ContainerOptions.PropertySelectionBehavior">PropertySelectionBehavior</see> 
     /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
-    /// of the container.
+    /// of the container. By default, no properties will be injected by the container.
     /// </summary>
-    public interface IConstructorResolutionBehavior
+    public interface IPropertySelectionBehavior
     {
         /// <summary>
-        /// Gets the given <paramref name="implementationType"/>'s constructor that can be used by the 
-        /// container to create that instance.
+        /// Determines whether a property should be injected by the container upon creation of its type.
         /// </summary>
         /// <param name="serviceType">Type of the abstraction that is requested.</param>
-        /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
-        /// <returns>
-        /// The <see cref="ConstructorInfo"/>.
-        /// </returns>
-        /// <exception cref="ActivationException">Thrown when no suitable constructor could be found.</exception>
-        ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
+        /// <param name="propertyInfo">The property to check.</param>
+        /// <returns>True when the property should be injected.</returns>
+        bool SelectProperty(Type serviceType, PropertyInfo propertyInfo);
     }
 }
