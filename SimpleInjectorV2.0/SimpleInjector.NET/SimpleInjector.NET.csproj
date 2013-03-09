@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimpleInjector</RootNamespace>
+    <AssemblyName>SimpleInjector</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>http://localhost/SimpleInjector/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\NET\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\NET\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\bin\NET\SimpleInjector.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugSymbols>false</DebugSymbols>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActivationException.cs" />
+    <Compile Include="Advanced\AdvancedExtensions.cs" />
+    <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
+    <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
+    <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
+    <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
+    <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
+    <Compile Include="Diagnostics\ContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\ShortCircuitContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\ContainerDebugView.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItem.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItemGenericTypeGrouper.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItemType.cs" />
+    <Compile Include="Diagnostics\GeneralWarningsContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\IContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\KnownRelationshipCollection.cs" />
+    <Compile Include="Diagnostics\TypeGeneralizer.cs" />
+    <Compile Include="ContainerOptions.cs" />
+    <Compile Include="CyclicDependencyValidator.cs" />
+    <Compile Include="CyclicDependencyValidatorExtensions.cs" />
+    <Compile Include="Diagnostics\LifestyleMismatchServices.cs" />
+    <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="ExpressionBuildingEventArgs.cs" />
+    <Compile Include="ExpressionBuiltEventArgs.cs" />
+    <Compile Include="Extensions\DecoratorExtensions.cs" />
+    <Compile Include="Extensions\DecoratorPredicateContext.cs" />
+    <Compile Include="Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs" />
+    <Compile Include="Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
+    <Compile Include="Extensions\Decorators\DecoratableEnumerable.cs" />
+    <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />
+    <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
+    <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
+    <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
+    <Compile Include="Extensions\Decorators\IDecoratableEnumerable.cs" />
+    <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
+    <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
+    <Compile Include="Extensions\GenericArgumentFinder.cs" />
+    <Compile Include="Extensions\GenericTypeBuilder.cs" />
+    <Compile Include="Extensions\ExtensionHelpers.cs" />
+    <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
+    <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
+    <Compile Include="Lifestyles\CustomLifestyle.cs" />
+    <Compile Include="Lifestyles\ExpressionRegistration.cs" />
+    <Compile Include="Lifestyles\HybridLifestyle.cs" />
+    <Compile Include="Advanced\KnownRelationship.cs" />
+    <Compile Include="Lifestyle.cs" />
+    <Compile Include="Registration.cs" />
+    <Compile Include="Lifestyles\SingletonLifestyle.cs" />
+    <Compile Include="Lifestyles\TransientLifestyle.cs" />
+    <Compile Include="Lifestyles\UnknownLifestyle.cs" />
+    <Compile Include="PropertyInjector.cs" />
+    <Compile Include="Container.Registration.cs" />
+    <Compile Include="Container.Resolving.cs" />
+    <Compile Include="Container.Common.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="InstanceProducer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Requires.cs" />
+    <Compile Include="StringResources.cs" />
+    <Compile Include="UnregisteredTypeEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,420 @@
+﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
+
+
+Version v2.0.1 (v2.0.1 RTM) 2013-02-28
+	General description:
+
+	Bug fixes:
+		-[Core] Custom KnownDependency instances that where added during the interception (ExpressionBuilding)
+		 of a decorator type (RegisterDecorator) where not added to the decorated registration. (work item 19391)
+		-[Core] Decorating empty (unregistered) collections failed when the decorator had a lifestyle different
+		 than transient or singleton. (work item 19400)
+		-[Core] When RegisterManyForOpenGeneric registered implementations that implemented multiple closed
+		 generic versions of the supplied generic interface, each closed-generic interface got its own
+		 registration, which had the effect of still returning more than one instance of that implementation
+		 within the registered lifestyle. (work item 19384).
+		-[Integration.Wcf] The integration package just didn't work as expected.
+
+
+Version v2.0.0 (v2.0 RTM) 2013-02-25
+	General description:
+		This major release adds explicit lifestyle support and Debugger Diagnostic Services to the Core
+		library. The addition of explicit lifestyle support makes it easier to register types in any given
+		lifestyle, and the Lifestyle.Hybrid makes it really easy to create a registration that mixes
+		any number of lifestyles together. The Diagnostic Services help you to spot common configuration and
+		programming mistakes such as lifestyle mismatches, and short circuited dependencies.
+
+	New features:
+		-[Core] Diagnostic Debug View added to give feedback on possible misconfigurations in the
+		 container. See here for more information: https://simpleinjector.codeplex.com/wikipage?title=Diagnostics
+		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
+		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.CreateHybrid() method to create
+		 hybrid lifestyles and a Lifestyle.CreateCustom() method to create a lifestyle based on a name and
+		 a supplied delegate. Other lifestyle classes are implemented in the integration and extension
+		 libraries.
+		-[Core] Register overloads added that take Lifetyle as argument.
+		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
+		 expression is built that creates a new instance, but before instance initializers and lifestyle
+		 caching gets added to the expression.
+		-[Core] AddRegistration(Type, Registration) method added to allow directly adding a registration.
+		 This allows binding two or more service types to the same implementation.
+		-[Integration.Web] WebRequestLifestyle has been added.
+		-[Integration.Wcf] WcfOperationLifestyle has been added.
+		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
+		-[Core] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Core] RegisterOpenGeneric overloads have been added that allow specifying a lifestyle.
+		-[Core] RegisterDecorator overloads have been added that allow specifying a lifestyle.
+
+	Breaking changes:
+		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
+		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
+		-[Core] All Func<T> factory delegates registered using one of the Register overloads (such as
+		 Register<T>(Func<T>) are now considered to return transient instances. Custom lifestyles should
+		 applied by supplying a custom Lifestyle implementation.
+		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
+		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>) and to
+		 instances registered using RegisterSingle<T>(T) and RegisterSingle(Type, object). Note that this 
+		 could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
+		 own caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
+		 Instead of registering Func<T> delegates to implement custom lifestyle, derive from Lifestyle.
+		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
+		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
+		 in case a type got registered using RegisterSingle<A, B>(). The new ExpressionBuilding event will
+		 now handle the first call and will do this in a more reliable manner.
+		-[Core] The Container.GetInitializer<TService>() method has been removed from the container. The
+		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
+		 SimpleInjector.Advanced namespace. It's an extension method now. (work item 18349).
+		-[Core] The types System.Type and System.String are considered ambiguous and are now disallowed from
+		 being registered directly. An exception is thrown.
+		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
+		 WebRequestLifestyle can be used instead.
+		-[Core] The old OpenGenericBatchRegistrationExtensions.GetTypesToRegister overloads have been marked 
+		 obsolete. There are new overloads that take the Container as an argument.
+
+	Changes:
+		-[Extensions] Extensions library has been merged with core library. Extensions library is currently 
+		 empty, but will still be used as NuGet package for backwards compatibility for existing users.
+		-[Core] A call to GetCurrentRegistrations() will not lock the container anymore. This allows users
+		 to use this method to query the container during registration.
+		-[Core] RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods now ignore 
+		 any found decorator type. This makes it easier to have use batch registration while having 
+		 non-generic decorators in the same project.
+
+	Bug fixes:
+		-[Core] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event
+		 that was triggered twice for singletons. (work item 19110)
+		-[Core] Memory leak when using decorators with while creating many Container instances. (work item 
+		 19241)
+		-[Core] RegisterOpenGeneric failed to resolve types that had a "where TOne : TTwo" type constraint.
+		-[Extensions.LifetimeScoping] Registration order of RegisterDecorator and RegisterLifetimeScope
+		 mattered for the lifetime op the decorator. (work item 19120)
+		-[Integration.Web] Registration order of RegisterDecorator and RegisterPerWebRequest mattered for the 
+		 lifetime op the decorator. (work item 19120)
+		-[Integration.Wcf] Registration order of RegisterDecorator and RegisterPerWcfOperation mattered for 
+		 the lifetime op the decorator. (work item 19120)
+
+
+Version 1.next (not released yet)
+	General description:
+
+	Bug fixes:
+		-[Extensions] RegisterDecorator extension methods did not check whether the registered decorator type
+		 contained a constructor argument that the type implemented. This allowed registration of decorators
+		 that could never be used. (work item 18956)
+		-[Extensions.LifetimeScoping] Registrations made using RegisterLifetimeScope could be invalidated by
+		 other RegisterLifetimeScope registrations in case AllowOverridingRegistrations was set to true and
+		 Verify was called in between. (work item 19119)
+
+
+Version 1.6.1 (v1.6.1 RTM) 2012-12-12
+	General description:
+		The integration packages that were targetted at .NET 4.0 were incorrectly targetted at .NET 4.5. This
+		was caused by a misconfiguration in the build script. This made it impossible to use those packages
+		when .NET 4.5 was not installed.
+
+
+Version 1.6.0.12318 (v1.6.0 RTM) 2012-11-13
+	General description:
+		A few minor bug fixes have been made to the Core and Extensions project and the behaviors of the Per
+		Web Request lifestyle (RegisterPerWebRequest/SimpleInjector.Integration.Web) and Per Lifetime Scope
+		(RegisterLifetimeScope/SimpleInjector.Extensions.LifetimeScoping) have been changed. Both lifestyles
+		now throw an exception when an instance is trying to be resolved outside their scope. For Per Web 
+		Request this means that calling GetInstance when HttpContext.Current == null will fail, instead of
+		returning a transient instance. For Per Lifetime Scope this means that calling GetInstance will fail
+		when no scope is defined, instead of returning a singleton instance.
+	
+	Breaking changes:
+		-[Extensions.LifetimeScoping] now throws an exception when a per-lifetime scoped instance is requested
+		 outside the context of a Lifetime Scope. The previous released returned a singleton, but this would
+		 easily lead to hard to track errors.
+		-[Integration.Web] now throws an exception when a per-web-request scoped instance is requested outside
+		 the context of a HTTP request (when HttpContext.Current is null). The previous release returned a
+		 transient, but this would easily lead to hard to track errors.
+
+	Code changes:
+		-[Integration.Web] PerWebRequestInstanceCreator<TService> class made public to make it easier to make
+		 open generic registrations with a per web request lifestyle.
+
+	Bug fixes:
+		-[Core] Building a friendly name for an exception message failed for types nested in a generic type.
+		 The original error was lost.
+		-[Core] Calling GetService(Type) and GetRegistration(Type) with type being typeof(IEnumerable<>) 
+		 failed instead of returning null.
+		-[Core] GetInstance(Type) threw a less expressive exception as GetInstance<TService>() when a type
+		 could not be resolved. (work item 18542)
+		-[Core] Injecting properties could fail under .NET 4.0 and up where class inherited from 
+		 System.Windows.Forms.UserControl (work item 18909).
+		-[Extensions] RegisterOpenGeneric allowed registering types that could never be resolved (for instance
+		 because they had multiple constructors). An ArgumentException is now thrown during registration.
+		-[Extensions] An implementation type registered using RegisterOpenGeneric that could not be resolved
+		 (because for instance it has unregistered dependencies) caused a NullReferenceException.
+
+
+Version 1.5.0.12199 (v1.5.0 RTM) 2012-07-17
+	General description:
+		An extension point is added to the core library, which allows developers to override the behavior of
+		resolution and injection of constructors. For normal scenarios the use of the default behavior 
+		(which only allows one single public constructor) is still advised. 
+		
+		Other great improvements are in the RegisterDecorator extension methods of the Extensions project. 
+		The container now allows injecting a Func<ServiceType> into the decorator (besides injecting the 
+		decorated service type), which enabled more advanced scenarios where creation of the decorated type 
+		should be delayed (which is especially usefull when defining decorators for asynchronous execution and
+		lifetime scoping). New RegisterSingleDecorator extension methods have been added, which can improve 
+		performance and are especially useful when using Func<ServiceType> decorators. Support to decorating 
+		collections has been improved. In most situations the predicate will be called for each element in the
+		collection.
+
+	Code changes:
+		-[Core] Extension points added in the form of ContainerOptions.ConstructorXXXBehavior, which allows 
+		 developers to override the behavior of constructor resolution and injection. (work item 18097)
+		-[Core] Container.Options property has been added, containing the container options.
+		-[Extensions] RegisterDecorator extension methods now allow injecting Func<ServiceType> delegates. This
+		 enables some interesting advanced scenarios where the creation of the decorated instance should be
+		 delayed. (work item 18211)
+		-[Extensions] RegisterSingleDecorator overloads added. These overloads are especially useful when
+		 injecting Func<ServiceType> delegates into decorators.
+		-[Extensions] When collections are registered using RegisterAll overloads that either take a list of
+		 System.Type instances or a array of singletons (so not with RegisterAll<T>(IEnumerable<T>)), the
+		 predicate supplied to RegisterDecorator will be called on each item in the collection, instead of
+		 being called once for the complete collection. This allows individual items to be decorated while
+		 skipping others.
+		-[Extensions] The extension methods Register(this Container, Type service, Type implementation) and 
+		 RegisterSingle(this Container, Type service, Type implementation) now allow supplying the same type
+		 for service and implementation, which registers the type by itself. (work item 18234)
+		-[Extensions] RegisterDecorator and RegisterSingleDecorator extension methods now throw an expressive
+		 NotSupportedException when a closed generic service type with open generic decorator type is supplied.
+		 The container cannot handle this scenario, but the user can simply swap the generic type from the
+		 service type to the decorator to get this to work.
+
+	Bug fixes:
+		-[Core] Container did not self-register when created with Container(ContainerOptions) ctor.
+		 (work item 18139)
+		-[LifetimeScoping] Dispose was called multiple times on instances, for each time they were resolved.
+		 (work item 18268)
+		 -[Extensions] RegisterAll did not allow registering a service type that equaled the registered
+		 service type, for instance container.RegisterAll<IService>(new[] { typeof(IService) }) failed.
+		-[Extensions] Conditional decoration (using the Predicate<DecoratorPredicateContext>) fixed for
+		 decorating items in collections. The predicate was not checked on collections.
+		-[Extensions] The IEnumerable<ServiceType> was supplied to the Predicate<DecoratorPredicateContext>
+		 through the ServiceType property, instead of the service type itself when decorating collections.
+
+
+Version 1.4.2.12141 (v1.4.2 RTM) 2012-05-20
+	Bug fixes:
+		-There was a bug in the SimpleInjector.Extensions.LifetimeScoping.dll, which made it impossible to
+		 register instances (with a different lifestyle than Lifetime Scope) for disposal, when no services
+		 where registered with the Lifetime Scope lifestyle.
+
+
+Version 1.4.2.12140 (v1.4.2 RTM) 2012-05-19
+	General description:
+		The extensions project now contains 'RegisterDecorator' extension methods that replace the old
+		'RegisterOpenGenericDecorator' extension methods. The new methods allow registering both generic and
+		non-generic decorators. Integration projects have been added to the solution, which should make it
+		easier to integrate Simple Injector with ASP.NET.
+
+	Project changes:
+		-New projects that were added to the solution:
+			+SimpleInjector.Integration.Web (.NET 4.0)
+			 Adds extension methods for Per Web Request lifestyle. This assembly takes a dependency on 
+			 .NET 4.0 to allow the needed HTTP Module to be auto registered on application start-up.
+			+SimpleInjector.Integration.Web.WebForms (.NET 3.5)
+			 Adds extension methods for registering Page and UserControl classes.
+			+SimpleInjector.Integration.Web.Mvc (.NET 4.0)
+			 Adds extension methods for adding the container as Dependency Resolver (MVC3 / .NET 4) and
+			 registering all Controller classes.
+			+SimpleInjector.Extensions.LifetimeScoping (.NET 4.0)
+			 Adds extension methods for Lifetime Scope lifestyle. This functionality can not be placed in 
+			 SimpleInjector.Extensions, because it has a dependency on .NET 4.0 (makes use of ThreadLocal<T>), 
+			 while SimpleInjector.Extensions must stay compatible with .NET 3.5 (for now).
+			+SimpleInjector.Packaging (.NET 3.5) allows bundling sets of related services and register them
+			 together.
+
+	Code Changes:
+		-[Extensions] New DecoratorExtensions class added. This class replaces GenericDecoratorExtensions
+		 and allows registering both generic and non-generic decorators and enables decorating collections
+		 that are returned using GetAllInstances or are injected using IEnumerable<T> constructor arguments.
+
+	Bug fixes:
+		-[Extensions] RegisterManyForOpenGeneric extension method threw an exception which message contained
+		 the .NET type instead of the 'friendly' type name, as the rest of the Simple Injector uses.
+		-[Core] DebuggerDisplay for InstanceProducers did not work when running the VB debugger.
+
+
+Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
+	General description:
+		RegisterOpenGenericDecorator extension methods improved to allow registering non-generic decorator.
+
+	Code changes:
+		-[Extensions] GetTypesToRegister methods added to the OpenGenericBatchRegistrationExtensions class
+		 which allows to customize the behavior.
+		-[Extensions] RegisterOpenGenericDecorator extension methods now allow registering non-generic
+		 implementations, as long as they implement the supplied open generic service type.
+
+	Bug fixes:
+		-None.
+
+
+Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18
+	General description:
+		Container.GetInitializer<T> method added to the core library, and RegisterManyForOpenGeneric in
+		extensions now execute initalizers on decorators.
+
+	Code changes:
+		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
+		 GetInitializer<T>. This enables certain specialized scenarios. The main (external) consumer of
+		 this method is the RegisterManyForOpenGeneric method of the Extensions project.
+		-[Extensions] Decorators created using the RegisterManyForOpenGeneric extension methods now get
+		 initialized with any registered initializers (if any).
+
+	Bug fixes:
+		-[Core] The exception message that was thrown in case the delegate of a type could not be compiled, 
+		 incorrectly described the UnregisteredTypeEventArgs.Register method, which was confusing.
+
+
+Version 1.3.1.11358 (v1.3.1 RTM) 2011-12-23
+	General description:
+		RegisterOpenGenericDecorator extension methods added to the SimpleInjector.Extensions project.
+
+	Code Changes:
+		-[Extensions] New RegisterManyForOpenGeneric overloads added.
+		-[Extensions] RegisterOpenGenericDecorator extension methods have been added.
+
+
+Version 1.3.0.11343 (v1.3 RTM) 2011-12-09
+	General description:
+		This release adds a few features and fixes two bugs in the core library. The most important new
+		feature is the addition of a ExpresionBuilt event, which allows users to alter the way types are 
+		created by the container. This enables scenarios as interception, context based injection, and 
+		wrapping types with decorators.
+			
+	Code changes:
+		-[Core] A new overload to the Container.GetRegistration() method has been added. This overload allows
+		 users to signal whether the method should throw or return null (what the original overload does).
+		 Since the GetRegistration is the only method in the system that both builds and returns
+		 IInstanceProducers, it is very convenient when it can throw, because this makes some scenarios
+		 using the ExpressionBuilt event much cleaner, with less code.
+		-[Core] All exception messages now display the names of generic types in short C# notation. 
+		 For instance, messages will now show a name such as IEnumerable<IComparable<Int32>> instead of the
+		 unreadable System.Collections.Generic.IEnumerable`1[System.IComparable`1[System.Int32]].
+		-[Core] New constructor overload added to the Container allowing to change the behavior of the
+		 container using the new ContainerOptions class. The only option currently supported is 
+		 AllowOverridingRegistrations.
+		-[Core] Container.ExpressionBuilt event added to enable interception scenarios.
+		-[Core] InstanceProducers are now allowed to return types that can not be casted to the given service 
+		 type. This allows them to be retrieved using the non-generic Container.GetInstance(Type) and is
+		 useful for interception scenarios.
+		-[Core] Large internal refactoring of the InstanceProducer model. A lot of duplicate code is removed.
+	
+	Bug Fixes:
+		-[Core] InjectProperties and GetRegistration failed in certain circumstances. (work item 16930)
+		-[Core] Calling the Verify method still resulted in a lockdown of the container, when the registered
+		 delegates called back into the container. This made it impossible to verify a partially configured
+		 container.
+
+
+Version 1.2.0.11273 (v1.2 RTM) 2011-09-30
+	General description:
+		This release fixes a few small bugs, adds the possibility to do property injection, improves 
+		performance and the SimpleInjector.Extensions.dll is now available for Silverlight.
+
+	Project changes:
+		-The solution and projects are converted to Visual Studio 2010. The library is still compatible with
+		 .NET 3.5 though.
+		-New SimpleInjector.Extensions.Silverlight project was added (and supporting unit test project).
+	
+	Code changes:
+		-[Extensions] Performance optimization in the RegisterOpenGeneric en RegisterSingleOpenGeneric 
+		 extension methods. Types can now be resolved as quickly as types that are registered using 
+		 container.Register<TService, TImplementation>() and container.RegisterSingle<T>(T), which are the
+		 fasted type of registrations.
+		-[Core] New UnregisteredTypeEventArgs.Register(Expression) method was added to allow improving
+		 performance of unregistered type resolution scenarios. (work item 16641).
+		-[Extensions] Register(Container, Type) method added to the NonGenericRegistrationsExtensions class
+		 to allow registration of concrete transient types.
+		-[Core] The Container now registers itself upon creation. This makes some integration scenarios 
+		 easier.
+		-[Core] A InjectProperties(object) method has been added to the Container. This method enables 
+		 injecting public properties to a given type. By adding it to the core library the method can be 
+		 optimized for performance and used in integration scenarios without the need for adding the 
+		 Extensions.dll.
+		-[Core] The 'Handled' property of the UnregisteredTypeEventArgs is made public. This enables some 
+		 rare but interesting scenarios were users want to prevent an ActivationException from being thrown 
+		 when multiple delegates respond to the same ResolveUnregisteredType event. Publication of the 
+		 property allows users skip and continue when another delegate already registered that type.
+	
+	Bug fixes:
+		-[Extensions] NonGenericRegistrationsExtensions.RegisterAll(Container, Type, params Type[]) method was
+		 removed, because it was never picked by C# compiler when doing overload resolution.
+		-[Core] FuncSingletonInstanceProducer<T> did not reset the CyclicDependencyValidator in case of an
+		 exception, which causes the CyclicDependencyValidator to go of when that failing producer was called
+		 multiple times, hiding the real cause of failure.
+		-[Core] The TransientInstanceProducer<T> and FuncSingletonInstanceProducer<T> incorrectly called 
+		 "lock (this)". This behavior was correct in v1.0 were those types were not publicly exposed, but 
+		 since the IInstanceProducer interface has gone public in v1.1 this is now incorrect. We could now 
+		 face deadlocks when users decide to take a lock (for what strange reason what so ever) on these 
+		 instances.
+		-[Core] Container.GetAllInstances<T> and Container.GetAllInstances(Type) did not trigger unregistered 
+		 type resolution. (work item 16419).
+		-[Extensions] The RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods 
+		 that take an IEnumerable<Assembly> or Assembly[] failed when a Anonymously Hosted DynamicMethods 
+		 Assembly was supplied, which would typically happen when the method was called with 
+		 'AppDomain.CurrentDomain.GetAssemblies()'.
+		-[Extensions] The methods RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods did not 
+		 take generic type constraints and generic type reordering into consideration. (work item 16053).
+		-[Extensions] Due to a race condition, it was possible for the RegisterSingleOpenGeneric method to 
+		 new up more instances of the same type.
+
+
+Version 1.1.0.11142 (v1.1 RTM) 2011-05-22
+	General description:
+		This release fixes a small bug and adds a small feature to the core that allows the retrieval of
+		IInstanceProvider types. The SimpleInjector.Extensions.dll builds upon this feature to improve 
+		performance of the registrations made using the RegisterAll extension method. The extensions project
+		also adds new RegisterManyForOpenGeneric that allow many more advanced scenarios.
+	
+	Code Changes:
+		-RegisterSingle(Container, Type) method removed from NonGenericRegistrationsExtensions class in 
+		 SimpleInjector.Extensions. Because of the C# overload resolution rules, the C# compiler never picked 
+		 that method, but would always pick Container.RegisterSingle<Type>(Type), which would not yield the 
+		 correct configuration. Removing this method is a breaking change of the SimpleInjector.Extensions 
+		 library, but users will unlikely be affected by this.
+		-Performance optimization for non-generic RegisterAll methods in Extensions library. The optimization
+		 prevents the container.GetInstance method from being called on each service type in the collection,
+		 but now directly calls into the IInstanceProducer interfaces.
+		-Public Container.GetCurrentRegistrations() method added that returns a list of currently registered
+		 IInstanceProducer instances. This allows visualizing the registered dependencies.
+		-Public Container.GetRegistration(Type) method added 
+		-IInstanceProducer has been made public to allow better performance optimizations in the Extensions
+		 library and to give users the possibility see what types are registered.
+		-New RegisterManyForOpenGeneric overloads added in the Extensions library that allow users to supply
+		 a callback delegate that does the actual registration. This allows alternative scenarios such as 
+		 registration of multiple implementations of a closed generic service type. (work item 15878).
+		-The RegisterInitializer<T> method now allows multiple Action<T> delegates to be registered for a
+		 single T. (work item 15842).
+
+	Bug Fixes:
+		-Container.GetService method failed on concrete unregistered types, that could not be resolved using
+		 auto-wiring, such as System.String and System.Int32. (work item 15843).
+
+
+Version 1.0.0.11115 (v1.0 RTM) 2011-04-26
+	General description:
+	    First release of the Simple Injector.
+		
+	Code Changes compared to the Simple Service Locator v1.0:
+	    -Generic type constraint 'where T : class' added to the GetInstance<T> and GetAllInstances<T> methods.
+	    -Register<TConcrete>() method added for better Silverlight support.
+	    -Register<TConcrete>(Action<TConcrete>) and RegisterSingle<TConcrete>(Action<TConcrete>) methods
+	     removed.
+	    -RegisterInitializer<TService>(Action<TService>) method added.
+	    -The SimpleServiceLocator class is renamed to Container.
+	    -Extensions project is now a fully supported addition.
+	    -Silverlight unit test project added.
+	    -CSL Adapter project added: contains an adapter from the Simple Injector to the Common Service Locator.
+	    -Dependency on the Common Service Locator removed.
+	
+	Bug Fixes:
+	    -Silverlight support fixed. The container did not work properly in Silverlight.
+	    -Performance problems with the IServiceProvider.GetService(Type) method solved.
