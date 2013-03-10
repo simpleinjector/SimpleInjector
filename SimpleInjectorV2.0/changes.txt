@@ -1,8 +1,18 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version v2.0.2 (v2.0.2 RTM) 2013-03-10
+	General description:
+		This release fixes a bug with the Visual Studio Debug View.
+
+	Bug fixes:
+		-[Core] Diagnostic Services fail when grouping generic types that have a generic type constraint.
+		 (work item 19449)
+
+
 Version v2.0.1 (v2.0.1 RTM) 2013-02-28
 	General description:
+		This release fixes a few small bugs.
 
 	Bug fixes:
 		-[Core] Custom KnownDependency instances that where added during the interception (ExpressionBuilding)

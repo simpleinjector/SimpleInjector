@@ -26,9 +26,7 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     internal static class TypeGeneralizer
     {
@@ -37,12 +35,19 @@ namespace SimpleInjector.Diagnostics
         // by their partial generic type definition, which allows a much nicer user experience.
         internal static Type MakeTypePartiallyGenericUpToLevel(Type type, int nestingLevel)
         {
+            if (nestingLevel > 100)
+            {
+                // Stackoverflow prevention
+                throw new ArgumentException("nesting level bigger than 100 too high. Type: " +
+                    type.ToFriendlyName(), "nestingLevel");
+            }
+
             // example given type: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>>
-            // level 0 returns: IEnumerable<T>
-            // level 1 returns: IEnumerable<IQueryProcessor<TQuery, TResult>>
-            // level 2 returns: IEnumerable<IQueryProcessor<MyQuery<T>, int[]>
-            // level 3 returns: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>
-            // level 4 returns: !type.ContainsGenericParameters
+            // nestingLevel 4 returns: IEnumerable<IQueryHandler<MyQuery<Alpha>, int[]>
+            // nestingLevel 3 returns: IEnumerable<IQueryHandler<MyQuery<Alpha>, int[]>
+            // nestingLevel 2 returns: IEnumerable<IQueryHandler<MyQuery<T>, int[]>
+            // nestingLevel 1 returns: IEnumerable<IQueryHandler<TQuery, TResult>>
+            // nestingLevel 0 returns: IEnumerable<T>
             if (!type.IsGenericType)
             {
                 return type;
@@ -53,11 +58,26 @@ namespace SimpleInjector.Diagnostics
                 return type.GetGenericTypeDefinition();
             }
 
-            var arguments =
-                from argument in type.GetGenericArguments()
-                select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1);
+            return MakeTypePartiallyGeneric(type, nestingLevel);
+        }
 
-            return type.GetGenericTypeDefinition().MakeGenericType(arguments.ToArray());
+        private static Type MakeTypePartiallyGeneric(Type type, int nestingLevel)
+        {
+            var arguments = (
+                from argument in type.GetGenericArguments()
+                select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1))
+                .ToArray();
+
+            try
+            {
+                return type.GetGenericTypeDefinition().MakeGenericType(arguments.ToArray());
+            }
+            catch
+            {
+                // If we come here, MakeGenericType failed because of generic type constraints.
+                // In that case we skip this nesting level and go one level deeper.
+                return MakeTypePartiallyGenericUpToLevel(type, nestingLevel + 1);
+            }
         }
     }
 }

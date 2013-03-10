@@ -12,6 +12,15 @@
     [TestClass]
     public class TypeGeneralizerTests
     {
+        public interface IQuery<TResult>
+        {
+        }
+
+        public interface IQueryHandler<TQuery, TResult> where TQuery : IQuery<TResult>
+        {
+            TResult Handle(TQuery query);
+        }
+
         [TestMethod]
         public void MakeTypePartiallyGenericUpToLevel_NonGenericType_ReturnsTheSuppliedType()
         {
@@ -136,6 +145,44 @@
 
             // Assert
             Assert.AreEqual(expectedType, actualType);
+        }
+
+        [TestMethod]
+        public void MakeTypePartiallyGenericUpToLevel_RequestingLevel0OnTypeWithGenericConstraint_ReturnsGenericTypeDefinition()
+        {
+            // Arrange
+            Type inputType = typeof(IQueryHandler<ConstraintQuery, IEnumerable<int>>);
+            int nestingLevel = 0;
+            Type expectedType = typeof(IQueryHandler<,>);
+
+            // Act
+            Type actualType = TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(inputType, nestingLevel);
+
+            // Assert
+            Assert.AreEqual(expectedType, actualType);
+        }
+        
+        [TestMethod]
+        public void MakeTypePartiallyGenericUpToLevel_RequestingLevelOneOnTypeWithGenericConstraint_SkipsLevelOne()
+        {
+            // Arrange
+            Type inputType = typeof(IQueryHandler<ConstraintQuery, IEnumerable<int>>);
+            int nestingLevel = 1;
+            Type expectedType = typeof(IQueryHandler<ConstraintQuery, IEnumerable<int>>);
+
+            // Act
+            Type actualType = TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(inputType, nestingLevel);
+
+            // Assert
+            Assert.AreEqual(expectedType, actualType, @"
+                Since ConstraintQuery implements IQuery<IEnumerable<int>>, it is impossible to
+                build a IQueryHandler<ConstraintQuery, IEnumerable<T>> since IEnumerable<T> is
+                not an IEnumerable<int>. We should therefore skip that level and return a level
+                two type.");
+        }
+
+        public class ConstraintQuery : IQuery<IEnumerable<int>>
+        {
         }
     }
 #endif
