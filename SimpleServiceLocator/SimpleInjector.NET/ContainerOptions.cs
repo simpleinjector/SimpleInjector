@@ -26,7 +26,9 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+
     using SimpleInjector.Advanced;
 
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
@@ -44,6 +46,7 @@ namespace SimpleInjector
     /// container.Register<ITimeProvider, CustomTimeProvider>();
     /// ]]></code>
     /// </example>
+    [DebuggerDisplay("{DebuggerDisplayDescription,nq}")]
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -176,6 +179,46 @@ namespace SimpleInjector
         /// <value>The current <see cref="Container"/>.</value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Container Container { get; internal set; }
+
+        internal string DebuggerDisplayDescription
+        {
+            get
+            {
+                var descriptions = new List<string>();
+
+                if (this.AllowOverridingRegistrations)
+                {
+                    descriptions.Add("Allows Overriding Registrations");
+                }
+
+                if (!(this.ConstructorResolutionBehavior is DefaultConstructorResolutionBehavior))
+                {
+                    descriptions.Add("Custom Constructor Resolution");
+                }
+
+                if (!(this.ConstructorVerificationBehavior is DefaultConstructorVerificationBehavior))
+                {
+                    descriptions.Add("Custom Constructor Verification");
+                }
+
+                if (!(this.ConstructorInjectionBehavior is DefaultConstructorInjectionBehavior))
+                {
+                    descriptions.Add("Custom Constructor Injection");
+                }
+
+                if (!(this.PropertySelectionBehavior is DefaultPropertySelectionBehavior))
+                {
+                    descriptions.Add("Custom Property Selection");
+                }
+
+                if (descriptions.Count == 0)
+                {
+                    descriptions.Add("Default Configuration");
+                }
+
+                return string.Join(", ", descriptions);
+            }
+        }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
         {

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -336,7 +337,7 @@
         public void PropertyInjectionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
-            var expectedBehavior = new AlternativePropertyInjectionBehavior();
+            var expectedBehavior = new AlternativePropertySelectionBehavior();
 
             var options = new ContainerOptions();
 
@@ -354,7 +355,7 @@
         public void PropertyInjectionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
-            var expectedBehavior = new AlternativePropertyInjectionBehavior();
+            var expectedBehavior = new AlternativePropertySelectionBehavior();
 
             var options = new ContainerOptions();
 
@@ -398,6 +399,157 @@
                 action);
         }
 
+        [TestMethod]
+        public void ContainerOptions_Is_DecoratedWithADebuggerDisplayAttribute()
+        {
+            // Arrange
+            Type containerOptionsType = typeof(ContainerOptions);
+            
+            // Act
+            var debuggerDisplayAttributes = 
+                containerOptionsType.GetCustomAttributes(typeof(DebuggerDisplayAttribute), false);
+            
+            // Assert
+            Assert.AreEqual(1, debuggerDisplayAttributes.Length);
+        }
+
+        [TestMethod]
+        public void ContainerOptions_DebuggerDisplayAttribute_ReferencesExpectedProperty()
+        {
+            // Arrange
+            var debuggerDisplayAttribute =
+                typeof(ContainerOptions).GetCustomAttributes(typeof(DebuggerDisplayAttribute), false)
+                .Single() as DebuggerDisplayAttribute;
+
+            var debuggerDisplayDescriptionProperty = 
+                GetProperty<ContainerOptions>(options => options.DebuggerDisplayDescription);
+
+            // Act
+            string value = debuggerDisplayAttribute.Value;
+
+            // Assert
+            Assert.IsTrue(value.Contains(debuggerDisplayDescriptionProperty.Name), "actual: " + value);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithDefaultConfiguration_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Default Configuration", description);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithAllowOverridingRegistrations_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.AllowOverridingRegistrations = true;
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Allows Overriding Registrations", description);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithOverriddenConstructorResolutionBehavior_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Custom Constructor Resolution", description);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithOverriddenConstructorVerificationBehavior_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.ConstructorVerificationBehavior = new AlternativeConstructorVerificationBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Custom Constructor Verification", description);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithOverriddenConstructorInjectionBehavior_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Custom Constructor Injection", description);
+        }
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithOverriddenPropertySelectionBehavior_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Custom Property Selection", description);
+        }
+
+        [TestMethod]
+        public void DebuggerDisplayDescription_WithAllCustomValues_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.AllowOverridingRegistrations = true;
+            options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
+            options.ConstructorVerificationBehavior = new AlternativeConstructorVerificationBehavior();
+            options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
+            options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual(@"
+                Allows Overriding Registrations,
+                Custom Constructor Resolution,
+                Custom Constructor Verification,
+                Custom Constructor Injection,
+                Custom Property Selection
+                ".TrimInside(), description);
+        }
+
+        private static MemberInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
+        {
+            var body = (MemberExpression)propertySelector.Body;
+
+            return body.Member;
+        }
+
         public sealed class ClassWithContainerAsDependency
         {
             public ClassWithContainerAsDependency(Container container)
@@ -424,7 +576,15 @@
             }
         }
 
-        private sealed class AlternativePropertyInjectionBehavior : IPropertySelectionBehavior
+        private sealed class AlternativeConstructorVerificationBehavior : IConstructorVerificationBehavior
+        {
+            public void Verify(ParameterInfo parameter)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private sealed class AlternativePropertySelectionBehavior : IPropertySelectionBehavior
         {
             public bool SelectProperty(Type serviceType, PropertyInfo property)
             {
