@@ -33,17 +33,18 @@ namespace SimpleInjector.Diagnostics
         internal GeneralWarningsContainerAnalyzer()
         {
             this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
-            this.Add(new ContainerRegisteredContainerAnalyzer());
             this.Add(new ShortCircuitContainerAnalyzer());
+            this.Add(new SingleResponsibilityViolationsAnalyzer());
+            this.Add(new ContainerRegisteredContainerAnalyzer());
         }
 
-        public DebuggerViewItem Analyse(Container container)
+        public DebuggerViewItem Analyze(Container container)
         {
             const string WarningsName = "Configuration Warnings";
 
             var analysisResults = (
                 from analyzer in this
-                let result = analyzer.Analyse(container)
+                let result = analyzer.Analyze(container)
                 where result != null
                 select result)
                 .ToArray();

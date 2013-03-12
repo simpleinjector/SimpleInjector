@@ -33,7 +33,7 @@ namespace SimpleInjector.Diagnostics
 
     internal sealed class ShortCircuitContainerAnalyzer : IContainerAnalyzer
     {
-        public DebuggerViewItem Analyse(Container container)
+        public DebuggerViewItem Analyze(Container container)
         {
             var warnings = FindRegistrationsWithPossibleShortCircuitedDependencies(container);
 

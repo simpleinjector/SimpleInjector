@@ -1,112 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+Version v2.1.0 (v2.1 RTM)
 	General description:
 	
 	New features:
 		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
 		 (which is to not inject any properties). (work item 19389)
-
-
-Version v2.0.1 (v2.0.1 RTM) 2013-02-28
-	General description:
-
-	Bug fixes:
-		-[Core] Custom KnownDependency instances that where added during the interception (ExpressionBuilding)
-		 of a decorator type (RegisterDecorator) where not added to the decorated registration. (work item 19391)
-		-[Core] Decorating empty (unregistered) collections failed when the decorator had a lifestyle different
-		 than transient or singleton. (work item 19400)
-		-[Core] When RegisterManyForOpenGeneric registered implementations that implemented multiple closed
-		 generic versions of the supplied generic interface, each closed-generic interface got its own
-		 registration, which had the effect of still returning more than one instance of that implementation
-		 within the registered lifestyle. (work item 19384).
-		-[Integration.Wcf] The integration package just didn't work as expected.
-
-
-Version v2.0.0 (v2.0 RTM) 2013-02-25
-	General description:
-		This major release adds explicit lifestyle support and Debugger Diagnostic Services to the Core
-		library. The addition of explicit lifestyle support makes it easier to register types in any given
-		lifestyle, and the Lifestyle.Hybrid makes it really easy to create a registration that mixes
-		any number of lifestyles together. The Diagnostic Services help you to spot common configuration and
-		programming mistakes such as lifestyle mismatches, and short circuited dependencies.
-
-	New features:
-		-[Core] Diagnostic Debug View added to give feedback on possible misconfigurations in the
-		 container. See here for more information: https://simpleinjector.codeplex.com/wikipage?title=Diagnostics
-		-[Core] Lifestyle base class added for implementing custom lifestyle management. Default lifestyles
-		 are Lifestyle.Transient and Lifestyle.Singleton and a Lifestyle.CreateHybrid() method to create
-		 hybrid lifestyles and a Lifestyle.CreateCustom() method to create a lifestyle based on a name and
-		 a supplied delegate. Other lifestyle classes are implemented in the integration and extension
-		 libraries.
-		-[Core] Register overloads added that take Lifetyle as argument.
-		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
-		 expression is built that creates a new instance, but before instance initializers and lifestyle
-		 caching gets added to the expression.
-		-[Core] AddRegistration(Type, Registration) method added to allow directly adding a registration.
-		 This allows binding two or more service types to the same implementation.
-		-[Integration.Web] WebRequestLifestyle has been added.
-		-[Integration.Wcf] WcfOperationLifestyle has been added.
-		-[Extensions.LifetimeScoping] LifetimeScopeLifestyle has been added.
-		-[Core] RegisterManyForOpenGeneric overloads have been added that allow specifying a lifestyle.
-		-[Core] RegisterOpenGeneric overloads have been added that allow specifying a lifestyle.
-		-[Core] RegisterDecorator overloads have been added that allow specifying a lifestyle.
-
-	Breaking changes:
-		-[Core] Verify() now locks the container. New registrations can't be made after this point in time.
-		-[Core] Registrations can't be overridden anymore after Verify() has been called. (work item 19193).
-		-[Core] All Func<T> factory delegates registered using one of the Register overloads (such as
-		 Register<T>(Func<T>) are now considered to return transient instances. Custom lifestyles should
-		 applied by supplying a custom Lifestyle implementation.
-		-[Core] Action<T> delegates registered using RegisterInitializer<T>(Action<T>) are now also applied
-		 to Func<T> delegates registered using Register<T>(Func<T>) and RegisterSingle<T>(Func<T>) and to
-		 instances registered using RegisterSingle<T>(T) and RegisterSingle(Type, object). Note that this 
-		 could lead to inconsistent behavior or performance issues if the Func<T> delegate implements its
-		 own caching/lifetime, since for Register<T>(Func<T>) the Action<T> will be applied on each resolve.
-		 Instead of registering Func<T> delegates to implement custom lifestyle, derive from Lifestyle.
-		-[Core] IInstanceProducer interface has been replaced with an InstanceProducer class.
-		-[Core] ExpressionBuilt will not got called twice anymore. ExpressionBuilt got called two times
-		 in case a type got registered using RegisterSingle<A, B>(). The new ExpressionBuilding event will
-		 now handle the first call and will do this in a more reliable manner.
-		-[Core] The Container.GetInitializer<TService>() method has been removed from the container. The
-		 method cluttered the main API. The method is moved to the AdvancedExtensions class of the
-		 SimpleInjector.Advanced namespace. It's an extension method now. (work item 18349).
-		-[Core] The types System.Type and System.String are considered ambiguous and are now disallowed from
-		 being registered directly. An exception is thrown.
-		-[Integration.Web] The PerWebRequestInstanceCreator<TService> has been removed. The
-		 WebRequestLifestyle can be used instead.
-		-[Core] The old OpenGenericBatchRegistrationExtensions.GetTypesToRegister overloads have been marked 
-		 obsolete. There are new overloads that take the Container as an argument.
-
-	Changes:
-		-[Extensions] Extensions library has been merged with core library. Extensions library is currently 
-		 empty, but will still be used as NuGet package for backwards compatibility for existing users.
-		-[Core] A call to GetCurrentRegistrations() will not lock the container anymore. This allows users
-		 to use this method to query the container during registration.
-		-[Core] RegisterManyForOpenGeneric and RegisterManySinglesForOpenGeneric extension methods now ignore 
-		 any found decorator type. This makes it easier to have use batch registration while having 
-		 non-generic decorators in the same project.
-
-	Bug fixes:
-		-[Core] RegisterDecorator wrapped singletons twice. This was caused by the ExpressionBuilt event
-		 that was triggered twice for singletons. (work item 19110)
-		-[Core] Memory leak when using decorators with while creating many Container instances. (work item 
-		 19241)
-		-[Core] RegisterOpenGeneric failed to resolve types that had a "where TOne : TTwo" type constraint.
-		-[Extensions.LifetimeScoping] Registration order of RegisterDecorator and RegisterLifetimeScope
-		 mattered for the lifetime op the decorator. (work item 19120)
-		-[Integration.Web] Registration order of RegisterDecorator and RegisterPerWebRequest mattered for the 
-		 lifetime op the decorator. (work item 19120)
-		-[Integration.Wcf] Registration order of RegisterDecorator and RegisterPerWcfOperation mattered for 
-		 the lifetime op the decorator. (work item 19120)
-
-
-Version 1.next (not released yet)
-	General description:
-
-	New features:
-		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
-		 (which is to not inject any properties). (work item 19389)
+		-[Core] New warning added in the Diagnostic Services to warn about classes with too many dependencies.
+		 (work item 19428)
 
 
 Version v2.0.2 (v2.0.2 RTM) 2013-03-10

@@ -23,7 +23,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
     public class ShortCircuitContainerAnalyzerTests
     {
         [TestMethod]
-        public void Analyze_OnValidConfiguratoin_ReturnsNull()
+        public void Analyze_OnValidConfiguration_ReturnsNull()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -33,7 +33,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var analyzer = new ShortCircuitContainerAnalyzer();
 
             // Act
-            var results = analyzer.Analyse(container);
+            var results = analyzer.Analyze(container);
 
             // Assert
             Assert.IsNull(results);
@@ -54,7 +54,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var analyzer = new ShortCircuitContainerAnalyzer();
 
             // Act
-            var results = analyzer.Analyse(container).Value as DebuggerViewItem[];
+            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -85,7 +85,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var analyzer = new ShortCircuitContainerAnalyzer();
 
             // Act
-            var results = analyzer.Analyse(container).Value as DebuggerViewItem[];
+            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -118,7 +118,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             var analyzer = new ShortCircuitContainerAnalyzer();
 
             // Act
-            var results = (analyzer.Analyse(container).Value as DebuggerViewItem[]).Single();
+            var results = (analyzer.Analyze(container).Value as DebuggerViewItem[]).Single();
 
             // Assert
             Assert.AreEqual("Controller<T>", results.Name);

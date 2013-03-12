@@ -27,6 +27,6 @@ namespace SimpleInjector.Diagnostics
 {
     internal interface IContainerAnalyzer
     {
-        DebuggerViewItem Analyse(Container container);
+        DebuggerViewItem Analyze(Container container);
     }
 }

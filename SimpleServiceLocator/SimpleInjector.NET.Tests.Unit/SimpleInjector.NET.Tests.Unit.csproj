@@ -89,6 +89,7 @@
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
     <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs" />
     <Compile Include="Diagnostics\TypeGeneralizerTests.cs" />
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />

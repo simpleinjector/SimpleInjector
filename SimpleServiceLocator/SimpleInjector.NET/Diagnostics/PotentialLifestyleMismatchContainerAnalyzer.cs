@@ -38,7 +38,7 @@ namespace SimpleInjector.Diagnostics
         {
         }
 
-        public DebuggerViewItem Analyse(Container container)
+        public DebuggerViewItem Analyze(Container container)
         {
             var mismatches = (
                 from producer in container.GetCurrentRegistrations()
@@ -53,7 +53,7 @@ namespace SimpleInjector.Diagnostics
             }
 
             return new DebuggerViewItem(
-                "Potential Lifestyle Mismatches", 
+                DebuggerViewName, 
                 DescribeGroup(mismatches),
                 GroupMismatches(mismatches));
         }

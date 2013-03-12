@@ -72,7 +72,7 @@ namespace SimpleInjector.Diagnostics
             {
                 return type.GetGenericTypeDefinition().MakeGenericType(arguments.ToArray());
             }
-            catch
+            catch (ArgumentException)
             {
                 // If we come here, MakeGenericType failed because of generic type constraints.
                 // In that case we skip this nesting level and go one level deeper.

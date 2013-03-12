@@ -12,7 +12,11 @@
     public interface IPlugin
     {
     }
-    
+
+    public interface IGeneric<T>
+    {
+    }
+
     public interface IUserRepository
     {
         void Delete(int userId);
@@ -94,7 +98,7 @@
         }
     }
 
-    public class GenericType<T>
+    public class GenericType<T> : IGeneric<T>
     {
         public GenericType()
         {

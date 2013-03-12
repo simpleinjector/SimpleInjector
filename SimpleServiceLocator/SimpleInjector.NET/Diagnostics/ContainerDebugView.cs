@@ -93,7 +93,7 @@ namespace SimpleInjector.Diagnostics
         {
             return (
                 from analyzer in analyzers
-                select analyzer.Analyse(this.container))
+                select analyzer.Analyze(this.container))
                 .ToArray();
         }
 
@@ -110,7 +110,7 @@ namespace SimpleInjector.Diagnostics
 
         private sealed class RegistrationsContainerAnalyzer : IContainerAnalyzer
         {
-            public DebuggerViewItem Analyse(Container container)
+            public DebuggerViewItem Analyze(Container container)
             {
                 var registrations = container.GetCurrentRegistrations();
 

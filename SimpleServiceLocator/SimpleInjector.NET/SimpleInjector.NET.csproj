@@ -93,6 +93,7 @@
     <Compile Include="Diagnostics\GeneralWarningsContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\IContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\KnownRelationshipCollection.cs" />
+    <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzer.cs" />
     <Compile Include="Diagnostics\TypeGeneralizer.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />

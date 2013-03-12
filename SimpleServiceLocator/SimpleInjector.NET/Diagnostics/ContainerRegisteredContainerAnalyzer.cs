@@ -33,7 +33,7 @@ namespace SimpleInjector.Diagnostics
 
     internal sealed class ContainerRegisteredContainerAnalyzer : IContainerAnalyzer
     {
-        public DebuggerViewItem Analyse(Container container)
+        public DebuggerViewItem Analyze(Container container)
         {
             var warnings = FindContainerRegisteredRegistrations(container);
 

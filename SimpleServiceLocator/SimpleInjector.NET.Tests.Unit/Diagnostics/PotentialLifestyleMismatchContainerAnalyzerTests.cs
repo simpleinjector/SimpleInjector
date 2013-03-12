@@ -9,13 +9,13 @@
     public class PotentialLifestyleMismatchContainerAnalyzerTests
     {
         [TestMethod]
-        public void Analyse_ValidConfiguration_ReturnsNull()
+        public void Analyze_ValidConfiguration_ReturnsNull()
         {
             // Arrange
             var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
 
             // Act
-            var item = analyzer.Analyse(ContainerFactory.New());
+            var item = analyzer.Analyze(ContainerFactory.New());
 
             // Assert
             Assert.IsNull(item, 
@@ -23,7 +23,7 @@
         }
 
         [TestMethod]
-        public void Analyse_ContainerWithOneMismatch_ReturnsItemWithExpectedName()
+        public void Analyze_ContainerWithOneMismatch_ReturnsItemWithExpectedName()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -38,14 +38,14 @@
             container.Verify();
 
             // Act
-            var item = analyzer.Analyse(container);
+            var item = analyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("Potential Lifestyle Mismatches", item.Name);
         }
 
         [TestMethod]
-        public void Analyse_ContainerWithOneMismatch_ReturnsItemWithExpectedDescription()
+        public void Analyze_ContainerWithOneMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -60,14 +60,14 @@
             container.Verify();
 
             // Act
-            var item = analyzer.Analyse(container);
+            var item = analyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("1 possible mismatch for 1 service.", item.Description);
         }
 
         [TestMethod]
-        public void Analyse_ContainerWithTwoMismatch_ReturnsItemWithExpectedDescription()
+        public void Analyze_ContainerWithTwoMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -85,7 +85,7 @@
             container.Verify();
 
             // Act
-            var item = analyzer.Analyse(container);
+            var item = analyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("2 possible mismatches for 2 services.", item.Description);
