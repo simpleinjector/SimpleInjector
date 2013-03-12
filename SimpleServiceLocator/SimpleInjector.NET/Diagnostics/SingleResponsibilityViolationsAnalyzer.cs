@@ -33,7 +33,7 @@ namespace SimpleInjector.Diagnostics
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
-        private const int MaximumValidNumberOfDependencies = 7;
+        private const int MaximumValidNumberOfDependencies = 6;
         private const string DebuggerViewName = "Potential Single Responsibility Violations";
 
         internal SingleResponsibilityViolationsAnalyzer()
