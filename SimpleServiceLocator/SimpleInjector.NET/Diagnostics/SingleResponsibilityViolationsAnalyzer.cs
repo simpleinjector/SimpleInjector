@@ -75,26 +75,27 @@ namespace SimpleInjector.Diagnostics
         }
 
         private static DebuggerViewItem BuildMismatchViewItem(Type implementationType, 
-            IEnumerable<KnownRelationship> dependencies)
+            IEnumerable<KnownRelationship> relationships)
         {
-            string description = BuildRelationshipDescription(implementationType, dependencies);
+            var dependencies = relationships.Select(r => r.Dependency).ToArray();
 
-            DebuggerViewItem[] violationInformation = new[]
+            string description = BuildRelationshipDescription(implementationType, dependencies.Length);
+            
+            var violationInformation = new[]
             {
                 new DebuggerViewItem("ImplementationType", implementationType.ToFriendlyName(), implementationType),
-                new DebuggerViewItem("Dependencies", dependencies.Count() + " dependencies.", dependencies.ToArray()),
+                new DebuggerViewItem("Dependencies", dependencies.Length + " dependencies.", dependencies.ToArray()),
             };
 
             return new DebuggerViewItem("Violation", description, violationInformation);
         }
 
-        private static string BuildRelationshipDescription(Type implementationType, 
-            IEnumerable<KnownRelationship> dependencies)
+        private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "{0} has {1} dependencies which might indicate a SRP violation.",
                 Helpers.ToFriendlyName(implementationType),
-                dependencies.Count());
+                numberOfDependencies);
         }
 
         private static string DescribeGroup(IEnumerable<DebuggerViewItemType> violations)
