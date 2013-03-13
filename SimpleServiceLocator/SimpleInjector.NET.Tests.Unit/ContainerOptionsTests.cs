@@ -503,6 +503,7 @@
             // Assert
             Assert.AreEqual("Custom Constructor Injection", description);
         }
+
         [TestMethod]
         public void DebuggerDisplayDescription_WithOverriddenPropertySelectionBehavior_ReturnsExpectedMessage()
         {
