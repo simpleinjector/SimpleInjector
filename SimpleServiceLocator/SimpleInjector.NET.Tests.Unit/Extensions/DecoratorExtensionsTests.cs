@@ -1366,7 +1366,8 @@
                 .Single();
 
             // Assert
-            Assert.IsTrue(expectedRelationship.Equals(actualRelationship));
+            Assert.IsTrue(expectedRelationship.Equals(actualRelationship), 
+                "actual: " + RelationshipInfo.ToString(actualRelationship));
         }
 
         [TestMethod]
@@ -1972,6 +1973,16 @@
         internal bool Equals(KnownRelationship other)
         {
             return EqualsTo(this, other);
+        }
+
+        public static string ToString(KnownRelationship relationship)
+        {
+            return string.Format("ImplementationType: {0}, Lifestyle: '{1}', Dependency: {2}",
+                relationship.ImplementationType.ToFriendlyName(),
+                relationship.Lifestyle.Name,
+                string.Format("{{ ServiceType: {0}, Lifestyle: {1} }}",
+                    relationship.Dependency.ServiceType.ToFriendlyName(),
+                    relationship.Dependency.Lifestyle.Name));
         }
     }
 #endif
