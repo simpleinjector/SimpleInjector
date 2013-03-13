@@ -419,10 +419,7 @@ namespace SimpleInjector
                 generic T.")]
         public void Register<TConcrete>() where TConcrete : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
-
-            this.Register<TConcrete, TConcrete>(Lifestyle.Transient);
+            this.Register<TConcrete, TConcrete>(Lifestyle.Transient, "TConcrete", "TConcrete");
         }
 
         /// <summary>
@@ -443,11 +440,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
-                "TImplementation");
-
-            this.Register<TService, TImplementation>(Lifestyle.Transient);
+            this.Register<TService, TImplementation>(Lifestyle.Transient, "TService", "TImplementation");
         }
 
         /// <summary>
@@ -464,9 +457,6 @@ namespace SimpleInjector
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-
             this.Register<TService>(instanceCreator, Lifestyle.Transient);
         }
         
@@ -486,10 +476,7 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type concreteType)
         {
-            Requires.IsNotNull(concreteType, "concreteType");
-            Requires.IsNotAnAmbiguousType(concreteType, "concreteType");
-
-            this.Register(concreteType, concreteType, Lifestyle.Transient);
+            this.Register(concreteType, concreteType, Lifestyle.Transient, "concreteType", "concreteType");
         }
 
         /// <summary>
@@ -511,7 +498,7 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, Type implementation)
         {
-            this.Register(serviceType, implementation, Lifestyle.Transient);
+            this.Register(serviceType, implementation, Lifestyle.Transient, "serviceType", "implementation");
         }
 
         /// <summary>
@@ -551,10 +538,7 @@ namespace SimpleInjector
                 generic T.")]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TConcrete), "TConcrete");
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TConcrete), "TConcrete");
-
-            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton);
+            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, "TConcrete", "TConcrete");
         }
 
         /// <summary>
@@ -580,11 +564,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
-                "TImplementation");
-
-            this.Register<TService, TImplementation>(Lifestyle.Singleton);
+            this.Register<TService, TImplementation>(Lifestyle.Singleton, "TService", "TImplementation");
         }
 
         /// <summary>
@@ -653,7 +633,7 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingle(Type serviceType, Type implementation)
         {
-            this.Register(serviceType, implementation, Lifestyle.Singleton);
+            this.Register(serviceType, implementation, Lifestyle.Singleton, "serviceType", "implementation");
         }
 
         /// <summary>
@@ -724,13 +704,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(lifestyle, "lifestyle");
-
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-
-            var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
-
-            this.AddRegistration(typeof(TService), registration);
+            this.Register<TService, TImplementation>(lifestyle, "TService", "TImplementation");
         }
 
         /// <summary>
@@ -782,22 +756,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsReferenceType(implementationType, "implementationType");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
-            Requires.IsNotOpenGenericType(implementationType, "implementationType");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType, 
-                "implementationType");
-
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
-
-            var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
-
-            this.AddRegistration(serviceType, registration);
+            this.Register(serviceType, implementationType, lifestyle, "serviceType", "implementationType");
         }
 
         /// <summary>
@@ -1315,6 +1274,44 @@ namespace SimpleInjector
             }
 
             return errorMessage == null;
+        }
+
+        private void Register<TService, TImplementation>(Lifestyle lifestyle, string serviceTypeParamName,
+            string implementationTypeParamName)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
+
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
+                implementationTypeParamName);
+
+            var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
+
+            this.AddRegistration(typeof(TService), registration);
+        }
+
+        private void Register(Type serviceType, Type implementationType, Lifestyle lifestyle,
+            string serviceTypeParamName, string implementationTypeParamName)
+        {
+            Requires.IsNotNull(serviceType, serviceTypeParamName);
+            Requires.IsNotNull(implementationType, implementationTypeParamName);
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsReferenceType(serviceType, serviceTypeParamName);
+            Requires.IsReferenceType(implementationType, implementationTypeParamName);
+            Requires.IsNotOpenGenericType(serviceType, serviceTypeParamName);
+            Requires.IsNotOpenGenericType(implementationType, implementationTypeParamName);
+            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
+                implementationTypeParamName);
+
+            Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
+
+            var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+
+            this.AddRegistration(serviceType, registration);
         }
 
         private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)

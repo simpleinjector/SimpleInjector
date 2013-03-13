@@ -9,6 +9,12 @@ Version v2.1.0 (v2.1 RTM)
 		-[Core] New warning added in the Diagnostic Services to warn about classes with too many dependencies.
 		 (work item 19428)
 
+	Bug fixes:
+		-[Core] Register<TService, TImplementation>(Lifestyle) did not verify whether TImplementation was a
+		 constructable type (in the default configuration this means that it is concrete, has one constructor,
+		 and no primitive constructor arguments). This resulted in a failure during when resolving the
+		 instance, but this was later than needed. (work item 19464)
+
 
 Version v2.0.2 (v2.0.2 RTM) 2013-03-10
 	General description:

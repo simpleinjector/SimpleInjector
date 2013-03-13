@@ -97,5 +97,17 @@
             // Act
             container.Register<IUserRepository, SqlUserRepository>();
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RegisterGenericWithLifestyle_SuppliedAnImplementationWithTwoConstructors_ThrowsAnArgumentException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            container.Register<ConcreteTypeWithMultiplePublicConstructors, ConcreteTypeWithMultiplePublicConstructors>(
+                Lifestyle.Transient);
+        }
     }
 }
