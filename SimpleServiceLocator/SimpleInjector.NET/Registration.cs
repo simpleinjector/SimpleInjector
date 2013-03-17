@@ -450,6 +450,7 @@ namespace SimpleInjector
                 var newInstanceMethod =
                     Expression.Lambda<Func<TService>>(expression, new ParameterExpression[0]);
 
+                // TODO: Optimize compilation by using a dynamic assembly.
                 return newInstanceMethod.Compile();
             }
             catch (Exception ex)
