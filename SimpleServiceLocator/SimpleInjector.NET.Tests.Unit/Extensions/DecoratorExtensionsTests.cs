@@ -1,12 +1,11 @@
 ﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
 
@@ -1565,6 +1564,32 @@
             Assert.IsInstanceOfType(realHandler, typeof(NullCommandHandler<RealCommand>));
         }
 
+        [TestMethod]
+        public void GetAllInstances_RegisteringADecoratorThatWrapsTheWholeCollection_WorksAsExpected()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                typeof(NullCommandHandler<RealCommand>),
+                typeof(StubCommandHandler));
+
+            // EnumerableDecorator<T> decorated IEnumerable<T>
+            container.RegisterSingleDecorator(
+                typeof(IEnumerable<ICommandHandler<RealCommand>>),
+                typeof(EnumerableDecorator<ICommandHandler<RealCommand>>));
+
+            // Act
+            var collection = container.GetAllInstances<ICommandHandler<RealCommand>>();
+
+            // Assert
+            // Wrapping the collection itself instead of the individual elements allows you to apply a filter
+            // to the elements, perhaps based on the user's role. I must admit that this is a quite bizarre
+            // scenario, but it is currently supported (perhaps even by accident), so we need to have a test
+            // to ensure it keeps being supported in the future.
+            Assert.IsInstanceOfType(collection, typeof(EnumerableDecorator<ICommandHandler<RealCommand>>));
+        }
+
 #if DEBUG
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorType_ContainsAddedRelationship()
@@ -1600,6 +1625,7 @@
 
         private static KnownRelationship GetValidRelationship()
         {
+            // Arrange
             var container = new Container();
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient, 
@@ -1949,6 +1975,27 @@
 
         public void DoSomething()
         {
+        }
+    }
+
+    public class EnumerableDecorator<T> : IEnumerable<T>
+    {
+        private readonly IEnumerable<T> decoratedCollection;
+
+        public EnumerableDecorator(IEnumerable<T> decoratedCollection)
+        {
+            this.decoratedCollection = decoratedCollection;
+        }
+        
+        public IEnumerator<T> GetEnumerator()
+        {
+            // Scenario: do some filtering here, based on the user's role.
+            return this.decoratedCollection.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 
