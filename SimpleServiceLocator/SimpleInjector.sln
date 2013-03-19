@@ -118,13 +118,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.S
 EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "SimpleInjector.Documentation", "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj", "{DC974673-A490-4376-BECA-EEDE8A33579B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Interception", "SimpleInjector.Interception\SimpleInjector.Interception.csproj", "{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Interception.Tests.Unit", "SimpleInjector.Interception.Tests.Unit\SimpleInjector.Interception.Tests.Unit.csproj", "{8818088E-3979-4A6F-9B19-757D9D37ACC8}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 25
+		SccNumberOfProjects = 23
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -194,12 +190,6 @@ Global
 		SccProjectUniqueName22 = SimpleInjector.Documentation\\SimpleInjector.Documentation.shfbproj
 		SccProjectName22 = SimpleInjector.Documentation
 		SccLocalPath22 = SimpleInjector.Documentation
-		SccProjectUniqueName23 = SimpleInjector.Interception\\SimpleInjector.Interception.csproj
-		SccProjectName23 = SimpleInjector.Interception
-		SccLocalPath23 = SimpleInjector.Interception
-		SccProjectUniqueName24 = SimpleInjector.Interception.Tests.Unit\\SimpleInjector.Interception.Tests.Unit.csproj
-		SccProjectName24 = SimpleInjector.Interception.Tests.Unit
-		SccLocalPath24 = SimpleInjector.Interception.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -428,26 +418,6 @@ Global
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|x86.ActiveCfg = Release|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{EDF679B8-ACED-4DA0-BC98-6BB518DCD8FB}.Release|x86.ActiveCfg = Release|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8818088E-3979-4A6F-9B19-757D9D37ACC8}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
