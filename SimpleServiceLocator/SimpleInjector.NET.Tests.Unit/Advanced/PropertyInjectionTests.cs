@@ -233,7 +233,7 @@
             // Assert
             Assert.IsNotNull(service.Dependency);
         }
-#else
+#else // SILVERLIGHT
         [TestMethod]
         public void InjectingAllProperties_OnPrivateTypeWithPrivateSetterPropertyInSilverlight_FailsWithDescriptiveMessage()
         {
@@ -254,13 +254,14 @@
                     one of its properties.".TrimInside(), ex);
             }
         }
-#endif
+#endif // SILVERLIGHT
 
         private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
         {
             internal TDependency Dependency { get; private set; }
         }
 
+#if DEBUG
         [TestMethod]
         public void InjectAllProperties_OnTypeWithOnePropertyDependency_AddsThatDependencyAsKnownRelationship()
         {
@@ -286,6 +287,7 @@
             Assert.AreEqual(Lifestyle.Transient, relationships[0].Lifestyle);
             Assert.AreEqual(expectedDependency, relationships[0].Dependency);
         }
+#endif
 
         private static Container CreateContainerThatInjectsAllProperties()
         {
