@@ -81,10 +81,11 @@ namespace SimpleInjector.Advanced
 
         internal static PropertyInfo[] GetCandidateInjectionPropertiesFor(Type implementationType)
         {
-            var allButStaticProperties = BindingFlags.FlattenHierarchy | BindingFlags.Instance |
+            var all = BindingFlags.FlattenHierarchy | 
+                BindingFlags.Instance | BindingFlags.Static |
                 BindingFlags.NonPublic | BindingFlags.Public;
 
-            return implementationType.GetProperties(allButStaticProperties);
+            return implementationType.GetProperties(all);
         }
 
         internal static void VerifyProperties(PropertyInfo[] properties)
@@ -155,9 +156,16 @@ namespace SimpleInjector.Advanced
 
         private static void VerifyProperty(PropertyInfo property)
         {
-            if (property.GetSetMethod(nonPublic: true) == null)
+            MethodInfo setMethod = property.GetSetMethod(nonPublic: true);
+
+            if (setMethod == null)
             {
                 throw new ActivationException(StringResources.PropertyHasNoSetter(property));
+            }
+
+            if (setMethod.IsStatic)
+            {
+                throw new ActivationException(StringResources.PropertyIsStatic(property));
             }
         }
 

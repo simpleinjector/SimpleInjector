@@ -92,7 +92,7 @@
         }
 
         [TestMethod]
-        public void InjectAllProperties_TypeWithStaticProperty_StaticPropertyDoesNotGetInjected()
+        public void InjectAllProperties_TypeWithStaticProperty_ThrowsExpectedException()
         {
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
@@ -100,10 +100,19 @@
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
             // Act
-            var service = container.GetInstance<ServiceWithStaticPropertyDependency<ITimeProvider>>();
+            Action action = () => container.GetInstance<ServiceWithStaticPropertyDependency<ITimeProvider>>();
 
             // Assert
-            Assert.IsNull(ServiceWithStaticPropertyDependency<ITimeProvider>.Dependency);
+            // An exception should be thrown and static properties should not be ignored. Ignoring them could
+            // lead to a fragile configuration, because when a IPropertySelectionBehavior implementation
+            // returns true for that given property, it would not expect it to be ignored. Take for instance
+            // an custom IPropertySelectionBehavior that reacts on some [Inject] attribute to enable property
+            // injection. When an application developer decorates a property with [Inject], ignoring that 
+            // property when it is static would be a bad thing. On the other hand, it would be as bad as trying
+            // to inject into the static property.
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Property of type ITimeProvider with name 'Dependency' can't be injected, because it is static.",
+                action);
         }
 
         public class ServiceWithStaticPropertyDependency<TDependency>
@@ -282,8 +291,11 @@
         {
             var container = ContainerFactory.New();
 
-            container.Options.PropertySelectionBehavior = new PredicatePropertySelectionBehavior(
-                prop => prop.DeclaringType != typeof(RealTimeProvider));
+            Predicate<PropertyInfo> allExceptPropertiesDeclaredOnRealTimeProvider =
+                prop => prop.DeclaringType != typeof(RealTimeProvider);
+
+            container.Options.PropertySelectionBehavior = 
+                new PredicatePropertySelectionBehavior(allExceptPropertiesDeclaredOnRealTimeProvider);
 
             return container;
         }

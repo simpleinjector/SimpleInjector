@@ -422,5 +422,12 @@ namespace SimpleInjector
                 "Property of type {0} with name '{1}' can't be injected, because it has no set method.",
                 property.PropertyType.ToFriendlyName(), property.Name);
         }
+
+        internal static string PropertyIsStatic(PropertyInfo property)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Property of type {0} with name '{1}' can't be injected, because it is static.",
+                property.PropertyType.ToFriendlyName(), property.Name);
+        }
     }
 }
