@@ -1,11 +1,16 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version v2.1.0 (v2.1 RTM)
+
+Version v2.1.0 (v2.1 RTM) 2013-03-19
 	General description:
+		This minor release adds two new features: A new extension point has been added that makes it 
+		considerably easier to auto-wire properties; A new diagnostic warning has been added that searches the
+		configuration for components with too many dependencies, because they can cause maintainability issues.
 	
 	New features:
 		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
-		 (which is to not inject any properties). (work item 19389)
+		 (which is to not inject any properties). The default behaviour can be changed by replacing the
+		 Container.Options.PropertySelectionBehavior property. (work item 19389)
 		-[Core] New warning added in the Diagnostic Services to warn about classes with too many dependencies.
 		 (work item 19428)
 
