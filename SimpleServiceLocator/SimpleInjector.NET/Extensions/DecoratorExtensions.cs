@@ -518,9 +518,7 @@ namespace SimpleInjector.Extensions
             var data = new DecoratorExpressionInterceptorData(container, serviceType, decoratorType,
                 predicate, lifestyle);
 
-            container.ExpressionBuilt += new ServiceDecoratorExpressionInterceptor(data).Decorate;
-            container.ExpressionBuilt += new ContainerControlledServicesDecoratorInterceptor(data).Decorate;
-            container.ExpressionBuilt += new ContainerUncontrolledServicesDecoratorInterceptor(data).Decorate;
+            container.ExpressionBuilt += new DecoratorInterceptor(data).ExpressionBuilt;
         }
 
         private static void VerifyMethodArguments(Container container, Type serviceType, Type decoratorType,

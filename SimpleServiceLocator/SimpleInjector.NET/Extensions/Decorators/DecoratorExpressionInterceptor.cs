@@ -47,20 +47,14 @@ namespace SimpleInjector.Extensions.Decorators
             this.data = data;
         }
 
-        internal Container Container
+        protected Container Container
         {
             get { return this.data.Container; }
         }
 
-        internal Lifestyle Lifestyle
+        protected Lifestyle Lifestyle
         {
             get { return this.data.Lifestyle; }
-        }
-
-        // The service type definition (possibly open generic).
-        protected Type ServiceTypeDefinition
-        {
-            get { return this.data.ServiceType; }
         }
 
         // The decorator type definition (possibly open generic).
@@ -77,11 +71,6 @@ namespace SimpleInjector.Extensions.Decorators
         protected abstract Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get;
-        }
-
-        protected IConstructorResolutionBehavior ResolutionBehavior
-        {
-            get { return this.Container.Options.ConstructorResolutionBehavior; }
         }
 
         // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
@@ -114,44 +103,9 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        protected bool MustDecorate(Type serviceType, out Type decoratorType)
-        {
-            decoratorType = null;
-
-            if (this.ServiceTypeDefinition == serviceType)
-            {
-                decoratorType = this.DecoratorTypeDefinition;
-
-                return true;
-            }
-
-            if (!this.ServiceTypeDefinition.IsGenericTypeDefinitionOf(serviceType))
-            {
-                return false;
-            }
-
-            var results = this.BuildClosedGenericImplementation(serviceType);
-
-            if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
-            {
-                return false;
-            }
-
-            decoratorType = results.ClosedGenericImplementation;
-
-            return true;
-        }
-
         protected bool SatisfiesPredicate(Type registeredServiceType, Expression expression, Lifestyle lifestyle)
         {
             var context = this.CreatePredicateContext(registeredServiceType, expression, lifestyle);
-
-            return this.SatisfiesPredicate(context);
-        }
-
-        protected bool SatisfiesPredicate(ExpressionBuiltEventArgs e)
-        {
-            var context = this.CreatePredicateContext(e.RegisteredServiceType, e.Expression, e.Lifestyle);
 
             return this.SatisfiesPredicate(context);
         }
@@ -235,19 +189,6 @@ namespace SimpleInjector.Extensions.Decorators
                 decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
 
-        private KnownRelationship GetDecorateeRelationship(ConstructorInfo constructor,
-            Type registeredServiceType, InstanceProducer decoratee)
-        {
-            return (
-                from parameter in constructor.GetParameters()
-                where IsDecorateeParameter(parameter, registeredServiceType)
-                select new KnownRelationship(
-                    implementationType: constructor.DeclaringType,
-                    lifestyle: this.Lifestyle,
-                    dependency: decoratee))
-                .Single();
-        }
-
         protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)
         {
             return IsDecorateeDependencyParameter(parameter, registeredServiceType) ||
@@ -261,14 +202,7 @@ namespace SimpleInjector.Extensions.Decorators
                 parameter.ParameterType == typeof(Func<>).MakeGenericType(serviceType);
         }
 
-        private GenericTypeBuilder.BuildResult BuildClosedGenericImplementation(Type serviceType)
-        {
-            var builder = new GenericTypeBuilder(serviceType, this.DecoratorTypeDefinition);
-
-            return builder.BuildClosedGenericImplementation();
-        }
-
-        private DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType,
+        protected DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType,
             Expression expression, Lifestyle lifestyle)
         {
             var info = this.GetServiceTypeInfo(expression, registeredServiceType, lifestyle);
@@ -292,6 +226,19 @@ namespace SimpleInjector.Extensions.Decorators
                 from parameter in decoratorConstructor.GetParameters()
                 where IsDecorateeParameter(parameter, serviceType)
                 select parameter)
+                .Single();
+        }
+
+        private KnownRelationship GetDecorateeRelationship(ConstructorInfo constructor,
+            Type registeredServiceType, InstanceProducer decoratee)
+        {
+            return (
+                from parameter in constructor.GetParameters()
+                where IsDecorateeParameter(parameter, registeredServiceType)
+                select new KnownRelationship(
+                    implementationType: constructor.DeclaringType,
+                    lifestyle: this.Lifestyle,
+                    dependency: decoratee))
                 .Single();
         }
 

@@ -68,7 +68,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new object[] { container, expressions });
         }
 
-        internal static bool IsDecoratableEnumerableExpression(Expression enumerableExpression)
+        internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
             var constantExpression = enumerableExpression as ConstantExpression;
 

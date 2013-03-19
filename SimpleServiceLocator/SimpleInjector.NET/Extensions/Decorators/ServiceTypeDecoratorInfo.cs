@@ -31,6 +31,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using SimpleInjector.Lifestyles;
 
+    // A list of all decorators applied to a given service type.
     internal sealed class ServiceTypeDecoratorInfo
     {
         private readonly Type registeredServiceType;
@@ -58,11 +59,11 @@ namespace SimpleInjector.Extensions.Decorators
             return this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
         }
 
-        internal void AddAppliedDecorator(Type decoratorType, Type originalImplementationType, 
-            DecoratorExpressionInterceptor interceptor, Expression decoratedExpression)
+        internal void AddAppliedDecorator(Type decoratorType, Type originalImplementationType,
+            Container container, Lifestyle lifestyle, Expression decoratedExpression)
         {
-            var registration = new ExpressionRegistration(decoratedExpression, originalImplementationType, 
-                interceptor.Lifestyle, interceptor.Container);
+            var registration = new ExpressionRegistration(decoratedExpression, originalImplementationType,
+                lifestyle, container);
 
             var producer = new InstanceProducer(this.registeredServiceType, registration);
 
