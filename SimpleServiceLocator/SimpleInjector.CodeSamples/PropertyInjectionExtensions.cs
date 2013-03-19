@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -73,8 +72,8 @@
             {
                 this.baseBehavior = baseBehavior;
             }
-            
-            public bool SelectProperty(Type serviceType, PropertyInfo property)
+
+            bool IPropertySelectionBehavior.SelectProperty(Type serviceType, PropertyInfo property)
             {
                 return this.IsPropertyRegisteredForAutowiring(property) || 
                     this.baseBehavior.SelectProperty(serviceType, property);

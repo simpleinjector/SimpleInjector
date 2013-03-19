@@ -39,7 +39,9 @@
 
             private bool IsImplicitInjectableProperty(PropertyInfo property)
             {
-                return property.CanWrite && property.GetSetMethod() != null &&
+                MethodInfo setMethod = property.GetSetMethod(nonPublic: false);
+
+                return setMethod != null && !setMethod.IsStatic && property.CanWrite && 
                     this.options.Container.GetRegistration(property.PropertyType, throwOnFailure: false) != null;
             }
         }
