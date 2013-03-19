@@ -2022,7 +2022,7 @@
             return EqualsTo(this, other);
         }
 
-        public static string ToString(KnownRelationship relationship)
+        internal static string ToString(KnownRelationship relationship)
         {
             return string.Format("ImplementationType: {0}, Lifestyle: '{1}', Dependency: {2}",
                 relationship.ImplementationType.ToFriendlyName(),
