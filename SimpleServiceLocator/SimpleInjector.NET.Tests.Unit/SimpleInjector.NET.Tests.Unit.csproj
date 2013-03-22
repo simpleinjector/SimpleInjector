@@ -114,7 +114,7 @@
     <Compile Include="Lifestyles\CustomLifestyleTests.cs" />
     <Compile Include="Lifestyles\HybridLifestyleTests.cs" />
     <Compile Include="LifestyleTests.cs" />
-    <Compile Include="Lifestyles\LifestyleRegistrationTests.cs" />
+    <Compile Include="RegistrationTests.cs" />
     <Compile Include="Lifestyles\UnknownLifestyleTests.cs" />
     <Compile Include="RegisterAllTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

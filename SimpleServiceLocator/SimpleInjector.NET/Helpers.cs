@@ -177,14 +177,25 @@ namespace SimpleInjector
         {
             Type actionArgumentType = action.GetType().GetGenericArguments()[0];
 
-            ParameterExpression objParameter = Expression.Parameter(typeof(T), "obj");
+            if (actionArgumentType.IsAssignableFrom(typeof(T)))
+            {
+                // In most cases, the given T is a concrete type such as ServiceImpl, and supplied action
+                // object can be everything from Action<ServiceImpl>, to Action<IService>, to Action<object>.
+                // Since Action<T> is contravariant (we're running under .NET 4.0) we can simply cast it.
+                return (Action<T>)action;
+            }
 
-            // Build the following expression: obj => action(obj);
+            // If we come here, the given T is most likely System.Object and this means that the caller needs
+            // a Action<object>, the instance that needs to be casted, so we we need to build the following
+            // delegate:
+            // instance => action((ActionType)instance);
+            var parameter = Expression.Parameter(typeof(T), "instance");
+
+            Expression argument = Expression.Convert(parameter, actionArgumentType);
+
             var instanceInitializer = Expression.Lambda<Action<T>>(
-                Expression.Invoke(
-                    Expression.Constant(action),
-                    new[] { Expression.Convert(objParameter, actionArgumentType) }),
-                new ParameterExpression[] { objParameter });
+                Expression.Invoke(Expression.Constant(action), argument),
+                parameter);
 
             return instanceInitializer.Compile();
         }

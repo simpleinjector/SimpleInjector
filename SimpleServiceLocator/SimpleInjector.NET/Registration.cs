@@ -50,11 +50,12 @@ namespace SimpleInjector
     /// </example>
     public abstract class Registration
     {
-        private static readonly PropertyInfo[] NoProperties = new PropertyInfo[0];
+        private static readonly Action<object> NoOp = instance => { };
 
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
 
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
+        private Action<object> instanceInitializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Registration"/> class.
@@ -108,6 +109,35 @@ namespace SimpleInjector
             {
                 return this.dependencies.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Initializes an already created instance and applies properties and initializers to that instance.
+        /// </summary>
+        /// <remarks>
+        /// This method is especially useful in integration scenarios where the given platform is in control
+        /// of creating certain types. By passing the instance created by the platform to this method, the
+        /// container is still able to apply any properties (as defined using a custom
+        /// <see cref="IPropertySelectionBehavior"/>) and by applying any 
+        /// <see cref="Container.RegisterInitializer">initializers</see>.
+        /// </remarks>
+        /// <param name="instance">The instance to initialize.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="instance"/> is not
+        /// of type <see cref="ImplementationType"/>.</exception>
+        public void InitializeInstance(object instance)
+        {
+            Requires.IsNotNull(instance, "instance");
+            Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(), 
+                "instance");
+
+            if (this.instanceInitializer == null)
+            {
+                this.instanceInitializer = this.BuildInstanceInitializer();
+            }
+
+            this.instanceInitializer(instance);
         }
 
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> dependencies)
@@ -265,6 +295,32 @@ namespace SimpleInjector
             return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
         }
 
+        private Action<object> BuildInstanceInitializer()
+        {
+            Type type = this.ImplementationType;
+
+            var parameter = Expression.Parameter(typeof(object));
+
+            var castedParameter = Expression.Convert(parameter, type);
+
+            Expression expression = castedParameter;
+
+            expression = this.WrapWithPropertyInjector(type, type, castedParameter);
+
+            expression = this.InterceptInstanceCreation(type, type, expression);
+
+            expression = this.WrapWithInitializer(this.ImplementationType, expression);
+
+            if (expression != castedParameter)
+            {
+                return Expression.Lambda<Action<object>>(expression, parameter).Compile();
+            }
+
+            // In this case, no properties and initializers have been applied and the expression wasn't
+            // intercepted. Instead of compiling an empty delegate down, we simply return a NoOp.
+            return NoOp;
+        }
+
         private NewExpression BuildNewExpression(Type serviceType, Type implementationType)
         {
             var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
@@ -315,12 +371,6 @@ namespace SimpleInjector
         private PropertyInfo[] GetPropertiesToInject(Type serviceType, Type implementationType)
         {
             var propertySelector = this.Container.Options.PropertySelectionBehavior;
-
-            if (propertySelector is DefaultPropertySelectionBehavior)
-            {
-                // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
-                return NoProperties;
-            }
 
             var candidates = PropertyInjectionHelper.GetCandidateInjectionPropertiesFor(implementationType);
 
@@ -415,6 +465,22 @@ namespace SimpleInjector
                 // It's not possible to return a Expression that is as heavily optimized as the newExpression
                 // simply is, because the instance initializer must be called as well.
                 return BuildExpressionWithInstanceInitializer<TImplementation>(expression, instanceInitializer);
+            }
+
+            return expression;
+        }
+
+        private Expression WrapWithInitializer(Type implementationType, Expression expression)
+        {
+            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType);
+
+            if (instanceInitializer != null)
+            {
+                // It's not possible to return a Expression that is as heavily optimized as the newExpression
+                // simply is, because the instance initializer must be called as well.
+                return Expression.Convert(
+                    BuildExpressionWithInstanceInitializer<object>(expression, instanceInitializer),
+                    implementationType);
             }
 
             return expression;

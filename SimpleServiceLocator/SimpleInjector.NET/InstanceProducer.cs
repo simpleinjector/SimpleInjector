@@ -83,12 +83,16 @@ namespace SimpleInjector
         /// <value>A <see cref="Type"/> instance.</value>
         public Type ServiceType { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="Registration"/> instance for this instance.
+        /// </summary>
+        /// <value>The <see cref="Registration"/>.</value>
+        public Registration Registration { get; private set; }
+
         internal Type ImplementationType
         {
             get { return this.Registration.ImplementationType ?? this.ServiceType; }
         }
-
-        internal Registration Registration { get; private set; }
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.

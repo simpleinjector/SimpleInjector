@@ -1,6 +1,17 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vNext
+	General description:
+
+	New features:
+		-[Core] InstanceProducer.Registration property added to allow accessing the InstanceProducer's
+		 Registration.
+		-[Core] Registration.InitializeInstance(object) method added to allow initializing instances that
+		 can't be created by the container, but need to be initialized according to the container's
+		 configuration. (work item 19502)
+
+
 Version v2.1.0 (v2.1 RTM) 2013-03-19
 	General description:
 		This minor release adds two new features: A new extension point has been added that makes it 

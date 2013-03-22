@@ -30,6 +30,11 @@
         }
     }
 
+    public class FakeTimeProvider : ITimeProvider
+    {
+        public DateTime Now { get; set; }
+    }
+
     public class SqlUserRepository : IUserRepository
     {
         public void Delete(int userId)

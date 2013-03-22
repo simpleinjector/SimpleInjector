@@ -176,9 +176,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Lifestyles\HybridLifestyleTests.cs">
       <Link>Lifestyles\HybridLifestyleTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Lifestyles\LifestyleRegistrationTests.cs">
-      <Link>Lifestyles\LifestyleRegistrationTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\LifestyleTests.cs">
       <Link>LifestyleTests.cs</Link>
     </Compile>
@@ -214,6 +211,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleConcreteTests.cs">
       <Link>RegisterSingleConcreteTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegistrationTests.cs">
+      <Link>RegistrationTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ResolveUnregisteredTypeEventTests.cs">
       <Link>ResolveUnregisteredTypeEventTests.cs</Link>
