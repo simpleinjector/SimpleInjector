@@ -118,8 +118,7 @@ namespace SimpleInjector
         /// This method is especially useful in integration scenarios where the given platform is in control
         /// of creating certain types. By passing the instance created by the platform to this method, the
         /// container is still able to apply any properties (as defined using a custom
-        /// <see cref="IPropertySelectionBehavior"/>) and by applying any 
-        /// <see cref="Container.RegisterInitializer">initializers</see>.
+        /// <see cref="IPropertySelectionBehavior"/>) and by applying any initializers.
         /// </remarks>
         /// <param name="instance">The instance to initialize.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference
