@@ -10,6 +10,7 @@ Version vNext
 		-[Core] Registration.InitializeInstance(object) method added to allow initializing instances that
 		 can't be created by the container, but need to be initialized according to the container's
 		 configuration. (work item 19502)
+		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 
 Version v2.1.0 (v2.1 RTM) 2013-03-19

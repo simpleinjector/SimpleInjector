@@ -112,7 +112,7 @@ namespace SimpleInjector
                     this.isValid = this.CanBuildExpression();
                 }
 
-                return this.isValid.Value;
+                return this.isValid.GetValueOrDefault();
             }
         }
 

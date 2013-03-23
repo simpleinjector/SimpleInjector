@@ -1,7 +1,7 @@
 @ECHO OFF
 
-set version=2.1.0
-set prereleasePostfix=
+set version=2.2.0
+set prereleasePostfix=-beta1
 set buildNumber=0
 
 
@@ -9,6 +9,7 @@ set version_Core=%version%
 set version_Packaging=%version_Core%
 set version_Extensions=%version_Core%
 set version_Integration_Web=%version_Core%
+set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
 set version_Extensions_LifetimeScoping=%version_Core%
@@ -41,6 +42,7 @@ set named_version_Core=%version_Core%%prereleasePostfix%
 set named_version_Packaging=%version_Packaging%%prereleasePostfix%
 set named_version_Extensions=%version_Extensions%%prereleasePostfix%
 set named_version_Integration_Web=%version_Integration_Web%%prereleasePostfix%
+set named_version_Integration_WebForms=%version_Integration_WebForms%%prereleasePostfix%
 set named_version_Integration_Mvc=%version_Integration_Mvc%%prereleasePostfix%
 set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
 set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%%prereleasePostfix%
@@ -49,6 +51,7 @@ set numeric_version_Core=%version_Core%.%buildNumber%
 set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 set numeric_version_Extensions=%version_Extensions%.%buildNumber%
 set numeric_version_Integration_Web=%version_Integration_Web%.%buildNumber%
+set numeric_version_Integration_WebForms=%version_Integration_WebForms%.%buildNumber%
 set numeric_version_Integration_Mvc=%version_Integration_Mvc%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
@@ -94,9 +97,9 @@ ren %targetPathNet%\SimpleInjector.Integration.Web.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Integration_Web% /out:%targetPathNet%\SimpleInjector.Integration.Web.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
-%msbuild% "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.WebForms.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
-ren %targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.Integration.Web.WebForms.dll /keyfile:SimpleInjector.snk
+%msbuild% "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.Forms.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
+ren %targetPathNet%\SimpleInjector.Integration.Web.Forms.dll temp.dll
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Integration_WebForms% /out:%targetPathNet%\SimpleInjector.Integration.Web.Forms.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
@@ -186,6 +189,8 @@ copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\E
 mkdir Releases\temp\NET40\Integration
 copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
 copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.xml
+copy bin\NET\SimpleInjector.Integration.Web.Forms.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Forms.dll
+copy bin\NET\SimpleInjector.Integration.Web.Forms.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Forms.xml
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.dll
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.xml
 copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
@@ -322,6 +327,30 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %named_version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
+
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Forms Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy bin\NET\SimpleInjector.Integration.Web.Forms.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Forms.dll
+copy bin\NET\SimpleInjector.Integration.Web.Forms.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Forms.xml
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {version} %named_version_Integration_WebForms%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {version_Integration_Web} %named_version_Integration_Web%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\f5118ffcdd6c4fc48e26b35d803ac086.psmdcp {version} %named_version_Integration_WebForms%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.%named_version_Integration_WebForms%.zip"
+ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.%named_version_Integration_WebForms%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
+
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {version} %named_version_Integration_WebForms%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {version_Integration_WebForms} %named_version_Integration_WebForms%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\bb004cba2f014ed0b6ded4de9f7d3f1b.psmdcp {version} %named_version_Integration_WebForms%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart.%named_version_Integration_WebForms%.zip"
+ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart.%named_version_Integration_WebForms%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp

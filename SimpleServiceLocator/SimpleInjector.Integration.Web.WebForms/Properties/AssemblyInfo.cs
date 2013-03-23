@@ -7,12 +7,12 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimpleInjector.Integration.Web.WebForms")]
+[assembly: AssemblyTitle("SimpleInjector.Integration.Web.Forms")]
 [assembly: AssemblyDescription("Integration library for ASP.NET Web Forms for the Simple Injector Inversion of Control library.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
-[assembly: AssemblyProduct("SimpleInjector.Integration.Web.WebForms")]
-[assembly: AssemblyCopyright("Copyright © 2012 S. van Deursen")]
+[assembly: AssemblyProduct("SimpleInjector.Integration.Web.Forms")]
+[assembly: AssemblyCopyright("Copyright © 2013 S. van Deursen")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

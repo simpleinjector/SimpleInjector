@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2012 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2012 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -31,9 +31,11 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Web;
     using System.Web.Compilation;
     using System.Web.UI;
-    using SimpleInjector.Extensions;
+
+    using SimpleInjector.Integration.Web.Forms;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET Web Forms applications.
@@ -41,65 +43,156 @@ namespace SimpleInjector
     public static class SimpleInjectorWebFormExtensions
     {
         /// <summary>
-        /// Registers the <see cref="Page"/> instances that are declared as public concrete types in the 
-        /// supplied set of <paramref name="assemblies"/>.
+        /// Registers the <see cref="Page"/> instances that are declared as public concrete types in
+        /// the set of assemblies that can be found in the application's bin folder. The types will be
+        /// registered as concrete transient.
         /// </summary>
         /// <param name="container">The container.</param>
-        /// <param name="assemblies">The assemblies.</param>
-        public static void RegisterWebFormPages(this Container container, params Assembly[] assemblies)
+        public static void RegisterPages(this Container container)
         {
-            RegisterTypes<Page>(container, assemblies);
+            RegisterPages(container, GetAssemblies());
         }
 
         /// <summary>
-        /// Registers the <see cref="UserControl"/> instances that are declared as public concrete types in the 
-        /// supplied set of <paramref name="assemblies"/>.
+        /// Registers the <see cref="Page"/> instances that are declared as public concrete types in the 
+        /// supplied set of <paramref name="assemblies"/>. The types will be registered as concrete transient.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="assemblies">The assemblies.</param>
-        public static void RegisterWebFormUserControls(this Container container, params Assembly[] assemblies)
+        public static void RegisterPages(this Container container, params Assembly[] assemblies)
         {
-            RegisterTypes<UserControl>(container, assemblies);
+            RegisterPages(container, (IEnumerable<Assembly>)assemblies);
         }
 
-        private static void RegisterTypes<TBase>(Container container, params Assembly[] assemblies)
+        /// <summary>
+        /// Registers the <see cref="Page"/> instances that are declared as public concrete types in the 
+        /// supplied set of <paramref name="assemblies"/>. The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public static void RegisterPages(this Container container, IEnumerable<Assembly> assemblies)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(assemblies, "assemblies");
 
-            if (assemblies == null || assemblies.Length == 0)
-            {
-                assemblies = BuildManager.GetReferencedAssemblies().OfType<Assembly>().ToArray();
-            }            
+            var pageTypes = GetConcreteTypesThatDeriveFrom<Page>(assemblies);
 
-            var concreteTypes =
+            container.RegisterBatchAsConcreteTransient(pageTypes);
+        }
+
+        /// <summary>
+        /// Registers the <see cref="UserControl"/> instances that are declared as public concrete 
+        /// types in the set of assemblies that can be found in the application's bin folder.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        public static void RegisterUserControls(this Container container)
+        {
+            RegisterUserControls(container, GetAssemblies());
+        }
+
+        /// <summary>
+        /// Registers the <see cref="UserControl"/> instances that are declared as public concrete 
+        /// types in the supplied set of <paramref name="assemblies"/>.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public static void RegisterUserControls(this Container container, params Assembly[] assemblies)
+        {
+            RegisterUserControls(container, (IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Registers the <see cref="UserControl"/> instances that are declared as public concrete transient 
+        /// types in the supplied set of <paramref name="assemblies"/>.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public static void RegisterUserControls(this Container container, IEnumerable<Assembly> assemblies)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(assemblies, "assemblies");
+
+            var userControlTypes = GetConcreteTypesThatDeriveFrom<UserControl>(assemblies);
+
+            container.RegisterBatchAsConcreteTransient(userControlTypes);
+        }
+
+        /// <summary>
+        /// Registers all concrete <see cref="IHttpHandler"/> implementations (except <see cref="Page"/> and
+        /// <see cref="HttpApplication"/> implementations) that are declared as public concrete  
+        /// types in the set of assemblies that can be found in the application's bin folder.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        public static void RegisterHttpHandlers(this Container container)
+        {
+            RegisterHttpHandlers(container, GetAssemblies());
+        }
+
+        /// <summary>
+        /// Registers all concrete <see cref="IHttpHandler"/> implementations (except <see cref="Page"/> and
+        /// <see cref="HttpApplication"/> implementations) that are declared as public concrete  
+        /// types in the supplied set of <paramref name="assemblies"/>.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public static void RegisterHttpHandlers(this Container container, params Assembly[] assemblies)
+        {
+            RegisterHttpHandlers(container, (IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Registers all concrete <see cref="IHttpHandler"/> implementations (except <see cref="Page"/> and
+        /// <see cref="HttpApplication"/> implementations) that are declared as public concrete  
+        /// types in the supplied set of <paramref name="assemblies"/>.
+        /// The types will be registered as concrete transient.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies.</param>
+        public static void RegisterHttpHandlers(this Container container, IEnumerable<Assembly> assemblies)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(assemblies, "assemblies");
+
+            var handlerTypes =
+                from type in GetConcreteTypesThatDeriveFrom<IHttpHandler>(assemblies)
+                where !typeof(Page).IsAssignableFrom(type)
+                where !typeof(HttpApplication).IsAssignableFrom(type)
+                select type;
+
+            container.RegisterBatchAsConcreteTransient(handlerTypes);
+        }
+    
+        private static IEnumerable<Assembly> GetAssemblies()
+        {
+            return
+                from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
+                where !assembly.IsDynamic
+                where !assembly.GlobalAssemblyCache
+                select assembly;
+        }
+
+        private static IEnumerable<Type> GetConcreteTypesThatDeriveFrom<T>(IEnumerable<Assembly> assemblies)
+        {
+            return
                 from assembly in assemblies
-                from type in GetExportedTypesFrom(assembly)
-                where typeof(TBase).IsAssignableFrom(type)
-                where typeof(TBase) != type
+                where !assembly.IsDynamic
+                from type in assembly.GetExportedTypes()
+                where typeof(T).IsAssignableFrom(type) && typeof(T) != type
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
                 select type;
-
-            foreach (var concreteType in concreteTypes)
-            {
-                container.Register(concreteType, concreteType, Lifestyle.Transient);
-            }
         }
 
-        private static IEnumerable<Type> GetExportedTypesFrom(Assembly assembly)
+        private static void RegisterBatchAsConcreteTransient(this Container container, IEnumerable<Type> types)
         {
-            try
+            foreach (Type concreteType in types)
             {
-                return assembly.GetExportedTypes();
-            }
-            catch (NotSupportedException)
-            {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
-                // Assembly and it would be safe to skip this exception.
-                return Enumerable.Empty<Type>();
+                container.Register(concreteType, concreteType, Lifestyle.Transient);
             }
         }
     }
