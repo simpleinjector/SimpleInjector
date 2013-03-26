@@ -289,12 +289,35 @@
         }
 #endif
 
+        [TestMethod]
+        public void InjectAllProperties_OnContainerUncontrolledSingleton_InjectsProperty()
+        {
+            // Arrange
+            var singleton = new ServiceWithProperty<ITimeProvider>();
+
+            Assert.IsNull(singleton.Dependency, "Test setup failed.");
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            container.RegisterSingle<ServiceWithProperty<ITimeProvider>>(singleton);
+
+            // Act
+            container.GetInstance<ServiceWithProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(singleton.Dependency);
+        }
+
         private static Container CreateContainerThatInjectsAllProperties()
         {
             var container = ContainerFactory.New();
 
             Predicate<PropertyInfo> allExceptPropertiesDeclaredOnRealTimeProvider =
-                prop => prop.DeclaringType != typeof(RealTimeProvider);
+                prop => 
+                    prop.DeclaringType != typeof(RealTimeProvider) && 
+                    prop.DeclaringType != typeof(Container);
 
             container.Options.PropertySelectionBehavior = 
                 new PredicatePropertySelectionBehavior(allExceptPropertiesDeclaredOnRealTimeProvider);

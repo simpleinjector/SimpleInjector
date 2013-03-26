@@ -31,7 +31,7 @@
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Wcf.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.Mvc.dll" Analyze="True" AnalyzeAllChildren="True" />
-  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.WebForms.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.Forms.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Packaging.dll" Analyze="True" AnalyzeAllChildren="True" />
  </Targets>
  <Rules>

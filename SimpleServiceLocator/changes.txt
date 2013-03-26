@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version v2.2.0 (v2.2 RTM)
 	General description:
 
 	New features:
@@ -11,6 +11,11 @@ Version vNext
 		 can't be created by the container, but need to be initialized according to the container's
 		 configuration. (work item 19502)
 		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
+
+	Bug fixes:
+		-[Core] Properties where not injected when a single instance was registered using RegisterSingle<T>(T),
+		 although any initializers (registered through RegisterInitializer<T>(Action<T>) did fire. 
+		 (work item 19513)
 
 
 Version v2.1.0 (v2.1 RTM) 2013-03-19

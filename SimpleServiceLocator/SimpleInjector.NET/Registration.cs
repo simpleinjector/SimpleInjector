@@ -177,6 +177,35 @@ namespace SimpleInjector
                 p => new OverriddenParameter(Expression.Constant(null, p.Item1.ParameterType), p.Item2));
         }
 
+        // Wraps the expression with a delegate that injects the properties.
+        internal Expression WrapWithPropertyInjector(Type serviceType, Type implementationType,
+            Expression expressionToWrap)
+        {
+            if (this.Container.Options.PropertySelectionBehavior is DefaultPropertySelectionBehavior)
+            {
+                // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
+                return expressionToWrap;
+            }
+
+            return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
+        }
+
+        internal Expression WrapWithInitializer(Type implementationType, Expression expression)
+        {
+            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType);
+
+            if (instanceInitializer != null)
+            {
+                // It's not possible to return a Expression that is as heavily optimized as the newExpression
+                // simply is, because the instance initializer must be called as well.
+                return Expression.Convert(
+                    BuildExpressionWithInstanceInitializer<object>(expression, instanceInitializer),
+                    implementationType);
+            }
+
+            return expression;
+        }
+
         /// <summary>
         /// Builds a <see cref="Func{T}"/> delegate for the creation of the <typeparamref name="TService"/>
         /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Func{T}"/> might
@@ -320,7 +349,7 @@ namespace SimpleInjector
             return NoOp;
         }
 
-        private NewExpression BuildNewExpression(Type serviceType, Type implementationType)
+        private Expression BuildNewExpression(Type serviceType, Type implementationType)
         {
             var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
 
@@ -334,19 +363,6 @@ namespace SimpleInjector
                 select placeHolder ?? this.BuildParameterExpression(parameter);
 
             return Expression.New(constructor, parameters.ToArray());
-        }
-
-        // Wraps the expression with a delegate that injects the properties.
-        private Expression WrapWithPropertyInjector(Type serviceType, Type implementationType, 
-            Expression expressionToWrap)
-        {
-            if (this.Container.Options.PropertySelectionBehavior is DefaultPropertySelectionBehavior)
-            {
-                // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
-                return expressionToWrap;
-            }
-
-            return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
         }
 
         private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType, 
@@ -464,22 +480,6 @@ namespace SimpleInjector
                 // It's not possible to return a Expression that is as heavily optimized as the newExpression
                 // simply is, because the instance initializer must be called as well.
                 return BuildExpressionWithInstanceInitializer<TImplementation>(expression, instanceInitializer);
-            }
-
-            return expression;
-        }
-
-        private Expression WrapWithInitializer(Type implementationType, Expression expression)
-        {
-            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType);
-
-            if (instanceInitializer != null)
-            {
-                // It's not possible to return a Expression that is as heavily optimized as the newExpression
-                // simply is, because the instance initializer must be called as well.
-                return Expression.Convert(
-                    BuildExpressionWithInstanceInitializer<object>(expression, instanceInitializer),
-                    implementationType);
             }
 
             return expression;
