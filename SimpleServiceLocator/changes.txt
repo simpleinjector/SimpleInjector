@@ -16,6 +16,9 @@ Version v2.2.0 (v2.2 RTM)
 		-[Core] Properties where not injected when a single instance was registered using RegisterSingle<T>(T),
 		 although any initializers (registered through RegisterInitializer<T>(Action<T>) did fire. 
 		 (work item 19513)
+		-[Core] A NullReferenceException would be thrown by the container, when a Func<T> registration was
+		 called that returned null combined with the injection of one or more properties on that given T.
+		 (work item 19526)
 
 
 Version v2.1.0 (v2.1 RTM) 2013-03-19

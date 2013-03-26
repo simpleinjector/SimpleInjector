@@ -113,7 +113,12 @@
     public class PluginImpl : IPlugin
     {
     }
-
+    
+    public class PluginWithDependencyOfType<TDependency> : IPlugin
+    {
+        public TDependency Dependency { get; set; }
+    }
+    
     public class PluginManager
     {
         public PluginManager(IEnumerable<IPlugin> plugins)

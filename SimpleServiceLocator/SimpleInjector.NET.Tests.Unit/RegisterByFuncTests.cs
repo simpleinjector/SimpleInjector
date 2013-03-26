@@ -2,8 +2,9 @@
 {
     using System;
     using System.Linq;
-
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class RegisterByFuncTests
@@ -87,7 +88,7 @@
         }
         
         [TestMethod]
-        public void GetInstance_SubTypeRegisteredWithFuncReturningNull_ThrowsException()
+        public void GetInstance_SubTypeRegisteredWithFuncReturningNull_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -98,6 +99,7 @@
                 // Act
                 container.GetInstance<RealUserService>();
 
+                // Assert
                 Assert.Fail("Exception expected.");
             }
             catch (ActivationException ex)
@@ -105,6 +107,44 @@
                 Assert.IsTrue(ex.Message.Contains(
                     "The registered delegate for type IUserRepository returned null."),
                     "Actual: " + ex.Message);
+            }
+        }
+        
+        [TestMethod]
+        public void GetInstance_TypeRegisteredWithFuncReturningNullWhilePropertiesBeingInjected_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Ensure properties of type ITimeProvider will be injected.
+            container.Options.PropertySelectionBehavior = new InjectPropertyOfType<ITimeProvider>();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // MyPlugin contains a TimeProvider property of type ITimeProvider.
+            container.Register<PluginWithDependencyOfType<ITimeProvider>>(() => null);
+
+            try
+            {
+                // Act
+                container.GetInstance<PluginWithDependencyOfType<ITimeProvider>>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "The registered delegate for type PluginWithDependencyOfType<ITimeProvider> returned null."),
+                    "Actual: " + ex.Message);
+            }
+        }
+
+        private sealed class InjectPropertyOfType<T> : IPropertySelectionBehavior
+        {
+            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
+            {
+                return propertyInfo.PropertyType == typeof(T);
             }
         }
 

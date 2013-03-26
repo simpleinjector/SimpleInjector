@@ -275,18 +275,13 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
+            
+            expression = WrapWithNullChecker<TService>(expression);
 
             expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TService), expression);
 
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TService), expression);
             
-            // We have to decorate the given instanceCreator to add a null check and throw an expressive
-            // exception when the instanceCreator returned null. By preventing to polute the expression given
-            // to the ExpressionBuilding event (triggered by the previous call), we wrap the null checker
-            // after the ExpressionBuilding returned. But we need to wrap it before any initializer is ran,
-            // since that could lead to null reference exceptions in user code.
-            expression = WrapWithNullChecker<TService>(expression);
-
             expression = this.WrapWithInitializer<TService>(expression);
 
             return expression;
