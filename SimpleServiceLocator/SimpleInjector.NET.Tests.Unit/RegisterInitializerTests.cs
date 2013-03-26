@@ -7,7 +7,7 @@
     [TestClass]
     public class RegisterInitializerTests
     {
-        private interface ICommand
+        public interface ICommand
         {
             bool SendAsynchronously { get; set; }
 
@@ -240,6 +240,10 @@
             container.GetInstance<ICommand>();
             container.GetInstance<ICommand>();
             container.GetInstance<ICommand>();
+
+            // The registered delegate for type RegisterInitializerTests+ICommand threw an exception. 
+            // Attempt by method 'Expression.CreateLambda(Type, Expression, String, Boolean, ReadOnlyCollection`1)' 
+            // to access method 'Expression`1>.Create(Expression, String, Boolean, ReadOnlyCollection`1)' failed.
 
             // Assert
             Assert.AreEqual(1, actualNumberOfCalls,

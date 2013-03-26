@@ -190,17 +190,15 @@ namespace SimpleInjector
             return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
         }
 
-        internal Expression WrapWithInitializer(Type implementationType, Expression expression)
+        internal Expression WrapWithInitializer(Type serviceType, Type implementationType, Expression expression)
         {
             Action<object> instanceInitializer = this.Container.GetInitializer(implementationType);
 
             if (instanceInitializer != null)
             {
-                // It's not possible to return a Expression that is as heavily optimized as the newExpression
-                // simply is, because the instance initializer must be called as well.
                 return Expression.Convert(
                     BuildExpressionWithInstanceInitializer<object>(expression, instanceInitializer),
-                    implementationType);
+                    serviceType);
             }
 
             return expression;
@@ -332,7 +330,7 @@ namespace SimpleInjector
 
             expression = this.InterceptInstanceCreation(type, type, expression);
 
-            expression = this.WrapWithInitializer(this.ImplementationType, expression);
+            expression = this.WrapWithInitializer(type, type, expression);
 
             if (expression != castedParameter)
             {

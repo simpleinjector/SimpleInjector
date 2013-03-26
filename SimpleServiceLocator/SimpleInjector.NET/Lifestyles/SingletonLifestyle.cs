@@ -100,13 +100,26 @@ namespace SimpleInjector.Lifestyles
 
             private object GetInjectedInterceptedAndInitializedInstance()
             {
+                try
+                {
+                    return this.GetInjectedInterceptedAndInitializedInstanceInternal();
+                }
+                catch (MemberAccessException ex)
+                {
+                    throw new ActivationException(
+                        StringResources.UnableToResolveTypeDueToSecurityConfiguration(this.serviceType, ex));
+                }
+            }
+
+            private object GetInjectedInterceptedAndInitializedInstanceInternal()
+            {
                 Expression expression = Expression.Constant(this.originalInstance, this.implementationType);
 
                 expression = this.WrapWithPropertyInjector(this.serviceType, this.implementationType, expression);
 
                 expression = this.InterceptInstanceCreation(this.serviceType, this.implementationType, expression);
 
-                expression = this.WrapWithInitializer(this.implementationType, expression);
+                expression = this.WrapWithInitializer(this.serviceType, this.implementationType, expression);
 
                 var initializer = Expression.Lambda(expression).Compile();
 

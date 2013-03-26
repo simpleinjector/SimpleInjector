@@ -134,21 +134,46 @@
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_RegisteringAnInternalServiceType_Succeeds()
+        public void RegisterSingleByInstance_RegisteringAnInternalServiceType_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = ExpectedSandboxFailureExpectedMessage;
+
+            var container = new Container();
+
+            IInternalService expectedSingleton = new InternalServiceImpl(null);
+
+            container.RegisterSingle(typeof(IInternalService), expectedSingleton);
+
+            try
+            {
+                // Act
+                object actualInstance = container.GetInstance<IInternalService>();
+                container.GetInstance(typeof(IInternalService));
+
+                Assert.Fail("The call is expected to fail inside a Silverlight sandbox.");
+            }
+            catch (Exception ex)
+            {
+                // Assert
+                AssertThat.StringContains(expectedMessage, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInternalImplementationWithInitializerForPublicAbstraction_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            object expectedSingleton = new InternalServiceImpl(null);
+            container.RegisterInitializer<InternalImplOfPublicService>(impl => { });
 
-            container.RegisterSingle(typeof(IInternalService), expectedSingleton);
+            IPublicService expectedSingleton = new InternalImplOfPublicService(null);
+
+            container.RegisterSingle(typeof(IPublicService), expectedSingleton);
 
             // Act
-            object actualInstance = container.GetInstance<IInternalService>();
-            container.GetInstance(typeof(IInternalService));
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedSingleton, actualInstance));
+            container.GetInstance(typeof(IPublicService));
         }
 
         [TestMethod]
