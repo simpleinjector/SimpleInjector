@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
@@ -40,3 +41,8 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
+
+[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
+    Scope = "namespace", 
+    Target = "SimpleInjector.Integration.Web.Forms",
+    Justification = "We can't merge namespaces, because this basically is the only namespace in the assembly.")]

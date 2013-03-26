@@ -27,6 +27,7 @@ namespace SimpleInjector.Integration.Web.Forms
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Web;
     using System.Web.UI;
@@ -59,17 +60,21 @@ namespace SimpleInjector.Integration.Web.Forms
 
             if (SimpleInjectorWebFormsHttpModule.container != null)
             {
-                throw new InvalidOperationException("SetContainer already called.");
+                throw new InvalidOperationException("SetContainer has already been called.");
             }
 
             SimpleInjectorWebFormsHttpModule.container = container;
         }
 
-        void IHttpModule.Dispose()
+        /// <summary>Disposes of the resources (other than memory) used by this module.</summary>
+        public virtual void Dispose()
         {
         }
 
-        void IHttpModule.Init(HttpApplication context)
+        /// <summary>Initializes a module and prepares it to handle requests.</summary>
+        /// <param name="context">An <see cref="HttpApplication"/> that provides access to the methods, 
+        /// properties, and events common to all application objects within an ASP.NET application.</param>
+        public virtual void Init(HttpApplication context)
         {
             this.application = context;
 
@@ -84,14 +89,18 @@ namespace SimpleInjector.Integration.Web.Forms
         /// <returns>The container instance.</returns>
         /// <exception cref="InvalidOperationException">Thrown when <see cref="SetContainer"/> hasn't been
         /// called.</exception>
+        /// <value>The method should never return null.</value>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
+            Justification = "The execution of this method could potentially be performance heavy.")]
         protected virtual Container GetContainer()
         {
             if (SimpleInjectorWebFormsHttpModule.container == null)
             {
                 throw new InvalidOperationException(
-                    "Make sure WebFormsInitializerHttpModule.SetContainer is called during application startup.");
+                    "Make sure WebFormsInitializerHttpModule.SetContainer is called during application " + 
+                    "startup.");
             }
-
+                
             return SimpleInjectorWebFormsHttpModule.container;
         }
 
@@ -101,57 +110,88 @@ namespace SimpleInjector.Integration.Web.Forms
 
             if (handler != null)
             {
-                this.InitializeHttpHandler(handler);
+                var initializer = new HandlerInitializer(handler, this.GetContainer());
 
-                var page = handler as Page;
-
-                if (page != null)
-                {
-                    this.InitializeControls(page);
-                }
+                initializer.InitializeHttpHandler();
             }
         }
 
-        private void InitializeHttpHandler(IHttpHandler instance)
+        private sealed class HandlerInitializer
         {
-            Type type = instance.GetType();
+            private readonly IHttpHandler handler;
+            private readonly Container container;
 
-            // ASP.NET creates a sub type for Pages with all the mark up, but this is not the type that a user 
-            // can register and not always a type that can be initialized.
-            type = typeof(Page).IsAssignableFrom(type) ? type.BaseType : type;
+            public HandlerInitializer(IHttpHandler handler, Container container)
+            {
+                this.handler = handler;
+                this.container = container;
+            }
 
-            this.GetRegistration(type).InitializeInstance(instance);
-        }
+            internal void InitializeHttpHandler()
+            {
+                bool handlerIsPage = typeof(Page).IsAssignableFrom(this.handler.GetType());
 
-        private Registration GetRegistration(Type type)
-        {
-            return this.GetContainer().GetRegistration(type, throwOnFailure: true).Registration;
-        }
+                if (handlerIsPage)
+                {
+                    this.InitializePage();
+                }
+                else
+                {                
+                    this.InitializeHandler();
+                }
+            }
 
-        private void InitializeControls(Page page)
-        {
-            PageInitializer.HookEventsForControlInitialization(this, page);
+            private void InitializePage()
+            {
+                // ASP.NET creates a sub type for Pages with all the mark up, but this is not the type that a 
+                // user can register and not always a type that can be initialized.
+                Type pageType = this.handler.GetType().BaseType;
+
+                var page = (Page)this.handler;
+
+                this.InitializeInstance(pageType, page);
+                
+                this.InitializePageUserControls(page);
+            }
+            
+            private void InitializeHandler()
+            {
+                Type handlerType = this.handler.GetType();
+
+                this.InitializeInstance(handlerType, this.handler);
+            }
+
+            private void InitializePageUserControls(Page page)
+            {
+                PageInitializer.HookEventsForUserControlInitialization(page, this.container);
+            }
+
+            private void InitializeInstance(Type type, object instance)
+            {
+                var producer = this.container.GetRegistration(type, throwOnFailure: true);
+
+                producer.Registration.InitializeInstance(instance);
+            }
         }
 
         private sealed class PageInitializer
         {
             private readonly HashSet<Control> alreadyInitializedControls = new HashSet<Control>();
-            private readonly SimpleInjectorWebFormsHttpModule module;
             private readonly Page page;
+            private readonly Container container;
 
-            private PageInitializer(SimpleInjectorWebFormsHttpModule module, Page page)
+            private PageInitializer(Page page, Container container)
             {
-                this.module = module;
                 this.page = page;
+                this.container = container;
             }
 
-            internal static void HookEventsForControlInitialization(SimpleInjectorWebFormsHttpModule module,
-                Page page)
+            internal static void HookEventsForUserControlInitialization(Page page, Container container)
             {
-                var x = new PageInitializer(module, page);
+                var initializer = new PageInitializer(page, container);
 
-                page.PreInit += x.PreInit;
-                page.PreLoad += x.PreLoad;
+                page.PreInit += initializer.PreInit;
+                page.PreLoad += initializer.PreLoad;
             }
 
             private void PreInit(object sender, EventArgs e)
@@ -169,13 +209,13 @@ namespace SimpleInjector.Integration.Web.Forms
 
             private IEnumerable<MasterPage> GetMasterPages()
             {
-                MasterPage masterPage = this.page.Master;
+                MasterPage master = this.page.Master;
 
-                while (masterPage != null)
+                while (master != null)
                 {
-                    yield return masterPage;
+                    yield return master;
 
-                    masterPage = masterPage.Master;
+                    master = master.Master;
                 }
             }
 
@@ -228,11 +268,18 @@ namespace SimpleInjector.Integration.Web.Forms
                     // type that a user can register and not always a type that can be initialized.
                     Type type = instance.GetType().BaseType;
 
-                    this.module.GetRegistration(type).InitializeInstance(instance);
+                    this.InitializeInstance(type, instance);
 
                     // Ensure every user control is only initialized once.
                     this.alreadyInitializedControls.Add(instance);
                 }
+            }
+
+            private void InitializeInstance(Type type, object instance)
+            {
+                var producer = this.container.GetRegistration(type, throwOnFailure: true);
+
+                producer.Registration.InitializeInstance(instance);
             }
         }
     }
