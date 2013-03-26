@@ -315,7 +315,7 @@ namespace SimpleInjector
 
             expression = this.WrapWithInitializer<TImplementation>(expression);
 
-            return this.ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(expression);
+            return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
         }
 
         private Action<object> BuildInstanceInitializer()
@@ -354,8 +354,8 @@ namespace SimpleInjector
 
             var parameters =
                 from parameter in constructor.GetParameters()
-                let placeHolder = this.GetOverriddenParameter(parameter).PlaceHolder
-                select placeHolder ?? this.BuildParameterExpression(parameter);
+                let overriddenParameter = this.GetOverriddenParameterFor(parameter)
+                select overriddenParameter ?? this.BuildParameterExpressionFor(parameter);
 
             return Expression.New(constructor, parameters.ToArray());
         }
@@ -391,32 +391,37 @@ namespace SimpleInjector
                 .ToArray();
         }
 
-        private Expression ReplacePlaceHolderExpressionWithOverriddenParameterExpressions(Expression expression)
+        private Expression ReplacePlaceHoldersWithOverriddenParameters(Expression expression)
         {
             if (this.overriddenParameters != null)
             {
-                foreach (var value in this.overriddenParameters.Values)
+                foreach (var overriddenParameter in this.overriddenParameters.Values)
                 {
-                    expression = SubExpressionReplacer.Replace(expression, value.PlaceHolder, value.Expression);
+                    expression = SubExpressionReplacer.Replace(
+                        expressionToAlter: expression, 
+                        subExpressionToFind: overriddenParameter.PlaceHolder, 
+                        replacementExpression: overriddenParameter.Expression);
                 }
             }
 
             return expression;
         }
 
-        private OverriddenParameter GetOverriddenParameter(ParameterInfo parameter)
+        private Expression GetOverriddenParameterFor(ParameterInfo parameter)
         {
             if (this.overriddenParameters != null && this.overriddenParameters.ContainsKey(parameter))
             {
-                return this.overriddenParameters[parameter];
+                return this.overriddenParameters[parameter].PlaceHolder;
             }
 
-            return new OverriddenParameter();
+            return null;
         }
 
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
         {
-            var dependencyTypes = constructor.GetParameters().Select(p => p.ParameterType);
+            var dependencyTypes = 
+                from parameter in constructor.GetParameters()
+                select parameter.ParameterType;
 
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
@@ -443,7 +448,7 @@ namespace SimpleInjector
             }
         }
 
-        private Expression BuildParameterExpression(ParameterInfo parameter)
+        private Expression BuildParameterExpressionFor(ParameterInfo parameter)
         {
             var injectionBehavior = this.Container.Options.ConstructorInjectionBehavior;
 
