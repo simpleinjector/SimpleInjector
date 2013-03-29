@@ -9,14 +9,14 @@ using SimpleInjector.Lifestyles;
     [TestClass]
     public class ContextDependentExtensionsTests
     {
-        public interface ILogger
+        public interface IContextualLogger
         {
             DependencyContext Context { get; }
         }
 
         public interface IRepository
         {
-            ILogger Logger { get; }
+            IContextualLogger Logger { get; }
         }
 
         public interface IService
@@ -30,10 +30,10 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.Register<ILogger, ContextualLogger>();
+            container.Register<IContextualLogger, ContextualLogger>();
 
             // Act
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Act
             var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
@@ -59,7 +59,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.RegisterInitializer<RepositoryThatDependsOnLogger>(_ => { });
 
@@ -77,7 +77,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -95,10 +95,10 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Act
-            var logger = container.GetInstance<ILogger>() as ContextualLogger;
+            var logger = container.GetInstance<IContextualLogger>() as ContextualLogger;
 
             // Assert
             Assert.AreEqual(null, logger.Context.ServiceType);
@@ -111,7 +111,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -135,7 +135,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -167,7 +167,7 @@ using SimpleInjector.Lifestyles;
             // RegisterWithContext should be able to work correctly, even if the Expression has been altered.
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -188,7 +188,7 @@ using SimpleInjector.Lifestyles;
 
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -210,9 +210,9 @@ using SimpleInjector.Lifestyles;
             // Since InterceptWith alters the Expression of ILogger, this would make it harder for 
             // the Expression visitor of RegisterWithContext to find and alter this expression. So this is
             // an interesting test.
-            container.InterceptWith<FakeInterceptor>(type => type == typeof(ILogger));
+            container.InterceptWith<FakeInterceptor>(type => type == typeof(IContextualLogger));
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Act
             var repository = container.GetInstance<IRepository>();
@@ -231,7 +231,7 @@ using SimpleInjector.Lifestyles;
 
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
 
@@ -251,7 +251,7 @@ using SimpleInjector.Lifestyles;
 
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>(hybrid);
 
@@ -269,7 +269,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
             container.Register<IService, ServiceThatDependsOnRepository>();
@@ -290,7 +290,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var container = new Container();
 
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
             container.Register<IService, ServiceThatDependsOnRepository>();
@@ -326,7 +326,7 @@ using SimpleInjector.Lifestyles;
 
         public sealed class ServiceDecoratorWithLoggerDependency : IService
         {
-            public ServiceDecoratorWithLoggerDependency(IService decorated, ILogger logger)
+            public ServiceDecoratorWithLoggerDependency(IService decorated, IContextualLogger logger)
             {
                 this.Decorated = decorated;
                 this.Logger = logger;
@@ -334,12 +334,12 @@ using SimpleInjector.Lifestyles;
 
             public IService Decorated { get; private set; }
 
-            public ILogger Logger { get; private set; }
+            public IContextualLogger Logger { get; private set; }
         }
 
         public sealed class ServiceThatDependsOnRepository : IService
         {
-            public ServiceThatDependsOnRepository(IRepository repository, ILogger logger,
+            public ServiceThatDependsOnRepository(IRepository repository, IContextualLogger logger,
                 ConcreteCommand justAnExtraArgumentToMakeUsFindBugsFaster)
             {
                 this.InjectedRepository = (RepositoryThatDependsOnLogger)repository;
@@ -353,15 +353,15 @@ using SimpleInjector.Lifestyles;
 
         public sealed class RepositoryThatDependsOnLogger : IRepository
         {
-            public RepositoryThatDependsOnLogger(ILogger logger)
+            public RepositoryThatDependsOnLogger(IContextualLogger logger)
             {
                 this.Logger = logger;
             }
 
-            public ILogger Logger { get; private set; }
+            public IContextualLogger Logger { get; private set; }
         }
 
-        public sealed class ContextualLogger : ILogger
+        public sealed class ContextualLogger : IContextualLogger
         {
             public ContextualLogger(DependencyContext context)
             {

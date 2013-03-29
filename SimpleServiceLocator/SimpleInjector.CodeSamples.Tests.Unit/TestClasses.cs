@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public interface ILogger
     {
@@ -16,6 +17,10 @@
     public interface IValidator<T>
     {
         void Validate(T instance);
+    }
+
+    public sealed class InjectAttribute : Attribute
+    {
     }
 
     public class CommandWithDependency : ICommand

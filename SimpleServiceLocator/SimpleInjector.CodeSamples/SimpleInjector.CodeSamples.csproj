@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributedPropertyInjectionExtensions.cs" />
+    <Compile Include="MethodInjectionExtensions.cs" />
     <Compile Include="PropertyInjectionExtensions.cs" />
     <Compile Include="MostParametersConstructorResolutionBehavior.cs" />
     <Compile Include="MostResolvableParametersConstructorResolutionBehavior.cs" />
