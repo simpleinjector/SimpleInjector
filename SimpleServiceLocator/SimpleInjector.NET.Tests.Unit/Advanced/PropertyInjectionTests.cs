@@ -34,8 +34,10 @@
             Action action = () => container.GetInstance<ServiceWithProperty<ITimeProvider>>();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "No registration for type ITimeProvider could be found", 
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                Property of type ITimeProvider with name 'Dependency' can't be injected, because no
+                registration for type ITimeProvider could be found. 
+                No registration for type ITimeProvider could be found.".TrimInside(), 
                 action);
         }
 

@@ -429,5 +429,16 @@ namespace SimpleInjector
                 "Property of type {0} with name '{1}' can't be injected, because it is static.",
                 property.PropertyType.ToFriendlyName(), property.Name);
         }
+
+        internal static string NoRegistrationForPropertyFound(PropertyInfo property, Exception innerException)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Property of type {0} with name '{1}' can't be injected, because no registration for type " +
+                "{2} could be found. {3}",
+                property.PropertyType.ToFriendlyName(), 
+                property.Name, 
+                property.PropertyType.ToFriendlyName(),
+                innerException.Message);
+        }
     }
 }

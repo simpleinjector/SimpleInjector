@@ -19,6 +19,8 @@ Version v2.2.0 (v2.2 RTM)
 		-[Core] A NullReferenceException would be thrown by the container, when a Func<T> registration was
 		 called that returned null combined with the injection of one or more properties on that given T.
 		 (work item 19526)
+		-[Core] The exception thrown by the container when one of the type's properties can't be resolved is
+		 more expressive now, and describes the name of the property.
 
 
 Version v2.1.0 (v2.1 RTM) 2013-03-19

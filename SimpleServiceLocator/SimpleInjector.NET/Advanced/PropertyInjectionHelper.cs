@@ -208,9 +208,10 @@ namespace SimpleInjector.Advanced
             {
                 registration = this.container.GetRegistration(property.PropertyType, throwOnFailure: true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                // Throw a more expressive exception.
+                throw new ActivationException(StringResources.NoRegistrationForPropertyFound(property, ex), ex);
             }
 
             return registration.BuildExpression();
