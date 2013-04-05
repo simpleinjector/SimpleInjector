@@ -20,7 +20,7 @@
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
 
             container.RegisterRuntimeDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
-                context => decorateHandler);
+                () => decorateHandler);
 
             // Act
             var handler1 = container.GetInstance<ICommandHandler<RealCommand>>();

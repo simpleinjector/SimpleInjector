@@ -9,44 +9,20 @@
     {
         public static void RegisterRuntimeDecorator(
             this Container container, Type serviceType, Type decoratorType,
-            Func<DecoratorPredicateContext, bool> runtimePredicate)
+            Func<bool> runtimePredicate)
         {
-            var localContext = new ThreadLocal<DecoratorPredicateContext>();
-
-            container.RegisterDecorator(serviceType, decoratorType, c =>
-            {
-                localContext.Value = c;
-                return true;
-            });
-
-            container.ExpressionBuilt += (s, e) =>
-            {
-                if (localContext.Value != null)
-                {
-                    DecoratorPredicateContext context = localContext.Value;
-                    Expression undecorated = context.Expression;
-                    Expression decorated = e.Expression;
-
-                    localContext.Value = null;
-
-                    Expression shouldDecorate = Expression.Invoke(
-                        Expression.Constant(runtimePredicate),
-                        Expression.Constant(context));
-
-                    Type type = e.RegisteredServiceType;
-
-                    e.Expression = Expression.Condition(shouldDecorate,
-                        Expression.Convert(decorated, type),
-                        Expression.Convert(undecorated, type));
-                }
-            };
+            container.RegisterRuntimeDecorator<Container>(
+                serviceType, decoratorType,
+                Lifestyle.Transient,
+                context => true,
+                context => runtimePredicate());
         }
 
         public static void RegisterRuntimeDecorator<TContextInfo>(
             this Container container, Type serviceType, Type decoratorType,
             Lifestyle lifestyle,
-            Func<DecoratorPredicateContext, bool> compileTimePredicate,
-            Func<DecoratorPredicateContext, TContextInfo, bool> runtimePredicate)
+            Predicate<DecoratorPredicateContext> compileTimePredicate,
+            Predicate<TContextInfo> runtimePredicate)
             where TContextInfo : class
         {
             var localContext = new ThreadLocal<DecoratorPredicateContext>();
@@ -62,8 +38,7 @@
             {
                 if (localContext.Value != null)
                 {
-                    DecoratorPredicateContext context = localContext.Value;
-                    Expression undecorated = context.Expression;
+                    Expression decoratee = localContext.Value.Expression;
                     Expression decorated = e.Expression;
 
                     localContext.Value = null;
@@ -73,14 +48,11 @@
 
                     Expression shouldDecorate = Expression.Invoke(
                         Expression.Constant(runtimePredicate),
-                        Expression.Constant(context),
                         contextInfoRegistration.BuildExpression());
 
-                    Type type = e.RegisteredServiceType;
-
                     e.Expression = Expression.Condition(shouldDecorate,
-                        Expression.Convert(decorated, type),
-                        Expression.Convert(undecorated, type));
+                        Expression.Convert(decorated, e.RegisteredServiceType),
+                        Expression.Convert(decoratee, e.RegisteredServiceType));
                 }
             };
         }
