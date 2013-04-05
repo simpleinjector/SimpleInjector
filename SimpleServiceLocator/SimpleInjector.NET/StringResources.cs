@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
 
     /// <summary>Internal helper for string resources.</summary>
@@ -244,9 +245,14 @@ namespace SimpleInjector
         internal static string SuppliedTypeIsAnOpenGenericType(Type type)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied type {0} is an open generic type. Use the RegisterOpenGeneric or " +
-                "RegisterManyForOpenGeneric extension method for registering open generic types.",
-                type.ToFriendlyName());
+                "The supplied type {0} is an open generic type. This type cannot be used for registration " +
+                "using this method. You can use one of the {1}.RegisterOpenGeneric extension method " +
+                "overloads for mapping an generic abstraction to an generic implementation, or use one of " +
+                "the {2}.RegisterManyForOpenGeneric extension method overloads for registering a set of " +
+                "implementations for a generic abstraction.",
+                type.ToFriendlyName(),
+                typeof(OpenGenericRegistrationExtensions).FullName,
+                typeof(OpenGenericBatchRegistrationExtensions).FullName);
         }
 
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)

@@ -1049,7 +1049,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(serviceTypes, "serviceTypes");
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
             // Make a copy for correctness and performance.
             Type[] types = serviceTypes.ToArray();
@@ -1079,7 +1079,7 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(collection, "collection");
 
-            Requires.TypeIsNotOpenGeneric(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 

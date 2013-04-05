@@ -116,21 +116,11 @@ namespace SimpleInjector
             }
         }
 
-        internal static void TypeIsNotOpenGeneric(Type type, string paramName)
-        {
-            // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
-            // to find out if this type can be created.
-            if (type.ContainsGenericParameters)
-            {
-                throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
-            }
-        }
-
         internal static void DoesNotContainOpenGenericTypes(IEnumerable<Type> serviceTypes, string paramName)
         {
             foreach (var type in serviceTypes)
             {
-                TypeIsNotOpenGeneric(type, paramName);
+                IsNotOpenGenericType(type, paramName);
             }
         }
 

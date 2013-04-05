@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -90,6 +91,27 @@
 
             // Assert
             Assert.IsFalse(object.ReferenceEquals(instance1, instance2));
+        }
+        
+        [TestMethod]
+        public void RegisterByType_OpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            try
+            {
+                // Act
+                container.Register(typeof(IDictionary<,>), typeof(Dictionary<,>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("The supplied type ") &&
+                    ex.Message.Contains(" is an open generic type."), "Actual: " + ex.Message);
+            }
         }
     }
 }
