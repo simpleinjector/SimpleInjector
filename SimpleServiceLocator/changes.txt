@@ -1,8 +1,19 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vNext
+	General description:
+
+	New features:
+		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
+
+	Bug fixes:
+
+
 Version v2.2.0 (v2.2 RTM)
 	General description:
+		Besides a few bug fixes, this minor release adds two features that enable some integration scenarios 
+		where the container is not in control of the creation of types, but types still need to be wired up.
 
 	New features:
 		-[Core] InstanceProducer.Registration property added to allow accessing the InstanceProducer's
@@ -10,7 +21,6 @@ Version v2.2.0 (v2.2 RTM)
 		-[Core] Registration.InitializeInstance(object) method added to allow initializing instances that
 		 can't be created by the container, but need to be initialized according to the container's
 		 configuration. (work item 19502)
-		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 	Bug fixes:
 		-[Core] Properties where not injected when a single instance was registered using RegisterSingle<T>(T),
