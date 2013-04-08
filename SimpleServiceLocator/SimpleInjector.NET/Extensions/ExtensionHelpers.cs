@@ -208,7 +208,7 @@ namespace SimpleInjector.Extensions
             return source.Union(Enumerable.Repeat(element, 1));
         }
 
-        private static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
         {
             var thisType = new[] { type };
             return thisType.Concat(type.GetBaseTypesAndInterfaces());

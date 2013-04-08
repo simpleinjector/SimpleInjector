@@ -107,7 +107,7 @@ namespace SimpleInjector.Extensions
             var openGenericBaseType = this.ClosedGenericBaseType.GetGenericTypeDefinition();
 
             return (
-                from baseType in this.OpenGenericImplementation.GetBaseTypesAndInterfaces()
+                from baseType in this.OpenGenericImplementation.GetTypeBaseTypesAndInterfaces()
                 where openGenericBaseType.IsGenericTypeDefinitionOf(baseType)
                 select baseType)
                 .Distinct();

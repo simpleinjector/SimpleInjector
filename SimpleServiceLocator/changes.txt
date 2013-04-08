@@ -21,6 +21,9 @@ Version v2.2.0 (v2.2 RTM)
 		 (work item 19526)
 		-[Core] The exception thrown by the container when one of the type's properties can't be resolved is
 		 more expressive now, and describes the name of the property.
+		-[Core] RegisterSingleOpenGeneric and RegisterOpenGeneric with custom lifestyle didn't work correctly 
+		 when the registration was made with the same type for both the service and implementation type, 
+		 making the container fall back to resolving a transient type. (work item 19570).
 
 
 Version v2.1.0 (v2.1 RTM) 2013-03-19

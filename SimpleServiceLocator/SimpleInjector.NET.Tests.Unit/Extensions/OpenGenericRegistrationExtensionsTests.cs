@@ -727,6 +727,25 @@
             Assert.IsNull(registration,
                 "Since TIn : TOut but object does not inherit from IDisposable, GetRegistration should return null.");
         }
+        
+        [TestMethod]
+        public void GetInstance_SingleOpenGenericOnConcreteType_AlwaysReturnSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Service type is the same as implementation
+            container.RegisterSingleOpenGeneric(
+                typeof(NewConstraintEventHandler<>), 
+                typeof(NewConstraintEventHandler<>));
+
+            // Act
+            var t1 = container.GetInstance<NewConstraintEventHandler<int>>();
+            var t2 = container.GetInstance<NewConstraintEventHandler<int>>();
+
+            // Assert
+            Assert.IsTrue(object.ReferenceEquals(t1, t2));
+        }
 
 #if SILVERLIGHT
         [TestMethod]
