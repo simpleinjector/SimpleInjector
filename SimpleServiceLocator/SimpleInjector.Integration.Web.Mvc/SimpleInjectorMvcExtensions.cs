@@ -83,6 +83,26 @@ namespace SimpleInjector
                             "grouped together.")]
         public static void RegisterMvcControllers(this Container container, params Assembly[] assemblies)
         {
+            foreach (var controllerType in GetControllerTypesToRegister(container, assemblies))
+            {
+                container.Register(controllerType, controllerType, Lifestyle.Transient);
+            }
+        }
+
+        /// <summary>
+        /// Returns all public, non abstract, non generic types that implement <see cref="IController"/> and
+        /// which name end with "Controller" that are located in the supplied <paramref name="assemblies"/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method to retrieve the list of <see cref="Controller"/> types for manual registration.
+        /// In most cases, this method doesn't have to be called directly, but the 
+        /// <see cref="RegisterMvcControllers"/> method can be used instead.
+        /// </remarks>
+        /// <param name="container">The container to use.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A list of types.</returns>
+        public static Type[] GetControllerTypesToRegister(Container container, params Assembly[] assemblies)
+        {
             if (container == null)
             {
                 throw new ArgumentNullException("container");
@@ -93,7 +113,7 @@ namespace SimpleInjector
                 assemblies = BuildManager.GetReferencedAssemblies().OfType<Assembly>().ToArray();
             }
 
-            var controllerTypes =
+            return (
                 from assembly in assemblies
                 where !assembly.IsDynamic
                 from type in assembly.GetExportedTypes()
@@ -101,12 +121,8 @@ namespace SimpleInjector
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
                 where type.Name.EndsWith("Controller", StringComparison.Ordinal)
-                select type;
-
-            foreach (var controllerType in controllerTypes)
-            {
-                container.Register(controllerType, controllerType, Lifestyle.Transient);
-            }
+                select type)
+                .ToArray();
         }
     }
 }

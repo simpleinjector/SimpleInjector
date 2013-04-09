@@ -5,6 +5,9 @@ Version vNext
 	General description:
 
 	New features:
+		-[Integration.Web.Mvc] SimpleInjectorMvcExtensions.GetControllerTypesToRegister method added. This
+		 allows users to change the way MVC controllers are registered by default (using the
+		 RegisterMvcControllers overload).
 		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 	Bug fixes:
