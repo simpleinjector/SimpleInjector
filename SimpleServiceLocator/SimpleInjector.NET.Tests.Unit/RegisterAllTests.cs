@@ -661,6 +661,16 @@
             container.RegisterAll<IUserRepository>(typeof(SqlUserRepository), typeof(IUserRepository));
         }
 
+        [TestMethod]
+        public void RegisterAll_RegisteringAnInterfaceOnACollectionOfObjects_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            
+            // Act
+            container.RegisterAll<object>(typeof(IDisposable));
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
