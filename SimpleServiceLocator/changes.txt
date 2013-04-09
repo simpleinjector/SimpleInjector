@@ -8,6 +8,9 @@ Version vNext
 		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 	Bug fixes:
+		-[Core] Registering a collection using RegisterAll<object>(Type[]) failed when one of the supplied
+		 types was an interface incorrectly stating the the interface did not inherit from Object. 
+		 (work item 19577)
 
 
 Version v2.2.0 (v2.2 RTM)

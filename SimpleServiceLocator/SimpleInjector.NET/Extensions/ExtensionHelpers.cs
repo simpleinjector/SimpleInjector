@@ -216,7 +216,7 @@ namespace SimpleInjector.Extensions
 
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
-            Type baseType = type.BaseType;
+            Type baseType = type.BaseType ?? (type != typeof(object) ? typeof(object) : null);
 
             while (baseType != null)
             {
