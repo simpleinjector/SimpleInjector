@@ -11,6 +11,11 @@ Version vNext
 		-[Core] Registering a collection using RegisterAll<object>(Type[]) failed when one of the supplied
 		 types was an interface incorrectly stating the the interface did not inherit from Object. 
 		 (work item 19577)
+		-[Core] The RegisterAll<TService>(TService[]) overload that takes in an array of singleton instances,
+		 did not let those instances go through the pipeline as would happen when registering a singleton
+		 instance using Register<TService>(TService). With the latter method properties and possible other
+		 transformations would be applied, while the former only called the initializer delegates.
+		 (work item 19576)
 
 
 Version v2.2.0 (v2.2 RTM)

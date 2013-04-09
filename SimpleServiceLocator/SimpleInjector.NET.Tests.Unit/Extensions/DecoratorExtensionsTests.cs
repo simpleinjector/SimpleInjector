@@ -1701,7 +1701,7 @@
 
     public class StubCommandHandler : ICommandHandler<RealCommand>
     {
-        public void Handle(RealCommand command)
+        public virtual void Handle(RealCommand command)
         {
         }
     }

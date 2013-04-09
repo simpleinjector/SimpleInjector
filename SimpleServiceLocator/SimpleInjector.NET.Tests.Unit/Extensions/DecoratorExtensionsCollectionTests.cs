@@ -1615,7 +1615,47 @@
             // Act
             container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
         }
-        
+
+        [TestMethod]
+        public void GetAllInstances_OnContainerControlledCollection_AppliesDecoratorOnSingleElements()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Registering them by object prevents the decorator from being applied.
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                typeof(StubCommandHandler),
+                typeof(RealCommandHandler));
+
+            // Registers a decorator specific for the StubCommandHandler type.
+            container.RegisterDecorator(typeof(StubCommandHandler), typeof(StubCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(StubCommandHandlerDecorator));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_OnContainerUncontrolledSingletons_AppliesDecoratorOnSingleElements()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(
+                new StubCommandHandler(),
+                new RealCommandHandler());
+
+            container.RegisterDecorator(typeof(StubCommandHandler), typeof(StubCommandHandlerDecorator));
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(StubCommandHandlerDecorator));
+        }
+
 #if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
@@ -1752,6 +1792,21 @@
             public void Handle(T command)
             {
                 // Start a transaction (not important for these tests).
+            }
+        }
+
+        public class StubCommandHandlerDecorator : StubCommandHandler
+        {
+            private StubCommandHandler decoratee;
+
+            public StubCommandHandlerDecorator(StubCommandHandler decoratee)
+            {
+                this.decoratee = decoratee;
+            }
+
+            public override void Handle(RealCommand command)
+            {
+                this.decoratee.Handle(command);
             }
         }
 

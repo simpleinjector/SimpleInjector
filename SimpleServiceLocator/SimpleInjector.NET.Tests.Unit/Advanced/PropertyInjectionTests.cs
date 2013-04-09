@@ -312,6 +312,27 @@
             Assert.IsNotNull(singleton.Dependency);
         }
 
+        [TestMethod]
+        public void InjectAllProperties_OnContainerUncontrolledSingletonsCollection_InjectsProperty()
+        {
+            // Arrange
+            var singleton = new ServiceWithProperty<ITimeProvider>();
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            ServiceWithProperty<ITimeProvider>[] services = new[] { singleton };
+
+            container.RegisterAll<ServiceWithProperty<ITimeProvider>>(services);
+
+            // Act
+            container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
+
+            // Assert
+            Assert.IsNotNull(singleton.Dependency);
+        }
+
         private static Container CreateContainerThatInjectsAllProperties()
         {
             var container = ContainerFactory.New();

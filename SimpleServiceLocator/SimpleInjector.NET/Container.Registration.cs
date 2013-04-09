@@ -980,7 +980,9 @@ namespace SimpleInjector
 
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
-            this.RegisterAll<TService>(new DecoratableSingletonCollection<TService>(this, singletons));
+            var collection = new DecoratableSingletonCollection<TService>(this, singletons.ToArray());
+
+            this.RegisterAll<TService>(collection);
         }
 
         /// <summary>
@@ -1424,28 +1426,34 @@ namespace SimpleInjector
             {
                 foreach (var item in this.Items)
                 {
-                    yield return Expression.Constant(item.Instance);
+                    yield return item.BuildExpression();
                 }
             }
         }
 
         private abstract class DecoratableSingletonCollectionBase<TService> : IEnumerable<TService>
         {
-            protected readonly DecoratableSingleton[] Items;
-
+            private readonly Lazy<InstanceProducer[]> instanceProducers;
+                
             protected DecoratableSingletonCollectionBase(Container container, TService[] instances)
             {
-                this.Items = (
-                    from instance in instances
-                    select new DecoratableSingleton(instance, container))
-                    .ToArray();
+                // Ensure that for every instance only one InstanceProducer is created (to prevent double
+                // initialization and creation of multiple singleton decorators).
+                this.instanceProducers = new Lazy<InstanceProducer[]>(
+                    () => CreateInstanceProducers(container, instances),
+                    System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);         
+            }
+
+            protected InstanceProducer[] Items
+            {
+                get { return this.instanceProducers.Value; }
             }
 
             public IEnumerator<TService> GetEnumerator()
             {
                 for (int i = 0; i < this.Items.Length; i++)
                 {
-                    yield return this.Items[i].Instance;
+                    yield return (TService)this.Items[i].GetInstance();
                 }
             }
 
@@ -1454,49 +1462,16 @@ namespace SimpleInjector
                 return this.GetEnumerator();
             }
 
-            protected sealed class DecoratableSingleton
+            private static InstanceProducer[] CreateInstanceProducers(Container container, 
+                TService[] instances)
             {
-                private readonly TService instance;
-                private readonly Container container;
-                private bool initialized;
-
-                public DecoratableSingleton(TService instance, Container container)
-                {
-                    this.instance = instance;
-                    this.container = container;
-                    this.initialized = false;
-                }
-
-                public TService Instance
-                {
-                    get
-                    {
-                        if (!this.initialized)
-                        {
-                            lock (this)
-                            {
-                                if (!this.initialized)
-                                {
-                                    this.Initialize(this.instance);
-
-                                    this.initialized = true;
-                                }
-                            }
-                        }
-
-                        return this.instance;
-                    }
-                }
-
-                private void Initialize(TService instance)
-                {
-                    var initializer = this.container.GetInitializer<TService>();
-
-                    if (initializer != null)
-                    {
-                        initializer(instance);
-                    }
-                }
+                return (
+                    from instance in instances
+                    let type = instance.GetType()
+                    let registration = SingletonLifestyle.CreateSingleRegistration(type, instance, container)
+                    let producer = new InstanceProducer(type, registration)
+                    select producer)
+                    .ToArray();
             }
         }
     }
