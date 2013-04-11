@@ -26,6 +26,15 @@
 namespace SimpleInjector.Extensions.Decorators
 {
     using System.Collections;
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Interface for the generic <see cref="DecoratableSingletonCollection"/> class. 
+    /// </summary>
+    internal interface IDecoratableSingletonCollection
+    {
+        Expression[] BuildExpressions();
+    }
 
     /// <summary>
     /// An IDecoratableEnumerable is a special enumerable that can be used more efficiently by the container

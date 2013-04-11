@@ -31,8 +31,8 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
@@ -1409,69 +1409,6 @@ namespace SimpleInjector
                 // generic type argument is just an argument, and ArgumentException even allows us to supply 
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
                 throw new ArgumentException(message, parameterName);
-            }
-        }
-
-        // This class is a trick to allow the SimpleInjector.Extensions library to correctly wrap these
-        // instances with decorators (it uses the IEnumerable<Expression>).
-        private sealed class DecoratableSingletonCollection<TService> 
-            : DecoratableSingletonCollectionBase<TService>, IEnumerable<Expression>
-        {
-            internal DecoratableSingletonCollection(Container container, TService[] services)
-                : base(container, services)
-            {
-            }
-
-            IEnumerator<Expression> IEnumerable<Expression>.GetEnumerator()
-            {
-                foreach (var item in this.Items)
-                {
-                    yield return item.BuildExpression();
-                }
-            }
-        }
-
-        private abstract class DecoratableSingletonCollectionBase<TService> : IEnumerable<TService>
-        {
-            private readonly Lazy<InstanceProducer[]> instanceProducers;
-                
-            protected DecoratableSingletonCollectionBase(Container container, TService[] instances)
-            {
-                // Ensure that for every instance only one InstanceProducer is created (to prevent double
-                // initialization and creation of multiple singleton decorators).
-                this.instanceProducers = new Lazy<InstanceProducer[]>(
-                    () => CreateInstanceProducers(container, instances),
-                    System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);         
-            }
-
-            protected InstanceProducer[] Items
-            {
-                get { return this.instanceProducers.Value; }
-            }
-
-            public IEnumerator<TService> GetEnumerator()
-            {
-                for (int i = 0; i < this.Items.Length; i++)
-                {
-                    yield return (TService)this.Items[i].GetInstance();
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
-            }
-
-            private static InstanceProducer[] CreateInstanceProducers(Container container, 
-                TService[] instances)
-            {
-                return (
-                    from instance in instances
-                    let type = instance.GetType()
-                    let registration = SingletonLifestyle.CreateSingleRegistration(type, instance, container)
-                    let producer = new InstanceProducer(type, registration)
-                    select producer)
-                    .ToArray();
             }
         }
     }

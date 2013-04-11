@@ -140,6 +140,9 @@
     <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
       <Link>ExpressionBuiltEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratableSingletonCollection.cs">
+      <Link>Extensions\DecoratableSingletonCollection.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
       <Link>Extensions\DecoratorExtensions.cs</Link>
     </Compile>

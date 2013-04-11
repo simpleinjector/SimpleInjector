@@ -74,22 +74,23 @@ namespace SimpleInjector.Extensions.Decorators
 
             object enumerable = constantExpression != null ? constantExpression.Value : null;
 
-            return enumerable is IEnumerable<Expression> || enumerable is IDecoratableEnumerable;
+            return enumerable is IDecoratableSingletonCollection || enumerable is IDecoratableEnumerable;
         }
 
         internal static IDecoratableEnumerable ConvertToDecoratableEnumerable(Type serviceType,
             Container container, object enumerable)
         {
             // The RegisterAll<TService>(TService[]) method in the core library registers a collection that
-            // implements IEnumerable<Expression>, especially for use here.
-            var expressions = enumerable as IEnumerable<Expression>;
+            // implements IExpressionContainer, specially for use here.
+            var expressionContainer = enumerable as IDecoratableSingletonCollection;
 
-            if (expressions != null)
+            if (expressionContainer != null)
             {
-                enumerable = DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, expressions);
+                enumerable = DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, 
+                    expressionContainer.BuildExpressions());
             }
 
-            return enumerable as IDecoratableEnumerable;
+            return (IDecoratableEnumerable)enumerable;
         }
 
         internal static IEnumerable Select(this IEnumerable source, Type type, Delegate selector)

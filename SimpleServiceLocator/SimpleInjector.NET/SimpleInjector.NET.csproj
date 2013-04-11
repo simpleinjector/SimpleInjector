@@ -102,6 +102,7 @@
     <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzer.cs" />
     <Compile Include="ExpressionBuildingEventArgs.cs" />
     <Compile Include="ExpressionBuiltEventArgs.cs" />
+    <Compile Include="Extensions\DecoratableSingletonCollection.cs" />
     <Compile Include="Extensions\DecoratorExtensions.cs" />
     <Compile Include="Extensions\DecoratorPredicateContext.cs" />
     <Compile Include="Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs" />
