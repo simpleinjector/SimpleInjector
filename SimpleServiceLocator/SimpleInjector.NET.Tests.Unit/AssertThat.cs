@@ -15,6 +15,10 @@
 
                 Assert.Fail("Exception expected.");
             }
+            catch (AssertFailedException)
+            {
+                throw;
+            }
             catch (TException ex)
             {
                 Assert.IsInstanceOfType(ex, typeof(TException));
