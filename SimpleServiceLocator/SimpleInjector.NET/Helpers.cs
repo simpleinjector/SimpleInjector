@@ -79,7 +79,7 @@ namespace SimpleInjector
                 return CreateReadOnlyCollection(collection);
             }
         }
-        
+
         // Throws an InvalidOperationException on failure.
         internal static void Verify(this InstanceProducer instanceProducer)
         {
@@ -114,33 +114,17 @@ namespace SimpleInjector
             return copy;
         }
 
-        internal static void ThrowWhenCollectionCanNotBeIterated(IEnumerable collection, Type serviceType)
+        internal static void ThrowWhenCollectionIsInvalid(IEnumerable collection, Type serviceType)
         {
-            try
-            {
-                var enumerator = collection.GetEnumerator();
-                try
-                {
-                    // Just iterate the collection.
-                    while (enumerator.MoveNext())
-                    {
-                    }
-                }
-                finally
-                {
-                    IDisposable disposable = enumerator as IDisposable;
+            // This construct looks a bit weird, but prevents the collection from being iterated twice.
+            bool collectionContainsNullElements = false;
 
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-            }
-            catch (Exception ex)
+            ThrowWhenCollectionCanNotBeIterated(collection, serviceType, item =>
             {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidIteratingCollectionFailed(serviceType, ex), ex);
-            }
+                collectionContainsNullElements |= item == null;
+            });
+
+            ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
 
         internal static bool IsConcreteType(Type serviceType)
@@ -148,17 +132,6 @@ namespace SimpleInjector
             // While array types are in fact concrete, we can not create them and creating them would be
             // pretty useless.
             return !serviceType.IsAbstract && !serviceType.ContainsGenericParameters && !serviceType.IsArray;
-        }
-
-        internal static void ThrowWhenCollectionContainsNullArguments(IEnumerable collection, Type serviceType)
-        {
-            bool collectionContainsNullItems = collection.Cast<object>().Any(c => c == null);
-
-            if (collectionContainsNullItems)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
-            }
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
@@ -334,16 +307,57 @@ namespace SimpleInjector
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
                 .ToArray();
         }
-                
+
         private static Func<object> CompileLambda(Expression expression)
         {
             return Expression.Lambda<Func<object>>(expression).Compile();
         }
 
+        private static void ThrowWhenCollectionCanNotBeIterated(IEnumerable collection, Type serviceType,
+            Action<object> itemProcessor)
+        {
+            try
+            {
+                var enumerator = collection.GetEnumerator();
+                try
+                {
+                    // Just iterate the collection.
+                    while (enumerator.MoveNext())
+                    {
+                        itemProcessor(enumerator.Current);
+                    }
+                }
+                finally
+                {
+                    IDisposable disposable = enumerator as IDisposable;
+
+                    if (disposable != null)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidIteratingCollectionFailed(serviceType, ex), ex);
+            }
+        }
+
+        private static void ThrowWhenCollectionContainsNullElements(Type serviceType,
+            bool collectionContainsNullItems)
+        {
+            if (collectionContainsNullItems)
+            {
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
+            }
+        }
+
 #if !SILVERLIGHT
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Expression expression, 
+        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Expression expression,
             out object createdInstance)
         {
             try
@@ -379,14 +393,14 @@ namespace SimpleInjector
             }
         }
 
-        private static Func<object> CompileInDynamicAssemblyAsClosure(Expression originalExpression, 
+        private static Func<object> CompileInDynamicAssemblyAsClosure(Expression originalExpression,
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
             // to replace them to something that can be compiled: an object[] with constants.
             var constantsParameter = Expression.Parameter(typeof(object[]), "constants");
 
-            var replacedExpression = 
+            var replacedExpression =
                 ReplaceConstantsWithArrayLookup(originalExpression, constantExpressions, constantsParameter);
 
             var lambda = Expression.Lambda<Func<object[], object>>(replacedExpression, constantsParameter);
@@ -415,7 +429,7 @@ namespace SimpleInjector
 
         private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda)
         {
-            return (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda, "DynamicInstanceProducer", 
+            return (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda, "DynamicInstanceProducer",
                 "GetInstance");
         }
 
@@ -431,7 +445,7 @@ namespace SimpleInjector
         private sealed class InternalUseFinderVisitor : ExpressionVisitor
         {
             public bool NeedsAccessToInternals { get; private set; }
-            
+
             protected override Expression VisitNew(NewExpression node)
             {
                 this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor.DeclaringType));

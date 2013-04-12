@@ -289,7 +289,27 @@
                 AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);
             }
         }
-        
+
+        [TestMethod]
+        public void Verify_OnCollection_IteratesTheCollectionOnce()
+        {
+            // Arrange
+            int expectedNumberOfCreatedPlugins = 1;
+            int actualNumberOfCreatedPlugins = 0;
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl));
+
+            container.RegisterInitializer<PluginImpl>(plugin => actualNumberOfCreatedPlugins++);
+            
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.AreEqual(expectedNumberOfCreatedPlugins, actualNumberOfCreatedPlugins);
+        }
+
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)

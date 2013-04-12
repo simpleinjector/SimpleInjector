@@ -1373,9 +1373,8 @@ namespace SimpleInjector
             {
                 Type serviceType = pair.Key;
                 IEnumerable collection = pair.Value;
-
-                Helpers.ThrowWhenCollectionCanNotBeIterated(collection, serviceType);
-                Helpers.ThrowWhenCollectionContainsNullArguments(collection, serviceType);
+                
+                Helpers.ThrowWhenCollectionIsInvalid(collection, serviceType);
             }
         }
 
