@@ -128,12 +128,7 @@ namespace SimpleInjector
         {
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            var collection = (IEnumerable)this.GetInstance(collectionType);
-
-            // We can't use collection.Cast<object>(), since this does an 'as IEnumerable<object>' under the
-            // covers, and this can return a collection of Expressions (in .NET 4.0), because of our special
-            // ResolvableEnumerable.
-            return ToGenericEnumerable(collection);
+            return (IEnumerable<object>)this.GetInstance(collectionType);
         }
 
         /// <summary>Gets the service object of the specified type.</summary>
@@ -543,14 +538,6 @@ namespace SimpleInjector
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.registrations = snapshotCopy;
-        }
-
-        private static IEnumerable<object> ToGenericEnumerable(IEnumerable enumerable)
-        {
-            foreach (object item in enumerable)
-            {
-                yield return item;
-            }
         }
     }
 }

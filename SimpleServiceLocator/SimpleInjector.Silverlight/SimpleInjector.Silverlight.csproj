@@ -104,6 +104,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IndexableEnumerable.cs">
+      <Link>Advanced\IndexableEnumerable.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IPropertySelectionBehavior.cs">
       <Link>Advanced\IPropertySelectionBehavior.cs</Link>
     </Compile>

@@ -82,6 +82,7 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\IndexableEnumerable.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredContainerAnalyzer.cs" />

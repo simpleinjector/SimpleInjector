@@ -5,6 +5,12 @@ Version vNext
 	General description:
 
 	New features:
+		-[Core] When a collection is registered using RegisterAll<T>(T[]), RegisterAll<T>(Type[]), 
+		 RegisterAll<T>(IEnumerable<Type>) or RegisterAll(Type, IEnumerable<Type>), retrieving that instance
+		 using the generic GetAllInstances<T>() will now return a collection that implements IList<T>. This
+		 allows retrieving elements by index with an performance characteristic of O(1). Collections decorated
+		 using the RegisterDecorator overloads will maintain this behavior. Note that this is not supported
+		 when retrieving instances using GetAllInstances(Type). (work item 19575)
 		-[Integration.Web.Mvc] SimpleInjectorMvcExtensions.GetControllerTypesToRegister method added. This
 		 allows users to change the way MVC controllers are registered by default (using the
 		 RegisterMvcControllers overload).

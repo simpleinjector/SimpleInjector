@@ -82,6 +82,7 @@
     <Compile Include="Advanced\DefaultConstructorInjectionBehaviorTests.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehaviorTests.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehaviorTests.cs" />
+    <Compile Include="Advanced\IndexableCollectionsTests.cs" />
     <Compile Include="Advanced\PropertyInjectionTests.cs" />
     <Compile Include="AmbiguousTypesTests.cs" />
     <Compile Include="ContainerFactory.cs" />

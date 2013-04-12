@@ -47,6 +47,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -56,6 +57,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -69,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributedPropertyInjectionExtensions.cs" />
+    <Compile Include="KeyedFactory.cs" />
     <Compile Include="RuntimeDecoratorExtensions.cs" />
     <Compile Include="MethodInjectionExtensions.cs" />
     <Compile Include="PropertyInjectionExtensions.cs" />

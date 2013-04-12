@@ -30,10 +30,11 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal sealed class DecoratableEnumerable<TService> : IEnumerable<TService>, IDecoratableEnumerable
+    internal sealed class DecoratableEnumerable<TService> : IndexableEnumerable<TService>, IDecoratableEnumerable
     {
         private readonly Container container;
         private readonly Type[] serviceTypes;
@@ -62,6 +63,30 @@ namespace SimpleInjector.Extensions.Decorators
                 DecoratorPredicateContext.CreateFromExpressions(container, typeof(TService), expressions);
         }
 
+        public override int Count
+        {
+            get 
+            {
+                this.InitializeInstanceCreators();
+                return this.instanceCreators.Length; 
+            }
+        }
+
+        public override TService this[int index]
+        {
+            get
+            {
+                this.InitializeInstanceCreators();
+
+                return this.instanceCreators[index]();
+            }
+
+            set
+            {
+                IndexableEnumerable<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
+            }
+        }
+
         public DecoratorPredicateContext[] GetDecoratorPredicateContexts()
         {
             this.BuildContexts();
@@ -69,12 +94,9 @@ namespace SimpleInjector.Extensions.Decorators
             return this.contexts.ToArray();
         }
 
-        public IEnumerator<TService> GetEnumerator()
+        public override IEnumerator<TService> GetEnumerator()
         {
-            if (this.instanceCreators == null)
-            {
-                this.BuildInstanceCreators();
-            }
+            this.InitializeInstanceCreators();
 
             return this.GetEnumeratorForCreators();
         }
@@ -84,11 +106,20 @@ namespace SimpleInjector.Extensions.Decorators
             return this.GetEnumerator();
         }
 
-        private void BuildInstanceCreators()
+        private void InitializeInstanceCreators()
+        {
+            if (this.instanceCreators == null)
+            {
+                this.instanceCreators = this.BuildInstanceCreators();
+            }
+        }
+
+        private Func<TService>[] BuildInstanceCreators()
         {
             this.BuildContexts();
 
-            this.instanceCreators = (
+            // TODO: Optimize performance (replace lambda.Compile).
+            return (
                 from context in this.contexts
                 let lambda = Expression.Lambda<Func<TService>>(context.Expression)
                 let instanceCreator = lambda.Compile()
@@ -111,9 +142,9 @@ namespace SimpleInjector.Extensions.Decorators
 
         private IEnumerator<TService> GetEnumeratorForCreators()
         {
-            for (int i = 0; i < this.instanceCreators.Length; i++)
+            foreach (var instanceCreator in this.instanceCreators)
             {
-                yield return this.instanceCreators[i]();
+                yield return instanceCreator();
             }
         }
 
