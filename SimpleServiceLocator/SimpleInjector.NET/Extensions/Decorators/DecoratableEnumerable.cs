@@ -83,7 +83,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             set
             {
-                IndexableEnumerable<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
+                throw IndexableEnumerable<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
             }
         }
 
