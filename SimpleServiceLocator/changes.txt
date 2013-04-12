@@ -3,6 +3,7 @@
 
 Version vNext
 	General description:
+		
 
 	New features:
 		-[Core] When a collection is registered using RegisterAll<T>(T[]), RegisterAll<T>(Type[]), 
