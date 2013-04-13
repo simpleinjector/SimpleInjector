@@ -142,7 +142,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             var allContexts = contexts.Select(c => c.Context).ToArray();
 
-            return DecoratorHelpers.CreateDecoratableEnumerable(this.registeredServiceType, allContexts);
+            return DecoratorHelpers.CreateDecoratedEnumerable(this.registeredServiceType, allContexts);
         }
 
         private DecoratorPredicateContext DecorateContext(DecoratorPredicateContext predicateContext)

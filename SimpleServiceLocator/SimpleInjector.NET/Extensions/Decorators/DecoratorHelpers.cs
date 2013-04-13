@@ -50,7 +50,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new object[] { container, serviceTypes });
         }
 
-        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
             DecoratorPredicateContext[] contexts)
         {
             Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
@@ -59,7 +59,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new object[] { contexts });
         }
 
-        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
             Container container, IEnumerable<Expression> expressions)
         {
             Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
@@ -86,7 +86,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (expressionContainer != null)
             {
-                enumerable = DecoratorHelpers.CreateDecoratableEnumerable(serviceType, container, 
+                enumerable = DecoratorHelpers.CreateDecoratedEnumerable(serviceType, container, 
                     expressionContainer.BuildExpressions());
             }
 
