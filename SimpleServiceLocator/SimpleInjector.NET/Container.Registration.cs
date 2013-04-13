@@ -1061,7 +1061,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
                 typeCanBeServiceType: true);
 
-            IDecoratableEnumerable enumerable =
+            IDecoratedEnumerable enumerable =
                 DecoratorHelpers.CreateDecoratableEnumerable(serviceType, this, types);
 
             this.RegisterAllInternal(serviceType, enumerable);

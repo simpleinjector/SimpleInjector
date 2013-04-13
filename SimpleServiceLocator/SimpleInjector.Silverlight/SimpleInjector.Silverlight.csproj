@@ -158,8 +158,8 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
       <Link>Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratableEnumerable.cs">
-      <Link>Extensions\Decorators\DecoratableEnumerable.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratedEnumerable.cs">
+      <Link>Extensions\Decorators\DecoratedEnumerable.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorExpressionInterceptor.cs">
       <Link>Extensions\Decorators\DecoratorExpressionInterceptor.cs</Link>
@@ -176,8 +176,11 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInterceptor.cs">
       <Link>Extensions\Decorators\DecoratorInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IDecoratableEnumerable.cs">
-      <Link>Extensions\Decorators\IDecoratableEnumerable.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IDecoratableSingletonCollection.cs">
+      <Link>Extensions\Decorators\IDecoratableSingletonCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IDecoratedEnumerable.cs">
+      <Link>Extensions\Decorators\IDecoratedEnumerable.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
       <Link>Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>

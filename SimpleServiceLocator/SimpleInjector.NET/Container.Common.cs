@@ -70,7 +70,6 @@ namespace SimpleInjector
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
-        //private Dictionary<Type, IEnumerable> collectionsToValidate = new Dictionary<Type, IEnumerable>();
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;

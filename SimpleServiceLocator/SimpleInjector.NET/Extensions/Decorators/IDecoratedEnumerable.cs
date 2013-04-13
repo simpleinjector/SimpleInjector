@@ -29,19 +29,11 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Interface for the generic <see cref="DecoratableSingletonCollection{TService}"/> class. 
-    /// </summary>
-    internal interface IDecoratableSingletonCollection
-    {
-        Expression[] BuildExpressions();
-    }
-
-    /// <summary>
     /// An IDecoratableEnumerable is a special enumerable that can be used more efficiently by the container
     /// to apply decorators to, with the biggest noticable difference that the registered predicate, will be
     /// checked for each service in the collection.
     /// </summary>
-    internal interface IDecoratableEnumerable : IEnumerable
+    internal interface IDecoratedEnumerable : IEnumerable
     {
         DecoratorPredicateContext[] GetDecoratorPredicateContexts();
     }

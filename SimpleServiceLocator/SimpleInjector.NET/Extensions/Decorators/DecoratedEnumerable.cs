@@ -34,7 +34,7 @@ namespace SimpleInjector.Extensions.Decorators
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal sealed class DecoratableEnumerable<TService> : IndexableEnumerable<TService>, IDecoratableEnumerable
+    internal sealed class DecoratedEnumerable<TService> : IndexableEnumerable<TService>, IDecoratedEnumerable
     {
         private readonly Container container;
         private readonly Type[] serviceTypes;
@@ -43,20 +43,20 @@ namespace SimpleInjector.Extensions.Decorators
         private Func<TService>[] instanceCreators;
 
         // This constructor needs to be public. It is called using reflection.
-        public DecoratableEnumerable(Container container, Type[] serviceTypes)
+        public DecoratedEnumerable(Container container, Type[] serviceTypes)
         {
             this.container = container;
             this.serviceTypes = serviceTypes;
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public DecoratableEnumerable(DecoratorPredicateContext[] contexts)
+        public DecoratedEnumerable(DecoratorPredicateContext[] contexts)
         {
             this.contexts = contexts;
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public DecoratableEnumerable(Container container, IEnumerable<Expression> expressions)
+        public DecoratedEnumerable(Container container, IEnumerable<Expression> expressions)
         {
             this.container = container;
             this.contexts =

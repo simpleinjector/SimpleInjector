@@ -42,14 +42,14 @@ namespace SimpleInjector.Extensions.Decorators
     // -RegisterAll<TService>(this Container container, params Type[] serviceTypes)
     internal sealed class ContainerControlledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
-        private readonly Dictionary<Type, IDecoratableEnumerable> decoratableEnumerablesCache;
+        private readonly Dictionary<Type, IDecoratedEnumerable> decoratableEnumerablesCache;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
         private readonly ConstructorInfo decoratorConstructor;
         private readonly Type decoratorType;
 
         public ContainerControlledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data,
-            Dictionary<Type, IDecoratableEnumerable> decoratableEnumerablesCache,
+            Dictionary<Type, IDecoratedEnumerable> decoratableEnumerablesCache,
             ExpressionBuiltEventArgs e, Type registeredServiceType, Type decoratorType)
             : base(data)
         {
@@ -83,13 +83,13 @@ namespace SimpleInjector.Extensions.Decorators
         {
             var decoratableCollection = ((ConstantExpression)this.e.Expression).Value;
 
-            IDecoratableEnumerable decoratables = DecoratorHelpers.ConvertToDecoratableEnumerable(
+            IDecoratedEnumerable decoratables = DecoratorHelpers.ConvertToDecoratableEnumerable(
                 this.registeredServiceType, this.Container, decoratableCollection);
 
             return this.BuildDecoratorExpression(decoratables, out foundRelationships);
         }
         
-        private Expression BuildDecoratorExpression(IDecoratableEnumerable collection, 
+        private Expression BuildDecoratorExpression(IDecoratedEnumerable collection, 
             out IEnumerable<KnownRelationship> foundRelationships)
         {
             foundRelationships = Enumerable.Empty<KnownRelationship>();
@@ -101,7 +101,7 @@ namespace SimpleInjector.Extensions.Decorators
             // to the current decorator registration.
             lock (this.decoratableEnumerablesCache)
             {
-                IDecoratableEnumerable decoratedCollection;
+                IDecoratedEnumerable decoratedCollection;
 
                 if (!this.decoratableEnumerablesCache.TryGetValue(this.registeredServiceType, 
                     out decoratedCollection))
@@ -116,7 +116,7 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        private IDecoratableEnumerable BuildDecoratableEnumerable(IDecoratableEnumerable originalDecoratables,
+        private IDecoratedEnumerable BuildDecoratableEnumerable(IDecoratedEnumerable originalDecoratables,
             out IEnumerable<KnownRelationship> foundRelationships)
         {
             var contexts = (

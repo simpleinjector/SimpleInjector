@@ -41,30 +41,30 @@ namespace SimpleInjector.Extensions.Decorators
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
 
-        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
             Container container, Type[] serviceTypes)
         {
-            Type allInstancesEnumerableType = typeof(DecoratableEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
 
-            return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
+            return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, serviceTypes });
         }
 
-        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
             DecoratorPredicateContext[] contexts)
         {
-            Type allInstancesEnumerableType = typeof(DecoratableEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
 
-            return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
+            return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { contexts });
         }
 
-        internal static IDecoratableEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
             Container container, IEnumerable<Expression> expressions)
         {
-            Type allInstancesEnumerableType = typeof(DecoratableEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
 
-            return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
+            return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, expressions });
         }
 
@@ -74,10 +74,10 @@ namespace SimpleInjector.Extensions.Decorators
 
             object enumerable = constantExpression != null ? constantExpression.Value : null;
 
-            return enumerable is IDecoratableSingletonCollection || enumerable is IDecoratableEnumerable;
+            return enumerable is IDecoratableSingletonCollection || enumerable is IDecoratedEnumerable;
         }
 
-        internal static IDecoratableEnumerable ConvertToDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable ConvertToDecoratableEnumerable(Type serviceType,
             Container container, object enumerable)
         {
             // The RegisterAll<TService>(TService[]) method in the core library registers a collection that
@@ -90,7 +90,7 @@ namespace SimpleInjector.Extensions.Decorators
                     expressionContainer.BuildExpressions());
             }
 
-            return (IDecoratableEnumerable)enumerable;
+            return (IDecoratedEnumerable)enumerable;
         }
 
         internal static IEnumerable Select(this IEnumerable source, Type type, Delegate selector)
