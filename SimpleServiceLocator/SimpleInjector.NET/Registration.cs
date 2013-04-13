@@ -85,6 +85,8 @@ namespace SimpleInjector
         /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
         public Lifestyle Lifestyle { get; private set; }
 
+        internal bool IsCollection { get; set; }
+
         /// <summary>
         /// Gets the <see cref="Container"/> instance for this registration.
         /// </summary>

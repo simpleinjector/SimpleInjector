@@ -26,6 +26,8 @@ Version vNext
 		 instance using Register<TService>(TService). With the latter method properties and possible other
 		 transformations would be applied, while the former only called the initializer delegates.
 		 (work item 19576)
+		-[Core] Verify only checked the original registration of collections and not whether the final
+		 collection (that could be intercepted and decorated) worked as expected. (work item 19596)
 
 
 Version v2.2.0 (v2.2 RTM)

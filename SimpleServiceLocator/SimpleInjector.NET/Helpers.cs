@@ -114,7 +114,7 @@ namespace SimpleInjector
             return copy;
         }
 
-        internal static void ThrowWhenCollectionIsInvalid(IEnumerable collection, Type serviceType)
+        internal static void VerifyCollection(IEnumerable collection, Type serviceType)
         {
             // This construct looks a bit weird, but prevents the collection from being iterated twice.
             bool collectionContainsNullElements = false;

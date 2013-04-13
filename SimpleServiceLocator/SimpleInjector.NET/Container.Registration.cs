@@ -956,9 +956,9 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(
                 typeof(IEnumerable<TService>), () => readOnlyCollection, this);
 
-            this.AddRegistration(typeof(IEnumerable<TService>), registration);
+            registration.IsCollection = true;
 
-            this.collectionsToValidate[typeof(TService)] = readOnlyCollection;
+            this.AddRegistration(typeof(IEnumerable<TService>), registration);
         }
 
         /// <summary>
@@ -1327,9 +1327,9 @@ namespace SimpleInjector
             var registration = Lifestyle.Singleton.CreateRegistration(enumerableServiceType,
                 () => castedCollection, this);
 
-            this.AddRegistration(enumerableServiceType, registration);
+            registration.IsCollection = true;
 
-            this.collectionsToValidate[serviceType] = readOnlyCollection;
+            this.AddRegistration(enumerableServiceType, registration);
         }
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
@@ -1355,26 +1355,35 @@ namespace SimpleInjector
 
         private void ValidateRegistrations()
         {
-            foreach (var pair in this.registrations)
-            {
-                InstanceProducer producer = pair.Value;
+            // The producer can be null.
+            var producers =
+                from registration in this.registrations
+                where registration.Value != null
+                select registration.Value;
 
-                // The producer can be null.
-                if (producer != null)
-                {
-                    producer.Verify();
-                }
+            foreach (var producer in producers)
+            {
+                producer.Verify();
             }
         }
 
         private void ValidateRegisteredCollections()
         {
-            foreach (var pair in this.collectionsToValidate)
+            var collectionRegistrations =
+                from registration in this.registrations
+                where registration.Value != null
+                where registration.Value.Registration.IsCollection
+                select registration;
+
+            foreach (var pair in collectionRegistrations)
             {
-                Type serviceType = pair.Key;
-                IEnumerable collection = pair.Value;
+                Type collectionType = pair.Key;
+                Type serviceType = collectionType.GetGenericArguments()[0];
+                InstanceProducer producer = pair.Value;
+
+                var collection = (IEnumerable)producer.GetInstance();
                 
-                Helpers.ThrowWhenCollectionIsInvalid(collection, serviceType);
+                Helpers.VerifyCollection(collection, serviceType);
             }
         }
 

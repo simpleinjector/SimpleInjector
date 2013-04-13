@@ -310,10 +310,34 @@
             Assert.AreEqual(expectedNumberOfCreatedPlugins, actualNumberOfCreatedPlugins);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsAnActivationException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl));
+
+            // FailingConstructorDecorator constructor throws an exception.
+            container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
+
+            // Act
+            container.Verify();
+        }
+
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)
             {
+            }
+        }
+
+        private sealed class FailingConstructorPluginDecorator : IPlugin
+        {
+            public FailingConstructorPluginDecorator(IPlugin plugin)
+            {
+                throw new NotImplementedException();
             }
         }
     }
