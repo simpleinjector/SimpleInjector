@@ -29,7 +29,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Interface for the generic <see cref="DecoratableSingletonCollection"/> class. 
+    /// Interface for the generic <see cref="DecoratableSingletonCollection{TService}"/> class. 
     /// </summary>
     internal interface IDecoratableSingletonCollection
     {
