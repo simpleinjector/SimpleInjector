@@ -297,6 +297,11 @@ namespace SimpleInjector
             {
                 get { return this.instanceProducer.ImplementationType; }
             }
+
+            public KnownRelationship[] Relationships
+            {
+                get { return this.instanceProducer.Registration.GetRelationships(); }
+            }
         }
     }
 }

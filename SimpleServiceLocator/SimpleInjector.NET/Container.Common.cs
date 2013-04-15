@@ -33,8 +33,9 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
+    using System.Reflection.Emit;
     using System.Threading;
-
     using SimpleInjector.Diagnostics;
 
     /// <summary>
@@ -64,9 +65,10 @@ namespace SimpleInjector
         private static long counter;
 
         private readonly object locker = new object();
-        private readonly long containerId;
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
         private readonly IDictionary items = new Dictionary<object, object>();
+        private readonly long containerId;
+        private readonly Lazy<ModuleBuilder> moduleBuilder;
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
@@ -113,15 +115,23 @@ namespace SimpleInjector
             this.RegisterSingle<Container>(this);
 
             this.containerId = Interlocked.Increment(ref counter);
+
+            this.moduleBuilder =
+                new Lazy<ModuleBuilder>(this.CreateModuleBuilder, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
 
-        internal bool CompileInDynamicAssembly
+        internal static long Counter
         {
-            get { return this.containerId < 5; }
+            get { return counter; }
+        }
+
+        internal long ContainerId
+        {
+            get { return this.containerId; }
         }
 
         internal bool IsLocked
@@ -166,6 +176,11 @@ namespace SimpleInjector
         internal bool SuccesfullyVerified
         {
             get { return this.succesfullyVerified; }
+        }
+
+        internal ModuleBuilder ModuleBuilder
+        {
+            get { return this.moduleBuilder.Value; }
         }
 
         /// <summary>
@@ -330,6 +345,13 @@ namespace SimpleInjector
                     this.locked = true;
                 }
             }
+        }
+
+        private ModuleBuilder CreateModuleBuilder()
+        {
+            return AppDomain.CurrentDomain.DefineDynamicAssembly(
+                new AssemblyName("SimpleInjector.Compiled_" + this.containerId), AssemblyBuilderAccess.Run)
+                .DefineDynamicModule("SimpleInjector.CompiledModule");
         }
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>

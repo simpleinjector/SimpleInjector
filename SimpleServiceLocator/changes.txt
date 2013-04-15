@@ -1,6 +1,11 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vFuture
+	New features:
+		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
+
+
 Version vNext
 	General description:
 		
@@ -15,8 +20,11 @@ Version vNext
 		-[Integration.Web.Mvc] SimpleInjectorMvcExtensions.GetControllerTypesToRegister method added. This
 		 allows users to change the way MVC controllers are registered by default (using the
 		 RegisterMvcControllers overload).
-		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
+	Changes:
+		-[Core] Each container instance now uses a single dynamic assembly for delegate compilation. This used
+		 to be one generic assembly per compiled delegate, but this has much more overhead.
+		 
 	Bug fixes:
 		-[Core] Registering a collection using RegisterAll<object>(Type[]) failed when one of the supplied
 		 types was an interface incorrectly stating the the interface did not inherit from Object. 

@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
 
     [TestClass]
@@ -312,7 +312,7 @@
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsAnActivationException()
+        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsInvalidOperationException()
         {
             // Arrange
             var container = ContainerFactory.New();

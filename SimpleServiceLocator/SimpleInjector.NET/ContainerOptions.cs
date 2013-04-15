@@ -50,6 +50,9 @@ namespace SimpleInjector
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool? enableDynamicAssemblyCompilation;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
         
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -179,6 +182,42 @@ namespace SimpleInjector
         /// <value>The current <see cref="Container"/>.</value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Container Container { get; internal set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation. 
+        /// By default, this value is <b>true</b> for the first few containers that are created in an app 
+        /// domain and <b>false</b> for all other containers. You can set this value explicitly to <b>false</b>
+        /// to prevent the use of dynamic assemblies or you can set this value explicitly to <b>true</b> to
+        /// force more container instances to use dynamic assemblies. Note that creating an infinite number
+        /// of <see cref="Container"/> instances (for instance one per web request) with this property set to
+        /// <b>true</b> will result in a memory leak; dynamic assemblies take up memory and will only be
+        /// unloaded when the app domain is unloaded.
+        /// </summary>
+        /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
+        /// </value>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal bool EnableDynamicAssemblyCompilation
+        {
+            get
+            {
+                if (this.enableDynamicAssemblyCompilation != null)
+                {
+                    return this.enableDynamicAssemblyCompilation.Value;
+                }
+
+                if (this.Container != null)
+                {
+                    return this.Container.ContainerId < 5;
+                }
+
+                return false;
+            }
+
+            set
+            {
+                this.enableDynamicAssemblyCompilation = value;
+            }
+        }
 
         internal string DebuggerDisplayDescription
         {

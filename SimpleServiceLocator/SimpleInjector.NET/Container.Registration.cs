@@ -1114,7 +1114,6 @@ namespace SimpleInjector
             try
             {
                 this.ValidateRegistrations();
-                this.ValidateRegisteredCollections();
                 this.succesfullyVerified = true;
             }
             finally
@@ -1361,29 +1360,17 @@ namespace SimpleInjector
                 where registration.Value != null
                 select registration.Value;
 
-            foreach (var producer in producers)
+            foreach (var producer in producers.ToArray())
             {
-                producer.Verify();
-            }
-        }
+                var instance = producer.Verify();
 
-        private void ValidateRegisteredCollections()
-        {
-            var collectionRegistrations =
-                from registration in this.registrations
-                where registration.Value != null
-                where registration.Value.Registration.IsCollection
-                select registration;
+                if (producer.Registration.IsCollection)
+                {
+                    Type collectionType = producer.ServiceType;
+                    Type serviceType = collectionType.GetGenericArguments()[0];
 
-            foreach (var pair in collectionRegistrations)
-            {
-                Type collectionType = pair.Key;
-                Type serviceType = collectionType.GetGenericArguments()[0];
-                InstanceProducer producer = pair.Value;
-
-                var collection = (IEnumerable)producer.GetInstance();
-                
-                Helpers.VerifyCollection(collection, serviceType);
+                    Helpers.VerifyCollection((IEnumerable)instance, serviceType);
+                }
             }
         }
 

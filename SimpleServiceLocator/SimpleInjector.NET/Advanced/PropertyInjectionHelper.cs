@@ -34,6 +34,7 @@ namespace SimpleInjector.Advanced
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Security;
+    using System.Threading;
 
     internal sealed class PropertyInjectionHelper
     {
@@ -61,6 +62,10 @@ namespace SimpleInjector.Advanced
                 typeof(Func<,,,,,,,,,,,,,,,>),
                 typeof(Func<,,,,,,,,,,,,,,,,>),
             });
+
+#if !SILVERLIGHT
+        private static long injectorClassCounter;
+#endif
 
         private readonly Container container;
         private readonly Type implementationType;
@@ -236,9 +241,10 @@ namespace SimpleInjector.Advanced
         private Delegate CompilePropertyInjectorLambda(LambdaExpression expression)
         {
 #if !SILVERLIGHT
-            if (this.container.CompileInDynamicAssembly && !Helpers.ExpressionNeedsAccessToInternals(expression))
+            if (this.container.Options.EnableDynamicAssemblyCompilation && 
+                !Helpers.ExpressionNeedsAccessToInternals(expression))
             {
-                return CompileLambdaInDynamicAssemblyWithFallback(expression);
+                return this.CompileLambdaInDynamicAssemblyWithFallback(expression);
             }
 #endif
             return expression.Compile();
@@ -248,11 +254,12 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
                             "in that case.")]
-        private static Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
+        private Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
         {
             try
             {
-                var @delegate = Helpers.CompileLambdaInDynamicAssembly(expression, "DynamicPropertyInjector", 
+                var @delegate = Helpers.CompileLambdaInDynamicAssembly(this.container, expression,
+                    "DynamicPropertyInjector" + GetNextInjectorClassId(), 
                     "InjectProperties");
 
                 // Test the creation. Since we're using a dynamically created assembly, we can't create every
@@ -273,6 +280,11 @@ namespace SimpleInjector.Advanced
         private static void JitCompileDelegate(Delegate @delegate)
         {
             RuntimeHelpers.PrepareDelegate(@delegate);
+        }
+
+        private static long GetNextInjectorClassId()
+        {
+            return Interlocked.Increment(ref injectorClassCounter);
         }
 #endif
     }

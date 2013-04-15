@@ -35,12 +35,17 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Threading;
 
     /// <summary>
     /// Helper methods for the container.
     /// </summary>
     internal static class Helpers
     {
+#if !SILVERLIGHT
+        private static long dynamicClassCounter;
+#endif
+
         internal static string ToFriendlyName(this Type type)
         {
             string name = type.Name;
@@ -81,7 +86,7 @@ namespace SimpleInjector
         }
 
         // Throws an InvalidOperationException on failure.
-        internal static void Verify(this InstanceProducer instanceProducer)
+        internal static object Verify(this InstanceProducer instanceProducer)
         {
             try
             {
@@ -90,7 +95,7 @@ namespace SimpleInjector
                 // IDisposable, but there is no way for us to know if we should actually dispose this 
                 // instance or not :-(. Disposing it could make us prevent a singleton from ever being
                 // used; not disposing it could make us leak resources :-(.
-                instanceProducer.GetInstance();
+                return instanceProducer.GetInstance();
             }
             catch (Exception ex)
             {
@@ -217,24 +222,20 @@ namespace SimpleInjector
             // creates many containers, because this will create a memory leak (dynamic assemblies are never 
             // unloaded). We might however relax this constraint and optimize the first N container instances.
             // (where N is configurable)
-            if (container.CompileInDynamicAssembly && !ExpressionNeedsAccessToInternals(expression))
+            if (container.Options.EnableDynamicAssemblyCompilation && 
+                !ExpressionNeedsAccessToInternals(expression))
             {
-                return CompileAndExecuteInDynamicAssemblyWithFallback(expression, out createdInstance);
+                return CompileAndExecuteInDynamicAssemblyWithFallback(container, expression, out createdInstance);
             }
 #endif
             return CompileLambda(expression);
         }
 
-        internal static Delegate CompileLambdaInDynamicAssembly(LambdaExpression lambda, string typeName,
-            string methodName)
+        internal static Delegate CompileLambdaInDynamicAssembly(Container container, LambdaExpression lambda, 
+            string typeName, string methodName)
         {
-            var assemblyName = new AssemblyName("SimpleInjector.Compiled");
+            TypeBuilder typeBuilder = container.ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
 
-            AssemblyBuilder assemblyBuilder =
-                AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-
-            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("SimpleInjector.CompiledModule");
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public);
             MethodBuilder methodBuilder = typeBuilder.DefineMethod(methodName,
                 MethodAttributes.Static | MethodAttributes.Public);
 
@@ -357,12 +358,12 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Expression expression,
-            out object createdInstance)
+        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Container container,
+            Expression expression, out object createdInstance)
         {
             try
             {
-                var @delegate = CompileInDynamicAssembly(expression);
+                var @delegate = CompileInDynamicAssembly(container, expression);
 
                 // Test the creation. Since we're using a dynamically created assembly, we can't create every
                 // delegate we can create using expression.Compile(), so we need to test this. We need to 
@@ -379,22 +380,22 @@ namespace SimpleInjector
             }
         }
 
-        private static Func<object> CompileInDynamicAssembly(Expression expression)
+        private static Func<object> CompileInDynamicAssembly(Container container, Expression expression)
         {
             ConstantExpression[] constantExpressions = GetConstants(expression).Distinct().ToArray();
 
             if (constantExpressions.Any())
             {
-                return CompileInDynamicAssemblyAsClosure(expression, constantExpressions);
+                return CompileInDynamicAssemblyAsClosure(container, expression, constantExpressions);
             }
             else
             {
-                return CompileInDynamicAssemblyAsStatic(expression);
+                return CompileInDynamicAssemblyAsStatic(container, expression);
             }
         }
 
-        private static Func<object> CompileInDynamicAssemblyAsClosure(Expression originalExpression,
-            ConstantExpression[] constantExpressions)
+        private static Func<object> CompileInDynamicAssemblyAsClosure(Container container,
+            Expression originalExpression, ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
             // to replace them to something that can be compiled: an object[] with constants.
@@ -405,18 +406,18 @@ namespace SimpleInjector
 
             var lambda = Expression.Lambda<Func<object[], object>>(replacedExpression, constantsParameter);
 
-            Func<object[], object> create = CompileDelegateInDynamicAssembly(lambda);
+            Func<object[], object> create = CompileDelegateInDynamicAssembly(container, lambda);
 
             object[] contants = constantExpressions.Select(c => c.Value).ToArray();
 
             return () => create(contants);
         }
 
-        private static Func<object> CompileInDynamicAssemblyAsStatic(Expression expression)
+        private static Func<object> CompileInDynamicAssemblyAsStatic(Container container, Expression expression)
         {
             var lambda = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
 
-            return CompileDelegateInDynamicAssembly(lambda);
+            return CompileDelegateInDynamicAssembly(container, lambda);
         }
 
         private static Expression ReplaceConstantsWithArrayLookup(Expression expression,
@@ -427,10 +428,11 @@ namespace SimpleInjector
             return indexizer.Visit(expression);
         }
 
-        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda)
+        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Container container,
+            Expression<TDelegate> lambda)
         {
-            return (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda, "DynamicInstanceProducer",
-                "GetInstance");
+            return (TDelegate)(object)CompileLambdaInDynamicAssembly(container, lambda, 
+                "DynamicInstanceProducer" + GetNextDynamicClassId(), "GetInstance");
         }
 
         private static List<ConstantExpression> GetConstants(Expression expression)
@@ -440,6 +442,11 @@ namespace SimpleInjector
             constantFinder.Visit(expression);
 
             return constantFinder.Constants;
+        }
+
+        private static long GetNextDynamicClassId()
+        {
+            return Interlocked.Increment(ref dynamicClassCounter);
         }
 
         private sealed class InternalUseFinderVisitor : ExpressionVisitor
