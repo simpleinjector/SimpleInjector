@@ -1062,7 +1062,7 @@ namespace SimpleInjector
                 typeCanBeServiceType: true);
 
             IDecoratedEnumerable enumerable =
-                DecoratorHelpers.CreateDecoratableEnumerable(serviceType, this, types);
+                DecoratorHelpers.CreateContainerControlledEnumerable(serviceType, this, types);
 
             this.RegisterAllInternal(serviceType, enumerable);
         }

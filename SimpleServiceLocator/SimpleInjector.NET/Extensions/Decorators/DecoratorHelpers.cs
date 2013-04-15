@@ -41,10 +41,10 @@ namespace SimpleInjector.Extensions.Decorators
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
 
-        internal static IDecoratedEnumerable CreateDecoratableEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateContainerControlledEnumerable(Type serviceType,
             Container container, Type[] serviceTypes)
         {
-            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
 
             return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, serviceTypes });
@@ -53,7 +53,7 @@ namespace SimpleInjector.Extensions.Decorators
         internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
             DecoratorPredicateContext[] contexts)
         {
-            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
 
             return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { contexts });
@@ -62,7 +62,7 @@ namespace SimpleInjector.Extensions.Decorators
         internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
             Container container, IEnumerable<Expression> expressions)
         {
-            Type allInstancesEnumerableType = typeof(DecoratedEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
 
             return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, expressions });

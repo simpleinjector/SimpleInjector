@@ -108,7 +108,7 @@
     <Compile Include="Extensions\DecoratorPredicateContext.cs" />
     <Compile Include="Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
-    <Compile Include="Extensions\Decorators\DecoratedEnumerable.cs" />
+    <Compile Include="Extensions\Decorators\ContainerControlledEnumerable.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
