@@ -40,7 +40,7 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Container container;
         private readonly Type[] serviceTypes;
 
-        private IEnumerable<DecoratorPredicateContext> contexts;
+        private DecoratorPredicateContext[] contexts;
         private Func<TService>[] instanceCreators;
 
         // This constructor needs to be public. It is called using reflection.
@@ -51,26 +51,23 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledEnumerable(DecoratorPredicateContext[] contexts)
+        public ContainerControlledEnumerable(Container container, IEnumerable<Expression> expressions)
+            : this(
+                container,
+                DecoratorPredicateContext.CreateFromExpressions(container, typeof(TService), expressions))
         {
-            this.contexts = contexts;
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledEnumerable(Container container, IEnumerable<Expression> expressions)
+        public ContainerControlledEnumerable(Container container, DecoratorPredicateContext[] contexts)
         {
             this.container = container;
-            this.contexts =
-                DecoratorPredicateContext.CreateFromExpressions(container, typeof(TService), expressions);
+            this.contexts = contexts;
         }
 
         public override int Count
         {
-            get 
-            {
-                this.InitializeInstanceCreators();
-                return this.instanceCreators.Length; 
-            }
+            get { return this.serviceTypes != null ? this.serviceTypes.Length : this.contexts.Length; }
         }
 
         public override TService this[int index]
@@ -119,13 +116,32 @@ namespace SimpleInjector.Extensions.Decorators
         {
             this.BuildContexts();
 
-            // TODO: Optimize performance (replace lambda.Compile).
             return (
                 from context in this.contexts
-                let lambda = Expression.Lambda<Func<TService>>(context.Expression)
-                let instanceCreator = lambda.Compile()
-                select instanceCreator)
+                select this.BuildInstanceCreator(context.Expression))
                 .ToArray();
+        }
+
+        private Func<TService> BuildInstanceCreator(Expression expression)
+        {
+            Func<object> instanceCreator = null;
+
+            return () =>
+            {
+                if (instanceCreator == null)
+                {
+                    object instance;
+
+                    instanceCreator = Helpers.CompileAndRun(this.container, expression, out instance);
+
+                    if (instance != null)
+                    {
+                        return (TService)instance;
+                    }
+                }
+
+                return (TService)instanceCreator();
+            };
         }
 
         private void BuildContexts()

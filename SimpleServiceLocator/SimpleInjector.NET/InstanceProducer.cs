@@ -62,9 +62,7 @@ namespace SimpleInjector
 
             this.validator = new CyclicDependencyValidator(this.ServiceType);
 
-            this.expression = new Lazy<Expression>(
-                () => this.BuildExpressionInternal(),
-                System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+            this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
         }
 
         /// <summary>
@@ -202,7 +200,7 @@ namespace SimpleInjector
 
             try
             {
-                return Helpers.CompileAndExecuteExpression(this.Registration.Container, expression, out createdInstance);
+                return Helpers.CompileAndRun(this.Registration.Container, expression, out createdInstance);
             }
             catch (Exception ex)
             {

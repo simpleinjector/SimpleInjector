@@ -19,8 +19,7 @@
             // Ensure that for every instance only one InstanceProducer is created (to prevent double
             // initialization and creation of multiple singleton decorators).
             this.instanceProducers = new Lazy<InstanceProducer[]>(
-                () => CreateSingletonInstanceProducers(container, instances),
-                System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+                () => CreateSingletonInstanceProducers(container, instances));
         }
 
         Expression[] IDecoratableSingletonCollection.BuildExpressions()

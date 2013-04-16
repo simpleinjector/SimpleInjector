@@ -200,7 +200,11 @@ namespace SimpleInjector
             return castedCollection;
         }
 
-        internal static Func<object> CompileAndExecuteExpression(Container container, Expression expression,
+        // Compile the expression. If the expression is compiled in a dynamic assembly, the compiled delegate
+        // is called (to ensure that it will run, because it tends to fail now and then) and the created
+        // instance is returned through the out parameter. Note that NO created instance will be returned when
+        // the expression is compiled using Expression.Compile)(.
+        internal static Func<object> CompileAndRun(Container container, Expression expression,
             out object createdInstance)
         {
             createdInstance = null;
@@ -374,7 +378,9 @@ namespace SimpleInjector
             }
             catch
             {
-                // The fallback
+                // The fallback. Here we don't execute the lambda, because this would mean that when the
+                // execution fails the lambda is not returned and the compiled delegate would never be cached,
+                // forcing a compilation hit on each call.
                 createdInstance = null;
                 return CompileLambda(expression);
             }

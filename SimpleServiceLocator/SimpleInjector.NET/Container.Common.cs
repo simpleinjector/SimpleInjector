@@ -116,8 +116,7 @@ namespace SimpleInjector
 
             this.containerId = Interlocked.Increment(ref counter);
 
-            this.moduleBuilder =
-                new Lazy<ModuleBuilder>(this.CreateModuleBuilder, LazyThreadSafetyMode.ExecutionAndPublication);
+            this.moduleBuilder = new Lazy<ModuleBuilder>(this.CreateModuleBuilder);
         }
 
         /// <summary>Gets the container options.</summary>

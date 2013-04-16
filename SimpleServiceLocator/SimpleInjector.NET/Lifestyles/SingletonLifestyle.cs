@@ -83,9 +83,8 @@ namespace SimpleInjector.Lifestyles
                 this.serviceType = serviceType;
                 this.implementationType = instance.GetType();
 
-                // ExecutionAndPublication ensures that the initializer is guaranteed to be called just once.
-                this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance, 
-                    LazyThreadSafetyMode.ExecutionAndPublication);
+                // Default lazy behavior ensures that the initializer is guaranteed to be called just once.
+                this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
             }
 
             public override Type ImplementationType
@@ -183,10 +182,9 @@ namespace SimpleInjector.Lifestyles
             {
                 // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
                 // we want to be very sure that there will never be more than one instance of a singleton
-                // created. Since the same Registration instance can be used by multipl InstanceProducers,
+                // created. Since the same Registration instance can be used by multiple InstanceProducers,
                 // we absolutely need this protection.
-                this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck, 
-                    LazyThreadSafetyMode.ExecutionAndPublication);
+                this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck);
             }
 
             public override Expression BuildExpression()

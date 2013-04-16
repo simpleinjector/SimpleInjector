@@ -77,8 +77,7 @@
                     return lifestyleApplierFactory(() => transientInstanceCreator());
                 };
 
-                this.lazyLifestyleApplier = 
-                    new Lazy<Func<object>>(initializer, LazyThreadSafetyMode.ExecutionAndPublication);
+                this.lazyLifestyleApplier = new Lazy<Func<object>>(initializer);
             }
 
             public override Type ImplementationType

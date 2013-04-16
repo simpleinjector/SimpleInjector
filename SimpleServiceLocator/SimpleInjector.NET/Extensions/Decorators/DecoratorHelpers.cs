@@ -50,13 +50,13 @@ namespace SimpleInjector.Extensions.Decorators
                 new object[] { container, serviceTypes });
         }
 
-        internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
+        internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType, Container container,
             DecoratorPredicateContext[] contexts)
         {
             Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
 
             return (IDecoratedEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
-                new object[] { contexts });
+                new object[] { container, contexts });
         }
 
         internal static IDecoratedEnumerable CreateDecoratedEnumerable(Type serviceType,
