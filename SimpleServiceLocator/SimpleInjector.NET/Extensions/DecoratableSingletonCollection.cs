@@ -10,24 +10,28 @@
     using SimpleInjector.Lifestyles;
 
     internal sealed class DecoratableSingletonCollection<TService> : IEnumerable<TService>,
-        IDecoratableSingletonCollection
+        IDecoratableEnumerable
     {
+        private readonly Container container;
         private readonly Lazy<InstanceProducer[]> instanceProducers;
+        private readonly Lazy<DecoratorPredicateContext[]> decoratorPredicateContexts;
 
         internal DecoratableSingletonCollection(Container container, TService[] instances)
         {
+            this.container = container;
+
             // Ensure that for every instance only one InstanceProducer is created (to prevent double
             // initialization and creation of multiple singleton decorators).
             this.instanceProducers = new Lazy<InstanceProducer[]>(
                 () => CreateSingletonInstanceProducers(container, instances));
+
+            this.decoratorPredicateContexts = new Lazy<DecoratorPredicateContext[]>(
+                this.CreateDecoratorPredicateContexts);
         }
 
-        Expression[] IDecoratableSingletonCollection.BuildExpressions()
+        public DecoratorPredicateContext[] GetDecoratorPredicateContexts()
         {
-            return (
-                from producer in this.instanceProducers.Value
-                select producer.BuildExpression())
-                .ToArray();
+            return this.decoratorPredicateContexts.Value;
         }
 
         public IEnumerator<TService> GetEnumerator()
@@ -52,6 +56,15 @@
                 let registration = SingletonLifestyle.CreateSingleRegistration(type, instance, container)
                 let producer = new InstanceProducer(type, registration)
                 select producer)
+                .ToArray();
+        }
+
+        private DecoratorPredicateContext[] CreateDecoratorPredicateContexts()
+        {
+            return (
+                from instanceProducer in this.instanceProducers.Value
+                select DecoratorPredicateContext.CreateFromProducer(this.container, typeof(TService),
+                    instanceProducer))
                 .ToArray();
         }
     }

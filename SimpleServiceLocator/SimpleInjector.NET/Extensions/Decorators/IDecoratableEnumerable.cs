@@ -33,7 +33,7 @@ namespace SimpleInjector.Extensions.Decorators
     /// to apply decorators to, with the biggest noticable difference that the registered predicate, will be
     /// checked for each service in the collection.
     /// </summary>
-    internal interface IDecoratedEnumerable : IEnumerable
+    internal interface IDecoratableEnumerable : IEnumerable
     {
         DecoratorPredicateContext[] GetDecoratorPredicateContexts();
     }

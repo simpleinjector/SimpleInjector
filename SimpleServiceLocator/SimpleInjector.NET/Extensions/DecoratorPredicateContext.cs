@@ -104,6 +104,16 @@ namespace SimpleInjector.Extensions
                 .ToArray();
         }
 
+        internal static DecoratorPredicateContext CreateFromProducer(Container container, Type serviceType,
+            InstanceProducer producer)
+        {
+            var expression = producer.BuildExpression();
+
+            Type implementationType = ExtensionHelpers.DetermineImplementationType(expression, serviceType);
+
+            return CreateFromExpression(container, serviceType, implementationType, expression, producer);
+        }
+
         internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
             Expression expression)
         {
@@ -113,16 +123,16 @@ namespace SimpleInjector.Extensions
         }
 
         internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
-            Type implementationType, Expression expression)
+            Type implementationType, Expression expression, InstanceProducer producer = null)
         {
             var lifestyle = ExtensionHelpers.DetermineLifestyle(expression);
             var registration = new ExpressionRegistration(expression, implementationType, lifestyle, container);
 
             // This producer will never be part of the container, but can still be used for analysis.
-            var fakeProducer = new InstanceProducer(serviceType, registration);
+            producer = producer ?? new InstanceProducer(serviceType, registration);
 
             return new DecoratorPredicateContext(serviceType, implementationType,
-                DecoratorPredicateContext.NoDecorators, expression, fakeProducer);
+                DecoratorPredicateContext.NoDecorators, expression, producer);
         }
 
         internal DecoratorPredicateContext Decorate(Type decoratorType, Expression decoratedExpression,

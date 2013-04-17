@@ -465,7 +465,7 @@ namespace SimpleInjector
         {
             Type elementType = enumerableType.GetGenericArguments()[0];
 
-            IDecoratedEnumerable enumerable =
+            IDecoratableEnumerable enumerable =
                 DecoratorHelpers.CreateContainerControlledEnumerable(elementType, this, Type.EmptyTypes);
 
             var registration = new ExpressionRegistration(Expression.Constant(enumerable, enumerableType), this);

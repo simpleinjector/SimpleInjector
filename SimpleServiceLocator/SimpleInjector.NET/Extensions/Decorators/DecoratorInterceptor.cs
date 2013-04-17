@@ -38,7 +38,7 @@ namespace SimpleInjector.Extensions.Decorators
         // So the Type is an closed generic version of the open generic service that is wrapped, the
         // registration is the registration for the closed generic decorator.
         private readonly Dictionary<Type, Registration> registrationsCache;
-        private readonly Dictionary<Type, IDecoratedEnumerable> decoratableEnumerablesCache;
+        private readonly Dictionary<Type, IDecoratableEnumerable> decoratableEnumerablesCache;
         private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollectionsCache;
 
         private readonly DecoratorExpressionInterceptorData data;
@@ -46,7 +46,7 @@ namespace SimpleInjector.Extensions.Decorators
         public DecoratorInterceptor(DecoratorExpressionInterceptorData data)
         {
             this.registrationsCache = new Dictionary<Type, Registration>();
-            this.decoratableEnumerablesCache = new Dictionary<Type, IDecoratedEnumerable>();
+            this.decoratableEnumerablesCache = new Dictionary<Type, IDecoratableEnumerable>();
             this.singletonDecoratedCollectionsCache = new Dictionary<Type, IEnumerable>();
 
             this.data = data;

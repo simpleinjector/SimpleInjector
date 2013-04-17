@@ -114,8 +114,7 @@
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInterceptor.cs" />
-    <Compile Include="Extensions\Decorators\IDecoratedEnumerable.cs" />
-    <Compile Include="Extensions\Decorators\IDecoratableSingletonCollection.cs" />
+    <Compile Include="Extensions\Decorators\IDecoratableEnumerable.cs" />
     <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
     <Compile Include="Extensions\GenericArgumentFinder.cs" />
