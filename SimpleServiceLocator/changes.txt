@@ -1,13 +1,15 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vFuture
+Version vNext
 	New features:
 		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 
-Version vNext
-	General description:		
+Version 2.2.1 (v2.2.1 RTM)  2013-04-19
+	This patch release fixes fixes a few small bugs and and performance improvements. The performance of
+	the initialization phase is improved and items of registered collections can now be retrieved with an
+	O(1) characteristic.
 
 	New features:
 		-[Integration.Web.Mvc] SimpleInjectorMvcExtensions.GetControllerTypesToRegister method added. This
@@ -37,7 +39,7 @@ Version vNext
 		 collection (that could be intercepted and decorated) worked as expected. (work item 19596)
 
 
-Version v2.2.0 (v2.2 RTM)
+Version v2.2.0 (v2.2 RTM) 2013-04-08
 	General description:
 		Besides a few bug fixes, this minor release adds two features that enable some integration scenarios 
 		where the container is not in control of the creation of types, but types still need to be wired up.
