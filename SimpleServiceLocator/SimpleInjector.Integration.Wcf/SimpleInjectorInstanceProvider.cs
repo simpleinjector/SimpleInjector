@@ -16,16 +16,16 @@ namespace SimpleInjector.Integration.Wcf
             this.serviceType = serviceType;
         }
 
+        public object GetInstance(InstanceContext instanceContext, Message message)
+        {
+            return this.GetInstance(instanceContext);
+        }
+
         public object GetInstance(InstanceContext instanceContext)
         {
             this.container.BeginWcfOperationScope();
 
             return this.container.GetInstance(this.serviceType);
-        }
-
-        public object GetInstance(InstanceContext instanceContext, Message message)
-        {
-            return this.GetInstance(instanceContext);
         }
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
