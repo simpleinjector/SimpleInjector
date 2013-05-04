@@ -95,15 +95,6 @@ namespace SimpleInjector.Extensions
 
         internal InstanceProducer Registration { get; private set; }
 
-        internal static DecoratorPredicateContext[] CreateFromExpressions(Container container, Type serviceType,
-            IEnumerable<Expression> expressions)
-        {
-            return (
-                from expression in expressions
-                select DecoratorPredicateContext.CreateFromExpression(container, serviceType, expression))
-                .ToArray();
-        }
-
         internal static DecoratorPredicateContext CreateFromProducer(Container container, Type serviceType,
             InstanceProducer producer)
         {
@@ -112,14 +103,6 @@ namespace SimpleInjector.Extensions
             Type implementationType = ExtensionHelpers.DetermineImplementationType(expression, serviceType);
 
             return CreateFromExpression(container, serviceType, implementationType, expression, producer);
-        }
-
-        internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
-            Expression expression)
-        {
-            Type implementationType = ExtensionHelpers.DetermineImplementationType(expression, serviceType);
-
-            return CreateFromExpression(container, serviceType, implementationType, expression);
         }
 
         internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
