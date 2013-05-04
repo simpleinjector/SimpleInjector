@@ -50,5 +50,10 @@ namespace SimpleInjector.Diagnostics
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public object Value { get; private set; }
+
+        public override string ToString()
+        {
+            return this.Description;
+        }
     }
 }

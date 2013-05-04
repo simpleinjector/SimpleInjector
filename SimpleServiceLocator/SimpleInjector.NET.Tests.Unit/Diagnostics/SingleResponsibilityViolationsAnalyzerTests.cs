@@ -7,6 +7,10 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
 
+    public interface IGenericPlugin<T> 
+    {
+    }
+
     [TestClass]
     public class SingleResponsibilityViolationsAnalyzerTests
     {
@@ -42,7 +46,33 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
 
             // Assert
             Assert.IsNull(results, 
-                "7 dependencies is still considered valid (to prevent too many false positives).");
+                "6 dependencies is still considered valid (to prevent too many false positives).");
+        }
+
+        [TestMethod]
+        public void Analyze_OpenGenericRegistrationWithValidAmountOfDependencies_ReturnsNull()
+        {
+            // Arrange
+            Container container = CreateContainerWithRegistrations();
+
+            // Consumer class contains a IGenericPlugin<IDisposable> dependency
+            container.Register<Consumer<IGenericPlugin<IDisposable>>>();
+
+            // Register open generic type with 6 dependencies.
+            container.RegisterOpenGeneric(typeof(IGenericPlugin<>), typeof(GenericPluginWith6Dependencies<>));
+
+            container.Verify();
+            
+            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+
+            // Act
+            var results = analyzer.Analyze(container);
+
+            // Assert
+            Assert.IsNull(results,
+                "The registration is considered to be valid, since both the type and decorator do not " +
+                "exceed the maximum number of dependencies. Message: {0}",
+                results == null ? null : results.Items().FirstOrDefault());
         }
 
         [TestMethod]
@@ -365,6 +395,26 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             IGeneric<char> dependency5,
             IGeneric<decimal> dependency6,
             IGeneric<int?> dependency7)
+        {
+        }
+    }
+
+    public class Consumer<TDependency>
+    {
+        public Consumer(TDependency dependency)
+        {
+        }
+    }
+
+    public class GenericPluginWith6Dependencies<T> : IGenericPlugin<T>
+    {
+        public GenericPluginWith6Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6)
         {
         }
     }

@@ -88,6 +88,7 @@
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
+    <Compile Include="Diagnostics\DebuggerViewItemExtensions.cs" />
     <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs" />

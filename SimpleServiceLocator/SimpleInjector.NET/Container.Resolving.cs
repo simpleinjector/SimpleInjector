@@ -326,15 +326,13 @@ namespace SimpleInjector
         {
             InstanceProducer instanceProducer = null;
 
-            var snapshot = this.registrations;
-
-            if (!snapshot.TryGetValue(serviceType, out instanceProducer))
+            if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
             {
                 var producer = buildInstanceProducer();
 
                 // Always register the producer, even if it is null. This improves performance for the
                 // GetService and GetRegistration methods.
-                this.RegisterInstanceProducer(serviceType, producer, snapshot);
+                this.RegisterInstanceProducer(serviceType, producer);
 
                 return producer;
             }
@@ -525,12 +523,13 @@ namespace SimpleInjector
         // registrations when multiple threads simultaneously add different types. This however, does not
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.
-        private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer,
-            Dictionary<Type, InstanceProducer> snapshot)
+        private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer)
         {
-            var snapshotCopy = Helpers.MakeCopyOf(snapshot);
+            var snapshotCopy = Helpers.MakeCopyOf(this.registrations);
 
-            snapshotCopy.Add(serviceType, instanceProducer);
+            // This registration might already exist if it was added made by another thread. That's why we
+            // need to use the indexer, instead of Add.
+            snapshotCopy[serviceType] = instanceProducer;
 
             // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
             // producer from being added after the snapshot has been made accessible to other threads.

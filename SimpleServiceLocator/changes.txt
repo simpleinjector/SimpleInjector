@@ -6,8 +6,22 @@ Version vNext
 		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
 
 
+Version 2.2.3 (v2.2.3 RTM)  2013-05-05
+	Small performance improvement and bug fix concerning the use of ResolveUnregisteredType and
+	RegisterOpenGeneric.
+
+	Changes:
+		-[Core] ResolveUnregisteredType event was triggered more often than needed, which had a negative
+		 impact on performance.
+
+	Bug fixes:
+		-[Core] Use of ResolveUnregisteredType event (that is primarily consumed by the RegisterOpenGeneric
+		 extension methods) could lead to incorrect 'Single Responsibility Violation' warnings in the
+		 Debugger Diagnostic view. (work item 19670)
+
+
 Version 2.2.1 (v2.2.1 RTM)  2013-04-19
-	This patch release fixes fixes a few small bugs and and performance improvements. The performance of
+	This patch release fixes a few small bugs and and performance improvements. The performance of
 	the initialization phase is improved and items of registered collections can now be retrieved with an
 	O(1) characteristic.
 
@@ -28,7 +42,7 @@ Version 2.2.1 (v2.2.1 RTM)  2013-04-19
 		 
 	Bug fixes:
 		-[Core] Registering a collection using RegisterAll<object>(Type[]) failed when one of the supplied
-		 types was an interface incorrectly stating the the interface did not inherit from Object. 
+		 types was an interface incorrectly stating the interface did not inherit from Object. 
 		 (work item 19577)
 		-[Core] The RegisterAll<TService>(TService[]) overload that takes in an array of singleton instances,
 		 did not let those instances go through the pipeline as would happen when registering a singleton
