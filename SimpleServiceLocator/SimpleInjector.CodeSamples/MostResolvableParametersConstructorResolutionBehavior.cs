@@ -8,7 +8,7 @@
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    // Mimics the constructor resolution behavior of Ninject, Castle Windsor and StructureMap.
+    // Mimics the constructor resolution behavior of Autofac, Ninject, Castle Windsor and StructureMap.
     // Register this as follows:
     // container.Options.ConstructorResolutionBehavior =
     //     new MostResolvableParametersConstructorResolutionBehavior(container);
