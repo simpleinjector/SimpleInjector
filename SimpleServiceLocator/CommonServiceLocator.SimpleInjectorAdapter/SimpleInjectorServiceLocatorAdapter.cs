@@ -63,7 +63,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>A sequence of instances of the requested <typeparamref name="TService" />.</returns>
-        public IEnumerable<TService> GetAllInstances<TService>()
+        public virtual IEnumerable<TService> GetAllInstances<TService>()
         {
             try
             {
@@ -83,7 +83,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>A sequence of instances of the requested <paramref name="serviceType" />.</returns>
-        public IEnumerable<object> GetAllInstances(Type serviceType)
+        public virtual IEnumerable<object> GetAllInstances(Type serviceType)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="NotSupportedException">Thrown when a non-null key is requested. Keyed 
         /// registration is not supported by the Simple Injector.</exception>
         /// <returns>The requested service instance.</returns>
-        public TService GetInstance<TService>(string key)
+        public virtual TService GetInstance<TService>(string key)
         {
             if (key == null)
             {
@@ -124,7 +124,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is are errors resolving
         /// the service instance.</exception>
         /// <returns>The requested service instance.</returns>
-        public TService GetInstance<TService>()
+        public virtual TService GetInstance<TService>()
         {
             try
             {
@@ -146,7 +146,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="NotSupportedException">Thrown when a non-null key is requested. Keyed 
         /// registration is not supported by the Simple Injector.</exception>
         /// <returns>The requested service instance.</returns>
-        public object GetInstance(Type serviceType, string key)
+        public virtual object GetInstance(Type serviceType, string key)
         {
             if (key == null)
             {
@@ -165,7 +165,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">Thrown when there is an error resolving
         /// the service instance.</exception>
         /// <returns>The requested service instance.</returns>
-        public object GetInstance(Type serviceType)
+        public virtual object GetInstance(Type serviceType)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         /// <summary>Gets the service object of the specified type.</summary>
         /// <returns>A service object of type serviceType.-or- null if there is no service object of type serviceType.</returns>
         /// <param name="serviceType">An object that specifies the type of service object to get. </param>
-        object IServiceProvider.GetService(Type serviceType)
+        public virtual object GetService(Type serviceType)
         {
             try
             {
