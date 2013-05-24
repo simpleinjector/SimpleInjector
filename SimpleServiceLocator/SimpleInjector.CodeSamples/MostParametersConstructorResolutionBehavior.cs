@@ -7,7 +7,7 @@
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    // Mimics the constructor resolution behavior of Unity.
+    // Mimics the constructor resolution behavior of Unity and StructureMap.
     // Register this as follows:
     // container.Options.ConstructorResolutionBehavior = new MostParametersConstructorResolutionBehavior();
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
