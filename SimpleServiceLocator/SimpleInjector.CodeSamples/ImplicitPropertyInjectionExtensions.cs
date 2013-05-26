@@ -1,10 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // http://simpleinjector.codeplex.com/wikipage?title=ImplicitPropertyInjectionExtensions
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Reflection;
 
     using SimpleInjector.Advanced;
@@ -37,12 +34,24 @@
                     this.baseBehavior.SelectProperty(serviceType, property);
             }
 
+            [DebuggerStepThrough]
             private bool IsImplicitInjectableProperty(PropertyInfo property)
+            {
+                return IsInjectableProperty(property) && this.IsAvailableService(property.PropertyType);
+            }
+
+            [DebuggerStepThrough]
+            private static bool IsInjectableProperty(PropertyInfo property)
             {
                 MethodInfo setMethod = property.GetSetMethod(nonPublic: false);
 
-                return setMethod != null && !setMethod.IsStatic && property.CanWrite && 
-                    this.options.Container.GetRegistration(property.PropertyType, throwOnFailure: false) != null;
+                return setMethod != null && !setMethod.IsStatic && property.CanWrite;
+            }
+
+            [DebuggerStepThrough]
+            private bool IsAvailableService(Type serviceType)
+            {
+                return this.options.Container.GetRegistration(serviceType) != null;
             }
         }
     }
