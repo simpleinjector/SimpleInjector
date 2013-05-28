@@ -113,7 +113,21 @@
     public class PluginImpl : IPlugin
     {
     }
+
+    public class PluginImpl2 : IPlugin
+    {
+    }
     
+    public class PluginDecorator : IPlugin
+    {
+        public PluginDecorator(IPlugin decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+
+        public IPlugin Decoratee { get; private set; }
+    }
+
     public class PluginWithDependencyOfType<TDependency> : IPlugin
     {
         public TDependency Dependency { get; set; }

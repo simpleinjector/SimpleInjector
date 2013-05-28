@@ -365,12 +365,5 @@
         public class Plugin2 : IPlugin
         {
         }
-
-        public class PluginDecorator : IPlugin
-        {
-            public PluginDecorator(IPlugin decoratee)
-            {
-            }
-        }
     }
 }
