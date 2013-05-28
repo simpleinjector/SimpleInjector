@@ -41,13 +41,13 @@
             // Assert
             Assert.IsInstanceOfType(actualPlugins1[0], typeof(Plugin1));
             Assert.IsInstanceOfType(actualPlugins1[1], typeof(Plugin2));
-            Assert.IsInstanceOfType(actualPlugins1[2], typeof(PluginDecorator));
+            Assert.IsInstanceOfType(actualPlugins1[2], typeof(Plugin3));
             Assert.IsInstanceOfType(actualPlugins1[3], typeof(Plugin));
             Assert.IsInstanceOfType(actualPlugins1[4], typeof(Plugin));
 
             Assert.IsInstanceOfType(factory("1"), typeof(Plugin1));
             Assert.IsInstanceOfType(factory("2"), typeof(Plugin2));
-            Assert.IsInstanceOfType(factory("3"), typeof(PluginDecorator));
+            Assert.IsInstanceOfType(factory("3"), typeof(Plugin3));
             Assert.IsInstanceOfType(factory("4"), typeof(Plugin));
             Assert.IsInstanceOfType(factory("5"), typeof(Plugin));
 
