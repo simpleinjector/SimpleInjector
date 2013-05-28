@@ -72,6 +72,7 @@
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
     <Compile Include="KeyedFactoryTests.cs" />
+    <Compile Include="KeyedRegistrationsTests.cs" />
     <Compile Include="RuntimeDecoratorExtensionsTests.cs" />
     <Compile Include="ExpirationExtensionsTests.cs" />
     <Compile Include="MethodInjectionExtensionsTests.cs" />
