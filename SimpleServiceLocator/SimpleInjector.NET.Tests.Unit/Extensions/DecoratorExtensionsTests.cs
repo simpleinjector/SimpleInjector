@@ -1622,7 +1622,47 @@
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
+#endif
 
+        // This is a regression test. This test failed on Simple Injector 2.0 to 2.2.3.
+        [TestMethod]
+        public void RegisterDecorator_AppliedToMultipleInstanceProducersWithTheSameServiceType_CallsThePredicateForEachImplementationType()
+        {
+            // Arrange
+            Type serviceType = typeof(IPlugin);
+
+            var implementationTypes = new List<Type>();
+
+            var container = ContainerFactory.New();
+
+            var prod1 = new InstanceProducer(serviceType,
+                Lifestyle.Transient.CreateRegistration(serviceType, typeof(PluginImpl), container));
+
+            var prod2 = new InstanceProducer(serviceType,
+                Lifestyle.Transient.CreateRegistration(serviceType, typeof(PluginImpl2), container));
+
+            container.RegisterDecorator(serviceType, typeof(PluginDecorator), context =>
+            {
+                implementationTypes.Add(context.ImplementationType);
+                return true;
+            });
+
+            // Act
+            var instance1 = prod1.GetInstance();
+            var instance2 = prod2.GetInstance();
+
+            // Assert
+            string message = "The predicate was expected to be called with a context containing the " +
+                "implementation type: ";
+
+            Assert.AreEqual(2, implementationTypes.Count, "Predicate was expected to be called twice.");
+            Assert.IsTrue(implementationTypes.Any(type => type == typeof(PluginImpl)),
+                message + typeof(PluginImpl).Name);
+            Assert.IsTrue(implementationTypes.Any(type => type == typeof(PluginImpl2)),
+                message + typeof(PluginImpl2).Name);
+        }
+
+#if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
