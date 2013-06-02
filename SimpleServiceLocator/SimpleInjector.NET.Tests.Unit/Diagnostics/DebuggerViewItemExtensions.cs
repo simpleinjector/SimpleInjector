@@ -4,6 +4,7 @@
     using System.Linq;
     using SimpleInjector.Diagnostics;
 
+#if DEBUG
     internal static class DebuggerViewItemExtensions
     {
         internal static IEnumerable<DebuggerViewItem> Items(this DebuggerViewItem item)
@@ -16,4 +17,5 @@
             return Enumerable.Empty<DebuggerViewItem>();
         }
     }
+#endif
 }
