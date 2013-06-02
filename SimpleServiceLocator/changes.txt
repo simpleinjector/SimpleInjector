@@ -2,8 +2,12 @@
 
 
 Version vNext
+
 	New features:
-		-[Integration.Web.Forms] ASP.NET Web Forms integration added. (work item 19510)
+	Changes:
+	Bug fixes:
+		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when
+		 they shared the same Registration. (work item 19796).
 
 
 Version 2.2.3 (v2.2.3 RTM)  2013-05-05

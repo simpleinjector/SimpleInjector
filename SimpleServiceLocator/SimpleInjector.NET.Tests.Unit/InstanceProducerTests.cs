@@ -1,12 +1,23 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions;
 
     [TestClass]
     public class InstanceProducerTests
     {
+        public interface IOne
+        {
+        }
+
+        public interface ITwo
+        {
+        }
+
         [TestMethod]
         public void GetInstance_Always_LocksTheContainer()
         {
@@ -59,6 +70,45 @@
             Assert.AreEqual(Lifestyle.Transient, relationships[0].Lifestyle);
             Assert.AreEqual(typeof(IUserRepository), relationships[0].Dependency.ServiceType);
         }
+
+        // This test proves a bug in v2.2.3.
+        [TestMethod]
+        public void GetRelationships_ForInstanceProducerThatSharesThRegistrationWithAnOtherProducer_HasItsOwnSetOfRegistrations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration = Lifestyle.Transient.CreateRegistration<OneAndTwo, OneAndTwo>(container);
+
+            container.AddRegistration(typeof(IOne), registration);
+            container.AddRegistration(typeof(ITwo), registration);
+
+            // Decorator to wrap around IOne (and not ITwo).
+            container.RegisterDecorator(typeof(IOne), typeof(OneDecorator));
+
+            InstanceProducer twoProducer = container.GetRegistration(typeof(ITwo));
+
+            container.Verify();
+
+            // Act
+            KnownRelationship[] relationships = twoProducer.GetRelationships();
+                        
+            // Assert
+            Assert.IsFalse(relationships.Any(), 
+                "The InstanceProducer for ITwo was expected to have no relationships. Current: " +
+                string.Join(", ", relationships.Select(r => r.ImplementationType.Name)));
+        }
 #endif
+
+        public class OneAndTwo : IOne, ITwo 
+        {
+        }
+
+        public class OneDecorator : IOne
+        {
+            public OneDecorator(IOne one)
+            {
+            }
+        }
     }
 }

@@ -315,11 +315,12 @@ namespace SimpleInjector
             return instanceCreatorExpression;
         }
 
-        internal void OnExpressionBuilt(ExpressionBuiltEventArgs e, Registration registration)
+        internal void OnExpressionBuilt(ExpressionBuiltEventArgs e, InstanceProducer instanceProducer)
         {
             if (this.expressionBuilt != null)
             {
-                var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+                var relationships = 
+                    new KnownRelationshipCollection(instanceProducer.GetRelationships().ToList());
 
                 e.KnownRelationships = relationships;
 
@@ -327,7 +328,7 @@ namespace SimpleInjector
 
                 if (relationships.Changed)
                 {
-                    registration.ReplaceRelationships(e.KnownRelationships);
+                    instanceProducer.ReplaceRelationships(e.KnownRelationships);
                 }
             }
         }

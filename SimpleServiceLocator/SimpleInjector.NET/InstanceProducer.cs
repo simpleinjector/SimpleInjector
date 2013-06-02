@@ -26,10 +26,11 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
-
     using SimpleInjector.Advanced;
 
     /// <summary>
@@ -48,6 +49,7 @@ namespace SimpleInjector
         private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
+        private KnownRelationship[] relationships;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
@@ -185,7 +187,12 @@ namespace SimpleInjector
 
         internal KnownRelationship[] GetRelationships()
         {
-            return this.Registration.GetRelationships();
+            return this.relationships ?? this.Registration.GetRelationships();
+        }
+
+        internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
+        {
+            this.relationships = relationships.Distinct().ToArray();
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
@@ -228,7 +235,7 @@ namespace SimpleInjector
 
             e.Lifestyle = this.Lifestyle;
 
-            this.Registration.Container.OnExpressionBuilt(e, this.Registration);
+            this.Registration.Container.OnExpressionBuilt(e, this);
 
             this.overriddenLifestyle = e.Lifestyle;
 
