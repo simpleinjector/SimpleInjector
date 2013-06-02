@@ -1599,7 +1599,8 @@
             // Assert
             Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
-                "should be added to the registration of the service type.");
+                "should be added to the registration of the service type. Current: " +
+                string.Join(", ", relationships.Select(r => r.ImplementationType.Name)));
         }
 #endif
 
