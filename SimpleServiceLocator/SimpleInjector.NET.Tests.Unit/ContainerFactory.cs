@@ -8,7 +8,9 @@
         {
             var container = new Container();
 
+#if DEBUG
             container.Options.EnableDynamicAssemblyCompilation = true;
+#endif
 
             return container;
         }
