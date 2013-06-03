@@ -4,7 +4,11 @@
 Version vNext
 
 	New features:
-	Changes:
+		-[Core] RegisterManyForOpenGeneric overloads that take in an BatchRegistrationCallback and a list of
+		 types now accept open generic types. Closed generic versions of the supplied open generic types will
+		 be added to the list of implementations that is supplied to the BatchRegistrationCallback.
+		(work item 19745).
+
 	Bug fixes:
 		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when
 		 they shared the same Registration. (work item 19796).

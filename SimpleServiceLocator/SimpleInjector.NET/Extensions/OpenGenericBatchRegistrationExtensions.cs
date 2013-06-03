@@ -1160,24 +1160,58 @@ namespace SimpleInjector.Extensions
         private static void RegisterOpenGenericInternal(Type openGenericType,
             IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
         {
+            var openGenericImplementations = (
+                from implementation in typesToRegister
+                where implementation.ContainsGenericParameters
+                select implementation)
+                .ToArray();
+
             // A single type to register can implement multiple closed versions of a open generic type, so
             // we can end up with multiple registrations per type.
             // Example: class StrangeValidator : IValidator<Person>, IValidator<Customer> { }
             var registrations =
                 from implementation in typesToRegister
+                where !implementation.ContainsGenericParameters
                 from service in implementation.GetBaseTypesAndInterfacesFor(openGenericType)
                 let registration = new { service, implementation }
                 group registration by registration.service into g
+                let matchingClosedGenericImplementations = 
+                    GetMatchingClosedGenericTypesForOpenGenericTypes(g.Key, openGenericImplementations)
                 select new
                 {
                     ServiceType = g.Key,
-                    Implementations = g.Select(r => r.implementation).ToArray()
+                    Implementations = g.Select(r => r.implementation)
+                        .Concat(matchingClosedGenericImplementations)
+                        .ToArray()
                 };
 
             foreach (var registration in registrations)
             {
                 callback(registration.ServiceType, registration.Implementations);
             }
+        }
+
+        private static IEnumerable<Type> GetMatchingClosedGenericTypesForOpenGenericTypes(
+            Type closedGenericServiceType, Type[] openGenericImplementations)
+        {
+            if (openGenericImplementations.Length == 0)
+            {
+                return Enumerable.Empty<Type>();
+            }
+
+            return
+                from openGenericImplementation in openGenericImplementations
+                let type = BuildClosedGenericOrNull(closedGenericServiceType, openGenericImplementation)
+                where type != null
+                select type;
+        }
+        
+        private static Type BuildClosedGenericOrNull(Type closedGenericBaseType, 
+            Type openGenericImplementation)
+        {
+            var builder = new GenericTypeBuilder(closedGenericBaseType, openGenericImplementation);
+
+            return builder.BuildClosedGenericImplementation().ClosedGenericImplementation;
         }
 
         private static void RequiresSingleImplementation(Type closedServiceType, Type[] implementations)

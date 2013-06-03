@@ -731,6 +731,73 @@
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
         }
 
+        [TestMethod]
+        public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var types = new[] { typeof(GenericHandler<>) };
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), 
+                (service, implementations) => { },
+                types);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericType_ReturnsTheExpectedClosedGenericVersion()
+        {
+            // Arrange
+            var types = new[] { typeof(DecimalHandler), typeof(GenericHandler<>) };
+            var expected = new[] { typeof(DecimalHandler), typeof(GenericHandler<decimal>) };
+
+            // Assert
+            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericTypeWithCompatibleTypeConstraint_ReturnsThatGenericType()
+        {
+            // Arrange
+            var types = new[] { typeof(FloatHandler), typeof(GenericStructHandler<>) };
+            var expected = new[] { typeof(FloatHandler), typeof(GenericStructHandler<float>) };
+
+            // Assert
+            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericTypeWithIncompatibleTypeConstraint_DoesNotReturnThatGenericType()
+        {
+            // Arrange
+            var types = new[] { typeof(ObjectHandler), typeof(GenericStructHandler<>) };
+            var expected = new[] { typeof(ObjectHandler) };
+
+            // Assert
+            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
+        }
+
+        private static void Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(
+            Type[] inputTypes, Type[] expected)
+        {
+            // Arrange
+            var actual = new List<Type>();
+
+            var container = ContainerFactory.New();
+
+            // Act
+            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
+                (service, implementations) => actual.AddRange(implementations),
+                inputTypes);
+
+            // Assert
+            bool collectionsContainTheSameElements = !Enumerable.Except(expected, actual).Any();
+
+            Assert.IsTrue(collectionsContainTheSameElements,
+                "Actual list: " + string.Join(", ", actual.Select(t => t.ToFriendlyName())));
+        }
+
         private static void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
         {
             Assert.IsNotNull(actualList);
@@ -797,6 +864,26 @@
         }
 
         public class MultiInterfaceHandler : ICommandHandler<int>, ICommandHandler<double>
+        {
+        }
+
+        public class DecimalHandler : ICommandHandler<decimal>
+        {
+        }
+
+        public class FloatHandler : ICommandHandler<float>
+        {
+        }
+
+        public class ObjectHandler : ICommandHandler<object>
+        {
+        }
+
+        public class GenericHandler<T> : ICommandHandler<T>
+        {
+        }
+
+        public class GenericStructHandler<T> : ICommandHandler<T> where T : struct
         {
         }
 
