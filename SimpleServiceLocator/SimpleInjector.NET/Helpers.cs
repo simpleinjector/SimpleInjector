@@ -45,6 +45,17 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         private static long dynamicClassCounter;
 #endif
+        internal static string ToCommaSeparatedText(this IEnumerable<string> values)
+        {
+            var names = values.ToArray();
+
+            if (names.Length <= 1)
+            {
+                return names.FirstOrDefault() ?? string.Empty;
+            }
+
+            return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
+        }
 
         internal static string ToFriendlyName(this Type type)
         {

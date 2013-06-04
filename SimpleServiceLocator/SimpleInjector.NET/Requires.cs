@@ -153,7 +153,8 @@ namespace SimpleInjector
                 from type in typesToRegister
                 where !ExtensionHelpers.ServiceIsAssignableFromImplementation(serviceType, type)
                 where !typeCanBeServiceType || type != serviceType
-                select type).FirstOrDefault();
+                select type)
+                .FirstOrDefault();
 
             if (invalidType != null)
             {
@@ -230,6 +231,26 @@ namespace SimpleInjector
                 string message = StringResources.TheSuppliedRegistrationBelongsToADifferentContainer();
 
                 throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void CollectionDoesNotContainOpenGenericTypes(IEnumerable<Type> typesToRegister,
+            string paramName)
+        {
+            if (typesToRegister != null)
+            {
+                var openGenericTypes =
+                    from type in typesToRegister
+                    where type != null && type.ContainsGenericParameters
+                    select type;
+
+                if (openGenericTypes.Any())
+                {
+                    string message = StringResources
+                        .ThisRegisterManyForOpenGenericOverloadDoesNotAllowOpenGenerics(openGenericTypes);
+
+                    throw new ArgumentException(message, paramName);
+                }
             }
         }
 

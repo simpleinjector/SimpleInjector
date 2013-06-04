@@ -732,6 +732,75 @@
         }
 
         [TestMethod]
+        public void RegisterManyForOpenGenericWithoutCallback1_SuppliedWithOpenGenericType_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Type[] types = new[] { typeof(GenericHandler<>) };
+
+            // Act
+            Action action = () => container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithParamName("typesToRegister", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied list of types contains an open generic type, but this overloaded method is unable
+                to handle open generic types because this overload can only register closed generic services 
+                types that have a single implementation. Please use the overload that takes in the 
+                BatchRegistrationCallback instead.".TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericWithoutCallback2_SuppliedWithOpenGenericType_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Type> types = new[] { typeof(GenericHandler<>) };
+
+            // Act
+            Action action = () => container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                @"The supplied list of types contains an open generic type", action);
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericWithoutCallback1_SuppliedWithOpenGenericType_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Type[] types = new[] { typeof(GenericHandler<>) };
+
+            // Act
+            Action action = () => container.RegisterManySinglesForOpenGeneric(typeof(ICommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                @"The supplied list of types contains an open generic type", action);
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericWithoutCallback2_SuppliedWithOpenGenericType_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Type> types = new[] { typeof(GenericHandler<>) };
+
+            // Act
+            Action action = () => container.RegisterManySinglesForOpenGeneric(typeof(ICommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                @"The supplied list of types contains an open generic type", action);
+        }
+
+        [TestMethod]
         public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericType_Succeeds()
         {
             // Arrange

@@ -446,5 +446,19 @@ namespace SimpleInjector
                 property.PropertyType.ToFriendlyName(),
                 innerException.Message);
         }
+
+        internal static string ThisRegisterManyForOpenGenericOverloadDoesNotAllowOpenGenerics(
+            IEnumerable<Type> openGenericTypes)
+        {
+            var typeNames = openGenericTypes.Select(type => type.ToFriendlyName());
+            
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied list of types contains an open generic type, but this overloaded method is " +
+                "unable to handle open generic types because this overload can only register closed " +
+                "generic services types that have a single implementation. Please use the overload that " +
+                "takes in the {0} instead. Invalid types: {1}.",
+                typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name,
+                typeNames.ToCommaSeparatedText());
+        }
     }
 }

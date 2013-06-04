@@ -609,7 +609,7 @@ namespace SimpleInjector.Extensions
                 container.Register(closedServiceType, types.Single(), Lifestyle.Transient);
             };
 
-            RegisterManyForOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
+            RegisterManyForOpenGeneric(openGenericServiceType, typesToRegister, callback);
         }
 
         /// <summary>
@@ -639,7 +639,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback, IEnumerable<Type> typesToRegister)
         {
-            RegisterManyForOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
+            RegisterManyForOpenGenericWithOpenGenericTypes(openGenericServiceType, typesToRegister, callback);
         }
 
         /// <summary>
@@ -704,7 +704,7 @@ namespace SimpleInjector.Extensions
                 container.Register(closedServiceType, types.Single(), Lifestyle.Singleton);
             };
 
-            RegisterManyForOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
+            RegisterManyForOpenGeneric(openGenericServiceType, typesToRegister, callback);
         }
 
         /// <summary>
@@ -1121,7 +1121,7 @@ namespace SimpleInjector.Extensions
             var types =
                 GetTypesToRegisterInternal(container, openGenericServiceType, accessibility, assemblies);
 
-            RegisterManyForOpenGenericInternal(openGenericServiceType, types, callback);
+            RegisterManyForOpenGeneric(openGenericServiceType, types, callback);
         }
 
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, 
@@ -1141,14 +1141,31 @@ namespace SimpleInjector.Extensions
                 select type;
         }
 
-        private static void RegisterManyForOpenGenericInternal(Type openGenericServiceType,
+        private static void RegisterManyForOpenGeneric(Type openGenericServiceType,
             IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
         {
             // Make a copy of the collection for performance and correctness.
             typesToRegister = typesToRegister != null ? typesToRegister.ToArray() : null;
 
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
+            Requires.CollectionDoesNotContainOpenGenericTypes(typesToRegister, "typesToRegister");
+
+            RegisterManyForOpenGenericCore(openGenericServiceType, typesToRegister, callback);
+        }
+
+        private static void RegisterManyForOpenGenericWithOpenGenericTypes(Type openGenericServiceType,
+            IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
+        {
+            // Make a copy of the collection for performance and correctness.
+            typesToRegister = typesToRegister != null ? typesToRegister.ToArray() : null;
+
+            RegisterManyForOpenGenericCore(openGenericServiceType, typesToRegister, callback);
+        }
+
+        private static void RegisterManyForOpenGenericCore(Type openGenericServiceType,
+            IEnumerable<Type> typesToRegister, BatchRegistrationCallback callback)
+        {
             Requires.IsNotNull(typesToRegister, "typesToRegister");
+            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(callback, "callback");
             Requires.DoesNotContainNullValues(typesToRegister, "typesToRegister");
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");

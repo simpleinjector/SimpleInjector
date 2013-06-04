@@ -43,6 +43,20 @@
             });
         }
 
+        internal static void ThrowsWithParamName(string expectedParamName, Action action)
+        {
+            try
+            {
+                action();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                ExceptionContainsParamName(ex, expectedParamName);
+            }
+        }
+
         internal static void ThrowsWithParamName<TArgumentException>(string expectedParamName, Action action)
             where TArgumentException : ArgumentException
         {
