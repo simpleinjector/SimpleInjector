@@ -1,11 +1,17 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Globalization;
-    using System.Linq;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
     internal static class TestHelpers
     {
+        internal static string ToFriendlyNamesText(this IEnumerable<Type> types)
+        {
+            return string.Join(", ", types.Select(type => type.ToFriendlyName()));
+        }
+
         internal static string ToFriendlyName(this Type type)
         {
             if (type == null)

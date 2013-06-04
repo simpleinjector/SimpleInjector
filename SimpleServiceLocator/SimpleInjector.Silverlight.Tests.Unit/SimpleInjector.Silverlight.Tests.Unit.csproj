@@ -224,6 +224,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.cs">
       <Link>TestClasses.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestHelpers.cs">
+      <Link>TestHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\UnregisteredTypeEventArgsTests.cs">
       <Link>UnregisteredTypeEventArgsTests.cs</Link>
     </Compile>

@@ -118,7 +118,7 @@
                 select property.Name;
 
             Assert.IsFalse(uninjectedProperties.Any(), "All properties were expected to be injected. " +
-                "Uninjected properties: " + string.Join(", ", uninjectedProperties.ToArray()));
+                "Uninjected properties: " + string.Join(", ", uninjectedProperties));
         }
 
         [TestMethod]

@@ -307,14 +307,14 @@ namespace SimpleInjector
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations)
         {
-            var typeDescription =
-                string.Join(", ", implementations.Select(type => type.ToFriendlyName()).ToArray());
+            var friendlyNames = implementations.Select(type => type.ToFriendlyName());
 
             return string.Format(CultureInfo.InvariantCulture,
                     "There are {0} types that represent the closed generic type {1}. Types: {2}. " +
                     "Either remove one of the types or use an overload that takes an {3} delegate, " +
                     "which allows you to define the way these types should be registered.",
-                    implementations.Length, closedServiceType.ToFriendlyName(), typeDescription,
+                    implementations.Length, closedServiceType.ToFriendlyName(),
+                    friendlyNames.ToCommaSeparatedText(),
                     typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name);
         }
 
@@ -378,7 +378,7 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to use {0} as a decorator, its constructor should have an " +
                 "argument of one of the following types: {1}.",
-                decoratorType.ToFriendlyName(), string.Join(", ", friendlyValidTypes.ToArray()));
+                decoratorType.ToFriendlyName(), friendlyValidTypes.ToCommaSeparatedText());
         }
 
         internal static string DecoratorContainsUnresolvableTypeArguments(Type decoratorType)

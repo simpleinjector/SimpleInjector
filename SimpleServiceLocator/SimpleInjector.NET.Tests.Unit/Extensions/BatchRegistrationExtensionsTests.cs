@@ -848,23 +848,23 @@
         }
 
         private static void Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(
-            Type[] inputTypes, Type[] expected)
+            Type[] inputTypes, Type[] expectedTypes)
         {
             // Arrange
-            var actual = new List<Type>();
+            var actualTypes = new List<Type>();
 
             var container = ContainerFactory.New();
 
             // Act
             container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
-                (service, implementations) => actual.AddRange(implementations),
+                (service, implementations) => actualTypes.AddRange(implementations),
                 inputTypes);
 
             // Assert
-            bool collectionsContainTheSameElements = !Enumerable.Except(expected, actual).Any();
+            bool collectionsContainTheSameElements = !Enumerable.Except(expectedTypes, actualTypes).Any();
 
             Assert.IsTrue(collectionsContainTheSameElements,
-                "Actual list: " + string.Join(", ", actual.Select(t => t.ToFriendlyName())));
+                "Actual list: " + actualTypes.ToFriendlyNamesText());
         }
 
         private static void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)

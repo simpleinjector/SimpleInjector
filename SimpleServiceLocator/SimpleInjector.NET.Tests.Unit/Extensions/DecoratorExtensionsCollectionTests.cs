@@ -1230,7 +1230,7 @@
                     // Assert
                     Assert.AreEqual(1, context.AppliedDecorators.Count,
                         "One decorator was expected to be applied. Applied decorators: " +
-                        string.Join(", ", context.AppliedDecorators.Select(d => d.Name).ToArray()));
+                        context.AppliedDecorators.ToFriendlyNamesText());
 
                     Assert.AreEqual(context.AppliedDecorators.Single(),
                         typeof(TransactionalCommandHandlerDecorator<RealCommand>));
@@ -1600,7 +1600,7 @@
             Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type. Current: " +
-                string.Join(", ", relationships.Select(r => r.ImplementationType.Name)));
+                relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
 #endif
 

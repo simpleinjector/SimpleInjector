@@ -1068,7 +1068,7 @@
             {
                 AssertThat.StringContains(
                     @"its constructor should have an argument of one of the following types:
-                    ICommandHandler<Int32>, Func<ICommandHandler<Int32>>".TrimInside(),
+                    ICommandHandler<Int32> and Func<ICommandHandler<Int32>>".TrimInside(),
                     ex.Message);
 
                 AssertThat.ExceptionContainsParamName(ex, "decoratorType");

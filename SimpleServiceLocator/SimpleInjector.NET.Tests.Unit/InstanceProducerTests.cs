@@ -96,7 +96,7 @@
             // Assert
             Assert.IsFalse(relationships.Any(), 
                 "The InstanceProducer for ITwo was expected to have no relationships. Current: " +
-                string.Join(", ", relationships.Select(r => r.ImplementationType.Name)));
+                relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
 #endif
 
