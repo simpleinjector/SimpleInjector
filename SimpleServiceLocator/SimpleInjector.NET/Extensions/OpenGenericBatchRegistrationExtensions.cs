@@ -617,6 +617,9 @@ namespace SimpleInjector.Extensions
         /// definition of the given <paramref name="openGenericServiceType"/>, by supplying a 
         /// <see cref="BatchRegistrationCallback"/> delegate, that will be called for each found closed generic 
         /// implementation.
+        /// If the list contains open generic types, matching closed generic versions of each open generic
+        /// type will be added to the list of implementations that is passed on to the 
+        /// <paramref name="callback"/> delegate.
         /// </summary>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
