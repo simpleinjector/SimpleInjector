@@ -45,6 +45,16 @@ namespace SimpleInjector
 #if !SILVERLIGHT
         private static long dynamicClassCounter;
 #endif
+        internal static Lazy<T> ToLazy<T>(T value)
+        {
+            return new Lazy<T>(() => value, LazyThreadSafetyMode.None);
+        }
+
+        internal static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T element)
+        {
+            return source.Concat(Enumerable.Repeat(element, 1));
+        }
+
         internal static string ToCommaSeparatedText(this IEnumerable<string> values)
         {
             var names = values.ToArray();
