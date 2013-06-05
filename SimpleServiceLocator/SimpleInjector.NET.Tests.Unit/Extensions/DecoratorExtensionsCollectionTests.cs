@@ -1389,7 +1389,8 @@
 
             // Assert
             Assert.AreEqual(1, relationships.Length);
-            Assert.IsTrue(expectedRelationship.Equals(relationships[0]));
+            Assert.IsTrue(expectedRelationship.Equals(relationships[0]),
+                "Actual relationship: " + RelationshipInfo.ToString(relationships[0]));
         }
 #endif
         

@@ -68,7 +68,7 @@ namespace SimpleInjector.Extensions.Decorators
             get { return this.data.Predicate; }
         }
 
-        protected abstract Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
+        protected abstract Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get;
         }
@@ -85,27 +85,29 @@ namespace SimpleInjector.Extensions.Decorators
         // DecoratorExpressionInterceptor and the ContainerUncontrolledServiceDecoratorInterceptor can have
         // their own dictionary. This is needed because they both use the same key, but store different
         // information.
-        protected Dictionary<Type, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(
+        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(
             object key)
         {
             lock (key)
             {
                 var threadLocal =
-                    (ThreadLocal<Dictionary<Type, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
+                    (ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
 
                 if (threadLocal == null)
                 {
-                    threadLocal = new ThreadLocal<Dictionary<Type, ServiceTypeDecoratorInfo>>();
+                    threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>();
                     this.Container.SetItem(key, threadLocal);
                 }
 
-                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<Type, ServiceTypeDecoratorInfo>());
+                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
             }
         }
 
-        protected bool SatisfiesPredicate(Type registeredServiceType, Expression expression, Lifestyle lifestyle)
+        protected bool SatisfiesPredicate(InstanceProducer registeredProducer, Type registeredServiceType,
+            Expression expression, Lifestyle lifestyle)
         {
-            var context = this.CreatePredicateContext(registeredServiceType, expression, lifestyle);
+            var context = 
+                this.CreatePredicateContext(registeredProducer, registeredServiceType, expression, lifestyle);
 
             return this.SatisfiesPredicate(context);
         }
@@ -117,12 +119,15 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
         {
-            return this.GetServiceTypeInfo(e.Expression, e.RegisteredServiceType, e.Lifestyle);
+            return this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.RegisteredServiceType, e.Lifestyle);
         }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            Type registeredServiceType, Lifestyle lifestyle)
+            InstanceProducer registeredProducer, Type registeredServiceType, Lifestyle lifestyle)
         {
+            // registeredProducer.ServiceType and registeredServiceType are different when called by 
+            // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
+            // registeredServiceType will be T.
             ExpressionRegistration registration = null;
 
             Func<InstanceProducer> producerBuilder = () =>
@@ -132,7 +137,7 @@ namespace SimpleInjector.Extensions.Decorators
                 return new InstanceProducer(registeredServiceType, registration);
             };
 
-            var info = this.GetServiceTypeInfo(originalExpression, registeredServiceType, producerBuilder);
+            var info = this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
 
             if (registration != null)
             {
@@ -143,22 +148,24 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            Type registeredServiceType, Func<InstanceProducer> producerBuilder)
+            InstanceProducer registeredProducer, Func<InstanceProducer> producerBuilder)
         {
+            Type registeredServiceType = registeredProducer.ServiceType;
+
             var predicateCache = this.ThreadStaticServiceTypePredicateCache;
 
-            if (!predicateCache.ContainsKey(registeredServiceType))
+            if (!predicateCache.ContainsKey(registeredProducer))
             {
                 Type implementationType =
                     ExtensionHelpers.DetermineImplementationType(originalExpression, registeredServiceType);
 
                 var producer = producerBuilder();
 
-                predicateCache[registeredServiceType] =
+                predicateCache[registeredProducer] =
                     new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);
             }
 
-            return predicateCache[registeredServiceType];
+            return predicateCache[registeredProducer];
         }
 
         protected KnownRelationship[] GetKnownDecoratorRelationships(Registration decoratorRegistration,
@@ -202,11 +209,20 @@ namespace SimpleInjector.Extensions.Decorators
                 parameter.ParameterType == typeof(Func<>).MakeGenericType(serviceType);
         }
 
-        protected DecoratorPredicateContext CreatePredicateContext(Type registeredServiceType,
-            Expression expression, Lifestyle lifestyle)
+        protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
-            var info = this.GetServiceTypeInfo(expression, registeredServiceType, lifestyle);
+            return this.CreatePredicateContext(e.InstanceProducer, e.RegisteredServiceType, e.Expression, 
+                e.Lifestyle);
+        }
 
+        protected DecoratorPredicateContext CreatePredicateContext(InstanceProducer registeredProducer,
+            Type registeredServiceType, Expression expression, Lifestyle lifestyle)
+        {
+            var info = this.GetServiceTypeInfo(expression, registeredProducer, registeredServiceType, lifestyle);
+
+            // NOTE: registeredServiceType can be different from registeredProducer.ServiceType.
+            // This is the case for container uncontrolled collections where producer.ServiceType is the
+            // IEnumerable<T> and registeredServiceType is T.
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 

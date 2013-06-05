@@ -66,7 +66,7 @@ namespace SimpleInjector.Extensions.Decorators
             this.decoratorType = this.decoratorConstructor.DeclaringType;
         }
 
-        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
+        protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
         }
@@ -78,13 +78,14 @@ namespace SimpleInjector.Extensions.Decorators
             // have defined.
             var expression = Expression.Constant(null, this.registeredServiceType);
 
-            return this.SatisfiesPredicate(this.registeredServiceType, expression, Lifestyle.Unknown);
+            return this.SatisfiesPredicate(this.e.InstanceProducer, this.registeredServiceType, expression, 
+                Lifestyle.Unknown);
         }
 
         internal void ApplyDecorator()
         {
-            var serviceInfo = 
-                this.GetServiceTypeInfo(this.e.Expression, this.registeredServiceType, Lifestyle.Unknown);
+            var serviceInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer, 
+                this.registeredServiceType, Lifestyle.Unknown);
 
             Registration decoratorRegistration;
 

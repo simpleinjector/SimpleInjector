@@ -103,5 +103,7 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
         public Collection<KnownRelationship> KnownRelationships { get; internal set; }
+
+        internal InstanceProducer InstanceProducer { get; set; }
     }
 }

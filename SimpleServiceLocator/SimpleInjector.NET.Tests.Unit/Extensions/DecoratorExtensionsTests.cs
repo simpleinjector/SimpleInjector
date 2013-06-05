@@ -2064,7 +2064,7 @@
 
         internal static string ToString(KnownRelationship relationship)
         {
-            return string.Format("ImplementationType: {0}, Lifestyle: '{1}', Dependency: {2}",
+            return string.Format("ImplementationType: {0}, Lifestyle: {1}, Dependency: {2}",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Lifestyle.Name,
                 string.Format("{{ ServiceType: {0}, Lifestyle: {1} }}",

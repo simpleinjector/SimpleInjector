@@ -12,6 +12,9 @@ Version vNext
 	Bug fixes:
 		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when
 		 they shared the same Registration. (work item 19796).
+		-[Core] The RegisterDecorator method overload that accepts the predicate didn't supply the correct
+		 DecoratorPredicateContext when decorating multiple registrations with the same service type. The
+		 internal cached used the service type as key, not the InstanceProducer itself. (work item 19780).
 
 
 Version 2.2.3 (v2.2.3 RTM)  2013-05-05

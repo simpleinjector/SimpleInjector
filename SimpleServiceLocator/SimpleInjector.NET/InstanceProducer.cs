@@ -234,6 +234,7 @@ namespace SimpleInjector
             var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
 
             e.Lifestyle = this.Lifestyle;
+            e.InstanceProducer = this;
 
             this.Registration.Container.OnExpressionBuilt(e, this);
 

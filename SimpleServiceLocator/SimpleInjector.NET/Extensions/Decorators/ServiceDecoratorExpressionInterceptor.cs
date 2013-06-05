@@ -54,15 +54,14 @@ namespace SimpleInjector.Extensions.Decorators
             this.decoratorType = this.decoratorConstructor.DeclaringType;
         }
 
-        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
+        protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
         }
 
         internal bool SatisfiesPredicate()
         {
-            var context = this.CreatePredicateContext(this.registeredServiceType, 
-                this.e.Expression, this.e.Lifestyle);
+            var context = this.CreatePredicateContext(this.e);
 
             return this.SatisfiesPredicate(context);
         }

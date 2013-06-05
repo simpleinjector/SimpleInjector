@@ -121,11 +121,10 @@ namespace SimpleInjector.Extensions
         internal DecoratorPredicateContext Decorate(Type decoratorType, Expression decoratedExpression,
             InstanceProducer newRegistration)
         {
-            var list = this.AppliedDecorators.ToList();
-            list.Add(decoratorType);
+            var appliedDecorators = this.AppliedDecorators.Concat(decoratorType).ToList().AsReadOnly();
 
             return new DecoratorPredicateContext(this.ServiceType, this.ImplementationType,
-                list.AsReadOnly(), decoratedExpression, newRegistration);
+                appliedDecorators, decoratedExpression, newRegistration);
         }
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,

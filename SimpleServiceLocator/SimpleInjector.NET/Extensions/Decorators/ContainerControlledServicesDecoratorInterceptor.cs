@@ -63,8 +63,8 @@ namespace SimpleInjector.Extensions.Decorators
             // The actual decorator could be different. TODO: must... write... test... for... this.
             this.decoratorType = this.decoratorConstructor.DeclaringType;
         }
-        
-        protected override Dictionary<Type, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
+
+        protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { throw new NotSupportedException(); }
         }
