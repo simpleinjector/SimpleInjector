@@ -1047,12 +1047,12 @@
             // Assert
             Assert.AreEqual(2, predicateContexts.Count, "Since the registration is made with an array of " +
                 "singletons, the decorator system should have enough information to call the predicate " +
-                "once for each element in the collection.");
+                "once for each element in the collection (the collection contains two elements).");
 
             DecoratorPredicateContext realContext = predicateContexts[0];
 
-            Assert.AreEqual(realContext.ServiceType, typeof(ICommandHandler<RealCommand>));
-            Assert.AreEqual(realContext.ImplementationType, typeof(RealCommandCommandHandler));
+            Assert.AreEqual(typeof(ICommandHandler<RealCommand>), realContext.ServiceType);
+            Assert.AreEqual(typeof(RealCommandCommandHandler), realContext.ImplementationType);
             Assert.IsInstanceOfType(realContext.Expression, typeof(ConstantExpression));
             Assert.AreEqual(0, realContext.AppliedDecorators.Count);
 
