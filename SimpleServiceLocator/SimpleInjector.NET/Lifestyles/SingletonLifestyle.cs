@@ -28,6 +28,8 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Linq.Expressions;
     using System.Threading;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions.Decorators;
 
     internal sealed class SingletonLifestyle : Lifestyle
     {

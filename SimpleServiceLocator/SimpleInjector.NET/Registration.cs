@@ -107,10 +107,7 @@ namespace SimpleInjector
         /// <returns>A new array containing the <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
         {
-            lock (this.dependencies)
-            {
-                return this.dependencies.ToArray();
-            }
+            return this.GetRelationshipsCore();
         }
 
         /// <summary>
@@ -139,6 +136,14 @@ namespace SimpleInjector
             }
 
             this.instanceInitializer(instance);
+        }
+
+        internal virtual KnownRelationship[] GetRelationshipsCore()
+        {
+            lock (this.dependencies)
+            {
+                return this.dependencies.ToArray();
+            }
         }
 
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> dependencies)

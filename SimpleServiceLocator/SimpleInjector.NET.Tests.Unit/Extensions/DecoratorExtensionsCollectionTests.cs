@@ -9,6 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.
@@ -608,18 +609,16 @@
                 typeof(RealCommandCommandHandlerDecorator));
 
             // Act
-            IEnumerable<ICommandHandler<RealCommand>> handlers =
-                container.GetAllInstances<ICommandHandler<RealCommand>>();
+            var handlers1 = container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
+            var handlers2 = container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
 
-            var nullHandler1 = ((RealCommandCommandHandlerDecorator)handlers.Last()).Decorated;
-            var nullHandler2 = ((RealCommandCommandHandlerDecorator)handlers.Last()).Decorated;
+            var nullHandler1 = ((RealCommandCommandHandlerDecorator)handlers1.Last()).Decorated;
+            var nullHandler2 = ((RealCommandCommandHandlerDecorator)handlers2.Last()).Decorated;
 
             // Assert
             Assert.IsInstanceOfType(nullHandler1, typeof(NullCommandHandler<RealCommand>));
 
-            bool isSingleton = object.ReferenceEquals(nullHandler1, nullHandler2);
-
-            Assert.IsTrue(isSingleton,
+            Assert.AreSame(nullHandler1, nullHandler2,
                 "The NullCommandHandler is registered as singleton and should be injected as singleton.");
         }
 
@@ -792,13 +791,15 @@
 
             var real = relationships[0];
 
-            Assert.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), real.ImplementationType);
-            Assert.AreEqual(typeof(RealCommandCommandHandler), real.Dependency.ServiceType);
+            AssertThat.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), real.ImplementationType);
+            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), real.Dependency.ServiceType);
+            AssertThat.AreEqual(typeof(RealCommandCommandHandler), real.Dependency.ImplementationType);
 
             var @default = relationships[1];
 
-            Assert.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), @default.ImplementationType);
-            Assert.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ServiceType);
+            AssertThat.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), @default.ImplementationType);
+            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), @default.Dependency.ServiceType);
+            AssertThat.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ImplementationType);
         }
 #endif
         
@@ -1325,18 +1326,11 @@
         public void GetRegistration_ContainerControlledCollectionWithDecorator_ContainsExpectedListOfRelationships()
         {
             // Arrange
-            var expectedRelationship1 = new RelationshipInfo
+            var expectedRelationship = new RelationshipInfo
             {
                 ImplementationType = typeof(RealCommandHandlerDecorator),
                 Lifestyle = Lifestyle.Transient,
-                Dependency = new DependencyInfo(typeof(StubCommandHandler), Lifestyle.Transient)
-            };
-
-            var expectedRelationship2 = new RelationshipInfo
-            {
-                ImplementationType = typeof(RealCommandHandlerDecorator),
-                Lifestyle = Lifestyle.Transient,
-                Dependency = new DependencyInfo(typeof(RealCommandHandler), Lifestyle.Transient)
+                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
             };
 
             var container = ContainerFactory.New();
@@ -1350,14 +1344,14 @@
 
             container.Verify();
 
+            var producer = container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
+
             // Act
-            var relationships =
-                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>)).GetRelationships();
+            var relationships = producer.GetRelationships();
 
             // Assert
             Assert.AreEqual(2, relationships.Length);
-            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
-            Assert.AreEqual(1, relationships.Count(actual => expectedRelationship2.Equals(actual)));
+            Assert.AreEqual(2, relationships.Count(actual => expectedRelationship.Equals(actual)));
         }
 
         [TestMethod]
@@ -1618,46 +1612,6 @@
             container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
         }
 
-        [TestMethod]
-        public void GetAllInstances_OnContainerControlledCollection_AppliesDecoratorOnSingleElements()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Registering them by object prevents the decorator from being applied.
-            container.RegisterAll<ICommandHandler<RealCommand>>(
-                typeof(StubCommandHandler),
-                typeof(RealCommandHandler));
-
-            // Registers a decorator specific for the StubCommandHandler type.
-            container.RegisterDecorator(typeof(StubCommandHandler), typeof(StubCommandHandlerDecorator));
-
-            // Act
-            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
-
-            // Assert
-            Assert.IsInstanceOfType(handler, typeof(StubCommandHandlerDecorator));
-        }
-
-        [TestMethod]
-        public void GetAllInstances_OnContainerUncontrolledSingletons_AppliesDecoratorOnSingleElements()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.RegisterAll<ICommandHandler<RealCommand>>(
-                new StubCommandHandler(),
-                new RealCommandHandler());
-
-            container.RegisterDecorator(typeof(StubCommandHandler), typeof(StubCommandHandlerDecorator));
-
-            // Act
-            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
-
-            // Assert
-            Assert.IsInstanceOfType(handler, typeof(StubCommandHandlerDecorator));
-        }
-
 #if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
@@ -1794,21 +1748,6 @@
             public void Handle(T command)
             {
                 // Start a transaction (not important for these tests).
-            }
-        }
-
-        public class StubCommandHandlerDecorator : StubCommandHandler
-        {
-            private StubCommandHandler decoratee;
-
-            public StubCommandHandlerDecorator(StubCommandHandler decoratee)
-            {
-                this.decoratee = decoratee;
-            }
-
-            public override void Handle(RealCommand command)
-            {
-                this.decoratee.Handle(command);
             }
         }
 

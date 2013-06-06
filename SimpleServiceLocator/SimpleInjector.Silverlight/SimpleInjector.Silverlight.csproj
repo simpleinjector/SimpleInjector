@@ -143,20 +143,14 @@
     <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
       <Link>ExpressionBuiltEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratableSingletonCollection.cs">
-      <Link>Extensions\DecoratableSingletonCollection.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
       <Link>Extensions\DecoratorExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorPredicateContext.cs">
       <Link>Extensions\DecoratorPredicateContext.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerControlledEnumerable.cs">
-      <Link>Extensions\Decorators\ContainerControlledEnumerable.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs">
-      <Link>Extensions\Decorators\ContainerControlledServicesDecoratorInterceptor.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerControlledCollection.cs">
+      <Link>Extensions\Decorators\ContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
       <Link>Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
@@ -176,8 +170,8 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInterceptor.cs">
       <Link>Extensions\Decorators\DecoratorInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IDecoratableEnumerable.cs">
-      <Link>Extensions\Decorators\IDecoratableEnumerable.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IContainerControlledCollection.cs">
+      <Link>Extensions\Decorators\IContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
       <Link>Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>

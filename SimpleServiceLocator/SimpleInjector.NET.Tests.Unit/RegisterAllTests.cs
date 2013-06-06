@@ -365,7 +365,9 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IUserRepository>(new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() });
+            var repositories = new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() };
+
+            container.RegisterAll<IUserRepository>(repositories);
 
             // Act
             var collection = container.GetAllInstances<IUserRepository>();
@@ -676,7 +678,8 @@
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
                 "users to change the collection.";
 
-            if (collection is ReadOnlyCollection<T>)
+            if (collection is ReadOnlyCollection<T> ||
+                collection.GetType().Name.Contains("ContainerControlled"))
             {
                 return;
             }

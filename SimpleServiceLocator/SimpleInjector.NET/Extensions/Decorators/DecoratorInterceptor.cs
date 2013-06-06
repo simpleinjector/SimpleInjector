@@ -37,17 +37,15 @@ namespace SimpleInjector.Extensions.Decorators
         // registered.
         // So the Type is an closed generic version of the open generic service that is wrapped, the
         // registration is the registration for the closed generic decorator.
-        private readonly Dictionary<Type, Registration> registrationsCache;
-        private readonly Dictionary<Type, IDecoratableEnumerable> decoratableEnumerablesCache;
-        private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollectionsCache;
+        private readonly Dictionary<InstanceProducer, Registration> registrationsCache;
+        private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
 
         private readonly DecoratorExpressionInterceptorData data;
 
         public DecoratorInterceptor(DecoratorExpressionInterceptorData data)
         {
-            this.registrationsCache = new Dictionary<Type, Registration>();
-            this.decoratableEnumerablesCache = new Dictionary<Type, IDecoratableEnumerable>();
-            this.singletonDecoratedCollectionsCache = new Dictionary<Type, IEnumerable>();
+            this.registrationsCache = new Dictionary<InstanceProducer, Registration>();
+            this.singletonDecoratedCollectionsCache = new Dictionary<InstanceProducer, IEnumerable>();
 
             this.data = data;
         }
@@ -91,11 +89,8 @@ namespace SimpleInjector.Extensions.Decorators
         {
             if (IsCollectionType(e.RegisteredServiceType))
             {
-                if (DecoratorHelpers.IsContainerControlledCollectionExpression(e.Expression))
-                {
-                    this.TryToApplyDecoratorOnContainerControlledCollection(e);
-                }
-                else
+                // NOTE: Container controlled collections will decorate themselves.
+                if (!DecoratorHelpers.IsContainerControlledCollectionExpression(e.Expression))
                 {
                     this.TryToApplyDecoratorOnContainerUncontrolledCollection(e);
                 }
@@ -106,29 +101,7 @@ namespace SimpleInjector.Extensions.Decorators
         {
             return typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType);
         }
-
-        private void TryToApplyDecoratorOnContainerControlledCollection(ExpressionBuiltEventArgs e)
-        {
-            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
-
-            Type decoratorType;
-
-            // We don't check the predicate here; that is done for each element individually.
-            if (this.MustDecorate(serviceType, out decoratorType))
-            {
-                this.ApplyDecoratorOnContainerControlledCollection(e, serviceType, decoratorType);
-            }
-        }
-
-        private void ApplyDecoratorOnContainerControlledCollection(ExpressionBuiltEventArgs e, 
-            Type serviceType, Type decoratorType)
-        {
-            var controlledInterceptor = new ContainerControlledServicesDecoratorInterceptor(this.data,
-                this.decoratableEnumerablesCache, e, serviceType, decoratorType);
-
-            controlledInterceptor.ApplyDecorator();
-        }
-
+        
         private void TryToApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e)
         {
             var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];

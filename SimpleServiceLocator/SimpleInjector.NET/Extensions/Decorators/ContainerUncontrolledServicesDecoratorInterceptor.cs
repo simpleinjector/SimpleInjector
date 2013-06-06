@@ -44,14 +44,14 @@ namespace SimpleInjector.Extensions.Decorators
     {
         private static readonly object ContainerItemsKeyAndLock = new object();
 
-        private readonly Dictionary<Type, IEnumerable> singletonDecoratedCollectionsCache;
+        private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
         private readonly ConstructorInfo decoratorConstructor;
         private readonly Type decoratorType;
 
         public ContainerUncontrolledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data,
-            Dictionary<Type, IEnumerable> singletonDecoratedCollectionsCache,
+            Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache,
             ExpressionBuiltEventArgs e, Type registeredServiceType, Type decoratorType)
             : base(data)
         {
@@ -264,12 +264,12 @@ namespace SimpleInjector.Extensions.Decorators
             {
                 IEnumerable collection;
 
-                if (!this.singletonDecoratedCollectionsCache.TryGetValue(this.registeredServiceType, 
+                if (!this.singletonDecoratedCollectionsCache.TryGetValue(this.e.InstanceProducer, 
                     out collection))
                 {
                     collection = collectionCreator();
 
-                    this.singletonDecoratedCollectionsCache[this.registeredServiceType] = collection;
+                    this.singletonDecoratedCollectionsCache[this.e.InstanceProducer] = collection;
                 }
 
                 return collection;

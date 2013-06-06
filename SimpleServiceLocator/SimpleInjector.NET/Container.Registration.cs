@@ -946,8 +946,8 @@ namespace SimpleInjector
         /// reference.</exception>
         public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
         {
-            Requires.IsNotNull(collection, "collection");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            Requires.IsNotNull(collection, "collection");
 
             this.ThrowWhenCollectionTypeAlreadyRegistered(typeof(TService));
 
@@ -976,13 +976,13 @@ namespace SimpleInjector
         /// is a null reference.</exception>
         public void RegisterAll<TService>(params TService[] singletons) where TService : class
         {
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             Requires.IsNotNull(singletons, "singletons");
-
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
-            var collection = new DecoratableSingletonCollection<TService>(this, singletons.ToArray());
+            var collection = new ContainerControlledCollection<TService>(this, singletons);
 
-            this.RegisterAll<TService>(collection);
+            this.RegisterContainerControlledCollection(typeof(TService), collection);
         }
 
         /// <summary>
@@ -1061,10 +1061,10 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
                 typeCanBeServiceType: true);
 
-            IDecoratableEnumerable enumerable =
+            IContainerControlledCollection collection = 
                 DecoratorHelpers.CreateContainerControlledEnumerable(serviceType, this, types);
 
-            this.RegisterAllInternal(serviceType, enumerable);
+            this.RegisterContainerControlledCollection(serviceType, collection);
         }
 
         /// <summary>
@@ -1315,6 +1315,19 @@ namespace SimpleInjector
             this.AddRegistration(serviceType, registration);
         }
 
+        private void RegisterContainerControlledCollection(Type serviceType, 
+            IContainerControlledCollection collection)
+        {
+            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
+
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var registration = DecoratorHelpers.CreateDecoratableEnumerableRegistration(
+                enumerableServiceType, collection, this);
+
+            this.AddRegistration(enumerableServiceType, registration);
+        }
+
         private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
         {
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
@@ -1323,8 +1336,8 @@ namespace SimpleInjector
 
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            var registration = Lifestyle.Singleton.CreateRegistration(enumerableServiceType,
-                () => castedCollection, this);
+            var registration = 
+                SingletonLifestyle.CreateSingleRegistration(enumerableServiceType, castedCollection, this);
 
             registration.IsCollection = true;
 

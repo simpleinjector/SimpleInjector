@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -25,16 +25,18 @@
 
 namespace SimpleInjector.Extensions.Decorators
 {
+    using System;
     using System.Collections;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// An IDecoratableEnumerable is a special enumerable that can be used more efficiently by the container
     /// to apply decorators to, with the biggest noticable difference that the registered predicate, will be
     /// checked for each service in the collection.
     /// </summary>
-    internal interface IDecoratableEnumerable : IEnumerable
+    internal interface IContainerControlledCollection : IEnumerable
     {
-        DecoratorPredicateContext[] GetDecoratorPredicateContexts();
+        KnownRelationship[] GetRelationships();
     }
 }

@@ -33,14 +33,15 @@ namespace SimpleInjector.Extensions.Decorators
     {
         private static readonly object ContainerItemsKeyAndLock = new object();
 
-        private readonly Dictionary<Type, Registration> registrations;
+        private readonly Dictionary<InstanceProducer, Registration> registrations;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
         private readonly ConstructorInfo decoratorConstructor;
         private readonly Type decoratorType;
 
         public ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data,
-            Dictionary<Type, Registration> registrations, ExpressionBuiltEventArgs e, Type decoratorType)
+            Dictionary<InstanceProducer, Registration> registrations, ExpressionBuiltEventArgs e, 
+            Type decoratorType)
             : base(data)
         {
             this.registrations = registrations;
@@ -96,12 +97,12 @@ namespace SimpleInjector.Extensions.Decorators
             // Registration instance itself (such as the Singleton lifestyle does).
             lock (this.registrations)
             {
-                if (!this.registrations.TryGetValue(this.registeredServiceType, out registration))
+                if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
                 {
                     registration = this.CreateRegistration(this.registeredServiceType, 
                         this.decoratorConstructor, this.e.Expression);
 
-                    this.registrations[this.registeredServiceType] = registration;
+                    this.registrations[this.e.InstanceProducer] = registration;
                 }
             }
 

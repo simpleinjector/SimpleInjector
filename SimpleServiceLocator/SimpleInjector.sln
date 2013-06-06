@@ -69,7 +69,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation Genaration", "Documentation Genaration", "{59B27DFA-E74B-4A06-8DF2-7DFBBE6B7C5D}"
 	ProjectSection(SolutionItems) = preProject
-		builddocs.bat = builddocs.bat
 		SandcastleGUI.exe = SandcastleGUI.exe
 		SimpleInjector.SandcastleGUI = SimpleInjector.SandcastleGUI
 		SimpleInjector.snk = SimpleInjector.snk

@@ -55,13 +55,13 @@ namespace SimpleInjector.Extensions
             new ReadOnlyCollection<Type>(Type.EmptyTypes);
 
         internal DecoratorPredicateContext(Type serviceType, Type implementationType,
-            ReadOnlyCollection<Type> appliedDecorators, Expression expression, InstanceProducer registration)
+            ReadOnlyCollection<Type> appliedDecorators, Expression expression, InstanceProducer producer)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
             this.AppliedDecorators = appliedDecorators;
             this.Expression = expression;
-            this.Registration = registration;
+            this.InstanceProducer = producer;
         }
 
         /// <summary>
@@ -93,17 +93,7 @@ namespace SimpleInjector.Extensions
         /// <value>The current expression that is about to be decorated.</value>
         public Expression Expression { get; private set; }
 
-        internal InstanceProducer Registration { get; private set; }
-
-        internal static DecoratorPredicateContext CreateFromProducer(Container container, Type serviceType,
-            InstanceProducer producer)
-        {
-            var expression = producer.BuildExpression();
-
-            Type implementationType = ExtensionHelpers.DetermineImplementationType(expression, serviceType);
-
-            return CreateFromExpression(container, serviceType, implementationType, expression, producer);
-        }
+        internal InstanceProducer InstanceProducer { get; private set; }
 
         internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
             Type implementationType, Expression expression, InstanceProducer producer = null)
@@ -116,15 +106,6 @@ namespace SimpleInjector.Extensions
 
             return new DecoratorPredicateContext(serviceType, implementationType,
                 DecoratorPredicateContext.NoDecorators, expression, producer);
-        }
-
-        internal DecoratorPredicateContext Decorate(Type decoratorType, Expression decoratedExpression,
-            InstanceProducer newRegistration)
-        {
-            var appliedDecorators = this.AppliedDecorators.Concat(decoratorType).ToList().AsReadOnly();
-
-            return new DecoratorPredicateContext(this.ServiceType, this.ImplementationType,
-                appliedDecorators, decoratedExpression, newRegistration);
         }
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,

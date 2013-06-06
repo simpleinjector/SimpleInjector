@@ -13,6 +13,8 @@
         {
         }
 
+        // Okay, I admit. I was too lazy to write a set of good unit tests. This is just one big test that
+        // show cases the KeyedRegistrations.
         [TestMethod]
         public void Scenario1()
         {
@@ -29,6 +31,9 @@
 
             container.RegisterAll<IPlugin>(plugins);
 
+            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginDecorator),
+                context => context.ImplementationType == typeof(Plugin3));
+
             container.RegisterSingle<Func<string, IPlugin>>(key => plugins.GetInstance(key));
 
             container.Verify();
@@ -41,21 +46,21 @@
             // Assert
             Assert.IsInstanceOfType(actualPlugins1[0], typeof(Plugin1));
             Assert.IsInstanceOfType(actualPlugins1[1], typeof(Plugin2));
-            Assert.IsInstanceOfType(actualPlugins1[2], typeof(Plugin3));
+            Assert.IsInstanceOfType(actualPlugins1[2], typeof(PluginDecorator));
             Assert.IsInstanceOfType(actualPlugins1[3], typeof(Plugin));
             Assert.IsInstanceOfType(actualPlugins1[4], typeof(Plugin));
 
             Assert.IsInstanceOfType(factory("1"), typeof(Plugin1));
             Assert.IsInstanceOfType(factory("2"), typeof(Plugin2));
-            Assert.IsInstanceOfType(factory("3"), typeof(Plugin3));
+            Assert.IsInstanceOfType(factory("3"), typeof(PluginDecorator));
             Assert.IsInstanceOfType(factory("4"), typeof(Plugin));
             Assert.IsInstanceOfType(factory("5"), typeof(Plugin));
 
-            Assert.IsFalse(object.ReferenceEquals(actualPlugins1[0], actualPlugins2[0]));
-            Assert.IsFalse(object.ReferenceEquals(actualPlugins1[1], actualPlugins2[1]));
-            Assert.IsTrue(object.ReferenceEquals(actualPlugins1[2], actualPlugins2[2]));
-            Assert.IsFalse(object.ReferenceEquals(actualPlugins1[3], actualPlugins2[3]));
-            Assert.IsTrue(object.ReferenceEquals(actualPlugins1[4], actualPlugins2[4]));
+            Assert.AreNotSame(actualPlugins1[0], actualPlugins2[0]);
+            Assert.AreNotSame(actualPlugins1[1], actualPlugins2[1]);
+            Assert.AreSame(actualPlugins1[2], actualPlugins2[2]);
+            Assert.AreNotSame(actualPlugins1[3], actualPlugins2[3]);
+            Assert.AreSame(actualPlugins1[4], actualPlugins2[4]);
         }
 
         public class Plugin1 : IPlugin 

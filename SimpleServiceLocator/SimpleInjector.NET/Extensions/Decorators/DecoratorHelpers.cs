@@ -40,23 +40,23 @@ namespace SimpleInjector.Extensions.Decorators
     {
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
+                
+        internal static Registration CreateDecoratableEnumerableRegistration(Type serviceType,
+            IContainerControlledCollection instance, Container container)
+        {
+            return new ContainerControlledCollectionRegistration(serviceType, instance, container)
+            {
+                IsCollection = true
+            };
+        }     
 
-        internal static IDecoratableEnumerable CreateContainerControlledEnumerable(Type serviceType,
+        internal static IContainerControlledCollection CreateContainerControlledEnumerable(Type serviceType,
             Container container, Type[] serviceTypes)
         {
-            Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
+            Type allInstancesEnumerableType = typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
 
-            return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
+            return (IContainerControlledCollection)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, serviceTypes });
-        }
-
-        internal static IDecoratableEnumerable CreateDecoratedEnumerable(Type serviceType, Container container,
-            DecoratorPredicateContext[] contexts)
-        {
-            Type allInstancesEnumerableType = typeof(ContainerControlledEnumerable<>).MakeGenericType(serviceType);
-
-            return (IDecoratableEnumerable)Activator.CreateInstance(allInstancesEnumerableType,
-                new object[] { container, contexts });
         }
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
@@ -65,7 +65,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             object enumerable = constantExpression != null ? constantExpression.Value : null;
 
-            return enumerable is IDecoratableEnumerable;
+            return enumerable is IContainerControlledCollection;
         }
 
         internal static IEnumerable Select(this IEnumerable source, Type type, Delegate selector)
@@ -180,6 +180,35 @@ namespace SimpleInjector.Extensions.Decorators
                 serviceType.IsGenericType &&
                 parameterType.IsGenericType &&
                 serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
+        }
+
+        private sealed class ContainerControlledCollectionRegistration : Registration
+        {
+            private readonly IContainerControlledCollection instance;
+            private readonly Type serviceType;
+
+            internal ContainerControlledCollectionRegistration(Type serviceType,
+                IContainerControlledCollection instance, Container container)
+                : base(Lifestyle.Singleton, container)
+            {
+                this.instance = instance;
+                this.serviceType = serviceType;
+            }
+
+            public override Type ImplementationType
+            {
+                get { return this.serviceType; }
+            }
+
+            public override Expression BuildExpression()
+            {
+                return Expression.Constant(this.instance, this.serviceType);
+            }
+
+            internal override KnownRelationship[] GetRelationshipsCore()
+            {
+                return base.GetRelationshipsCore().Concat(this.instance.GetRelationships()).ToArray();
+            }
         }
     }
 }

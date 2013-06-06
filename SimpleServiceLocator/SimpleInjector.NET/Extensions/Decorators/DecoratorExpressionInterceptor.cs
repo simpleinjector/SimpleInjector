@@ -179,7 +179,7 @@ namespace SimpleInjector.Extensions.Decorators
                 where relationship.Dependency.ServiceType != registeredServiceType
                 select relationship;
 
-            return normalDependencyRelationships.Union(decorateeRelationship).ToArray();
+            return normalDependencyRelationships.Concat(decorateeRelationship).ToArray();
         }
         
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,

@@ -30,36 +30,43 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Threading;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal sealed class ContainerControlledEnumerable<TService> : IndexableEnumerable<TService>, 
-        IDecoratableEnumerable
+    internal sealed class ContainerControlledCollection<TService> : IndexableEnumerable<TService>, 
+        IContainerControlledCollection
     {
         private readonly Container container;
-        private readonly Type[] serviceTypes;
 
+        private List<Lazy<InstanceProducer>> producers;
         private DecoratorPredicateContext[] contexts;
         private Func<TService>[] instanceCreators;
 
         // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledEnumerable(Container container, Type[] serviceTypes)
+        public ContainerControlledCollection(Container container, Type[] serviceTypes)
         {
             this.container = container;
-            this.serviceTypes = serviceTypes;
+            this.producers = serviceTypes.Select(this.GetLazyInstanceProducer).ToList();
         }
-        
-        // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledEnumerable(Container container, DecoratorPredicateContext[] contexts)
+
+        internal ContainerControlledCollection(Container container, TService[] singletons)
+            : this(container, ConvertSingletonsToInstanceProducers(container, singletons))
+        {
+        }
+
+        internal ContainerControlledCollection(Container container,
+            IEnumerable<InstanceProducer> producers)
         {
             this.container = container;
-            this.contexts = contexts;
+            this.producers = producers.Select(Helpers.ToLazy).ToList();
         }
 
         public override int Count
         {
-            get { return this.serviceTypes != null ? this.serviceTypes.Length : this.contexts.Length; }
+            get { return this.producers != null ? this.producers.Count : this.contexts.Length; }
         }
 
         public override TService this[int index]
@@ -77,11 +84,14 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        public DecoratorPredicateContext[] GetDecoratorPredicateContexts()
+        KnownRelationship[] IContainerControlledCollection.GetRelationships()
         {
-            this.BuildContexts();
-
-            return this.contexts.ToArray();
+            return (
+                from context in this.contexts ?? Enumerable.Empty<DecoratorPredicateContext>()
+                from relationship in context.InstanceProducer.GetRelationships()
+                select relationship)
+                .Distinct()
+                .ToArray();
         }
 
         public override IEnumerator<TService> GetEnumerator()
@@ -141,10 +151,13 @@ namespace SimpleInjector.Extensions.Decorators
             if (this.contexts == null)
             {
                 this.contexts = (
-                    from implementationType in this.serviceTypes
-                    let producer = this.GetRegistration(implementationType)
-                    select DecoratorPredicateContext.CreateFromExpression(this.container, producer.ServiceType,
-                        implementationType, producer.BuildExpression()))
+                    from producer in this.producers.Select(p => p.Value)
+                    select DecoratorPredicateContext.CreateFromExpression(
+                        this.container, 
+                        producer.ServiceType, 
+                        producer.ImplementationType, 
+                        producer.BuildExpression(),
+                        producer))
                     .ToArray();
             }
         }
@@ -156,19 +169,29 @@ namespace SimpleInjector.Extensions.Decorators
                 yield return instanceCreator();
             }
         }
-
-        private InstanceProducer GetRegistration(Type serviceType)
+        
+        private static IEnumerable<InstanceProducer> ConvertSingletonsToInstanceProducers(Container container,
+            TService[] singletons)
         {
-            var producer = this.container.GetRegistration(serviceType);
+            return
+                from instance in singletons
+                let registration =
+                    SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, container)
+                select new InstanceProducer(typeof(TService), registration);
+        }
 
-            if (producer == null)
+        private Lazy<InstanceProducer> GetLazyInstanceProducer(Type serviceType)
+        {
+            // precondition: typeof(TService).IsAssignableFrom(serviceType).
+            return new Lazy<InstanceProducer>(() =>
             {
-                // This will throw an exception, because there is no registration for the service type.
-                // By calling GetInstance we reuse the descriptive exception messages of the container.
-                this.container.GetInstance(serviceType);
-            }
+                // instanceProducer.ServiceType == serviceType
+                var instanceProducer = this.container.GetRegistration(serviceType, throwOnFailure: true);
 
-            return producer;
+                // We need to create a new InstanceProducer with instanceProducer.ServiceType == typeof(TService).
+                // This allows decorators to be applied 
+                return new InstanceProducer(typeof(TService), instanceProducer.Registration);
+            });
         }
     }
 }
