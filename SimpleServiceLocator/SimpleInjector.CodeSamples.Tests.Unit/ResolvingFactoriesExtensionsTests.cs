@@ -156,5 +156,120 @@
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "Singleton object was expected.");
         }
+
+        [TestMethod]
+        public void AllowResolvingParameterizedFuncFactories_ResolvingTypeWithoutDependencies_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+            
+            // Act
+            var tupleFactory = container.GetInstance<Func<int, string, Tuple<int, string>>>();
+
+            var tuple = tupleFactory(1, "foo");
+
+            // Assert
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("foo", tuple.Item2);
+        }
+
+        [TestMethod]
+        public void AllowResolvingParameterizedFuncFactories_ResolvingTypeWithOneDependencyAsLastCtorParameter_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+
+            container.Register<ILogger, NullLogger>();
+
+            // Act
+            var tupleFactory = container.GetInstance<Func<int, string, Tuple<int, string, ILogger>>>();
+
+            var tuple = tupleFactory(0, null);
+
+            // Assert
+            Assert.IsInstanceOfType(tuple.Item3, typeof(ILogger));
+        }
+
+        [TestMethod]
+        public void AllowResolvingParameterizedFuncFactories_ResolvingTypeWithOneDependencyAsFirstCtorParameter_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+
+            container.Register<ILogger, NullLogger>();
+
+            // Act
+            var tupleFactory = container.GetInstance<Func<int, string, Tuple<ILogger, int, string>>>();
+
+            var tuple = tupleFactory(0, null);
+
+            // Assert
+            Assert.IsInstanceOfType(tuple.Item1, typeof(NullLogger));
+        }
+        
+        [TestMethod]
+        public void AllowResolvingParameterizedFuncFactories_ResolvingTypeWithOneDependencyAtBothSidesOfCtorParameterList_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+
+            container.Register<ILogger, NullLogger>();
+            container.Register<ICommand, ConcreteCommand>();
+
+            // Act
+            var tupleFactory = container.GetInstance<Func<int, string, Tuple<ILogger, int, string, ICommand>>>();
+
+            var tuple = tupleFactory(0, null);
+
+            // Assert
+            Assert.IsInstanceOfType(tuple.Item1, typeof(NullLogger));
+            Assert.IsInstanceOfType(tuple.Item4, typeof(ConcreteCommand));
+        }
+        
+        [TestMethod]
+        public void AllowResolvingParameterizedFuncFactories_WithDependencies_PrevervesLifestyles()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+
+            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ICommand, ConcreteCommand>();
+
+            // Act
+            var tupleFactory = container.GetInstance<Func<string, Tuple<ILogger, string, ICommand>>>();
+
+            var tuple1 = tupleFactory(null);
+            var tuple2 = tupleFactory(null);
+
+            // Assert
+            Assert.AreSame(tuple1.Item1, tuple2.Item1, "Logger is expected to be singleton");
+            Assert.AreNotSame(tuple1.Item3, tuple2.Item3, "Command is expected to be transient");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ActivationException))]
+        public void AllowResolvingParameterizedFuncFactories_WithParametersInIncorrectOrder_ThrowExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AllowResolvingParameterizedFuncFactories();
+
+            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ICommand, ConcreteCommand>();
+
+            // Act
+            container.GetInstance<Func<int, string, Tuple<ILogger, string, int>>>();
+        }
     }
 }
