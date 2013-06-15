@@ -50,12 +50,20 @@ namespace SimpleInjector.Lifestyles
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
         internal static Registration CreateSingleRegistration(Type serviceType, object instance, 
-            Container container)
+            Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, "instance");
 
-            return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 
-                container);
+            // When running in a sandbox, getting the type of the instance might work when the type is
+            // internal. We might to walk the hierarchy up from the implementation type to the service type
+            // and get the first public base type (or interface) we encounter, or perhaps simply fall back to
+            // the service type directly. Problem with this is that we probably don't want to let the fx
+            // behave differently inside a sandbox, since that would confuse users.
+            // TODO: Find out if this is a problem and how to go around this.
+            implementationType = implementationType ?? instance.GetType();
+
+            return new SingletonInstanceLifestyleRegistration(serviceType, implementationType, instance, 
+                Lifestyle.Singleton, container);
         }
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
@@ -77,13 +85,13 @@ namespace SimpleInjector.Lifestyles
             private readonly Type implementationType;
             private readonly Lazy<object> initializedInstance;
 
-            internal SingletonInstanceLifestyleRegistration(Type serviceType, object instance, 
-                Lifestyle lifestyle, Container container)
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
+                object instance, Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
                 this.originalInstance = instance;
                 this.serviceType = serviceType;
-                this.implementationType = instance.GetType();
+                this.implementationType = implementationType;
 
                 // Default lazy behavior ensures that the initializer is guaranteed to be called just once.
                 this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
@@ -96,7 +104,7 @@ namespace SimpleInjector.Lifestyles
 
             public override Expression BuildExpression()
             {
-                return Expression.Constant(this.initializedInstance.Value);
+                return Expression.Constant(this.initializedInstance.Value, this.serviceType);
             }
 
             private object GetInjectedInterceptedAndInitializedInstance()
@@ -114,7 +122,7 @@ namespace SimpleInjector.Lifestyles
 
             private object GetInjectedInterceptedAndInitializedInstanceInternal()
             {
-                Expression expression = Expression.Constant(this.originalInstance, this.implementationType);
+                Expression expression = Expression.Constant(this.originalInstance, this.serviceType);
 
                 expression = this.WrapWithPropertyInjector(this.serviceType, this.implementationType, expression);
 
