@@ -152,12 +152,7 @@ namespace SimpleInjector.Extensions.Decorators
             {
                 this.contexts = (
                     from producer in this.producers.Select(p => p.Value)
-                    select DecoratorPredicateContext.CreateFromExpression(
-                        this.container, 
-                        producer.ServiceType, 
-                        producer.ImplementationType, 
-                        producer.BuildExpression(),
-                        producer))
+                    select DecoratorPredicateContext.CreateFromProducer(this.container, producer))
                     .ToArray();
             }
         }

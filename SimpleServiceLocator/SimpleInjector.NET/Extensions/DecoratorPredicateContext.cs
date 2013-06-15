@@ -95,16 +95,15 @@ namespace SimpleInjector.Extensions
 
         internal InstanceProducer InstanceProducer { get; private set; }
 
-        internal static DecoratorPredicateContext CreateFromExpression(Container container, Type serviceType,
-            Type implementationType, Expression expression, InstanceProducer producer = null)
+        internal static DecoratorPredicateContext CreateFromProducer(Container container, 
+            InstanceProducer producer)
         {
-            var lifestyle = ExtensionHelpers.DetermineLifestyle(expression);
-            var registration = new ExpressionRegistration(expression, implementationType, lifestyle, container);
+            var expression = producer.BuildExpression();
 
-            // This producer will never be part of the container, but can still be used for analysis.
-            producer = producer ?? new InstanceProducer(serviceType, registration);
+            var registration = new ExpressionRegistration(expression, producer.ImplementationType, 
+                producer.Lifestyle, container);
 
-            return new DecoratorPredicateContext(serviceType, implementationType,
+            return new DecoratorPredicateContext(producer.ServiceType, producer.ImplementationType,
                 DecoratorPredicateContext.NoDecorators, expression, producer);
         }
 
