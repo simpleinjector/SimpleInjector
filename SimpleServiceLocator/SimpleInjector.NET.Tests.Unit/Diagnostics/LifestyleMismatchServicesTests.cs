@@ -381,7 +381,7 @@
 
             public override Type ImplementationType
             {
-                get { throw new NotImplementedException(); }
+                get { return typeof(object); }
             }
 
             public override Expression BuildExpression()

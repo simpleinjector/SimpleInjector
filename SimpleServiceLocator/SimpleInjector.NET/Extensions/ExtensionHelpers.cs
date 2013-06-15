@@ -30,11 +30,9 @@ namespace SimpleInjector.Extensions
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Helper methods for the extensions.
@@ -92,32 +90,7 @@ namespace SimpleInjector.Extensions
             return registeredServiceType;
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
-        internal static Lifestyle DetermineLifestyle(Expression expression)
-        {
-            if (IsSingletonExpression(expression))
-            {
-                return Lifestyle.Singleton;
-            }
-
-            if (IsTransientExpression(expression))
-            {
-                return Lifestyle.Transient;
-            }
-
-            // Implementation type can not be determined.
-            return Lifestyle.Unknown;
-        }
-
         internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
-        {
-            var body = methodCall.Body as MethodCallExpression;
-
-            return body.Method.GetGenericMethodDefinition();
-        }
-
-        internal static MethodInfo GetGenericMethod(Expression<Action<Container>> methodCall)
         {
             var body = methodCall.Body as MethodCallExpression;
 
@@ -218,31 +191,6 @@ namespace SimpleInjector.Extensions
                 where type == serviceType ||
                     (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
                 select type;
-        }
-        
-        private static bool IsSingletonExpression(Expression expression)
-        {
-            return expression is ConstantExpression;
-        }
-
-        private static bool IsTransientExpression(Expression expression)
-        {
-            if (expression is NewExpression)
-            {
-                // Transient without initializers.
-                return true;
-            }
-
-            var invocation = expression as InvocationExpression;
-
-            if (invocation != null && invocation.Expression is ConstantExpression &&
-                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
-            {
-                // Transient with initializers.
-                return true;
-            }
-
-            return false;
         }
     }
 }

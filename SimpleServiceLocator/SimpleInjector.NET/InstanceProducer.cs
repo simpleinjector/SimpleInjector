@@ -62,7 +62,7 @@ namespace SimpleInjector
             this.ServiceType = serviceType;
             this.Registration = registration;
 
-            this.validator = new CyclicDependencyValidator(this.ServiceType);
+            this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
             this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
         }

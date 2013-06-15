@@ -29,8 +29,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Threading;
+
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -42,8 +41,6 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Container container;
 
         private List<Lazy<InstanceProducer>> producers;
-        private DecoratorPredicateContext[] contexts;
-        private Func<TService>[] instanceCreators;
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container, Type[] serviceTypes)
@@ -66,16 +63,14 @@ namespace SimpleInjector.Extensions.Decorators
 
         public override int Count
         {
-            get { return this.producers != null ? this.producers.Count : this.contexts.Length; }
+            get { return this.producers.Count; }
         }
 
         public override TService this[int index]
         {
             get
             {
-                this.InitializeInstanceCreators();
-
-                return this.instanceCreators[index]();
+                return (TService)this.producers[index].Value.GetInstance();
             }
 
             set
@@ -87,8 +82,8 @@ namespace SimpleInjector.Extensions.Decorators
         KnownRelationship[] IContainerControlledCollection.GetRelationships()
         {
             return (
-                from context in this.contexts ?? Enumerable.Empty<DecoratorPredicateContext>()
-                from relationship in context.InstanceProducer.GetRelationships()
+                from producer in this.producers.Select(p => p.Value)
+                from relationship in producer.GetRelationships()
                 select relationship)
                 .Distinct()
                 .ToArray();
@@ -96,73 +91,15 @@ namespace SimpleInjector.Extensions.Decorators
 
         public override IEnumerator<TService> GetEnumerator()
         {
-            this.InitializeInstanceCreators();
-
-            return this.GetEnumeratorForCreators();
+            foreach (var producer in this.producers)
+            {
+                yield return (TService)producer.Value.GetInstance();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
-        }
-
-        private void InitializeInstanceCreators()
-        {
-            if (this.instanceCreators == null)
-            {
-                this.instanceCreators = this.BuildInstanceCreators();
-            }
-        }
-
-        private Func<TService>[] BuildInstanceCreators()
-        {
-            this.BuildContexts();
-
-            return (
-                from context in this.contexts
-                select this.BuildInstanceCreator(context.Expression))
-                .ToArray();
-        }
-
-        private Func<TService> BuildInstanceCreator(Expression expression)
-        {
-            Func<object> instanceCreator = null;
-
-            return () =>
-            {
-                if (instanceCreator == null)
-                {
-                    object instance;
-
-                    instanceCreator = Helpers.CompileAndRun(this.container, expression, out instance);
-
-                    if (instance != null)
-                    {
-                        return (TService)instance;
-                    }
-                }
-
-                return (TService)instanceCreator();
-            };
-        }
-
-        private void BuildContexts()
-        {
-            if (this.contexts == null)
-            {
-                this.contexts = (
-                    from producer in this.producers.Select(p => p.Value)
-                    select DecoratorPredicateContext.CreateFromProducer(this.container, producer))
-                    .ToArray();
-            }
-        }
-
-        private IEnumerator<TService> GetEnumeratorForCreators()
-        {
-            foreach (var instanceCreator in this.instanceCreators)
-            {
-                yield return instanceCreator();
-            }
         }
         
         private static IEnumerable<InstanceProducer> ConvertSingletonsToInstanceProducers(Container container,

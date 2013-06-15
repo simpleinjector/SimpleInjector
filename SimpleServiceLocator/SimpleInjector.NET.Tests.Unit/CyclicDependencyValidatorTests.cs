@@ -1,8 +1,9 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -360,37 +361,82 @@
             // This registration will use a FuncSingletonInstanceProducer under the covers.
             container.RegisterSingle<ITimeProvider>(() => { throw new NullReferenceException(); });
 
-            try
-            {
-                container.GetInstance<ITimeProvider>();
+            Action arrangeAction = () => container.GetInstance<ITimeProvider>();
 
-                Assert.Fail("Test setup failed: Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(expectedMessage, ex.Message, "Test setup failed.");
-            }
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, arrangeAction, 
+                "Test setup failed.");
 
-            try
-            {
-                // Act
-                container.GetInstance<ITimeProvider>();
+            // Act
+            Action action = () => container.GetInstance<ITimeProvider>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(expectedMessage, ex.Message,
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action,
                     "Repeating calls to a failing FuncSingletonInstanceProducer should result in the same " +
                     "exception being thrown every time.");
-            }
+        }
+
+        [TestMethod]
+        public void IteratingOverAnCollectionOfServices_ElementOfTheCollectionDependsOnTheCollection_ThrowsExpectedException()
+        {
+            // Arrange
+            CompositeService.ResetStackoverflowProtection();
+
+            var container = new Container();
+
+            container.RegisterSingle<IService, CompositeService>();
+
+            // CompositeService is also part of the collection making it indirectly depending on itself.
+            container.RegisterAll<IService>(typeof(Service), typeof(CompositeService));
+
+            // Act
+            Action action = () => container.GetAllInstances<IService>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The configuration is invalid. The type CyclicDependencyValidatorTests+CompositeService " + 
+                "is directly or indirectly depending on itself.",
+                action);
         }
 
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
         }
+
+        #region Composite dependency
+
+        public abstract class IService
+        {
+        }
+
+        public class Service : IService
+        {
+        }
+
+        public class CompositeService : IService
+        {
+            [ThreadStatic]
+            private static int recursionCountDown;
+
+            public CompositeService(IEnumerable<IService> availableServices)
+            {
+                recursionCountDown--;
+
+                if (recursionCountDown <= 0)
+                {
+                    throw new InvalidOperationException("Recursive operation detected :-(.");
+                }
+
+                availableServices.ToArray();
+            }
+
+            public static void ResetStackoverflowProtection()
+            {
+                recursionCountDown = 100;
+            }
+        }
+
+        #endregion
 
         #region Direct dependency
 

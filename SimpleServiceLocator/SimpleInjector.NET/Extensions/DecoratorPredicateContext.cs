@@ -26,13 +26,11 @@
 namespace SimpleInjector.Extensions
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Extensions.Decorators;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -51,17 +49,13 @@ namespace SimpleInjector.Extensions
         "ImplementationType = {Helpers.ToFriendlyName(ImplementationType),nq})")]
     public sealed class DecoratorPredicateContext
     {
-        internal static readonly ReadOnlyCollection<Type> NoDecorators =
-            new ReadOnlyCollection<Type>(Type.EmptyTypes);
-
         internal DecoratorPredicateContext(Type serviceType, Type implementationType,
-            ReadOnlyCollection<Type> appliedDecorators, Expression expression, InstanceProducer producer)
+            ReadOnlyCollection<Type> appliedDecorators, Expression expression)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
             this.AppliedDecorators = appliedDecorators;
             this.Expression = expression;
-            this.InstanceProducer = producer;
         }
 
         /// <summary>
@@ -93,27 +87,13 @@ namespace SimpleInjector.Extensions
         /// <value>The current expression that is about to be decorated.</value>
         public Expression Expression { get; private set; }
 
-        internal InstanceProducer InstanceProducer { get; private set; }
-
-        internal static DecoratorPredicateContext CreateFromProducer(Container container, 
-            InstanceProducer producer)
-        {
-            var expression = producer.BuildExpression();
-
-            var registration = new ExpressionRegistration(expression, producer.ImplementationType, 
-                producer.Lifestyle, container);
-
-            return new DecoratorPredicateContext(producer.ServiceType, producer.ImplementationType,
-                DecoratorPredicateContext.NoDecorators, expression, producer);
-        }
-
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)
         {
             var appliedDecorators = info.AppliedDecorators.Select(d => d.DecoratorType).ToList().AsReadOnly();
 
             return new DecoratorPredicateContext(serviceType, info.ImplementationType, appliedDecorators,
-                expression, info.GetCurrentInstanceProducer());
+                expression);
         }
     }
 }

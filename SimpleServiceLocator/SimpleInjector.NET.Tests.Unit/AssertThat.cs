@@ -25,7 +25,8 @@
             }
         }
 
-        internal static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, Action action)
+        internal static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, 
+            Action action, string assertMessage = null)
             where TException : Exception
         {
             Throws<TException>(() =>
@@ -36,7 +37,7 @@
                 }
                 catch (Exception ex)
                 {
-                    ExceptionMessageContains(expectedMessage, ex);
+                    ExceptionMessageContains(expectedMessage, ex, assertMessage);
 
                     throw;
                 }
