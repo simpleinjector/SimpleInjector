@@ -7,13 +7,14 @@
 
     internal static class AssertThat
     {
-        internal static void Throws<TException>(Action action) where TException : Exception
+        internal static void Throws<TException>(Action action, string assertMessage = null) 
+            where TException : Exception
         {
             try
             {
                 action();
 
-                Assert.Fail("Exception expected.");
+                Assert.Fail("Action was expected to throw an exception. " + assertMessage);
             }
             catch (AssertFailedException)
             {
@@ -21,7 +22,7 @@
             }
             catch (TException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(TException));
+                Assert.IsInstanceOfType(ex, typeof(TException), assertMessage);
             }
         }
 

@@ -74,14 +74,14 @@ namespace SimpleInjector.Extensions.Decorators
             // can be wrapped with an initializer.
             var registration = this.CreateRegistration();
 
-            this.ReplaceExpression(registration);
+            this.ReplaceOriginalExpression(registration);
 
             this.AddKnownDecoratorRelationships(registration);
 
-            this.AddAppliedDecoratorToDecoratorPredicateContext();
+            this.AddAppliedDecoratorToPredicateContext();
         }
 
-        private void ReplaceExpression(Registration registration)
+        private void ReplaceOriginalExpression(Registration registration)
         {
             this.e.Expression = registration.BuildExpression();
 
@@ -100,7 +100,7 @@ namespace SimpleInjector.Extensions.Decorators
                 if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
                 {
                     registration = this.CreateRegistration(this.registeredServiceType, 
-                        this.decoratorConstructor, this.e.Expression);
+                        this.decoratorConstructor, this.e.Expression, this.e.InstanceProducer);
 
                     this.registrations[this.e.InstanceProducer] = registration;
                 }
@@ -122,7 +122,7 @@ namespace SimpleInjector.Extensions.Decorators
             this.e.KnownRelationships.AddRange(relationships);
         }
 
-        private void AddAppliedDecoratorToDecoratorPredicateContext()
+        private void AddAppliedDecoratorToPredicateContext()
         {
             var info = this.GetServiceTypeInfo(this.e);
 

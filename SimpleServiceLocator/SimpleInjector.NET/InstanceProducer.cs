@@ -44,12 +44,17 @@ namespace SimpleInjector
         "Lifestyle = {Lifestyle.Name,nq}")]
     public sealed class InstanceProducer
     {
+        private static readonly Action[] NoVerifiers = new Action[0];
+
+        private readonly object locker = new object();
+
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
         private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
         private KnownRelationship[] relationships;
+        private List<Action> verifiers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
@@ -185,6 +190,41 @@ namespace SimpleInjector
             }
         }
 
+        // Throws an InvalidOperationException on failure.
+        internal object Verify()
+        {
+            object instance;
+
+            try
+            {
+                // Test the creator
+                // NOTE: We've got our first quirk in the design here: The returned object could implement
+                // IDisposable, but there is no way for us to know if we should actually dispose this 
+                // instance or not :-(. Disposing it could make us prevent a singleton from ever being
+                // used; not disposing it could make us leak resources :-(.
+                instance = this.GetInstance();
+
+                this.DoExtraVerfication();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    this.ServiceType, ex), ex);
+            }
+
+            return instance;
+        }
+
+        internal void AddVerifier(Action action)
+        {
+            lock (this.locker)
+            {
+                var verifiers = this.verifiers ?? (this.verifiers = new List<Action>());
+
+                verifiers.Add(action);
+            }
+        }
+
         internal KnownRelationship[] GetRelationships()
         {
             return this.relationships ?? this.Registration.GetRelationships();
@@ -198,6 +238,22 @@ namespace SimpleInjector
         internal void EnsureTypeWillBeExplicitlyVerified()
         {
             this.isValid = null;
+        }
+
+        private void DoExtraVerfication()
+        {
+            foreach (var verify in this.GetVerifiers())
+            {
+                verify();
+            }
+        }
+
+        private Action[] GetVerifiers()
+        {
+            lock (this.locker)
+            {
+                return this.verifiers != null ? this.verifiers.ToArray() : NoVerifiers;
+            }
         }
 
         private Func<object> BuildInstanceCreator(out object createdInstance)

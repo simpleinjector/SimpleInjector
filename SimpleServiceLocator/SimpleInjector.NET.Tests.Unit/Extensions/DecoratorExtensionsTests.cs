@@ -1662,6 +1662,33 @@
                 message + typeof(PluginImpl2).Name);
         }
 
+        [TestMethod]
+        public void Verify_WithProxyDecoratorWrappingAnInvalidRegistration_ShouldFailWithExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICommandHandler<RealCommand>>(() =>
+            {
+                throw new Exception("Failure.");
+            });
+
+            // AsyncCommandHandlerProxy<T> depends on Func<ICommandHandler<T>>.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The configuration is invalid. 
+                Creating the instance for type ICommandHandler<RealCommand> failed.
+                Failure."
+                .TrimInside(),
+                action,
+                "Verification should fail because the Func<ICommandHandler<T>> is invalid.");
+        }
+
 #if DEBUG
         private static KnownRelationship GetValidRelationship()
         {

@@ -183,12 +183,17 @@ namespace SimpleInjector.Extensions.Decorators
         }
         
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
-            Expression decorateeExpression)
+            Expression decorateeExpression, InstanceProducer producer)
         {
             ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
 
             decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(
                 decorateeParameter, serviceType, decorateeExpression);
+
+            if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
+            {
+                AddVerifierForDecorateeFactoryDependency(decorateeExpression, producer);
+            }
 
             var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
 
@@ -243,6 +248,23 @@ namespace SimpleInjector.Extensions.Decorators
                 where IsDecorateeParameter(parameter, serviceType)
                 select parameter)
                 .Single();
+        }
+
+        private static void AddVerifierForDecorateeFactoryDependency(Expression decorateeExpression, 
+            InstanceProducer producer)
+        {
+            // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as 
+            // verifier. This allows those dependencies to be verified when calling Container.Verify().
+            Action verifier = GetVerifierFromDecorateeExpression(decorateeExpression);
+
+            producer.AddVerifier(verifier);
+        }
+
+        private static Action GetVerifierFromDecorateeExpression(Expression decorateeExpression)
+        {
+            Func<object> instanceCreator = (Func<object>)((ConstantExpression)decorateeExpression).Value;
+
+            return () => instanceCreator();
         }
 
         private KnownRelationship GetDecorateeRelationship(ConstructorInfo constructor,

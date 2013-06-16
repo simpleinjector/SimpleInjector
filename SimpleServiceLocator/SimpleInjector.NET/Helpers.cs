@@ -111,25 +111,6 @@ namespace SimpleInjector
             }
         }
 
-        // Throws an InvalidOperationException on failure.
-        internal static object Verify(this InstanceProducer instanceProducer)
-        {
-            try
-            {
-                // Test the creator
-                // NOTE: We've got our first quirk in the design here: The returned object could implement
-                // IDisposable, but there is no way for us to know if we should actually dispose this 
-                // instance or not :-(. Disposing it could make us prevent a singleton from ever being
-                // used; not disposing it could make us leak resources :-(.
-                return instanceProducer.GetInstance();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    instanceProducer.ServiceType, ex), ex);
-            }
-        }
-
         internal static Dictionary<TKey, TValue> MakeCopyOf<TKey, TValue>(Dictionary<TKey, TValue> source)
         {
             // We choose an initial capacity of count + 1, because we'll be adding 1 item to this copy.

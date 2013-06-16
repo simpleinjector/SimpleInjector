@@ -9,6 +9,10 @@ Version vNext
 		 be added to the list of implementations that is supplied to the BatchRegistrationCallback.
 		(work item 19745).
 
+	Changes:
+		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 
+		 (work item 19851).
+
 	Bug fixes:
 		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when
 		 they shared the same Registration. (work item 19796).
