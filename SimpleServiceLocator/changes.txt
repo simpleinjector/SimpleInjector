@@ -17,6 +17,9 @@ Version vNext
 		 internal cached used the service type as key, not the InstanceProducer itself. (work item 19780).
 		-[Core] The container did not check for possible cyclic dependencies while resolving collections,
 		 which could cause a stackoverflow exception. (work item 19849).
+		-[Core] The uses friendly (C# like) type names in exception messages, but this failed when displaying
+		 a type that was a an array of generic types (example: Tuple<int>[]). In that case a FormatException
+		 was thrown (work item 19847).
 
 
 Version 2.2.3 (v2.2.3 RTM)  2013-05-05

@@ -562,6 +562,28 @@
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
+        // This test verifies the bug reported in work item 19847.
+        [TestMethod]
+        public void GetInstance_DependingOnAnArrayOfGenericElementsThatIsUnregistered_ThrowsAnExceptionThatCorrectlyFormatsThatArray()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            
+            // Act
+            // CompositeService<T> depends on IGeneric<T>[] (array)
+            Action action = () => container.GetInstance<CompositeService<string>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("IGeneric<String>[]", action);
+        }
+
+        public class CompositeService<T>
+        {
+            public CompositeService(IGeneric<T>[] dependencies)
+            {
+            }
+        }
+
         private sealed class Wrapper<T>
         {
             public Wrapper(IEnumerable<T> wrappedCollection)

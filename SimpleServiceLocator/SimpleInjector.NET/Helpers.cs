@@ -69,6 +69,11 @@ namespace SimpleInjector
 
         internal static string ToFriendlyName(this Type type)
         {
+            if (type.IsArray)
+            {
+                return type.GetElementType().ToFriendlyName() + "[]";
+            }
+
             string name = type.Name;
 
             if (type.IsNested && !type.IsGenericParameter)
