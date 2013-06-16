@@ -12,6 +12,8 @@ Version vNext
 	Changes:
 		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 
 		 (work item 19851).
+		-[NuGet] Silverlight NuGet packages are now merged with .NET packages. The separate Silverlight
+		 packages still exist, but will be deprecated soon. (work item 19764).
 
 	Bug fixes:
 		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when

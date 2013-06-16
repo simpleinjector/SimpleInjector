@@ -10,10 +10,10 @@
     <id>SimpleInjector</id>
     <title>Simple Injector</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The goal of Simple Injector is to provide .NET application developers with an easy, flexible, and fast dependency injection framework, that uses best practices to steers developers towards the pit of success.</description>
-    <summary>The Simple Injector is an easy-to-use Inversion of Control library for .NET.</summary>
+    <description>The goal of Simple Injector is to provide .NET and Silveright application developers with an easy, flexible, and fast dependency injection framework, that uses best practices to steers developers towards the pit of success.</description>
+    <summary>The Simple Injector is an easy-to-use Inversion of Control library for .NET and Silverlight.</summary>
     <copyright>S. van Deursen 2010 - 2013</copyright>
     <language>en-US</language>
-    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator</tags>
+    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC silverlight Servicelocator</tags>
   </metadata>
 </package>

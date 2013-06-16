@@ -1,6 +1,6 @@
 @ECHO OFF
 
-set version=2.2.0
+set version=2.3.0
 set prereleasePostfix=
 set buildNumber=0
 
@@ -240,6 +240,8 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy bin\NET\SimpleInjector.dll Releases\temp\lib\net40-client\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net40-client\SimpleInjector.xml
+copy bin\Silverlight\SimpleInjector.dll Releases\temp\lib\sl40\SimpleInjector.dll
+copy bin\Silverlight\SimpleInjector.xml Releases\temp\lib\sl40\SimpleInjector.xml
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
@@ -251,22 +253,12 @@ xcopy %nugetTemplatePath%\.NET\CommonServiceLocator.SimpleInjectorAdapter Releas
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy bin\NET\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\lib\net40-client\CommonServiceLocator.SimpleInjectorAdapter.dll
 copy bin\NET\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\lib\net40-client\CommonServiceLocator.SimpleInjectorAdapter.xml
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\lib\sl40\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\lib\sl40\CommonServiceLocator.SimpleInjectorAdapter.xml
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\1fea7be7f6324eb68593116ecd0864e4.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\CommonServiceLocator.SimpleInjectorAdapter.%named_version_Core%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\CommonServiceLocator.SimpleInjectorAdapter.%named_version_Core%.zip" "*.nupkg"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-REM copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\lib\net40-client\SimpleInjector.Extensions.dll
-REM copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.xml
-%replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {version} %named_version_Extensions%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\3b15d35fbc3a4556960337dcd95cf0f4.psmdcp {version} %named_version_Extensions%
-REM %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip"
-REM ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.%named_version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -382,8 +374,8 @@ echo NUGET PACKAGES SILVERLIGHT
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\Silverlight\SimpleInjector.Silverlight Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\Silverlight\SimpleInjector.dll Releases\temp\lib\sl30\SimpleInjector.dll
-copy bin\Silverlight\SimpleInjector.xml Releases\temp\lib\sl30\SimpleInjector.xml
+copy bin\Silverlight\SimpleInjector.dll Releases\temp\lib\sl40\SimpleInjector.dll
+copy bin\Silverlight\SimpleInjector.xml Releases\temp\lib\sl40\SimpleInjector.xml
 %replace% /source:Releases\temp\SimpleInjector.Silverlight.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\bc50420a966a46388a7509b095da88af.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Silverlight.%named_version_Core%.zip"
@@ -393,23 +385,11 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\lib\sl30\CommonServiceLocator.SimpleInjectorAdapter.xml
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\lib\sl40\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\lib\sl40\CommonServiceLocator.SimpleInjectorAdapter.xml
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\b0dd4e78d398462ead742df1961bccc2.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip"
 ren "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip" "*.nupkg"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\Silverlight\SimpleInjector.Extensions.Silverlight Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\lib\sl30\SimpleInjector.Extensions.dll
-REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\lib\sl30\SimpleInjector.Extensions.xml
-%replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {version} %named_version_Extensions%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.Silverlight.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\7ed90488e5714295854ab251e2959afe.psmdcp {version} %named_version_Extensions%
-REM %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip"
-REM ren "%CD%\Releases\v%named_version%\Silverlight\SimpleInjector.Extensions.Silverlight.%named_version_Extensions%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
