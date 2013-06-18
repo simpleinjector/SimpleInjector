@@ -49,16 +49,17 @@ namespace SimpleInjector.Extensions.Decorators
             this.producers = serviceTypes.Select(this.GetLazyInstanceProducer).ToList();
         }
 
-        internal ContainerControlledCollection(Container container, TService[] singletons)
-            : this(container, ConvertSingletonsToInstanceProducers(container, singletons))
-        {
-        }
-
-        internal ContainerControlledCollection(Container container,
+        // This constructor needs to be public. It is called using reflection.
+        public ContainerControlledCollection(Container container,
             IEnumerable<InstanceProducer> producers)
         {
             this.container = container;
             this.producers = producers.Select(Helpers.ToLazy).ToList();
+        }
+
+        internal ContainerControlledCollection(Container container, TService[] singletons)
+            : this(container, ConvertSingletonsToInstanceProducers(container, singletons))
+        {
         }
 
         public override int Count

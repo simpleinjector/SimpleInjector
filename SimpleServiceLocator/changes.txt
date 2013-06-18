@@ -8,6 +8,10 @@ Version vNext
 		 types now accept open generic types. Closed generic versions of the supplied open generic types will
 		 be added to the list of implementations that is supplied to the BatchRegistrationCallback.
 		(work item 19745).
+		-[Core] RegisterAllOpenGeneric method (and overloads). They do to collections what RegisterOpenGeneric
+		 does to normal registrations. RegisterAllOpenGeneric allows registering a list of open generic types
+		 which will be tranformed to a list of matching closed generic types when a collection is requested.
+		 (work item 19758).
 
 	Changes:
 		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 

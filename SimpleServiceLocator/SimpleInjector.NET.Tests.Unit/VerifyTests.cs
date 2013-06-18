@@ -326,6 +326,46 @@
             container.Verify();
         }
 
+        [TestMethod]
+        public void Verify_WithCollectionsResolvedThroughUnregisteredTypeResolution_StillVerifiesThoseCollections()
+        {
+            // Arrange
+            // All these collection are resolved through unregistered type resolution.
+            var expectedTypes = new[]
+            {
+                typeof(IEnumerable<Service<Service<Service<int>>>>),
+                typeof(IEnumerable<Service<Service<int>>>),
+                typeof(IEnumerable<Service<int>>),
+                typeof(IEnumerable<int>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAllOpenGeneric(typeof(Service<>), typeof(Service<>));
+
+            container.Register<Service<Service<Service<Service<int>>>>>();
+
+            container.Verify();
+
+            // Act
+            var registrations = container.GetCurrentRegistrations();
+            var actualTypes = registrations.Select(p => p.ServiceType).ToList();
+
+            // Assert
+            var missingTypes = expectedTypes.Where(registration => !actualTypes.Contains(registration));
+
+            // When the missingTypes list is empty, this means that the container kept looking for new 
+            // registrations at the end of the verification process.
+            Assert.IsFalse(missingTypes.Any(), "Missing registrations: " + missingTypes.ToFriendlyNamesText());
+        }
+
+        public class Service<T>
+        {
+            public Service(IEnumerable<T> collection)
+            {
+            }
+        }
+        
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)

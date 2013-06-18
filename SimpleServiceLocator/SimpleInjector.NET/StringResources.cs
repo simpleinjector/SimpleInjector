@@ -461,5 +461,10 @@ namespace SimpleInjector
                 typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name,
                 typeNames.ToCommaSeparatedText());
         }
+
+        internal static string TheCollectionShouldContainAtleastOneElement()
+        {
+            return "The supplied collection should contain atleast one element.";
+        }
     }
 }

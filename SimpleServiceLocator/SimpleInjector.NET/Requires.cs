@@ -164,12 +164,44 @@ namespace SimpleInjector
             }
         }
 
+        internal static void TypesAreAllGenericTypeDefinitions(IEnumerable<Type> openGenericImplementations, 
+            string paramName)
+        {
+            var invalidType = (
+                from type in openGenericImplementations
+                where !type.IsGenericTypeDefinition
+                select type)
+                .FirstOrDefault();
+            
+            if (invalidType != null)
+            {
+                Requires.TypeIsOpenGeneric(invalidType, paramName);
+            }
+        }
+
         internal static void ImplementationHasSelectableConstructor(Container container, Type serviceType,
             Type implementationType, string paramName)
         {
             string message;
 
             if (!container.IsConstructableType(serviceType, implementationType, out message))
+            {
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void ImplementationsAllHaveSelectableConstructor(Container container,
+            Type openGenericServiceType, IEnumerable<Type> openGenericImplementations, string paramName)
+        {
+            string message = null;
+
+            var invalidType = (
+                from type in openGenericImplementations
+                where !container.IsConstructableType(openGenericServiceType, type, out message)
+                select type)
+                .SingleOrDefault();
+
+            if (invalidType != null)
             {
                 throw new ArgumentException(message, paramName);
             }
@@ -251,6 +283,16 @@ namespace SimpleInjector
 
                     throw new ArgumentException(message, paramName);
                 }
+            }
+        }
+
+        internal static void CollectionIsNotEmpty(IEnumerable<Type> collection, string paramName)
+        {
+            if (!collection.Any())
+            {
+                string message = StringResources.TheCollectionShouldContainAtleastOneElement();
+
+                throw new ArgumentException(message, paramName);
             }
         }
 

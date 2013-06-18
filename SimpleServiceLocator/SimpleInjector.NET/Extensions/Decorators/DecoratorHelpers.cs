@@ -44,7 +44,9 @@ namespace SimpleInjector.Extensions.Decorators
         internal static Registration CreateDecoratableEnumerableRegistration(Type serviceType,
             IContainerControlledCollection instance, Container container)
         {
-            return new ContainerControlledCollectionRegistration(serviceType, instance, container)
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            return new ContainerControlledCollectionRegistration(enumerableServiceType, instance, container)
             {
                 IsCollection = true
             };
@@ -57,6 +59,15 @@ namespace SimpleInjector.Extensions.Decorators
 
             return (IContainerControlledCollection)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, serviceTypes });
+        }
+        
+        internal static IContainerControlledCollection CreateContainerControlledEnumerable(Type serviceType,
+            Container container, IEnumerable<InstanceProducer> producers)
+        {
+            Type allInstancesEnumerableType = typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
+
+            return (IContainerControlledCollection)Activator.CreateInstance(allInstancesEnumerableType,
+                new object[] { container, producers });
         }
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)

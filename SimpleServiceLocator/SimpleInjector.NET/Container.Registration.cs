@@ -1320,12 +1320,10 @@ namespace SimpleInjector
         {
             this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
 
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+            var registration = DecoratorHelpers.CreateDecoratableEnumerableRegistration(serviceType, 
+                collection, this);
 
-            var registration = DecoratorHelpers.CreateDecoratableEnumerableRegistration(
-                enumerableServiceType, collection, this);
-
-            this.AddRegistration(enumerableServiceType, registration);
+            this.AddRegistration(typeof(IEnumerable<>).MakeGenericType(serviceType), registration);
         }
 
         private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
@@ -1368,13 +1366,36 @@ namespace SimpleInjector
 
         private void ValidateRegistrations()
         {
-            // The producer can be null.
-            var producers =
-                from registration in this.registrations
-                where registration.Value != null
-                select registration.Value;
+            var producersToVerify = this.GetCurrentInstanceProducers();
 
-            foreach (var producer in producers.ToArray())
+            VerifyProducers(producersToVerify);
+
+            var verifiedCollections = producersToVerify.Where(p => p.Registration.IsCollection);
+
+            // The verification process can trigger the registration of new instance producers.
+            // Those new producers need to be checked as well, but only collections need to be checked, since
+            // they need to be iterated and their items might be unregistered.
+            this.ValidateNewCollectionsRecursive(collectionsToExclude: verifiedCollections);
+        }
+
+        private void ValidateNewCollectionsRecursive(IEnumerable<InstanceProducer> collectionsToExclude)
+        {
+            var currentCollections = this.GetCurrentInstanceProducers().Where(p => p.Registration.IsCollection);
+
+            var collectionsToVerify = currentCollections.Except(collectionsToExclude).ToArray();
+
+            if (collectionsToVerify.Any())
+            {
+                VerifyProducers(collectionsToVerify);
+
+                this.ValidateNewCollectionsRecursive(
+                    collectionsToExclude: collectionsToExclude.Concat(collectionsToVerify).ToArray());
+            }
+        }
+
+        private static void VerifyProducers(InstanceProducer[] producersToVerify)
+        {
+            foreach (var producer in producersToVerify)
             {
                 var instance = producer.Verify();
 
@@ -1386,6 +1407,16 @@ namespace SimpleInjector
                     Helpers.VerifyCollection((IEnumerable)instance, serviceType);
                 }
             }
+        }
+
+        private InstanceProducer[] GetCurrentInstanceProducers()
+        {
+            // The producer can be null.
+            return (
+                from registration in this.registrations
+                where registration.Value != null
+                select registration.Value)
+                .ToArray();
         }
 
         private Action<T>[] GetInstanceInitializersFor<T>(Type type)

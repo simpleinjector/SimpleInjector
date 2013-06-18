@@ -27,9 +27,10 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector;
+    using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -81,10 +82,17 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers that an instance of <paramref name="openGenericImplementation"/> will be returned 
-        /// when a <paramref name="openGenericServiceType"/> is requested. The instance will be cached 
+        /// Registers that a closed generic instance of the supplied 
+        /// <paramref name="openGenericImplementation"/> will be returned when a closed generic version of
+        /// the <paramref name="openGenericServiceType"/> is requested. The instance will be cached 
         /// according to the specified <paramref name="lifestyle"/>.
         /// </summary>
+        /// <remarks>
+        /// Types registered using the <b>RegisterOpenGeneric</b> are resolved using unregistered type
+        /// resolution. This means that an explicit registration made for a closed generic version of the
+        /// <paramref name="openGenericServiceType"/> always gets resolved first and the given
+        /// <paramref name="openGenericImplementation"/> only gets resolved when there is no such registration.
+        /// </remarks>
         /// <example>
         /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
         /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
@@ -161,6 +169,180 @@ namespace SimpleInjector.Extensions
             {
                 OpenGenericServiceType = openGenericServiceType,
                 OpenGenericImplementation = openGenericImplementation,
+                Container = container,
+                Lifestyle = lifestyle
+            };
+
+            container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+        }
+
+        /// <summary>
+        /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
+        /// when a collection of <paramref name="openGenericServiceType"/> is requested. New instances of 
+        /// the registered <paramref name="openGenericImplementations"/> will be returned whenever the
+        /// resolved collection is itereated.
+        /// </summary>
+        /// <example>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable{Type})">RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable&lt;Type&gt;)</see>
+        /// overload for an example.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances.</param>
+        /// <param name="openGenericImplementations">The list of open generic implementation types
+        /// that will be returned when a collection of <paramref name="openGenericServiceType"/> is requested.
+        /// </param>
+        public static void RegisterAllOpenGeneric(this Container container,
+            Type openGenericServiceType, params Type[] openGenericImplementations)
+        {
+            RegisterAllOpenGeneric(container, openGenericServiceType,
+                (IEnumerable<Type>)openGenericImplementations);
+        }
+
+        /// <summary>
+        /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
+        /// when a collection of <paramref name="openGenericServiceType"/> is requested. New instances of 
+        /// the registered <paramref name="openGenericImplementations"/> will be returned whenever the
+        /// resolved collection is itereated.
+        /// </summary>
+        /// <example>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable{Type})">RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable&lt;Type&gt;)</see>
+        /// overload for an example.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances.</param>
+        /// <param name="openGenericImplementations">The list of open generic implementation types
+        /// that will be returned when a collection of <paramref name="openGenericServiceType"/> is requested.
+        /// </param>
+        public static void RegisterAllOpenGeneric(this Container container,
+            Type openGenericServiceType, IEnumerable<Type> openGenericImplementations)
+        {
+            RegisterAllOpenGeneric(container, openGenericServiceType, Lifestyle.Transient,
+                (IEnumerable<Type>)openGenericImplementations);
+        }
+
+        /// <summary>
+        /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
+        /// when a collection of <paramref name="openGenericServiceType"/> is requested. The instances will be 
+        /// cached according to the specified <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <example>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable{Type})">RegisterAllOpenGeneric(Container,Type,Lifestyle,IEnumerable&lt;Type&gt;)</see>
+        /// overload for an example.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances.</param>
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
+        /// <param name="openGenericImplementations">The list of open generic implementation types
+        /// that will be returned when a collection of <paramref name="openGenericServiceType"/> is requested.
+        /// </param>
+        public static void RegisterAllOpenGeneric(this Container container,
+          Type openGenericServiceType, Lifestyle lifestyle, params Type[] openGenericImplementations)
+        {
+            RegisterAllOpenGeneric(container, openGenericServiceType, lifestyle,
+                (IEnumerable<Type>)openGenericImplementations);
+        }
+
+        /// <summary>
+        /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
+        /// when a collection of <paramref name="openGenericServiceType"/> is requested. The instances will be 
+        /// cached according to the specified <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Collections registered using the <b>RegisterAllOpenGeneric</b> are resolved using unregistered type
+        /// resolution. This means that an explicit registration made for a collection of the closed generic 
+        /// version of the <paramref name="openGenericServiceType"/> always gets resolved first and a 
+        /// collection of <paramref name="openGenericImplementations"/> only gets resolved when there is no 
+        /// such registration.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// The following example shows the definition of a generic <b>IValidator&lt;T&gt;</b> interface
+        /// and, a <b>NullValidator&lt;T&gt;</b> implementation and a specific validator for Orders.
+        /// The registration ensures a <b>OrderValidator</b> is returned when a 
+        /// <b>IValidator&lt;Order&gt;</b> is requested. For all requests for a 
+        /// <b>IValidator&lt;T&gt;</b> other than a <b>IValidator&lt;Order&gt;</b>, an 
+        /// implementation of <b>NullValidator&lt;T&gt;</b> will be returned.
+        /// <code lang="cs"><![CDATA[
+        /// public interface IValidator<T>
+        /// { 
+        ///     void Validate(T instance);
+        /// }
+        /// 
+        /// public class DefaultValidator<T> : IValidator<T>
+        /// {
+        ///     public void Validate(T instance)
+        ///     {
+        ///         // some default validation
+        ///     }
+        /// }
+        /// 
+        /// [TestMethod]
+        /// public static void TestRegisterAllOpenGeneric()
+        /// {
+        ///     // Arrange
+        ///     var container = new Container();
+        ///     
+        ///     Type[] types = new[] { typeof(OrderValidator), typeof(DefaultValidator<>) };
+        ///     
+        ///     container.RegisterManyForOpenGeneric(typeof(IValidator<>),
+        ///         (serviceType, implementationTypes) => container.RegisterAll(serviceType, implementationTypes), 
+        ///         types);
+        ///     
+        ///     container.RegisterAllOpenGeneric(typeof(IValidator<>), typeof(DefaultValidator<>));
+        ///     
+        ///     // Act
+        ///     var orderValidators = container.GetAllInstances<IValidator<Order>>();
+        ///     var customerValidators = container.GetAllInstances<IValidator<Customer>>();
+        /// 
+        ///     // Assert
+        ///     Assert.IsTrue(orderValidators.SequenceEqual(
+        ///         new[] { typeof(OrderValidator), typeof(DefaultValidator<Order>) }));
+        ///     
+        ///     // Without the call to RegisterAllOpenGeneric this customerValidators would be empty.
+        ///     Assert.IsTrue(customerValidators.SequenceEqual(new[] { typeof(DefaultValidator<Customer>) }));
+        /// }
+        /// ]]></code>
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances.</param>
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
+        /// <param name="openGenericImplementations">The list of open generic implementation types
+        /// that will be returned when a collection of <paramref name="openGenericServiceType"/> is requested.
+        /// </param>
+        public static void RegisterAllOpenGeneric(this Container container,
+            Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Type> openGenericImplementations)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(openGenericImplementations, "openGenericImplementations");
+
+            // Make a copy of the collection for performance and correctness.
+            openGenericImplementations = openGenericImplementations.ToArray();
+
+            Requires.CollectionIsNotEmpty(openGenericImplementations, "openGenericImplementations");
+
+            Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
+            Requires.DoesNotContainNullValues(openGenericImplementations, "openGenericImplementations");
+            Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, 
+                openGenericImplementations, "openGenericImplementations", typeCanBeServiceType: true);
+            Requires.TypesAreAllGenericTypeDefinitions(openGenericImplementations, "openGenericImplementations");
+
+            Requires.ImplementationsAllHaveSelectableConstructor(container, openGenericServiceType,
+                openGenericImplementations, "openGenericImplementations");
+
+            var resolver = new UnregisteredAllOpenGenericResolver
+            {
+                OpenGenericServiceType = openGenericServiceType,
+                OpenGenericImplementations = openGenericImplementations,
                 Container = container,
                 Lifestyle = lifestyle
             };
@@ -254,6 +436,89 @@ namespace SimpleInjector.Extensions
                 {
                     throw new ActivationException(ex.Message);
                 }
+            }
+        }
+        
+        private sealed class UnregisteredAllOpenGenericResolver
+        {
+            private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
+                new Dictionary<Type, Registration>();
+
+            internal Type OpenGenericServiceType { get; set; }
+
+            internal IEnumerable<Type> OpenGenericImplementations { get; set; }
+
+            internal Container Container { get; set; }
+
+            internal Lifestyle Lifestyle { get; set; }
+
+            internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
+            {
+                if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
+                {
+                    Type closedServiceType = e.UnregisteredServiceType.GetGenericArguments().Single();
+
+                    if (this.OpenGenericServiceType.IsGenericTypeDefinitionOf(closedServiceType))
+                    {
+                        var closedGenericImplementations =
+                            this.GetClosedGenericImplementationsFor(closedServiceType);
+
+                        if (closedGenericImplementations.Any())
+                        {
+                            var registration = this.GetContainerControlledRegistrationFromCache(
+                                closedServiceType, closedGenericImplementations);
+
+                            e.Register(registration);
+                        }
+                    }
+                }
+            }
+
+            private Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
+            {
+                return (
+                    from openGenericImplementation in this.OpenGenericImplementations
+                    let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
+                    let result = builder.BuildClosedGenericImplementation()
+                    where result.ClosedServiceTypeSatisfiesAllTypeConstraints
+                    select result.ClosedGenericImplementation)
+                    .ToArray();
+            }
+
+            private Registration GetContainerControlledRegistrationFromCache(
+                Type closedServiceType, Type[] closedGenericImplementations)
+            {
+                lock (this.lifestyleRegistrationCache)
+                {
+                    Registration registration;
+
+                    if (!this.lifestyleRegistrationCache.TryGetValue(closedServiceType, out registration))
+                    {
+                        registration = this.BuildContainerControlledRegistration(closedServiceType,
+                            closedGenericImplementations);
+
+                        this.lifestyleRegistrationCache[closedServiceType] = registration;
+                    }
+
+                    return registration;
+                }
+            }
+
+            private Registration BuildContainerControlledRegistration(Type closedServiceType,
+                Type[] closedGenericImplementations)
+            {
+                var producers = (
+                    from closedGenericImplementation in closedGenericImplementations
+                    let registration = this.Lifestyle.CreateRegistration(closedServiceType,
+                        closedGenericImplementation, this.Container)
+                    select new InstanceProducer(closedServiceType, registration))
+                    .ToArray();
+
+                var collection = DecoratorHelpers.CreateContainerControlledEnumerable(
+                    closedServiceType, this.Container, producers);
+
+                return DecoratorHelpers.CreateDecoratableEnumerableRegistration(closedServiceType,
+                    collection, this.Container);
             }
         }
     }
