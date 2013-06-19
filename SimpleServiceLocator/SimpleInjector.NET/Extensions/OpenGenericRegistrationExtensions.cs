@@ -507,17 +507,16 @@ namespace SimpleInjector.Extensions
             private Registration BuildContainerControlledRegistration(Type closedServiceType,
                 Type[] closedGenericImplementations)
             {
-                var producers = (
+                var registrations = (
                     from closedGenericImplementation in closedGenericImplementations
-                    let registration = this.Lifestyle.CreateRegistration(closedServiceType,
-                        closedGenericImplementation, this.Container)
-                    select new InstanceProducer(closedServiceType, registration))
+                    select this.Lifestyle.CreateRegistration(closedServiceType,
+                        closedGenericImplementation, this.Container))
                     .ToArray();
 
-                var collection = DecoratorHelpers.CreateContainerControlledEnumerable(
-                    closedServiceType, this.Container, producers);
+                var collection = DecoratorHelpers.CreateContainerControlledCollection(
+                    closedServiceType, this.Container, registrations);
 
-                return DecoratorHelpers.CreateDecoratableEnumerableRegistration(closedServiceType,
+                return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
                     collection, this.Container);
             }
         }

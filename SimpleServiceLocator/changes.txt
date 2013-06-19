@@ -12,6 +12,8 @@ Version vNext
 		 does to normal registrations. RegisterAllOpenGeneric allows registering a list of open generic types
 		 which will be tranformed to a list of matching closed generic types when a collection is requested.
 		 (work item 19758).
+		-[Core] New RegisterAll(Type, IEnumerable<Registration>) overload added to make registering collections
+		 more consistent. (work item 19876)
 
 	Changes:
 		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 

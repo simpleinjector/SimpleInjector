@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.Decorators
+namespace SimpleInjector.Advanced
 {
     using System;
     using System.Collections;
@@ -46,15 +46,14 @@ namespace SimpleInjector.Extensions.Decorators
         public ContainerControlledCollection(Container container, Type[] serviceTypes)
         {
             this.container = container;
-            this.producers = serviceTypes.Select(this.GetLazyInstanceProducer).ToList();
+            this.producers = serviceTypes.Select(this.ToLazyInstanceProducer).ToList();
         }
 
         // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledCollection(Container container,
-            IEnumerable<InstanceProducer> producers)
+        public ContainerControlledCollection(Container container, IEnumerable<Registration> registrations)
         {
             this.container = container;
-            this.producers = producers.Select(Helpers.ToLazy).ToList();
+            this.producers = registrations.Select(ToLazyInstanceProducer).ToList();
         }
 
         internal ContainerControlledCollection(Container container, TService[] singletons)
@@ -103,26 +102,28 @@ namespace SimpleInjector.Extensions.Decorators
             return this.GetEnumerator();
         }
         
-        private static IEnumerable<InstanceProducer> ConvertSingletonsToInstanceProducers(Container container,
+        private static IEnumerable<Registration> ConvertSingletonsToInstanceProducers(Container container,
             TService[] singletons)
         {
             return
                 from instance in singletons
-                let registration =
-                    SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, container)
-                select new InstanceProducer(typeof(TService), registration);
+                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, container);
         }
 
-        private Lazy<InstanceProducer> GetLazyInstanceProducer(Type serviceType)
+        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration)
         {
-            // precondition: typeof(TService).IsAssignableFrom(serviceType).
+            return Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
+        }
+
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type serviceType)
+        {
             return new Lazy<InstanceProducer>(() =>
             {
                 // instanceProducer.ServiceType == serviceType
                 var instanceProducer = this.container.GetRegistration(serviceType, throwOnFailure: true);
 
                 // We need to create a new InstanceProducer with instanceProducer.ServiceType == typeof(TService).
-                // This allows decorators to be applied 
+                // This allows decorators to be applied.
                 return new InstanceProducer(typeof(TService), instanceProducer.Registration);
             });
         }

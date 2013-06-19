@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.Decorators
+namespace SimpleInjector.Advanced
 {
     using System;
     using System.Collections;

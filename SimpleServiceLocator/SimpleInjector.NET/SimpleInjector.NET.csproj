@@ -106,13 +106,13 @@
     <Compile Include="Extensions\DecoratorExtensions.cs" />
     <Compile Include="Extensions\DecoratorPredicateContext.cs" />
     <Compile Include="Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
-    <Compile Include="Extensions\Decorators\ContainerControlledCollection.cs" />
+    <Compile Include="Advanced\ContainerControlledCollection.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInterceptor.cs" />
-    <Compile Include="Extensions\Decorators\IContainerControlledCollection.cs" />
+    <Compile Include="Advanced\IContainerControlledCollection.cs" />
     <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
     <Compile Include="Extensions\GenericArgumentFinder.cs" />

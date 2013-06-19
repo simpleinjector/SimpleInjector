@@ -164,6 +164,14 @@ namespace SimpleInjector
             }
         }
 
+        internal static void ServiceIsAssignableFromImplementations(Type serviceType,
+            IEnumerable<Registration> registrations, string paramName, bool typeCanBeServiceType = false)
+        {
+            var typesToRegister = registrations.Select(registration => registration.ImplementationType);
+
+            ServiceIsAssignableFromImplementations(serviceType, typesToRegister, paramName, typeCanBeServiceType);
+        }
+
         internal static void TypesAreAllGenericTypeDefinitions(IEnumerable<Type> openGenericImplementations, 
             string paramName)
         {

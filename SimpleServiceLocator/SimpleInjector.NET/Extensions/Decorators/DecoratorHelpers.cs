@@ -40,8 +40,8 @@ namespace SimpleInjector.Extensions.Decorators
     {
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
-                
-        internal static Registration CreateDecoratableEnumerableRegistration(Type serviceType,
+
+        internal static Registration CreateRegistrationForContainerControlledCollection(Type serviceType,
             IContainerControlledCollection instance, Container container)
         {
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
@@ -52,7 +52,7 @@ namespace SimpleInjector.Extensions.Decorators
             };
         }     
 
-        internal static IContainerControlledCollection CreateContainerControlledEnumerable(Type serviceType,
+        internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
             Container container, Type[] serviceTypes)
         {
             Type allInstancesEnumerableType = typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
@@ -60,14 +60,14 @@ namespace SimpleInjector.Extensions.Decorators
             return (IContainerControlledCollection)Activator.CreateInstance(allInstancesEnumerableType,
                 new object[] { container, serviceTypes });
         }
-        
-        internal static IContainerControlledCollection CreateContainerControlledEnumerable(Type serviceType,
-            Container container, IEnumerable<InstanceProducer> producers)
+
+        internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
+            Container container, IEnumerable<Registration> registrations)
         {
             Type allInstancesEnumerableType = typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
 
             return (IContainerControlledCollection)Activator.CreateInstance(allInstancesEnumerableType,
-                new object[] { container, producers });
+                new object[] { container, registrations });
         }
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)

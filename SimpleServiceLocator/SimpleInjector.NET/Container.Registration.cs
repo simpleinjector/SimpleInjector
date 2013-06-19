@@ -931,10 +931,11 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a dynamic collection of elements of type <typeparamref name="TService"/>. A call to
-        /// <see cref="GetAllInstances{T}"/> will return the <paramref name="collection"/> itself, and updates 
-        /// to the collection will be reflected in the result. If updates are allowed, make sure the 
-        /// collection can be iterated safely if you're running a multi-threaded application.
+        /// Registers a dynamic (container uncontrolled) collection of elements of type 
+        /// <typeparamref name="TService"/>. A call to <see cref="GetAllInstances{T}"/> will return the 
+        /// <paramref name="collection"/> itself, and updates to the collection will be reflected in the 
+        /// result. If updates are allowed, make sure the collection can be iterated safely if you're running 
+        /// a multi-threaded application.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="collection">The collection to register.</param>
@@ -984,7 +985,7 @@ namespace SimpleInjector
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
         }
-
+        
         /// <summary>
         /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
         /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
@@ -1062,13 +1063,53 @@ namespace SimpleInjector
                 typeCanBeServiceType: true);
 
             IContainerControlledCollection collection = 
-                DecoratorHelpers.CreateContainerControlledEnumerable(serviceType, this, types);
+                DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, types);
 
             this.RegisterContainerControlledCollection(serviceType, collection);
         }
 
         /// <summary>
-        /// Registers a <paramref name="collection"/> of elements of type <paramref name="serviceType"/>.
+        /// Registers an collection of <paramref name="registrations"/>, which instances will be resolved when
+        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
+        /// requested. On enumeration the container is called for each type in the list.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
+        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
+        /// <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="registrations"/> elements.
+        /// </exception>
+        public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registrations, "registrations");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+
+            // Make a copy for correctness and performance.
+            registrations = registrations.ToArray();
+
+            Requires.DoesNotContainNullValues(registrations, "registrations");
+
+            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, "registrations",
+                typeCanBeServiceType: true);
+
+            IContainerControlledCollection collection =
+                DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, registrations);
+
+            this.RegisterContainerControlledCollection(serviceType, collection);
+        }
+
+        /// <summary>
+        /// Registers a dynamic (container uncontrolled) collection of elements of type 
+        /// <paramref name="serviceType"/>. A call to <see cref="GetAllInstances{T}"/> will return the 
+        /// <paramref name="collection"/> itself, and updates to the collection will be reflected in the 
+        /// result. If updates are allowed, make sure the collection can be iterated safely if you're running 
+        /// a multi-threaded application.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="collection">The collection of items to register.</param>
@@ -1320,7 +1361,7 @@ namespace SimpleInjector
         {
             this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
 
-            var registration = DecoratorHelpers.CreateDecoratableEnumerableRegistration(serviceType, 
+            var registration = DecoratorHelpers.CreateRegistrationForContainerControlledCollection(serviceType, 
                 collection, this);
 
             this.AddRegistration(typeof(IEnumerable<>).MakeGenericType(serviceType), registration);

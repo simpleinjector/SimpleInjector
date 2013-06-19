@@ -83,6 +83,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
       <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollection.cs">
+      <Link>Advanced\ContainerControlledCollection.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
       <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IContainerControlledCollection.cs">
+      <Link>Advanced\IContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IndexableEnumerable.cs">
       <Link>Advanced\IndexableEnumerable.cs</Link>
@@ -149,9 +155,6 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorPredicateContext.cs">
       <Link>Extensions\DecoratorPredicateContext.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerControlledCollection.cs">
-      <Link>Extensions\Decorators\ContainerControlledCollection.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
       <Link>Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
     </Compile>
@@ -169,9 +172,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInterceptor.cs">
       <Link>Extensions\Decorators\DecoratorInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\IContainerControlledCollection.cs">
-      <Link>Extensions\Decorators\IContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
       <Link>Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>

@@ -8,6 +8,8 @@
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SimpleInjector.Extensions;
+
     [TestClass]
     public class RegisterAllTests
     {
@@ -671,6 +673,66 @@
             
             // Act
             container.RegisterAll<object>(typeof(IDisposable));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegisterAllWithRegistration_ResolvesTheExpectedInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IUserRepository), new[] 
+            { 
+                Lifestyle.Transient.CreateRegistration<IUserRepository, SqlUserRepository>(container)
+            });
+
+            // Act
+            var repository = container.GetAllInstances<IUserRepository>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(repository, typeof(SqlUserRepository));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegistrationUsedInMultipleCollections_ResolvesTheExpectedInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration =
+                Lifestyle.Singleton.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+
+            container.RegisterAll(typeof(IUserRepository), new[] { registration });
+            container.RegisterAll(typeof(object), new[] { registration });
+
+            // Act
+            var instance1 = container.GetAllInstances<IUserRepository>().Single();
+            var instance2 = container.GetAllInstances<object>().Single();
+
+            // Assert
+            Assert.AreSame(instance1, instance2);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegisterAllWithRegistrationsAndDecorator_WrapsTheDecorator()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IPlugin), new[] 
+            { 
+                Lifestyle.Transient.CreateRegistration<PluginImpl, PluginImpl>(container),
+                Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container)
+            });
+
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            var plugins = container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator));
+            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator));
         }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
