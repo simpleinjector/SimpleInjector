@@ -1389,8 +1389,7 @@ namespace SimpleInjector
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
             var registration = 
-                SingletonLifestyle.CreateSingleRegistration(enumerableServiceType, castedCollection, this,
-                   enumerableServiceType);
+                SingletonLifestyle.CreateSingleRegistration(enumerableServiceType, castedCollection, this);
 
             registration.IsCollection = true;
 

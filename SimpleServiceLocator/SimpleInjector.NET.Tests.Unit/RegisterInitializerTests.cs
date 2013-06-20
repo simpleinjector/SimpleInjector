@@ -293,6 +293,28 @@
                 "ConcreteCommand should never fire. Although the performance hit would be a one-time hit, " +
                 "users would expect this behavior to be the same as when registering a transient.");
         }
+        
+        [TestMethod]
+        public void GetInstance_RequestingASingletonTypeThatIsRegisteredUsingAnInstance_NeverCallsTheInitializerForTheImplementation()
+        {
+            // Arrange
+            bool initializerWasCalled = false;
+
+            var container = ContainerFactory.New();
+
+            container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
+
+            container.RegisterSingle<ICommand>(new ConcreteCommand());
+
+            // Act
+            container.GetInstance<ICommand>();
+
+            // Assert
+            Assert.IsFalse(initializerWasCalled,
+                "Since only ICommand is 'staticly' available information, the initializer for " +
+                "ConcreteCommand should never fire. Although the performance hit would be a one-time hit, " +
+                "users would expect this behavior to be the same as when registering a transient.");
+        }
 
         [TestMethod]
         public void GetInstance_CalledMultipleTimesOnOnInstanceRegisteredAsSingleFunc_CallsTheInitializerJustOnce()

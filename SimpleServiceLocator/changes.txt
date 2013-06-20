@@ -37,6 +37,11 @@ Version vNext
 		-[Core] The uses friendly (C# like) type names in exception messages, but this failed when displaying
 		 a type that was a an array of generic types (example: Tuple<int>[]). In that case a FormatException
 		 was thrown (work item 19847).
+		-[Core] Resolving an externally provided singleton (using RegisterSingle<TService>(TService)) failed
+		 when the supplied instance was a subtype of TService and contained a property that was configured to
+		 be injected. (work items 19880).
+		-[Core] RegisterInitializer behaved inconsistent between singleton registrations with a delegate and
+		 an instance. The instance would get the delegate applied, while the delegate didn't. (work item 19881).
 
 
 Version 2.2.3 (v2.2.3 RTM)  2013-05-05

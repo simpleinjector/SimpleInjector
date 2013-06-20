@@ -9,6 +9,10 @@
     [TestClass]
     public class PropertyInjectionTests
     {
+        public interface IService
+        {
+        }
+
         [TestMethod]
         public void InjectingAllProperties_OnTypeWithPublicWritableProperty_InjectsPropertyDependency()
         {
@@ -41,11 +45,6 @@
                 action);
         }
 
-        public class ServiceWithProperty<TDependency>
-        {
-            public TDependency Dependency { get; set; }
-        }
-
         [TestMethod]
         public void InjectingAllProperties_OnTypeWithReadOnlyProperty_ThrowsExpectedException()
         {
@@ -65,14 +64,6 @@
                 action);
         }
 
-        public class ServiceWithReadOnlyPropertyDependency<TDependency>
-        {
-            public TDependency Dependency
-            {
-                get { return default(TDependency); }
-            }
-        }
-
         [TestMethod]
         public void InjectingAllProperties_OnTypeWithPrivateSetterProperty_Succeeds()
         {
@@ -87,11 +78,6 @@
 
             // Assert
             Assert.IsNotNull(service.Dependency);
-        }
-
-        public class ServiceWithPrivateSetPropertyDependency<TDependency>
-        {
-            public TDependency Dependency { get; private set; }
         }
 
         [TestMethod]
@@ -118,11 +104,6 @@
                 action);
         }
 
-        public class ServiceWithStaticPropertyDependency<TDependency>
-        {
-            public static TDependency Dependency { get; set; }
-        }
-
         [TestMethod]
         public void InjectAllProperties_ServiceWithMultiplePropertiesOfSameType_AlwaysInjectNewTransientType()
         {
@@ -135,7 +116,7 @@
             var service = container.GetInstance<ServiceWithTwoPropertiesOfSameType<ITimeProvider>>();
 
             // Assert
-            Assert.IsFalse(object.ReferenceEquals(service.Dependency01, service.Dependency02));
+            Assert.AreNotSame(service.Dependency01, service.Dependency02);
         }
 
         [TestMethod]
@@ -150,14 +131,7 @@
             var service = container.GetInstance<ServiceWithTwoPropertiesOfSameType<ITimeProvider>>();
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(service.Dependency01, service.Dependency02));
-        }
-
-        public class ServiceWithTwoPropertiesOfSameType<TDependency>
-        {
-            public TDependency Dependency01 { get; set; }
-
-            public TDependency Dependency02 { get; set; }
+            Assert.AreSame(service.Dependency01, service.Dependency02);
         }
 
         [TestMethod]
@@ -176,49 +150,6 @@
 
             // Assert
             Assert_ContainsNoUninjectedProperties(service);
-        }
-
-        public class ServiceWithLotsOfProperties<TDependency>
-        {
-            public TDependency Dependency01 { get; set; }
-
-            public TDependency Dependency02 { get; set; }
-
-            public TDependency Dependency03 { get; set; }
-
-            public TDependency Dependency04 { get; set; }
-
-            public TDependency Dependency05 { get; set; }
-
-            public TDependency Dependency06 { get; set; }
-
-            public TDependency Dependency07 { get; set; }
-
-            public TDependency Dependency08 { get; set; }
-
-            public TDependency Dependency09 { get; set; }
-
-            public TDependency Dependency10 { get; set; }
-
-            public TDependency Dependency11 { get; set; }
-
-            public TDependency Dependency12 { get; set; }
-
-            public TDependency Dependency13 { get; set; }
-
-            public TDependency Dependency14 { get; set; }
-
-            public TDependency Dependency15 { get; set; }
-
-            public TDependency Dependency16 { get; set; }
-
-            public TDependency Dependency17 { get; set; }
-
-            public TDependency Dependency18 { get; set; }
-
-            public TDependency Dependency19 { get; set; }
-
-            public TDependency Dependency20 { get; set; }
         }
 
 #if !SILVERLIGHT
@@ -258,11 +189,6 @@
             }
         }
 #endif // SILVERLIGHT
-
-        private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
-        {
-            internal TDependency Dependency { get; private set; }
-        }
 
 #if DEBUG
         [TestMethod]
@@ -333,6 +259,48 @@
             // Assert
             Assert.IsNotNull(singleton.Dependency);
         }
+        
+        [TestMethod]
+        public void InjectAllProperties_OnContainerUncontrolledSingleton_DoesNotInjectPropertiesOfImplementation()
+        {
+            // Arrange
+            var singleton = new ServiceWithProperty<ITimeProvider>();
+
+            Assert.IsNull(singleton.Dependency, "Test setup failed.");
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            container.RegisterSingle<IService>(singleton);
+
+            // Act
+            container.GetInstance<IService>();
+
+            // Assert
+            Assert.IsNull(singleton.Dependency);
+        }
+
+        [TestMethod]
+        public void InjectAllProperties_OnContainerUncontrolledSingletonsCollection_DoesNotInjectPropertiesOfImplementation()
+        {
+            // Arrange
+            var singleton = new ServiceWithProperty<ITimeProvider>();
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            IService[] services = new[] { singleton };
+
+            container.RegisterAll<IService>(services);
+
+            // Act
+            container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
+
+            // Assert
+            Assert.IsNull(singleton.Dependency);
+        }
 
         private static Container CreateContainerThatInjectsAllProperties()
         {
@@ -359,6 +327,84 @@
 
             Assert.IsFalse(uninjectedProperties.Any(),
                 "Property: " + uninjectedProperties.FirstOrDefault() + " was not injected.");
+        }
+
+        public class ServiceWithProperty<TDependency> : IService
+        {
+            public TDependency Dependency { get; set; }
+        }
+
+        public class ServiceWithReadOnlyPropertyDependency<TDependency>
+        {
+            public TDependency Dependency
+            {
+                get { return default(TDependency); }
+            }
+        }
+
+        public class ServiceWithPrivateSetPropertyDependency<TDependency>
+        {
+            public TDependency Dependency { get; private set; }
+        }
+
+        public class ServiceWithStaticPropertyDependency<TDependency>
+        {
+            public static TDependency Dependency { get; set; }
+        }
+
+        public class ServiceWithTwoPropertiesOfSameType<TDependency>
+        {
+            public TDependency Dependency01 { get; set; }
+
+            public TDependency Dependency02 { get; set; }
+        }
+
+        public class ServiceWithLotsOfProperties<TDependency>
+        {
+            public TDependency Dependency01 { get; set; }
+
+            public TDependency Dependency02 { get; set; }
+
+            public TDependency Dependency03 { get; set; }
+
+            public TDependency Dependency04 { get; set; }
+
+            public TDependency Dependency05 { get; set; }
+
+            public TDependency Dependency06 { get; set; }
+
+            public TDependency Dependency07 { get; set; }
+
+            public TDependency Dependency08 { get; set; }
+
+            public TDependency Dependency09 { get; set; }
+
+            public TDependency Dependency10 { get; set; }
+
+            public TDependency Dependency11 { get; set; }
+
+            public TDependency Dependency12 { get; set; }
+
+            public TDependency Dependency13 { get; set; }
+
+            public TDependency Dependency14 { get; set; }
+
+            public TDependency Dependency15 { get; set; }
+
+            public TDependency Dependency16 { get; set; }
+
+            public TDependency Dependency17 { get; set; }
+
+            public TDependency Dependency18 { get; set; }
+
+            public TDependency Dependency19 { get; set; }
+
+            public TDependency Dependency20 { get; set; }
+        }
+
+        private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
+        {
+            internal TDependency Dependency { get; private set; }
         }
 
         private class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
