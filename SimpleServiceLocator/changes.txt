@@ -7,11 +7,11 @@ Version vNext
 		-[Core] RegisterManyForOpenGeneric overloads that take in an BatchRegistrationCallback and a list of
 		 types now accept open generic types. Closed generic versions of the supplied open generic types will
 		 be added to the list of implementations that is supplied to the BatchRegistrationCallback.
-		(work item 19745).
+		 (work item 19745)
 		-[Core] RegisterAllOpenGeneric method (and overloads). They do to collections what RegisterOpenGeneric
 		 does to normal registrations. RegisterAllOpenGeneric allows registering a list of open generic types
 		 which will be tranformed to a list of matching closed generic types when a collection is requested.
-		 (work item 19758).
+		 (work item 19758)
 		-[Core] New RegisterAll(Type, IEnumerable<Registration>) overload added to make registering collections
 		 more consistent. (work item 19876)
 		-[Core] A new AppendToCollection extension method has been added to the AdvancedExtensions class in
@@ -21,8 +21,10 @@ Version vNext
 	Changes:
 		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 
 		 (work item 19851).
+		-[Core] Registrations of collections are now generated and compiled more lazily which improves
+		 performance when items are retrieved by index in large collections. (work item 19601)
 		-[NuGet] Silverlight NuGet packages are now merged with .NET packages. The separate Silverlight
-		 packages still exist, but will be deprecated soon. (work item 19764).
+		 packages still exist, but will be deprecated soon. (work item 19764)
 
 	Bug fixes:
 		-[Core] Adding KnownRelationships during ExpressionBuilt would leak to other InstanceProducers when
