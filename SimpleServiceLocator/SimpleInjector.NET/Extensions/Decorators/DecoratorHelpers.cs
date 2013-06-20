@@ -50,7 +50,23 @@ namespace SimpleInjector.Extensions.Decorators
             {
                 IsCollection = true
             };
-        }     
+        }
+
+        internal static IContainerControlledCollection ExtractContainerControlledCollectionFromRegistration(
+            Registration registration)
+        {
+            var controlledRegistration = registration as ContainerControlledCollectionRegistration;
+
+            // We can only determine the value when registration is created using the 
+            // CreateRegistrationForContainerControlledCollection method. When the registration is null the
+            // collection might be registered as container-uncontrolled collection.
+            if (controlledRegistration == null)
+            {
+                return null;
+            }
+
+            return controlledRegistration.Collection;
+        }
 
         internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
             Container container, Type[] serviceTypes)
@@ -195,14 +211,13 @@ namespace SimpleInjector.Extensions.Decorators
 
         private sealed class ContainerControlledCollectionRegistration : Registration
         {
-            private readonly IContainerControlledCollection instance;
             private readonly Type serviceType;
 
             internal ContainerControlledCollectionRegistration(Type serviceType,
-                IContainerControlledCollection instance, Container container)
+                IContainerControlledCollection collection, Container container)
                 : base(Lifestyle.Singleton, container)
             {
-                this.instance = instance;
+                this.Collection = collection;
                 this.serviceType = serviceType;
             }
 
@@ -211,14 +226,16 @@ namespace SimpleInjector.Extensions.Decorators
                 get { return this.serviceType; }
             }
 
+            internal IContainerControlledCollection Collection { get; private set; }
+
             public override Expression BuildExpression()
             {
-                return Expression.Constant(this.instance, this.serviceType);
+                return Expression.Constant(this.Collection, this.serviceType);
             }
 
             internal override KnownRelationship[] GetRelationshipsCore()
             {
-                return base.GetRelationshipsCore().Concat(this.instance.GetRelationships()).ToArray();
+                return base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
             }
         }
     }

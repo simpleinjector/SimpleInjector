@@ -79,6 +79,13 @@ namespace SimpleInjector.Advanced
             }
         }
 
+        void IContainerControlledCollection.Append(Registration registration)
+        {
+            this.container.ThrowWhenContainerIsLocked();
+
+            this.producers.Add(ToLazyInstanceProducer(registration));
+        }
+
         KnownRelationship[] IContainerControlledCollection.GetRelationships()
         {
             return (

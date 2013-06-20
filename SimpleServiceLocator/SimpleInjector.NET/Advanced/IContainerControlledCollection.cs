@@ -38,5 +38,7 @@ namespace SimpleInjector.Advanced
     internal interface IContainerControlledCollection : IEnumerable
     {
         KnownRelationship[] GetRelationships();
+
+        void Append(Registration registration);
     }
 }

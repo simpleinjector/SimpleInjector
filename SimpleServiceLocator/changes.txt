@@ -14,6 +14,9 @@ Version vNext
 		 (work item 19758).
 		-[Core] New RegisterAll(Type, IEnumerable<Registration>) overload added to make registering collections
 		 more consistent. (work item 19876)
+		-[Core] A new AppendToCollection extension method has been added to the AdvancedExtensions class in
+		 the SimpleInjector.Advanced namespace to make integration with frameworks such as NServiceBus and
+		 ReactiveUI easier (work item 19771)
 
 	Changes:
 		-[Core] Func<T> decoratee dependencies in decorators are now verified when calling container.Verify() 

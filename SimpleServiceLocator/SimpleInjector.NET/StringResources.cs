@@ -466,5 +466,17 @@ namespace SimpleInjector
         {
             return "The supplied collection should contain atleast one element.";
         }
+
+        internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+            Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "You are trying to append a registration to the registered collection of {0} instances, " +
+                "which is either registered using RegisterAll<TService>(IEnumerable<TService>) or " +
+                "RegistereAll(Type, IEnumerable). Since the number of returned items might change on each " +
+                "call, appending registrations to these collections is not supported. Please register the " +
+                "collection with one of the other RegisterAll overloads is appending is required.",
+                serviceType.ToFriendlyName());
+        }
     }
 }

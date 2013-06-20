@@ -1268,22 +1268,35 @@ namespace SimpleInjector
         /// </exception>
         public void AddRegistration(Type serviceType, Registration registration)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
-
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
-
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
-
-            Requires.IsRegistrationForThisContainer(this, registration, "registration");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
-                "registration");
+            this.VerifyServiceTypeAndRegistrationArguments(serviceType, registration);
 
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(serviceType);
 
             this.registrations[serviceType] = new InstanceProducer(serviceType, registration);
+        }
+
+        // This method is internal to prevent the main API of the framework from being 'polluted'. The
+        // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
+        // exposure.
+        internal void RegisterAllAppend(Type serviceType, Registration registration)
+        {
+            this.VerifyServiceTypeAndRegistrationArguments(serviceType, registration);
+
+            this.ThrowWhenContainerIsLocked();
+
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
+
+            if (collectionRegistered)
+            {
+                this.AppendToExistingRegistration(serviceType, registration);
+            }
+            else
+            {
+                this.RegisterAll(serviceType, new[] { registration });
+            }
         }
 
         internal void ThrowWhenContainerIsLocked()
@@ -1490,6 +1503,44 @@ namespace SimpleInjector
                 // generic type argument is just an argument, and ArgumentException even allows us to supply 
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
                 throw new ArgumentException(message, parameterName);
+            }
+        }
+
+        private void VerifyServiceTypeAndRegistrationArguments(Type serviceType, Registration registration)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registration, "registration");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            Requires.IsRegistrationForThisContainer(this, registration, "registration");
+            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
+                "registration");
+        }
+
+        private void AppendToExistingRegistration(Type serviceType, Registration registration)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var producer = this.registrations[enumerableServiceType];
+
+            IContainerControlledCollection instance = 
+                DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
+
+            if (instance != null)
+            {
+                instance.Append(registration);
+            }
+            else
+            {
+                string exceptionMessage =
+                    StringResources.AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+                        serviceType);
+
+                throw new NotSupportedException(exceptionMessage);
             }
         }
     }

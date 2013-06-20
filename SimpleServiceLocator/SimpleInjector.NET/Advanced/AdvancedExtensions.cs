@@ -130,6 +130,29 @@ namespace SimpleInjector.Advanced
             container.SetItem(key, item);
         }
 
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterAll</b> overloads.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="registration">The registration to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, is open generic, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterAll</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public static void AppendToCollection(this Container container, Type serviceType, 
+            Registration registration)
+        {
+            Requires.IsNotNull(container, "container");
+
+            container.RegisterAllAppend(serviceType, registration);
+        }
+
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)
         {
             foreach (var parameter in constructor.GetParameters())
