@@ -84,5 +84,23 @@
                 dict.Add(name, new InstanceProducer(serviceType, registration));
             }
         }
+
+        public new void Verify()
+        {
+            base.Verify();
+
+            this.VerifyNamedRegistrations();
+        }
+
+        private void VerifyNamedRegistrations()
+        {
+            foreach (var producersForOneServiceType in this.namedProducers.Values)
+            {
+                foreach (var producer in producersForOneServiceType.Values)
+                {
+                    producer.GetInstance();
+                }
+            }
+        }
     }
 }
