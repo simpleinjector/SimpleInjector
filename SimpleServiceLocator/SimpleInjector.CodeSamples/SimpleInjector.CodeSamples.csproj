@@ -73,6 +73,7 @@
     <Compile Include="AttributedPropertyInjectionExtensions.cs" />
     <Compile Include="KeyedFactory.cs" />
     <Compile Include="KeyedRegistrations.cs" />
+    <Compile Include="NamedContainer.cs" />
     <Compile Include="RuntimeDecoratorExtensions.cs" />
     <Compile Include="MethodInjectionExtensions.cs" />
     <Compile Include="PropertyInjectionExtensions.cs" />
