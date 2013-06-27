@@ -42,7 +42,7 @@ namespace SimpleInjector.Integration.Wcf
     {
         // Here we use .NET 4.0 ThreadLocal instead of the [ThreadStatic] attribute, to allow each container
         // to have it's own set of scopes.
-        private readonly ThreadLocal<WcfOperationScope> threadLocalScopes = new ThreadLocal<WcfOperationScope>();
+        private readonly ThreadLocal<InternalScope> threadLocalScopes = new ThreadLocal<InternalScope>();
 
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "autoWiringProtection",
             Justification = "See comment on IAutoRegistrationProtection interface.")]
@@ -63,26 +63,74 @@ namespace SimpleInjector.Integration.Wcf
 
         internal WcfOperationScope CurrentScope
         {
-            get { return this.threadLocalScopes.Value; }
+            get 
+            {
+                var nestedScope = this.threadLocalScopes.Value;
+
+                return nestedScope != null ? nestedScope.Scope : null;
+            }
         }
 
         internal WcfOperationScope BeginScope()
         {
-            if (this.threadLocalScopes.Value != null)
+            var nestedScope = this.threadLocalScopes.Value;
+
+            if (nestedScope != null)
             {
-                throw new InvalidOperationException("WCF scopes can not be nested.");
+                // We don't really do nested scoping, since we always return the same WcfOperationScope instance,
+                // but for some WCF configurations, IInstanceProvider.GetInstance is called twice. We allow and
+                // ignore that second call.
+                return nestedScope.BeginNestedScope();
             }
 
             var scope = new WcfOperationScope(this);
 
-            this.threadLocalScopes.Value = scope;
+            this.threadLocalScopes.Value = new InternalScope(scope);
 
             return scope;
         }
 
         internal void EndLifetimeScope()
         {
-            this.threadLocalScopes.Value = null;
+            var nestedScope = this.threadLocalScopes.Value;
+
+            if (nestedScope == null || nestedScope.IsOuterScope)
+            {
+                this.threadLocalScopes.Value = null;
+            }
+            else
+            {
+                nestedScope.EndNestedScope();
+            }
+        }
+
+        private sealed class InternalScope
+        {
+            private int currentNestingLevel;
+
+            internal InternalScope(WcfOperationScope scope)
+            {
+                this.Scope = scope;
+            }
+
+            internal WcfOperationScope Scope { get; private set; }
+
+            internal bool IsOuterScope
+            {
+                get { return this.currentNestingLevel <= 0; }
+            }
+            
+            internal WcfOperationScope BeginNestedScope()
+            {
+                this.currentNestingLevel++;
+
+                return this.Scope;
+            }
+
+            internal void EndNestedScope()
+            {
+                this.currentNestingLevel--;
+            }
         }
     }
 }
