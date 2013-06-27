@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.3.0
-set prereleasePostfix=
+set prereleasePostfix=-beta3
 set buildNumber=0
 
 
@@ -33,6 +33,7 @@ set targetPathNet=%targetPath%\NET
 set targetPathSilverlight=%targetPath%\Silverlight
 set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
 set v4targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
+set v45targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5"
 
 
 
@@ -66,6 +67,12 @@ mkdir %targetPathNet%
 
 copy "Shared Assemblies\*.*" %targetPathNet%\*.*
 
+REM Example build steps for building a .NET 4.5 assembly. When added, building of other assemblies fails :-(
+REM %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:TargetFrameworkVersion=v4.5;TargetFrameworkProfile=;Configuration=%configuration% /p:DefineConstants="%defineConstantsNet% NET45"
+REM ren %targetPathNet%\SimpleInjector.dll temp.dll
+REM %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v45targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.dll /keyfile:SimpleInjector.snk
+REM del %targetPathNet%\temp.dll
+REM ren %targetPathNet%\SimpleInjector.dll SimpleInjector_45.dll
 
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.dll temp.dll
