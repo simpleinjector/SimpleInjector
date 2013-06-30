@@ -104,11 +104,6 @@ ren %targetPathNet%\SimpleInjector.Integration.Web.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Integration_Web% /out:%targetPathNet%\SimpleInjector.Integration.Web.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
-%msbuild% "SimpleInjector.Integration.Web.WebForms\SimpleInjector.Integration.Web.Forms.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
-ren %targetPathNet%\SimpleInjector.Integration.Web.Forms.dll temp.dll
-%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Integration_WebForms% /out:%targetPathNet%\SimpleInjector.Integration.Web.Forms.dll /keyfile:SimpleInjector.snk
-del %targetPathNet%\temp.dll
-
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Integration_Mvc% /out:%targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll /keyfile:SimpleInjector.snk
@@ -167,7 +162,7 @@ echo %named_version% >> Releases\v%named_version%\version.txt
 rmdir Releases\temp /s /q
 
 
-echo CODEPLEX DOWNLOAD .NET
+echo CODEPLEX DOWNLOAD
 
 mkdir Releases\temp
 copy licence.txt Releases\temp\licence.txt
@@ -186,8 +181,6 @@ copy bin\NET\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET40\CommonS
 copy bin\NET\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
 mkdir Releases\temp\NET40\Extensions
-REM copy bin\NET\SimpleInjector.Extensions.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.dll
-REM copy bin\NET\SimpleInjector.Extensions.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.xml
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
@@ -196,34 +189,20 @@ copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\E
 mkdir Releases\temp\NET40\Integration
 copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
 copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.xml
-copy bin\NET\SimpleInjector.Integration.Web.Forms.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Forms.dll
-copy bin\NET\SimpleInjector.Integration.Web.Forms.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Forms.xml
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.dll
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.xml
 copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
 copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.xml
+
+mkdir Releases\temp\Silverlight
+copy bin\Silverlight\SimpleInjector.dll Releases\temp\Silverlight\SimpleInjector.dll
+copy bin\Silverlight\SimpleInjector.xml Releases\temp\Silverlight\SimpleInjector.xml
+mkdir Releases\temp\Silverlight\CommonServiceLocator
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\Silverlight\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\Silverlight\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
+copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\Silverlight\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
+copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\Silverlight\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Runtime Library v%named_version%.zip"
-
-rmdir Releases\temp /s /q
-
-
-echo CODEPLEX DOWNLOAD SILVERLIGHT
-
-mkdir Releases\temp
-copy licence.txt Releases\temp\licence.txt
-mkdir Releases\temp\Documentation
-copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
-copy bin\Silverlight\SimpleInjector.dll Releases\temp\SimpleInjector.dll
-copy bin\Silverlight\SimpleInjector.xml Releases\temp\SimpleInjector.xml
-mkdir Releases\temp\CommonServiceLocator
-copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\Silverlight\Microsoft.Practices.ServiceLocation.dll Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
-copy bin\Silverlight\Microsoft.Practices.ServiceLocation.xml Releases\temp\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
-REM mkdir Releases\temp\Extensions
-REM copy bin\Silverlight\SimpleInjector.Extensions.dll Releases\temp\Extensions\SimpleInjector.Extensions.dll
-REM copy bin\Silverlight\SimpleInjector.Extensions.xml Releases\temp\Extensions\SimpleInjector.Extensions.xml
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Silverlight Runtime Library v%named_version%.zip"
 
 rmdir Releases\temp /s /q
 
@@ -326,30 +305,6 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %named_version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip" "*.nupkg"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Forms Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\NET\SimpleInjector.Integration.Web.Forms.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Forms.dll
-copy bin\NET\SimpleInjector.Integration.Web.Forms.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Forms.xml
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {version} %named_version_Integration_WebForms%
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.nuspec {version_Integration_Web} %named_version_Integration_Web%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\f5118ffcdd6c4fc48e26b35d803ac086.psmdcp {version} %named_version_Integration_WebForms%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.%named_version_Integration_WebForms%.zip"
-ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.%named_version_Integration_WebForms%.zip" "*.nupkg"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {version} %named_version_Integration_WebForms%
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Forms.QuickStart.nuspec {version_Integration_WebForms} %named_version_Integration_WebForms%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\bb004cba2f014ed0b6ded4de9f7d3f1b.psmdcp {version} %named_version_Integration_WebForms%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart.%named_version_Integration_WebForms%.zip"
-ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Forms.QuickStart.%named_version_Integration_WebForms%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp

@@ -6,6 +6,10 @@ Version vNext
 
 Version 2.3.0 (v2.3 RTM)  2013-06-30
 
+	General description:
+		This minor release focusses on advanced and integration scenarios in the core library. Besides these 
+		features, this release contains several bug fixes.
+
 	New features:
 		-[Core] RegisterManyForOpenGeneric overloads that take in an BatchRegistrationCallback and a list of
 		 types now accept open generic types. Closed generic versions of the supplied open generic types will
@@ -37,9 +41,9 @@ Version 2.3.0 (v2.3 RTM)  2013-06-30
 		 internal cached used the service type as key, not the InstanceProducer itself. (work item 19780).
 		-[Core] The container did not check for possible cyclic dependencies while resolving collections,
 		 which could cause a stackoverflow exception. (work item 19849).
-		-[Core] The uses friendly (C# like) type names in exception messages, but this failed when displaying
-		 a type that was a an array of generic types (example: Tuple<int>[]). In that case a FormatException
-		 was thrown (work item 19847).
+		-[Core] The framework shows user friendly (C# like) type names in exception messages, but this failed
+		 when displaying a type that was a an array of generic types (example: Tuple<int>[]). In that case a 
+		 FormatException was thrown (work item 19847).
 		-[Core] Resolving an externally provided singleton (using RegisterSingle<TService>(TService)) failed
 		 when the supplied instance was a subtype of TService and contained a property that was configured to
 		 be injected. (work items 19880).
@@ -50,8 +54,10 @@ Version 2.3.0 (v2.3 RTM)  2013-06-30
 
 
 Version 2.2.3 (v2.2.3 RTM)  2013-05-05
-	Small performance improvement and bug fix concerning the use of ResolveUnregisteredType and
-	RegisterOpenGeneric.
+
+	General description:
+		Small performance improvement and bug fix concerning the use of ResolveUnregisteredType and
+		RegisterOpenGeneric.
 
 	Changes:
 		-[Core] ResolveUnregisteredType event was triggered more often than needed, which had a negative
@@ -64,9 +70,11 @@ Version 2.2.3 (v2.2.3 RTM)  2013-05-05
 
 
 Version 2.2.1 (v2.2.1 RTM)  2013-04-19
-	This patch release fixes a few small bugs and and performance improvements. The performance of
-	the initialization phase is improved and items of registered collections can now be retrieved with an
-	O(1) characteristic.
+
+	General description:
+		This patch release fixes a few small bugs and and performance improvements. The performance of
+		the initialization phase is improved and items of registered collections can now be retrieved with an
+		O(1) characteristic.
 
 	New features:
 		-[Integration.Web.Mvc] SimpleInjectorMvcExtensions.GetControllerTypesToRegister method added. This
