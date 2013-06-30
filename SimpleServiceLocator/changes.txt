@@ -4,7 +4,7 @@
 Version vNext
 
 
-Version 2.3.0 (v2.3 RTM)  [No release date yet]
+Version 2.3.0 (v2.3 RTM)  2013-06-30
 
 	New features:
 		-[Core] RegisterManyForOpenGeneric overloads that take in an BatchRegistrationCallback and a list of
