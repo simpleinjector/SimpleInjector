@@ -1,8 +1,11 @@
 ﻿namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Advanced;
 
     [TestClass]
     public class SimpleInjectorLifetimeScopeExtensionsTests
@@ -847,6 +850,62 @@
                     "Actual: ", ex.InnerException.Message);
             }
         }
+        
+        [TestMethod]
+        public void LifetimeScope_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
+        {
+            // Arrange
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            var container = new Container();
+
+            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+
+            container.AppendToCollection(typeof(ICommand), reg1);
+            container.AppendToCollection(typeof(ICommand), reg2);
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
+
+                // Assert
+                Assert.AreNotSame(commands[0], commands[1], "Two instances were expected.");
+            }
+        }
+
+        [TestMethod]
+        public void LifetimeScopeDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
+        {
+            // Arrange
+            var disposedInstances = new HashSet<object>();
+
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            var container = new Container();
+
+            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            
+            container.AppendToCollection(typeof(ICommand), reg1);
+            container.AppendToCollection(typeof(ICommand), reg2);
+
+            using (container.BeginLifetimeScope())
+            {
+                var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
+
+                Assert.AreNotSame(commands[0], commands[1], "Test setup failed.");      
+
+                commands[0].Disposing += sender => disposedInstances.Add(sender);
+                commands[1].Disposing += sender => disposedInstances.Add(sender);
+
+                // Act
+            }
+
+            // Assert
+            Assert.AreEqual(2, disposedInstances.Count, "Two instances were expected to be disposed.");
+        }
 
         public class ConcreteCommand : ICommand
         {
@@ -857,6 +916,8 @@
 
         public class DisposableCommand : ICommand, IDisposable
         {
+            public event Action<DisposableCommand> Disposing;
+
             public int DisposeCount { get; private set; }
 
             public bool HasBeenDisposed
@@ -867,6 +928,11 @@
             public void Dispose()
             {
                 this.DisposeCount++;
+
+                if (this.Disposing != null)
+                {
+                    this.Disposing(this);
+                }
             }
 
             public void Execute()
