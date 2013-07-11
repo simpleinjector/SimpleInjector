@@ -29,6 +29,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     /// <summary>
@@ -39,7 +40,9 @@ namespace SimpleInjector.Integration.Wcf
     /// </summary>
     public sealed class WcfOperationScope : IDisposable
     {
-        private readonly Dictionary<Type, object> lifetimeScopedInstances = new Dictionary<Type, object>();
+        private readonly Dictionary<Registration, object> lifetimeScopedInstances =
+            new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+
         private readonly int initialThreadId;
         private WcfOperationScopeManager manager;
         private List<IDisposable> disposables;
@@ -114,10 +117,10 @@ namespace SimpleInjector.Integration.Wcf
 
                 // EndLifetimeScope should not be called from a different thread than where it was started.
                 // Calling this method from another thread could remove the wrong scope.
-                bool scopeEnded = this.manager.EndLifetimeScope();
+                bool outerScopeEnded = this.manager.EndLifetimeScope();
 
                 // Prevent disposing all instances when we ended an inner scope.
-                if (scopeEnded)
+                if (outerScopeEnded)
                 {
                     this.manager = null;
 
@@ -134,15 +137,15 @@ namespace SimpleInjector.Integration.Wcf
             }
         }
 
-        internal TService GetInstance<TService>(Func<TService> instanceCreator,
+        internal TService GetInstance<TService>(Registration key, Func<TService> instanceCreator,
             bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
             object instance;
 
-            if (!this.lifetimeScopedInstances.TryGetValue(typeof(TService), out instance))
+            if (!this.lifetimeScopedInstances.TryGetValue(key, out instance))
             {
-                this.lifetimeScopedInstances[typeof(TService)] = instance = instanceCreator();
+                this.lifetimeScopedInstances[key] = instance = instanceCreator();
 
                 if (disposeWhenLifetimeScopeEnds)
                 {
@@ -156,6 +159,21 @@ namespace SimpleInjector.Integration.Wcf
             }
 
             return (TService)instance;
+        }
+
+        private sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
+        {
+            internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
+
+            public bool Equals(T x, T y)
+            {
+                return object.ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(T obj)
+            {
+                return RuntimeHelpers.GetHashCode(obj);
+            }
         }
     }
 }

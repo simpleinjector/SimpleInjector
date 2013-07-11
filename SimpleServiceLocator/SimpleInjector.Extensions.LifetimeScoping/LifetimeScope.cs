@@ -29,6 +29,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     /// <summary>
@@ -37,7 +38,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </summary>
     public sealed class LifetimeScope : IDisposable
     {
-        private readonly Dictionary<Type, object> lifetimeScopedInstances = new Dictionary<Type, object>();
+        private readonly Dictionary<Registration, object> lifetimeScopedInstances =
+            new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+
         private readonly int initialThreadId;
         private LifetimeScopeManager manager;
         private List<IDisposable> disposables;
@@ -131,15 +134,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
         }
 
-        internal TService GetInstance<TService>(Func<TService> instanceCreator,
+        internal TService GetInstance<TService>(Registration key, Func<TService> instanceCreator,
             bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
             object instance;
 
-            if (!this.lifetimeScopedInstances.TryGetValue(typeof(TService), out instance))
+            if (!this.lifetimeScopedInstances.TryGetValue(key, out instance))
             {
-                this.lifetimeScopedInstances[typeof(TService)] = instance = instanceCreator();
+                this.lifetimeScopedInstances[key] = instance = instanceCreator();
 
                 if (disposeWhenLifetimeScopeEnds)
                 {
@@ -153,6 +156,21 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
 
             return (TService)instance;
+        }
+
+        private sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
+        {
+            internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
+
+            public bool Equals(T x, T y)
+            {
+                return object.ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(T obj)
+            {
+                return RuntimeHelpers.GetHashCode(obj);
+            }
         }
     }
 }

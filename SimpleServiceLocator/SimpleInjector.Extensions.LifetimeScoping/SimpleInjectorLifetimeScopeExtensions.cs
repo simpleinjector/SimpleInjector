@@ -29,9 +29,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq.Expressions;
 
-    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.LifetimeScoping;
     
     /// <summary>

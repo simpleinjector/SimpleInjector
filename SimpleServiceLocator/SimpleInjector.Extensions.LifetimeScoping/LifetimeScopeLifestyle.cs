@@ -29,7 +29,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     using System.Linq.Expressions;
 
     using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
@@ -222,7 +221,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                     return this.GetInstanceWithoutScope();
                 }
 
-                return scope.GetInstance(this.instanceCreator, this.Dispose);
+                return scope.GetInstance(this, this.instanceCreator, this.Dispose);
             }
 
             protected virtual Func<TService> BuildInstanceCreator()

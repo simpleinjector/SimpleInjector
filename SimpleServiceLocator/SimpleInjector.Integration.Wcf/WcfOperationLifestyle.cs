@@ -29,7 +29,6 @@ namespace SimpleInjector.Integration.Wcf
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
@@ -196,7 +195,7 @@ namespace SimpleInjector.Integration.Wcf
                     return this.GetInstanceWithoutScope();
                 }
 
-                return scope.GetInstance(this.instanceCreator, this.Dispose);
+                return scope.GetInstance(this, this.instanceCreator, this.Dispose);
             }
 
             protected virtual Func<TService> BuildInstanceCreator()
