@@ -3,6 +3,14 @@
 
 Version vNext
 
+	Bug fixes:
+		-[Integration.Wcf] Lifetime scope was not disposed when object graph construction failed. 
+		 (work item 19948)
+		-[Integration.Wcf] Instances where cached per service type instead of per registration.
+		 (work item 19947)
+		-[Extensions.LifetimeScoping] Instances where cached per service type instead of per registration. 
+		 (work item 19947)	 
+
 
 Version 2.3.0 (v2.3 RTM)  2013-06-30
 
