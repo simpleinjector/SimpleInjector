@@ -90,17 +90,19 @@ namespace SimpleInjector.Integration.Wcf
             return scope;
         }
 
-        internal void EndLifetimeScope()
+        internal bool EndLifetimeScope()
         {
             var nestedScope = this.threadLocalScopes.Value;
 
             if (nestedScope == null || nestedScope.IsOuterScope)
             {
                 this.threadLocalScopes.Value = null;
+                return true;
             }
             else
             {
                 nestedScope.EndNestedScope();
+                return false;
             }
         }
 

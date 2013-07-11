@@ -114,19 +114,23 @@ namespace SimpleInjector.Integration.Wcf
 
                 // EndLifetimeScope should not be called from a different thread than where it was started.
                 // Calling this method from another thread could remove the wrong scope.
-                this.manager.EndLifetimeScope();
+                bool scopeEnded = this.manager.EndLifetimeScope();
 
-                this.manager = null;
-
-                if (this.disposables != null)
+                // Prevent disposing all instances when we ended an inner scope.
+                if (scopeEnded)
                 {
-                    foreach (var disposable in this.disposables)
-                    {
-                        disposable.Dispose();
-                    }
-                }
+                    this.manager = null;
 
-                this.disposables = null;
+                    if (this.disposables != null)
+                    {
+                        foreach (var disposable in this.disposables)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
+
+                    this.disposables = null;
+                }
             }
         }
 

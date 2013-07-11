@@ -23,9 +23,20 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
-            this.container.BeginWcfOperationScope();
+            var scope = this.container.BeginWcfOperationScope();
 
-            return this.container.GetInstance(this.serviceType);
+            try
+            {
+                return this.container.GetInstance(this.serviceType);
+            }
+            catch
+            {
+                // We need to dispose the scope here, because WCF will never call ReleaseInstance if
+                // this method throws an exception (since it has no instance to pass to ReleaseInstance).
+                scope.Dispose();
+
+                throw;
+            }
         }
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
