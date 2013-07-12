@@ -4,17 +4,16 @@
 Version vNext
 
 
-Version vPatch
+Version 2.3.1 (v2.3.1 RTM)  2013-07-12
 
 	General description:
-
+		This patch release fixes a few bugs in the WCF Integration packages and one bug in the LifetimeScoping
+		package.
 
 	Bug fixes:
-		-[Integration.Wcf] Lifetime scope was not disposed when object graph construction failed. 
-		 (work item 19948)
-		-[Integration.Wcf] Instances where cached per service type instead of per registration.
-		 (work item 19947)
+		-[Integration.Wcf] Lifetime scope was not disposed when object graph construction failed. (work item 19948)
 		-[Integration.Wcf] WCF Integration broke WS-Discovery. (work item 19960)
+		-[Integration.Wcf] Instances where cached per service type instead of per registration. (work item 19947)
 		-[Extensions.LifetimeScoping] Instances where cached per service type instead of per registration. 
 		 (work item 19947)	 
 
