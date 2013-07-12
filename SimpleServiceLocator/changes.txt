@@ -3,11 +3,18 @@
 
 Version vNext
 
+
+Version vPatch
+
+	General description:
+
+
 	Bug fixes:
 		-[Integration.Wcf] Lifetime scope was not disposed when object graph construction failed. 
 		 (work item 19948)
 		-[Integration.Wcf] Instances where cached per service type instead of per registration.
 		 (work item 19947)
+		-[Integration.Wcf] WCF Integration broke WS-Discovery. (work item 19960)
 		-[Extensions.LifetimeScoping] Instances where cached per service type instead of per registration. 
 		 (work item 19947)	 
 
