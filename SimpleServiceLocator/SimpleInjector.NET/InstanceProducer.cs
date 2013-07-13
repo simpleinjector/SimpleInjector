@@ -38,6 +38,45 @@ namespace SimpleInjector
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
     /// <see cref="Container.GetCurrentRegistrations"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
     /// </summary>
+    /// <remarks>
+    /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
+    /// <b>InstanceProducer</b>s can be created manually to implement special scenarios. An 
+    /// <b>InstanceProducer</b> wraps <see cref="Registration"/> instance. The <b>Registration</b> builds an
+    /// <see cref="Expression"/> that describes the intend to create the instance according to a certain
+    /// lifestyle. The <b>InstanceProducer</b> on the other hand transforms this <b>Expression</b> to a
+    /// delegate and allows the actual instance to be created. A <b>Registration</b> itself can't create any
+    /// instance. The <b>InsanceProducer</b> allows intercepting created instances by hooking onto the
+    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
+    /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type)">RegisterDecorator</see>
+    /// extension methods for instance work by hooking onto the <b>ExpressionBuilt</b> event and allow
+    /// wrapping the returned instance with a decorator.
+    /// </remarks>
+    /// <example>
+    /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap
+    /// the same <b>Registration</b> instance. Since the <b>Registration</b> is created using the 
+    /// <see cref="SimpleInjector.Lifestyle.Singleton">Singleton</see> lifestyle, both producers will return 
+    /// the same instance. The <b>InstanceProducer</b> for the <code>Interface1</code> however, will wrap that
+    /// instance in a (transient) <code>Interface1Decorator</code>.
+    /// <code lang="cs"><![CDATA[
+    /// var container = new Container();
+    /// 
+    /// // ServiceImpl implements both Interface1 and Interface2.
+    /// var registration = Lifestyle.Singleton.CreateRegistration<ServiceImpl, ServiceImpl>(container);
+    /// 
+    /// var producer1 = new InstanceProducer(typeof(Interface1), registration);
+    /// var producer2 = new InstanceProducer(typeof(Interface2), registration);
+    /// 
+    /// container.RegisterDecorator(typeof(Interface1), typeof(Interface1Decorator));
+    /// 
+    /// var instance1 = (Interface1)producer1.GetInstance();
+    /// var instance2 = (Interface2)producer2.GetInstance();
+    /// 
+    /// Assert.IsInstanceOfType(instance1, typeof(Interface1Decorator));
+    /// Assert.IsInstanceOfType(instance2, typeof(ServiceImpl));
+    /// 
+    /// Assert.AreSame(((Interface1Decorator)instance1).DecoratedInstance, instance2);
+    /// ]]></code>
+    /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay(
         "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +

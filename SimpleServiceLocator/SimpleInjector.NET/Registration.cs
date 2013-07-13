@@ -34,7 +34,8 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// A <b>Registration</b> implements lifestyle based caching for a single service.
+    /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an
+    /// <see cref="Expression"/> that describes the creation of the service.
     /// </summary>
     /// <remarks>
     /// <see cref="Lifestyle"/> implementations create a new <b>Registration</b> instance for each registered
@@ -44,7 +45,7 @@ namespace SimpleInjector
     /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> applied, and the caching 
     /// particular to its lifestyle have been applied. Interception using the 
     /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b> 
-    /// be applied.</remarks>
+    /// be applied in the <b>Registration</b>, but will be applied in <see cref="InstanceProducer"/>.</remarks>
     /// <example>
     /// See the <see cref="Lifestyle"/> documentation for an example.
     /// </example>
