@@ -2,7 +2,7 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Lifestyles;
+    using SimpleInjector.Extensions;
 
     [TestClass]
     public class LifestyleTests
@@ -67,6 +67,144 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("name", action);
         }
 
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer1_ReturnsExpectedInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer<IPlugin, PluginImpl>(container);
+
+            // This allows verifying whether the InstanceProducer's service type is set correctly
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
+            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+        }
+
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer2_ReturnsExpectedInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer<IPlugin>(() => new PluginImpl(), container);
+
+            // This allows verifying whether the InstanceProducer's service type is set correctly
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
+            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+        }
+
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer3_ReturnsExpectedInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer(typeof(IPlugin), typeof(PluginImpl), container);
+
+            // This allows verifying whether the InstanceProducer's service type is set correctly
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
+            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+        }
+        
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer1_ExpressionBuildingGetsSuppliedWithExpectedServiceType()
+        {
+            // Arrange
+            Type expectedRegisteredServiceType = typeof(IPlugin);
+            Type actualRegisteredServiceType = null;
+
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer<IPlugin, PluginImpl>(container);
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(PluginImpl))
+                {
+                    actualRegisteredServiceType = e.RegisteredServiceType;
+                }
+            };
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.AreEqual(expectedRegisteredServiceType, actualRegisteredServiceType,
+                "The RegisteredServiceType supplied to the ExpressionBuilding should be IPlugin.");
+        }
+
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer2_ExpressionBuildingGetsSuppliedWithExpectedServiceType()
+        {
+            // Arrange
+            Type expectedRegisteredServiceType = typeof(IPlugin);
+            Type actualRegisteredServiceType = null;
+
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer<IPlugin>(() => new PluginImpl(), container);
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(IPlugin))
+                {
+                    actualRegisteredServiceType = e.RegisteredServiceType;
+                }
+            };
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.AreEqual(expectedRegisteredServiceType, actualRegisteredServiceType,
+                "The RegisteredServiceType supplied to the ExpressionBuilding should be IPlugin.");
+        }
+
+        [TestMethod]
+        public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer3_ExpressionBuildingGetsSuppliedWithExpectedServiceType()
+        {
+            // Arrange
+            Type expectedRegisteredServiceType = typeof(IPlugin);
+            Type actualRegisteredServiceType = null;
+
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer(typeof(IPlugin), typeof(PluginImpl), container);
+
+            container.ExpressionBuilding += (s, e) =>
+            {
+                if (e.KnownImplementationType == typeof(PluginImpl))
+                {
+                    actualRegisteredServiceType = e.RegisteredServiceType;
+                }
+            };
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.AreEqual(expectedRegisteredServiceType, actualRegisteredServiceType,
+                "The RegisteredServiceType supplied to the ExpressionBuilding should be IPlugin.");
+        }
+        
         private sealed class FakeLifestyle : Lifestyle
         {
             public FakeLifestyle(string name) : base(name)

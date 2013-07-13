@@ -3,6 +3,12 @@
 
 Version vNext
 
+	General description:
+
+	New features:
+		-[Core] Lifestyle.CreateProducer extension methods added to make creating InstanceProducer instances
+		 more convenient. (work item 19959).
+
 
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12
 
