@@ -99,7 +99,7 @@ namespace SimpleInjector
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
             // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
             // implementation of the GenericArgumentFinder. That's not an easy thing to fix :-(
-            if (!type.IsGenericTypeDefinition)
+            if (!type.ContainsGenericParameters)
             {
                 string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type);
 
@@ -215,19 +215,36 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DecoratorDoesNotContainUnresolvableTypeArguments(Type serviceType,
-            Type decoratorType, string parameterName)
+        internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
+            Type implementationType, string parameterName)
         {
-            if (serviceType.ContainsGenericParameters && decoratorType.ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters && 
+                implementationType.ContainsGenericParameters)
             {
-                var builder = new GenericTypeBuilder(serviceType, decoratorType);
+                var builder = new GenericTypeBuilder(serviceType, implementationType);
 
-                if (!builder.OpenGenericImplementationCanBeAppliedToServiceType())
+                if (builder.OpenGenericImplementationCanBeAppliedToServiceType())
                 {
-                    string error = StringResources.DecoratorContainsUnresolvableTypeArguments(decoratorType);
-
-                    throw new ArgumentException(error, parameterName);
+                    return;
                 }
+
+                if (TypeContainsGenericArgumentsWithConstraintsContainingAnotherArgument(implementationType))
+                {
+                    // HACK: When the given implementationType contains generic type constraints that reference
+                    // other arguments (for instance 'where T1 : IBar<T2>'), it is too hard to find out whether
+                    // the type contains unused type arguments or that those arguments can be deduced from the
+                    // other arguments. The only way we can do this right now is when actual type (from a
+                    // closed generic type) are given, but at this stage we only have the open generic type.
+                    // So in that case we just skip this test to prevent throwing an exception in a case that
+                    // the registration actually is correct, with the risk of sometimes allowing the user to
+                    // register a type that will never be resolved.
+                    return;
+                }
+
+                string error =
+                    StringResources.OpenGenericTypeContainsUnresolvableTypeArguments(implementationType);
+
+                throw new ArgumentException(error, parameterName);
             }
         }
 
@@ -348,6 +365,25 @@ namespace SimpleInjector
                 decoratorType, validConstructorArgumentTypes);
 
             throw new ArgumentException(message, paramName);
+        }
+        
+        private static bool TypeContainsGenericArgumentsWithConstraintsContainingAnotherArgument(
+            Type implementationType)
+        {
+            return implementationType.GetGenericArguments()
+                .Any(GenericArgumentContainsConstraintsContainingAnotherArgument);
+        }
+
+        private static bool GenericArgumentContainsConstraintsContainingAnotherArgument(Type argument)
+        {
+            return argument.IsGenericParameter &&
+                argument.GetGenericParameterConstraints().Any(ContainsAnotherArgument);
+        }
+
+        private static bool ContainsAnotherArgument(Type constraint)
+        {
+            return constraint.IsGenericParameter || (constraint.IsGenericType &&
+                constraint.GetGenericArguments().Any(ContainsAnotherArgument));
         }
     }
 }

@@ -149,6 +149,9 @@
     <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
       <Link>ExpressionBuiltEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\ArgumentMapping.cs">
+      <Link>Extensions\ArgumentMapping.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
       <Link>Extensions\DecoratorExtensions.cs</Link>
     </Compile>

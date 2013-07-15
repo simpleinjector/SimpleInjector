@@ -381,12 +381,12 @@ namespace SimpleInjector
                 decoratorType.ToFriendlyName(), friendlyValidTypes.ToCommaSeparatedText());
         }
 
-        internal static string DecoratorContainsUnresolvableTypeArguments(Type decoratorType)
+        internal static string OpenGenericTypeContainsUnresolvableTypeArguments(Type openGenericImplementation)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied decorator {0} contains unresolvable type arguments. " +
-                "The type would never be resolved and is therefore not suited to be used as decorator.",
-                decoratorType.ToFriendlyName());
+                "The supplied type {0} contains unresolvable type arguments. " +
+                "The type would never be resolved and is therefore not suited to be used.",
+                openGenericImplementation.ToFriendlyName());
         }
         
         internal static string DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(Type serviceType,

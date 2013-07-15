@@ -90,6 +90,12 @@ namespace SimpleInjector.Extensions
             return registeredServiceType;
         }
 
+        internal static bool ContainsGenericParameter(this Type type)
+        {
+            return type.IsGenericParameter || 
+                (type.IsGenericType && type.GetGenericArguments().Any(ContainsGenericParameter));
+        }
+
         internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
         {
             var body = methodCall.Body as MethodCallExpression;

@@ -27,6 +27,7 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     /// <summary>
@@ -34,15 +35,30 @@ namespace SimpleInjector.Extensions
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
+        [DebuggerDisplay("{Helpers.ToFriendlyName(closedGenericBaseType)}")]
+        private readonly Type closedGenericBaseType;
+        
+        [DebuggerDisplay("{Helpers.ToFriendlyName(openGenericImplementation)}")]
+        private readonly Type openGenericImplementation;
+        
+        [DebuggerDisplay("{Helpers.ToFriendlyName(partialOpenGenericImplementation)}")]
+        private readonly Type partialOpenGenericImplementation;
+
+        private readonly bool isPartialOpenGenericImplementation;
+      
         public GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
-        {
-            this.ClosedGenericBaseType = closedGenericBaseType;
-            this.OpenGenericImplementation = openGenericImplementation;
+        {          
+            this.closedGenericBaseType = closedGenericBaseType;
+
+            this.openGenericImplementation = openGenericImplementation;
+
+            if (openGenericImplementation.IsGenericType && !openGenericImplementation.IsGenericTypeDefinition)
+            {
+                this.openGenericImplementation = openGenericImplementation.GetGenericTypeDefinition();
+                this.partialOpenGenericImplementation = openGenericImplementation;
+                this.isPartialOpenGenericImplementation = true;
+            }
         }
-
-        private Type ClosedGenericBaseType { get; set; }
-
-        private Type OpenGenericImplementation { get; set; }
 
         internal bool OpenGenericImplementationCanBeAppliedToServiceType()
         {
@@ -53,7 +69,7 @@ namespace SimpleInjector.Extensions
         {
             var serviceType = this.FindMatchingOpenGenericServiceType();
 
-            if (serviceType != null)
+            if (serviceType != null && this.SafisfiesPartialTypeArguments(serviceType))
             {
                 Type closedGenericImplementation =
                     this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
@@ -68,26 +84,25 @@ namespace SimpleInjector.Extensions
             return BuildResult.Invalid();
         }
 
-        private Type FindMatchingOpenGenericServiceType()
+        private CandicateServiceType FindMatchingOpenGenericServiceType()
         {
             // There can be more than one service that exactly matches, but they will never have a different
             // set of generic type arguments; the type system ensures this. 
             return (
-                from serviceType in this.GetCandidateServiceTypes()
-                where this.SatisfiesGenericTypeConstraints(serviceType)
-                select serviceType)
+                from openCandidateServiceType in this.GetOpenCandidateServiceTypes()
+                where this.MatchesClosedGenericBaseType(openCandidateServiceType)
+                select openCandidateServiceType)
                 .FirstOrDefault();
         }
 
-        private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(Type serviceType)
+        private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(
+            CandicateServiceType candicateServiceType)
         {
-            if (this.OpenGenericImplementation.ContainsGenericParameters)
+            if (this.openGenericImplementation.IsGenericType)
             {
-                var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
-
                 try
                 {
-                    return this.OpenGenericImplementation.MakeGenericType(arguments);
+                    return this.openGenericImplementation.MakeGenericType(candicateServiceType.Arguments);
                 }
                 catch (ArgumentException)
                 {
@@ -98,50 +113,85 @@ namespace SimpleInjector.Extensions
             }
             else
             {
-                return this.OpenGenericImplementation;
+                return this.openGenericImplementation;
             }
         }
 
-        private IEnumerable<Type> GetCandidateServiceTypes()
+        private IEnumerable<CandicateServiceType> GetOpenCandidateServiceTypes()
         {
-            var openGenericBaseType = this.ClosedGenericBaseType.GetGenericTypeDefinition();
+            var openGenericBaseType = this.closedGenericBaseType.GetGenericTypeDefinition();
 
-            return (
-                from baseType in this.OpenGenericImplementation.GetTypeBaseTypesAndInterfaces()
+            var openGenericBaseTypes = (
+                from baseType in this.openGenericImplementation.GetTypeBaseTypesAndInterfaces()
                 where openGenericBaseType.IsGenericTypeDefinitionOf(baseType)
                 select baseType)
-                .Distinct();
+                .Distinct()
+                .ToArray();
+
+            return
+                from type in openGenericBaseTypes
+                select this.ToCandicateServiceType(type);
         }
 
-        private bool SatisfiesGenericTypeConstraints(Type serviceType)
+        private CandicateServiceType ToCandicateServiceType(Type openCandidateServiceType)
         {
-            if (!this.OpenGenericImplementation.ContainsGenericParameters)
+            if (openCandidateServiceType.IsGenericType)
             {
-                // When there are no generic type arguments, there are (obviously) no generic type constraints
-                // so checking for the number of argument would always succeed, while this is not correct.
-                // Instead we should check whether the given service type is the requested closed generic base
-                // type.
-                return this.ClosedGenericBaseType == serviceType;
+                return new CandicateServiceType(openCandidateServiceType,
+                    this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
             }
-            else
-            {
-                var arguments = this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(serviceType);
 
-                // Type arguments that don't match are left out. When the length of the result does not match 
-                // the actual length, this means that the generic type constraints don't match and the given 
-                // service type does not satisft the generic type constraints.
-                return arguments.Length == this.OpenGenericImplementation.GetGenericArguments().Length;
-            }
+            return new CandicateServiceType(openCandidateServiceType, Type.EmptyTypes);
         }
 
-        private Type[] GetMatchingGenericArgumentsForOpenImplementationBasedOn(Type openGenericServiceType)
+        private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)
         {
-            var finder = new GenericArgumentFinder
+            if (this.openGenericImplementation.IsGenericType)
             {
-                OpenServiceGenericTypeArguments = openGenericServiceType.GetGenericArguments(),
-                ClosedServiceConcreteTypeArguments = this.ClosedGenericBaseType.GetGenericArguments(),
-                OpenGenericImplementationTypeArguments = this.OpenGenericImplementation.GetGenericArguments(),
-            };
+                return this.SatisfiesGenericTypeConstraints(openCandidateServiceType);
+            }
+
+            // When there are no generic type arguments, there are (obviously) no generic type constraints
+            // so checking for the number of argument would always succeed, while this is not correct.
+            // Instead we should check whether the given service type is the requested closed generic base
+            // type.
+            return this.closedGenericBaseType == openCandidateServiceType.ServiceType;
+        }
+
+        private bool SatisfiesGenericTypeConstraints(CandicateServiceType openCandidateServiceType)
+        {
+            // Type arguments that don't match are left out of the list. 
+            // When the length of the result does not match the actual length, this means that the generic 
+            // type constraints don't match and the given service type does not satisfy the generic type 
+            // constraints.
+            return openCandidateServiceType.Arguments.Count() == 
+                this.openGenericImplementation.GetGenericArguments().Length;
+        }
+
+        private bool SafisfiesPartialTypeArguments(CandicateServiceType candicateServiceType)
+        {
+            if (!this.isPartialOpenGenericImplementation)
+            {
+                return true;
+            }
+
+            return this.SafisfiesPartialTypeArguments(candicateServiceType.Arguments);
+        }
+
+        private bool SafisfiesPartialTypeArguments(Type[] arguments)
+        {
+            // Map the parial open generic type arguments to the concrete arguments.
+            var mappings =
+                this.partialOpenGenericImplementation.GetGenericArguments()
+                .Zip(arguments, ArgumentMapping.Create);
+
+            return mappings.All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
+        }
+
+        private Type[] GetMatchingGenericArgumentsForOpenImplementationBasedOn(Type openCandidateServiceType)
+        {
+            var finder = new GenericArgumentFinder(openCandidateServiceType, this.closedGenericBaseType,
+                this.openGenericImplementation, this.partialOpenGenericImplementation);
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
         }
@@ -169,6 +219,28 @@ namespace SimpleInjector.Extensions
                     ClosedServiceTypeSatisfiesAllTypeConstraints = true,
                     ClosedGenericImplementation = closedGenericImplementation,
                 };
+            }
+        }
+
+        /// <summary>
+        /// A open generic type with the concrete arguments that can be used to create a closed generic type.
+        /// </summary>
+        private sealed class CandicateServiceType
+        {
+            internal readonly Type ServiceType;
+            internal readonly Type[] Arguments;
+
+            public CandicateServiceType(Type serviceType, Type[] arguments)
+            {
+                this.ServiceType = serviceType;
+                this.Arguments = arguments;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("ServiceType: {0}, Arguments: {1}",
+                    this.ServiceType.ToFriendlyName(),
+                    this.Arguments.Select(type => type.ToFriendlyName()).ToCommaSeparatedText());
             }
         }
     }

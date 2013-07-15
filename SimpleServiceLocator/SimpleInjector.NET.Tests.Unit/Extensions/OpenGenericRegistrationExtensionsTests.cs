@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
@@ -16,6 +17,10 @@
     }
 
     public interface IBar<T>
+    {
+    }
+
+    public interface IInterface<TOne, TTwo, TThree> 
     {
     }
 
@@ -42,7 +47,7 @@
     {
     }
 
-    public interface IProducer<T>
+    public interface IProducer<TValue>
     {
     }
 
@@ -505,6 +510,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            // NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double> where T : struct
             container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
 
             // Act
@@ -550,19 +556,106 @@
         }
 
         [TestMethod]
+        public void RegisterOpenGeneric_RegisterOpenGenericWithImplementationWithTypeArgumentThatHasNoMapping_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Atca
+            Action action = () => container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
+            
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "SneakyMonoDictionary<T, TUnused> contains unresolvable type arguments",
+                action);
+        }
+
+        [TestMethod]
+        public void GetRegistration_RegisterPartialOpenGenericWithImplementationWithTypeArgumentThatHasNoMappingFilledIn_ReturnsExpectedType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // SneakyMonoDictionary<T, object>
+            var implementationType = typeof(SneakyMonoDictionary<,>).MakeGenericType(
+                typeof(SneakyMonoDictionary<,>).GetGenericArguments().First(),
+                typeof(object));
+            
+            container.RegisterOpenGeneric(typeof(IDictionary<,>), implementationType);
+
+            // Act
+            // SneakyMonoDictionary implements Dictionary<T, T>, so requesting this should succeed.
+            var instance = container.GetInstance<IDictionary<int, int>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(SneakyMonoDictionary<int, object>),
+                "SneakyMonoDictionary implements Dictionary<T, T>, so requesting an IDictionary<int, int> " +
+                "should succeed because we filled in TUnused with System.Object.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_PartialOpenGenericNastynessPart1_ReturnsExpectedType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var openImplementationType = typeof(Implementation<,,,>);
+            var arguments = openImplementationType.GetGenericArguments();
+
+            // TestDictionary<X, object, string, Y> -> IInterface<X, X, Y>
+            var parialOpenImplementationType =
+                openImplementationType.MakeGenericType(arguments[0], typeof(object), typeof(string), arguments[3]);
+
+            container.RegisterOpenGeneric(typeof(IInterface<,,>), parialOpenImplementationType);
+
+            // Act
+            var instance = container.GetInstance<IInterface<int, int, double>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(Implementation<int, object, string, double>));
+        }
+
+        [TestMethod]
+        public void GetRegistration_PartialOpenGenericNastynessPart2_ReturnsExpectedType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var openImplementationType = typeof(Implementation<,,,>);
+            var arguments = openImplementationType.GetGenericArguments();
+
+            // TestDictionary<X, object, string, object> -> IInterface<X, X, object>
+            var parialOpenImplementationType =
+                openImplementationType.MakeGenericType(arguments[0], typeof(object), typeof(string), typeof(object));
+
+            container.RegisterOpenGeneric(typeof(IInterface<,,>), parialOpenImplementationType);
+
+            // Act
+            var instance = container.GetInstance<IInterface<int, int, object>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(Implementation<int, object, string, object>));
+        }
+
+        [TestMethod]
         public void GetRegistration_RegisterOpenGenericWithImplementationWithTypeArgumentThatHasNoMapping_ReturnsNull()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
+            var implementationType = typeof(SneakyMonoDictionary<,>).MakeGenericType(
+                typeof(SneakyMonoDictionary<,>).GetGenericArguments().First(),
+                typeof(object));
+            
+            container.RegisterOpenGeneric(typeof(IDictionary<,>), implementationType);
 
             // Act
             var producer = container.GetRegistration(typeof(IDictionary<int, object>));
 
             // Assert
-            Assert.IsNull(producer, "Resolving IDictionary<int, object> should ignore " +
-                "SneakyMonoDictionary<T, Unused> because there is no mapping to Unused.");
+            Assert.IsNull(producer, 
+                "SneakyMonoDictionary implements Dictionary<T, T>, so there is no mapping from " +
+                "IDictionary<int, object> to SneakyMonoDictionary<T, TUnused>, even with Unused filled in.");
         }
 
         [TestMethod]
@@ -934,22 +1027,6 @@
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "ClassConstraintEventHandler<Object> is not an open generic type.", action);
         }
-        
-        [TestMethod]
-        public void RegisterAllOpenGeneric_SuppliedWithAPartiallyOpenGenericType_ThrowsExpectedException()
-        {
-            // Arrange
-            Type invalidType = typeof(ClassConstraintEventHandler<>).MakeGenericType(typeof(List<>));
-
-            var container = ContainerFactory.New();
-
-            // Act
-            Action action = () => container.RegisterAllOpenGeneric(typeof(IEventHandler<>), invalidType);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "ClassConstraintEventHandler<List<T>> is not an open generic type.", action);
-        }
 
         [TestMethod]
         public void RegisterAllOpenGeneric_CalledWithAbstractType_ThrowsExpectedException()
@@ -1086,6 +1163,182 @@
         }
 #endif
 
+        [TestMethod]
+        public void GetInstance_OnRegisteredPartialGenericType1_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(typeof(List<>));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            container.GetInstance<IEventHandler<List<int>>>();
+        }
+
+        [TestMethod]
+        public void GetInstance_OnRegisteredPartialGenericType2_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<int, List<T>>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(int),
+                    typeof(List<>)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int, List<double>>>));
+
+            // Assert
+            Assert.IsNotNull(registration);
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch1_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(typeof(List<>));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Collection<int>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch2_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<int, List<T>>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(int),
+                    typeof(List<>)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<double, List<int>>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch3_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<int, List<T>>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(int),
+                    typeof(List<>)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<double, object>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch4_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<Nullable<T>, object>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(Nullable<>),
+                    typeof(object)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, List<int>>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch5_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<Nullable<T>, List<int>>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(Nullable<>),
+                    typeof(List<int>)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, Collection<int>>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+        
+        [TestMethod]
+        public void GetRegistration_OnRegisteredPartialGenericTypeThatDoesNotMatch6_ReturnsNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // ClassConstraintEventHandler<Tuple<Nullable<T>, List<int>>>
+            var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(
+                typeof(Tuple<,>).MakeGenericType(
+                    typeof(Nullable<>),
+                    typeof(List<int>)));
+
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+
+            // Act
+            var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, string>>));
+
+            // Assert
+            Assert.IsNull(registration, "The type does not match and should not be resolved.");
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_SupplyingATypeWithAGenericArgumentThatCanNotBeMappedToTheBaseType_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            // ValidatorWithUnusedTypeArgument<T, TUnused>
+            Action action = () => container.RegisterOpenGeneric(
+                typeof(IValidate<>), 
+                typeof(ValidatorWithUnusedTypeArgument<,>));
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "contains unresolvable type arguments",
+                action,
+                "Registration should fail, because the framework should detect that the implementation " +
+                "contains a generic type argument that can never be resolved.");
+        }
+
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
         {
@@ -1214,6 +1467,14 @@
             }
         }
 
+        public sealed class ValidatorWithUnusedTypeArgument<T, TUnused> : IValidate<T>
+        {
+            public void Validate(T instance)
+            {
+                // Do nothing.
+            }
+        }
+
         public class Bar
         {
         }
@@ -1244,6 +1505,10 @@
             public TDependency Dependency { get; private set; }
         }
         
+        public class Implementation<X, TUnused1, TUnused2, Y> : IInterface<X, X, Y> 
+        {
+        }
+
         internal class InternalEventHandler<TEvent> : IEventHandler<TEvent>
         {
         }

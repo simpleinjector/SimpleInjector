@@ -164,6 +164,8 @@ namespace SimpleInjector.Extensions
                 openGenericImplementation, "openGenericServiceType");
             Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
                 openGenericImplementation, "openGenericImplementation");
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(openGenericServiceType, 
+                openGenericImplementation, "openGenericImplementation");
 
             var resolver = new UnregisteredOpenGenericResolver
             {

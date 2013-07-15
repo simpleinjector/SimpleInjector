@@ -36,6 +36,30 @@
     public class DecoratorExtensionsTests
     {
         [TestMethod]
+        public void GetInstance_OnRegisteredPartialGenericDecoratorType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICommandHandler<List<int>>, NullCommandHandler<List<int>>>();
+
+            // ClassConstraintHandlerDecorator<List<T>>
+            var partialOpenGenericDecoratorType = 
+                typeof(ClassConstraintHandlerDecorator<>).MakeGenericType(typeof(List<>));
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), partialOpenGenericDecoratorType);
+
+            // Act
+            var instance = container.GetInstance<ICommandHandler<List<int>>>();
+
+            // Assert
+            Assert.AreEqual(
+                typeof(ClassConstraintHandlerDecorator<List<int>>).ToFriendlyName(),
+                instance.GetType().ToFriendlyName(),
+                "Decorator was not applied.");
+        }
+
+        [TestMethod]
         public void GetInstance_OnDecoratedNonGenericType_ReturnsTheDecoratedService()
         {
             // Arrange
