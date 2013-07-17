@@ -29,6 +29,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     using System.Linq.Expressions;
 
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
@@ -69,7 +70,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// }
     /// ]]></code>
     /// </example>
-    public sealed class LifetimeScopeLifestyle : Lifestyle
+    public sealed class LifetimeScopeLifestyle : ScopedLifestyle
     {
         internal static readonly Lifestyle WithDisposal = new LifetimeScopeLifestyle(true);
 
@@ -101,6 +102,61 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         protected override int Length
         {
             get { return 100; }
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the current
+        /// lifetime scope ends, but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
+        public static void WhenCurrentScopeEnds(Container container, Action action)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
+
+            var scope = container.GetCurrentLifetimeScope();
+
+            if (scope == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException("This method can only be called within the context of " +
+                    "an active lifetime scope. Make sure you call container.BeginLifetimeScope() first.");
+            }
+
+            scope.RegisterDelegateForScopeEnd(action);
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
+        /// but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
+        public override void WhenScopeEnds(Container container, Action action)
+        {
+            WhenCurrentScopeEnds(container, action);
         }
 
         internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)

@@ -907,6 +907,135 @@
             Assert.AreEqual(2, disposedInstances.Count, "Two instances were expected to be disposed.");
         }
 
+        [TestMethod]
+        public void Verify_WithWhenScopeEndsRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            container.Register<ICommand, DisposableCommand>(lifestyle);
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                lifestyle.WhenScopeEnds(container, () => { });
+            });
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void LifetimeScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredAction()
+        {
+            // Arrange
+            int actionCallCount = 0;
+
+            var container = new Container();
+
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                lifestyle.WhenScopeEnds(container, () => { actionCallCount++; });
+            });
+
+            using (container.BeginLifetimeScope())
+            {
+                container.GetInstance<DisposableCommand>();
+
+                // Act
+            }
+
+            // Assert
+            Assert.AreEqual(1, actionCallCount, "Delegate is expected to be called exactly once.");            
+        }
+        
+        [TestMethod]
+        public void LifetimeScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredActionBeforeCallingDispose()
+        {
+            // Arrange
+            bool delegateHasBeenCalled = false;
+            DisposableCommand instanceToDispose = null;
+
+            var container = new Container();
+
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                LifetimeScopeLifestyle.WhenCurrentScopeEnds(container, () => 
+                {
+                    Assert.IsFalse(command.HasBeenDisposed, 
+                        "The action should be called before disposing the instance, because users are " +
+                        "to use those instances.");
+                    delegateHasBeenCalled = true;
+                });
+            });
+
+            using (container.BeginLifetimeScope())
+            {
+                instanceToDispose = container.GetInstance<DisposableCommand>();
+
+                // Act
+            }
+
+            // Assert
+            Assert.IsTrue(delegateHasBeenCalled, "Delegate is expected to be called.");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void WhenScopeEnds_NullContainerArgument_ThrowsException()
+        {
+            // Arrange
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            // Act
+            lifestyle.WhenScopeEnds(null, () => { });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void WhenScopeEnds_NullActionArgument_ThrowsException()
+        {
+            // Arrange
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            // Act
+            lifestyle.WhenScopeEnds(new Container(), null);
+        }
+        [TestMethod]
+        public void WhenScopeEnds_CalledOutOfTheContextOfALifetimeScope_ThrowsException()
+        {
+            // Arrange
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ConcreteCommand>();
+
+            try
+            {
+                // Act
+                lifestyle.WhenScopeEnds(container, () => { });
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "This method can only be called within the context of an active lifetime scope."),
+                    "Actual: " + ex.Message);
+            }
+        }
+
         public class ConcreteCommand : ICommand
         {
             public void Execute()

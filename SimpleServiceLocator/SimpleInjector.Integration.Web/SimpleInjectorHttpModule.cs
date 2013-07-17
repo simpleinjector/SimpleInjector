@@ -42,7 +42,7 @@ namespace SimpleInjector.Integration.Web
         {
             context.EndRequest += (sender, e) =>
             {
-                SimpleInjectorWebExtensions.ExecuteAllRegisteredEndWebRequestDelegates();
+                SimpleInjectorWebExtensions.CleanUpWebRequest();
             };
         }
 

@@ -39,6 +39,9 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWebExtensions
     {
+        private static readonly object WebRequestEndActionsKey = new object();
+        private static readonly object ObjectsToDisposeKey = new object();
+
         /// <summary>
         /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
         /// request and ensures that -if <typeparamref name="TConcrete"/> implements 
@@ -190,35 +193,70 @@ namespace SimpleInjector
                     "This method can only be called in the context of a web request.");
             }
 
-            RegisterDelegateForEndWebRequest(context, () => disposable.Dispose());
+            RegisterDisposableForEndWebRequest(context, disposable);
         }
 
-        internal static void RegisterDelegateForEndWebRequest(HttpContext context, Action webRequestEnds)
+        internal static void RegisterDelegateForWebRequestEnd(HttpContext context, Action webRequestEnds)
         {
-            var key = typeof(SimpleInjectorWebExtensions);
-
-            var actions = (List<Action>)context.Items[key];
+            var actions = (List<Action>)context.Items[WebRequestEndActionsKey];
 
             if (actions == null)
             {
-                context.Items[key] = actions = new List<Action>();
+                context.Items[WebRequestEndActionsKey] = actions = new List<Action>();
             }
 
             actions.Add(webRequestEnds);
         }
 
-        internal static void ExecuteAllRegisteredEndWebRequestDelegates()
+        internal static void CleanUpWebRequest()
+        {
+            try
+            {
+                // Actions should be executed before disposing objects. Those actions will likely have effect
+                // on the objects that are about to be disposed.
+                ExecuteAllRegisteredEndWebRequestDelegates();
+            }
+            finally
+            {
+                DisposeAllRegisteredDisposables();
+            }
+        }
+
+        private static void RegisterDisposableForEndWebRequest(HttpContext context, IDisposable disposable)
+        {
+            var disposables = (List<IDisposable>)context.Items[ObjectsToDisposeKey];
+
+            if (disposables == null)
+            {
+                context.Items[ObjectsToDisposeKey] = disposables = new List<IDisposable>();
+            }
+
+            disposables.Add(disposable);
+        }
+
+        private static void ExecuteAllRegisteredEndWebRequestDelegates()
         {
             var context = HttpContext.Current;
 
-            var key = typeof(SimpleInjectorWebExtensions);
-
-            var actions = (List<Action>)context.Items[key];
+            var actions = (List<Action>)context.Items[WebRequestEndActionsKey];
 
             if (actions != null)
             {
                 actions.ForEach(action => action());
-                context.Items[key] = null;
+                context.Items[WebRequestEndActionsKey] = null;
+            }
+        }
+
+        private static void DisposeAllRegisteredDisposables()
+        {
+            var context = HttpContext.Current;
+
+            var disposables = (List<IDisposable>)context.Items[ObjectsToDisposeKey];
+
+            if (disposables != null)
+            {
+                disposables.ForEach(disposable => disposable.Dispose());
+                context.Items[ObjectsToDisposeKey] = null;
             }
         }
     }

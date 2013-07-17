@@ -30,6 +30,7 @@ namespace SimpleInjector.Integration.Web
     using System.Web;
 
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single HTTP Web Request.
@@ -44,7 +45,7 @@ namespace SimpleInjector.Integration.Web
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new WebRequestLifestyle());
     /// ]]></code>
     /// </example>
-    public sealed class WebRequestLifestyle : Lifestyle
+    public sealed class WebRequestLifestyle : ScopedLifestyle
     {
         /// <summary>
         /// A default <see cref="WebRequestLifestyle"/> instance that can be used for registering components
@@ -79,6 +80,59 @@ namespace SimpleInjector.Integration.Web
         protected override int Length
         {
             get { return 300; }
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
+        /// but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no web request.</exception>
+        public static void WhenCurrentRequestEnds(Container container, Action action)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
+
+            var context = HttpContext.Current;
+
+            if (context == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    "This method can only be called in the context of a web request.");
+            }
+
+            SimpleInjectorWebExtensions.RegisterDelegateForWebRequestEnd(context, action);
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
+        /// but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no web request.</exception>
+        public override void WhenScopeEnds(Container container, Action action)
+        {
+            WhenCurrentRequestEnds(container, action);
         }
 
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
