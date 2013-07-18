@@ -90,7 +90,8 @@ namespace SimpleInjector.Integration.Web
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no web request.</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
+        /// in the context of a web request.</exception>
         public static void WhenCurrentRequestEnds(Container container, Action action)
         {
             if (container == null)
@@ -129,10 +130,51 @@ namespace SimpleInjector.Integration.Web
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no web request.</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
+        /// in the context of a web request.</exception>
         public override void WhenScopeEnds(Container container, Action action)
         {
             WhenCurrentRequestEnds(container, action);
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
+        /// web request ends.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="disposable">The instance that should be disposed when the web request ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
+        /// in the context of a web request.</exception>
+        public override void RegisterForDisposal(Container container, IDisposable disposable)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (disposable == null)
+            {
+                throw new ArgumentNullException("disposable");
+            }
+
+            var context = HttpContext.Current;
+
+            if (context == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    "This method can only be called in the context of a web request.");
+            }
+
+            SimpleInjectorWebExtensions.RegisterDisposableForEndWebRequest(context, disposable);
         }
 
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)

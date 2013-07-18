@@ -45,6 +45,7 @@ namespace SimpleInjector.Integration.Wcf
 
         private readonly int initialThreadId;
         private WcfOperationScopeManager manager;
+        private List<Action> actions;
         private List<IDisposable> disposables;
 
         internal WcfOperationScope(WcfOperationScopeManager manager)
@@ -124,17 +125,19 @@ namespace SimpleInjector.Integration.Wcf
                 {
                     this.manager = null;
 
-                    if (this.disposables != null)
-                    {
-                        foreach (var disposable in this.disposables)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-
-                    this.disposables = null;
+                    this.CleanUpScope();
                 }
             }
+        }
+            
+        internal void RegisterDelegateForScopeEnd(Action action)
+        {
+            if (this.actions == null)
+            {
+                this.actions = new List<Action>();
+            }
+
+            this.actions.Add(action);
         }
 
         internal TService GetInstance<TService>(Registration key, Func<TService> instanceCreator,
@@ -159,6 +162,44 @@ namespace SimpleInjector.Integration.Wcf
             }
 
             return (TService)instance;
+        }
+
+        private void CleanUpScope()
+        {
+            try
+            {
+                this.ExecuteAllRegisteredEndWebRequestDelegates();
+            }
+            finally
+            {
+                this.DisposeAllRegisteredDisposables();
+            }
+        }
+
+        private void ExecuteAllRegisteredEndWebRequestDelegates()
+        {
+            if (this.actions != null)
+            {
+                foreach (var action in this.actions)
+                {
+                    action();
+                }
+            }
+
+            this.actions = null;
+        }
+
+        private void DisposeAllRegisteredDisposables()
+        {
+            if (this.disposables != null)
+            {
+                foreach (var disposable in this.disposables)
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            this.disposables = null;
         }
 
         private sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class

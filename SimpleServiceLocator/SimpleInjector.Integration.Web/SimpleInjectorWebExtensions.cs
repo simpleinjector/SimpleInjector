@@ -222,7 +222,7 @@ namespace SimpleInjector
             }
         }
 
-        private static void RegisterDisposableForEndWebRequest(HttpContext context, IDisposable disposable)
+        internal static void RegisterDisposableForEndWebRequest(HttpContext context, IDisposable disposable)
         {
             var disposables = (List<IDisposable>)context.Items[ObjectsToDisposeKey];
 

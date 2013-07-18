@@ -990,6 +990,34 @@
         }
 
         [TestMethod]
+        public void LifetimeScopeDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            DisposableCommand transientInstanceToDispose = null;
+
+            var container = new Container();
+
+            container.EnableLifetimeScoping();
+
+            var lifestyle = new LifetimeScopeLifestyle();
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                lifestyle.RegisterForDisposal(container, command);
+            });
+
+            using (container.BeginLifetimeScope())
+            {
+                transientInstanceToDispose = container.GetInstance<DisposableCommand>();
+
+                // Act
+            }
+
+            // Assert
+            Assert.IsTrue(transientInstanceToDispose.HasBeenDisposed);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
@@ -1010,6 +1038,7 @@
             // Act
             lifestyle.WhenScopeEnds(new Container(), null);
         }
+
         [TestMethod]
         public void WhenScopeEnds_CalledOutOfTheContextOfALifetimeScope_ThrowsException()
         {

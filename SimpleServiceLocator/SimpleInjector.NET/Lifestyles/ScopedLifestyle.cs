@@ -29,5 +29,17 @@
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
         public abstract void WhenScopeEnds(Container container, Action action);
+
+        /// <summary>
+        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
+        /// scope ends.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// scope for the supplied <paramref name="container"/>.</exception>
+        public abstract void RegisterForDisposal(Container container, IDisposable disposable);
     }
 }

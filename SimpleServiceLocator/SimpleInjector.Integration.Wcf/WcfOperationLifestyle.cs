@@ -29,6 +29,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
@@ -41,7 +42,7 @@ namespace SimpleInjector.Integration.Wcf
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new WcfOperationLifestyle());
     /// ]]></code>
     /// </example>
-    public class WcfOperationLifestyle : Lifestyle
+    public class WcfOperationLifestyle : ScopedLifestyle
     {
         /// <summary>
         /// A default <see cref="WcfOperationLifestyle"/> instance that can be used for registering components
@@ -76,6 +77,101 @@ namespace SimpleInjector.Integration.Wcf
         protected override int Length
         {
             get { return 250; }
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the current
+        /// WCF operation ends, but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the WCF operation ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
+        public static void WhenWcfOperationEnds(Container container, Action action)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
+
+            var scope = container.GetCurrentWcfOperationScope();
+
+            if (scope == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException("This method can only be called within the context of " +
+                    "an active WCF operation.");
+            }
+
+            scope.RegisterDelegateForScopeEnd(action);
+        }
+
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the current WCF 
+        /// operation ends, but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the WCF operation ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
+        public override void WhenScopeEnds(Container container, Action action)
+        {
+            WhenWcfOperationEnds(container, action);
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
+        /// WCF operation ends.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="disposable">The instance that should be disposed when the WCF operation ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
+        /// in the context of a WCF operation.</exception>
+        public override void RegisterForDisposal(Container container, IDisposable disposable)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
+            if (disposable == null)
+            {
+                throw new ArgumentNullException("disposable");
+            }
+
+            var scope = container.GetCurrentWcfOperationScope();
+
+            if (scope == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException("This method can only be called within the context of " +
+                    "an active WCF operation.");
+            }
+
+            scope.RegisterForDisposal(disposable);
         }
 
         /// <summary>
