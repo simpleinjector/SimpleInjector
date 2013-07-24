@@ -1084,6 +1084,27 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="registrations"/> elements.
         /// </exception>
+        public void RegisterAll(Type serviceType, params Registration[] registrations)
+        {
+            this.RegisterAll(serviceType, (IEnumerable<Registration>)registrations);
+        }
+
+        /// <summary>
+        /// Registers an collection of <paramref name="registrations"/>, which instances will be resolved when
+        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
+        /// requested. On enumeration the container is called for each type in the list.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
+        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
+        /// <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="registrations"/> elements.
+        /// </exception>
         public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
         {
             Requires.IsNotNull(serviceType, "serviceType");
