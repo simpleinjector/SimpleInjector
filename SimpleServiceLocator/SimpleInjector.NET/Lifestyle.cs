@@ -440,8 +440,8 @@ namespace SimpleInjector
         
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <paramref name="implementationType"/> with the caching as specified by this lifestyle.
-        /// This method might fail when run in a partial trust sandbox when <paramref name="implementationType"/>
+        /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle.
+        /// This method might fail when run in a partial trust sandbox when <paramref name="concreteType"/>
         /// is an internal type.
         /// </summary>
         /// <param name="concreteType">The concrete type that will be registered.</param>
