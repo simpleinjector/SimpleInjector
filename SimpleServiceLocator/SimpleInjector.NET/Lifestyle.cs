@@ -370,6 +370,28 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
+        /// reference (Nothing in VB).</exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = @"
+                Supplying the generic type arguments is needed, since internal types can not be created using 
+                the non-generic overloads in a sandbox.")]
+        public Registration CreateRegistration<TConcrete>(Container container)
+            where TConcrete : class
+        {
+            Requires.IsNotNull(container, "container");
+            
+            return this.CreateRegistrationCore<TConcrete, TConcrete>(container);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
@@ -413,6 +435,26 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
 
             return this.CreateRegistrationCore<TService>(instanceCreator, container);
+        }
+
+        
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <paramref name="implementationType"/> with the caching as specified by this lifestyle.
+        /// This method might fail when run in a partial trust sandbox when <paramref name="implementationType"/>
+        /// is an internal type.
+        /// </summary>
+        /// <param name="concreteType">The concrete type that will be registered.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// reference (Nothing in VB).</exception>
+        public Registration CreateRegistration(Type concreteType, Container container)
+        {
+            Requires.IsNotNull(concreteType, "concreteType");
+
+            return this.CreateRegistration(concreteType, concreteType, container);
         }
 
         /// <summary>
