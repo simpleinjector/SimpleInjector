@@ -42,9 +42,15 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
+        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
 #if !SILVERLIGHT
         private static long dynamicClassCounter;
 #endif
+        internal static bool IsAmbiguousType(Type type)
+        {
+            return AmbiguousTypes.Contains(type);
+        }
+
         internal static Lazy<T> ToLazy<T>(T value)
         {
             return new Lazy<T>(() => value, LazyThreadSafetyMode.None);

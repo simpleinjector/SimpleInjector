@@ -37,8 +37,6 @@ namespace SimpleInjector
 
     internal static class Requires
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
-
         internal static void IsNotNull(object instance, string paramName)
         {
             if (instance == null)
@@ -88,7 +86,7 @@ namespace SimpleInjector
 
         internal static void IsNotAnAmbiguousType(Type type, string paramName)
         {
-            if (AmbiguousTypes.Contains(type))
+            if (Helpers.IsAmbiguousType(type))
             {
                 throw new ArgumentException(StringResources.TypeIsAmbiguous(type), paramName);
             }

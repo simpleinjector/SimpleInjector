@@ -440,23 +440,26 @@ namespace SimpleInjector
                 !serviceType.ContainsGenericParameters &&
                 serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
-            if (typeIsGenericEnumerable && !serviceType.GetGenericArguments()[0].IsValueType)
+            if (typeIsGenericEnumerable)
             {
-                // During the time that this method is called we are after the registration phase and there is
-                // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
-                // it up). This means that we will must always return an empty set and we will do this by
-                // registering a SingletonInstanceProducer with an empty array of that type.
-                var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
+                Type elementType = serviceType.GetGenericArguments()[0];
 
-                // Flag that this producer is resolved by the container or using unregistered type resolution.
-                producer.IsContainerAutoRegistered = true;
+                if (!elementType.IsValueType && !Helpers.IsAmbiguousType(elementType))
+                {
+                    // During the time that this method is called we are after the registration phase and there is
+                    // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
+                    // it up). This means that we will must always return an empty set and we will do this by
+                    // registering a SingletonInstanceProducer with an empty array of that type.
+                    var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
 
-                return producer;
+                    // Flag that this producer is resolved by the container or using unregistered type resolution.
+                    producer.IsContainerAutoRegistered = true;
+
+                    return producer;
+                }
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         private InstanceProducer BuildEmptyCollectionInstanceProducer(Type enumerableType)
