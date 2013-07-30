@@ -440,7 +440,7 @@ namespace SimpleInjector
                 !serviceType.ContainsGenericParameters &&
                 serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
-            if (typeIsGenericEnumerable)
+            if (typeIsGenericEnumerable && !serviceType.GetGenericArguments()[0].IsValueType)
             {
                 // During the time that this method is called we are after the registration phase and there is
                 // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
