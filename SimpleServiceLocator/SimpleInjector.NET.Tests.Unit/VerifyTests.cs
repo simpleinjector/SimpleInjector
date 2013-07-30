@@ -333,17 +333,17 @@
             // All these collection are resolved through unregistered type resolution.
             var expectedTypes = new[]
             {
-                typeof(IEnumerable<Service<Service<Service<int>>>>),
-                typeof(IEnumerable<Service<Service<int>>>),
-                typeof(IEnumerable<Service<int>>),
-                typeof(IEnumerable<int>),
+                typeof(IEnumerable<Service<Service<Service<IDisposable>>>>),
+                typeof(IEnumerable<Service<Service<IDisposable>>>),
+                typeof(IEnumerable<Service<IDisposable>>),
+                typeof(IEnumerable<IDisposable>),
             };
 
             var container = ContainerFactory.New();
 
             container.RegisterAllOpenGeneric(typeof(Service<>), typeof(Service<>));
 
-            container.Register<Service<Service<Service<Service<int>>>>>();
+            container.Register<Service<Service<Service<Service<IDisposable>>>>>();
 
             container.Verify();
 
