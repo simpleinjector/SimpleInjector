@@ -48,7 +48,8 @@
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem></NamespaceSummaries>
+<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" /></NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
