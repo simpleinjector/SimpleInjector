@@ -33,6 +33,8 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
@@ -435,27 +437,44 @@ namespace SimpleInjector
 
         private InstanceProducer BuildInstanceProducerForCollection(Type serviceType)
         {
-            bool typeIsGenericEnumerable =
-                serviceType.IsGenericType &&
-                !serviceType.ContainsGenericParameters &&
-                serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-
-            if (typeIsGenericEnumerable)
+            // IEnumerable<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
+            if (!serviceType.IsGenericType || serviceType.ContainsGenericParameters ||
+                serviceType.GetGenericArguments().Length != 1)
             {
-                Type elementType = serviceType.GetGenericArguments()[0];
+                return null;
+            }
 
-                if (!elementType.IsValueType && !Helpers.IsAmbiguousType(elementType))
+            Type elementType = serviceType.GetGenericArguments()[0];
+
+            if (elementType.IsValueType || Helpers.IsAmbiguousType(elementType))
+            {
+                return null;
+            }
+
+            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+
+            if (serviceTypeDefinition == typeof(IEnumerable<>))
+            {
+                // During the time that this method is called we are after the registration phase and there is
+                // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
+                // it up). This means that we will must always return an empty set and we will do this by
+                // registering a SingletonInstanceProducer with an empty array of that type.
+                var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
+
+                // Flag that this producer is resolved by the container or using unregistered type resolution.
+                producer.IsContainerAutoRegistered = true;
+
+                return producer;
+            }
+            else if (serviceTypeDefinition == Helpers.IReadOnlyListType ||
+                serviceTypeDefinition == Helpers.IReadOnlyCollectionType)
+            {
+                var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
+
+                if (collection != null)
                 {
-                    // During the time that this method is called we are after the registration phase and there is
-                    // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
-                    // it up). This means that we will must always return an empty set and we will do this by
-                    // registering a SingletonInstanceProducer with an empty array of that type.
-                    var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
-
-                    // Flag that this producer is resolved by the container or using unregistered type resolution.
-                    producer.IsContainerAutoRegistered = true;
-
-                    return producer;
+                    return new InstanceProducer(serviceType,
+                        SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this));
                 }
             }
 

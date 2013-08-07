@@ -436,8 +436,7 @@ namespace SimpleInjector
 
             return this.CreateRegistrationCore<TService>(instanceCreator, container);
         }
-
-        
+                
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle.

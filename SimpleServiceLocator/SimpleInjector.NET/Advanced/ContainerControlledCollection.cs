@@ -29,13 +29,12 @@ namespace SimpleInjector.Advanced
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-
-    using SimpleInjector.Advanced;
+    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Lifestyles;
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal sealed class ContainerControlledCollection<TService> : IndexableEnumerable<TService>, 
+    internal class ContainerControlledCollection<TService> : IndexableEnumerable<TService>, 
         IContainerControlledCollection
     {
         private readonly Container container;
@@ -56,9 +55,13 @@ namespace SimpleInjector.Advanced
             this.producers = registrations.Select(ToLazyInstanceProducer).ToList();
         }
 
-        internal ContainerControlledCollection(Container container, TService[] singletons)
+        // This constructor needs to be public. It is called using reflection.
+        // Note: the parameter order is swapped to remove the ambiguity between the other ctors when using
+        // Activator.CreateInstance.
+        public ContainerControlledCollection(TService[] singletons, Container container)
             : this(container, ConvertSingletonsToInstanceProducers(container, singletons))
         {
+            // TODO: Make sure this method isn't called directly anymore.
         }
 
         public override int Count

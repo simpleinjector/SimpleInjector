@@ -42,6 +42,13 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
+        // Will be null when we're not running in a .NET 4.5 AppDomain.
+        internal static readonly Type IReadOnlyCollectionType = 
+            GetMsCorLibInterfaceType("System.Collections.Generic.IReadOnlyCollection`1");
+
+        internal static readonly Type IReadOnlyListType =
+            GetMsCorLibInterfaceType("System.Collections.Generic.IReadOnlyList`1");
+
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
 #if !SILVERLIGHT
         private static long dynamicClassCounter;
@@ -370,6 +377,18 @@ namespace SimpleInjector
                 throw new InvalidOperationException(
                     StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
             }
+        }
+
+        private static Type GetMsCorLibInterfaceType(string fullname)
+        {
+            var mscorlib = typeof(IEnumerable).Assembly;
+
+            return (
+                from type in mscorlib.GetExportedTypes()
+                where type.IsInterface
+                where type.FullName == fullname
+                select type)
+                .SingleOrDefault();
         }
 
 #if !SILVERLIGHT

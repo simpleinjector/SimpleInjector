@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
@@ -981,7 +982,8 @@ namespace SimpleInjector
             Requires.IsNotNull(singletons, "singletons");
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
-            var collection = new ContainerControlledCollection<TService>(this, singletons);
+            var collection = 
+                DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this, singletons);
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
         }

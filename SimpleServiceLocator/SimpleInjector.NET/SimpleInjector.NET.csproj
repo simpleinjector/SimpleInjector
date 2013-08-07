@@ -82,7 +82,8 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
-    <Compile Include="Advanced\IndexableEnumerable.cs" />
+    <Compile Include="Advanced\Internal\IndexableEnumerable.cs" />
+    <Compile Include="Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredContainerAnalyzer.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInterceptor.cs" />
-    <Compile Include="Advanced\IContainerControlledCollection.cs" />
+    <Compile Include="Advanced\Internal\IContainerControlledCollection.cs" />
     <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
     <Compile Include="Extensions\GenericArgumentFinder.cs" />

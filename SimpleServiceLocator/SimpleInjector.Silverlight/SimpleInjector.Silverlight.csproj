@@ -107,11 +107,14 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\IContainerControlledCollection.cs">
-      <Link>Advanced\IContainerControlledCollection.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\IContainerControlledCollection.cs">
+      <Link>Advanced\Internal\IContainerControlledCollection.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\IndexableEnumerable.cs">
-      <Link>Advanced\IndexableEnumerable.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\IndexableEnumerable.cs">
+      <Link>Advanced\Internal\IndexableEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs">
+      <Link>Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IPropertySelectionBehavior.cs">
       <Link>Advanced\IPropertySelectionBehavior.cs</Link>

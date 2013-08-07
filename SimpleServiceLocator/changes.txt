@@ -16,6 +16,8 @@ Version vNext
 		 Registration instances more convenient. (work item 20001)
 		-[Core] New convenient Lifestyle.CreateRegistration overloads added that allow supplying a single 
 		 TConcrete type instead of TService and TImplementation.
+		-[Core] Registered collections can now be injected and resolved as IReadOnlyCollection<T> and
+		 IReadOnlyList<T> (.NET 4.5 only). (work item 19992).
 
 
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12
