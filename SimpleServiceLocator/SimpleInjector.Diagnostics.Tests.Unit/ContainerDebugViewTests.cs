@@ -1,6 +1,6 @@
 ﻿#if !SILVERLIGHT
 #if DEBUG
-namespace SimpleInjector.Tests.Unit.Diagnostics
+namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Linq;
@@ -39,7 +39,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_WithValidArgument_Succeeds()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Act
             new ContainerDebugView(container);
@@ -49,7 +49,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Options_Always_ReturnsSameInstanceAsThatOfContainer()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Act
             var debugView = new ContainerDebugView(container);
@@ -61,7 +61,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         [TestMethod]
         public void Ctor_WithUnlockedContainer_LeavesContainerUnlocked()
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Act
             new ContainerDebugView(container);
@@ -73,7 +73,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         [TestMethod]
         public void Ctor_WithLockedContainer_LeavesContainerLocked()
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // This locks the container
             container.Verify();
@@ -90,7 +90,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         [TestMethod]
         public void Ctor_WithLockedContainer_ReturnsAnItemWithTheRegistrations()
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // This locks the container
             container.Verify();
@@ -108,7 +108,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_UnverifiedContainer_ReturnsOneItemWithInfoAboutHowToGetAnalysisInformation()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Act
             var debugView = new ContainerDebugView(container);
@@ -126,7 +126,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_UnsuccesfullyVerifiedContainer_ReturnsOneItemWithInfoAboutHowToGetAnalysisInformation()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Invalid registration
             container.Register<ILogger>(() => null);
@@ -151,7 +151,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Ctor_VerifiedContainerWithoutConfigurationErrors_ContainsAPotentialLifestyleMismatchesSection()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             // Forces a lifestyle mismatch
             container.RegisterSingle<ILogger, FakeLogger>();

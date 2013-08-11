@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Tests.Unit.Diagnostics
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Linq.Expressions;
@@ -365,7 +365,7 @@
 
         private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child)
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             return new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
@@ -375,7 +375,7 @@
 
         private class DummyRegistration : Registration
         {
-            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, ContainerFactory.New())
+            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, new Container())
             {
             }
 

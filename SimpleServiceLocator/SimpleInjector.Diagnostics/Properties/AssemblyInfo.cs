@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -24,7 +24,6 @@
 #endregion
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
@@ -34,12 +33,12 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Simple Injector")]
-[assembly: AssemblyDescription("The Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
+[assembly: AssemblyTitle("SimpleInjector.Diagnostics")]
+[assembly: AssemblyDescription("Diagnostics for Simple Injector")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
-[assembly: AssemblyProduct("Simple Injector")]
-[assembly: AssemblyCopyright("Copyright © 2010 S. van Deursen")]
+[assembly: AssemblyProduct("SimpleInjector.Diagnostics")]
+[assembly: AssemblyCopyright("Copyright © 2013 S. van Deursen")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -49,7 +48,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("28b6edc8-9b68-4053-85b4-dbaa25b07432")]
+[assembly: Guid("d9c35e92-fae3-4ac1-8436-7b6cec3c0e8c")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -69,15 +68,5 @@ using System.Security;
 [assembly: AllowPartiallyTrustedCallers]
 
 #if DEBUG
-[assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
-#endif
-[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics")]
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
-
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
-    Target = "SimpleInjector",
-    Justification = "Can't make up new types just to satisfy this rule.")]
-
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",
-    Target = "SimpleInjector.Advanced",
-    Justification = "Can't make up new types just to satisfy this rule.")]
+#endif

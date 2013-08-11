@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-namespace SimpleInjector.Tests.Unit.Diagnostics
+namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
 
@@ -26,7 +26,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_OnValidConfiguration_ReturnsNull()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.Verify();
 
@@ -59,10 +59,9 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             // Assert
             Assert.AreEqual(1, results.Length);
             Assert.AreEqual("HomeController", results[0].Name);
-            Assert.AreEqual(@"
-                HomeController might incorrectly depend on unregistered type MyUnitOfWork 
-                (Transient) instead of IUnitOfWork (Singleton).
-                ".TrimInside(),
+            Assert.AreEqual(
+                "HomeController might incorrectly depend on unregistered type MyUnitOfWork " +
+                "(Transient) instead of IUnitOfWork (Singleton).",
                 results[0].Description);
         }
 
@@ -70,7 +69,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_OnConfigurationWithOneShortCircuitedRegistrationWithTwoPossibleSolutions_ReturnsThatWarning()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
@@ -90,10 +89,9 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             // Assert
             Assert.AreEqual(1, results.Length);
             Assert.AreEqual(typeof(Controller<int>).ToFriendlyName(), results[0].Name);
-            Assert.AreEqual(@"
-                Controller<Int32> might incorrectly depend on unregistered type ImplementsBothInterfaces 
-                (Transient) instead of IService1 (Singleton) or IService2 (Singleton).
-                ".TrimInside(), 
+            Assert.AreEqual(
+                "Controller<Int32> might incorrectly depend on unregistered type ImplementsBothInterfaces " +
+                "(Transient) instead of IService1 (Singleton) or IService2 (Singleton).",
                 results[0].Description);
         }
 
@@ -101,7 +99,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_ShortCircuitedRegistrationWithMultipleTypesInOneGroup_Behavior()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             var registration = Lifestyle.Singleton
                 .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);

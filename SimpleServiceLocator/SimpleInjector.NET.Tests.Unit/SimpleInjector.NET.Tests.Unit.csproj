@@ -90,16 +90,9 @@
     <Compile Include="AmbiguousTypesTests.cs" />
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContainerTests.cs" />
-    <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
-    <Compile Include="Diagnostics\DebuggerViewItemExtensions.cs" />
-    <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
-    <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
-    <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs" />
-    <Compile Include="Diagnostics\TypeGeneralizerTests.cs" />
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="Advanced\KnownRelationshipTests.cs" />
-    <Compile Include="Diagnostics\LifestyleMismatchServicesTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
@@ -141,6 +134,10 @@
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
+      <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
+      <Name>SimpleInjector.Diagnostics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
       <Name>SimpleInjector.NET</Name>
@@ -170,6 +167,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Tests.Unit.Diagnostics
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -15,7 +15,7 @@
             var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
 
             // Act
-            var item = analyzer.Analyze(ContainerFactory.New());
+            var item = analyzer.Analyze(new Container());
 
             // Assert
             Assert.IsNull(item, 
@@ -26,7 +26,7 @@
         public void Analyze_ContainerWithOneMismatch_ReturnsItemWithExpectedName()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -48,7 +48,7 @@
         public void Analyze_ContainerWithOneMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -70,7 +70,7 @@
         public void Analyze_ContainerWithTwoMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 

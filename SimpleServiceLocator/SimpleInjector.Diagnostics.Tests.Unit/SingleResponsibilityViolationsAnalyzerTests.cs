@@ -1,5 +1,5 @@
 #if DEBUG
-namespace SimpleInjector.Tests.Unit.Diagnostics
+namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Linq;
@@ -18,7 +18,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
         public void Analyze_OnEmptyConfiguration_ReturnsNull()
         {
             // Arrange
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.Verify();
 
@@ -290,7 +290,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
 
         private static Container CreateContainerWithRegistrations(params Type[] implementationTypes)
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
 
@@ -306,7 +306,7 @@ namespace SimpleInjector.Tests.Unit.Diagnostics
             where TService : class, IPlugin
             where TImplementation : class, TService
         {
-            var container = ContainerFactory.New();
+            var container = new Container();
 
             container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
 
