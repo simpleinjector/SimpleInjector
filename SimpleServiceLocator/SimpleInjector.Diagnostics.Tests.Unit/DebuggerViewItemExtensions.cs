@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Debugger;
 
 #if DEBUG
     internal static class DebuggerViewItemExtensions

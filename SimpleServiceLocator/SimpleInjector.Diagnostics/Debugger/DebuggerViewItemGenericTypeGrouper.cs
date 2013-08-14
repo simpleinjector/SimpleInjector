@@ -23,7 +23,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Debugger
 {
     using System;
     using System.Collections.Generic;

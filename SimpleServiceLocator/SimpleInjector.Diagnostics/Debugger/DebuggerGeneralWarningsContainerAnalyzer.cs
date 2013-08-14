@@ -23,22 +23,47 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SimpleInjector.Diagnostics.Debugger;
 
-    internal class DebuggerViewItemType
+    internal sealed class DebuggerGeneralWarningsContainerAnalyzer : List<IDebuggerContainerAnalyzer>, 
+        IDebuggerContainerAnalyzer
     {
-        public DebuggerViewItemType(Type type, DebuggerViewItem item)
+        internal DebuggerGeneralWarningsContainerAnalyzer()
         {
-            this.Type = type;
-            this.Item = item;
+            this.Add(new DebuggerPotentialLifestyleMismatchContainerAnalyzer());
+            this.Add(new DebuggerShortCircuitContainerAnalyzer());
+            this.Add(new DebuggerSingleResponsibilityViolationsAnalyzer());
+            this.Add(new DebuggerContainerRegisteredContainerAnalyzer());
         }
 
-        public Type Type { get; private set; }
+        public DebuggerViewItem Analyze(Container container)
+        {
+            const string WarningsName = "Configuration Warnings";
 
-        public DebuggerViewItem Item { get; private set; }
+            var analysisResults = (
+                from analyzer in this
+                let result = analyzer.Analyze(container)
+                where result != null
+                select result)
+                .ToArray();
+
+            if (!analysisResults.Any())
+            {
+                return new DebuggerViewItem(WarningsName, "No warnings detected.");
+            }
+            else if (analysisResults.Length == 1)
+            {
+                return analysisResults.Single();
+            }
+            else
+            {
+                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
+                    analysisResults);
+            }
+        }
     }
 }

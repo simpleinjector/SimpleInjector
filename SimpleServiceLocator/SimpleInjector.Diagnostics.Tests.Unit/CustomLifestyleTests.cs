@@ -13,6 +13,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Debugger;
 
     [TestClass]
     public class CustomLifestyleTests

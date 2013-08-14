@@ -8,6 +8,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Debugger;
 
     public interface ILogger
     {

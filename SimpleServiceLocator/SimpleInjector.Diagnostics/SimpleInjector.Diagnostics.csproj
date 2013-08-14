@@ -49,18 +49,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class1.cs" />
     <Compile Include="ContainerDebugView.cs" />
-    <Compile Include="ContainerRegisteredContainerAnalyzer.cs" />
-    <Compile Include="DebuggerViewItem.cs" />
-    <Compile Include="DebuggerViewItemGenericTypeGrouper.cs" />
-    <Compile Include="DebuggerViewItemType.cs" />
-    <Compile Include="GeneralWarningsContainerAnalyzer.cs" />
+    <Compile Include="Analyzers\ContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="ContainerRegisteredServiceDiagnosticResult.cs" />
+    <Compile Include="Debugger\DebuggerContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Debugger\DebuggerPotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="Debugger\DebuggerShortCircuitContainerAnalyzer.cs" />
+    <Compile Include="Debugger\DebuggerSingleResponsibilityViolationsAnalyzer.cs" />
+    <Compile Include="Debugger\DebuggerViewItem.cs" />
+    <Compile Include="Debugger\DebuggerViewItemGenericTypeGrouper.cs" />
+    <Compile Include="Debugger\DebuggerViewItemType.cs" />
+    <Compile Include="Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs" />
+    <Compile Include="DiagnosticResult.cs" />
     <Compile Include="IContainerAnalyzer.cs" />
     <Compile Include="LifestyleMismatchServices.cs" />
-    <Compile Include="PotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="Analyzers\PotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="PotentialLifestyleMismatchDiagnosticResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShortCircuitContainerAnalyzer.cs" />
-    <Compile Include="SingleResponsibilityViolationsAnalyzer.cs" />
+    <Compile Include="Analyzers\ShortCircuitContainerAnalyzer.cs" />
+    <Compile Include="Analyzers\SingleResponsibilityViolationsAnalyzer.cs" />
+    <Compile Include="ShortCircuitedDependencyDiagnosticResult.cs" />
+    <Compile Include="SingleResponsibilityViolationDiagnosticResult.cs" />
     <Compile Include="TypeGeneralizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

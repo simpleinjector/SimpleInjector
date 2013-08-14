@@ -109,6 +109,14 @@
         {
         }
     }
+    
+    public class ComponentDependingOn<TDependency>
+    {
+        public ComponentDependingOn(TDependency dependency)
+        {
+
+        }
+    }
 
     public class PluginImpl : IPlugin
     {

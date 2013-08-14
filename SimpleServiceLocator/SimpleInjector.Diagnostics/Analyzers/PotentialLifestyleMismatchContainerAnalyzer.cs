@@ -23,45 +23,41 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Analyzers
 {
-    using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
+    using SimpleInjector.Advanced;
 
-    internal sealed class GeneralWarningsContainerAnalyzer : List<IContainerAnalyzer>, IContainerAnalyzer
+    internal sealed class PotentialLifestyleMismatchContainerAnalyzer : IContainerAnalyzer
     {
-        internal GeneralWarningsContainerAnalyzer()
+        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
-            this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
-            this.Add(new ShortCircuitContainerAnalyzer());
-            this.Add(new SingleResponsibilityViolationsAnalyzer());
-            this.Add(new ContainerRegisteredContainerAnalyzer());
+            return this.Analyze(container);
         }
 
-        public DebuggerViewItem Analyze(Container container)
+        public PotentialLifestyleMismatchDiagnosticResult[] Analyze(Container container)
         {
-            const string WarningsName = "Configuration Warnings";
-
-            var analysisResults = (
-                from analyzer in this
-                let result = analyzer.Analyze(container)
-                where result != null
-                select result)
-                .ToArray();
-
-            if (!analysisResults.Any())
-            {
-                return new DebuggerViewItem(WarningsName, "No warnings detected.");
-            }
-            else if (analysisResults.Length == 1)
-            {
-                return analysisResults.Single();
-            }
-            else
-            {
-                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
-                    analysisResults);
-            }
+            return (
+              from producer in container.GetCurrentRegistrations()
+              from dependency in producer.GetRelationships()
+              where LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency)
+              select new PotentialLifestyleMismatchDiagnosticResult(
+                  type: producer.ServiceType,
+                  name: "Mismatch",
+                  description: BuildRelationshipDescription(dependency),
+                  relationship: dependency))
+              .ToArray();          
+        }
+        
+        private static string BuildRelationshipDescription(KnownRelationship relationship)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0} ({1}) depends on {2} ({3}).",
+                Helpers.ToFriendlyName(relationship.ImplementationType),
+                relationship.Lifestyle.Name,
+                Helpers.ToFriendlyName(relationship.Dependency.ServiceType),
+                relationship.Dependency.Lifestyle.Name);
         }
     }
 }

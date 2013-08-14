@@ -23,46 +23,41 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Analyzers
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using SimpleInjector.Advanced;
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
         private const int MaximumValidNumberOfDependencies = 6;
         private const string DebuggerViewName = "Potential Single Responsibility Violations";
 
-        internal SingleResponsibilityViolationsAnalyzer()
+        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
+            return this.Analyze(container);
         }
 
-        public DebuggerViewItem Analyze(Container container)
+        public SingleResponsibilityViolationDiagnosticResult[] Analyze(Container container)
         {
-            var violations = (
+            return (
                 from registration in container.GetCurrentRegistrations()
                 where IsAnalyzableRegistration(registration)
                 from relationship in registration.GetRelationships()
                 group relationship by new { relationship.ImplementationType, registration } into g
                 where g.Count() > MaximumValidNumberOfDependencies
-                let item = BuildMismatchViewItem(g.Key.ImplementationType, g)
-                select new DebuggerViewItemType(g.Key.registration.ServiceType, item))
-                .ToArray();
-
-            if (!violations.Any())
-            {
-                return null;
-            }
-
-            return new DebuggerViewItem(
-                DebuggerViewName,
-                DescribeGroup(violations),
-                GroupViolations(violations));
+                let dependencies = g.Select(r => r.Dependency).ToArray()
+                select new SingleResponsibilityViolationDiagnosticResult(
+                    type: g.Key.registration.ServiceType,
+                    name: "Violation",
+                    description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
+                    implementationType: g.Key.ImplementationType,
+                    dependencies: dependencies))
+                .ToArray();           
         }
-
+        
         private static bool IsAnalyzableRegistration(InstanceProducer registration)
         {
             // We can't analyze collections, because this would lead to false positives when decorators are
@@ -70,24 +65,12 @@ namespace SimpleInjector.Diagnostics
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selve still get analyzed, so the only thing we'd miss here is the decorator.
-            return !registration.ServiceType.IsGenericType ||
-                registration.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
-        }
-
-        private static DebuggerViewItem BuildMismatchViewItem(Type implementationType, 
-            IEnumerable<KnownRelationship> relationships)
-        {
-            var dependencies = relationships.Select(r => r.Dependency).ToArray();
-
-            string description = BuildRelationshipDescription(implementationType, dependencies.Length);
-            
-            var violationInformation = new[]
+            if (!registration.ServiceType.IsGenericType)
             {
-                new DebuggerViewItem("ImplementationType", implementationType.ToFriendlyName(), implementationType),
-                new DebuggerViewItem("Dependencies", dependencies.Length + " dependencies.", dependencies.ToArray()),
-            };
+                return true;
+            }
 
-            return new DebuggerViewItem("Violation", description, violationInformation);
+            return registration.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
         }
 
         private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies)
@@ -96,32 +79,6 @@ namespace SimpleInjector.Diagnostics
                 "{0} has {1} dependencies which might indicate a SRP violation.",
                 Helpers.ToFriendlyName(implementationType),
                 numberOfDependencies);
-        }
-
-        private static string DescribeGroup(IEnumerable<DebuggerViewItemType> violations)
-        {
-            var violationCount = violations.Count();
-
-            return violationCount + " possible " + ViolationPlural(violationCount) + ".";
-        }
-
-        private static DebuggerViewItem[] GroupViolations(DebuggerViewItemType[] violations)
-        {
-            var grouper = new DebuggerViewItemGenericTypeGrouper(DescribeGroup, DescribeItem);
-
-            return grouper.Group(violations);
-        }
-
-        private static string DescribeItem(IEnumerable<DebuggerViewItem> item)
-        {
-            int count = item.Count();
-
-            return count + " possible " + ViolationPlural(count) + ".";
-        }
-
-        private static string ViolationPlural(int violationCount)
-        {
-            return "violation" + (violationCount != 1 ? "s" : string.Empty);
         }
     }
 }

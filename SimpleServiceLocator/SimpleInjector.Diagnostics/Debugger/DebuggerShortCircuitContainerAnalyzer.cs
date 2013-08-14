@@ -1,41 +1,21 @@
-﻿#region Copyright (c) 2013 S. van Deursen
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (C) 2013 S. van Deursen
- * 
- * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
- * cuttingedge.it.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
-
-namespace SimpleInjector.Diagnostics
+﻿namespace SimpleInjector.Diagnostics.Debugger
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics.Analyzers;
 
-    internal sealed class ShortCircuitContainerAnalyzer : IContainerAnalyzer
+    internal sealed class DebuggerShortCircuitContainerAnalyzer : IDebuggerContainerAnalyzer
     {
+        private const string DebuggerViewName = "Unregistered Types";
+
         public DebuggerViewItem Analyze(Container container)
         {
-            var warnings = FindRegistrationsWithPossibleShortCircuitedDependencies(container);
+            var analyzer = new ShortCircuitedDependencyContainerAnalyzer();
+
+            var warnings = analyzer.Analyze(container);
 
             if (!warnings.Any())
             {
@@ -132,18 +112,37 @@ namespace SimpleInjector.Diagnostics
                 possibleSkippedRegistrationsDescription);
         }
 
-        private static DebuggerViewItem[] GroupWarnings(DebuggerViewItemType[] warnings)
+        private static DebuggerViewItem[] GroupWarnings(ShortCircuitedDependencyDiagnosticResult[] warnings)
         {
+            var items =
+                from warning in warnings
+                let expected = warning.ExpectedDependencies
+                select new DebuggerViewItemType(warning.Type,
+                    new DebuggerViewItem(warning.Name, warning.Description, new[]
+                    {
+                        new DebuggerViewItem("Registration", 
+                            warning.Registration.ServiceType.ToFriendlyName(), warning.Registration),
+                        new DebuggerViewItem("Actual Dependency", 
+                            warning.ActualDependency.Dependency.ServiceType.ToFriendlyName(), 
+                            warning.ActualDependency),
+                        new DebuggerViewItem(
+                            name: expected.Count == 1 ? "Expected Dependency" : "Expected Dependencies",
+                            description: string.Join(", ",
+                                from dependency in expected
+                                select dependency.ServiceType.ToFriendlyName()),
+                            value: expected.Count == 1 ? expected.First() : (object)expected)
+                    }));
+
             var grouper = new DebuggerViewItemGenericTypeGrouper(DescribeGroup, DescribeItem);
 
-            return grouper.Group(warnings);
+            return grouper.Group(items.ToArray());
         }
-        
+
         private static string DescribeGroup(IEnumerable<DebuggerViewItemType> group)
         {
             int count = group.Count();
 
-            return count + " " + ComponentPlural(count) + 
+            return count + " " + ComponentPlural(count) +
                 " possibly short circuit to concrete unregistered types.";
         }
 

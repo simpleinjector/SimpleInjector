@@ -3,6 +3,8 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Diagnostics.Debugger;
 
 #if DEBUG
     [TestClass]
@@ -12,7 +14,7 @@
         public void Analyze_ValidConfiguration_ReturnsNull()
         {
             // Arrange
-            var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
+            var analyzer = new DebuggerPotentialLifestyleMismatchContainerAnalyzer();
 
             // Act
             var item = analyzer.Analyze(new Container());
@@ -33,7 +35,7 @@
             // RealUserService depends on IUserRepository
             container.RegisterSingle<RealUserService>();
 
-            var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
+            var analyzer = new DebuggerPotentialLifestyleMismatchContainerAnalyzer();
 
             container.Verify();
 
@@ -55,7 +57,7 @@
             // RealUserService depends on IUserRepository
             container.RegisterSingle<RealUserService>();
 
-            var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
+            var analyzer = new DebuggerPotentialLifestyleMismatchContainerAnalyzer();
 
             container.Verify();
 
@@ -80,7 +82,7 @@
             // FakeUserService depends on IUserRepository
             container.RegisterSingle<FakeUserService>();
 
-            var analyzer = new PotentialLifestyleMismatchContainerAnalyzer();
+            var analyzer = new DebuggerPotentialLifestyleMismatchContainerAnalyzer();
 
             container.Verify();
 

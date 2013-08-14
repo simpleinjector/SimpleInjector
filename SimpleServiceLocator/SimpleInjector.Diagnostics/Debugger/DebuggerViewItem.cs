@@ -23,17 +23,37 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Debugger
 {
-    using SimpleInjector.Diagnostics.Debugger;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
 
-    internal interface IContainerAnalyzer
+    [DebuggerDisplay("{Description,nq}", Name = "{Name,nq}")]
+    internal class DebuggerViewItem
     {
-        DiagnosticResult[] Analyze(Container container);
-    }
+        public DebuggerViewItem(string name, string description, object value = null)
+        {
+            this.Name = name;
+            this.Description = description;
+            this.Value = value;
+        }
 
-    internal interface IDebuggerContainerAnalyzer
-    {
-        DebuggerViewItem Analyze(Container container);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public string Description { get; private set; }
+        
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", 
+            Justification = "Called by the Visual Studio debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public string Name { get; private set; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "Called by the Visual Studio debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        public object Value { get; private set; }
+
+        public override string ToString()
+        {
+            return this.Description;
+        }
     }
 }

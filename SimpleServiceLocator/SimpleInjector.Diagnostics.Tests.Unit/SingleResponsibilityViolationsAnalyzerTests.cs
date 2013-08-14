@@ -5,6 +5,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Extensions;
 
     public interface IGenericPlugin<T> 
@@ -22,7 +24,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
@@ -39,7 +41,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
@@ -63,7 +65,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
             
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
@@ -83,7 +85,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -114,7 +116,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -140,7 +142,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -172,7 +174,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var items = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -194,7 +196,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -220,7 +222,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -246,7 +248,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -273,7 +275,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new SingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);

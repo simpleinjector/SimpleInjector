@@ -6,6 +6,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Diagnostics.Debugger;
 
     public interface IUnitOfWork
     {
@@ -30,7 +32,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new ShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
@@ -51,7 +53,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new ShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -81,7 +83,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new ShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -113,7 +115,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new ShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
 
             // Act
             var results = (analyzer.Analyze(container).Value as DebuggerViewItem[]).Single();

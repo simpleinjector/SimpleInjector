@@ -30,13 +30,15 @@ namespace SimpleInjector.Diagnostics
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Diagnostics.Debugger;
 
     internal sealed class ContainerDebugView
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static IEnumerable<IContainerAnalyzer> analyzers = new IContainerAnalyzer[]
+        private static IEnumerable<IDebuggerContainerAnalyzer> analyzers = new IDebuggerContainerAnalyzer[]
         {
-            new GeneralWarningsContainerAnalyzer(),
+            new DebuggerGeneralWarningsContainerAnalyzer(),
             new RegistrationsContainerAnalyzer()
         };
 
@@ -108,7 +110,7 @@ namespace SimpleInjector.Diagnostics
             };
         }
 
-        private sealed class RegistrationsContainerAnalyzer : IContainerAnalyzer
+        private sealed class RegistrationsContainerAnalyzer : IDebuggerContainerAnalyzer
         {
             public DebuggerViewItem Analyze(Container container)
             {

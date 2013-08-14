@@ -1,41 +1,20 @@
-﻿#region Copyright (c) 2013 S. van Deursen
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (C) 2013 S. van Deursen
- * 
- * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
- * cuttingedge.it.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
-
-namespace SimpleInjector.Diagnostics
+﻿namespace SimpleInjector.Diagnostics.Debugger
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics.Analyzers;
 
-    internal sealed class ContainerRegisteredContainerAnalyzer : IContainerAnalyzer
+    internal sealed class DebuggerContainerRegisteredContainerAnalyzer : IDebuggerContainerAnalyzer
     {
+        private const string DebuggerViewName = "Unregistered types";
+
         public DebuggerViewItem Analyze(Container container)
         {
-            var warnings = FindContainerRegisteredRegistrations(container);
+            var analyzer = new ContainerRegisteredServiceContainerAnalyzer();
+
+            var warnings = analyzer.Analyze(container);
 
             if (!warnings.Any())
             {
@@ -51,7 +30,10 @@ namespace SimpleInjector.Diagnostics
                 " been detected that " + IsPlural(numberOfAutoRegisteredServices) + " referenced by " +
                 numberOfRegistrations + " " + ComponentPlural(numberOfRegistrations) + ".";
 
-            return new DebuggerViewItem("Unregistered Types", description, GroupWarnings(warnings));
+            return new DebuggerViewItem(
+                DebuggerViewName,
+                description,
+                GroupWarnings(warnings));
         }
 
         private static DebuggerViewItemType[] FindContainerRegisteredRegistrations(Container container)
@@ -73,22 +55,27 @@ namespace SimpleInjector.Diagnostics
                 .ToArray();
         }
 
-        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DebuggerViewItemType> warnings)
+        private static int GetNumberOfAutoRegisteredServices(
+            IEnumerable<ContainerRegisteredServiceDiagnosticResult> warnings)
         {
             return (
                 from warning in warnings
-                let relationships = warning.Item.Value as IEnumerable<KnownRelationship>
-                from relationship in relationships
+                from relationship in warning.Relationships
                 select relationship.Dependency.ServiceType)
                 .Distinct()
                 .Count();
         }
 
-        private static DebuggerViewItem[] GroupWarnings(DebuggerViewItemType[] warnings)
+        private static DebuggerViewItem[] GroupWarnings(ContainerRegisteredServiceDiagnosticResult[] warnings)
         {
+            var items =
+                from warning in warnings
+                select new DebuggerViewItemType(warning.Type,
+                    new DebuggerViewItem(warning.Name, warning.Description, warning.Relationships));
+
             var grouper = new DebuggerViewItemGenericTypeGrouper(DescribeGroup, DescribeItem);
 
-            return grouper.Group(warnings);
+            return grouper.Group(items.ToArray());
         }
 
         private static string DescribeGroup(IEnumerable<DebuggerViewItemType> group)
@@ -103,9 +90,9 @@ namespace SimpleInjector.Diagnostics
 
             var componentCount = group.Select(item => item.Type).Distinct().Count();
 
-            return 
-                componentCount + " " + ComponentPlural(componentCount) + " depend on " + 
-                unregisteredServicesCount + " container-registered " + 
+            return
+                componentCount + " " + ComponentPlural(componentCount) + " depend on " +
+                unregisteredServicesCount + " container-registered " +
                 TypePlural(unregisteredServicesCount) + ".";
         }
 
@@ -113,7 +100,7 @@ namespace SimpleInjector.Diagnostics
         {
             return (string)item.First().Description;
         }
-        
+
         private static DebuggerViewItem BuildUnregisteredTypeViewItem(InstanceProducer registration,
             KnownRelationship[] relationships)
         {
