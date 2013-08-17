@@ -8,10 +8,10 @@
 
     public class ShortCircuitedDependencyDiagnosticResult : DiagnosticResult
     {
-        internal ShortCircuitedDependencyDiagnosticResult(Type type, string name, string description,
+        internal ShortCircuitedDependencyDiagnosticResult(Type type, string description,
             InstanceProducer registration, KnownRelationship actualDependency,
             IEnumerable<InstanceProducer> expectedDependencies)
-            : base(type, name, description, DiagnosticResultType.ShortCircuitedDependency)
+            : base(type, "Short Circuit", description, DiagnosticType.ShortCircuitedDependency)
         {
             this.Registration = registration;
             this.ActualDependency = actualDependency;

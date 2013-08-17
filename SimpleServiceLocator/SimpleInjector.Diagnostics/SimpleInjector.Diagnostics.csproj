@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyzer.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="ContainerDebugView.cs" />
     <Compile Include="Analyzers\ContainerRegisteredContainerAnalyzer.cs" />
@@ -61,7 +62,10 @@
     <Compile Include="Debugger\DebuggerViewItemGenericTypeGrouper.cs" />
     <Compile Include="Debugger\DebuggerViewItemType.cs" />
     <Compile Include="Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs" />
+    <Compile Include="DiagnosticGroup.cs" />
     <Compile Include="DiagnosticResult.cs" />
+    <Compile Include="DiagnosticResultGrouper.cs" />
+    <Compile Include="DiagnosticType.enum.cs" />
     <Compile Include="IContainerAnalyzer.cs" />
     <Compile Include="LifestyleMismatchServices.cs" />
     <Compile Include="Analyzers\PotentialLifestyleMismatchContainerAnalyzer.cs" />

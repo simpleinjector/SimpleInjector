@@ -25,10 +25,19 @@
 
 namespace SimpleInjector.Diagnostics
 {
+    using System.Collections.Generic;
     using SimpleInjector.Diagnostics.Debugger;
 
     internal interface IContainerAnalyzer
     {
+        DiagnosticType DiagnosticType { get; }
+
+        string Name { get; }
+
+        string GetRootDescription(IEnumerable<DiagnosticResult> results);
+
+        string GetGroupDescription(IEnumerable<DiagnosticResult> results);
+
         DiagnosticResult[] Analyze(Container container);
     }
 

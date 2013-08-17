@@ -32,7 +32,38 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ContainerRegisteredServiceContainerAnalyzer : IContainerAnalyzer
     {
-        private const string DebuggerViewName = "Unregistered dependency";
+        public DiagnosticType DiagnosticType
+        {
+            get { return DiagnosticType.ContainerRegisteredService; }
+        }
+
+        public string Name
+        {
+            get { return "Unregistered types"; }
+        }
+
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int unregisteredServicesCount = (
+                from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
+                from relationship in result.Relationships
+                select relationship.Dependency.ServiceType)
+                .Distinct()
+                .Count();
+
+            var componentCount = results.Select(result => result.Type).Distinct().Count();
+
+            return
+                componentCount + " " + ComponentPlural(componentCount) + " depend on " +
+                unregisteredServicesCount + " container-registered " +
+                TypePlural(unregisteredServicesCount) + ".";
+        }
+
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            // TODO: We can do better than this.
+            return results.First().Description;
+        }
 
         DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
@@ -62,7 +93,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             return new ContainerRegisteredServiceDiagnosticResult(
                 type: registration.ServiceType,
-                name: DebuggerViewName,
                 description: BuildDescription(registration, relationships),
                 relationships: relationships);
         }
@@ -109,6 +139,16 @@ namespace SimpleInjector.Diagnostics.Analyzers
             {
                 return unregisteredTypes.Length + " container-registered types";
             }
+        }
+
+        private static string ComponentPlural(int number)
+        {
+            return number == 1 ? "component" : "components";
+        }
+
+        private static string TypePlural(int number)
+        {
+            return number == 1 ? "type" : "types";
         }
     }
 }

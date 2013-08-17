@@ -8,9 +8,9 @@
 
     public class ContainerRegisteredServiceDiagnosticResult : DiagnosticResult
     {
-        public ContainerRegisteredServiceDiagnosticResult(Type type, string name, string description,
+        public ContainerRegisteredServiceDiagnosticResult(Type type, string description,
             IEnumerable<KnownRelationship> relationships)
-            : base(type, name, description, DiagnosticResultType.ContainerRegisteredService)
+            : base(type, "Unregistered type", description, DiagnosticType.ContainerRegisteredService)
         {
             this.Relationships = relationships.ToList().AsReadOnly();
         }

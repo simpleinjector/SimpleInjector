@@ -33,6 +33,31 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ShortCircuitedDependencyContainerAnalyzer : IContainerAnalyzer
     {
+        public DiagnosticType DiagnosticType
+        {
+            get { return DiagnosticType.ShortCircuitedDependency; }
+        }
+
+        public string Name
+        {
+            get { return "Possible Short Circuited Dependencies"; }
+        }
+
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+
+            return count + " " + ComponentPlural(count) +
+                " possibly short circuits to concrete unregistered types.";
+        }
+
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+
+            return count + " short circuited " + ComponentPlural(count) + ".";
+        }
+
         DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
             return this.Analyze(container);
@@ -76,7 +101,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     registeredImplementationTypes[actualDependency.Dependency.ServiceType]
                 select new ShortCircuitedDependencyDiagnosticResult(
                     type: registration.ServiceType,
-                    name: "Short Circuit",
                     description: BuildDescription(actualDependency, possibleSkippedRegistrations),
                     registration: registration,
                     actualDependency: actualDependency,
@@ -99,6 +123,16 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship.Dependency.ServiceType.ToFriendlyName(),
                 relationship.Dependency.Lifestyle.Name,
                 possibleSkippedRegistrationsDescription);
+        }
+
+        private static string ComponentPlural(int number)
+        {
+            return number == 1 ? "component" : "components";
+        }
+
+        private static string HasPlural(int number)
+        {
+            return number == 1 ? "has" : "have";
         }
     }
 }

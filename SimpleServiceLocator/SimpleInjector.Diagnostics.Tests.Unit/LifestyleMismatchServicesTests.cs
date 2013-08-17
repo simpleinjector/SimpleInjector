@@ -313,15 +313,17 @@
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient1_ReportsMismatch()
         {
             // Arrange
-            var hybridWithDeeplyNestedSingleton = Lifestyle.CreateHybrid(() => true,
+            Func<bool> selector = () => true;
+
+            var hybridWithDeeplyNestedSingleton = Lifestyle.CreateHybrid(selector,
                 Lifestyle.Transient, 
-                Lifestyle.CreateHybrid(() => true,
+                Lifestyle.CreateHybrid(selector,
                     Lifestyle.Transient, 
-                    Lifestyle.CreateHybrid(() => true,
+                    Lifestyle.CreateHybrid(selector,
                         Lifestyle.Transient, 
-                        Lifestyle.CreateHybrid(() => true,
+                        Lifestyle.CreateHybrid(selector,
                             Lifestyle.Transient, 
-                            Lifestyle.CreateHybrid(() => true,
+                            Lifestyle.CreateHybrid(selector,
                                 Lifestyle.Transient, 
                                 Lifestyle.Singleton)))));
 
@@ -340,15 +342,17 @@
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient2_ReportsMismatch()
         {
             // Arrange
-            var hybridWithDeeplyNestedTransient = Lifestyle.CreateHybrid(() => true,
+            Func<bool> selector = () => true; 
+            
+            var hybridWithDeeplyNestedTransient = Lifestyle.CreateHybrid(selector,
                 Lifestyle.Singleton,
-                Lifestyle.CreateHybrid(() => true,
+                Lifestyle.CreateHybrid(selector,
                     Lifestyle.Singleton,
-                    Lifestyle.CreateHybrid(() => true,
+                    Lifestyle.CreateHybrid(selector,
                         Lifestyle.Singleton,
-                        Lifestyle.CreateHybrid(() => true,
+                        Lifestyle.CreateHybrid(selector,
                             Lifestyle.Singleton,
-                            Lifestyle.CreateHybrid(() => true,
+                            Lifestyle.CreateHybrid(selector,
                                 Lifestyle.Singleton,
                                 Lifestyle.Transient)))));
 

@@ -5,9 +5,9 @@
 
     public class PotentialLifestyleMismatchDiagnosticResult : DiagnosticResult
     {
-        public PotentialLifestyleMismatchDiagnosticResult(Type type, string name, string description,
+        public PotentialLifestyleMismatchDiagnosticResult(Type type, string description,
             KnownRelationship relationship)
-            : base(type, name, description, DiagnosticResultType.PotentialLifestyleMismatch)
+            : base(type,  "Lifestyle Mismatch", description, DiagnosticType.PotentialLifestyleMismatch)
         {
             this.Relationship = relationship;
         }

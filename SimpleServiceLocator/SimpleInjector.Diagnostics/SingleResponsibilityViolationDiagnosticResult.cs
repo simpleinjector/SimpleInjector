@@ -7,9 +7,9 @@
 
     public class SingleResponsibilityViolationDiagnosticResult : DiagnosticResult
     {
-        public SingleResponsibilityViolationDiagnosticResult(Type type, string name, string description,
+        public SingleResponsibilityViolationDiagnosticResult(Type type, string description,
             Type implementationType, IEnumerable<InstanceProducer> dependencies)
-            : base(type, name, description, DiagnosticResultType.SingleResponsibilityViolation)
+            : base(type, "SRP Violation", description, DiagnosticType.SingleResponsibilityViolation)
         {
             this.ImplementationType = implementationType;
             this.Dependencies = dependencies.ToList().AsReadOnly();

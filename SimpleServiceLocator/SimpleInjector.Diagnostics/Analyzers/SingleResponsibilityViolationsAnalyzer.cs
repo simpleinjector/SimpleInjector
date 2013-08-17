@@ -33,7 +33,30 @@ namespace SimpleInjector.Diagnostics.Analyzers
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
         private const int MaximumValidNumberOfDependencies = 6;
-        private const string DebuggerViewName = "Potential Single Responsibility Violations";
+
+        public DiagnosticType DiagnosticType
+        {
+            get { return DiagnosticType.SingleResponsibilityViolation; }
+        }
+
+        public string Name
+        {
+            get { return "Potential Single Responsibility Violations"; }
+        }
+
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+
+            return count + " possible single responsibility " + ViolationPlural(count) + ".";
+        }
+
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+
+            return count + " possible " + ViolationPlural(count) + ".";
+        }
 
         DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
@@ -51,7 +74,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 let dependencies = g.Select(r => r.Dependency).ToArray()
                 select new SingleResponsibilityViolationDiagnosticResult(
                     type: g.Key.registration.ServiceType,
-                    name: "Violation",
                     description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
                     implementationType: g.Key.ImplementationType,
                     dependencies: dependencies))
@@ -79,6 +101,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 "{0} has {1} dependencies which might indicate a SRP violation.",
                 Helpers.ToFriendlyName(implementationType),
                 numberOfDependencies);
+        }
+
+        private static string ViolationPlural(int count)
+        {
+            return count == 1 ? "violation" : "violations";
         }
     }
 }

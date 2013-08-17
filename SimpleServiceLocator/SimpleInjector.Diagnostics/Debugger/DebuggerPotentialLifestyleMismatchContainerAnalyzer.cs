@@ -51,21 +51,21 @@
                 " for " + serviceCount + " " + ServicePlural(serviceCount) + ".";
         }
 
-        private static string ServicePlural(int number)
-        {
-            return "service" + (number != 1 ? "s" : string.Empty);
-        }
-
-        private static string MismatchPlural(int number)
-        {
-            return "mismatch" + (number != 1 ? "es" : string.Empty);
-        }
-
         private static string DescribeItem(IEnumerable<DebuggerViewItem> item)
         {
             int count = item.Count();
 
             return count + " possible " + MismatchPlural(count) + ".";
+        }
+
+        private static string ServicePlural(int number)
+        {
+            return number == 1 ? "service" : "services";
+        }
+
+        private static string MismatchPlural(int number)
+        {
+            return number == 1 ? "mismatch" : "mismatches";
         }
     }
 }

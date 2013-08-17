@@ -1,5 +1,4 @@
-﻿#if !SILVERLIGHT
-#if DEBUG
+﻿#if DEBUG
 namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
@@ -171,5 +170,4 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
     }
 }
-#endif
 #endif

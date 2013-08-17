@@ -118,6 +118,17 @@
         }
     }
 
+    public interface ICommandHandler<TCommand>
+    {
+    }
+
+    public class GenericHandler<TCommand, TDependency> : ICommandHandler<TCommand>
+    {
+        public GenericHandler(TDependency dependency)
+        {
+        }
+    }
+
     public class PluginImpl : IPlugin
     {
     }

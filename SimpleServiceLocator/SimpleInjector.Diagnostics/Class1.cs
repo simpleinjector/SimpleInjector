@@ -1,34 +1,9 @@
 ﻿namespace SimpleInjector.Diagnostics
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+    using SimpleInjector.Diagnostics.Analyzers;
 
-    public enum DiagnosticResultType
-    {
-        ContainerRegisteredService,
-        PotentialLifestyleMismatch,
-        ShortCircuitedDependency,
-        SingleResponsibilityViolation
-    }
-
-    public class DiagnosticGroup
-    {
-        public Type GroupType { get; private set; }
-
-        public string Name { get; private set; }
-
-        public string Description { get; private set; }
-
-        public DiagnosticResultType DiagnosticType { get; private set; }
-
-        public DiagnosticGroup Parent { get; private set; }
-
-        public IEnumerable<DiagnosticGroup> Children { get; private set; }
-
-        public IEnumerable<DiagnosticResult> Results { get; private set; }
-    }
 
     //var service = new DiagnosticServices(container);
 

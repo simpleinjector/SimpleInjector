@@ -25,12 +25,41 @@
 
 namespace SimpleInjector.Diagnostics.Analyzers
 {
+    using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using SimpleInjector.Advanced;
 
     internal sealed class PotentialLifestyleMismatchContainerAnalyzer : IContainerAnalyzer
     {
+        public DiagnosticType DiagnosticType
+        {
+            get { return DiagnosticType.PotentialLifestyleMismatch; }
+        }
+
+        public string Name
+        {
+            get { return "Potential Lifestyle Mismatches"; }
+        }
+
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        {
+            var mismatchCount = results.Count();
+            var serviceCount = results.Select(result => result.Type).Distinct().Count();
+
+            return
+                mismatchCount + " possible lifestyle " + MismatchPlural(mismatchCount) +
+                " for " + serviceCount + " " + ServicePlural(serviceCount) + ".";
+        }
+
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+
+            return count + " possible " + MismatchPlural(count) + ".";
+        }
+
         DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
         {
             return this.Analyze(container);
@@ -44,7 +73,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
               where LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency)
               select new PotentialLifestyleMismatchDiagnosticResult(
                   type: producer.ServiceType,
-                  name: "Mismatch",
                   description: BuildRelationshipDescription(dependency),
                   relationship: dependency))
               .ToArray();          
@@ -58,6 +86,16 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship.Lifestyle.Name,
                 Helpers.ToFriendlyName(relationship.Dependency.ServiceType),
                 relationship.Dependency.Lifestyle.Name);
+        }
+        
+        private static string ServicePlural(int number)
+        {
+            return number == 1 ? "service" : "services";
+        }
+
+        private static string MismatchPlural(int number)
+        {
+            return number == 1 ? "mismatch" : "mismatches";
         }
     }
 }

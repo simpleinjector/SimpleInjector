@@ -153,12 +153,12 @@
 
         private static string ComponentPlural(int number)
         {
-            return "component" + (number != 1 ? "s" : string.Empty);
+            return number == 1 ? "component" : "components";
         }
 
         private static string HasPlural(int number)
         {
-            return number != 1 ? "have" : "has";
+            return number == 1 ? "has" : "have";
         }
     }
 }
