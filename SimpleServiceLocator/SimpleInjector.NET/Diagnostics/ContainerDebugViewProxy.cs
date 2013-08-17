@@ -35,7 +35,7 @@
 
             if (debugViewType != null)
             {
-                debugView = Activator.CreateInstance(debugViewType, container);
+                this.debugView = Activator.CreateInstance(debugViewType, this.container);
             }
 
             this.container = container;
