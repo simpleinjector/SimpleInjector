@@ -3,8 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.Reflection;
-
-    // Proxy to the real ContainerDebugView that is located in the SimpleInjector.Diagnostics.dll.
+    
     internal sealed class ContainerDebugViewProxy
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -18,14 +17,33 @@
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Container container;
 
+        static ContainerDebugViewProxy()
+        {
+            try
+            {
+                var assembly = Assembly.Load("SimpleInjector.Diagnostics");
+                debugViewType = assembly.GetType("SimpleInjector.Diagnostics.ContainerDebugView");
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+        }
+
         public ContainerDebugViewProxy(Container container)
         {
-            if (debugViewType == null)
+            this.container = container;
+
+            debugView = CreateNewDebugViewInstance(container);
+        }
+
+        private static object CreateNewDebugViewInstance(Container container)
+        {
+            if (debugViewType != null)
             {
                 try
                 {
-                    var diagnostics = Assembly.Load("SimpleInjector.Diagnostics");
-                    debugViewType = diagnostics.GetType("SimpleInjector.Diagnostics.ContainerDebugView");
+                    return Activator.CreateInstance(debugViewType, container);
                 }
                 catch (Exception ex)
                 {
@@ -33,12 +51,7 @@
                 }
             }
 
-            if (debugViewType != null)
-            {
-                this.debugView = Activator.CreateInstance(debugViewType, this.container);
-            }
-
-            this.container = container;
+            return null;
         }
 
         public object Options

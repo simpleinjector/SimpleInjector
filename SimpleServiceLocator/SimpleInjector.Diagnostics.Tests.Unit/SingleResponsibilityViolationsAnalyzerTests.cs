@@ -206,7 +206,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var item = items.Single(i => i.Description.Contains(typeof(PluginWith7Dependencies).Name));
 
             // Assert
-            Assert.AreEqual("Violation", item.Name);
+            Assert.AreEqual("SRP Violation", item.Name);
             Assert.AreEqual(typeof(PluginWith7Dependencies).Name + 
                 " has 7 dependencies which might indicate a SRP violation.",
                 item.Description);
@@ -232,7 +232,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var item = items.Single(i => i.Description.Contains(typeof(PluginDecoratorWith7Dependencies).Name));
 
             // Assert
-            Assert.AreEqual("Violation", item.Name);
+            Assert.AreEqual("SRP Violation", item.Name);
             Assert.AreEqual(typeof(PluginDecoratorWith7Dependencies).Name + 
                 " has 7 dependencies which might indicate a SRP violation.",
                 item.Description);

@@ -25,7 +25,6 @@
 
 namespace SimpleInjector
 {
-    using SimpleInjector.Diagnostics;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -37,6 +36,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Reflection.Emit;
     using System.Threading;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
