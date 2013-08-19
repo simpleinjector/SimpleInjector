@@ -25,23 +25,6 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     public class ShortCircuitContainerAnalyzerTests
     {
         [TestMethod]
-        public void Analyze_OnValidConfiguration_ReturnsNull()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Verify();
-
-            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
-
-            // Act
-            var results = analyzer.Analyze(container);
-
-            // Assert
-            Assert.IsNull(results);
-        }
-
-        [TestMethod]
         public void Analyze_OnConfigurationWithOneShortCircuitedRegistration_ReturnsThatWarning()
         {
             // Arrange
@@ -53,10 +36,10 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = GetShortCircuitedResults(analyzer.Analyze(container));
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -83,10 +66,10 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = GetShortCircuitedResults(analyzer.Analyze(container));
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -115,16 +98,25 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerShortCircuitContainerAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
-            var results = (analyzer.Analyze(container).Value as DebuggerViewItem[]).Single();
+            var results = GetShortCircuitedResults(analyzer.Analyze(container)).Single();
 
             // Assert
             Assert.AreEqual("Controller<T>", results.Name);
-            Assert.AreEqual("2 components possibly short circuit to concrete unregistered types.", results.Description);
+            Assert.AreEqual("2 short circuited components.", results.Description);
             Assert.IsInstanceOfType(results.Value, typeof(DebuggerViewItem[]));
             Assert.AreEqual(2, ((DebuggerViewItem[])results.Value).Length);
+        }
+
+        private static DebuggerViewItem[] GetShortCircuitedResults(DebuggerViewItem item)
+        {
+            var results = item.Value as DebuggerViewItem[];
+
+            return results
+                .Single(result => result.Name == "Possible Short Circuited Dependencies")
+                .Value as DebuggerViewItem[];
         }
     }
         

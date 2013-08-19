@@ -24,13 +24,13 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
 
             // Assert
-            Assert.IsNull(results);
+            Assert.AreEqual("No warnings detected.", results.Description);
         }
 
         [TestMethod]
@@ -41,13 +41,13 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
 
             // Assert
-            Assert.IsNull(results, 
+            Assert.AreEqual("No warnings detected.", results.Description,
                 "6 dependencies is still considered valid (to prevent too many false positives).");
         }
 
@@ -64,14 +64,14 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             container.RegisterOpenGeneric(typeof(IGenericPlugin<>), typeof(GenericPluginWith6Dependencies<>));
 
             container.Verify();
-            
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
 
             // Assert
-            Assert.IsNull(results,
+            Assert.AreEqual("No warnings detected.", results.Description,
                 "The registration is considered to be valid, since both the type and decorator do not " +
                 "exceed the maximum number of dependencies. Message: {0}",
                 results == null ? null : results.Items().FirstOrDefault());
@@ -85,7 +85,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -116,16 +116,14 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
 
             var result = results.Single();
 
-            var violation = (result.Value as DebuggerViewItem[]).Single();
-
-            var violationInformation = violation.Value as DebuggerViewItem[];
+            var violationInformation = result.Value as DebuggerViewItem[];
 
             // Assert
             Assert_AreEqual(expectedImplementationTypeInformation, violationInformation[0]);
@@ -142,7 +140,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -174,7 +172,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var items = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -196,7 +194,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -206,7 +204,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var item = items.Single(i => i.Description.Contains(typeof(PluginWith7Dependencies).Name));
 
             // Assert
-            Assert.AreEqual("SRP Violation", item.Name);
+            Assert.AreEqual("IPlugin", item.Name);
             Assert.AreEqual(typeof(PluginWith7Dependencies).Name + 
                 " has 7 dependencies which might indicate a SRP violation.",
                 item.Description);
@@ -222,7 +220,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -232,7 +230,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var item = items.Single(i => i.Description.Contains(typeof(PluginDecoratorWith7Dependencies).Name));
 
             // Assert
-            Assert.AreEqual("SRP Violation", item.Name);
+            Assert.AreEqual("IPlugin", item.Name);
             Assert.AreEqual(typeof(PluginDecoratorWith7Dependencies).Name + 
                 " has 7 dependencies which might indicate a SRP violation.",
                 item.Description);
@@ -248,7 +246,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -275,13 +273,13 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerSingleResponsibilityViolationsAnalyzer();
+            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
 
             // Act
             var results = analyzer.Analyze(container);
 
             // Assert
-            Assert.IsNull(results, @"
+            Assert.AreEqual("No warnings detected.", results.Description, @"
                 Although the decorator has too many dependencies, the system has not enough information to
                 differentiate between a decorator with too many dependencies and a decorator that wraps many
                 elements. The diagnostic system simply registers all dependencies that this decorator has,

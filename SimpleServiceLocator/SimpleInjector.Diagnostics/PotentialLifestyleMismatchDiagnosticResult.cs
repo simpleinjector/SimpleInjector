@@ -7,7 +7,7 @@
     {
         public PotentialLifestyleMismatchDiagnosticResult(Type type, string description,
             KnownRelationship relationship)
-            : base(type,  "Lifestyle Mismatch", description, DiagnosticType.PotentialLifestyleMismatch)
+            : base(type, type.ToFriendlyName(), description, DiagnosticType.PotentialLifestyleMismatch, relationship)
         {
             this.Relationship = relationship;
         }

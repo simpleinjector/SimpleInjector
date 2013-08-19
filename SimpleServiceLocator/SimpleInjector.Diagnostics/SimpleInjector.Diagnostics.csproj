@@ -52,14 +52,9 @@
     <Compile Include="Analyzer.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="ContainerDebugView.cs" />
-    <Compile Include="Analyzers\ContainerRegisteredContainerAnalyzer.cs" />
+    <Compile Include="Analyzers\ContainerRegisteredServiceContainerAnalyzer.cs" />
     <Compile Include="ContainerRegisteredServiceDiagnosticResult.cs" />
-    <Compile Include="Debugger\DebuggerContainerRegisteredContainerAnalyzer.cs" />
-    <Compile Include="Debugger\DebuggerPotentialLifestyleMismatchContainerAnalyzer.cs" />
-    <Compile Include="Debugger\DebuggerShortCircuitContainerAnalyzer.cs" />
-    <Compile Include="Debugger\DebuggerSingleResponsibilityViolationsAnalyzer.cs" />
     <Compile Include="Debugger\DebuggerViewItem.cs" />
-    <Compile Include="Debugger\DebuggerViewItemGenericTypeGrouper.cs" />
     <Compile Include="Debugger\DebuggerViewItemType.cs" />
     <Compile Include="Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs" />
     <Compile Include="DiagnosticGroup.cs" />
@@ -71,7 +66,7 @@
     <Compile Include="Analyzers\PotentialLifestyleMismatchContainerAnalyzer.cs" />
     <Compile Include="PotentialLifestyleMismatchDiagnosticResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Analyzers\ShortCircuitContainerAnalyzer.cs" />
+    <Compile Include="Analyzers\ShortCircuitedDependencyContainerAnalyzer.cs" />
     <Compile Include="Analyzers\SingleResponsibilityViolationsAnalyzer.cs" />
     <Compile Include="ShortCircuitedDependencyDiagnosticResult.cs" />
     <Compile Include="SingleResponsibilityViolationDiagnosticResult.cs" />

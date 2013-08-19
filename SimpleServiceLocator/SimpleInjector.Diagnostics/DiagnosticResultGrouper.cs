@@ -13,18 +13,18 @@
             this.analyzer = analyzer;
         }
 
-        internal static void Group(IContainerAnalyzer analyzer, DiagnosticResult[] results)
+        internal static DiagnosticGroup Group(IContainerAnalyzer analyzer, DiagnosticResult[] results)
         {
-            new DiagnosticResultGrouper(analyzer).Group(results);
+            return new DiagnosticResultGrouper(analyzer).Group(results);
         }
 
-        internal void Group(DiagnosticResult[] results)
+        internal DiagnosticGroup Group(DiagnosticResult[] results)
         {
             var childGroups = this.GroupResults(results, level: 0);
 
             var groupResults = GetGroupResults(results, level: 0);
 
-            var group = new DiagnosticGroup(
+            return new DiagnosticGroup(
                 diagnosticType: this.analyzer.DiagnosticType,
                 groupType: typeof(object),
                 name: this.analyzer.Name,

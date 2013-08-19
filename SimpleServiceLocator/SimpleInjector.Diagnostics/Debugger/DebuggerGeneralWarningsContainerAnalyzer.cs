@@ -29,15 +29,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Linq;
     using SimpleInjector.Diagnostics.Debugger;
 
-    internal sealed class DebuggerGeneralWarningsContainerAnalyzer : List<IDebuggerContainerAnalyzer>, 
+    internal sealed class DebuggerGeneralWarningsContainerAnalyzer : List<IContainerAnalyzer>, 
         IDebuggerContainerAnalyzer
     {
         internal DebuggerGeneralWarningsContainerAnalyzer()
         {
-            this.Add(new DebuggerPotentialLifestyleMismatchContainerAnalyzer());
-            this.Add(new DebuggerShortCircuitContainerAnalyzer());
-            this.Add(new DebuggerSingleResponsibilityViolationsAnalyzer());
-            this.Add(new DebuggerContainerRegisteredContainerAnalyzer());
+            this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
+            this.Add(new ShortCircuitedDependencyContainerAnalyzer());
+            this.Add(new SingleResponsibilityViolationsAnalyzer());
+            this.Add(new ContainerRegisteredServiceContainerAnalyzer());
         }
 
         public DebuggerViewItem Analyze(Container container)
@@ -46,9 +46,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             var analysisResults = (
                 from analyzer in this
-                let result = analyzer.Analyze(container)
-                where result != null
-                select result)
+                let results = analyzer.Analyze(container)
+                where results.Any()
+                let diagnosticGroup = DiagnosticResultGrouper.Group(analyzer, results)
+                select new DebuggerViewItem(
+                    name: diagnosticGroup.Name,
+                    description: diagnosticGroup.Description,
+                    value: ConvertToDebuggerViewItems(diagnosticGroup)))
                 .ToArray();
 
             if (!analysisResults.Any())
@@ -64,6 +68,27 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
                     analysisResults);
             }
+        }
+
+        private static DebuggerViewItem[] ConvertToDebuggerViewItems(DiagnosticGroup group)
+        {
+            var childItems =
+                from child in @group.Children
+                select new DebuggerViewItem(
+                    name: child.Name,
+                    description: child.Description,
+                    value: ConvertToDebuggerViewItems(child));
+
+            var resultItems =
+                from result in @group.Results
+                select new DebuggerViewItem(
+                    name: result.Type.ToFriendlyName(),
+                    description: result.Description,
+                    value: result.Value);
+
+            return childItems.Concat(resultItems)
+                .OrderBy(item => item.Name)
+                .ToArray();
         }
     }
 }

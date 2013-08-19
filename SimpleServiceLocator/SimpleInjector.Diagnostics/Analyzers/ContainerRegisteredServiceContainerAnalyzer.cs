@@ -44,25 +44,35 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
-            int unregisteredServicesCount = (
+            int typeCount = GetNumberOfAutoRegisteredServices(results);
+
+            int componentCount = GetNumberOfComponents(results);
+
+            return GetTypeRootDescription(typeCount) + GetComponentDescription(componentCount) + ".";
+        }
+
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int componentCount = GetNumberOfComponents(results);
+
+            int typeCount = GetNumberOfAutoRegisteredServices(results);
+
+            return GetTypeGroupDescription(typeCount) + GetComponentDescription(componentCount) + ".";
+        }
+
+        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results)
+        {
+            return results.Select(result => result.Type).Distinct().Count();
+        }
+
+        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results)
+        {
+            return (
                 from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
                 from relationship in result.Relationships
                 select relationship.Dependency.ServiceType)
                 .Distinct()
                 .Count();
-
-            var componentCount = results.Select(result => result.Type).Distinct().Count();
-
-            return
-                componentCount + " " + ComponentPlural(componentCount) + " depend on " +
-                unregisteredServicesCount + " container-registered " +
-                TypePlural(unregisteredServicesCount) + ".";
-        }
-
-        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
-        {
-            // TODO: We can do better than this.
-            return results.First().Description;
         }
 
         DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
@@ -141,14 +151,35 @@ namespace SimpleInjector.Diagnostics.Analyzers
             }
         }
 
-        private static string ComponentPlural(int number)
+        private static string GetTypeRootDescription(int number)
         {
-            return number == 1 ? "component" : "components";
+            if (number == 1)
+            {
+                return "1 container-registered type has been detected that is referenced by ";
+            }
+
+            return number + " container-registered types have been detected that are referenced by ";
         }
 
-        private static string TypePlural(int number)
+        private static string GetTypeGroupDescription(int number)
         {
-            return number == 1 ? "type" : "types";
+            if (number == 1)
+            {
+                return "1 container-registered type is referenced by ";
+            }
+
+            return number + " container-registered types are referenced by ";
+        }
+
+
+        private static string GetComponentDescription(int number)
+        {
+            if (number == 1)
+            {
+                return "1 component";
+            }
+
+            return number + " components";
         }
     }
 }

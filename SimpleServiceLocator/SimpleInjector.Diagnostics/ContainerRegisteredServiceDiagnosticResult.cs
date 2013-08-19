@@ -10,7 +10,8 @@
     {
         public ContainerRegisteredServiceDiagnosticResult(Type type, string description,
             IEnumerable<KnownRelationship> relationships)
-            : base(type, "Unregistered type", description, DiagnosticType.ContainerRegisteredService)
+            : base(type, "Unregistered type", description, DiagnosticType.ContainerRegisteredService, 
+                relationships.ToArray())
         {
             this.Relationships = relationships.ToList().AsReadOnly();
         }
