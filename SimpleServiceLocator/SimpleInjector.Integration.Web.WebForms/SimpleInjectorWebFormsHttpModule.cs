@@ -110,24 +110,29 @@ namespace SimpleInjector.Integration.Web.Forms
 
             if (handler != null)
             {
-                var initializer = new HandlerInitializer(handler, this.GetContainer());
-
-                initializer.InitializeHttpHandler();
+                HandlerInitializer.Initialize(handler, this.GetContainer());
             }
         }
 
-        private sealed class HandlerInitializer
+        private struct HandlerInitializer
         {
             private readonly IHttpHandler handler;
             private readonly Container container;
 
-            public HandlerInitializer(IHttpHandler handler, Container container)
+            private HandlerInitializer(IHttpHandler handler, Container container)
             {
                 this.handler = handler;
                 this.container = container;
             }
 
-            internal void InitializeHttpHandler()
+            internal static void Initialize(IHttpHandler handler, Container container)
+            {
+                var initializer = new HandlerInitializer(handler, container);
+
+                initializer.InitializeHttpHandler();
+            }
+
+            private void InitializeHttpHandler()
             {
                 bool handlerIsPage = typeof(Page).IsAssignableFrom(this.handler.GetType());
 
