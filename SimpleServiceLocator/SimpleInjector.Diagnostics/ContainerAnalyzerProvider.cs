@@ -25,39 +25,22 @@
 
 namespace SimpleInjector.Diagnostics
 {
-    using System;
-    using System.Diagnostics;
+    using System.Collections.ObjectModel;
+    using SimpleInjector.Diagnostics.Analyzers;
 
-    /// <summary>
-    /// Base class for types that hold information about a single diagnostic message or warning for a
-    /// particular type or part of the configuration.
-    /// </summary>
-    [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
-    public abstract class DiagnosticResult
+    internal static class ContainerAnalyzerProvider
     {
-        internal DiagnosticResult(Type serviceType, string description, DiagnosticType type, object value)
+        private static readonly Collection<IContainerAnalyzer> analyzers = new Collection<IContainerAnalyzer>
         {
-            this.ServiceType = serviceType;
-            this.Description = description;
-            this.Type = type;
-            this.Value = value;
+            new PotentialLifestyleMismatchContainerAnalyzer(),
+            new ShortCircuitedDependencyContainerAnalyzer(),
+            new SingleResponsibilityViolationsAnalyzer(),
+            new ContainerRegisteredServiceContainerAnalyzer(),
+        };
+
+        internal static Collection<IContainerAnalyzer> Analyzers
+        {
+            get { return analyzers; }
         }
-
-        /// <summary>Gets the diagnostic type of this result.</summary>
-        public DiagnosticType Type { get; private set; }
-
-        /// <summary>The service type to which this warning is related.</summary>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
-        public Type ServiceType { get; private set; }
-
-        /// <summary>Gets the description of the diagnostic result.</summary>
-        [DebuggerDisplay("{Description,nq}")]
-        public string Description { get; private set; }
-
-        /// <summary>Gets the hierarchical group to which this diagnostic result belongs.</summary>
-        public DiagnosticGroup Group { get; internal set; }
-
-        [DebuggerHidden]
-        internal object Value { get; private set; }
     }
 }

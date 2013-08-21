@@ -100,10 +100,10 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 let possibleSkippedRegistrations =
                     registeredImplementationTypes[actualDependency.Dependency.ServiceType]
                 select new ShortCircuitedDependencyDiagnosticResult(
-                    type: registration.ServiceType,
+                    serviceType: registration.ServiceType,
                     description: BuildDescription(actualDependency, possibleSkippedRegistrations),
                     registration: registration,
-                    actualDependency: actualDependency,
+                    relationship: actualDependency,
                     expectedDependencies: possibleSkippedRegistrations))
                 .ToArray();
         }

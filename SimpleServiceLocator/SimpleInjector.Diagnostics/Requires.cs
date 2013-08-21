@@ -25,25 +25,16 @@
 
 namespace SimpleInjector.Diagnostics
 {
-    using SimpleInjector.Advanced;
+    using System;
 
-    internal static class LifestyleMismatchServices
+    internal static class Requires
     {
-        internal static bool DependencyHasPossibleLifestyleMismatch(KnownRelationship relationship)
+        internal static void IsNotNull(object instance, string paramName)
         {
-            Lifestyle componentLifestyle = relationship.Lifestyle;
-            Lifestyle dependencyLifestyle = relationship.Dependency.Lifestyle;
-
-            // If the lifestyles are the same instance, we consider them valid, even though in theory
-            // an hybrid lifestyle could screw things up. In practice this would be very unlikely, since
-            // the Func<bool> test delegate would typically return the same value within a given context.
-            if (object.ReferenceEquals(componentLifestyle, dependencyLifestyle) &&
-                componentLifestyle != Lifestyle.Unknown)
+            if (instance == null)
             {
-                return false;
+                throw new ArgumentNullException(paramName);
             }
-
-            return componentLifestyle.ComponentLength > dependencyLifestyle.DependencyLength;
         }
     }
 }

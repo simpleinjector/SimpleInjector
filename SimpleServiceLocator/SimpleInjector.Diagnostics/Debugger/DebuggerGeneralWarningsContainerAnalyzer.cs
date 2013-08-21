@@ -25,27 +25,17 @@
 
 namespace SimpleInjector.Diagnostics.Analyzers
 {
-    using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector.Diagnostics.Debugger;
 
-    internal sealed class DebuggerGeneralWarningsContainerAnalyzer : List<IContainerAnalyzer>, 
-        IDebuggerContainerAnalyzer
+    internal static class DebuggerGeneralWarningsContainerAnalyzer
     {
-        internal DebuggerGeneralWarningsContainerAnalyzer()
-        {
-            this.Add(new PotentialLifestyleMismatchContainerAnalyzer());
-            this.Add(new ShortCircuitedDependencyContainerAnalyzer());
-            this.Add(new SingleResponsibilityViolationsAnalyzer());
-            this.Add(new ContainerRegisteredServiceContainerAnalyzer());
-        }
-
-        public DebuggerViewItem Analyze(Container container)
+        internal static DebuggerViewItem Analyze(Container container)
         {
             const string WarningsName = "Configuration Warnings";
 
             var analysisResults = (
-                from analyzer in this
+                from analyzer in ContainerAnalyzerProvider.Analyzers
                 let results = analyzer.Analyze(container)
                 where results.Any()
                 let diagnosticGroup = DiagnosticResultGrouper.Group(analyzer, results)
@@ -82,7 +72,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             var resultItems =
                 from result in @group.Results
                 select new DebuggerViewItem(
-                    name: result.Type.ToFriendlyName(),
+                    name: result.ServiceType.ToFriendlyName(),
                     description: result.Description,
                     value: result.Value);
 

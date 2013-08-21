@@ -26,6 +26,7 @@
    <Directory>C:/Windows/Microsoft.NET/assembly/GAC_MSIL/System.Web.Mvc/v4.0_3.0.0.0__31bf3856ad364e35/</Directory>
   </AssemblyReferenceDirectories> 
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Diagnostics.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.LifetimeScoping.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Wcf.dll" Analyze="True" AnalyzeAllChildren="True" />

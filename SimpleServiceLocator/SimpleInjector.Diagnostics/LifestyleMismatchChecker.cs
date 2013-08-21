@@ -23,22 +23,27 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics.Debugger
+namespace SimpleInjector.Diagnostics
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using SimpleInjector.Advanced;
 
-    internal class DebuggerViewItemType
+    internal static class LifestyleMismatchChecker
     {
-        public DebuggerViewItemType(Type type, DebuggerViewItem item)
+        internal static bool HasPossibleLifestyleMismatch(KnownRelationship relationship)
         {
-            this.Type = type;
-            this.Item = item;
+            Lifestyle componentLifestyle = relationship.Lifestyle;
+            Lifestyle dependencyLifestyle = relationship.Dependency.Lifestyle;
+
+            // If the lifestyles are the same instance, we consider them valid, even though in theory
+            // an hybrid lifestyle could screw things up. In practice this would be very unlikely, since
+            // the Func<bool> test delegate would typically return the same value within a given context.
+            if (object.ReferenceEquals(componentLifestyle, dependencyLifestyle) &&
+                componentLifestyle != Lifestyle.Unknown)
+            {
+                return false;
+            }
+
+            return componentLifestyle.ComponentLength > dependencyLifestyle.DependencyLength;
         }
-
-        public Type Type { get; private set; }
-
-        public DebuggerViewItem Item { get; private set; }
     }
 }

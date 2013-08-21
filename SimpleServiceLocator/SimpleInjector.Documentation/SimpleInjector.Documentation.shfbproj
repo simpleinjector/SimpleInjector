@@ -35,6 +35,7 @@
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.xml" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Forms.xml" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Forms.dll" />
+      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Diagnostics.dll" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>
@@ -49,7 +50,8 @@
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" /></NamespaceSummaries>
+<NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
+<NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace is part of the &lt;b&gt;SimpleInjector.Diagnostics.dll&lt;/b&gt; adds diagnostic capabilities to the framework.</NamespaceSummaryItem></NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
@@ -75,7 +77,7 @@
     <Preliminary>False</Preliminary>
     <NamingMethod>MemberName</NamingMethod>
     <HelpTitle>Simple Injector</HelpTitle>
-    <CopyrightText>Copyright %28c%29 2013 S. van Deursen</CopyrightText>
+    <CopyrightText>Copyright %28c%29 2010 - 2013 S. van Deursen</CopyrightText>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <WebsiteSdkLinkType>Msdn</WebsiteSdkLinkType>
     <HtmlSdkLinkType>None</HtmlSdkLinkType>

@@ -22,7 +22,7 @@
             try
             {
                 var assembly = Assembly.Load("SimpleInjector.Diagnostics");
-                debugViewType = assembly.GetType("SimpleInjector.Diagnostics.ContainerDebugView");
+                debugViewType = assembly.GetType("SimpleInjector.Diagnostics.Debugger.ContainerDebugView");
             }
             catch (Exception ex)
             {

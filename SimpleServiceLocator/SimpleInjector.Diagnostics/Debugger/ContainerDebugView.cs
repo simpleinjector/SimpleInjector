@@ -23,25 +23,16 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Diagnostics.Debugger
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Diagnostics.Analyzers;
-    using SimpleInjector.Diagnostics.Debugger;
 
     internal sealed class ContainerDebugView
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static IEnumerable<IDebuggerContainerAnalyzer> analyzers = new IDebuggerContainerAnalyzer[]
-        {
-            new DebuggerGeneralWarningsContainerAnalyzer(),
-            new RegistrationsContainerAnalyzer()
-        };
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Container container;
         
@@ -93,10 +84,16 @@ namespace SimpleInjector.Diagnostics
 
         private DebuggerViewItem[] GetAnalysisResults()
         {
-            return (
-                from analyzer in analyzers
-                select analyzer.Analyze(this.container))
-                .ToArray();
+            var registrations = container.GetCurrentRegistrations();
+
+            return new DebuggerViewItem[]
+            {
+                DebuggerGeneralWarningsContainerAnalyzer.Analyze(this.container),
+                new DebuggerViewItem(
+                    name: "Registrations",
+                    description: "Count = " + registrations.Length,
+                    value: registrations)
+            };
         }
 
         private static DebuggerViewItem[] GetDebuggerTypeProxyFailureResults(Exception ex)
@@ -108,19 +105,6 @@ namespace SimpleInjector.Diagnostics
                     "We're so so sorry. The Debugger Type Proxy failed to initialize.", 
                     ex)
             };
-        }
-
-        private sealed class RegistrationsContainerAnalyzer : IDebuggerContainerAnalyzer
-        {
-            public DebuggerViewItem Analyze(Container container)
-            {
-                var registrations = container.GetCurrentRegistrations();
-
-                return new DebuggerViewItem(
-                    name: "Registrations",
-                    description: "Count = " + registrations.Length,
-                    value: registrations);
-            }
         }
     }
 }

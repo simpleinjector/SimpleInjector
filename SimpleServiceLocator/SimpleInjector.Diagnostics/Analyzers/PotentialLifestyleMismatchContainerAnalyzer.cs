@@ -46,7 +46,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
             var mismatchCount = results.Count();
-            var serviceCount = results.Select(result => result.Type).Distinct().Count();
+            var serviceCount = results.Select(result => result.ServiceType).Distinct().Count();
 
             return
                 mismatchCount + " possible lifestyle " + MismatchPlural(mismatchCount) +
@@ -69,13 +69,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             return (
               from producer in container.GetCurrentRegistrations()
-              from dependency in producer.GetRelationships()
-              where LifestyleMismatchServices.DependencyHasPossibleLifestyleMismatch(dependency)
+              from relationship in producer.GetRelationships()
+              where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(relationship)
               select new PotentialLifestyleMismatchDiagnosticResult(
-                  type: producer.ServiceType,
-                  description: BuildRelationshipDescription(dependency),
-                  relationship: dependency))
-              .ToArray();          
+                  serviceType: producer.ServiceType,
+                  description: BuildRelationshipDescription(relationship),
+                  relationship: relationship))
+              .ToArray();
         }
         
         private static string BuildRelationshipDescription(KnownRelationship relationship)

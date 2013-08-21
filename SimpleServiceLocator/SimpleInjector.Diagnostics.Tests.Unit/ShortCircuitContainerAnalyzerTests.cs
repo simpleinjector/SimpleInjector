@@ -36,10 +36,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = GetShortCircuitedResults(analyzer.Analyze(container));
+            var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container));
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -66,10 +64,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = GetShortCircuitedResults(analyzer.Analyze(container));
+            var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container));
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -98,10 +94,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = GetShortCircuitedResults(analyzer.Analyze(container)).Single();
+            var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container)).Single();
 
             // Assert
             Assert.AreEqual("Controller<T>", results.Name);

@@ -26,7 +26,6 @@
 namespace SimpleInjector.Diagnostics
 {
     using System.Collections.Generic;
-    using SimpleInjector.Diagnostics.Debugger;
 
     internal interface IContainerAnalyzer
     {
@@ -39,10 +38,5 @@ namespace SimpleInjector.Diagnostics
         string GetGroupDescription(IEnumerable<DiagnosticResult> results);
 
         DiagnosticResult[] Analyze(Container container);
-    }
-
-    internal interface IDebuggerContainerAnalyzer
-    {
-        DebuggerViewItem Analyze(Container container);
     }
 }

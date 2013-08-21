@@ -24,10 +24,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container);
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("No warnings detected.", results.Description);
@@ -41,10 +39,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container);
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("No warnings detected.", results.Description,
@@ -65,10 +61,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container);
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("No warnings detected.", results.Description,
@@ -85,10 +79,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -116,10 +108,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             var result = results.Single();
 
@@ -140,10 +130,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(2, results.Length);
@@ -172,10 +160,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var items = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var items = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(1, items.Length);
@@ -194,10 +180,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             var items = results.Single().Value as DebuggerViewItem[];
 
@@ -220,10 +204,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             var items = results.Single().Value as DebuggerViewItem[];
 
@@ -246,10 +228,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container).Value as DebuggerViewItem[];
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
             Assert.AreEqual(1, results.Length);
@@ -273,10 +253,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             container.Verify();
 
-            var analyzer = new DebuggerGeneralWarningsContainerAnalyzer();
-
             // Act
-            var results = analyzer.Analyze(container);
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
 
             // Assert
             Assert.AreEqual("No warnings detected.", results.Description, @"

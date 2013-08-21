@@ -62,7 +62,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results)
         {
-            return results.Select(result => result.Type).Distinct().Count();
+            return results.Select(result => result.ServiceType).Distinct().Count();
         }
 
         private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results)
@@ -102,7 +102,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             InstanceProducer registration, KnownRelationship[] relationships)
         {
             return new ContainerRegisteredServiceDiagnosticResult(
-                type: registration.ServiceType,
+                serviceType: registration.ServiceType,
                 description: BuildDescription(registration, relationships),
                 relationships: relationships);
         }

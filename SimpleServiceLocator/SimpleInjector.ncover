@@ -3,7 +3,7 @@
   <CoverageConfig version="3.3.4">
     <WorkingDirectory>.\</WorkingDirectory>
     <BuildId />
-    <CommandLineArgs>/testcontainer:"SimpleInjector.NET.Tests.Unit\bin\Debug\SimpleInjector.Tests.Unit.dll" /testcontainer:"SimpleInjector.Extensions.Tests.Unit\bin\Debug\SimpleInjector.Extensions.Tests.Unit.dll" /testcontainer:"SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\bin\Debug\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.dll" /testcontainer:"SimpleInjector.CodeSamples.Tests.Unit\bin\Debug\SimpleInjector.CodeSamples.Tests.Unit.dll" /testcontainer:"SimpleInjector.Integration.Web.Tests.Unit\bin\Debug\SimpleInjector.Integration.Web.Tests.Unit.dll"</CommandLineArgs>
+    <CommandLineArgs>/testcontainer:"SimpleInjector.NET.Tests.Unit\bin\Debug\SimpleInjector.Tests.Unit.dll" /testcontainer:"SimpleInjector.Extensions.Tests.Unit\bin\Debug\SimpleInjector.Extensions.Tests.Unit.dll" /testcontainer:"SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\bin\Debug\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.dll" /testcontainer:"SimpleInjector.CodeSamples.Tests.Unit\bin\Debug\SimpleInjector.CodeSamples.Tests.Unit.dll" /testcontainer:"SimpleInjector.Integration.Web.Tests.Unit\bin\Debug\SimpleInjector.Integration.Web.Tests.Unit.dll" /testcontainer:"SimpleInjector.Diagnostics.Tests.Unit\bin\Debug\SimpleInjector.Diagnostics.Tests.Unit.dll"</CommandLineArgs>
     <CommandLineExe>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\MSTest.exe</CommandLineExe>
     <CoverageTrend>trend.xml</CoverageTrend>
     <CoverageMetrics>Symbol, Branch, CyclomaticComplexity, MethodVisits</CoverageMetrics>

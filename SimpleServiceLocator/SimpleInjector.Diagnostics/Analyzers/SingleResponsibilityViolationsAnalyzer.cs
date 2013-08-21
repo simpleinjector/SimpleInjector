@@ -73,7 +73,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 where g.Count() > MaximumValidNumberOfDependencies
                 let dependencies = g.Select(r => r.Dependency).ToArray()
                 select new SingleResponsibilityViolationDiagnosticResult(
-                    type: g.Key.registration.ServiceType,
+                    serviceType: g.Key.registration.ServiceType,
                     description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
                     implementationType: g.Key.ImplementationType,
                     dependencies: dependencies))
