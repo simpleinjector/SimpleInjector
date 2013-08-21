@@ -70,3 +70,13 @@ using System.Security;
 #if DEBUG
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 #endif
+
+// During a publish build (using the build.bat) we need to compile this assembly with a strong name key, since 
+// we otherwise will not be able to access SimpleInjector.dll's internals. Although we could have done this
+// using delayed signing, it is considerably easier to do it this way.
+// Please note that the SimpleInjector.snk is private and is not in source control.
+#if PUBLISH
+#pragma warning disable 1699
+[assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
+#pragma warning restore 1699
+#endif
