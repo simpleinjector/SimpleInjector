@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Lifestyles
+﻿namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;

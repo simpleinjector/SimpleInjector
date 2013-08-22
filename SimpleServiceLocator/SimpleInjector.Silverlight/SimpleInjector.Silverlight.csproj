@@ -110,8 +110,8 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\Internal\IContainerControlledCollection.cs">
       <Link>Advanced\Internal\IContainerControlledCollection.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\IndexableEnumerable.cs">
-      <Link>Advanced\Internal\IndexableEnumerable.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\IndexableCollection.cs">
+      <Link>Advanced\Internal\IndexableCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs">
       <Link>Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs</Link>
@@ -235,6 +235,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Requires.cs">
       <Link>Requires.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\ScopedLifestyle.cs">
+      <Link>ScopedLifestyle.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\StringResources.cs">
       <Link>StringResources.cs</Link>

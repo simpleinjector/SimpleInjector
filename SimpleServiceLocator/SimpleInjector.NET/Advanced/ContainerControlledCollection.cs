@@ -34,7 +34,7 @@ namespace SimpleInjector.Advanced
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal class ContainerControlledCollection<TService> : IndexableEnumerable<TService>, 
+    internal class ContainerControlledCollection<TService> : IndexableCollection<TService>, 
         IContainerControlledCollection
     {
         private readonly Container container;
@@ -78,7 +78,7 @@ namespace SimpleInjector.Advanced
 
             set
             {
-                throw IndexableEnumerable<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
+                throw IndexableCollection<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
             }
         }
 

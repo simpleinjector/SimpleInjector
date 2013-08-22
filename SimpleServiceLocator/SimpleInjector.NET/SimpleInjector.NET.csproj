@@ -82,7 +82,7 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
-    <Compile Include="Advanced\Internal\IndexableEnumerable.cs" />
+    <Compile Include="Advanced\Internal\IndexableCollection.cs" />
     <Compile Include="Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
@@ -117,7 +117,7 @@
     <Compile Include="Lifestyles\HybridLifestyle.cs" />
     <Compile Include="Advanced\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
-    <Compile Include="Lifestyles\ScopedLifestyle.cs" />
+    <Compile Include="ScopedLifestyle.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />
     <Compile Include="Lifestyles\TransientLifestyle.cs" />

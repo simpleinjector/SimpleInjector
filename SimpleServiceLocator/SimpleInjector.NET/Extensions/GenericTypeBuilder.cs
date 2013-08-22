@@ -28,6 +28,7 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
 
     /// <summary>
@@ -238,7 +239,9 @@ namespace SimpleInjector.Extensions
 
             public override string ToString()
             {
-                return string.Format("ServiceType: {0}, Arguments: {1}",
+                // This is for our own debugging purposes. We don't use the DebuggerDisplayAttribute, since
+                // this code is hard to write (and maintain) as debugger display string.
+                return string.Format(CultureInfo.InvariantCulture, "ServiceType: {0}, Arguments: {1}",
                     this.ServiceType.ToFriendlyName(),
                     this.Arguments.Select(type => type.ToFriendlyName()).ToCommaSeparatedText());
             }

@@ -53,7 +53,7 @@
 
             this.genericArgument = typeBuilder.DefineGenericParameters("TService").Single();
 
-            typeBuilder.SetParent(typeof(IndexableEnumerable<>).MakeGenericType(this.genericArgument));
+            typeBuilder.SetParent(typeof(IndexableCollection<>).MakeGenericType(this.genericArgument));
             typeBuilder.AddInterfaceImplementation(Helpers.IReadOnlyListType.MakeGenericType(this.genericArgument));
             typeBuilder.AddInterfaceImplementation(Helpers.IReadOnlyCollectionType.MakeGenericType(this.genericArgument));
             typeBuilder.AddInterfaceImplementation(typeof(IContainerControlledCollection));
@@ -79,7 +79,7 @@
 
             MethodBuilder method = this.typeBuilder.DefineMethod(".ctor", methodAttributes);
 
-            var ctor = typeof(IndexableEnumerable<>).GetConstructor(
+            var ctor = typeof(IndexableCollection<>).GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                 null, Type.EmptyTypes, null);
 
@@ -87,7 +87,7 @@
 
             method.SetParameters(typeof(IContainerControlledCollection));
 
-            ParameterBuilder collection = method.DefineParameter(1, ParameterAttributes.None, "collection");
+            method.DefineParameter(1, ParameterAttributes.None, "collection");
 
             ILGenerator gen = method.GetILGenerator();
 
@@ -245,7 +245,7 @@
 
             method.SetParameters(typeof(int));
 
-            ParameterBuilder index = method.DefineParameter(1, ParameterAttributes.None, "index");
+            method.DefineParameter(1, ParameterAttributes.None, "index");
             ILGenerator gen = method.GetILGenerator();
 
             gen.Emit(OpCodes.Ldarg_0);

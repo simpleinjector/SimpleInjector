@@ -9,10 +9,14 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>This class is not meant for public use.</summary>
     /// <typeparam name="T">The type T.</typeparam>
-    public abstract class IndexableEnumerable<T> : IList<T>
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", 
+        MessageId = "Indexable",
+        Justification = "I think it's a word.")]
+    public abstract class IndexableCollection<T> : IList<T>
     {
         /// <summary>Gets the number of elements.</summary>
         /// <value>The number of elements.</value>
