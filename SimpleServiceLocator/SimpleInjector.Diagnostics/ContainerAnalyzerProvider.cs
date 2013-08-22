@@ -25,22 +25,18 @@
 
 namespace SimpleInjector.Diagnostics
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using SimpleInjector.Diagnostics.Analyzers;
 
     internal static class ContainerAnalyzerProvider
     {
-        private static readonly Collection<IContainerAnalyzer> analyzers = new Collection<IContainerAnalyzer>
+        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = (new List<IContainerAnalyzer>
         {
             new PotentialLifestyleMismatchContainerAnalyzer(),
             new ShortCircuitedDependencyContainerAnalyzer(),
             new SingleResponsibilityViolationsAnalyzer(),
             new ContainerRegisteredServiceContainerAnalyzer(),
-        };
-
-        internal static Collection<IContainerAnalyzer> Analyzers
-        {
-            get { return analyzers; }
-        }
+        }).AsReadOnly();
     }
 }

@@ -37,10 +37,10 @@ namespace SimpleInjector.Diagnostics
     [DebuggerDisplay("DiagnosticGroup (Name: {Name,nq})")]
     public class DiagnosticGroup
     {
-        internal DiagnosticGroup(DiagnosticType type, Type groupType, string name, string description,
+        internal DiagnosticGroup(DiagnosticType diagnosticType, Type groupType, string name, string description,
             IEnumerable<DiagnosticGroup> children, IEnumerable<DiagnosticResult> results)
         {
-            this.Type = type;
+            this.DiagnosticType = diagnosticType;
             this.GroupType = groupType;
             this.Name = name;
             this.Description = description;
@@ -59,33 +59,40 @@ namespace SimpleInjector.Diagnostics
         }
 
         /// <summary>
-        /// Gets the base <see cref="Type"/> that describes describes the service types of its 
+        /// Gets the base <see cref="DiagnosticType"/> that describes describes the service types of its 
         /// <see cref="Results"/>. The value often be either <see cref="System.Object"/> (in case this is a
         /// root group) or a partial generic type to allow hierarchical grouping of a large number of related
-        /// generic types.        /// 
+        /// generic types.
         /// </summary>
+        /// <value>The <see cref="Type"/>.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(GroupType),nq}")]
         public Type GroupType { get; private set; }
 
         /// <summary>Gets the friendly name of the group.</summary>
+        /// <value>The name.</value>
         [DebuggerDisplay("{Name,nq}")]
         public string Name { get; private set; }
 
         /// <summary>Gets the description of the group.</summary>
+        /// <value>The description.</value>
         [DebuggerDisplay("{Description,nq}")]
         public string Description { get; private set; }
 
         /// <summary>Gets the diagnostic type of all grouped <see cref="DiagnosticResult"/> instances.</summary>
-        public DiagnosticType Type { get; private set; }
+        /// <value>The <see cref="DiagnosticType"/>.</value>
+        public DiagnosticType DiagnosticType { get; private set; }
 
         /// <summary>Gets the parent <see cref="DiagnosticGroup"/> or null (Nothing in VB) when this is the
         /// root group.</summary>
+        /// <value>The <see cref="DiagnosticGroup"/>.</value>
         public DiagnosticGroup Parent { get; private set; }
 
         /// <summary>Gets the collection of child <see cref="DiagnosticGroup"/>s.</summary>
+        /// <value>A collection of <see cref="DiagnosticGroup"/> elements.</value>
         public ReadOnlyCollection<DiagnosticGroup> Children { get; private set; }
 
         /// <summary>Gets the collection of <see cref="DiagnosticResult"/> instances.</summary>
+        /// /// <value>A collection of <see cref="DiagnosticResult"/> elements.</value>
         public ReadOnlyCollection<DiagnosticResult> Results { get; private set; }
     }
 }

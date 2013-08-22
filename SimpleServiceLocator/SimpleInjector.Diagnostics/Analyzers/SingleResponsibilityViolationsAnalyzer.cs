@@ -58,12 +58,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + ViolationPlural(count) + ".";
         }
 
-        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
-        {
-            return this.Analyze(container);
-        }
-
-        public SingleResponsibilityViolationDiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(Container container)
         {
             return (
                 from registration in container.GetCurrentRegistrations()

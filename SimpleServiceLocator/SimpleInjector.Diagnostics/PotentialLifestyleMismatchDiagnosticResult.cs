@@ -43,6 +43,7 @@ namespace SimpleInjector.Diagnostics
         }
 
         /// <summary>Gets the object that describes the relationship between the component and its dependency.</summary>
+        /// <value>A <see cref="KnownRelationship"/> instance.</value>
         public KnownRelationship Relationship { get; private set; }
     }
 }

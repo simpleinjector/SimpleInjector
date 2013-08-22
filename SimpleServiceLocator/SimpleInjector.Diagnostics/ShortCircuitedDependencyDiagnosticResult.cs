@@ -53,12 +53,14 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the instance that describes the current relationship between the checked component
         /// and the short-circuited dependency.</summary>
+        /// <value>The <see cref="KnownRelationship"/>.</value>
         public KnownRelationship Relationship { get; private set; }
 
         /// <summary>
         /// Gets the collection of registrations that have the component's current dependency as 
         /// implementation type, but have a lifestyle that is different than the current dependency.
         /// </summary>
+        /// <value>A collection of <see cref="InstanceProducer"/> instances.</value>
         public ReadOnlyCollection<InstanceProducer> ExpectedDependencies { get; private set; }
 
         private static DebuggerViewItem[] CreateDebugValue(InstanceProducer registration,

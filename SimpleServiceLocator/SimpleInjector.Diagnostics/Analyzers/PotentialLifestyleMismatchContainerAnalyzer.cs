@@ -60,12 +60,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + MismatchPlural(count) + ".";
         }
 
-        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
-        {
-            return this.Analyze(container);
-        }
-
-        public PotentialLifestyleMismatchDiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(Container container)
         {
             return (
               from producer in container.GetCurrentRegistrations()

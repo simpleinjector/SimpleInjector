@@ -50,7 +50,7 @@ namespace SimpleInjector.Diagnostics
             var groupResults = GetGroupResults(results, level: 0);
 
             return new DiagnosticGroup(
-                type: this.analyzer.DiagnosticType,
+                diagnosticType: this.analyzer.DiagnosticType,
                 groupType: typeof(object),
                 name: this.analyzer.Name,
                 description: this.analyzer.GetRootDescription(results),
@@ -100,7 +100,7 @@ namespace SimpleInjector.Diagnostics
             }
 
             return new DiagnosticGroup(
-                type: this.analyzer.DiagnosticType,
+                diagnosticType: this.analyzer.DiagnosticType,
                 groupType: groupType,
                 name: Helpers.ToFriendlyName(groupType),
                 description: this.analyzer.GetGroupDescription(results),
@@ -111,7 +111,7 @@ namespace SimpleInjector.Diagnostics
         private DiagnosticGroup BuildNonGenericGroup(Type closedType, IEnumerable<DiagnosticResult> results)
         {
             return new DiagnosticGroup(
-                type: this.analyzer.DiagnosticType,
+                diagnosticType: this.analyzer.DiagnosticType,
                 groupType: closedType,
                 name: Helpers.ToFriendlyName(closedType),
                 description: this.analyzer.GetGroupDescription(results),

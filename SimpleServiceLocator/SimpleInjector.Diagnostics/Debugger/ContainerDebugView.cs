@@ -30,7 +30,9 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Diagnostics.Analyzers;
-
+    
+    [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses",
+        Justification = "This type is loaded by the SimpleInjector.dll when running in the VS debugger.")]
     internal sealed class ContainerDebugView
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -84,7 +86,7 @@ namespace SimpleInjector.Diagnostics.Debugger
 
         private DebuggerViewItem[] GetAnalysisResults()
         {
-            var registrations = container.GetCurrentRegistrations();
+            var registrations = this.container.GetCurrentRegistrations();
 
             return new DebuggerViewItem[]
             {

@@ -60,27 +60,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return GetTypeGroupDescription(typeCount) + GetComponentDescription(componentCount) + ".";
         }
 
-        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results)
-        {
-            return results.Select(result => result.ServiceType).Distinct().Count();
-        }
-
-        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results)
-        {
-            return (
-                from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
-                from relationship in result.Relationships
-                select relationship.Dependency.ServiceType)
-                .Distinct()
-                .Count();
-        }
-
-        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
-        {
-            return this.Analyze(container);
-        }
-
-        public ContainerRegisteredServiceDiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(Container container)
         {
             var registrations = container.GetCurrentRegistrations();
 
@@ -171,7 +151,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return number + " container-registered types are referenced by ";
         }
 
-
         private static string GetComponentDescription(int number)
         {
             if (number == 1)
@@ -180,6 +159,21 @@ namespace SimpleInjector.Diagnostics.Analyzers
             }
 
             return number + " components";
+        }
+
+        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results)
+        {
+            return results.Select(result => result.ServiceType).Distinct().Count();
+        }
+
+        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results)
+        {
+            return (
+                from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
+                from relationship in result.Relationships
+                select relationship.Dependency.ServiceType)
+                .Distinct()
+                .Count();
         }
     }
 }

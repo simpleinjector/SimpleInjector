@@ -93,6 +93,7 @@
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="Advanced\KnownRelationshipTests.cs" />
+    <Compile Include="Diagnostics\ContainerDebugViewProxyTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
@@ -168,9 +169,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Diagnostics\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

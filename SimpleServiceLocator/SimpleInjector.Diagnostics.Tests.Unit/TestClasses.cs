@@ -114,7 +114,6 @@
     {
         public ComponentDependingOn(TDependency dependency)
         {
-
         }
     }
 

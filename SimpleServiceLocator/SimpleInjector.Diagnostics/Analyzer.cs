@@ -38,7 +38,7 @@ namespace SimpleInjector.Diagnostics
     /// 
     /// var typesWithAShortedLifetimeThanTheirDependencies =
     ///     from result in results
-    ///     where result.Type == DiagnosticType.PotentialLifestyleMismatch
+    ///     where result.DiagnosticType == DiagnosticType.PotentialLifestyleMismatch
     ///     let mismatch = (PotentialLifestyleMismatchDiagnosticResult)result
     ///     select mismatch.Relationship.ImplementationType;
     /// ]]></code>

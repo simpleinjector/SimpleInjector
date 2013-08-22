@@ -46,24 +46,20 @@ namespace SimpleInjector.Diagnostics.Analyzers
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
-
-            return count + " " + ComponentPlural(count) +
-                " possibly short circuits to concrete unregistered types.";
+            
+            return count + 
+                (count == 1 ? "component possibly short circuits" : "components") +
+                " to concrete unregistered types.";
         }
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
 
-            return count + " short circuited " + ComponentPlural(count) + ".";
+            return count == 1 ? "1 short circuited component." : count + " short circuited components.";
         }
 
-        DiagnosticResult[] IContainerAnalyzer.Analyze(Container container)
-        {
-            return this.Analyze(container);
-        }
-
-        public ShortCircuitedDependencyDiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(Container container)
         {
             var registrations = container.GetCurrentRegistrations();
 
@@ -123,16 +119,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship.Dependency.ServiceType.ToFriendlyName(),
                 relationship.Dependency.Lifestyle.Name,
                 possibleSkippedRegistrationsDescription);
-        }
-
-        private static string ComponentPlural(int number)
-        {
-            return number == 1 ? "component" : "components";
-        }
-
-        private static string HasPlural(int number)
-        {
-            return number == 1 ? "has" : "have";
         }
     }
 }

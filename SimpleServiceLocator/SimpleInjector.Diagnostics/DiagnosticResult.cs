@@ -35,26 +35,30 @@ namespace SimpleInjector.Diagnostics
     [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
     public abstract class DiagnosticResult
     {
-        internal DiagnosticResult(Type serviceType, string description, DiagnosticType type, object value)
+        internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType, object value)
         {
             this.ServiceType = serviceType;
             this.Description = description;
-            this.Type = type;
+            this.DiagnosticType = diagnosticType;
             this.Value = value;
         }
 
         /// <summary>Gets the diagnostic type of this result.</summary>
-        public DiagnosticType Type { get; private set; }
+        /// <value>The <see cref="DiagnosticType"/>.</value>
+        public DiagnosticType DiagnosticType { get; private set; }
 
-        /// <summary>The service type to which this warning is related.</summary>
+        /// <summary>Gets the service type to which this warning is related.</summary>
+        /// <value>A <see cref="Type"/>.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
         public Type ServiceType { get; private set; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>
+        /// <value>A <see cref="String"/> with the description.</value>
         [DebuggerDisplay("{Description,nq}")]
         public string Description { get; private set; }
 
         /// <summary>Gets the hierarchical group to which this diagnostic result belongs.</summary>
+        /// <value>The <see cref="DiagnosticGroup"/>.</value>
         public DiagnosticGroup Group { get; internal set; }
 
         [DebuggerHidden]

@@ -31,13 +31,15 @@ namespace SimpleInjector.Diagnostics.Debugger
     [DebuggerDisplay("{Description,nq}", Name = "{Name,nq}")]
     internal class DebuggerViewItem
     {
-        public DebuggerViewItem(string name, string description, object value = null)
+        internal DebuggerViewItem(string name, string description, object value = null)
         {
             this.Name = name;
             this.Description = description;
             this.Value = value;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Description { get; private set; }
         
@@ -50,10 +52,5 @@ namespace SimpleInjector.Diagnostics.Debugger
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public object Value { get; private set; }
-
-        public override string ToString()
-        {
-            return this.Description;
-        }
     }
 }

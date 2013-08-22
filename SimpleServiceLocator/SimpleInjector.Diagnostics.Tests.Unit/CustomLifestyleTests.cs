@@ -145,8 +145,7 @@
             Assert.IsTrue(items.Any(item => item.Name == "Potential Lifestyle Mismatches"),
                 "No lifestyle mismatch was detected.");
         }
-
-
+        
         private sealed class FakeLifestyle : Lifestyle
         {
             private readonly int length;

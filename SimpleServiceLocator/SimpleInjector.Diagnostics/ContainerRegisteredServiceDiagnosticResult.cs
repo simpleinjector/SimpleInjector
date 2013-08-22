@@ -49,6 +49,7 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets a collection of <see cref="KnownRelationship"/> instances that describe all 
         /// container-registered dependencies for the given component.</summary>
+        /// <value>List of <see cref="KnownRelationship"/> objects.</value>
         public ReadOnlyCollection<KnownRelationship> Relationships { get; private set; }
     }
 }
