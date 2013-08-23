@@ -68,14 +68,12 @@ using System.Security;
 
 [assembly: AllowPartiallyTrustedCallers]
 
+#if !PUBLISH
+[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics")]
+[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 #if DEBUG
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
 #endif
-[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
-
-#if !PUBLISH
-[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics")]
-
 #else
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics, PublicKey=" + 
     "0024000004800000940000000602000000240000525341310004000001000100d9fe51dff71d3f" +
