@@ -6,15 +6,11 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class SimpleInjectorWebExtensionsTests
     {
-        public interface ICommand
-        {
-            void Execute();
-        }
-
         [TestMethod]
         public void RegisterPerWebRequest_CalledASingleTime_Succeeds()
         {
@@ -474,77 +470,62 @@
             }
         }
 
-        public class ConcreteCommand : ICommand
+        [TestMethod]
+        public void RegisterForDisposal_CalledOutsideTheContextOfAHttpRequest_ThrowsExpectedException()
         {
-            public void Execute()
-            {
-            }
+            // Act
+            Action action = () => SimpleInjectorWebExtensions.RegisterForDisposal(new DisposableCommand());
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "This method can only be called in the context of a web request", action);
         }
 
-        public class DisposableCommand : ICommand, IDisposable
+        [TestMethod]
+        public void WhenWebRequestEnds_BothAScopeEndsActionAndDisposableIntanceRegistered_InstancesGetDisposedLast()
         {
-            public int DisposeCount { get; private set; }
+            // Arrange
+            string expectedOrder = "[scope ending] [instance disposed]";
 
-            public bool HasBeenDisposed
+            string actualOrder = string.Empty;
+
+            ScopedLifestyle lifestyle = new WebRequestLifestyle();
+
+            var container = new Container();
+
+            var scope = new HttpContextScope();
+
+            try
             {
-                get { return this.DisposeCount > 0; }
+                lifestyle.RegisterForDisposal(container,
+                    new DisposableAction(() => actualOrder += "[instance disposed]"));
+
+                lifestyle.WhenScopeEnds(container, () => actualOrder += "[scope ending] ");
+            }
+            finally
+            {
+                // Act
+                scope.Dispose();
+            }
+
+            // Assert
+            Assert.AreEqual(expectedOrder, actualOrder,
+                "Instances should get disposed after all 'scope ends' actions are executed, since those " +
+                "delegates might still need to access those instances.");
+        }
+
+        public sealed class DisposableAction : IDisposable
+        {
+            private readonly Action calledOnDispose;
+
+            public DisposableAction(Action calledOnDispose)
+            {
+                this.calledOnDispose = calledOnDispose;
             }
 
             public void Dispose()
             {
-                this.DisposeCount++;
-            }
-
-            public void Execute()
-            {
-            }
-        }
-
-        public class DisposableCommandWithOverriddenEquality1 : DisposableCommandWithOverriddenEquality
-        {
-        }
-
-        public class DisposableCommandWithOverriddenEquality2 : DisposableCommandWithOverriddenEquality
-        {
-        }
-
-        public abstract class DisposableCommandWithOverriddenEquality : ICommand, IDisposable
-        {
-            public int HashCode { get; set; }
-
-            public int DisposeCount { get; private set; }
-
-            public void Dispose()
-            {
-                this.DisposeCount++;
-            }
-
-            public void Execute()
-            {
-            }
-
-            public override int GetHashCode()
-            {
-                return this.HashCode;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return this.GetHashCode() == obj.GetHashCode();
-            }
-        }
-
-        public class CommandDecorator : ICommand
-        {
-            public CommandDecorator(ICommand decorated)
-            {
-                this.DecoratedInstance = decorated;
-            }
-
-            public ICommand DecoratedInstance { get; private set; }
-
-            public void Execute()
-            {
+                this.calledOnDispose();
             }
         }
     }

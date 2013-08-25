@@ -5,9 +5,9 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    internal static class AssertThat
+    public static class AssertThat
     {
-        internal static void Throws<TException>(Action action, string assertMessage = null) 
+        public static void Throws<TException>(Action action, string assertMessage = null) 
             where TException : Exception
         {
             try
@@ -26,7 +26,7 @@
             }
         }
 
-        internal static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, 
+        public static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, 
             Action action, string assertMessage = null)
             where TException : Exception
         {
@@ -45,7 +45,7 @@
             });
         }
 
-        internal static void ThrowsWithParamName(string expectedParamName, Action action)
+        public static void ThrowsWithParamName(string expectedParamName, Action action)
         {
             try
             {
@@ -59,7 +59,7 @@
             }
         }
 
-        internal static void ThrowsWithParamName<TArgumentException>(string expectedParamName, Action action)
+        public static void ThrowsWithParamName<TArgumentException>(string expectedParamName, Action action)
             where TArgumentException : ArgumentException
         {
             try
@@ -76,7 +76,7 @@
             }
         }
 
-        internal static IEnumerable<Exception> GetExceptionChain(this Exception exception)
+        public static IEnumerable<Exception> GetExceptionChain(this Exception exception)
         {
             while (exception != null)
             {
@@ -85,7 +85,7 @@
             }
         }
 
-        internal static string TrimInside(this string value)
+        public static string TrimInside(this string value)
         {
             if (value == null)
             {
@@ -113,7 +113,7 @@
             return value.Trim();
         }
 
-        internal static void ExceptionContainsParamName(ArgumentException exception, string expectedParamName)
+        public static void ExceptionContainsParamName(ArgumentException exception, string expectedParamName)
         {
             string assertMessage = "Exception does not contain parameter with name: " + expectedParamName;
 
@@ -124,7 +124,7 @@
 #endif
         }
 
-        internal static void AreEqual(Type expectedType, Type actualType, string message = null)
+        public static void AreEqual(Type expectedType, Type actualType, string message = null)
         {
             if (expectedType != actualType)
             {
@@ -133,7 +133,7 @@
             }
         }
 
-        internal static void StringContains(string expectedMessage, string actualMessage, string assertMessage)
+        public static void StringContains(string expectedMessage, string actualMessage, string assertMessage)
         {
             if (expectedMessage == null)
             {
@@ -147,7 +147,7 @@
                 "Expected value to be in the string: \"" + expectedMessage + "\".");
         }
 
-        internal static void ExceptionMessageContains(string expectedMessage, Exception actualException,
+        public static void ExceptionMessageContains(string expectedMessage, Exception actualException,
             string assertMessage = null)
         {
             Assert.IsNotNull(actualException, "actualException should not be null.");
@@ -181,12 +181,12 @@
             StringContains(expectedMessage, actualException.Message, "stackTrace: " + stackTrace);
         }
 
-        internal static void StringContains(string expectedMessage, string actualMessage)
+        public static void StringContains(string expectedMessage, string actualMessage)
         {
             StringContains(expectedMessage, actualMessage, null);
         }
 
-        internal static void WriteToConsole(this Exception exception)
+        public static void WriteToConsole(this Exception exception)
         {
             while (exception != null)
             {
