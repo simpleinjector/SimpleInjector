@@ -18,6 +18,7 @@ Version vNext
 		 TConcrete type instead of TService and TImplementation.
 		-[Core] Registered collections can now be injected and resolved as IReadOnlyCollection<T> and
 		 IReadOnlyList<T> (.NET 4.5 only). (work item 19992).
+		-[Diagnostics] Created a public API for querying the container for diagnostic results (work item 20062)
 
 	Changes:
 		-[Core] Diagnostics moved into a separate project.
