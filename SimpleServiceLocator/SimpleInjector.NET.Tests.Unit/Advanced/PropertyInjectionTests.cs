@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -302,6 +303,37 @@
             Assert.IsNull(singleton.Dependency);
         }
 
+        [TestMethod]
+        public void InjectAllProperties_Always_PropertyDependenciesAreAlwaysCreatedBeforeTheTypeInWhichTheyGetInjectedInto()
+        {
+            // Arrange
+            var expectedOrderOfCreation = new List<Type>
+            {
+                typeof(PropertyDependency),
+                typeof(ComponentWithPropertyDependency),
+            };
+
+            var actualOrderOfCreation = new List<Type>();
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<Action<object>>(instance => actualOrderOfCreation.Add(instance.GetType()));
+
+            // Act
+            container.GetInstance<ComponentWithPropertyDependency>();
+
+            // Assert
+            Assert.IsTrue(
+                expectedOrderOfCreation.SequenceEqual(actualOrderOfCreation),
+                "Types were expected to be created in the following order: {0}, " +
+                "but they actually were created in the order: {1}. " +
+                "Creation of property dependencies -before- the actual type is important, because this " +
+                "allows them to be correctly disposed when disposing is done in the opposite order of " + 
+                "creation.",
+                string.Join(", ", expectedOrderOfCreation.Select(type => type.ToFriendlyName())),
+                string.Join(", ", actualOrderOfCreation.Select(type => type.ToFriendlyName())));
+        }
+
         private static Container CreateContainerThatInjectsAllProperties()
         {
             var container = ContainerFactory.New();
@@ -309,7 +341,8 @@
             Predicate<PropertyInfo> allExceptPropertiesDeclaredOnRealTimeProvider =
                 prop => 
                     prop.DeclaringType != typeof(RealTimeProvider) && 
-                    prop.DeclaringType != typeof(Container);
+                    prop.DeclaringType != typeof(Container) &&
+                    prop.DeclaringType != typeof(Delegate);
 
             container.Options.PropertySelectionBehavior = 
                 new PredicatePropertySelectionBehavior(allExceptPropertiesDeclaredOnRealTimeProvider);
@@ -401,7 +434,25 @@
 
             public TDependency Dependency20 { get; set; }
         }
+        
+        public class ComponentWithPropertyDependency
+        {
+            public ComponentWithPropertyDependency(Action<object> creationCallback)
+            {
+                creationCallback(this);
+            }
 
+            public PropertyDependency Dependency { get; set; }
+        }
+
+        public class PropertyDependency
+        {
+            public PropertyDependency(Action<object> creationCallback)
+            {
+                creationCallback(this);
+            }
+        }
+        
         private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
         {
             internal TDependency Dependency { get; private set; }

@@ -129,9 +129,9 @@ namespace SimpleInjector.Advanced
             var propertyInjectionExpressions =
                 this.BuildPropertyInjectionExpressions(targetParameter, properties, dependencyParameters);
 
-            Type funcType = GetFuncType(this.implementationType, properties);
+            Type funcType = GetFuncType(properties, this.implementationType);
 
-            var parameters = new[] { targetParameter }.Concat(dependencyParameters);
+            var parameters = dependencyParameters.Concat(new[] { targetParameter });
 
             var lambda = Expression.Lambda(
                 funcType,
@@ -177,10 +177,11 @@ namespace SimpleInjector.Advanced
         private Expression BuildPropertyInjectionExpression(Expression expression, PropertyInfo[] properties)
         {
             // Build up an expression like this:
+            // () => func1(Dep1, Dep2, Dep3, func2(Dep4, Dep5, Dep6), func3(Dep7, new TargetType(...))))
             // () => func1(func2(func3(new TargetType(...), Dep7), Dep4, Dep5, Dep6), Dep1, Dep2, Dep3)
             if (properties.Length > MaximumNumberOfPropertiesPerDelegate)
             {
-                // Expression becomes: Func<TargetType, Prop8, Prop9, ... , PropN>
+                // Expression becomes: Func<Prop8, Prop9, ... , PropN, TargetType>
                 var restProperties = properties.Skip(MaximumNumberOfPropertiesPerDelegate).ToArray();
                 expression = this.BuildPropertyInjectionExpression(expression, restProperties);
 
@@ -190,7 +191,8 @@ namespace SimpleInjector.Advanced
 
             Expression[] dependencyExpressions = this.GetPropertyExpressions(properties);
 
-            var arguments = new[] { expression }.Concat(dependencyExpressions);
+            // var arguments = new[] { expression }.Concat(dependencyExpressions);
+            var arguments = dependencyExpressions.Concat(new[] { expression });
 
             Delegate propertyInjectionDelegate = this.BuildPropertyInjectionDelegate(properties);
 
@@ -222,11 +224,13 @@ namespace SimpleInjector.Advanced
             return registration.BuildExpression();
         }
 
-        private static Type GetFuncType(Type injecteeType, PropertyInfo[] properties)
+        private static Type GetFuncType(PropertyInfo[] properties, Type injecteeType)
         {
-            var genericTypeArguments = new List<Type> { injecteeType };
+            var genericTypeArguments = new List<Type>();
 
             genericTypeArguments.AddRange(from property in properties select property.PropertyType);
+
+            genericTypeArguments.Add(injecteeType);
 
             // Return type is TResult. This is always the last generic type.
             genericTypeArguments.Add(injecteeType);

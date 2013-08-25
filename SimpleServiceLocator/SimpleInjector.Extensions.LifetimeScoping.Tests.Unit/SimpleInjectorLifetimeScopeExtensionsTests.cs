@@ -2,7 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
@@ -1065,6 +1068,110 @@
             }
         }
 
+        [TestMethod]
+        public void WhenScopeEnds_WithMultipleDisposableComponentsDependingOnEachOther_DependsComponentsInExpectedOrder()
+        {
+            // Arrange
+            var expectedOrderOfDisposal = new List<Type>
+            {
+                typeof(Outer),
+                typeof(Middle),
+                typeof(Inner),
+            };
+
+            var actualOrderOfDisposal = new List<Type>();
+
+            var container = new Container();
+
+            // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
+            // This way we can check in which order the instances are disposed.
+            container.RegisterSingle<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
+
+            // Outer depends on Middle that depends on Inner. 
+            // Registration is deliberately made in a different order to prevent that the order of
+            // registration might influence the order of disposing.
+            container.RegisterLifetimeScope<Middle>();
+            container.RegisterLifetimeScope<Inner>();
+            container.RegisterLifetimeScope<Outer>();
+
+            var scope = container.BeginLifetimeScope();
+
+            try
+            {
+                // Resolve the outer most object.
+                container.GetInstance<Outer>();
+            }
+            finally
+            {
+                // Act
+                scope.Dispose();
+            }
+
+            // Assert
+            Assert.IsTrue(
+                expectedOrderOfDisposal.SequenceEqual(actualOrderOfDisposal),
+                "Types were expected to be disposed in the following order: {0}, " +
+                "but they actually were disposed in the order: {1}. " +
+                "This order is important, because when a components gets disposed, it might still want to " +
+                "call the components it depends on, but at that time those components are already disposed.",
+                string.Join(", ", expectedOrderOfDisposal.Select(type => type.ToFriendlyName())),
+                string.Join(", ", actualOrderOfDisposal.Select(type => type.ToFriendlyName())));
+        }
+
+        [TestMethod]
+        public void WhenScopeEnds_WithMultipleDisposableComponentsAndPropertyDependencyDependingOnEachOther_DependsComponentsInExpectedOrder()
+        {
+            // Arrange
+            var expectedOrderOfDisposal = new List<Type>
+            {
+                typeof(Middle),
+                typeof(Inner),
+                typeof(PropertyDependency),
+            };
+
+            var actualOrderOfDisposal = new List<Type>();
+
+            var container = new Container();
+
+            // Allow PropertyDependency to be injected as property on Inner 
+            container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
+
+            // PropertyDependency, Middle and Inner all depend on Func<object> and call it when disposed.
+            // This way we can check in which order the instances are disposed.
+            container.RegisterSingle<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
+
+            // Middle depends on Inner that depends on property PropertyDependency. 
+            // Registration is deliberately made in a different order to prevent that the order of
+            // registration might influence the order of disposing.
+            container.RegisterLifetimeScope<PropertyDependency>();
+            container.RegisterLifetimeScope<Middle>();
+            container.RegisterLifetimeScope<Inner>();
+
+            // Act
+            var scope = container.BeginLifetimeScope();
+
+            try
+            {
+                // Resolve the outer most object.
+                container.GetInstance<Middle>();
+            }
+            finally
+            {
+                // Act
+                scope.Dispose();
+            }
+
+            // Assert
+            Assert.IsTrue(
+                expectedOrderOfDisposal.SequenceEqual(actualOrderOfDisposal),
+                "Types were expected to be disposed in the following order: {0}, " +
+                "but they actually were disposed in the order: {1}. " +
+                "Since PropertyDependency is injected as property into Inner, it is important that " +
+                "PropertyDependency is disposed after Inner.",
+                string.Join(", ", expectedOrderOfDisposal.Select(type => type.ToFriendlyName())),
+                string.Join(", ", actualOrderOfDisposal.Select(type => type.ToFriendlyName())));
+        }
+
         public class ConcreteCommand : ICommand
         {
             public void Execute()
@@ -1144,6 +1251,69 @@
             public void Execute()
             {
             }
+        }
+        
+        private sealed class InjectProperties<TAttribute> : IPropertySelectionBehavior
+            where TAttribute : Attribute
+        {
+            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
+            {
+                return propertyInfo.GetCustomAttribute<TAttribute>() != null;
+            }
+        }
+    }
+
+    public class Outer : DisposableBase
+    {
+        public Outer(Middle dependency, Action<object> disposing)
+            : base(disposing)
+        {
+            Debug.WriteLine(this.GetType().Name + " created.");
+        }
+    }
+
+    public class Middle : DisposableBase
+    {
+        public Middle(Inner dependency, Action<object> disposing)
+            : base(disposing)
+        {
+            Debug.WriteLine(this.GetType().Name + " created.");
+        }
+    }
+
+    public class Inner : DisposableBase
+    {
+        public Inner(Action<object> disposing)
+            : base(disposing)
+        {
+            Debug.WriteLine(this.GetType().Name + " created.");
+        }
+
+        [Import]
+        public PropertyDependency PropertyDependency { get; set; }
+    }
+
+    public class PropertyDependency : DisposableBase
+    {
+        public PropertyDependency(Action<object> disposing)
+            : base(disposing)
+        {
+            Debug.WriteLine(this.GetType().Name + " created.");
+        }
+    }
+
+    public abstract class DisposableBase : IDisposable
+    {
+        private readonly Action<object> disposing;
+
+        protected DisposableBase(Action<object> disposing)
+        {
+            this.disposing = disposing;
+        }
+
+        public void Dispose()
+        {
+            this.disposing(this);
         }
     }
 }

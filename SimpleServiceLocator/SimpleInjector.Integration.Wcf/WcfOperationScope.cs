@@ -193,9 +193,12 @@ namespace SimpleInjector.Integration.Wcf
         {
             if (this.disposables != null)
             {
-                foreach (var disposable in this.disposables)
+                // Dispose all instances in the opposite order in which they are created. This prevents
+                // prevents ObjectDisposedExceptions from being thrown when dependent services are called
+                // from within the Dispoe method.
+                for (int index = this.disposables.Count - 1; index >= 0; index--)
                 {
-                    disposable.Dispose();
+                    this.disposables[index].Dispose();
                 }
             }
 

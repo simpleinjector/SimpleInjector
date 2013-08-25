@@ -71,6 +71,7 @@ using System.Security;
 #if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics")]
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
+[assembly: InternalsVisibleTo("SimpleInjector.Extensions.LifetimeScoping.Tests.Unit")]
 #if DEBUG
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
 #endif
