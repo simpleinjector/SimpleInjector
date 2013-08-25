@@ -92,6 +92,16 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <returns>The requested service or object.</returns>
         public object GetService(Type serviceType)
         {
+            // By calling GetInstance instead of GetService when resolving a controller, we prevent the
+            // container from returning null when the controller isn't registered explicitly and can't be
+            // created because of an configuration error. GetInstance will throw a descriptive exception
+            // instead. Not doing this will cause MVC to throw a non-descriptive "Make sure that the 
+            // controller has a parameterless public constructor" exception.
+            if (!serviceType.IsAbstract && typeof(IController).IsAssignableFrom(serviceType))
+            {
+                return this.Container.GetInstance(serviceType);
+            }
+
             return ((IServiceProvider)this.Container).GetService(serviceType);
         }
 
