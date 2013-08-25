@@ -23,7 +23,7 @@ Version vNext
 	Changes:
 		-[Core] Diagnostics moved into a separate project.
 
-	Buf fixes:
+	Bug fixes:
 		-[Integration.Mvc] The SimpleInjectorDependencyResolver will now throw a descriptive exception when
 		 an unregistered controller can't be created (for whatever reason) instead of allowing null to be
 		 returned, since this causes MVC to throw a non-descriptive "Make sure that the controller has a 
