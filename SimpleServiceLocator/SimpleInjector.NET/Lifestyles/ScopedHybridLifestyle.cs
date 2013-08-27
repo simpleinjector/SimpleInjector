@@ -28,13 +28,14 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Diagnostics.CodeAnalysis;
 
-    internal sealed class HybridLifestyle : Lifestyle
+    internal sealed class ScopedHybridLifestyle : ScopedLifestyle
     {
         private readonly Func<bool> lifestyleSelector;
-        private readonly Lifestyle trueLifestyle;
-        private readonly Lifestyle falseLifestyle;
+        private readonly ScopedLifestyle trueLifestyle;
+        private readonly ScopedLifestyle falseLifestyle;
 
-        internal HybridLifestyle(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        internal ScopedHybridLifestyle(Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle,
+            ScopedLifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
             this.lifestyleSelector = lifestyleSelector;
@@ -55,6 +56,21 @@ namespace SimpleInjector.Lifestyles
         protected override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
+        }
+
+        private ScopedLifestyle CurrentLifestyle
+        {
+            get { return this.lifestyleSelector() ? this.trueLifestyle : this.falseLifestyle; }
+        }
+
+        public override void WhenScopeEnds(Container container, Action action)
+        {
+            this.CurrentLifestyle.WhenScopeEnds(container, action);
+        }
+
+        public override void RegisterForDisposal(Container container, IDisposable disposable)
+        {
+            this.CurrentLifestyle.RegisterForDisposal(container, disposable);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
@@ -83,7 +99,7 @@ namespace SimpleInjector.Lifestyles
 
         private static string GetHybridName(Lifestyle lifestyle)
         {
-            var hybrid = lifestyle as HybridLifestyle;
+            var hybrid = lifestyle as ScopedHybridLifestyle;
 
             return hybrid != null ? hybrid.GetHybridName() : (lifestyle != null ? lifestyle.Name : "Null");
         }

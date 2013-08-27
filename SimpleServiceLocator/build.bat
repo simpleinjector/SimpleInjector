@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.4.0
-set prereleasePostfix=-alpha2
+set prereleasePostfix=-alpha3
 set buildNumber=0
 
 
@@ -159,6 +159,8 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\Silverlight\Documentation
 
 copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
+copy bin\NET\SimpleInjector.Diagnostics.dll Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.dll
+copy bin\NET\SimpleInjector.Diagnostics.xml Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.xml
 copy bin\Silverlight\SimpleInjector.dll Releases\v%named_version%\Silverlight\SimpleInjector.dll
 copy bin\Silverlight\SimpleInjector.xml Releases\v%named_version%\Silverlight\SimpleInjector.xml
 

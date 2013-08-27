@@ -218,6 +218,12 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridLifestyle.cs">
       <Link>Lifestyles\HybridLifestyle.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\HybridRegistration.cs">
+      <Link>Lifestyles\HybridRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedHybridLifestyle.cs">
+      <Link>Lifestyles\ScopedHybridLifestyle.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\SingletonLifestyle.cs">
       <Link>Lifestyles\SingletonLifestyle.cs</Link>
     </Compile>

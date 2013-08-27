@@ -256,6 +256,40 @@
             Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
         }
 
+        [TestMethod]
+        public void CreateRegistration_WithScopedLifestylesAlways_ReturnsARegistrationThatWrapsTheOriginalLifestyle()
+        {
+            // Arrange
+            ScopedLifestyle expectedLifestyle =
+                Lifestyle.CreateHybrid(() => true, new CustomScopedLifestyle(), new CustomScopedLifestyle());
+
+            var container = ContainerFactory.New();
+
+            // Act
+            var registration =
+                expectedLifestyle.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+
+            // Assert
+            Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationService_WithScopedLifestylesAlways_ReturnsARegistrationThatWrapsTheOriginalLifestyle()
+        {
+            // Arrange
+            ScopedLifestyle expectedLifestyle =
+                Lifestyle.CreateHybrid(() => true, new CustomScopedLifestyle(), new CustomScopedLifestyle());
+
+            var container = ContainerFactory.New();
+
+            // Act
+            var registration =
+                expectedLifestyle.CreateRegistration<IUserRepository>(() => null, container);
+
+            // Assert
+            Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
+        }
+
 #if DEBUG
         [TestMethod]
         public void Relationships_HybridRegistrationWithOneDependency_ReturnsThatDependencyWithExpectedLifestyle()
@@ -285,5 +319,196 @@
                 "is not singleton or transient, but hybrid");
         }
 #endif
+
+        [TestMethod]
+        public void CreateHybrid_WithNullLifestyleSelector_ReturnsScopedLifestyle()
+        {
+            // Arrange
+            Func<bool> invalidLifestyleSelector = null;
+
+            // Act
+            Action action = () =>
+            {
+                ScopedLifestyle hybrid = Lifestyle.CreateHybrid(
+                    invalidLifestyleSelector,
+                    new CustomScopedLifestyle(),
+                    new CustomScopedLifestyle());
+            };
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("lifestyleSelector", action);
+        }
+
+        [TestMethod]
+        public void CreateHybrid_WithNullTrueLifestyle_ReturnsScopedLifestyle()
+        {
+            // Arrange
+            ScopedLifestyle invalidTrueLifestyle = null;
+
+            // Act
+            Action action = () =>
+            {
+                ScopedLifestyle hybrid = Lifestyle.CreateHybrid(
+                    () => true,
+                    invalidTrueLifestyle,
+                    new CustomScopedLifestyle());
+            };
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("trueLifestyle", action);
+        }
+
+        [TestMethod]
+        public void CreateHybrid_WithNullFalseLifestyle_ReturnsScopedLifestyle()
+        {
+            // Arrange
+            ScopedLifestyle invalidFalseLifestyle = null;
+
+            // Act
+            Action action = () =>
+            {
+                ScopedLifestyle hybrid = Lifestyle.CreateHybrid(
+                    () => true,
+                    new CustomScopedLifestyle(),
+                    invalidFalseLifestyle);
+            };
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("falseLifestyle", action);
+        }
+
+        [TestMethod]
+        public void CreateHybrid_WithValidScopedLifestyles_ReturnsScopedLifestyle()
+        {
+            // Arrange
+            ScopedLifestyle trueLifestyle = new CustomScopedLifestyle();
+            ScopedLifestyle falseLifestyle = new CustomScopedLifestyle();
+
+            // Act
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => true, trueLifestyle, falseLifestyle);
+
+            // Assert
+            Assert.IsNotNull(hybrid);
+        }
+
+        [TestMethod]
+        public void WhenScopeEnds_CalledOnCreatedScopedHybridWithFalseSelector_ForwardsCallToFalseLifestyle()
+        {
+            // Arrange
+            CustomScopedLifestyle trueLifestyle = new CustomScopedLifestyle();
+            CustomScopedLifestyle falseLifestyle = new CustomScopedLifestyle();
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => false, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.WhenScopeEnds(new Container(), () => { });
+
+            // Assert
+            Assert.AreEqual(0, trueLifestyle.WhenScopeEndsCallCount, "TrueLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, falseLifestyle.WhenScopeEndsCallCount, "FalseLifestyle was expected to be called.");
+        }
+
+        [TestMethod]
+        public void WhenScopeEnds_CalledOnCreatedScopedHybridWithTrueSelector_ForwardsCallToTrueLifestyle()
+        {
+            // Arrange
+            CustomScopedLifestyle trueLifestyle = new CustomScopedLifestyle();
+            CustomScopedLifestyle falseLifestyle = new CustomScopedLifestyle();
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => true, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.WhenScopeEnds(new Container(), () => { });
+
+            // Assert
+            Assert.AreEqual(1, trueLifestyle.WhenScopeEndsCallCount, "TrueLifestyle was expected to be called.");
+            Assert.AreEqual(0, falseLifestyle.WhenScopeEndsCallCount, "FalseLifestyle was NOT expected to be called.");
+        }
+
+        [TestMethod]
+        public void RegisterForDisposal_CalledOnCreatedScopedHybridWithFalseSelector_ForwardsCallToFalseLifestyle()
+        {
+            // Arrange
+            CustomScopedLifestyle trueLifestyle = new CustomScopedLifestyle();
+            CustomScopedLifestyle falseLifestyle = new CustomScopedLifestyle();
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => false, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+
+            // Assert
+            Assert.AreEqual(0, trueLifestyle.RegisterForDisposalCallCount, "TrueLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, falseLifestyle.RegisterForDisposalCallCount, "FalseLifestyle was expected to be called.");
+        }
+
+        [TestMethod]
+        public void RegisterForDisposal_CalledOnCreatedScopedHybridWithTrueSelector_ForwardsCallToTrueLifestyle()
+        {
+            // Arrange
+            CustomScopedLifestyle trueLifestyle = new CustomScopedLifestyle();
+            CustomScopedLifestyle falseLifestyle = new CustomScopedLifestyle();
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => true, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+
+            // Assert
+            Assert.AreEqual(1, trueLifestyle.RegisterForDisposalCallCount, "TrueLifestyle was expected to be called.");
+            Assert.AreEqual(0, falseLifestyle.RegisterForDisposalCallCount, "FalseLifestyle was NOT expected to be called.");
+        }
+
+        private class DisposableObject : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+
+        private class CustomScopedLifestyle : ScopedLifestyle
+        {
+            private readonly Lifestyle realLifestyle;
+
+            public CustomScopedLifestyle() : base("Custom")
+            {
+                this.realLifestyle = Lifestyle.Transient;
+            }
+
+            public int WhenScopeEndsCallCount { get; private set; }
+
+            public int RegisterForDisposalCallCount { get; private set; }
+
+            public override void WhenScopeEnds(Container container, Action action)
+            {
+                Assert.IsNotNull(container, "container");
+                Assert.IsNotNull(action, "action");
+
+                this.WhenScopeEndsCallCount++;
+            }
+
+            public override void RegisterForDisposal(Container container, IDisposable disposable)
+            {
+                Assert.IsNotNull(container, "container");
+                Assert.IsNotNull(disposable, "disposable");
+
+                this.RegisterForDisposalCallCount++;
+            }
+
+            protected override int Length
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+            {
+                return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
+            }
+
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, Container container)
+            {
+                return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
+            }
+        }
     }
 }

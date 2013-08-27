@@ -52,8 +52,8 @@ namespace SimpleInjector
     /// a single instance of the registered component will be returned by that container instance. Other
     /// lifestyles are defined in integration and extension packages. The 
     /// <see cref="Lifestyle.CreateCustom">CreateCustom</see> method allows defining a custom lifestyle and 
-    /// the <see cref="Lifestyle.CreateHybrid">CreateHybrid</see> method allows creating a lifestle that mixes 
-    /// multiple other lifestyles.
+    /// the <see cref="Lifestyle.CreateHybrid(Func{bool}, Lifestyle, Lifestyle)">CreateHybrid</see> method 
+    /// allows creating a lifestle that mixes multiple other lifestyles.
     /// </summary>
     /// <remarks>
     /// This type is abstract and can be overridden to implement a custom lifestyle.
@@ -233,6 +233,52 @@ namespace SimpleInjector
             Requires.IsNotNull(falseLifestyle, "falseLifestyle");
 
             return new HybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
+        }
+
+        /// <summary>
+        /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
+        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of 
+        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/> 
+        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By 
+        /// nesting hybrid lifestyles, any number of lifestyles can be mixed.
+        /// </summary>
+        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which 
+        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is 
+        /// returned; the <paramref name="falseLifestyle"/> otherwise. This delegate will be called every
+        /// time an instance needs to be resolved or injected.</param>
+        /// <param name="trueLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// returns <b>true</b>.</param>
+        /// <param name="falseLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// returns <b>false</b>.</param>
+        /// <returns>A new scoped hybrid lifestyle that wraps the supplied lifestyles.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <example>
+        /// <para>
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// <b>WebRequestLifestyle</b> and <b>LifetimeScopeLifestyle</b>:
+        /// </para>
+        /// <code lang="cs"><![CDATA[
+        /// // NOTE: WebRequestLifestyle is located in SimpleInjector.Integration.Web.dll.
+        /// // NOTE: LifetimeScopeLifestyle is located in SimpleInjector.Extensions.LifetimeScoping.dll.
+        /// var mixedScopeLifestyle = Lifestyle.CreateHybrid(
+        ///     () => HttpContext.Current != null,
+        ///     new WebRequestLifestyle(),
+        ///     new LifetimeScopeLifestyle());
+        /// 
+        /// // The created lifestyle can be reused for many registrations.
+        /// container.Register<IUserRepository, SqlUserRepository>(mixedScopeLifestyle);
+        /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
+        /// ]]></code>
+        /// </example>
+        public static ScopedLifestyle CreateHybrid(Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle,
+            ScopedLifestyle falseLifestyle)
+        {
+            Requires.IsNotNull(lifestyleSelector, "lifestyleSelector");
+            Requires.IsNotNull(trueLifestyle, "trueLifestyle");
+            Requires.IsNotNull(falseLifestyle, "falseLifestyle");
+
+            return new ScopedHybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
         }
         
         /// <summary>

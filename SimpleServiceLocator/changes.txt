@@ -12,6 +12,8 @@ Version vNext
 		 lifetime scoping web and WCF. This allows the container registration to be oblivious to the actual
 		 scoped lifestyle implementation. The ScopedLifestyle class adds an WhenScopeEnds an 
 		 RegisterForDisposal method that users can interact with. (work item 19969)
+		-[Core] New Lifestyle.CreateHybrid method overload added that accepts two ScopedLifestyle instances
+		 and returns a hybrid ScopeLifestyle. (work item 19969)
 		-[Core] RegisterAll(Type, params Registration[]) overload added to make registring collections using
 		 Registration instances more convenient. (work item 20001)
 		-[Core] New convenient Lifestyle.CreateRegistration overloads added that allow supplying a single 

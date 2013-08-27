@@ -308,7 +308,26 @@
             // Assert
             Assert.IsTrue(result, "Both lifestyles of the parent are longer than those of the child.");
         }
-        
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_ShortScopedHybridToLongScopedHybrid_ReportsMismatch()
+        {
+            // Arrange
+            ScopedLifestyle singleton = new CustomScopedLifestyle(Lifestyle.Singleton);
+            ScopedLifestyle transient = new CustomScopedLifestyle(Lifestyle.Transient);
+
+            var parentHybrid = Lifestyle.CreateHybrid(() => true, singleton, singleton);
+            var childHybrid = Lifestyle.CreateHybrid(() => true, singleton, transient);
+
+            var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
+
+            // Act
+            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+
+            // Assert
+            Assert.IsTrue(result, "Both lifestyles of the parent are longer than those of the child.");
+        }
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient1_ReportsMismatch()
         {
@@ -410,6 +429,39 @@
             internal static Lifestyle LifetimeScope = new FakeLifestyle("Lifetime Scope", 100);
             internal static Lifestyle WcfOperation = new FakeLifestyle("WCF Operation", 250);
             internal static Lifestyle WebRequest = new FakeLifestyle("Web Request", 300);
+        }
+
+        private class CustomScopedLifestyle : ScopedLifestyle
+        {
+            private readonly Lifestyle realLifestyle;
+
+            public CustomScopedLifestyle(Lifestyle realLifestyle) : base("Custom " + realLifestyle.Name)
+            {
+                this.realLifestyle = realLifestyle;
+            }
+
+            public override void WhenScopeEnds(Container container, Action action)
+            {
+            }
+
+            public override void RegisterForDisposal(Container container, IDisposable disposable)
+            {
+            }
+
+            protected override int Length
+            {
+                get { return this.realLifestyle.ComponentLength; }
+            }
+
+            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+            {
+                return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
+            }
+
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, Container container)
+            {
+                return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
+            }
         }
     }
     

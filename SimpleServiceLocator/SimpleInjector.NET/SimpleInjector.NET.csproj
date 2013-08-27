@@ -117,6 +117,8 @@
     <Compile Include="Lifestyles\HybridLifestyle.cs" />
     <Compile Include="Advanced\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
+    <Compile Include="Lifestyles\HybridRegistration.cs" />
+    <Compile Include="Lifestyles\ScopedHybridLifestyle.cs" />
     <Compile Include="ScopedLifestyle.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />
