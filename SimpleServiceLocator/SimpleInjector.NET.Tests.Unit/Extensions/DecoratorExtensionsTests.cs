@@ -2090,7 +2090,6 @@
         }
     }
 
-#if DEBUG
     internal class RelationshipInfo
     {
         public Type ImplementationType { get; set; }
@@ -2123,5 +2122,4 @@
                     relationship.Dependency.Lifestyle.Name));
         }
     }
-#endif
 }

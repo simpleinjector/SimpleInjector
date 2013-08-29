@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit.Diagnostics
+﻿#if DEBUG
+namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
@@ -48,3 +49,4 @@
         }
     }
 }
+#endif
