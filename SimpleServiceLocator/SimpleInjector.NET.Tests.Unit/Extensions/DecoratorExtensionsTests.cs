@@ -1473,6 +1473,37 @@
             // Assert
             Assert.AreEqual(1, relationships.Count(actual => expectedRelationship1.Equals(actual)));
         }
+
+        // This test was written for work item https://simpleinjector.codeplex.com/workitem/20141.
+        [TestMethod]
+        public void GetRelationships_DecoratorDependingOnFuncDecorateeFactory_ReturnsRelationshipForThatFactory()
+        {
+            // Arrange
+            var expectedRelationship = new RelationshipInfo
+            {
+                Lifestyle = Lifestyle.Singleton,
+                ImplementationType = typeof(NonGenericServiceDecoratorWithFunc),
+                Dependency = new DependencyInfo(typeof(Func<INonGenericService>), Lifestyle.Singleton)
+            };
+
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Transient);
+
+            container.RegisterDecorator(typeof(INonGenericService), 
+                typeof(NonGenericServiceDecoratorWithFunc), Lifestyle.Singleton);
+
+            container.Verify();
+
+            // Act
+            var relationships = container.GetRegistration(typeof(INonGenericService)).GetRelationships();
+
+            // Assert
+            var actualRelationship = relationships.Single();
+
+            Assert.IsTrue(expectedRelationship.Equals(actualRelationship),
+                "actual: " + RelationshipInfo.ToString(actualRelationship));
+        }
 #endif
 
         [TestMethod]
