@@ -24,13 +24,15 @@ Version vNext
 
 	Changes:
 		-[Core] Diagnostics moved into a separate project.
-
-	Bug fixes:
 		-[Integration.Mvc] The SimpleInjectorDependencyResolver will now throw a descriptive exception when
 		 an unregistered controller can't be created (for whatever reason) instead of allowing null to be
 		 returned, since this causes MVC to throw a non-descriptive "Make sure that the controller has a 
 		 parameterless public constructor" exception, hiding the real cause. (work item 20097).
+
+	Bug fixes:
 		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
+		-[Core/Diagnostics] Diagnostic Services incorrectly reported a 'potential lifetime mismatch' warning
+		 when a singleton decorator depended on a Func<T> where T was the decorated type. (work item 20141)
 		
 
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12
