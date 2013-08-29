@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <version>{version}</version>
+    <authors>S. van Deursen</authors>
+    <owners>S. van Deursen</owners>
+    <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
+    <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=Web%20Forms%20Integration</projectUrl>
+    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
+    <dependencies>
+      <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
+    </dependencies>
+    <id>SimpleInjector.Integration.Web.Forms</id>
+    <title>Simple Injector ASP.NET Web Forms Integration</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The Simple Injector ASP.NET Web Forms Integration.</description>
+    <summary>ASP.NET Web Forms integration for Simple Injector.</summary>
+    <copyright>S. van Deursen 2011 - 2013</copyright>
+    <language>en-US</language>
+    <tags>simpleinjector WebForms Web Forms architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC HttpHandler UserControl Page</tags>
+  </metadata>
+</package>
