@@ -321,8 +321,30 @@ namespace SimpleInjector
             int numberOfServiceTypeDependencies =
                 DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, decoratorConstructor);
 
+            if (numberOfServiceTypeDependencies == 0)
+            {
+                ThrowMustContainTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);           
+            }
+            else
+            {
+                ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);
+            }
+        }
+
+        private static void ThrowMustContainTheServiceTypeAsArgument(Type serviceType,
+            ConstructorInfo decoratorConstructor, string paramName)
+        {
             string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                decoratorConstructor.DeclaringType, serviceType, numberOfServiceTypeDependencies);
+                decoratorConstructor.DeclaringType, serviceType);
+
+            throw new ArgumentException(message, paramName);
+        }
+
+        private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(Type serviceType,
+            ConstructorInfo decoratorConstructor, string paramName)
+        {
+            string message = StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
+                decoratorConstructor.DeclaringType, serviceType);
 
             throw new ArgumentException(message, paramName);
         }

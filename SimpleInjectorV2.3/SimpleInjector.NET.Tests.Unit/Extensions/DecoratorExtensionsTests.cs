@@ -873,8 +873,53 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains(@"
-                    its constructor should have a single argument of type 
-                    ICommandHandler<TCommand>".TrimInside(),
+                    For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as  
+                    a decorator, its constructor must include a single parameter of type 
+                    ICommandHandler<TCommand>".TrimInside(), ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_SupplyingTypeThatIsNotADecorator_ThrowsException2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            try
+            {
+                // Act
+                container.RegisterDecorator(typeof(ICommandHandler<>),
+                    typeof(InvalidDecoratorCommandHandlerDecorator<>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains(@"
+                    does not currently exist in the constructor".TrimInside(),
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_SupplyingTypeThatIsNotADecorator_ThrowsException3()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            try
+            {
+                // Act
+                container.RegisterDecorator(typeof(ICommandHandler<>),
+                    typeof(InvalidDecoratorCommandHandlerDecorator2<>));
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ArgumentException ex)
+            {
+                AssertThat.StringContains("is defined multiple times in the constructor",
                     ex.Message);
             }
         }
@@ -1042,8 +1087,8 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains("its constructor should have a single argument of type " +
-                    "INonGenericService or Func<INonGenericService>",
+                AssertThat.StringContains(
+                    "single parameter of type INonGenericService (or Func<INonGenericService>)",
                     ex.Message);
             }
         }
@@ -1759,6 +1804,19 @@
         }
     }
 
+    public class InvalidDecoratorCommandHandlerDecorator2<T> : ICommandHandler<T>
+    {
+        // This is not a decorator as it expects more than one ICommandHandler<T> parameter.
+        public InvalidDecoratorCommandHandlerDecorator2(ICommandHandler<T> decorated1,
+            ICommandHandler<T> decorated2, ILogger logger)
+        {
+        }
+
+        public void Handle(T command)
+        {
+        }
+    }
+
     public class NullCommandHandler<T> : ICommandHandler<T>
     {
         public void Handle(T command)
@@ -1936,7 +1994,7 @@
         }
     }
 
-    // This is not a decorator, since the class implements ICommandHandler<int> but wraps ICommandHandler<T>
+    // This is not a decorator, the class implements ICommandHandler<int> but wraps ICommandHandler<byte>
     public class BadCommandHandlerDecorator1 : ICommandHandler<int>
     {
         public BadCommandHandlerDecorator1(ICommandHandler<byte> handler)
@@ -1948,7 +2006,7 @@
         }
     }
 
-    // This is not a decorator, since the class implements ICommandHandler<int> but wraps ICommandHandler<T>
+    // This is not a decorator, the class takes 2 generic types but wraps ICommandHandler<T>
     public class BadCommandHandlerDecorator2<T, TUnresolved> : ICommandHandler<T>
     {
         public BadCommandHandlerDecorator2(ICommandHandler<T> handler)
