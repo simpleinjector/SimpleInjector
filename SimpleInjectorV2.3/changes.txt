@@ -4,7 +4,7 @@
 Version 2.3.2 (v2.3.2 RTM) 
 
 	General description:
-		This patch release fixes ...
+		This patch release fixes a few minor bugs in the Core library and one in the MVC integration library.
 
 	Bug fixes:
 		-[Integration.Mvc] The SimpleInjectorDependencyResolver will now throw a descriptive exception when
