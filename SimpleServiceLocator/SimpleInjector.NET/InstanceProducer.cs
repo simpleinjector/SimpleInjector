@@ -153,12 +153,17 @@ namespace SimpleInjector
             {
                 if (this.isValid == null)
                 {
-                    this.isValid = this.CanBuildExpression();
+                    this.Exception = this.GetExceptionIfInvalid();
+                    this.isValid = this.Exception == null;
                 }
 
                 return this.isValid.GetValueOrDefault();
             }
         }
+
+        // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
+        // when the producer is valid.
+        internal Exception Exception { get; private set; }
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -358,18 +363,18 @@ namespace SimpleInjector
             }
         }
 
-        private bool CanBuildExpression()
+        private Exception GetExceptionIfInvalid()
         {
             try
             {
                 // Test if the instance can be made.
                 this.BuildExpression();
 
-                return true;
+                return null;
             }
-            catch (ActivationException)
+            catch (ActivationException ex)
             {
-                return false;
+                return ex.InnerException ?? ex;
             }
         }
 

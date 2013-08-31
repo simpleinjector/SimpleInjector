@@ -209,6 +209,44 @@
                     "(2) The exception message should give a solution to solve the problem.");
             }
         }
+        
+        [TestMethod]
+        public void GetRegistration_UnregisteredConcreteTypeWithConstructorWithInvalidArguments_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            try
+            {
+                // Act
+                container.GetRegistration(typeof(RealUserService), throwOnFailure: true);
+
+                // Assert
+                Assert.Fail("Because we did not register the IUserRepository interface, " +
+                    "GetRegistration   should fail.");
+            }
+            catch (ActivationException ex)
+            {
+                string message = ex.Message;
+
+                AssertThat.ExceptionMessageContains(typeof(RealUserService).Name, ex,
+                    "The exception message should contain the name of the type.");
+
+                AssertThat.ExceptionMessageContains(typeof(IUserRepository).Name, ex,
+                    "The exception message should contain the missing constructor argument.");
+
+                AssertThat.ExceptionMessageContains(
+                    "Please ensure IUserRepository is registered in the container",
+                    ex, "(1) The exception message should give a solution to solve the problem.");
+
+                AssertThat.ExceptionMessageContains(@"
+                    Please ensure IUserRepository is registered in the container,
+                    or change the constructor of RealUserService"
+                    .TrimInside(),
+                    ex,
+                    "(2) The exception message should give a solution to solve the problem.");
+            }
+        }
 
         [TestMethod]
         public void GetInstance_WithUnregisteredGenericTypeDefinition_ThrowsException()

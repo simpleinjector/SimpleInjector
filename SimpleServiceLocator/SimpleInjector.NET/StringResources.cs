@@ -356,12 +356,23 @@ namespace SimpleInjector
         }
 
         internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
-            Type serviceType, int numberOfServiceTypeDependencies)
+            Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to use {0} as a decorator, its constructor should have a " +
-                "single argument of type {1} or Func<{1}>, but it currently has {2}.",
-                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName(), numberOfServiceTypeDependencies);
+                "For the container to be able to use {0} as a decorator, its constructor must include a " +
+                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being decorated. " +
+                "The parameter type {1} does not currently exist in the constructor of class {0}.",
+                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+        }
+
+        internal static string TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(Type decoratorType,
+            Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to use {0} as a decorator, its constructor must include a " +
+                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being decorated. " +
+                "The parameter type {1} is defined multiple times in the constructor of class {0}.",
+                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
         internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,

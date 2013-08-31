@@ -33,6 +33,10 @@ Version vNext
 		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
 		-[Core/Diagnostics] Diagnostic Services incorrectly reported a 'potential lifetime mismatch' warning
 		 when a singleton decorator depended on a Func<T> where T was the decorated type. (work item 20141)
+		-[Core] Calls to GetRegistration did not throw an exception that was as expressive as call to
+		 GetInstance. (work item 20155).
+		-[Core] Improved the exception message when a decorator registration is done with a type that can not
+		 be used as decorator. (work item 20047).
 		
 
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12

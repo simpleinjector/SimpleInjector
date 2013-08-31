@@ -224,7 +224,7 @@ namespace SimpleInjector
 
             if (!producerIsValid && throwOnFailure)
             {
-                this.ThrowMissingInstanceProducerException(serviceType);
+                this.ThrowInvalidRegistrationException(serviceType, producer);
             }
 
             // Prevent returning invalid producers
@@ -365,6 +365,18 @@ namespace SimpleInjector
             // creating an instance, could make us loose all registrations that are done by GetInstance. This
             // will not have any functional effects, but can result in a performance penalty.
             return instanceProducer.GetInstance();
+        }
+
+        private void ThrowInvalidRegistrationException(Type serviceType, InstanceProducer producer)
+        {
+            if (producer != null)
+            {
+                throw producer.Exception;
+            }
+            else
+            {
+                this.ThrowMissingInstanceProducerException(serviceType);
+            }
         }
 
         private void ThrowMissingInstanceProducerException(Type serviceType)
