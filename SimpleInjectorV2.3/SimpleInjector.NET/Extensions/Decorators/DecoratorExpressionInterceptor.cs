@@ -272,12 +272,37 @@ namespace SimpleInjector.Extensions.Decorators
         {
             return (
                 from parameter in constructor.GetParameters()
-                where IsDecorateeParameter(parameter, registeredServiceType)
-                select new KnownRelationship(
-                    implementationType: constructor.DeclaringType,
-                    lifestyle: this.Lifestyle,
-                    dependency: decoratee))
+                let isDecorateeParameter = IsDecorateeDependencyParameter(parameter, registeredServiceType)
+                let isDecorateeFactory = IsDecorateeFactoryDependencyParameter(parameter, registeredServiceType)
+                where isDecorateeParameter || isDecorateeFactory
+                select isDecorateeParameter 
+                    ? this.CreateDecorateeRelationship(constructor, decoratee)
+                    : this.CreateDecorateeFactoryRelationship(constructor, parameter))
                 .Single();
+        }
+
+        private KnownRelationship CreateDecorateeRelationship(ConstructorInfo constructor, 
+            InstanceProducer decoratee)
+        {
+            return new KnownRelationship(
+                implementationType: constructor.DeclaringType,
+                lifestyle: this.Lifestyle,
+                dependency: decoratee);
+        }
+        
+        private KnownRelationship CreateDecorateeFactoryRelationship(ConstructorInfo constructor,
+            ParameterInfo parameter)
+        {
+            // We create a dummy expression with a null value. Much easier than passing on the real delegate.
+            // We won't miss it, since the created InstanceProducer is just a dummy for purposes of analysis.
+            var dummyExpression = Expression.Constant(null, parameter.ParameterType);
+
+            var registration = new ExpressionRegistration(dummyExpression, this.Container);
+
+            return new KnownRelationship(
+                implementationType: constructor.DeclaringType,
+                lifestyle: Lifestyle.Singleton,
+                dependency: new InstanceProducer(parameter.ParameterType, registration));
         }
 
         // The constructor parameter in which the decorated instance should be injected.
