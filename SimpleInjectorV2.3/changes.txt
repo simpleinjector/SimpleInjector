@@ -15,6 +15,8 @@ Version 2.3.2 (v2.3.2 RTM)
 		 when a singleton decorator depended on a Func<T> where T was the decorated type. (work item 20141)
 		-[Core] Calls to GetRegistration did not throw an exception that was as expressive as call to
 		 GetInstance. (work item 20155).
+		-[Core] Improved the exception message when a decorator registration is done with a type that can not
+		 be used as decorator. (work item 20047).
 		
 		
 
