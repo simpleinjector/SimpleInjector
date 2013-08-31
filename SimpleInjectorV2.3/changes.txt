@@ -13,6 +13,8 @@ Version 2.3.2 (v2.3.2 RTM)
 		 parameterless public constructor" exception, hiding the real cause. (work item 20097).
 		-[Core] Diagnostic Services incorrectly reported a 'potential lifetime mismatch' warning
 		 when a singleton decorator depended on a Func<T> where T was the decorated type. (work item 20141)
+		-[Core] Calls to GetRegistration did not throw an exception that was as expressive as call to
+		 GetInstance. (work item 20155).
 		
 		
 
