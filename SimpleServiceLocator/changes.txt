@@ -4,7 +4,7 @@
 Version vNext
 
 	General description:
-
+	
 	New features:
 		-[Core] Lifestyle.CreateProducer extension methods added to make creating InstanceProducer instances
 		 more convenient. (work item 19959).
@@ -24,21 +24,31 @@ Version vNext
 
 	Changes:
 		-[Core] Diagnostics moved into a separate project.
+		-[Core] The container now ensures that property dependencies are always created before the type in
+		 which they are injected into. (work item 20100).
+
+	Bug fixes:
+		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
+				
+
+Version 2.3.2 (v2.3.2 RTM) 2013-08-31
+
+	General description:
+		This patch release fixes a few minor bugs in the Core library and one in the MVC integration library.
+
+	Bug fixes:
 		-[Integration.Mvc] The SimpleInjectorDependencyResolver will now throw a descriptive exception when
 		 an unregistered controller can't be created (for whatever reason) instead of allowing null to be
 		 returned, since this causes MVC to throw a non-descriptive "Make sure that the controller has a 
 		 parameterless public constructor" exception, hiding the real cause. (work item 20097).
-
-	Bug fixes:
-		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
-		-[Core/Diagnostics] Diagnostic Services incorrectly reported a 'potential lifetime mismatch' warning
+		-[Core] Diagnostic Services incorrectly reported a 'potential lifetime mismatch' warning
 		 when a singleton decorator depended on a Func<T> where T was the decorated type. (work item 20141)
 		-[Core] Calls to GetRegistration did not throw an exception that was as expressive as call to
 		 GetInstance. (work item 20155).
 		-[Core] Improved the exception message when a decorator registration is done with a type that can not
 		 be used as decorator. (work item 20047).
 		
-
+				
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12
 
 	General description:
