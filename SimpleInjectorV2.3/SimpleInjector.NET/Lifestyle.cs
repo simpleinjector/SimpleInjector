@@ -326,6 +326,8 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
+            this.Initialize(container);
+
             return this.CreateRegistrationCore<TService, TImplementation>(container);
         }
 
@@ -348,6 +350,8 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");
+
+            this.Initialize(container);
 
             return this.CreateRegistrationCore<TService>(instanceCreator, container);
         }
@@ -429,6 +433,17 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>Initializes the lifestyle for use in the supplied container.</summary>
+        /// <remarks>
+        /// This method may be called multiple times for the same container. This method is called by the
+        /// container.</remarks>
+        /// <param name="container">The container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
+        public virtual void Initialize(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+        }
+
         internal Registration CreateRegistration(Type serviceType, Type implementationType,
             Container container, IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
         {
@@ -438,7 +453,7 @@ namespace SimpleInjector
 
             return registration;
         }
-        
+
         /// <summary>
         /// When overridden in a derived class, 
         /// creates a new <see cref="Registration"/> instance defining the creation of the

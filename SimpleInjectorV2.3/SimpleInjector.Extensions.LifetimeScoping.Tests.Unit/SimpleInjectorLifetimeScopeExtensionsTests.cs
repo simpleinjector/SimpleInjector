@@ -15,6 +15,10 @@
             void Execute();
         }
 
+        public interface IRepository<T>
+        {
+        }
+
         [TestMethod]
         public void GetInstance_RegistrationUsingLifetimeScopeLifestyle_Succeeds()
         {
@@ -905,6 +909,33 @@
 
             // Assert
             Assert.AreEqual(2, disposedInstances.Count, "Two instances were expected to be disposed.");
+        }
+
+        [TestMethod]
+        public void MethodUnderTest_Scenario_Behavior()
+        {
+            // Arrange
+            var container = new Container();
+
+            var hybridLifestyle = new LifetimeScopeLifestyle();
+
+            container.RegisterOpenGeneric(typeof(IRepository<>), typeof(Repository<>), hybridLifestyle);
+
+            container.Register<HomeController>();
+
+            // Act
+            container.Verify();
+        }
+
+        public class HomeController
+        {
+            public HomeController(IRepository<int> repository)
+            {
+            }
+        }
+
+        public class Repository<T> : IRepository<T> where T : new()
+        {
         }
 
         public class ConcreteCommand : ICommand

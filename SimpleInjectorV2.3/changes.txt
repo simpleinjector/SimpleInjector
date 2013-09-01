@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 2.3.2 (v2.3.2 RTM) 
+Version 2.3.4 (v2.3.4 RTM) 2013-09-01
 
 	General description:
 		This patch release fixes a few minor bugs in the Core library and one in the MVC integration library.
@@ -17,6 +17,7 @@ Version 2.3.2 (v2.3.2 RTM)
 		 GetInstance. (work item 20155).
 		-[Core] Improved the exception message when a decorator registration is done with a type that can not
 		 be used as decorator. (work item 20047).
+		-[LifetimeScoping] Lifetime scoping failed when used in RegisterOpenGeneric. (work item 20162).
 		
 		
 

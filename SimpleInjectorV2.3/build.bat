@@ -1,6 +1,6 @@
 @ECHO OFF
 
-set version=2.3.0
+set version=2.3.4
 set prereleasePostfix=
 set buildNumber=0
 
@@ -58,6 +58,7 @@ set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
 
 
+if not exist SimpleInjector.snk goto :strong_name_key_missing
 
 mkdir %targetPathNet%
 
@@ -77,6 +78,11 @@ REM ren %targetPathNet%\SimpleInjector.dll SimpleInjector_45.dll
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 ren %targetPathNet%\SimpleInjector.dll temp.dll
 %ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.dll /keyfile:SimpleInjector.snk
+del %targetPathNet%\temp.dll
+
+%msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
+ren %targetPathNet%\SimpleInjector.Diagnostics.dll temp.dll
+%ilmerge% %targetPathNet%\temp.dll /ndebug /targetplatform:%v4targetPlatform% /ver:%numeric_version_Core% /out:%targetPathNet%\SimpleInjector.Diagnostics.dll /keyfile:SimpleInjector.snk
 del %targetPathNet%\temp.dll
 
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=Release /p:DefineConstants="%defineConstantsNet%"
@@ -154,6 +160,8 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\Silverlight\Documentation
 
 copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
+copy bin\NET\SimpleInjector.Diagnostics.dll Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.dll
+copy bin\NET\SimpleInjector.Diagnostics.xml Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.xml
 copy bin\Silverlight\SimpleInjector.dll Releases\v%named_version%\Silverlight\SimpleInjector.dll
 copy bin\Silverlight\SimpleInjector.xml Releases\v%named_version%\Silverlight\SimpleInjector.xml
 
@@ -173,6 +181,8 @@ copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET40\SimpleInjector.xml
+copy bin\NET\SimpleInjector.Diagnostics.dll Releases\temp\NET40\SimpleInjector.Diagnostics.dll
+copy bin\NET\SimpleInjector.Diagnostics.xml Releases\temp\NET40\SimpleInjector.Diagnostics.xml
 
 mkdir Releases\temp\NET40\CommonServiceLocator
 copy bin\NET\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET40\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
@@ -226,6 +236,8 @@ xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 copy bin\NET\SimpleInjector.dll Releases\temp\lib\net40-client\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net40-client\SimpleInjector.xml
+copy bin\NET\SimpleInjector.Diagnostics.dll Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.dll
+copy bin\NET\SimpleInjector.Diagnostics.xml Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.xml
 copy bin\Silverlight\SimpleInjector.dll Releases\temp\lib\sl40\SimpleInjector.dll
 copy bin\Silverlight\SimpleInjector.xml Releases\temp\lib\sl40\SimpleInjector.xml
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
@@ -355,3 +367,12 @@ copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\tem
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip"
 ren "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
+
+GOTO :EOF
+
+
+
+:strong_name_key_missing
+echo The strong name key SimpleInjector.snk does not exist. You should generate (a fake) one for this build script to work.
+GOTO :EOF
+
