@@ -103,26 +103,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             get { return 100; }
         }
 
-        /// <summary>Initializes the lifestyle for use in the supplied container.</summary>
-        /// <remarks>
-        /// This method may be called multiple times for the same container. This method is called by the
-        /// container.</remarks>
-        /// <param name="container">The container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
-        public override void Initialize(Container container)
-        {
-            base.Initialize(container);
-
-            try
-            {
-                SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(container);
-            }
-            catch (InvalidOperationException)
-            {
-                // Thrown when the container is locked.
-            }
-        }
-
         internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)
         {
             return disposeWhenLifetimeScopeEnds ? WithDisposal : NoDisposal;
@@ -139,6 +119,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
+            EnableLifetimeScoping(container);
+
             return new LifetimeScopeRegistration<TService, TImplementation>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds
@@ -159,11 +141,28 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
+            EnableLifetimeScoping(container);
+
             return new LifetimeScopeRegistration<TService>(this, container)
             {
                 Dispose = this.disposeInstanceWhenLifetimeScopeEnds,
                 InstanceCreator = instanceCreator
             };
+        }
+
+        private static void EnableLifetimeScoping(Container container)
+        {
+            if (!container.IsLocked())
+            {
+                try
+                {
+                    SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(container);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Thrown when the container is locked.
+                }
+            }
         }
 
         private sealed class LifetimeScopeRegistration<TService> : LifetimeScopeRegistration<TService, TService>
@@ -205,7 +204,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             {
                 if (this.instanceCreator == null)
                 {
-                    this.manager = this.Container.GetInstance<LifetimeScopeManager>();
+                    IServiceProvider provider = this.Container;
+
+                    this.manager = (LifetimeScopeManager)provider.GetService(typeof(LifetimeScopeManager));
+
+                    if (this.manager == null)
+                    {
+                        throw new InvalidOperationException(
+                            SimpleInjectorLifetimeScopeExtensions.LifetimeScopingIsNotEnabledExceptionMessage);
+                    }
 
                     this.instanceCreator = this.BuildInstanceCreator();
                 }

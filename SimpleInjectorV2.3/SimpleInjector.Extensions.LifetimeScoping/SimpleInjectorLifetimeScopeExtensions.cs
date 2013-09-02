@@ -29,6 +29,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
 
     using SimpleInjector.Extensions.LifetimeScoping;
     
@@ -37,7 +38,7 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorLifetimeScopeExtensions
     {
-        private const string LifetimeScopingIsNotEnabledExceptionMessage =
+        internal const string LifetimeScopingIsNotEnabledExceptionMessage =
             "To enable lifetime scoping, please make sure the EnableLifetimeScoping extension method is " +
             "called during the configuration of the container.";
 
@@ -52,6 +53,7 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         public static void EnableLifetimeScoping(this Container container)
         {
             Requires.IsNotNull(container, "container");
@@ -69,8 +71,10 @@ namespace SimpleInjector
             {
                 // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
                 // nasty, but probably the only way to do this.
+                // NOTE: We can't call GetCurrentRegistrations, because that might lock the container.
                 if (!ex.Message.Contains("already been registered"))
                 {
+                    // Typically, what will be thrown here will be a 'container locked' exception.
                     throw;
                 }
             }

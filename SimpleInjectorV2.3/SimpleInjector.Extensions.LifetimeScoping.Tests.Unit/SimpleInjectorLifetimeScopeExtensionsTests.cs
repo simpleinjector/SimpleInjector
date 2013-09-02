@@ -15,7 +15,7 @@
             void Execute();
         }
 
-        public interface IRepository<T>
+        public interface IGeneric<T>
         {
         }
 
@@ -84,7 +84,59 @@
                     "Actual message: " + ex.Message);
             }
         }
+        
+        [TestMethod]
+        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
 
+            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), new LifetimeScopeLifestyle());
+
+            container.Register<ClassDependingOn<IGeneric<int>>>();
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: ");
+            }
+        }
+
+        [TestMethod]
+        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var hybrid = Lifestyle.CreateHybrid(() => false, new LifetimeScopeLifestyle(), new LifetimeScopeLifestyle());
+
+            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), hybrid);
+
+            container.Register<ClassDependingOn<IGeneric<int>>>();
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: " + ex.Message);
+            }
+        }
+        
         [TestMethod]
         public void RegisterLifetimeScope_CalledASingleTime_Succeeds()
         {
@@ -911,36 +963,20 @@
             Assert.AreEqual(2, disposedInstances.Count, "Two instances were expected to be disposed.");
         }
 
-        [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public class ConcreteCommand : ICommand
         {
-            // Arrange
-            var container = new Container();
-
-            var hybridLifestyle = new LifetimeScopeLifestyle();
-
-            container.RegisterOpenGeneric(typeof(IRepository<>), typeof(Repository<>), hybridLifestyle);
-
-            container.Register<HomeController>();
-
-            // Act
-            container.Verify();
-        }
-
-        public class HomeController
-        {
-            public HomeController(IRepository<int> repository)
+            public void Execute()
             {
             }
         }
 
-        public class Repository<T> : IRepository<T> where T : new()
+        public class Generic<T> : IGeneric<T>
         {
         }
 
-        public class ConcreteCommand : ICommand
+        public class ClassDependingOn<TDependency>
         {
-            public void Execute()
+            public ClassDependingOn(TDependency dependency)
             {
             }
         }

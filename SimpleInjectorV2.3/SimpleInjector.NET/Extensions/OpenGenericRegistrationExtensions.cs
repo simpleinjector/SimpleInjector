@@ -165,8 +165,6 @@ namespace SimpleInjector.Extensions
             Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
                 openGenericImplementation, "openGenericImplementation");
 
-            lifestyle.Initialize(container);
-
             var resolver = new UnregisteredOpenGenericResolver
             {
                 OpenGenericServiceType = openGenericServiceType,
