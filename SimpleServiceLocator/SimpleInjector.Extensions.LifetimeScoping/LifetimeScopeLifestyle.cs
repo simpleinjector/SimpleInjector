@@ -248,13 +248,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         private static void EnableLifetimeScoping(Container container)
         {
-            try
+            if (!container.IsLocked())
             {
-                SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(container);
-            }
-            catch (InvalidOperationException)
-            {
-                // Thrown when the container is locked.
+                try
+                {
+                    SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping(container);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Thrown when the container is locked.
+                }
             }
         }
 
@@ -297,7 +300,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             {
                 if (this.instanceCreator == null)
                 {
-                    this.manager = this.Container.GetInstance<LifetimeScopeManager>();
+                    IServiceProvider provider = this.Container;
+
+                    this.manager = (LifetimeScopeManager)provider.GetService(typeof(LifetimeScopeManager));
+
+                    if (this.manager == null)
+                    {
+                        throw new InvalidOperationException(
+                            SimpleInjectorLifetimeScopeExtensions.LifetimeScopingIsNotEnabledExceptionMessage);
+                    }
 
                     this.instanceCreator = this.BuildInstanceCreator();
                 }

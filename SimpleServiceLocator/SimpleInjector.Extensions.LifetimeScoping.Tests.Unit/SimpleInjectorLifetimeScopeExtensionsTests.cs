@@ -18,6 +18,10 @@
             void Execute();
         }
 
+        public interface IGeneric<T>
+        {
+        }
+
         [TestMethod]
         public void GetInstance_RegistrationUsingLifetimeScopeLifestyle_Succeeds()
         {
@@ -83,7 +87,59 @@
                     "Actual message: " + ex.Message);
             }
         }
+        
+        [TestMethod]
+        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
 
+            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), new LifetimeScopeLifestyle());
+
+            container.Register<ClassDependingOn<IGeneric<int>>>();
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: ");
+            }
+        }
+
+        [TestMethod]
+        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var hybrid = Lifestyle.CreateHybrid(() => false, new LifetimeScopeLifestyle(), new LifetimeScopeLifestyle());
+
+            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), hybrid);
+
+            container.Register<ClassDependingOn<IGeneric<int>>>();
+
+            try
+            {
+                // Act
+                container.Verify();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.IsTrue(ex.Message.Contains(
+                    "please make sure the EnableLifetimeScoping extension method is called"),
+                    "Actual message: " + ex.Message);
+            }
+        }
+        
         [TestMethod]
         public void RegisterLifetimeScope_CalledASingleTime_Succeeds()
         {
@@ -1175,6 +1231,17 @@
         public class ConcreteCommand : ICommand
         {
             public void Execute()
+            {
+            }
+        }
+
+        public class Generic<T> : IGeneric<T>
+        {
+        }
+
+        public class ClassDependingOn<TDependency>
+        {
+            public ClassDependingOn(TDependency dependency)
             {
             }
         }

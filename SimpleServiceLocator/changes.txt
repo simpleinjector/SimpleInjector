@@ -30,7 +30,19 @@ Version vNext
 	Bug fixes:
 		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
 		-[Core] Not all created registrations ended up in the debugger diagnostics view (work item 19954).
+	
 				
+Version 2.3.5 (v2.3.5 RTM) 2013-09-02
+
+	General description:
+		This patch release fixes a minor bug the Integration.LifetimeScoping package and fixes versioning
+		problems caused by release 2.3.4.
+
+	Bug fixes:
+		[LifetimeScoping] Making a registration using RegisterOpenGeneric and the lifetime scope lifestyle,
+		without explicitly enabling lifetime scoping using EnableLifetimeScoping, led to a uninformative
+		exception, hiding the real problem. (work item 20162).
+
 
 Version 2.3.2 (v2.3.2 RTM) 2013-08-31
 
@@ -49,7 +61,7 @@ Version 2.3.2 (v2.3.2 RTM) 2013-08-31
 		-[Core] Improved the exception message when a decorator registration is done with a type that can not
 		 be used as decorator. (work item 20047).
 		
-				
+		
 Version 2.3.1 (v2.3.1 RTM)  2013-07-12
 
 	General description:
