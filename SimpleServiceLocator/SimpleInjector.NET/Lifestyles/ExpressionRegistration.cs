@@ -57,11 +57,6 @@ namespace SimpleInjector.Lifestyles
             return this.expression;
         }
 
-        internal void SetImplementationType(Type implementationType)
-        {
-            this.implementationType = implementationType;
-        }
-
         private static Lifestyle GetLifestyleFor(Expression expression)
         {
             if (expression is ConstantExpression)
