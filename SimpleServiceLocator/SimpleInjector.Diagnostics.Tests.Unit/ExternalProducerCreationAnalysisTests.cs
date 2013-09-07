@@ -8,7 +8,7 @@
     using SimpleInjector.Extensions;
 
     [TestClass]
-    public class Class1
+    public class ExternalProducerCreationAnalysisTests
     {
         [TestMethod]
         public void Analyze_ProducerGenericWithLifestyleMismatch_ProducesAPotentialLifestyleMismatchWarning()

@@ -235,5 +235,43 @@
             Assert.IsNull(actualRegistration, "IInstanceProducer returned while it shouldn't be, because " +
                 "invalid registrations (for unregistered types) should not be returned.");
         }
+
+        [TestMethod]
+        public void CreateProducer_ThatIsReferenced_EndsUpInTheCurrentRegistrationsList()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            var producer = Lifestyle.Transient.CreateProducer<ITimeProvider, RealTimeProvider>(container);
+
+            // Assert
+            Assert.IsTrue(container.GetCurrentRegistrations().Contains(producer),
+                "A created producer should end up in the list of CurrentRegistrations, because both " +
+                "the Verify() and the Diagnostic Services depend on this behavior.");
+
+            GC.KeepAlive(producer);
+        }
+
+        [TestMethod]
+        public void CreateProducer_ThatBecomesUnreferenced_DoesNotEndsUpInTheCurrentRegistrationsList()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            var producer = Lifestyle.Transient.CreateProducer<ITimeProvider, RealTimeProvider>(container);
+
+            // Remove the reference
+            producer = null;
+
+            GC.Collect();
+
+            // Assert
+            Assert.IsFalse(container.GetCurrentRegistrations().Contains(producer),
+                "A created producer should NOT end up in the list of CurrentRegistrations when the " +
+                "application doesn't reference it and the GC ran, because that will cause a memory leak " +
+                "and might cause an OutOfMemoryException.");
+        }
     }
 }
