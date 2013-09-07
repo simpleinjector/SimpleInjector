@@ -58,6 +58,7 @@ set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
 
 
+if not exist SimpleInjector.snk goto :strong_name_key_missing
 
 mkdir %targetPathNet%
 
@@ -366,3 +367,12 @@ copy bin\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\tem
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip"
 ren "%CD%\Releases\v%named_version%\Silverlight\CommonServiceLocator.SimpleInjectorAdapter.Silverlight.%named_version_Core%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
+
+GOTO :EOF
+
+
+
+:strong_name_key_missing
+echo The strong name key SimpleInjector.snk does not exist. You should generate (a fake) one for this build script to work.
+GOTO :EOF
+

@@ -1296,7 +1296,21 @@ namespace SimpleInjector
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(serviceType);
 
-            this.registrations[serviceType] = new InstanceProducer(serviceType, registration);
+            var producer = new InstanceProducer(serviceType, registration);
+
+            this.registrations[serviceType] = producer;
+
+            this.RemoveExternalProducer(producer);
+        }
+
+        internal void RegisterExternalProducer(InstanceProducer producer)
+        {
+            this.externalProducers.Add(producer);
+        }
+
+        internal void RemoveExternalProducer(InstanceProducer producer)
+        {
+            this.externalProducers.Remove(producer);
         }
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
@@ -1442,31 +1456,35 @@ namespace SimpleInjector
 
         private void ValidateRegistrations()
         {
-            var producersToVerify = this.GetCurrentInstanceProducers();
+            int maximumNumberOfIterations = 10;
 
-            VerifyProducers(producersToVerify);
+            InstanceProducer[] producersToVerify;
 
-            var verifiedCollections = producersToVerify.Where(p => p.Registration.IsCollection);
-
-            // The verification process can trigger the registration of new instance producers.
-            // Those new producers need to be checked as well, but only collections need to be checked, since
-            // they need to be iterated and their items might be unregistered.
-            this.ValidateNewCollectionsRecursive(collectionsToExclude: verifiedCollections);
-        }
-
-        private void ValidateNewCollectionsRecursive(IEnumerable<InstanceProducer> collectionsToExclude)
-        {
-            var currentCollections = this.GetCurrentInstanceProducers().Where(p => p.Registration.IsCollection);
-
-            var collectionsToVerify = currentCollections.Except(collectionsToExclude).ToArray();
-
-            if (collectionsToVerify.Any())
+            // The verification process can trigger the registration of new instance producers. Those new 
+            // producers need to be checked as well. That's why we have a loop here. But since a user could
+            // accidentally trigger the creation of new registrations during verify, we must set a sensible
+            // limit to the number of iterations.
+            do
             {
-                VerifyProducers(collectionsToVerify);
+                maximumNumberOfIterations--;
 
-                this.ValidateNewCollectionsRecursive(
-                    collectionsToExclude: collectionsToExclude.Concat(collectionsToVerify).ToArray());
+                producersToVerify = (
+                    from registration in this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
+                    where !registration.Verified
+                    select registration)
+                    .ToArray();
+
+                VerifyProducers(producersToVerify);
             }
+            while (maximumNumberOfIterations > 0 && producersToVerify.Any());
+
+            // TODO: Remove this check.
+#if DEBUG
+            if (maximumNumberOfIterations <= 0)
+            {
+                throw new InvalidOperationException("What kind of crazy configuration is this?");
+            }
+#endif
         }
 
         private static void VerifyProducers(InstanceProducer[] producersToVerify)
@@ -1483,16 +1501,6 @@ namespace SimpleInjector
                     Helpers.VerifyCollection((IEnumerable)instance, serviceType);
                 }
             }
-        }
-
-        private InstanceProducer[] GetCurrentInstanceProducers()
-        {
-            // The producer can be null.
-            return (
-                from registration in this.registrations
-                where registration.Value != null
-                select registration.Value)
-                .ToArray();
         }
 
         private Action<T>[] GetInstanceInitializersFor<T>(Type type)

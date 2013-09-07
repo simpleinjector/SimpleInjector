@@ -58,36 +58,37 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + ViolationPlural(count) + ".";
         }
 
-        public DiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
             return (
-                from registration in container.GetCurrentRegistrations()
-                where IsAnalyzableRegistration(registration)
-                from relationship in registration.GetRelationships()
-                group relationship by new { relationship.ImplementationType, registration } into g
-                where g.Count() > MaximumValidNumberOfDependencies
+                from producer in producers
+                where IsAnalyzable(producer)
+                from relationship in producer.GetRelationships()
+                group relationship by new { relationship.ImplementationType, producer } into g
+                let numberOfUniqueDependencies = g.Select(i => i.Dependency.ServiceType).Distinct().Count()
+                where numberOfUniqueDependencies > MaximumValidNumberOfDependencies
                 let dependencies = g.Select(r => r.Dependency).ToArray()
                 select new SingleResponsibilityViolationDiagnosticResult(
-                    serviceType: g.Key.registration.ServiceType,
+                    serviceType: g.Key.producer.ServiceType,
                     description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
                     implementationType: g.Key.ImplementationType,
                     dependencies: dependencies))
                 .ToArray();           
         }
         
-        private static bool IsAnalyzableRegistration(InstanceProducer registration)
+        private static bool IsAnalyzable(InstanceProducer producer)
         {
             // We can't analyze collections, because this would lead to false positives when decorators are
             // applied to the collection. For a decorator, each collection element it decorates is a 
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selve still get analyzed, so the only thing we'd miss here is the decorator.
-            if (!registration.ServiceType.IsGenericType)
+            if (!producer.ServiceType.IsGenericType)
             {
                 return true;
             }
 
-            return registration.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
+            return producer.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
         }
 
         private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies)

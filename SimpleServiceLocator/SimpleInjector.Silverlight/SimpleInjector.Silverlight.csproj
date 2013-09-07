@@ -83,6 +83,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
       <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ConditionalHashSet.cs">
+      <Link>Advanced\ConditionalHashSet.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollection.cs">
       <Link>Advanced\ContainerControlledCollection.cs</Link>
     </Compile>
@@ -252,6 +255,7 @@
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SilverlightSpecific\MissingMethods.cs" />
     <Compile Include="SilverlightSpecific\ThreadLocal.cs" />
     <Compile Include="SilverlightSpecific\ThreadLocalValue.cs" />
   </ItemGroup>

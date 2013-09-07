@@ -425,8 +425,10 @@ namespace SimpleInjector
 
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
         {
+            // We have to suppress the overridden parameterm since this might result in a wrong relationship.
             var dependencyTypes = 
                 from parameter in constructor.GetParameters()
+                where this.overriddenParameters == null || !this.overriddenParameters.ContainsKey(parameter)
                 select parameter.ParameterType;
 
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);

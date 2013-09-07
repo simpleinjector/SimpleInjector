@@ -4,6 +4,14 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    public interface ILogger
+    {
+    }
+
+    public interface IConcreteThing
+    {
+    }
+
     public interface ITimeProvider
     {
         DateTime Now { get; }
@@ -178,6 +186,112 @@
     public class ServiceWithUnregisteredDependencies
     {
         public ServiceWithUnregisteredDependencies(IDisposable a, IComparable b)
+        {
+        }
+    }
+
+    public class ConcreteShizzle
+    {
+    }
+
+    public class FakeLogger : ILogger
+    {
+        public FakeLogger(ConcreteShizzle shizzle, ConcreteThing thing)
+        {
+        }
+    }
+
+    public class ConcreteThing : IConcreteThing
+    {
+    }
+    
+    public class SomePluginImpl : IPlugin
+    {
+    }
+
+    public class PluginWith6Dependencies : IPlugin
+    {
+        public PluginWith6Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6)
+        {
+        }
+    }
+
+    public class PluginWith7Dependencies : IPlugin
+    {
+        public PluginWith7Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6,
+            IGeneric<int?> dependency7)
+        {
+        }
+    }
+
+    public class AnotherPluginWith7Dependencies : IPlugin
+    {
+        public AnotherPluginWith7Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6,
+            IGeneric<int?> dependency7)
+        {
+        }
+    }
+
+    public class PluginDecoratorWith5Dependencies : IPlugin
+    {
+        public PluginDecoratorWith5Dependencies(
+            IPlugin decoratee,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5)
+        {
+        }
+    }
+
+    public class PluginDecoratorWith7Dependencies : IPlugin
+    {
+        public PluginDecoratorWith7Dependencies(
+            IPlugin decoratee,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6,
+            IGeneric<int?> dependency7)
+        {
+        }
+    }
+
+    public class Consumer<TDependency>
+    {
+        public Consumer(TDependency dependency)
+        {
+        }
+    }
+
+    public class GenericPluginWith6Dependencies<T> : IGenericPlugin<T>
+    {
+        public GenericPluginWith6Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6)
         {
         }
     }

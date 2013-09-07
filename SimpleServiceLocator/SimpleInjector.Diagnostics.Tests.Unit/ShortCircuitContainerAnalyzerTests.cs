@@ -1,5 +1,4 @@
-﻿#if DEBUG
-namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
 
@@ -139,4 +138,3 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
     }
 }
-#endif

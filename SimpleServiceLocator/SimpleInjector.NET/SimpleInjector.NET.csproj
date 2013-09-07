@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="ActivationException.cs" />
     <Compile Include="Advanced\AdvancedExtensions.cs" />
+    <Compile Include="Advanced\ConditionalHashSet.cs" />
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />

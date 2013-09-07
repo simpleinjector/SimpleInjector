@@ -29,6 +29,7 @@ Version vNext
 
 	Bug fixes:
 		-[Core/LifetimeScoping/Web/Wcf] Instances were disposed in wrong order. (work item 20100)
+		-[Core] Not all created registrations ended up in the debugger diagnostics view (work item 19954).
 				
 
 Version 2.3.2 (v2.3.2 RTM) 2013-08-31

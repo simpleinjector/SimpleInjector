@@ -3,24 +3,8 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Diagnostics.Tests.Unit.Helpers;
 
-    public static class Helpers
-    {
-        public static DiagnosticGroup Root(this DiagnosticGroup group)
-        {
-            while (true)
-            {
-                if (group.Parent == null)
-                {
-                    return group;
-                }
-
-                group = group.Parent;
-            }
-        }
-    }
-
-#if DEBUG
     [TestClass]
     public class PotentialLifestyleMismatchContainerAnalyzerTests
     {
@@ -87,5 +71,4 @@
             Assert.AreEqual("2 possible lifestyle mismatches for 2 services.", item.Description);
         }
     }
-#endif
 }

@@ -392,8 +392,8 @@ namespace SimpleInjector
             Container container)
             where TService : class
         {
-            return new InstanceProducer(typeof(TService), 
-                this.CreateRegistrationCore<TService>(instanceCreator, container));
+            return new InstanceProducer(typeof(TService),
+                this.CreateRegistration<TService>(instanceCreator, container));
         }
         
         /// <summary>

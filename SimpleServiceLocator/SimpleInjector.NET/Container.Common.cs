@@ -36,6 +36,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Reflection.Emit;
     using System.Threading;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
 
     /// <summary>
@@ -50,7 +51,7 @@ namespace SimpleInjector
     /// <para> 
     /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
     /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(Type)"/> and
-    /// <see cref="GetCurrentRegistrations"/> and anything related to resolving instances from multiple thread 
+    /// <see cref="GetCurrentRegistrations()"/> and anything related to resolving instances from multiple thread 
     /// concurrently. It is however <b>unsafe</b> to call
     /// <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
     /// <see cref="ExpressionBuilding"/>, <see cref="ExpressionBuilt"/>, <see cref="ResolveUnregisteredType"/>,
@@ -69,6 +70,10 @@ namespace SimpleInjector
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
         private readonly Lazy<ModuleBuilder> moduleBuilder;
+
+        // This list contains all instance producers that not yet have been explicitly registered in the container.
+        private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
+            new ConditionalHashSet<InstanceProducer>();
 
         private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
@@ -200,20 +205,14 @@ namespace SimpleInjector
         /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either 
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// Because of this, do not compare sets of instances returned by different calls to 
-        /// <see cref="GetCurrentRegistrations"/> by reference. The way of comparing lists is by the actual 
+        /// <see cref="GetCurrentRegistrations()"/> by reference. The way of comparing lists is by the actual 
         /// type. The type of each instance is guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
         public InstanceProducer[] GetCurrentRegistrations()
         {
-            // Filter out the invalid registrations (see the IsValid property for more information).
-            return (
-                from registration in this.registrations.Values
-                where registration != null
-                where registration.IsValid
-                select registration)
-                .ToArray();
+            return this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: false);
         }
 
         /// <summary>Determines whether the specified System.Object is equal to the current System.Object.
@@ -260,6 +259,25 @@ namespace SimpleInjector
         public new Type GetType()
         {
             return base.GetType();
+        }
+
+        internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
+            bool includeExternalProducers = true)
+        {
+            IEnumerable<InstanceProducer> registrations = this.registrations.Values;
+
+            if (includeExternalProducers)
+            {
+                registrations = registrations.Concat(this.externalProducers.Keys);
+            }
+
+            // Filter out the invalid registrations (see the IsValid property for more information).
+            return (
+                from registration in registrations
+                where registration != null
+                where includeInvalidContainerRegisteredTypes || registration.IsValid
+                select registration)
+                .ToArray();
         }
 
         internal object GetItem(object key)

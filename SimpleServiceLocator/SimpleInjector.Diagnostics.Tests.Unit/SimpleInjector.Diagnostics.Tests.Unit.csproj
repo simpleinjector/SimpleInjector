@@ -61,9 +61,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AnalyzerTests.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="ContainerDebugViewTests.cs" />
     <Compile Include="CustomLifestyleTests.cs" />
-    <Compile Include="DebuggerViewItemExtensions.cs" />
+    <Compile Include="Helpers\DebuggerViewItemExtensions.cs" />
+    <Compile Include="Helpers\DiagnosticGroupExtensions.cs" />
     <Compile Include="LifestyleMismatchServicesTests.cs" />
     <Compile Include="PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="ShortCircuitContainerAnalyzerTests.cs" />

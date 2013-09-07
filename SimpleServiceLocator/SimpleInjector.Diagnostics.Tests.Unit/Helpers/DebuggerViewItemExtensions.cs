@@ -1,11 +1,10 @@
-﻿namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit.Helpers
 {
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
 
-#if DEBUG
     internal static class DebuggerViewItemExtensions
     {
         internal static IEnumerable<DebuggerViewItem> Items(this DebuggerViewItem item)
@@ -18,5 +17,4 @@
             return Enumerable.Empty<DebuggerViewItem>();
         }
     }
-#endif
 }

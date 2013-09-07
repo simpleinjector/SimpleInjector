@@ -571,6 +571,11 @@ namespace SimpleInjector
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.registrations = snapshotCopy;
+
+            if (instanceProducer != null)
+            {
+                this.RemoveExternalProducer(instanceProducer);
+            }
         }
     }
 }

@@ -57,7 +57,7 @@ namespace SimpleInjector
         {
             return AmbiguousTypes.Contains(type);
         }
-
+        
         internal static Lazy<T> ToLazy<T>(T value)
         {
             return new Lazy<T>(() => value, LazyThreadSafetyMode.None);

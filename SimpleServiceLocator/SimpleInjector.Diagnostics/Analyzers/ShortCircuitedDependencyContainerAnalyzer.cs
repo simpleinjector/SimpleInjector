@@ -59,17 +59,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count == 1 ? "1 short circuited component." : count + " short circuited components.";
         }
 
-        public DiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            var registrations = container.GetCurrentRegistrations();
-
             var containerRegisteredRegistrations =
-                from producer in container.GetCurrentRegistrations()
+                from producer in producers
                 where producer.IsContainerAutoRegistered
                 select producer;
 
             Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = (
-                from registration in registrations
+                from registration in producers
                 where registration.ServiceType != registration.ImplementationType
                 group registration by registration.ImplementationType into registrationGroup
                 select registrationGroup)
@@ -89,7 +87,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 .ToDictionary(producer => producer.ServiceType);
 
             return (
-                from registration in registrations
+                from registration in producers
                 from actualDependency in registration.GetRelationships()
                 where autoRegisteredRegistrationsWithLifestyleMismatch.ContainsKey(
                     actualDependency.Dependency.ServiceType)

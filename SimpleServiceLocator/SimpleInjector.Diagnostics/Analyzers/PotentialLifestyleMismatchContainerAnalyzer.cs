@@ -60,10 +60,10 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + MismatchPlural(count) + ".";
         }
 
-        public DiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
             return (
-              from producer in container.GetCurrentRegistrations()
+              from producer in producers
               from relationship in producer.GetRelationships()
               where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(relationship)
               select new PotentialLifestyleMismatchDiagnosticResult(

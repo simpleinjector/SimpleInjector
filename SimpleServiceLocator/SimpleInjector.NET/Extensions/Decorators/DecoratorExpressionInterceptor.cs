@@ -128,27 +128,18 @@ namespace SimpleInjector.Extensions.Decorators
             // registeredProducer.ServiceType and registeredServiceType are different when called by 
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
             // registeredServiceType will be T.
-            ExpressionRegistration registration = null;
-
-            Func<InstanceProducer> producerBuilder = () =>
+            Func<Type, InstanceProducer> producerBuilder = implementationType =>
             {
-                registration = new ExpressionRegistration(originalExpression, null, lifestyle, this.Container);
-
-                return new InstanceProducer(registeredServiceType, registration);
+                // This is fake producer that is not meant for resolving instances.
+                return new InstanceProducer(registeredServiceType,
+                    new ExpressionRegistration(originalExpression, implementationType, lifestyle, this.Container));
             };
 
-            var info = this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
-
-            if (registration != null)
-            {
-                registration.SetImplementationType(info.ImplementationType);
-            }
-
-            return info;
+            return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
         }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            InstanceProducer registeredProducer, Func<InstanceProducer> producerBuilder)
+            InstanceProducer registeredProducer, Func<Type, InstanceProducer> producerBuilder)
         {
             Type registeredServiceType = registeredProducer.ServiceType;
 
@@ -159,7 +150,7 @@ namespace SimpleInjector.Extensions.Decorators
                 Type implementationType =
                     ExtensionHelpers.DetermineImplementationType(originalExpression, registeredServiceType);
 
-                var producer = producerBuilder();
+                var producer = producerBuilder(implementationType);
 
                 predicateCache[registeredProducer] =
                     new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);

@@ -125,16 +125,37 @@ namespace SimpleInjector.Advanced
             return Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type serviceType)
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType)
         {
+            // Note that the 'implementationType' could in fact be a service type as well and it is allowed
+            // for the implementationType to equal TService. This will happen when someone does the following:
+            // container.RegisterAll<ILogger>(typeof(ILogger));
             return new Lazy<InstanceProducer>(() =>
             {
-                // instanceProducer.ServiceType == serviceType
-                var instanceProducer = this.container.GetRegistration(serviceType, throwOnFailure: true);
+                // If the the elementType is explicitly registered (using Register) we select this registration
+                // (but we skip any implicit registrations, sine there could be more than one and it would
+                // be unclear which one to pick).
+                var instanceProducer = 
+                    this.container.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true, 
+                        includeExternalProducers: false)
+                        .FirstOrDefault(p => p.ServiceType == implementationType);
 
-                // We need to create a new InstanceProducer with instanceProducer.ServiceType == typeof(TService).
-                // This allows decorators to be applied.
-                return new InstanceProducer(typeof(TService), instanceProducer.Registration);
+                // If there is such a producer registered we return a new one with the collection's type.
+                // This producer will be automatically registered as external producer.
+                if (instanceProducer != null)
+                {
+                    return new InstanceProducer(typeof(TService), instanceProducer.Registration);
+                }
+
+                if (!Helpers.IsConcreteType(implementationType))
+                {
+                    // This method will throw an (expressive) exception since implementationType is not concrete.
+                    this.container.GetRegistration(implementationType, throwOnFailure: true);
+                }
+                
+                // In case there is no registration, we create a new one.
+                // This producer will be automatically registered as external producer.
+                return Lifestyle.Transient.CreateProducer(typeof(TService), implementationType, this.container);
             });
         }
     }

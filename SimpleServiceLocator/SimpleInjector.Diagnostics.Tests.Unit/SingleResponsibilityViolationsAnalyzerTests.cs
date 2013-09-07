@@ -1,12 +1,11 @@
-#if DEBUG
 namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Diagnostics.Debugger;
+    using SimpleInjector.Diagnostics.Tests.Unit.Helpers;
     using SimpleInjector.Extensions;
 
     public interface IGenericPlugin<T> 
@@ -232,21 +231,22 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 
             // Assert
+            Assert.IsNotNull(results, "A warning should have been detected.");
             Assert.AreEqual(1, results.Length);
-            Assert.AreEqual(typeof(PluginWith7Dependencies).Name, results[0].Name);
             Assert.AreEqual(
                 typeof(PluginWith7Dependencies).Name + " has 7 dependencies which might indicate a SRP violation.",
                 results[0].Description);
         }
 
         [TestMethod]
-        public void Analyze_ConfigurationWithCollectionWithDecoratorWithTooManyDependencies_DoesNotWarnAboutThatDecorator()
+        public void Analyze_ConfigurationWithCollectionWithMultipleDecoratorsWithValidNumberOfDependencies_DoesNotWarnAboutThatDecorator()
         {
             // Arrange
             Container container = CreateContainerWithRegistrations(Type.EmptyTypes);
 
-            // This decorator has too many dependencies
-            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith5Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith5Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith5Dependencies));
 
             // Non of these types have too many dependencies.
             container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(SomePluginImpl));
@@ -264,6 +264,27 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
                 and all elements it decorates are a dependency and its hard to see the real number of
                 dependencies it has. Because of this, we have to suppress violations on collections
                 completely.");
+        }
+
+        [TestMethod]
+        public void Analyze_ConfigurationWithCollectionADecoratorsWithTooManyDependencies_WarnsAboutThatDecorator()
+        {
+            // Arrange
+            Container container = CreateContainerWithRegistrations(Type.EmptyTypes);
+
+            // This decorator has too many dependencies
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+
+            // Non of these types have too many dependencies.
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(SomePluginImpl));
+
+            container.Verify();
+
+            // Act
+            var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
+
+            // Assert
+            Assert.AreEqual("2 possible single responsibility violations.", results.Description);
         }
 
         private static Container CreateContainerWithRegistrations(params Type[] implementationTypes)
@@ -305,96 +326,4 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             }
         }
     }
-    
-    public class SomePluginImpl : IPlugin
-    {
-    }
-
-    public class PluginWith6Dependencies : IPlugin
-    {
-        public PluginWith6Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6)
-        {
-        }
-    }
-
-    public class PluginWith7Dependencies : IPlugin
-    {
-        public PluginWith7Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
-        {
-        }
-    }
-
-    public class AnotherPluginWith7Dependencies : IPlugin
-    {
-        public AnotherPluginWith7Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
-        {
-        }
-    }
-
-    public class PluginDecoratorWith5Dependencies : IPlugin
-    {
-        public PluginDecoratorWith5Dependencies(
-            IPlugin decoratee,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5)
-        {
-        }
-    }
-
-    public class PluginDecoratorWith7Dependencies : IPlugin
-    {
-        public PluginDecoratorWith7Dependencies(
-            IPlugin decoratee,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
-        {
-        }
-    }
-
-    public class Consumer<TDependency>
-    {
-        public Consumer(TDependency dependency)
-        {
-        }
-    }
-
-    public class GenericPluginWith6Dependencies<T> : IGenericPlugin<T>
-    {
-        public GenericPluginWith6Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6)
-        {
-        }
-    }
 }
-#endif

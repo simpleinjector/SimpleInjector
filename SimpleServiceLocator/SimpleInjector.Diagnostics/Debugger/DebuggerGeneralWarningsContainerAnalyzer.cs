@@ -39,9 +39,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             const string WarningsName = "Configuration Warnings";
 
+            var producersToAnalyze = container.GetCurrentRegistrations();
+
             var analysisResults = (
                 from analyzer in ContainerAnalyzerProvider.Analyzers
-                let results = analyzer.Analyze(container)
+                let results = analyzer.Analyze(producersToAnalyze)
                 where results.Any()
                 let diagnosticGroup = DiagnosticResultGrouper.Group(analyzer, results)
                 select new DebuggerViewItem(

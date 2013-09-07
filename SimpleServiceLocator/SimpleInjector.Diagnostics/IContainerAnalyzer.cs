@@ -37,6 +37,6 @@ namespace SimpleInjector.Diagnostics
 
         string GetGroupDescription(IEnumerable<DiagnosticResult> results);
 
-        DiagnosticResult[] Analyze(Container container);
+        DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers);
     }
 }

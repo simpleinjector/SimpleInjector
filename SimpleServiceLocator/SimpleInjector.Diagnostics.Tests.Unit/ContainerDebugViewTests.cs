@@ -9,29 +9,6 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
 
-    public interface ILogger
-    {
-    }
-
-    public interface IConcreteThing
-    {
-    }
-
-    public class ConcreteShizzle
-    {
-    }
-
-    public class FakeLogger : ILogger
-    {
-        public FakeLogger(ConcreteShizzle shizzle, ConcreteThing thing)
-        {
-        }
-    }
-
-    public class ConcreteThing : IConcreteThing
-    {
-    }
-
     [TestClass]
     public class ContainerDebugViewTests
     {

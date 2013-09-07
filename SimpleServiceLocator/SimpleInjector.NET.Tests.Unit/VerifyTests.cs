@@ -272,21 +272,7 @@
             {
                 string actualMessage = ex.Message;
 
-                string exceptionInfo = string.Empty;
-
-                Exception exception = ex;
-
-                while (exception != null)
-                {
-                    exceptionInfo +=
-                        exception.GetType().FullName + Environment.NewLine +
-                        exception.Message + Environment.NewLine +
-                        exception.StackTrace + Environment.NewLine + Environment.NewLine;
-
-                    exception = exception.InnerException;
-                }
-
-                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + exceptionInfo);
+                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + ex.ToString());
             }
         }
 

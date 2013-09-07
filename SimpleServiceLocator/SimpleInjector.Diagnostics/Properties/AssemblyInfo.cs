@@ -67,7 +67,7 @@ using System.Security;
 
 [assembly: AllowPartiallyTrustedCallers]
 
-#if DEBUG
+#if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 #endif
 

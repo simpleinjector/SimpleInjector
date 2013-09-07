@@ -62,9 +62,11 @@ namespace SimpleInjector.Diagnostics
                     "Only successfully verified container instance can be analyzed.");
             }
 
+            var producersToAnalyse = container.GetCurrentRegistrations();
+
             var analyzerResultsCollection = (
                 from analyzer in ContainerAnalyzerProvider.Analyzers
-                let results = analyzer.Analyze(container)
+                let results = analyzer.Analyze(producersToAnalyse)
                 where results.Any()
                 select new { Results = results, Analyzer = analyzer })
                 .ToArray();

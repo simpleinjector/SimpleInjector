@@ -32,11 +32,12 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
-    /// <see cref="Container.GetCurrentRegistrations"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
+    /// <see cref="Container.GetCurrentRegistrations()"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
     /// </summary>
     /// <remarks>
     /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
@@ -109,6 +110,15 @@ namespace SimpleInjector
             this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
             this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
+
+            // ExpressionRegistration is an internal Registration type tht is used by decorators and an 
+            // InstanceProducer for this registration should never be registered, because that would cause
+            // an endless loop, since verify would call GetInstance on them which would again cause the 
+            // decoration process to be triggered, creates a new InstanceProducer... You get the picture.
+            if (!(registration is ExpressionRegistration))
+            {
+                registration.Container.RegisterExternalProducer(this);
+            }
         }
 
         /// <summary>
@@ -164,6 +174,11 @@ namespace SimpleInjector
         // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
         // when the producer is valid.
         internal Exception Exception { get; private set; }
+
+        internal bool Verified 
+        {
+            get { return this.expression.IsValueCreated; }
+        }
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -406,7 +421,7 @@ namespace SimpleInjector
 
             public KnownRelationship[] Relationships
             {
-                get { return this.instanceProducer.Registration.GetRelationships(); }
+                get { return this.instanceProducer.GetRelationships(); }
             }
         }
     }

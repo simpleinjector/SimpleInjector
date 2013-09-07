@@ -60,20 +60,18 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return GetTypeGroupDescription(typeCount) + GetComponentDescription(componentCount) + ".";
         }
 
-        public DiagnosticResult[] Analyze(Container container)
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            var registrations = container.GetCurrentRegistrations();
-
             var autoRegisteredServices = new HashSet<Type>(
-                from producer in container.GetCurrentRegistrations()
+                from producer in producers
                 where producer.IsContainerAutoRegistered
                 select producer.ServiceType);
 
             return (
-                from registration in registrations
-                from relationship in registration.GetRelationships()
+                from producer in producers
+                from relationship in producer.GetRelationships()
                 where autoRegisteredServices.Contains(relationship.Dependency.ServiceType)
-                group relationship by registration into relationshipGroup
+                group relationship by producer into relationshipGroup
                 select BuildDiagnosticResult(relationshipGroup.Key, relationshipGroup.ToArray()))
                 .ToArray();
         }
