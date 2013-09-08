@@ -32,8 +32,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-
-    using SimpleInjector.Lifestyles;
+    using SimpleInjector.Advanced;
 
     // This class allows decorating collections of services with elements that are created out of the control
     // of the container. Collections are registered using the following methods:
@@ -91,9 +90,6 @@ namespace SimpleInjector.Extensions.Decorators
 
             var decoratedExpression = this.BuildDecoratorExpression(out decoratorRegistration);
 
-            var relationships = this.GetKnownDecoratorRelationships(decoratorRegistration,
-                this.decoratorConstructor, this.registeredServiceType, serviceInfo.GetCurrentInstanceProducer());
-
             this.e.Expression = decoratedExpression;
 
             // Add the decorator to the list of applied decorator. This way users can use this
@@ -101,7 +97,7 @@ namespace SimpleInjector.Extensions.Decorators
             serviceInfo.AddAppliedDecorator(this.decoratorType, this.registeredServiceType, this.Container, 
                 this.Lifestyle, decoratedExpression);
 
-            this.e.KnownRelationships.AddRange(relationships);
+            this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }
         
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
@@ -147,11 +143,12 @@ namespace SimpleInjector.Extensions.Decorators
                 DecoratorExpressionInterceptor.GetExpressionForDecorateeDependencyParameterOrNull(
                     decorateeParameter, this.registeredServiceType, decorateeExpression);
 
-            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
+            var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();
 
             // Create the decorator as transient. Caching is applied later on.
             return Lifestyle.Transient.CreateRegistration(this.registeredServiceType,
-                this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+                this.decoratorConstructor.DeclaringType, this.Container,
+                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer));
         }
 
         // Creates an expression that calls a Func<T, T> delegate that takes in the service and returns

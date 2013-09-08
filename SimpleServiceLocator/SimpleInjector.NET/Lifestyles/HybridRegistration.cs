@@ -71,8 +71,7 @@ namespace SimpleInjector.Lifestyles
                 ifFalse: Expression.Convert(falseExpression, this.serviceType));
         }
 
-        internal override void SetParameterOverrides(
-            IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+        internal override void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)
         {
             this.trueRegistration.SetParameterOverrides(overriddenParameters);
             this.falseRegistration.SetParameterOverrides(overriddenParameters);

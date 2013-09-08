@@ -125,6 +125,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\KnownRelationship.cs">
       <Link>Advanced\KnownRelationship.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\OverriddenParameter.cs">
+      <Link>Advanced\OverriddenParameter.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
       <Link>Advanced\PropertyInjectionHelper.cs</Link>
     </Compile>

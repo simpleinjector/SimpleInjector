@@ -177,14 +177,12 @@ namespace SimpleInjector
             }
         }
 
-        // This method should only be called by the Lifestyle base class.
-        internal virtual void SetParameterOverrides(IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+        // This method should only be called by the Lifestyle base class and the HybridRegistration.
+        internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)
         {
-            this.overriddenParameters = overriddenParameters.ToDictionary(
-                p => p.Item1,
-                p => new OverriddenParameter(Expression.Constant(null, p.Item1.ParameterType), p.Item2));
+            this.overriddenParameters = overriddenParameters.ToDictionary(p => p.Parameter);
         }
-
+   
         // Wraps the expression with a delegate that injects the properties.
         internal Expression WrapWithPropertyInjector(Type serviceType, Type implementationType,
             Expression expressionToWrap)
@@ -360,8 +358,8 @@ namespace SimpleInjector
 
             var parameters =
                 from parameter in constructor.GetParameters()
-                let overriddenParameter = this.GetOverriddenParameterFor(parameter)
-                select overriddenParameter ?? this.BuildParameterExpressionFor(parameter);
+                let overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder
+                select overriddenExpression ?? this.BuildParameterExpressionFor(parameter);
 
             return Expression.New(constructor, parameters.ToArray());
         }
@@ -413,23 +411,26 @@ namespace SimpleInjector
             return expression;
         }
 
-        private Expression GetOverriddenParameterFor(ParameterInfo parameter)
+        private OverriddenParameter GetOverriddenParameterFor(ParameterInfo parameter)
         {
             if (this.overriddenParameters != null && this.overriddenParameters.ContainsKey(parameter))
             {
-                return this.overriddenParameters[parameter].PlaceHolder;
+                return this.overriddenParameters[parameter];
             }
 
-            return null;
+            return new OverriddenParameter();
         }
 
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
         {
-            // We have to suppress the overridden parameterm since this might result in a wrong relationship.
+            // We have to suppress the overridden parameter since this might result in a wrong relationship.
             var dependencyTypes = 
                 from parameter in constructor.GetParameters()
-                where this.overriddenParameters == null || !this.overriddenParameters.ContainsKey(parameter)
-                select parameter.ParameterType;
+                let overriddenProducer = this.GetOverriddenParameterFor(parameter).Producer
+                let instanceProducer = 
+                    overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(parameter.ParameterType)
+                where instanceProducer != null
+                select instanceProducer;
 
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
@@ -437,18 +438,20 @@ namespace SimpleInjector
         private void AddPropertiesAsKnownRelationships(Type implementationType, 
             IEnumerable<PropertyInfo> properties)
         {
-            var dependencyTypes = properties.Select(p => p.PropertyType);
+            var dependencies = 
+                from dependencyType in properties.Select(p => p.PropertyType)
+                let instanceProducer = this.Container.GetRegistrationEvenIfInvalid(dependencyType)
+                where instanceProducer != null
+                select instanceProducer;
 
-            this.AddRelationships(implementationType, dependencyTypes);
+            this.AddRelationships(implementationType, dependencies);
         }
 
-        private void AddRelationships(Type implementationType, IEnumerable<Type> dependencies)
+        private void AddRelationships(Type implementationType, IEnumerable<InstanceProducer> dependencies)
         {
             var relationships =
                 from dependency in dependencies
-                let registration = this.Container.GetRegistrationEvenIfInvalid(dependency)
-                where registration != null
-                select new KnownRelationship(implementationType, this.Lifestyle, registration);
+                select new KnownRelationship(implementationType, this.Lifestyle, dependency);
 
             foreach (var relationship in relationships)
             {
@@ -544,35 +547,7 @@ namespace SimpleInjector
 
             return instance;
         }
-        
-        private struct OverriddenParameter
-        {
-            private readonly ConstantExpression placeHolder;
-            private readonly Expression expression;
-
-            public OverriddenParameter(ConstantExpression placeHolder, Expression expression)
-            {
-                this.placeHolder = placeHolder;
-                this.expression = expression;
-            }
-
-            // A placeholder is a fake expression that we inject into the NewExpression. After the 
-            // NewExpression is created, it is ran through the ExpressionBuilding interception. By using
-            // placeholders instead of the real overridden expressions we prevent those expressions from
-            // being processed twice by the ExpressionBuilding event (since we expect the supplied expressions
-            // to already be processed). After the event has ran we replace the placeholders with the real
-            // expressions again (using an ExpressionVisitor).
-            internal ConstantExpression PlaceHolder 
-            { 
-                get { return this.placeHolder; } 
-            }
-
-            internal Expression Expression 
-            {
-                get { return this.expression; }
-            }
-        }
-
+   
         // Searches an expression for a specific sub expression and replaces that sub expression with a
         // different supplied expression.
         private sealed class SubExpressionReplacer : ExpressionVisitor

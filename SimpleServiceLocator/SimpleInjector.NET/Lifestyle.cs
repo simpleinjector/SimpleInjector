@@ -31,7 +31,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
-
+    using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -580,7 +580,7 @@ namespace SimpleInjector
         }
 
         internal Registration CreateRegistration(Type serviceType, Type implementationType,
-            Container container, IEnumerable<Tuple<ParameterInfo, Expression>> overriddenParameters)
+            Container container, params OverriddenParameter[] overriddenParameters)
         {
             var registration = this.CreateRegistration(serviceType, implementationType, container);
 

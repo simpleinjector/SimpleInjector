@@ -70,13 +70,13 @@ namespace SimpleInjector.Extensions.Decorators
         internal void ApplyDecorator()
         {
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
-            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied and it
-            // can be wrapped with an initializer.
+            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied,
+            // properties can be injected, and it can be wrapped with an initializer.
             var registration = this.CreateRegistration();
 
             this.ReplaceOriginalExpression(registration);
 
-            this.AddKnownDecoratorRelationships(registration);
+            this.e.KnownRelationships.AddRange(registration.GetRelationships());
 
             this.AddAppliedDecoratorToPredicateContext();
         }
@@ -100,26 +100,14 @@ namespace SimpleInjector.Extensions.Decorators
                 if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
                 {
                     registration = this.CreateRegistration(this.registeredServiceType, 
-                        this.decoratorConstructor, this.e.Expression, this.e.InstanceProducer);
+                        this.decoratorConstructor, this.e.Expression, this.e.InstanceProducer,
+                        this.GetServiceTypeInfo(this.e));
 
                     this.registrations[this.e.InstanceProducer] = registration;
                 }
             }
 
             return registration;
-        }
-        
-        private void AddKnownDecoratorRelationships(Registration decoratorRegistration)
-        {
-            var info = this.GetServiceTypeInfo(this.e);
-
-            InstanceProducer decoratee = info.GetCurrentInstanceProducer();
-
-            // Must be called before the current decorator is added to the list of applied decorators
-            var relationships = this.GetKnownDecoratorRelationships(decoratorRegistration,
-                this.decoratorConstructor, this.registeredServiceType, decoratee);
-
-            this.e.KnownRelationships.AddRange(relationships);
         }
 
         private void AddAppliedDecoratorToPredicateContext()

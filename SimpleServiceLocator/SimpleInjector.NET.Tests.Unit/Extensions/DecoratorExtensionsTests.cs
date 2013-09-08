@@ -1376,7 +1376,6 @@
                 "The wrapped instance should have the expected lifestyle (transient in this case).");
         }
 
-#if DEBUG
         [TestMethod]
         public void GetRegistration_TransientInstanceDecoratedWithTransientDecorator_ContainsTheExpectedRelationship()
         {
@@ -1411,31 +1410,54 @@
         public void GetRegistration_TransientInstanceDecoratedWithSingletonDecorator_ContainsTheExpectedRelationship()
         {
             // Arrange
-            var expectedRelationship = new RelationshipInfo
-            {
-                Lifestyle = Lifestyle.Singleton,
-                ImplementationType = typeof(RealCommandHandlerDecorator),
-                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
+
+            var expectedRelationships = new[]
+            {   
+                new RelationshipInfo
+                {
+                    Lifestyle = hybrid,
+                    ImplementationType = typeof(RealCommandHandlerDecorator),
+                    Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
+                },
+                new RelationshipInfo
+                {
+                    Lifestyle = Lifestyle.Singleton,
+                    ImplementationType = typeof(RealCommandHandlerDecorator),
+                    Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), hybrid)
+                },
             };
 
             var container = ContainerFactory.New();
 
             // StubCommandHandler has no dependencies.
-            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(
+                Lifestyle.Transient);
 
             // RealCommandHandlerDecorator only has ICommandHandler<RealCommand> as dependency.
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>), 
+                typeof(RealCommandHandlerDecorator),
+                hybrid);
+
+            // RealCommandHandlerDecorator only has ICommandHandler<RealCommand> as dependency.
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>), 
+                typeof(RealCommandHandlerDecorator), 
+                Lifestyle.Singleton);
 
             container.Verify();
 
             // Act
-            var actualRelationship = container.GetRegistration(typeof(ICommandHandler<RealCommand>))
+            var actualRelationships = container.GetRegistration(typeof(ICommandHandler<RealCommand>))
                 .GetRelationships()
-                .Single();
+                .ToArray();
 
             // Assert
-            Assert.IsTrue(expectedRelationship.Equals(actualRelationship), 
-                "actual: " + RelationshipInfo.ToString(actualRelationship));
+            Assert.IsTrue(
+                actualRelationships.All(a => expectedRelationships.Any(e => e.Equals(a))),
+                "actual: " + Environment.NewLine + 
+                string.Join(Environment.NewLine, actualRelationships.Select(r => RelationshipInfo.ToString(r))));
         }
 
         [TestMethod]
@@ -1549,7 +1571,37 @@
             Assert.IsTrue(expectedRelationship.Equals(actualRelationship),
                 "actual: " + RelationshipInfo.ToString(actualRelationship));
         }
-#endif
+
+        [TestMethod]
+        public void GetRelationships_DecoratorDependingOnTransientFuncDecorateeFactory_ReturnsRelationshipForThatFactory()
+        {
+            // Arrange
+            var expectedRelationship = new RelationshipInfo
+            {
+                Lifestyle = Lifestyle.Transient,
+                ImplementationType = typeof(NonGenericServiceDecoratorWithFunc),
+                Dependency = new DependencyInfo(typeof(Func<INonGenericService>), Lifestyle.Singleton)
+            };
+
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Transient);
+
+            // Here we register the decorator as transient!
+            container.RegisterDecorator(typeof(INonGenericService),
+                typeof(NonGenericServiceDecoratorWithFunc), Lifestyle.Transient);
+
+            container.Verify();
+
+            // Act
+            var relationships = container.GetRegistration(typeof(INonGenericService)).GetRelationships();
+
+            // Assert
+            var actualRelationship = relationships.Single();
+
+            Assert.IsTrue(expectedRelationship.Equals(actualRelationship),
+                "actual: " + RelationshipInfo.ToString(actualRelationship));
+        }
 
         [TestMethod]
         public void Lifestyle_TransientRegistrationDecoratedWithSingletonDecorator_GetsLifestyleOfDecorator()
@@ -2019,22 +2071,6 @@
         public void Handle(T command)
         {
             // Run decorated instance on new thread (not important for these tests).
-        }
-    }
-
-    public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
-    {
-        public LifetimeScopeCommandHandlerProxy(Func<ICommandHandler<T>> decorateeFactory,
-            Container container)
-        {
-            this.DecorateeFactory = decorateeFactory;
-        }
-
-        public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
-
-        public void Handle(T command)
-        {
-            // Start lifetime scope here (not important for these tests).
         }
     }
 

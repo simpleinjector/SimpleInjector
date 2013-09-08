@@ -86,6 +86,7 @@
     <Compile Include="Advanced\Internal\IndexableCollection.cs" />
     <Compile Include="Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
+    <Compile Include="Advanced\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />

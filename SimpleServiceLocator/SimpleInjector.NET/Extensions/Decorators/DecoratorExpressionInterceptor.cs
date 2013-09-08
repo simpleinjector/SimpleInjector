@@ -130,7 +130,10 @@ namespace SimpleInjector.Extensions.Decorators
             // registeredServiceType will be T.
             Func<Type, InstanceProducer> producerBuilder = implementationType =>
             {
-                // This is fake producer that is not meant for resolving instances.
+                // The InstanceProducer created here is used to do correct diagnostics. We can't return the
+                // registeredProducer here, since the lifestyle of the original producer can change after
+                // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
+                // results.
                 return new InstanceProducer(registeredServiceType,
                     new ExpressionRegistration(originalExpression, implementationType, lifestyle, this.Container));
             };
@@ -159,37 +162,26 @@ namespace SimpleInjector.Extensions.Decorators
             return predicateCache[registeredProducer];
         }
 
-        protected KnownRelationship[] GetKnownDecoratorRelationships(Registration decoratorRegistration,
-            ConstructorInfo decoratorConstructor, Type registeredServiceType, InstanceProducer decoratee)
-        {
-            var decorateeRelationship =
-                this.GetDecorateeRelationship(decoratorConstructor, registeredServiceType, decoratee);
-
-            var normalDependencyRelationships =
-                from relationship in decoratorRegistration.GetRelationships()
-                where relationship.Dependency.ServiceType != registeredServiceType
-                select relationship;
-
-            return normalDependencyRelationships.Concat(decorateeRelationship).ToArray();
-        }
-        
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
-            Expression decorateeExpression, InstanceProducer producer)
+            Expression decorateeExpression, InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
         {
             ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
 
             decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(
                 decorateeParameter, serviceType, decorateeExpression);
 
+            var currentProducer = info.GetCurrentInstanceProducer();
+
             if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
             {
-                AddVerifierForDecorateeFactoryDependency(decorateeExpression, producer);
+                AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
+
+                currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);
             }
 
-            var overriddenParameters = new[] { Tuple.Create(decorateeParameter, decorateeExpression) };
-
             return this.Lifestyle.CreateRegistration(serviceType,
-                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+                decoratorConstructor.DeclaringType, this.Container,
+                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer));
         }
 
         protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)
@@ -241,6 +233,17 @@ namespace SimpleInjector.Extensions.Decorators
                 .Single();
         }
 
+        protected InstanceProducer CreateDecorateeFactoryProducer(ParameterInfo parameter)
+        {
+            // We create a dummy expression with a null value. Much easier than passing on the real delegate.
+            // We won't miss it, since the created InstanceProducer is just a dummy for purposes of analysis.
+            var dummyExpression = Expression.Constant(null, parameter.ParameterType);
+
+            var registration = new ExpressionRegistration(dummyExpression, this.Container);
+
+            return new InstanceProducer(parameter.ParameterType, registration);
+        }
+        
         private static void AddVerifierForDecorateeFactoryDependency(Expression decorateeExpression, 
             InstanceProducer producer)
         {
@@ -257,45 +260,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             return () => instanceCreator();
         }
-
-        private KnownRelationship GetDecorateeRelationship(ConstructorInfo constructor,
-            Type registeredServiceType, InstanceProducer decoratee)
-        {
-            return (
-                from parameter in constructor.GetParameters()
-                let isDecorateeParameter = IsDecorateeDependencyParameter(parameter, registeredServiceType)
-                let isDecorateeFactory = IsDecorateeFactoryDependencyParameter(parameter, registeredServiceType)
-                where isDecorateeParameter || isDecorateeFactory
-                select isDecorateeParameter 
-                    ? this.CreateDecorateeRelationship(constructor, decoratee)
-                    : this.CreateDecorateeFactoryRelationship(constructor, parameter))
-                .Single();
-        }
-
-        private KnownRelationship CreateDecorateeRelationship(ConstructorInfo constructor, 
-            InstanceProducer decoratee)
-        {
-            return new KnownRelationship(
-                implementationType: constructor.DeclaringType,
-                lifestyle: this.Lifestyle,
-                dependency: decoratee);
-        }
         
-        private KnownRelationship CreateDecorateeFactoryRelationship(ConstructorInfo constructor,
-            ParameterInfo parameter)
-        {
-            // We create a dummy expression with a null value. Much easier than passing on the real delegate.
-            // We won't miss it, since the created InstanceProducer is just a dummy for purposes of analysis.
-            var dummyExpression = Expression.Constant(null, parameter.ParameterType);
-
-            var registration = new ExpressionRegistration(dummyExpression, this.Container);
-
-            return new KnownRelationship(
-                implementationType: constructor.DeclaringType,
-                lifestyle: Lifestyle.Singleton,
-                dependency: new InstanceProducer(parameter.ParameterType, registration));
-        }
-
         // The constructor parameter in which the decorated instance should be injected.
         private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
             Type serviceType, Expression expression)
