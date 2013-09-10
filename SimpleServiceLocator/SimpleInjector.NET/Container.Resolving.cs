@@ -404,29 +404,29 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteUnregisteredType<TService>();
+                () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>();
 
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
 
         private InstanceProducer BuildInstanceProducerForType(Type serviceType)
         {
-            Func<InstanceProducer> buildInstanceProducerForConcreteType =
-                () => this.BuildInstanceProducerForConcreteUnregisteredType(serviceType);
+            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType =
+                () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType);
 
-            return this.BuildInstanceProducerForType(serviceType, buildInstanceProducerForConcreteType);
+            return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcreteType);
         }
 
         private InstanceProducer BuildInstanceProducerForType(Type serviceType,
-            Func<InstanceProducer> buildInstanceProducerForConcreteType)
+            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType)
         {
             return
-                this.BuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
-                this.BuildInstanceProducerForCollection(serviceType) ??
-                buildInstanceProducerForConcreteType();
+                this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
+                this.TryBuildInstanceProducerForCollection(serviceType) ??
+                tryBuildInstanceProducerForConcreteType();
         }
 
-        private InstanceProducer BuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
+        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
         {
             var e = new UnregisteredTypeEventArgs(serviceType);
 
@@ -447,7 +447,7 @@ namespace SimpleInjector
             }
         }
 
-        private InstanceProducer BuildInstanceProducerForCollection(Type serviceType)
+        private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
         {
             if (!serviceType.IsGenericType)
             {
@@ -470,8 +470,9 @@ namespace SimpleInjector
                 return null;
             }
 
-            return this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType)
-                ?? this.TryBuildEmptyCollectionInstanceProducerForReadOnly(serviceType);            
+            return 
+                this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType) ?? 
+                this.TryBuildEmptyCollectionInstanceProducerForReadOnly(serviceType);            
         }
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
@@ -482,7 +483,7 @@ namespace SimpleInjector
                 // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
                 // it up). This means that we will must always return an empty set and we will do this by
                 // registering a SingletonInstanceProducer with an empty array of that type.
-                var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
+                var producer = this.BuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
 
                 producer.IsContainerAutoRegistered = true;
 
@@ -490,6 +491,18 @@ namespace SimpleInjector
             }
 
             return null;
+        }
+
+        private InstanceProducer BuildEmptyCollectionInstanceProducerForEnumerable(Type enumerableType)
+        {
+            Type elementType = enumerableType.GetGenericArguments()[0];
+
+            var collection =
+                DecoratorHelpers.CreateContainerControlledCollection(elementType, this, Type.EmptyTypes);
+
+            var registration = new ExpressionRegistration(Expression.Constant(collection, enumerableType), this);
+
+            return new InstanceProducer(enumerableType, registration);
         }
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForReadOnly(Type serviceType)
@@ -521,19 +534,7 @@ namespace SimpleInjector
             return null;
         }
 
-        private InstanceProducer BuildEmptyCollectionInstanceProducer(Type enumerableType)
-        {
-            Type elementType = enumerableType.GetGenericArguments()[0];
-
-            var collection =
-                DecoratorHelpers.CreateContainerControlledCollection(elementType, this, Type.EmptyTypes);
-
-            var registration = new ExpressionRegistration(Expression.Constant(collection, enumerableType), this);
-
-            return new InstanceProducer(enumerableType, registration);
-        }
-
-        private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
             where TConcrete : class
         {
             if (this.IsConcreteConstructableType(typeof(TConcrete)))
@@ -546,7 +547,7 @@ namespace SimpleInjector
             return null;
         }
 
-        private InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType)
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type concreteType)
         {
             if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
                 this.IsConcreteConstructableType(concreteType))

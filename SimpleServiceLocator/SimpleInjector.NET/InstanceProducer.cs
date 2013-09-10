@@ -111,10 +111,12 @@ namespace SimpleInjector
 
             this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
 
-            // ExpressionRegistration is an internal Registration type that is used by decorators and an 
-            // InstanceProducer for this registration should never be registered, because that would cause
-            // an endless loop, since verify would call GetInstance on them which would again cause the 
-            // decoration process to be triggered, creates a new InstanceProducer... You get the picture.
+            // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
+            // of registration doesn't have to be registered, sine it will either always be registered
+            // in the registrations dictionary anyway, or it is used to build up an InstanceProducer (by
+            // the decorator sub system) that is only used for diagnosis. Allowing the latter producers to
+            // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
+            // producers needlessly.
             if (!(registration is ExpressionRegistration))
             {
                 registration.Container.RegisterExternalProducer(this);
