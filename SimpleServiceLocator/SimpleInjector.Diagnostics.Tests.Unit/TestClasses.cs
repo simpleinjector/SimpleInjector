@@ -200,6 +200,13 @@
         {
         }
     }
+    
+    public class NullLogger : ILogger
+    {
+        public NullLogger()
+        {
+        }
+    }
 
     public class ConcreteThing : IConcreteThing
     {

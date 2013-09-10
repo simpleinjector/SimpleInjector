@@ -61,6 +61,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AnalyzerTests.cs" />
+    <Compile Include="ContainerRegisteredServiceContainerAnalyzerTests.cs" />
     <Compile Include="ExternalProducerCreationAnalysisTests.cs" />
     <Compile Include="ContainerDebugViewTests.cs" />
     <Compile Include="CustomLifestyleTests.cs" />

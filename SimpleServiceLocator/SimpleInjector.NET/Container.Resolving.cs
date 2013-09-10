@@ -449,23 +449,34 @@ namespace SimpleInjector
 
         private InstanceProducer BuildInstanceProducerForCollection(Type serviceType)
         {
-            // IEnumerable<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
-            if (!serviceType.IsGenericType || serviceType.ContainsGenericParameters ||
-                serviceType.GetGenericArguments().Length != 1)
+            if (!serviceType.IsGenericType)
             {
                 return null;
             }
 
-            Type elementType = serviceType.GetGenericArguments()[0];
+            Type[] arguments = serviceType.GetGenericArguments();
 
+            // IEnumerable<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
+            if (serviceType.ContainsGenericParameters || arguments.Length != 1)
+            {
+                return null;
+            }
+
+            Type elementType = arguments.First();
+
+            // We don't auto-register collections for ambiguous types.
             if (elementType.IsValueType || Helpers.IsAmbiguousType(elementType))
             {
                 return null;
             }
 
-            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+            return this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType)
+                ?? this.TryBuildEmptyCollectionInstanceProducerForReadOnly(serviceType);            
+        }
 
-            if (serviceTypeDefinition == typeof(IEnumerable<>))
+        private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
+        {
+            if (serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 // During the time that this method is called we are after the registration phase and there is
                 // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
@@ -473,20 +484,37 @@ namespace SimpleInjector
                 // registering a SingletonInstanceProducer with an empty array of that type.
                 var producer = this.BuildEmptyCollectionInstanceProducer(serviceType);
 
-                // Flag that this producer is resolved by the container or using unregistered type resolution.
                 producer.IsContainerAutoRegistered = true;
 
                 return producer;
             }
-            else if (serviceTypeDefinition == Helpers.IReadOnlyListType ||
+
+            return null;
+        }
+
+        private InstanceProducer TryBuildEmptyCollectionInstanceProducerForReadOnly(Type serviceType)
+        {
+            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+
+            if (serviceTypeDefinition == Helpers.IReadOnlyListType ||
                 serviceTypeDefinition == Helpers.IReadOnlyCollectionType)
             {
+                Type elementType = serviceType.GetGenericArguments()[0];
+
                 var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
 
                 if (collection != null)
                 {
-                    return new InstanceProducer(serviceType,
-                        SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this));
+                    var registration = SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this);
+
+                    var producer = new InstanceProducer(serviceType, registration);
+
+                    if (!((IEnumerable<object>)collection).Any())
+                    {
+                        producer.IsContainerAutoRegistered = true;
+                    }
+
+                    return producer;
                 }
             }
 
