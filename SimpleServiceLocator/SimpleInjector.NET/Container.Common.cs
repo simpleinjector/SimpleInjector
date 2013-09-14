@@ -202,11 +202,11 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either 
-        /// always return <b>null</b> or always return a producer that is able to return the expected instance.
-        /// Because of this, do not compare sets of instances returned by different calls to 
-        /// <see cref="GetCurrentRegistrations()"/> by reference. The way of comparing lists is by the actual 
-        /// type. The type of each instance is guaranteed to be unique in the returned list.
+        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either 
+        /// always return a producer that is able to return the expected instance. Because of this, do not 
+        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/> 
+        /// by reference. The way of comparing lists is by the actual type. The type of each instance is 
+        /// guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
