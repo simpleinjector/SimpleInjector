@@ -5,10 +5,19 @@
     using System.Linq;
     using System.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Extensions;
 
     [TestClass]
     public class CyclicDependencyValidatorTests
     {
+        public interface INode
+        {
+        }
+
+        public interface INodeFactory
+        {
+        }
+
         private interface IOne
         {
         }
@@ -398,6 +407,57 @@
                 action);
         }
 
+        [TestMethod]
+        public void Verify_DelayedCyclicReference_ShouldSucceed()
+        {
+            // Arrange
+            var container = new Container();
+
+            // NodeOne depends on INodeFactory
+            container.RegisterAll<INode>(typeof(NodeOne));
+
+            // NodeFactory depends on IEnumerable<INode>
+            container.Register<INodeFactory, NodeFactory>();
+
+            // Act
+            // Simple Injector's goal is to prevent stackoverflow exceptions when building up object graphs. 
+            // Since the creation of the INode types are delayed since an IEnumerable<T> is injected into the 
+            // NodeFactory (note that injecting an an IEnumerable<T> does trigger the creation of its 
+            // instances; iterating the collection does), this can be revolved fine and there will be no
+            // stackoverflow. It is therefore not Simple Injector's job to disallow such construct. Having the 
+            // circular reference in the code might be a problem, but the design might also be intentional and
+            // could work just fine. Simple Injector should allow this.
+            container.Verify();
+
+            // Extra check in case Verify doens't do its job.
+            container.GetAllInstances<INode>().ToArray();
+        }
+
+        [TestMethod]
+        public void Verify_DelayedCyclicReferenceWithDecorator_ShouldSucceed()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<INode>(typeof(NodeOne));
+
+            // With the previous releases of Simple Injector the use of a decorator would cause collections to
+            // be built less lazily, i.e. all collection elements would be compiled upon injection. This would
+            // cause the Verify complain about the cyclic reference, which should not happen. This is why we
+            // have this extra test with the decorator. For more information about why this should succeed,
+            // see the comment on the previous test.
+            container.RegisterDecorator(typeof(INode), typeof(NodeDecorator));
+
+            // NodeFactory depends on IEnumerable<INode>
+            container.Register<INodeFactory, NodeFactory>();
+
+            // Act
+            container.Verify();
+
+            // Extra check in case Verify doens't do its job.
+            container.GetAllInstances<INode>().ToArray();
+        }
+
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
@@ -433,6 +493,31 @@
             public static void ResetStackoverflowProtection()
             {
                 recursionCountDown = 100;
+            }
+        }
+
+        #endregion
+
+        #region Cyclic Dependency Through IEnumerable<T>
+
+        public class NodeOne : INode
+        {
+            public NodeOne(INodeFactory nodeFactory)
+            {
+            }
+        }
+
+        public class NodeDecorator : INode
+        {
+            public NodeDecorator(INode node)
+            {
+            }
+        }
+
+        public class NodeFactory : INodeFactory
+        {
+            public NodeFactory(IEnumerable<INode> nodes)
+            {
             }
         }
 
