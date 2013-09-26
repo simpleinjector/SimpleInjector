@@ -91,6 +91,7 @@
     <Compile Include="PerThreadRegistrationsExtensions.cs" />
     <Compile Include="ResolvingExtensions.cs" />
     <Compile Include="ResolvingFactoriesExtensions.cs" />
+    <Compile Include="ThreadLifestyle.cs" />
     <Compile Include="VarianceExtensions.cs" />
     <Compile Include="WinFormsIntegrationExtensions.cs" />
     <Compile Include="ParameterConvention.cs" />
