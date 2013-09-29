@@ -71,6 +71,7 @@
     <Compile Include="AssertThat.cs" />
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
+    <Compile Include="ContextualDecoratorExtensionsTests.cs" />
     <Compile Include="KeyedFactoryTests.cs" />
     <Compile Include="KeyedRegistrationsTests.cs" />
     <Compile Include="RuntimeDecoratorExtensionsTests.cs" />

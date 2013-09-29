@@ -7,10 +7,6 @@
     [TestClass]
     public class RuntimeDecoratorExtensionsTests
     {
-        public interface ICommandHandler<TCommand> 
-        {
-        }
-
         [TestMethod]
         public void GetInstance_OnRegisterRuntimeDecoratorRegistration_DecorationCanBeChangedDynamically()
         {
@@ -67,31 +63,6 @@
             // Assert
             Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<RealCommand>));
             Assert.IsInstanceOfType(handler2, typeof(CommandHandlerDecorator<RealCommand>));
-        }
-        
-        public class RealCommand 
-        {
-        }
-
-        public class NullCommandHandler<TCommand> : ICommandHandler<TCommand> 
-        {
-        }
-
-        public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
-        {
-            public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
-            {
-            }
-        }
-
-        public class CommandHandlerProxy<TCommand> : ICommandHandler<TCommand>
-        {
-            public readonly Func<ICommandHandler<TCommand>> DecorateeFactory;
-
-            public CommandHandlerProxy(Func<ICommandHandler<TCommand>> decorateeFactory)
-            {
-                this.DecorateeFactory = decorateeFactory;
-            }            
         }
     }
 }

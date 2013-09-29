@@ -4,6 +4,10 @@
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    public interface ICommandHandler<TCommand>
+    {
+    }
+
     public interface ILogger
     {
         void Log(string message);
@@ -69,6 +73,44 @@
         public override string ToString()
         {
             return string.Join(Environment.NewLine, this);
+        }
+    }
+
+    public class RealCommand
+    {
+    }
+
+    public class NullCommandHandler<TCommand> : ICommandHandler<TCommand>
+    {
+    }
+
+    public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    {
+        public readonly ICommandHandler<TCommand> Decoratee;
+
+        public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+    }
+
+    public class AnotherCommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    {
+        public readonly ICommandHandler<TCommand> Decoratee;
+
+        public AnotherCommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+    }
+
+    public class CommandHandlerProxy<TCommand> : ICommandHandler<TCommand>
+    {
+        public readonly Func<ICommandHandler<TCommand>> DecorateeFactory;
+
+        public CommandHandlerProxy(Func<ICommandHandler<TCommand>> decorateeFactory)
+        {
+            this.DecorateeFactory = decorateeFactory;
         }
     }
 }
