@@ -111,7 +111,8 @@ namespace SimpleInjector.Extensions.Decorators
 
             decoratorRegistration = this.CreateRegistrationForUncontrolledCollection(parameter);
 
-            Expression parameterizedDecoratorExpression = decoratorRegistration.BuildExpression();
+            Expression parameterizedDecoratorExpression = 
+                decoratorRegistration.BuildExpression(this.e.InstanceProducer);
 
             // TODO: Optimize for performance by using a dynamic assembly where possible.
             Delegate wrapInstanceWithDecorator =

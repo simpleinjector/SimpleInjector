@@ -31,7 +31,9 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an
@@ -49,14 +51,29 @@ namespace SimpleInjector
     /// <example>
     /// See the <see cref="Lifestyle"/> documentation for an example.
     /// </example>
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        // I'm still wondering whether it was better to use Dictionary<Thread, InstanceProducer> instead of
+        // ThreadLocal<InstanceProducer>. That would have prevented me from having to write all this :-)
+        Justification = "This class references ThreadLocal<InstanceProducer> and ThreadLocal<T> implements " +
+            "IDisposable. Not letting Registration implement IDisposable however is not a problem, because:" +
+            "-Unless a user registers the InstanceCreated event, no ThreadLocal<T> will get created. " +
+            "-Registration objects will typically live as long as the AppDomain, so for those instances   " +
+            " disposing is not an issue.                                                                  " +
+            "-The InstanceProducers stored in the ThreadLocal<T> also live long and will be removed from  " +
+            " the ThreadLocal<T> during the call to BuildExpression(InstanceProducer) and the ThreadLocal " +
+            " wil because of this not keep those instances alive unnecessary.                             " +
+            "-ThreadLocal<T> implements a finalizer and the GC will eventually clean up those few         " +
+            " instances that are referenced in a Registration that gets dereferenced.")]
     public abstract class Registration
     {
         private static readonly Action<object> NoOp = instance => { };
 
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
-
+        
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
         private Action<object> instanceInitializer;
+
+        private ThreadLocal<InstanceProducer> currentProducer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Registration"/> class.
@@ -100,7 +117,7 @@ namespace SimpleInjector
         /// </summary>
         /// <returns>An <see cref="Expression"/>.</returns>
         public abstract Expression BuildExpression();
-
+ 
         /// <summary>
         /// Gets the list of <see cref="KnownRelationship"/> instances. Note that the list is only available
         /// after calling <see cref="BuildExpression"/>.
@@ -137,6 +154,23 @@ namespace SimpleInjector
             }
 
             this.instanceInitializer(instance);
+        }
+
+        internal Expression BuildExpression(InstanceProducer producer)
+        {
+            // This is an ugly hack. We can't pass on the supplied producer down the callstack, since that would
+            // mean we'd have to introduce a breaking change in the API. Instead we pass the producer through
+            // using a ThreadLocal<T>. This isn't pretty, but it does the trick.
+            try
+            {
+                this.SetCurrentProducer(producer);
+
+                return this.BuildExpression();
+            }
+            finally
+            {
+                this.ResetCurrentProducer();
+            }
         }
 
         internal virtual KnownRelationship[] GetRelationshipsCore()
@@ -208,6 +242,16 @@ namespace SimpleInjector
             }
 
             return expression;
+        }
+
+        internal InstanceProducer GetCurrentProducer()
+        {
+            if (this.Container.InstanceCreatedHandler != null && this.currentProducer != null)
+            {
+                return this.currentProducer.Value;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -288,6 +332,8 @@ namespace SimpleInjector
             
             expression = this.WrapWithInitializer<TService>(expression);
 
+            expression = this.WrapWithInstanceCreatedCallback<TService>(expression);
+
             return expression;
         }
 
@@ -319,6 +365,8 @@ namespace SimpleInjector
 
             expression = this.WrapWithInitializer<TImplementation>(expression);
 
+            expression = this.WrapWithInstanceCreatedCallback<TImplementation>(expression);
+
             return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
         }
 
@@ -336,6 +384,8 @@ namespace SimpleInjector
 
             expression = this.InterceptInstanceCreation(type, type, expression);
 
+            // NOTE: We can't wrap with the instance created callback, since the InitializeInstance is called
+            // directly by a user.
             expression = this.WrapWithInitializer(type, type, expression);
 
             if (expression != castedParameter)
@@ -496,6 +546,27 @@ namespace SimpleInjector
             return expression;
         }
 
+        private Expression WrapWithInstanceCreatedCallback<TImplementation>(Expression expression)
+        {
+            InstanceCreatedEventHandler handler = this.Container.InstanceCreatedHandler;
+            InstanceProducer producer = this.GetCurrentProducer();
+            Registration registration = this;
+
+            if (handler != null && producer != null)
+            {
+                Func<TImplementation, TImplementation> instanceCreatedWrapper = instance =>
+                {
+                    handler(producer, new InstanceCreatedEventArgs(registration, instance));
+
+                    return instance;
+                };
+
+                return Expression.Invoke(Expression.Constant(instanceCreatedWrapper), expression);
+            }
+
+            return expression;
+        }
+
         private static Expression BuildExpressionWithInstanceInitializer<TImplementation>(
             Expression newExpression, Action<TImplementation> instanceInitializer)
             where TImplementation : class
@@ -526,7 +597,8 @@ namespace SimpleInjector
                 var newInstanceMethod =
                     Expression.Lambda<Func<TService>>(expression, new ParameterExpression[0]);
 
-                // TODO: Optimize compilation by using a dynamic assembly.
+                // We can't optimize this delegate using Helpers.CompileAndRun, since we don't have the ability
+                // to return the created instance.
                 return newInstanceMethod.Compile();
             }
             catch (Exception ex)
@@ -547,7 +619,43 @@ namespace SimpleInjector
 
             return instance;
         }
-   
+
+        private void SetCurrentProducer(InstanceProducer producer)
+        {
+            if (this.Container.InstanceCreatedHandler == null)
+            {
+                return;
+            }
+
+            // Call initialize after the InstanceCreatedHandler == null to prevent unnecessarily creation
+            // of the ThreadLocal<T> object, since it takes up extra memory.
+            this.InitializeThreadLocalInstanceProducer();
+
+            this.currentProducer.Value = producer;
+        }
+
+        private void InitializeThreadLocalInstanceProducer()
+        {
+            if (this.currentProducer == null)
+            {
+                lock (this.Container.SyncRoot)
+                {
+                    if (this.currentProducer == null)
+                    {
+                        this.currentProducer = new ThreadLocal<InstanceProducer>();
+                    }
+                }
+            }
+        }
+
+        private void ResetCurrentProducer()
+        {
+            if (this.currentProducer != null)
+            {
+                this.currentProducer.Value = null;
+            }
+        }
+
         // Searches an expression for a specific sub expression and replaces that sub expression with a
         // different supplied expression.
         private sealed class SubExpressionReplacer : ExpressionVisitor

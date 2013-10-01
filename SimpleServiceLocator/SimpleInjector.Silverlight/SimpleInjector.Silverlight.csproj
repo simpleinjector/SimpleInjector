@@ -149,6 +149,9 @@
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\InstanceCreatedEventArgs.cs">
+      <Link>Diagnostics\InstanceCreatedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\KnownRelationshipCollection.cs">
       <Link>Diagnostics\KnownRelationshipCollection.cs</Link>
     </Compile>

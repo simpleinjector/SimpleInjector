@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
     using SimpleInjector.Advanced.Internal;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
@@ -397,6 +398,37 @@ namespace SimpleInjector
                 this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilding -= value;
+            }
+        }
+
+        /// <summary>
+        /// Occurs directly after the creation of an instance. Multiple delegates may handle the same service type.
+        /// </summary>
+        /// <remarks>
+        /// <b>WARNING:</b> Registering to this event can have considerate impact on the performance of the 
+        /// container, since the event will get triggered for every instance that is created by the container.
+        /// </remarks>
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly", Justification = 
+            "InstanceCreatedEventHandler explicitly violates the design guidelines by having a sender that " +
+            "is not System.Object and having an 'e' parameter that does not inherit from EventArgs. By " +
+            "supplying the actual sender type (InstanceProducer) we make it easier for the user to handle " +
+            "this event, since this parameter is needed in the common use cases. The 'e' parameter is a " +
+            "struct to prevent unneeded object allocations and improve performance. Since EventArgs is a " +
+            "class, we cannot derive from EventArgs.")]
+        public event InstanceCreatedEventHandler InstanceCreated
+        {
+            add
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.instanceCreated += value;
+            }
+
+            remove
+            {
+                this.ThrowWhenContainerIsLocked();
+
+                this.instanceCreated -= value;
             }
         }
 

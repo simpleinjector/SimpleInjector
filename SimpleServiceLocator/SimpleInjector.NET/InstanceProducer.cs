@@ -340,7 +340,7 @@ namespace SimpleInjector
             // We must lock the container, because not locking could lead to race conditions.
             this.Registration.Container.LockContainer();
 
-            var expression = this.Registration.BuildExpression();
+            var expression = this.Registration.BuildExpression(this);
 
             if (expression == null)
             {

@@ -59,8 +59,9 @@ namespace SimpleInjector.Lifestyles
 
         public override Expression BuildExpression()
         {
-            Expression trueExpression = this.trueRegistration.BuildExpression();
-            Expression falseExpression = this.falseRegistration.BuildExpression();
+            InstanceProducer producer = this.GetCurrentProducer();
+            Expression trueExpression = this.trueRegistration.BuildExpression(producer);
+            Expression falseExpression = this.falseRegistration.BuildExpression(producer);
 
             // Must be called after BuildExpression has been called.
             this.AddRelationships();

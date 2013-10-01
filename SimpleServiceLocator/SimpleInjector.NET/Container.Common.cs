@@ -89,7 +89,10 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
+
         private EventHandler<ExpressionBuiltEventArgs> expressionBuilt;
+
+        private InstanceCreatedEventHandler instanceCreated;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -136,6 +139,11 @@ namespace SimpleInjector
         internal long ContainerId
         {
             get { return this.containerId; }
+        }
+
+        internal object SyncRoot
+        {
+            get { return this.locker; }
         }
 
         internal bool IsLocked
@@ -185,6 +193,11 @@ namespace SimpleInjector
         internal ModuleBuilder ModuleBuilder
         {
             get { return this.moduleBuilder.Value; }
+        }
+
+        internal InstanceCreatedEventHandler InstanceCreatedHandler
+        {
+            get { return this.instanceCreated; }
         }
 
         /// <summary>

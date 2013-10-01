@@ -114,6 +114,7 @@
     <Compile Include="Extensions\ExtensionHelpers.cs" />
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
+    <Compile Include="Diagnostics\InstanceCreatedEventArgs.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />
     <Compile Include="Lifestyles\HybridLifestyle.cs" />

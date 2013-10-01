@@ -83,7 +83,7 @@ namespace SimpleInjector.Extensions.Decorators
 
         private void ReplaceOriginalExpression(Registration registration)
         {
-            this.e.Expression = registration.BuildExpression();
+            this.e.Expression = registration.BuildExpression(this.e.InstanceProducer);
 
             this.e.Lifestyle = this.Lifestyle;
         }
