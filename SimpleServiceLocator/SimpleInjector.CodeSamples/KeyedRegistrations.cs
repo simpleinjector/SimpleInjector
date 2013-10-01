@@ -52,6 +52,11 @@
             this.Register(lifestyle.CreateRegistration(typeof(TService), instanceCreator, this.container), key);
         }
 
+        public InstanceProducer GetRegistration(TKey key)
+        {
+            return this.keyedProducers[key];
+        }
+
         public IEnumerator<TService> GetEnumerator()
         {
             foreach (var producer in this.producers)
