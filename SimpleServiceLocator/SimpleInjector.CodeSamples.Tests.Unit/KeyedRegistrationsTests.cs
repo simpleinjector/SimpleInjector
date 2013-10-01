@@ -2,10 +2,12 @@
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-    
+
     [TestClass]
     public class KeyedRegistrationsTests
     {
@@ -22,6 +24,10 @@
             var container = new Container();
 
             var plugins = new KeyedRegistrations<string, IPlugin>(container);
+
+            container.Options.ConstructorInjectionBehavior = new NamedConstructorInjectionBehavior(
+                container.Options.ConstructorInjectionBehavior,
+                (serviceType, name) => plugins.GetRegistration(name));
 
             plugins.Register(typeof(Plugin1), "1");
             plugins.Register<Plugin2>("2");
@@ -42,6 +48,7 @@
             var actualPlugins1 = container.GetAllInstances<IPlugin>().ToArray();
             var actualPlugins2 = container.GetAllInstances<IPlugin>().ToArray();
             var factory = container.GetInstance<Func<string, IPlugin>>();
+            var consumer = container.GetInstance<NamedPluginConsumer>();
 
             // Assert
             Assert.IsInstanceOfType(actualPlugins1[0], typeof(Plugin1));
@@ -61,6 +68,11 @@
             Assert.AreSame(actualPlugins1[2], actualPlugins2[2]);
             Assert.AreNotSame(actualPlugins1[3], actualPlugins2[3]);
             Assert.AreSame(actualPlugins1[4], actualPlugins2[4]);
+
+            Assert.IsInstanceOfType(consumer.Plugin1, typeof(Plugin1));
+            Assert.IsInstanceOfType(consumer.Plugin2, typeof(Plugin2));
+            Assert.IsInstanceOfType(consumer.Plugin3, typeof(PluginDecorator));
+            Assert.IsInstanceOfType(consumer.Plugin4, typeof(Plugin));
         }
 
         public class Plugin1 : IPlugin 
@@ -86,6 +98,65 @@
         {
             public PluginDecorator(IPlugin plugin)
             {
+            }
+        }
+                
+        [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
+        public class NamedAttribute : Attribute
+        {
+            public NamedAttribute(string name)
+            {
+                this.Name = name;
+            }
+
+            public string Name { get; private set; }
+        }
+
+        public class NamedPluginConsumer
+        {
+            public NamedPluginConsumer(
+                [Named("1")] IPlugin plugin1,
+                [Named("2")] IPlugin plugin2,
+                [Named("3")] IPlugin plugin3,
+                [Named("4")] IPlugin plugin4)
+            {
+                this.Plugin1 = plugin1;
+                this.Plugin2 = plugin2;
+                this.Plugin3 = plugin3;
+                this.Plugin4 = plugin4;
+            }
+
+            public IPlugin Plugin1 { get; private set; }
+
+            public IPlugin Plugin2 { get; private set; }
+
+            public IPlugin Plugin3 { get; private set; }
+
+            public IPlugin Plugin4 { get; private set; }
+        }
+
+        public class NamedConstructorInjectionBehavior : IConstructorInjectionBehavior
+        {
+            private readonly IConstructorInjectionBehavior defaultBehavior;
+            private readonly Func<Type, string, InstanceProducer> keyedProducerRetriever;
+
+            public NamedConstructorInjectionBehavior(IConstructorInjectionBehavior defaultBehavior,
+                Func<Type, string, InstanceProducer> keyedProducerRetriever)
+            {
+                this.defaultBehavior = defaultBehavior;
+                this.keyedProducerRetriever = keyedProducerRetriever;
+            }
+
+            public Expression BuildParameterExpression(ParameterInfo parameter)
+            {
+                var attribute = parameter.GetCustomAttribute<NamedAttribute>();
+
+                if (attribute != null)
+                {
+                    return this.keyedProducerRetriever(parameter.ParameterType, attribute.Name).BuildExpression();
+                }
+
+                return this.defaultBehavior.BuildParameterExpression(parameter);
             }
         }
     }
