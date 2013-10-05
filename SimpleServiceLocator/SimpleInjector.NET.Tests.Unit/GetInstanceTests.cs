@@ -26,22 +26,15 @@
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
+            // Act
+            Action action = () => container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(@"
-                    The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
                     of type IDisposable with name 'a' that is not registered."
-                    .TrimInside(),
-                    ex.Message);
-            }
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -50,22 +43,15 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(@"
-                    The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
-                    of type IDisposable with name 'a' that is not registered."
-                    .TrimInside(),
-                    ex.Message);
-            }
+            // Act
+            Action action = () => container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
+            
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
+                of type IDisposable with name 'a' that is not registered."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -74,22 +60,15 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance<ServiceWithUnregisteredDependencies>();
+            // Act
+            Action action = () => container.GetInstance<ServiceWithUnregisteredDependencies>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(@"
-                    The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
-                    of type IDisposable with name 'a' that is not registered."
-                    .TrimInside(),
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The constructor of the type ServiceWithUnregisteredDependencies contains the parameter 
+                of type IDisposable with name 'a' that is not registered."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -122,20 +101,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
+            // Act
+            Action action = 
+                () => container.GetInstance(typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(
-                    "GetInstanceTests+SomeGenericNastyness<TBla>+ReadOnlyDictionary<TKey, TValue>+KeyCollection",
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "GetInstanceTests+SomeGenericNastyness<TBla>+ReadOnlyDictionary<TKey, TValue>+KeyCollection", 
+                action);
         }
 
         [TestMethod]
@@ -147,16 +120,12 @@
             // Lazy<Func<TResult>>
             var nastyOpenGenericType = typeof(Lazy<>).MakeGenericType(typeof(Func<>));
 
-            try
-            {
-                // Act
-                container.GetInstance(nastyOpenGenericType);
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "No registration for type Lazy<Func<TResult>> could be found.", ex);
-            }
+            // Act
+            Action action = () => container.GetInstance(nastyOpenGenericType);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "No registration for type Lazy<Func<TResult>> could be found.", action);
         }
 
         [TestMethod]
@@ -165,16 +134,12 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetAllInstances(typeof(IEnumerable<>));
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "No registration for type IEnumerable<IEnumerable<T>> could be found.", ex);
-            }
+            // Act
+            Action action = () => container.GetAllInstances(typeof(IEnumerable<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "No registration for type IEnumerable<IEnumerable<T>> could be found.", action);
         }
 
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
