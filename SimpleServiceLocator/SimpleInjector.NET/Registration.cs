@@ -42,7 +42,7 @@ namespace SimpleInjector
     /// <remarks>
     /// <see cref="Lifestyle"/> implementations create a new <b>Registration</b> instance for each registered
     /// service type. <see cref="Expression"/>s returned from the 
-    /// <see cref="Registration.BuildExpression">BuildExpression</see> method can be intercepted by any event
+    /// <see cref="Registration.BuildExpression()">BuildExpression</see> method can be intercepted by any event
     /// registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have 
     /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> applied, and the caching 
     /// particular to its lifestyle have been applied. Interception using the 
@@ -120,7 +120,7 @@ namespace SimpleInjector
  
         /// <summary>
         /// Gets the list of <see cref="KnownRelationship"/> instances. Note that the list is only available
-        /// after calling <see cref="BuildExpression"/>.
+        /// after calling <see cref="BuildExpression()"/>.
         /// </summary>
         /// <returns>A new array containing the <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
