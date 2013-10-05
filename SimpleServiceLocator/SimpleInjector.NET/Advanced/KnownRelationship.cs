@@ -27,16 +27,13 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
 
     /// <summary>
     /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
     /// information to spot possible misconfigurations. 
     /// </summary>
-    [DebuggerDisplay(
-        "ImplementationType = {SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}, " +
-        "Lifestyle = {Lifestyle.Name,nq}, " +
-        "Dependency = \\{ServiceType = {SimpleInjector.Helpers.ToFriendlyName(Dependency.ServiceType),nq}, " +
-            "Lifestyle = {Dependency.Lifestyle.Name,nq}\\}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
         /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
@@ -57,7 +54,7 @@ namespace SimpleInjector.Advanced
 
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
         /// <value>The implementation type of the parent type of the relationship.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
+        [DebuggerDisplay("{ImplementationTypeDebuggerDisplay,nq}")]
         public Type ImplementationType { get; private set; }
 
         /// <summary>Gets the lifestyle of the parent type of the relationship.</summary>
@@ -67,6 +64,23 @@ namespace SimpleInjector.Advanced
         /// <summary>Gets the type that the parent depends on (it is injected into the parent).</summary>
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; private set; }
+
+        private string DebuggerDisplay
+        {
+            get
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "ImplementationType = {0}, Lifestyle = {1}, Dependency = {{{2}}}",
+                    this.ImplementationTypeDebuggerDisplay,
+                    this.Lifestyle.Name,
+                    this.Dependency.DebuggerDisplay);
+            }
+        }
+
+        private string ImplementationTypeDebuggerDisplay
+        {
+            get { return this.ImplementationType.ToFriendlyName(); }
+        }
 
         /// <summary>Serves as a hash function for a particular type.</summary>
         /// <returns>A hash code for the current <see cref="KnownRelationship"/>.</returns>

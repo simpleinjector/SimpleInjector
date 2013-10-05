@@ -29,6 +29,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
@@ -79,9 +80,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
-    [DebuggerDisplay(
-        "ServiceType = {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}, " +
-        "Lifestyle = {Lifestyle.Name,nq}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class InstanceProducer
     {
         private static readonly Action[] NoVerifiers = new Action[0];
@@ -180,6 +179,16 @@ namespace SimpleInjector
         internal bool Verified 
         {
             get { return this.expression.IsValueCreated; }
+        }
+
+        internal string DebuggerDisplay
+        {
+            get
+            {
+                return string.Format(CultureInfo.InvariantCulture, 
+                    "ServiceType = {0}, Lifestyle = {1}",
+                    this.ServiceType.ToFriendlyName(), this.Lifestyle.Name);
+            }
         }
 
         /// <summary>Produces an instance.</summary>

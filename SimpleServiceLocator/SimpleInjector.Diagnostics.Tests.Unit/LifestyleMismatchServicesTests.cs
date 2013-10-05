@@ -8,7 +8,6 @@
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
 
-#if DEBUG
     [TestClass]
     public class LifestyleMismatchServicesTests
     {
@@ -490,5 +489,4 @@
             return Lifestyle.Transient.CreateRegistration<TService>(instanceCreator, container);
         }
     }
-#endif
 }
