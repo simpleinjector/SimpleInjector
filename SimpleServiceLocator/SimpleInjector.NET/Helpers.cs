@@ -255,6 +255,7 @@ namespace SimpleInjector
             return CompileLambda(expression);
         }
 
+#if !SILVERLIGHT
         internal static Delegate CompileLambdaInDynamicAssembly(Container container, LambdaExpression lambda, 
             string typeName, string methodName)
         {
@@ -270,7 +271,6 @@ namespace SimpleInjector
             return Delegate.CreateDelegate(lambda.Type, type.GetMethod(methodName), true);
         }
 
-#if !SILVERLIGHT
         // This doesn't find all possible cases, but get's us close enough.
         internal static bool ExpressionNeedsAccessToInternals(Expression expression)
         {

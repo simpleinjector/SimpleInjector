@@ -69,7 +69,10 @@ namespace SimpleInjector
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
+
+#if !SILVERLIGHT
         private readonly Lazy<ModuleBuilder> moduleBuilder;
+#endif
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
@@ -124,7 +127,9 @@ namespace SimpleInjector
 
             this.containerId = Interlocked.Increment(ref counter);
 
+#if !SILVERLIGHT
             this.moduleBuilder = new Lazy<ModuleBuilder>(this.CreateModuleBuilder);
+#endif
         }
 
         /// <summary>Gets the container options.</summary>
@@ -190,10 +195,12 @@ namespace SimpleInjector
             get { return this.succesfullyVerified; }
         }
 
+#if !SILVERLIGHT
         internal ModuleBuilder ModuleBuilder
         {
             get { return this.moduleBuilder.Value; }
         }
+#endif
 
         internal InstanceCreatedEventHandler InstanceCreatedHandler
         {
@@ -378,12 +385,14 @@ namespace SimpleInjector
             }
         }
 
+#if !SILVERLIGHT
         private ModuleBuilder CreateModuleBuilder()
         {
             return AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName("SimpleInjector.Compiled_" + this.containerId), AssemblyBuilderAccess.Run)
                 .DefineDynamicModule("SimpleInjector.CompiledModule");
         }
+#endif
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
         private sealed class InstanceInitializer
