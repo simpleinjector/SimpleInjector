@@ -371,7 +371,16 @@ namespace SimpleInjector
 
         private ActivationException GetErrorForTryingToGetInstanceOfType(Exception innerException)
         {
-            string exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
+            string exceptionMessage;
+
+            if (this.IsContainerAutoRegistered)
+            {
+                exceptionMessage = StringResources.ImplicitRegistrationCouldNotBeMadeForType(this.ServiceType);
+            }
+            else
+            {
+                exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
+            }
 
             return new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
         }

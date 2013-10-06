@@ -26,6 +26,25 @@
             }
         }
 
+        public static void ThrowsWithExceptionMessageDoesNotContain<TException>(string messageNotToBeExpected,
+            Action action, string assertMessage = null)
+            where TException : Exception
+        {
+            Throws<TException>(() =>
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    ExceptionMessageShouldNotContain(messageNotToBeExpected, ex, assertMessage);
+
+                    throw;
+                }
+            });
+        }
+
         public static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, 
             Action action, string assertMessage = null)
             where TException : Exception
@@ -177,8 +196,39 @@
                 "Actual string: \"" + actualMessage + "\". " +
                 "Expected value to be in the string: \"" + expectedMessage + "\"." + Environment.NewLine +
                 stackTrace);
+        }
+        
+        public static void ExceptionMessageShouldNotContain(string messageNotToBeExpected, Exception actualException,
+            string assertMessage = null)
+        {
+            Assert.IsNotNull(actualException, "actualException should not be null.");
 
-            StringContains(expectedMessage, actualException.Message, "stackTrace: " + stackTrace);
+            if (messageNotToBeExpected == null)
+            {
+                return;
+            }
+
+            string stackTrace = "stackTrace: " + Environment.NewLine + Environment.NewLine;
+
+            Exception exception = actualException;
+
+            while (exception != null)
+            {
+                stackTrace += exception.StackTrace +
+                    Environment.NewLine + " <-----------> " + Environment.NewLine;
+
+                exception = exception.InnerException;
+            }
+
+            string actualMessage = actualException.Message;
+
+            Assert.IsTrue(actualMessage != null && !actualMessage.Contains(messageNotToBeExpected),
+                assertMessage +
+                " The string did contain the expected value, while it was not expected. " +
+                "Actual string: \"" + actualMessage + "\". " +
+                "Value to be NOT expected in the string: \"" + messageNotToBeExpected + "\"." + 
+                Environment.NewLine +
+                stackTrace);
         }
 
         public static void StringContains(string expectedMessage, string actualMessage)

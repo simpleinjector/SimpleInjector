@@ -32,6 +32,8 @@ Version vNext
 		-[Core] Not all created registrations ended up in the debugger diagnostics view (work item 19954).
 		-[Core] Visual Basic debugger now displays debug information. The experience still sucks for VB
 		 developers, but at least they can view the information now. (work item 20271)
+		-[Core] Exception messages often contained the text "No registration for type {0} could be found " 
+		 even though the type was registered explicitly. (Work item 20272).
 	
 				
 Version 2.3.5 (v2.3.5 RTM) 2013-09-02

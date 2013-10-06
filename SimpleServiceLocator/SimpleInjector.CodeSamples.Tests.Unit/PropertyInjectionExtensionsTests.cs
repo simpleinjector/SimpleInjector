@@ -124,8 +124,14 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(typeof(ServiceWithAttributedProperty).Name + " threw an exception."));
-                Assert.IsTrue(ex.Message.Contains(typeof(ILogger).Name + " could be found."));
+                AssertThat.StringContains(
+                    typeof(ServiceWithAttributedProperty).Name + 
+                    " could be found and an implicit registration could not be made.",
+                    ex.Message);
+
+                AssertThat.StringContains(
+                    typeof(ILogger).Name + " could be found.",
+                    ex.Message);
             }
         }
 

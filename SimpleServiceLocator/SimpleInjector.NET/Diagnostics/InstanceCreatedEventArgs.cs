@@ -117,8 +117,8 @@ namespace SimpleInjector.Diagnostics
         /// <returns>True if a and b are equal; otherwise, false.</returns>
         public static bool operator ==(InstanceCreatedEventArgs first, InstanceCreatedEventArgs second)
         {
-            return object.ReferenceEquals(first.registration, first.registration) &&
-                object.ReferenceEquals(second.instance, second.instance);
+            return object.ReferenceEquals(first.registration, second.registration) &&
+                object.ReferenceEquals(first.instance, second.instance);
         }
 
         /// <summary>

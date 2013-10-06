@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -397,8 +398,10 @@
             }
             catch (ActivationException ex)
             {
+                var innerExceptions = ex.InnerException.GetExceptionChain();
+                               
                 Assert.IsNotNull(ex.InnerException, "No inner exception was supplied.");
-                Assert.AreEqual(expectedInnerException, ex.InnerException,
+                Assert.IsTrue(innerExceptions.Contains(expectedInnerException),
                     "The supplied inner exception was not the expected inner exception");
             }
         }
@@ -446,25 +449,47 @@
                 }
             };
 
-            try
-            {
-                // Act
-                container.GetInstance<RealUserService>();
+            // Act
+            Action action = () => container.GetInstance<RealUserService>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (Exception ex)
-            {
-                const string AssertMessage = "Exception message was not descriptive enough.";
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The delegate that was registered for service type IUserRepository using the 
+                UnregisteredTypeEventArgs.Register(Func<object>) method returned an object that couldn't
+                be casted to IUserRepository. 
+                Unable to cast object of type 'SimpleInjector.Tests.Unit.RealUserService' 
+                to type 'SimpleInjector.Tests.Unit.IUserRepository'.".TrimInside(),
+                action,
+                "Exception message was not descriptive enough.");
+        }
 
-                AssertThat.ExceptionMessageContains(@"
-                    The registered delegate for type RealUserService threw an exception. 
-                    Unable to cast object of type 'SimpleInjector.Tests.Unit.RealUserService' 
-                    to type 'SimpleInjector.Tests.Unit.IUserRepository'."
-                    .TrimInside(),
-                    ex, AssertMessage);
-            }
+        [TestMethod]
+        public void GetInstance_EventRegisteredThrowsAnException_ThrowsExceptionWithExpectedMessage()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IUserRepository))
+                {
+                    e.Register(() =>
+                    {
+                        throw new InvalidOperationException("Some stupid exception.");
+                    });
+                }
+            };
+
+            // Act
+            Action action = () => container.GetInstance<RealUserService>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The delegate that was registered for service type IUserRepository using the 
+                UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception. 
+                Some stupid exception.".TrimInside(),
+                action,
+                "Exception message was not descriptive enough.");
         }
 
         [TestMethod]

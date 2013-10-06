@@ -406,12 +406,25 @@ namespace SimpleInjector
 
             this.AddConstructorParametersAsKnownRelationship(constructor);
 
-            var parameters =
-                from parameter in constructor.GetParameters()
-                let overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder
-                select overriddenExpression ?? this.BuildParameterExpressionFor(parameter);
+            return Expression.New(constructor, this.BuildConstructorParameters(constructor));
+        }
 
-            return Expression.New(constructor, parameters.ToArray());
+        private Expression[] BuildConstructorParameters(ConstructorInfo constructor)
+        {
+            // NOTE: We used to use a LINQ query here (which is cleaner code), but we reverted back to using
+            // a foreach statement to clean up the stack trace, since this is a very common code path to
+            // show up in the stack trace and preventing showing up the Enumerable and Buffer`1 calls here
+            // makes it easier for developers (and maintainers) to read the stack trace.
+            var parameters = new List<Expression>();
+
+            foreach (var parameter in constructor.GetParameters())
+            {
+                var overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder;
+
+                parameters.Add(overriddenExpression ?? this.BuildParameterExpressionFor(parameter));
+            }
+
+            return parameters.ToArray();
         }
 
         private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType, 

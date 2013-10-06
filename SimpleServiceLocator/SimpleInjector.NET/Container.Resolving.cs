@@ -397,8 +397,8 @@ namespace SimpleInjector
             this.IsConstructableType(concreteType, concreteType, out exceptionMessage);
 
             throw new ActivationException(
-                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType)
-                + exceptionMessage);
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType) + " " + 
+                exceptionMessage);
         }
 
         private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class

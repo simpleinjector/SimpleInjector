@@ -116,7 +116,6 @@ namespace SimpleInjector
         internal static string ParameterTypeMustBeRegistered(Type implementationType, ParameterInfo parameter)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                ImplicitRegistrationCouldNotBeMadeForType(implementationType) +
                 "The constructor of the type {3} contains the parameter of type {0} with name '{1}' that is " +
                 "not registered. Please ensure {0} is registered in the container, or change the " +
                 "constructor of {2}.",
@@ -169,7 +168,7 @@ namespace SimpleInjector
         internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found and an implicit registration could not be made. ",
+                "No registration for type {0} could be found and an implicit registration could not be made.",
                 serviceType.ToFriendlyName());
         }
 
@@ -488,6 +487,25 @@ namespace SimpleInjector
                 "call, appending registrations to these collections is not supported. Please register the " +
                 "collection with one of the other RegisterAll overloads is appending is required.",
                 serviceType.ToFriendlyName());
+        }
+
+        internal static string UnregisteredTypeEventArgsRegisterDelegateReturnedUncastableInstance(
+            Type serviceType, InvalidCastException exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The delegate that was registered for service type {0} using the " +
+                "UnregisteredTypeEventArgs.Register(Func<object>) method returned an object that " +
+                "couldn't be casted to {0}. {1}",
+                serviceType.ToFriendlyName(), exception.Message);
+        }
+
+        internal static string UnregisteredTypeEventArgsRegisterDelegateThrewAnException(Type serviceType, 
+            Exception exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The delegate that was registered for service type {0} using the " +
+                "UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception. {1}",
+                serviceType.ToFriendlyName(), exception.Message);
         }
     }
 }

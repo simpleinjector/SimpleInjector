@@ -19,7 +19,6 @@
 
     public interface IUserRepository
     {
-        void Delete(int userId);
     }
 
     public class RealTimeProvider : ITimeProvider
@@ -37,14 +36,15 @@
 
     public class SqlUserRepository : IUserRepository
     {
-        public void Delete(int userId)
-        {
-        }
     }
 
     public class InMemoryUserRepository : IUserRepository
     {
-        public void Delete(int userId)
+    }
+
+    public class PluginDependantUserRepository : IUserRepository
+    {
+        public PluginDependantUserRepository(IPlugin plugin)
         {
         }
     }

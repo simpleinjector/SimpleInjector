@@ -87,11 +87,11 @@ namespace SimpleInjector
 
             this.RequiresNotHandled();
 
-            this.Expression = 
-                Expression.Convert(
-                    Expression.Invoke(
-                        Expression.Constant(instanceCreator), new Expression[0]),
-                    this.UnregisteredServiceType);
+            this.Expression =
+                Expression.Call(
+                    typeof(UnregisteredTypeEventArgsCallHelper).GetMethod("GetInstance")
+                        .MakeGenericMethod(this.UnregisteredServiceType),
+                    Expression.Constant(instanceCreator));
         }
 
         /// <summary>
@@ -152,6 +152,37 @@ namespace SimpleInjector
                 throw new ActivationException(
                     StringResources.MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
                         this.UnregisteredServiceType));
+            }
+        }
+
+        internal static class UnregisteredTypeEventArgsCallHelper
+        {
+            // This method must be public.
+            public static TService GetInstance<TService>(Func<object> instanceCreator)
+            {
+                object instance;
+
+                try
+                {
+                    instance = instanceCreator();
+                }
+                catch (Exception ex)
+                {
+                    throw new ActivationException(
+                        StringResources.UnregisteredTypeEventArgsRegisterDelegateThrewAnException(
+                            typeof(TService), ex), ex);
+                }
+
+                try
+                {
+                    return (TService)instance;
+                }
+                catch (InvalidCastException ex)
+                {
+                    throw new InvalidCastException(
+                        StringResources.UnregisteredTypeEventArgsRegisterDelegateReturnedUncastableInstance(
+                            typeof(TService), ex), ex);
+                }
             }
         }
     }
