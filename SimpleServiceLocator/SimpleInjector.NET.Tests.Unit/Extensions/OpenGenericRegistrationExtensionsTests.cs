@@ -1328,6 +1328,8 @@
         [TestMethod]
         public void RegisterOpenGeneric_PredicateContext_ServiceTypeIsClosedImplentation()
         {
+            bool called = false;
+
             // Arrange
             var container = ContainerFactory.New();
             container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
@@ -1338,16 +1340,22 @@
                             throw new InvalidOperationException("ServiceType should be a closed type");
                         }
 
+                        called = true;
                         return true;
                     });
 
             // Act
             var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsTrue(called, "Predicate was not called");
         }
 
         [TestMethod]
         public void RegisterOpenGeneric_PredicateContext_ImplementationTypeIsClosedImplentation()
         {
+            bool called = false;
+
             // Arrange
             var container = ContainerFactory.New();
             container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
@@ -1358,11 +1366,15 @@
                             throw new InvalidOperationException("ImplementationType should be a closed type");
                         }
 
+                        called = true;
                         return true;
                     });
 
             // Act
             var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsTrue(called, "Predicate was not called");
         }
 
         [TestMethod]
@@ -1450,10 +1462,11 @@
                 "implemention of the requested service.");
         }
 
-        private bool handled = false;
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
         {
+            bool handled = false;
+
             // Arrange
             var container = ContainerFactory.New();
             container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
@@ -1472,16 +1485,16 @@
                     {
                         // this is the test - we are checking that c.handled changed between
                         // the registered Predicates for OpenGenericWithPredicate1<> and OpenGenericWithPredicate2<>
-                        this.handled = c.Handled;
+                        handled = c.Handled;
                         return c.ImplementationType.GetGenericArguments().Single() == typeof(long);
                     });
 
             // Act
-            this.handled = false;
+            handled = false;
             var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
 
             // Assert
-            Assert.IsTrue(this.handled);
+            Assert.IsTrue(handled);
         }
 
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(

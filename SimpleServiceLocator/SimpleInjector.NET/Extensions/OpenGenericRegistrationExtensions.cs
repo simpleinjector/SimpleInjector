@@ -154,18 +154,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
         {
-            container.ValidateRegisterOpenGenericRequirements(openGenericServiceType, 
-                openGenericImplementation, lifestyle);
-
-            var resolver = new UnregisteredOpenGenericResolver
-            {
-                OpenGenericServiceType = openGenericServiceType,
-                OpenGenericImplementation = openGenericImplementation,
-                Container = container,
-                Lifestyle = lifestyle
-            };
-
-            container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+            RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
+                lifestyle, c => true);
         }
 
         /// <summary>
@@ -190,9 +180,7 @@ namespace SimpleInjector.Extensions
             Predicate<OpenGenericPredicateContext> predicate)
         {
             container.ValidateRegisterOpenGenericRequirements(openGenericServiceType,
-                openGenericImplementationType, lifestyle);
-
-            Requires.IsNotNull(predicate, "predicate");
+                openGenericImplementationType, lifestyle, predicate);
 
             var resolver = new UnregisteredOpenGenericResolver
             {
@@ -381,12 +369,15 @@ namespace SimpleInjector.Extensions
         }
 
         private static void ValidateRegisterOpenGenericRequirements(this Container container,
-            Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
+            Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle,
+            Predicate<OpenGenericPredicateContext> predicate)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(openGenericImplementation, "openGenericImplementation");
             Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(predicate, "predicate");
+
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType,
