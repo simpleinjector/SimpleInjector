@@ -425,11 +425,6 @@ namespace SimpleInjector.Extensions
 
             private bool ClosedServiceTypeSatisfiesPredicate(Type service, Type implementation, bool handled)
             {
-                if (this.Predicate == null)
-                {
-                    return true;
-                }
-
                 var context = new OpenGenericPredicateContext(service, implementation, handled);
                 return this.Predicate(context);
             }
