@@ -1450,6 +1450,40 @@
                 "implemention of the requested service.");
         }
 
+        private bool handled = false;
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c =>
+                    {
+                        if (c.Handled)
+                        {
+                            throw new InvalidOperationException("The test assumes handled is false at this time.");
+                        }
+
+                        return c.ImplementationType.GetGenericArguments().Single() == typeof(int);
+                    });
+
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c =>
+                    {
+                        // this is the test - we are checking that c.handled changed between
+                        // the registered Predicates for OpenGenericWithPredicate1<> and OpenGenericWithPredicate2<>
+                        this.handled = c.Handled;
+                        return c.ImplementationType.GetGenericArguments().Single() == typeof(long);
+                    });
+
+            // Act
+            this.handled = false;
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsTrue(this.handled);
+        }
+
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
         {
