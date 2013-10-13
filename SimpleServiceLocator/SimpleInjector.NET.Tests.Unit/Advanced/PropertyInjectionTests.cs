@@ -30,6 +30,21 @@
         }
 
         [TestMethod]
+        public void InjectingAllProperties_OnTypeWithPublicWritableProperty_InjectsPropertyOfBaseType()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            var service = container.GetInstance<SubClassServiceWithProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.BaseClassDependency, "The dependency from the base should be injected.");
+        }
+
+        [TestMethod]
         public void InjectingAllProperties_OnTypeWithPublicWritablePropertyButRegistrationMissing_ThrowsException()
         {
             // Arrange
@@ -363,6 +378,17 @@
         }
 
         public class ServiceWithProperty<TDependency> : IService
+        {
+            public TDependency Dependency { get; set; }
+        }
+
+        public class BaseClassServiceWithProperty<TDependency> : IService
+        {
+            public TDependency BaseClassDependency { get; set; }
+        }
+
+
+        public class SubClassServiceWithProperty<TDependency> : BaseClassServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }
         }

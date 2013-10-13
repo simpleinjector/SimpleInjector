@@ -224,6 +224,7 @@ namespace SimpleInjector
             if (this.Container.Options.PropertySelectionBehavior is DefaultPropertySelectionBehavior)
             {
                 // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
+                // This speeds up the the initialization phase.
                 return expressionToWrap;
             }
 
