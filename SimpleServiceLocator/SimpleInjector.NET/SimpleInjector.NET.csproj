@@ -113,6 +113,7 @@
     <Compile Include="Extensions\GenericTypeBuilder.cs" />
     <Compile Include="Extensions\ExtensionHelpers.cs" />
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
+    <Compile Include="Extensions\OpenGenericPredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Diagnostics\InstanceCreatedEventArgs.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />

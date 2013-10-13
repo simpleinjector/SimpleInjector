@@ -1296,6 +1296,160 @@
                 "contains a generic type argument that can never be resolved.");
         }
 
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterface_Verifies()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>), 
+                Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(int));
+            
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(long));
+
+            // Act
+            container.Verify();
+
+            // Assert
+        }
+
+        [TestMethod]
+        public void ExtensionHelper_ContainsGenericParameter_WorksAsExpected()
+        {
+            // Arrange
+            Type open = typeof(OpenGenericWithPredicate1<>);
+            Type closed = typeof(OpenGenericWithPredicate1<int>);
+
+            // Assert
+            Assert.IsTrue(open.ContainsGenericParameter());
+            Assert.IsFalse(closed.ContainsGenericParameter());
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_PredicateContext_ServiceTypeIsClosedImplentation()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c =>
+                    {
+                        if (c.ServiceType.ContainsGenericParameter())
+                        {
+                            throw new InvalidOperationException("ServiceType should be a closed type");
+                        }
+
+                        return true;
+                    });
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_PredicateContext_ImplementationTypeIsClosedImplentation()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c =>
+                    {
+                        if (c.ImplementationType.ContainsGenericParameter())
+                        {
+                            throw new InvalidOperationException("ImplementationType should be a closed type");
+                        }
+
+                        return true;
+                    });
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate1()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
+
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(OpenGenericWithPredicate1<int>));
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
+
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<long>>();
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(OpenGenericWithPredicate2<long>));
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException1()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().FullName.StartsWith("System"));
+
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
+
+            // Act
+            Action action = () =>
+                container.GetInstance<IOpenGenericWithPredicate<long>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Multiple observers of the ResolveUnregisteredType event",
+                action,
+                "GetInstance should fail because the framework should detect that more than one " +
+                "implemention of the requested service.");
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
+
+            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
+
+            // Act
+            var result1 = container.GetInstance<IOpenGenericWithPredicate<long>>();
+            Action action = () => 
+                container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Multiple observers of the ResolveUnregisteredType event",
+                action,
+                "GetInstance should fail because the framework should detect that more than one " +
+                "implemention of the requested service.");
+        }
+
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
         {
@@ -1447,6 +1601,18 @@
         }
         
         public class Implementation<X, TUnused1, TUnused2, Y> : IInterface<X, X, Y> 
+        {
+        }
+
+        public interface IOpenGenericWithPredicate<T>
+        {
+        }
+
+        public class OpenGenericWithPredicate1<T> : IOpenGenericWithPredicate<T> 
+        {
+        }
+
+        public class OpenGenericWithPredicate2<T> : IOpenGenericWithPredicate<T> 
         {
         }
 

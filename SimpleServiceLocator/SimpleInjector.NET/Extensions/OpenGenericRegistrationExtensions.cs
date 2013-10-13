@@ -154,18 +154,8 @@ namespace SimpleInjector.Extensions
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
-            Requires.IsNotNull(openGenericImplementation, "openGenericImplementation");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
-            Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType, 
-                openGenericImplementation, "openGenericServiceType");
-            Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
-                openGenericImplementation, "openGenericImplementation");
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(openGenericServiceType, 
-                openGenericImplementation, "openGenericImplementation");
+            container.ValidateRegisterOpenGenericRequirements(openGenericServiceType, 
+                openGenericImplementation, lifestyle);
 
             var resolver = new UnregisteredOpenGenericResolver
             {
@@ -173,6 +163,44 @@ namespace SimpleInjector.Extensions
                 OpenGenericImplementation = openGenericImplementation,
                 Container = container,
                 Lifestyle = lifestyle
+            };
+
+            container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+        }
+
+        /// <summary>
+        /// Registers that the same instance of <paramref name="openGenericImplementationType"/> will be returned 
+        /// every time a <paramref name="openGenericServiceType"/> is requested.
+        /// </summary>
+        /// <example>
+        /// Please see the 
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric(Container,Type,Type,Lifestyle)</see>
+        /// overload for an example.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances..</param>
+        /// <param name="openGenericImplementationType">The definition of the open generic implementation type
+        /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
+        /// <param name="predicate">The predicate that determines whether the 
+        /// <paramref name="openGenericImplementationType"/> can implement the service type.</param>
+        public static void RegisterOpenGeneric(this Container container,
+            Type openGenericServiceType, Type openGenericImplementationType, Lifestyle lifestyle,
+            Predicate<OpenGenericPredicateContext> predicate)
+        {
+            container.ValidateRegisterOpenGenericRequirements(openGenericServiceType,
+                openGenericImplementationType, lifestyle);
+
+            Requires.IsNotNull(predicate, "predicate");
+
+            var resolver = new UnregisteredOpenGenericResolver
+            {
+                OpenGenericServiceType = openGenericServiceType,
+                OpenGenericImplementation = openGenericImplementationType,
+                Container = container,
+                Lifestyle = lifestyle,
+                Predicate = predicate
             };
 
             container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
@@ -352,6 +380,23 @@ namespace SimpleInjector.Extensions
             container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
         }
 
+        private static void ValidateRegisterOpenGenericRequirements(this Container container,
+            Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
+            Requires.IsNotNull(openGenericImplementation, "openGenericImplementation");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
+            Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType,
+                openGenericImplementation, "openGenericServiceType");
+            Requires.ImplementationHasSelectableConstructor(container, openGenericServiceType,
+                openGenericImplementation, "openGenericImplementation");
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(openGenericServiceType,
+                openGenericImplementation, "openGenericImplementation");
+        }
+
         /// <summary>Resolves a given open generic type.</summary>
         private sealed class UnregisteredOpenGenericResolver
         {
@@ -366,6 +411,8 @@ namespace SimpleInjector.Extensions
 
             internal Lifestyle Lifestyle { get; set; }
 
+            internal Predicate<OpenGenericPredicateContext> Predicate { get; set; }
+
             internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
             {
                 if (!this.OpenGenericServiceType.IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
@@ -375,12 +422,25 @@ namespace SimpleInjector.Extensions
 
                 var builder = new GenericTypeBuilder(e.UnregisteredServiceType, this.OpenGenericImplementation);
 
-                var results = builder.BuildClosedGenericImplementation();
+                var result = builder.BuildClosedGenericImplementation();
 
-                if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
+                if (result.ClosedServiceTypeSatisfiesAllTypeConstraints && 
+                    this.ClosedServiceTypeSatisfiesPredicate(e.UnregisteredServiceType, 
+                        result.ClosedGenericImplementation, e.Handled))
                 {
-                    this.RegisterType(e, results.ClosedGenericImplementation);
+                    this.RegisterType(e, result.ClosedGenericImplementation);
                 }
+            }
+
+            private bool ClosedServiceTypeSatisfiesPredicate(Type service, Type implementation, bool handled)
+            {
+                if (this.Predicate == null)
+                {
+                    return true;
+                }
+
+                var context = new OpenGenericPredicateContext(service, implementation, handled);
+                return this.Predicate(context);
             }
 
             private void RegisterType(UnregisteredTypeEventArgs e, Type closedGenericImplementation)
