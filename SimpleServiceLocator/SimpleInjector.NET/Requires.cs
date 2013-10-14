@@ -257,17 +257,6 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsValidValue(AccessibilityOption accessibility, string paramName)
-        {
-            if (accessibility != AccessibilityOption.AllTypes &&
-                accessibility != AccessibilityOption.PublicTypesOnly)
-            {
-                throw new ArgumentException(
-                    StringResources.ValueIsInvalidForEnumType((int)accessibility, typeof(AccessibilityOption)),
-                    paramName);
-            }
-        }
-
         internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
             string paramName)
         {

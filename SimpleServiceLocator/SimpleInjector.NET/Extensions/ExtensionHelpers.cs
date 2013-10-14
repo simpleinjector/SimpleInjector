@@ -127,11 +127,11 @@ namespace SimpleInjector.Extensions
         }
 
         internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly,
-            AccessibilityOption accessibility)
+            bool includeInternals)
         {
             try
             {
-                if (accessibility == AccessibilityOption.AllTypes)
+                if (includeInternals)
                 {
                     return assembly.GetTypes();
                 }

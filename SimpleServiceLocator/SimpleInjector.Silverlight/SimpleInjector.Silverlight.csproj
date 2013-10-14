@@ -206,6 +206,9 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericBatchRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericBatchRegistrationExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericPredicateContext.cs">
+      <Link>Extensions\OpenGenericPredicateContext.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
