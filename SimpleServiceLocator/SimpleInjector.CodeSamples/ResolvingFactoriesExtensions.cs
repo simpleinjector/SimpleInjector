@@ -21,17 +21,14 @@
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
-                    InstanceProducer registration = container.GetRegistration(serviceType);
+                    InstanceProducer registration = container.GetRegistration(serviceType, true);
 
-                    if (registration != null)
-                    {
-                        Type funcType = typeof(Func<>).MakeGenericType(serviceType);
+                    Type funcType = typeof(Func<>).MakeGenericType(serviceType);
 
-                        var factoryDelegate = 
-                            Expression.Lambda(funcType, registration.BuildExpression()).Compile();
+                    var factoryDelegate = 
+                        Expression.Lambda(funcType, registration.BuildExpression()).Compile();
 
-                        e.Register(Expression.Constant(factoryDelegate));
-                    }
+                    e.Register(Expression.Constant(factoryDelegate));
                 }
             };
         }
@@ -50,25 +47,22 @@
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
-                    InstanceProducer registration = container.GetRegistration(serviceType);
+                    InstanceProducer registration = container.GetRegistration(serviceType, true);
 
-                    if (registration != null)
-                    {
-                        Type funcType = typeof(Func<>).MakeGenericType(serviceType);
-                        Type lazyType = typeof(Lazy<>).MakeGenericType(serviceType);
+                    Type funcType = typeof(Func<>).MakeGenericType(serviceType);
+                    Type lazyType = typeof(Lazy<>).MakeGenericType(serviceType);
 
-                        var factoryDelegate = 
-                            Expression.Lambda(funcType, registration.BuildExpression()).Compile();
+                    var factoryDelegate = 
+                        Expression.Lambda(funcType, registration.BuildExpression()).Compile();
                         
-                        var lazyConstructor = (
-                            from ctor in lazyType.GetConstructors()
-                            where ctor.GetParameters().Length == 1
-                            where ctor.GetParameters()[0].ParameterType == funcType
-                            select ctor)
-                            .Single();
+                    var lazyConstructor = (
+                        from ctor in lazyType.GetConstructors()
+                        where ctor.GetParameters().Length == 1
+                        where ctor.GetParameters()[0].ParameterType == funcType
+                        select ctor)
+                        .Single();
 
-                        e.Register(Expression.New(lazyConstructor, Expression.Constant(factoryDelegate)));
-                    }
+                    e.Register(Expression.New(lazyConstructor, Expression.Constant(factoryDelegate)));
                 }
             };
         }
