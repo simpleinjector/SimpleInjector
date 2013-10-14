@@ -142,7 +142,7 @@ namespace SimpleInjector.Extensions
                     this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
             }
 
-            return new CandicateServiceType(openCandidateServiceType, Type.EmptyTypes);
+            return new CandicateServiceType(openCandidateServiceType, new Type[0]);
         }
 
         private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)

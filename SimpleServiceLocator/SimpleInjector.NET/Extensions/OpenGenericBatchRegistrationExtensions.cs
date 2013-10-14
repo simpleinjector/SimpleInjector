@@ -98,8 +98,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
-                Lifestyle.Transient, includeInternal: false);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -121,8 +120,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
-                Lifestyle.Transient, includeInternal: false);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, Lifestyle.Transient);
         }
 
         /// <summary>
@@ -148,8 +146,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, params Assembly[] assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle,
-                includeInternal: false);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle);
         }
 
         /// <summary>
@@ -175,8 +172,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Assembly> assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle,
-                includeInternal: false);
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, lifestyle);
         }
 
         /// <summary>
@@ -232,7 +228,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, false, callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback);
         }
 
         /// <summary>
@@ -256,8 +252,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                includeInternals: false);
+            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies);
         }
 
         /// <summary>
@@ -281,8 +276,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                includeInternals: false);
+            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies);
         }
 
         /// <summary>
@@ -477,8 +471,7 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             params Assembly[] assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType, 
-                false, assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies);
         }
 
         /// <summary>
@@ -516,8 +509,7 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             IEnumerable<Assembly> assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType,
-                includeInternals: false, assemblies: assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies: assemblies);
         }
 
         /// <summary>
@@ -559,8 +551,7 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            return GetTypesToRegisterInternal(container, openGenericServiceType, 
-                AccessibilityOption.PublicTypesOnly, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies);
         }
 
         /// <summary>
@@ -601,12 +592,12 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            return GetTypesToRegisterInternal(container, openGenericServiceType, false, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies);
         }
 
         private static void RegisterManyForOpenGenericInternal(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle,
-            bool includeInternal)
+            bool includeInternal = false)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(lifestyle, "lifestyle");
@@ -622,8 +613,8 @@ namespace SimpleInjector.Extensions
                 Add(typesToRegister, implementation, closedServiceType);
             };
 
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, includeInternal, 
-                callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, 
+                includeInternal);
 
             RegisterTypes(container, lifestyle, typesToRegister);
         }
@@ -662,7 +653,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static void RegisterManySinglesForOpenGenericInternal(Container container,
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals)
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals = false)
         {
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
@@ -670,23 +661,21 @@ namespace SimpleInjector.Extensions
                 container.Register(closedServiceType, implementations.Single(), Lifestyle.Singleton);
             };
 
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, includeInternals, callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, includeInternals);
         }
 
-        private static void RegisterManyForOpenGenericInternal(Container container,
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals, 
-            BatchRegistrationCallback callback)
+        private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType, 
+            IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, bool includeInternals = false)
         {
             Requires.IsNotNull(assemblies, "assemblies");
 
-            var types =
-                GetTypesToRegisterInternal(container, openGenericServiceType, includeInternals, assemblies);
+            var types = GetTypesToRegisterInternal(container, openGenericServiceType, assemblies, includeInternals);
 
             RegisterManyForOpenGeneric(openGenericServiceType, types, callback);
         }
 
-        private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, 
-            Type openGenericServiceType, bool includeInternals, IEnumerable<Assembly> assemblies)
+        private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType,
+            IEnumerable<Assembly> assemblies, bool includeInternals = false)
         {
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(assemblies, "assemblies");

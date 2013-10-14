@@ -669,38 +669,38 @@ namespace SimpleInjector
                 this.currentProducer.Value = null;
             }
         }
+    }
+    
+    // Searches an expression for a specific sub expression and replaces that sub expression with a
+    // different supplied expression.
+    internal sealed class SubExpressionReplacer : ExpressionVisitor
+    {
+        private readonly ConstantExpression subExpressionToFind;
+        private readonly Expression replacementExpression;
 
-        // Searches an expression for a specific sub expression and replaces that sub expression with a
-        // different supplied expression.
-        private sealed class SubExpressionReplacer : ExpressionVisitor
+        private SubExpressionReplacer(ConstantExpression subExpressionToFind,
+            Expression replacementExpression)
         {
-            private readonly ConstantExpression subExpressionToFind;
-            private readonly Expression replacementExpression;
+            this.subExpressionToFind = subExpressionToFind;
+            this.replacementExpression = replacementExpression;
+        }
 
-            private SubExpressionReplacer(ConstantExpression subExpressionToFind,
-                Expression replacementExpression)
-            {
-                this.subExpressionToFind = subExpressionToFind;
-                this.replacementExpression = replacementExpression;
-            }
+        public override Expression Visit(Expression node)
+        {
+            return base.Visit(node);
+        }
 
-            public override Expression Visit(Expression node)
-            {
-                return base.Visit(node);
-            }
+        internal static Expression Replace(Expression expressionToAlter,
+            ConstantExpression subExpressionToFind, Expression replacementExpression)
+        {
+            var visitor = new SubExpressionReplacer(subExpressionToFind, replacementExpression);
 
-            internal static Expression Replace(Expression expressionToAlter,
-                ConstantExpression subExpressionToFind, Expression replacementExpression)
-            {
-                var visitor = new SubExpressionReplacer(subExpressionToFind, replacementExpression);
+            return visitor.Visit(expressionToAlter);
+        }
 
-                return visitor.Visit(expressionToAlter);
-            }
-
-            protected override Expression VisitConstant(ConstantExpression node)
-            {
-                return node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
-            }
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            return node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
         }
     }
 }

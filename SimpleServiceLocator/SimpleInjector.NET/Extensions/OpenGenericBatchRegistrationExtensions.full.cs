@@ -195,9 +195,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, accessibility, callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, accessibility);
         }
 
         /// <summary>
@@ -229,10 +227,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, 
-                accessibility == AccessibilityOption.AllTypes, callback);
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, accessibility);
         }
 
         /// <summary>
@@ -258,10 +253,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                accessibility);
+            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies, accessibility);
         }
 
         /// <summary>
@@ -287,8 +279,6 @@ namespace SimpleInjector.Extensions
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
             RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
                 accessibility);
         }
@@ -333,7 +323,7 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType, accessibility, assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies, accessibility);
         }
 
         /// <summary>
@@ -375,7 +365,7 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType, accessibility, assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies, accessibility);
         }
 
         /// <summary>
@@ -418,7 +408,7 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            return GetTypesToRegisterInternal(container, openGenericServiceType, accessibility, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies, accessibility);
         }
 
         /// <summary>
@@ -460,12 +450,14 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            return GetTypesToRegisterInternal(container, openGenericServiceType, accessibility, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies, accessibility);
         }
 
         private static void RegisterManyForOpenGenericInternal(this Container container, Type openGenericServiceType,
             IEnumerable<Assembly> assemblies, Lifestyle lifestyle, AccessibilityOption accessibility)
         {
+            IsValidValue(accessibility, "accessibility");
+
             RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies,
                 lifestyle, accessibility == AccessibilityOption.AllTypes);
         }
@@ -473,23 +465,29 @@ namespace SimpleInjector.Extensions
         private static void RegisterManySinglesForOpenGenericInternal(Container container, Type openGenericServiceType,
             IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
         {
+            Requires.IsNotNull(container, "container");
+            IsValidValue(accessibility, "accessibility");
+
             RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                accessibility == AccessibilityOption.AllTypes);
+                includeInternals: accessibility == AccessibilityOption.AllTypes);
         }
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType, 
-            AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
-        {
-            return GetTypesToRegisterInternal(container, openGenericServiceType, 
-                accessibility == AccessibilityOption.AllTypes, assemblies);
-        }
-
-        private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType,
-            Assembly[] assemblies, AccessibilityOption accessibility, BatchRegistrationCallback callback)
+            IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
         {
             IsValidValue(accessibility, "accessibility");
 
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                accessibility == AccessibilityOption.AllTypes, callback);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies, 
+                includeInternals: accessibility == AccessibilityOption.AllTypes);
+        }
+
+        private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType, 
+            IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, AccessibilityOption accessibility)
+        {
+            Requires.IsNotNull(container, "container");
+            IsValidValue(accessibility, "accessibility");
+
+            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback,
+                includeInternals: accessibility == AccessibilityOption.AllTypes);
         }
 
         private static void IsValidValue(AccessibilityOption accessibility, string paramName)

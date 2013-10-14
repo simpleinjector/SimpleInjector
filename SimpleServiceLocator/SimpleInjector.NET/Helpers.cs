@@ -34,7 +34,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Reflection.Emit;
     using System.Threading;
 
     /// <summary>
@@ -96,7 +95,7 @@ namespace SimpleInjector
 
             var genericArguments = GetGenericArguments(type);
 
-            if (genericArguments.Length == 0)
+            if (!genericArguments.Any())
             {
                 return name;
             }
@@ -259,9 +258,10 @@ namespace SimpleInjector
         internal static Delegate CompileLambdaInDynamicAssembly(Container container, LambdaExpression lambda, 
             string typeName, string methodName)
         {
-            TypeBuilder typeBuilder = container.ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
+            System.Reflection.Emit.TypeBuilder typeBuilder = 
+                container.ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
 
-            MethodBuilder methodBuilder = typeBuilder.DefineMethod(methodName,
+            System.Reflection.Emit.MethodBuilder methodBuilder = typeBuilder.DefineMethod(methodName,
                 MethodAttributes.Static | MethodAttributes.Public);
 
             lambda.CompileToMethod(methodBuilder);
@@ -316,11 +316,11 @@ namespace SimpleInjector
             }
         }
 
-        private static Type[] GetGenericArguments(Type type)
+        private static IEnumerable<Type> GetGenericArguments(Type type)
         {
-            if (!type.Name.Contains('`'))
+            if (!type.Name.Contains("`"))
             {
-                return Type.EmptyTypes;
+                return Enumerable.Empty<Type>();
             }
 
             int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1),

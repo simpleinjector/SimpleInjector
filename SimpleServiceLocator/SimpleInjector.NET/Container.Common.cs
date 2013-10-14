@@ -34,7 +34,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Reflection.Emit;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
@@ -71,7 +70,7 @@ namespace SimpleInjector
         private readonly long containerId;
 
 #if !SILVERLIGHT
-        private readonly Lazy<ModuleBuilder> moduleBuilder;
+        private readonly Lazy<System.Reflection.Emit.ModuleBuilder> moduleBuilder;
 #endif
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
@@ -128,7 +127,7 @@ namespace SimpleInjector
             this.containerId = Interlocked.Increment(ref counter);
 
 #if !SILVERLIGHT
-            this.moduleBuilder = new Lazy<ModuleBuilder>(this.CreateModuleBuilder);
+            this.moduleBuilder = new Lazy<System.Reflection.Emit.ModuleBuilder>(this.CreateModuleBuilder);
 #endif
         }
 
@@ -196,7 +195,7 @@ namespace SimpleInjector
         }
 
 #if !SILVERLIGHT
-        internal ModuleBuilder ModuleBuilder
+        internal System.Reflection.Emit.ModuleBuilder ModuleBuilder
         {
             get { return this.moduleBuilder.Value; }
         }
@@ -386,10 +385,11 @@ namespace SimpleInjector
         }
 
 #if !SILVERLIGHT
-        private ModuleBuilder CreateModuleBuilder()
+        private System.Reflection.Emit.ModuleBuilder CreateModuleBuilder()
         {
             return AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("SimpleInjector.Compiled_" + this.containerId), AssemblyBuilderAccess.Run)
+                new AssemblyName("SimpleInjector.Compiled_" + this.containerId),
+                    System.Reflection.Emit.AssemblyBuilderAccess.Run)
                 .DefineDynamicModule("SimpleInjector.CompiledModule");
         }
 #endif
