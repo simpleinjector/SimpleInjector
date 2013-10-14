@@ -28,6 +28,7 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Extensions.Decorators;
@@ -45,8 +46,7 @@ namespace SimpleInjector.Extensions
     /// <see cref="DecoratorExtensions.RegisterDecorator(Container, Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("DecoratorPredicateContext (ServiceType = {Helpers.ToFriendlyName(ServiceType),nq}, " +
-        "ImplementationType = {Helpers.ToFriendlyName(ImplementationType),nq})")]
+    [DebuggerDisplay("DecoratorPredicateContext ({DebuggerDisplay})")]
     public sealed class DecoratorPredicateContext
     {
         internal DecoratorPredicateContext(Type serviceType, Type implementationType,
@@ -86,6 +86,18 @@ namespace SimpleInjector.Extensions
         /// </summary>
         /// <value>The current expression that is about to be decorated.</value>
         public Expression Expression { get; private set; }
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay
+        {
+            get
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "ServiceType = {0}, ImplementationType = {1}",
+                    this.ServiceType.ToFriendlyName(),
+                    this.ImplementationType.ToFriendlyName());
+            }
+        }
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)
