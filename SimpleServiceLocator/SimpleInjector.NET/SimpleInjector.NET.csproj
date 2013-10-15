@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationException.cs" />
+    <Compile Include="ActivationException.full.cs" />
     <Compile Include="Advanced\AdvancedExtensions.cs" />
     <Compile Include="Advanced\ConditionalHashSet.cs" />
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
@@ -88,6 +89,10 @@
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
+    <Compile Include="Advanced\PropertyInjectionHelper.full.cs" />
+    <Compile Include="CompilationHelpers.cs" />
+    <Compile Include="CompilationHelpers.full.cs" />
+    <Compile Include="Container.Common.full.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
@@ -104,6 +109,7 @@
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
+    <Compile Include="Extensions\Decorators\DecoratorHelpers.full.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInterceptor.cs" />
     <Compile Include="Advanced\Internal\IContainerControlledCollection.cs" />
@@ -117,6 +123,7 @@
     <Compile Include="Extensions\OpenGenericPredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Diagnostics\InstanceCreatedEventArgs.cs" />
+    <Compile Include="FullSpecific\Helpers.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />
     <Compile Include="Lifestyles\HybridLifestyle.cs" />

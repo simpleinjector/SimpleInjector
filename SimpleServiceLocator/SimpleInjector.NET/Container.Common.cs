@@ -29,11 +29,9 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
@@ -57,9 +55,6 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
-#if !SILVERLIGHT
-    [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]
-#endif
     public partial class Container
     {
         private static long counter;
@@ -68,10 +63,6 @@ namespace SimpleInjector
         private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
-
-#if !SILVERLIGHT
-        private readonly Lazy<System.Reflection.Emit.ModuleBuilder> moduleBuilder;
-#endif
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
@@ -126,28 +117,23 @@ namespace SimpleInjector
 
             this.containerId = Interlocked.Increment(ref counter);
 
-#if !SILVERLIGHT
-            this.moduleBuilder = new Lazy<System.Reflection.Emit.ModuleBuilder>(this.CreateModuleBuilder);
-#endif
+            this.OnCreated();
         }
+
+        partial void OnCreated();
 
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
 
-        internal static long Counter
+        internal object SyncRoot
         {
-            get { return counter; }
+            get { return this.locker; }
         }
 
         internal long ContainerId
         {
             get { return this.containerId; }
-        }
-
-        internal object SyncRoot
-        {
-            get { return this.locker; }
         }
 
         internal bool IsLocked
@@ -193,13 +179,6 @@ namespace SimpleInjector
         {
             get { return this.succesfullyVerified; }
         }
-
-#if !SILVERLIGHT
-        internal System.Reflection.Emit.ModuleBuilder ModuleBuilder
-        {
-            get { return this.moduleBuilder.Value; }
-        }
-#endif
 
         internal InstanceCreatedEventHandler InstanceCreatedHandler
         {
@@ -383,16 +362,6 @@ namespace SimpleInjector
                 }
             }
         }
-
-#if !SILVERLIGHT
-        private System.Reflection.Emit.ModuleBuilder CreateModuleBuilder()
-        {
-            return AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("SimpleInjector.Compiled_" + this.containerId),
-                    System.Reflection.Emit.AssemblyBuilderAccess.Run)
-                .DefineDynamicModule("SimpleInjector.CompiledModule");
-        }
-#endif
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
         private sealed class InstanceInitializer

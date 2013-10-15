@@ -31,20 +31,12 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    //using System.Reflection.Emit;
     using SimpleInjector.Advanced;
     using SimpleInjector.Advanced.Internal;
 
-    internal static class DecoratorHelpers
+    internal static partial class DecoratorHelpers
     {
-#if !SILVERLIGHT
-        private static readonly Lazy<Type> ReadOnlyContainerControlledCollectionType =
-            new Lazy<Type>(ReadOnlyContainerControlledCollectionTypeBuilder.Build);
-#else
-        private static readonly Lazy<Type> ReadOnlyContainerControlledCollectionType =
-            new Lazy<Type>(() => null);
-
-#endif
+        private static readonly Lazy<Type> ReadOnlyContainerControlledCollectionType = new Lazy<Type>(() => null);
 
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));

@@ -46,7 +46,7 @@ namespace SimpleInjector.Extensions
     /// <see cref="DecoratorExtensions.RegisterDecorator(Container, Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("DecoratorPredicateContext ({DebuggerDisplay})")]
+    [DebuggerDisplay("DecoratorPredicateContext ({DebuggerDisplay,nq})")]
     public sealed class DecoratorPredicateContext
     {
         internal DecoratorPredicateContext(Type serviceType, Type implementationType,

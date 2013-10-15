@@ -50,7 +50,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Silverlight\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PCL</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -62,7 +62,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Silverlight\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;PCL</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -130,6 +130,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
       <Link>Advanced\PropertyInjectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\CompilationHelpers.cs">
+      <Link>CompilationHelpers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
@@ -264,6 +267,7 @@
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SilverlightSpecific\Helpers.cs" />
     <Compile Include="SilverlightSpecific\MissingMethods.cs" />
     <Compile Include="SilverlightSpecific\ThreadLocal.cs" />
     <Compile Include="SilverlightSpecific\ThreadLocalValue.cs" />

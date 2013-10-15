@@ -652,12 +652,9 @@ namespace SimpleInjector
             Type type, MemberAccessException innerException, string paramName)
         {
             // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-            return new ArgumentException(
+            return Helpers.CreateArgumentException(
                 StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException),
-#if !SILVERLIGHT
-                paramName,
-#endif
-                innerException);
+                paramName, innerException);
         }
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)

@@ -333,7 +333,7 @@ namespace SimpleInjector
 
             try
             {
-                return Helpers.CompileAndRun(this.Registration.Container, expression, out createdInstance);
+                return CompilationHelpers.CompileAndRun(this.Registration.Container, expression, out createdInstance);
             }
             catch (Exception ex)
             {

@@ -35,7 +35,7 @@ using System.Security;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Simple Injector")]
-[assembly: AssemblyDescription("The Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
+[assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
 [assembly: AssemblyProduct("Simple Injector")]

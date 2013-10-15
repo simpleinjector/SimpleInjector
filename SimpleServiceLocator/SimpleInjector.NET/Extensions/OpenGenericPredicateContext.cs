@@ -42,7 +42,7 @@ namespace SimpleInjector.Extensions
     /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle,Predicate{OpenGenericPredicateContext})">RegisterOpenGeneric</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("OpenGenericPredicateContext ({DebuggerDisplay})")]
+    [DebuggerDisplay("OpenGenericPredicateContext ({DebuggerDisplay,nq})")]
     public sealed class OpenGenericPredicateContext
     {
         internal OpenGenericPredicateContext(Type serviceType, Type implementationType, bool handled)

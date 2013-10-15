@@ -32,9 +32,6 @@ namespace SimpleInjector.Diagnostics
     /// <summary>Represents the method that will handle an <see cref="InstanceCreatedEventArgs"/> event.</summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e"> An <see cref="InstanceCreatedEventArgs"/> that contains the event data.</param>
-#if !SILVERLIGHT
-    [Serializable]
-#endif
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "e",
         Justification = "This is the event arguments and the convention is to name it 'e'.")]
     public delegate void InstanceCreatedEventHandler(InstanceProducer sender, InstanceCreatedEventArgs e);

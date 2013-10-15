@@ -1188,12 +1188,8 @@ namespace SimpleInjector
             catch (MemberAccessException ex)
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ArgumentException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex),
-#if !SILVERLIGHT
-                    "serviceType",
-#endif
-                    ex);
+                throw Helpers.CreateArgumentException(
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex), "serviceType", ex);
             }
         }
 
