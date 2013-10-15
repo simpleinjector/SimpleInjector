@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 
 	General description:
 	
@@ -20,6 +20,9 @@ Version vNext
 		 TConcrete type instead of TService and TImplementation.
 		-[Core] Registered collections can now be injected and resolved as IReadOnlyCollection<T> and
 		 IReadOnlyList<T> (.NET 4.5 only). (work item 19992).
+		-[Core] New RegisterOpenGeneric overloads have been added that allow passing on a predicate that
+		 allows determining on a per-type basis whether the registered implementation should be applied.
+		 (work item 20284).		
 		-[Diagnostics] Created a public API for querying the container for diagnostic results (work item 20062)
 
 	Changes:
