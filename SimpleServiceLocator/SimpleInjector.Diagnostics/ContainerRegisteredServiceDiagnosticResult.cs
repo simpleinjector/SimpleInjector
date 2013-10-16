@@ -41,7 +41,7 @@ namespace SimpleInjector.Diagnostics
     {
         internal ContainerRegisteredServiceDiagnosticResult(Type serviceType, string description,
             IEnumerable<KnownRelationship> relationships)
-            : base(serviceType, description, DiagnosticType.ContainerRegisteredService, 
+            : base(serviceType, description, DiagnosticType.ContainerRegisteredComponent, 
                 relationships.ToArray())
         {
             this.Relationships = relationships.ToList().AsReadOnly();

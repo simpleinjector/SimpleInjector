@@ -40,7 +40,7 @@ namespace SimpleInjector.Diagnostics
         /// resolution, but was created by the container using the transient lifestyle.
         /// For more information, see: https://simpleinjector.codeplex.com/wikipage?title=UnregisteredTypes.
         /// </summary>
-        ContainerRegisteredService,
+        ContainerRegisteredComponent,
 
         /// <summary>
         /// Diagnostic type that warns when a 

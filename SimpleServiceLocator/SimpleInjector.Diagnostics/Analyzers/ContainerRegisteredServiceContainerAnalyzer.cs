@@ -34,7 +34,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     {
         public DiagnosticType DiagnosticType
         {
-            get { return DiagnosticType.ContainerRegisteredService; }
+            get { return DiagnosticType.ContainerRegisteredComponent; }
         }
 
         public string Name
