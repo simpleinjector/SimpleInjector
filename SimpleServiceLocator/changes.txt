@@ -39,6 +39,8 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		 developers, but at least they can view the information now. (work item 20271)
 		-[Core] Exception messages often contained the text "No registration for type {0} could be found " 
 		 even though the type was registered explicitly. (Work item 20272).
+		-[Core] RegisterOpenGeneric could fail because it would try to apply an incompatible implementation,
+		 because the generic type constraints weren't always validated correctly.
 	
 				
 Version 2.3.5 (v2.3.5 RTM) 2013-09-02

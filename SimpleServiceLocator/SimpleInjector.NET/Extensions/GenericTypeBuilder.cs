@@ -76,7 +76,8 @@ namespace SimpleInjector.Extensions
                     this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
                 // closedGenericImplementation will be null when there was a mismatch on type constraints.
-                if (closedGenericImplementation != null)
+                if (closedGenericImplementation != null && 
+                    closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
                 {
                     return BuildResult.Valid(closedGenericImplementation);
                 }
@@ -165,7 +166,7 @@ namespace SimpleInjector.Extensions
             // When the length of the result does not match the actual length, this means that the generic 
             // type constraints don't match and the given service type does not satisfy the generic type 
             // constraints.
-            return openCandidateServiceType.Arguments.Count() == 
+            return openCandidateServiceType.Arguments.Count() ==
                 this.openGenericImplementation.GetGenericArguments().Length;
         }
 
