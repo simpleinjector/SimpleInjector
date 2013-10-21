@@ -59,7 +59,8 @@ namespace SimpleInjector.Extensions
                     this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
                 // closedGenericImplementation will be null when there was a mismatch on type constraints.
-                if (closedGenericImplementation != null)
+                if (closedGenericImplementation != null && 
+                    this.ClosedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
                 {
                     return BuildResult.Valid(closedGenericImplementation);
                 }

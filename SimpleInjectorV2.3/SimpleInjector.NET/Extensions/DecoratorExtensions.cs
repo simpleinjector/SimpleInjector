@@ -537,7 +537,6 @@ namespace SimpleInjector.Extensions
             Requires.IsDecorator(container, serviceType, decoratorType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,
                 decoratorType, "decoratorType");
-            Requires.DecoratorDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, "decoratorType");
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SimpleInjector.Advanced;
+using SimpleInjector.Extensions;
 
     public interface ILogger
     {
@@ -1121,32 +1122,6 @@
         }
 
         [TestMethod]
-        public void RegisterDecorator_RegisteringADecoratorWithAnUnresolvableTypeArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            try
-            {
-                // Act
-                // BadCommandHandlerDecorator2<T, TUnresolved> contains an unmappable type argument TUnresolved.
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(BadCommandHandlerDecorator2<,>));
-
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    @"contains unresolvable type arguments.",
-                    ex.Message);
-
-                AssertThat.ExceptionContainsParamName(ex, "decoratorType");
-            }
-        }
-
-        [TestMethod]
         public void GetInstance_TypeRegisteredWithRegisterSingleDecorator_AlwaysReturnsTheSameInstance()
         {
             // Arrange
@@ -1732,6 +1707,60 @@
                 .TrimInside(),
                 action,
                 "Verification should fail because the Func<ICommandHandler<T>> is invalid.");
+        }
+
+        [TestMethod]
+        public void GetInstance_DecoratorWithNestedGenericType_GetsAppliedCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(
+                typeof(IQueryHandler<CacheableQuery, ReadOnlyCollection<DayOfWeek>>),
+                typeof(CacheableQueryHandler));
+
+            container.Register(
+                typeof(IQueryHandler<NonCacheableQuery, DayOfWeek[]>),
+                typeof(NonCacheableQueryHandler));
+
+            container.RegisterDecorator(typeof(IQueryHandler<,>), typeof(CacheableQueryHandlerDecorator<,>));
+
+            // Act
+            var handler1 = container.GetInstance<IQueryHandler<CacheableQuery, ReadOnlyCollection<DayOfWeek>>>();
+            var handler2 = container.GetInstance<IQueryHandler<NonCacheableQuery, DayOfWeek[]>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(CacheableQueryHandlerDecorator<CacheableQuery, DayOfWeek>));
+            Assert.IsInstanceOfType(handler2, typeof(NonCacheableQueryHandler));
+        }
+
+        public interface ICacheableQuery<TResult> : IQuery<ReadOnlyCollection<TResult>>
+        {
+        }
+
+        public class CacheableQuery : ICacheableQuery<DayOfWeek>
+        {
+        }
+
+        public class NonCacheableQuery : IQuery<DayOfWeek[]>
+        {
+        }
+
+        public class CacheableQueryHandlerDecorator<TQuery, TResult>
+            : IQueryHandler<TQuery, ReadOnlyCollection<TResult>>
+            where TQuery : ICacheableQuery<TResult>
+        {
+            public CacheableQueryHandlerDecorator(IQueryHandler<TQuery, ReadOnlyCollection<TResult>> handler)
+            {
+            }
+        }
+
+        public class CacheableQueryHandler : IQueryHandler<CacheableQuery, ReadOnlyCollection<DayOfWeek>>
+        {
+        }
+
+        public class NonCacheableQueryHandler : IQueryHandler<NonCacheableQuery, DayOfWeek[]>
+        {
         }
 
 #if DEBUG

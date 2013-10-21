@@ -1086,6 +1086,25 @@
         }
 #endif
 
+        [TestMethod]
+        public void GetInstance_MultipleOpenGenericRegistrationsWithNestedTypesForSameService_ResolvesInstancesCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Order does not seem to matter, I've tried both ways.
+            container.RegisterOpenGeneric(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType1<>));
+            container.RegisterOpenGeneric(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType2<>));
+
+            // Act
+            var instance1 = container.GetInstance<IQueryHandler<GenericQuery1<string>, string>>();
+            var instance2 = container.GetInstance<IQueryHandler<GenericQuery2<string>, string>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance1, typeof(QueryHandlerWithNestedType1<string>));
+            Assert.IsInstanceOfType(instance2, typeof(QueryHandlerWithNestedType2<string>));
+        }
+
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
         {

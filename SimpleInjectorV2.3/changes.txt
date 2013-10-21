@@ -1,6 +1,17 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 2.3.6 (v2.3.6 RTM) 2013-10-21
+
+	General description:
+		This patch releases fixes one bug concerning resolving open generic types that contain nested generic
+		type arguments.
+
+	Bug fixes:
+		-[Core] Nested generic types are handled incorrectly. This affects RegisterOpenGeneric and
+		 RegisterDecorator. (work item 20332)
+
+
 Version 2.3.5 (v2.3.5 RTM) 2013-09-02
 
 	General description:
