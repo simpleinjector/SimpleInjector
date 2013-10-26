@@ -27,6 +27,7 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     /// <summary>
@@ -65,6 +66,9 @@ namespace SimpleInjector.Advanced
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; private set; }
 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay
         {
             get
@@ -77,6 +81,9 @@ namespace SimpleInjector.Advanced
             }
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string ImplementationTypeDebuggerDisplay
         {
             get { return this.ImplementationType.ToFriendlyName(); }

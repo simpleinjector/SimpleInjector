@@ -28,6 +28,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -36,6 +37,8 @@ namespace SimpleInjector.Extensions.Decorators
 
     internal static partial class DecoratorHelpers
     {
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline",
+            Justification = "Not possible.")]
         private static readonly Lazy<Type> ReadOnlyContainerControlledCollectionType = new Lazy<Type>(() => null);
 
         private static readonly MethodInfo EnumerableSelectMethod =

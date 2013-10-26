@@ -26,10 +26,7 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Text;
 
     internal static partial class CompilationHelpers
     {
@@ -42,10 +39,12 @@ namespace SimpleInjector
         {
             createdInstance = null;
 
+            var constantExpression = expression as ConstantExpression;
+
             // Skip compiling if all we need to do is return a singleton.
-            if (expression is ConstantExpression)
+            if (constantExpression != null)
             {
-                return CreateConstantOptimizedExpression((ConstantExpression)expression);
+                return CreateConstantOptimizedExpression(constantExpression);
             }
 
             Func<object> compiledLambda = null;

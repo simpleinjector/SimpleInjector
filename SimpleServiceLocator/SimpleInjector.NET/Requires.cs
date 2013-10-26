@@ -360,12 +360,6 @@ namespace SimpleInjector
 
             throw new ArgumentException(message, paramName);
         }
-  
-        private static bool GenericArgumentContainsConstraintsContainingAnotherArgument(Type argument)
-        {
-            return argument.IsGenericParameter &&
-                argument.GetGenericParameterConstraints().Any(ContainsAnotherArgument);
-        }
 
         private static bool ContainsAnotherArgument(Type constraint)
         {

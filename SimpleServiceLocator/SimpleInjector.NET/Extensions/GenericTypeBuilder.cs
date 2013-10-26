@@ -218,7 +218,7 @@ namespace SimpleInjector.Extensions
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
         }
 
-        private IEnumerable<Type> GetNestedTypeArgumentsForType(Type type)
+        private static IEnumerable<Type> GetNestedTypeArgumentsForType(Type type)
         {
             return (
                 from argument in type.GetGenericArguments()
