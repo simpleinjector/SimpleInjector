@@ -3,34 +3,12 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-
-    public interface ILogger
-    {
-        void Log(string message);
-    }
-
-    public interface ISpecialCommand
-    {
-    }
-
-    public interface ICommandHandler<TCommand>
-    {
-        void Handle(TCommand command);
-    }
-
-    public interface INonGenericService
-    {
-        void DoSomething();
-    }
-
-    public struct StructCommand
-    {
-    }
 
     [TestClass]
     public class DecoratorExtensionsTests
@@ -1742,7 +1720,6 @@
             Assert.IsInstanceOfType(collection, typeof(EnumerableDecorator<ICommandHandler<RealCommand>>));
         }
 
-#if DEBUG
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorType_ContainsAddedRelationship()
         {
@@ -1774,7 +1751,6 @@
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
-#endif
 
         // This is a regression test. This test failed on Simple Injector 2.0 to 2.2.3.
         [TestMethod]
@@ -1840,8 +1816,32 @@
                 action,
                 "Verification should fail because the Func<ICommandHandler<T>> is invalid.");
         }
+        
+        [TestMethod]
+        public void GetInstance_DecoratorWithNestedGenericType_GetsAppliedCorrectly()
+        {
+            // Arrange
+            var container = new Container();
 
-#if DEBUG
+            container.Register(
+                typeof(IQueryHandler<CacheableQuery, ReadOnlyCollection<DayOfWeek>>),
+                typeof(CacheableQueryHandler));
+
+            container.Register(
+                typeof(IQueryHandler<NonCacheableQuery, DayOfWeek[]>),
+                typeof(NonCacheableQueryHandler));
+
+            container.RegisterDecorator(typeof(IQueryHandler<,>), typeof(CacheableQueryHandlerDecorator<,>));
+
+            // Act
+            var handler1 = container.GetInstance<IQueryHandler<CacheableQuery, ReadOnlyCollection<DayOfWeek>>>();
+            var handler2 = container.GetInstance<IQueryHandler<NonCacheableQuery, DayOfWeek[]>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(CacheableQueryHandlerDecorator<CacheableQuery, DayOfWeek>));
+            Assert.IsInstanceOfType(handler2, typeof(NonCacheableQueryHandler));
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -1850,7 +1850,6 @@
             return new KnownRelationship(typeof(object), Lifestyle.Transient, 
                 container.GetRegistration(typeof(Container)));
         }
-#endif
     }
 
     public class DependencyInfo

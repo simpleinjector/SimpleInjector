@@ -221,28 +221,13 @@ namespace SimpleInjector
             {
                 var builder = new GenericTypeBuilder(serviceType, implementationType);
 
-                if (builder.OpenGenericImplementationCanBeAppliedToServiceType())
+                if (!builder.OpenGenericImplementationCanBeAppliedToServiceType())
                 {
-                    return;
+                    string error =
+                        StringResources.OpenGenericTypeContainsUnresolvableTypeArguments(implementationType);
+
+                    throw new ArgumentException(error, parameterName);
                 }
-
-                if (TypeContainsGenericArgumentsWithConstraintsContainingAnotherArgument(implementationType))
-                {
-                    // HACK: When the given implementationType contains generic type constraints that reference
-                    // other arguments (for instance 'where T1 : IBar<T2>'), it is too hard to find out whether
-                    // the type contains unused type arguments or that those arguments can be deduced from the
-                    // other arguments. The only way we can do this right now is when actual type (from a
-                    // closed generic type) are given, but at this stage we only have the open generic type.
-                    // So in that case we just skip this test to prevent throwing an exception in a case that
-                    // the registration actually is correct, with the risk of sometimes allowing the user to
-                    // register a type that will never be resolved.
-                    return;
-                }
-
-                string error =
-                    StringResources.OpenGenericTypeContainsUnresolvableTypeArguments(implementationType);
-
-                throw new ArgumentException(error, parameterName);
             }
         }
 
@@ -375,14 +360,7 @@ namespace SimpleInjector
 
             throw new ArgumentException(message, paramName);
         }
-        
-        private static bool TypeContainsGenericArgumentsWithConstraintsContainingAnotherArgument(
-            Type implementationType)
-        {
-            return implementationType.GetGenericArguments()
-                .Any(GenericArgumentContainsConstraintsContainingAnotherArgument);
-        }
-
+  
         private static bool GenericArgumentContainsConstraintsContainingAnotherArgument(Type argument)
         {
             return argument.IsGenericParameter &&

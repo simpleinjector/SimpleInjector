@@ -63,7 +63,26 @@ namespace SimpleInjector.Extensions
 
         internal bool OpenGenericImplementationCanBeAppliedToServiceType()
         {
-            return this.FindMatchingOpenGenericServiceType() != null;
+            var openGenericBaseType = this.closedGenericBaseType.GetGenericTypeDefinition();
+
+            var openGenericBaseTypes = (
+                from baseType in this.openGenericImplementation.GetTypeBaseTypesAndInterfaces()
+                where openGenericBaseType.IsGenericTypeDefinitionOf(baseType)
+                select baseType)
+                .Distinct()
+                .ToArray();
+
+            return openGenericBaseTypes.Any(type => 
+            {
+                var typeArguments = GetNestedTypeArgumentsForType(type);
+
+                var partialOpenImplementation = 
+                    this.partialOpenGenericImplementation ?? this.openGenericImplementation;
+
+                var unmappedArguments = partialOpenImplementation.GetGenericArguments().Except(typeArguments);
+
+                return unmappedArguments.All(argument => !argument.IsGenericParameter);
+            });
         }
 
         internal BuildResult BuildClosedGenericImplementation()
@@ -77,7 +96,7 @@ namespace SimpleInjector.Extensions
 
                 // closedGenericImplementation will be null when there was a mismatch on type constraints.
                 if (closedGenericImplementation != null && 
-                    closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
+                    this.closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
                 {
                     return BuildResult.Valid(closedGenericImplementation);
                 }
@@ -150,6 +169,7 @@ namespace SimpleInjector.Extensions
         {
             if (this.openGenericImplementation.IsGenericType)
             {
+                // return true;
                 return this.SatisfiesGenericTypeConstraints(openCandidateServiceType);
             }
 
@@ -196,6 +216,39 @@ namespace SimpleInjector.Extensions
                 this.openGenericImplementation, this.partialOpenGenericImplementation);
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
+        }
+
+        private IEnumerable<Type> GetNestedTypeArgumentsForType(Type type)
+        {
+            return (
+                from argument in type.GetGenericArguments()
+                from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument)
+                select nestedArgument)
+                .Distinct()
+                .ToArray();
+        }
+
+        private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(Type argument)
+        {
+            if (argument.IsGenericParameter)
+            {
+                var nestedArguments =
+                    from constraint in argument.GetGenericParameterConstraints()
+                    from arg in GetNestedTypeArgumentsForTypeArgument(constraint)
+                    select arg;
+
+                return nestedArguments.Concat(new[] { argument });
+            }
+
+            if (!argument.IsGenericType)
+            {
+                return Enumerable.Empty<Type>();
+            }
+
+            return
+                from genericArgument in argument.GetGenericArguments()
+                from arg in GetNestedTypeArgumentsForTypeArgument(genericArgument)
+                select arg;
         }
 
         /// <summary>Result of the GenericTypeBuilder.</summary>
