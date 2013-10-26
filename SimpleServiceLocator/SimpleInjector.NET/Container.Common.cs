@@ -120,8 +120,6 @@ namespace SimpleInjector
             this.OnCreated();
         }
 
-        partial void OnCreated();
-
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
@@ -362,6 +360,8 @@ namespace SimpleInjector
                 }
             }
         }
+
+        partial void OnCreated();
 
         /// <summary>Wrapper for instance initializer Action delegates.</summary>
         private sealed class InstanceInitializer

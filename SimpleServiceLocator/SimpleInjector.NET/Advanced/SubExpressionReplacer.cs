@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+﻿#region Copyright (c) 2013 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2010 S. van Deursen
+ * Copyright (C) 2013 S. van Deursen
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
@@ -23,38 +23,40 @@
 */
 #endregion
 
-namespace SimpleInjector
+namespace SimpleInjector.Advanced
 {
-    using System;
-    using System.Diagnostics;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using SimpleInjector.Diagnostics;
+    using System.Linq.Expressions;
 
-#if DEBUG
-    /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
-#endif
-    [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]
-    public partial class Container
+    // Searches an expression for a specific sub expression and replaces that sub expression with a
+    // different supplied expression.
+    internal sealed class SubExpressionReplacer : ExpressionVisitor
     {
-        private Lazy<ModuleBuilder> moduleBuilder;
+        private readonly ConstantExpression subExpressionToFind;
+        private readonly Expression replacementExpression;
 
-        internal ModuleBuilder ModuleBuilder
+        private SubExpressionReplacer(ConstantExpression subExpressionToFind,
+            Expression replacementExpression)
         {
-            get { return this.moduleBuilder.Value; }
+            this.subExpressionToFind = subExpressionToFind;
+            this.replacementExpression = replacementExpression;
         }
 
-        partial void OnCreated()
+        public override Expression Visit(Expression node)
         {
-            this.moduleBuilder = new Lazy<ModuleBuilder>(this.CreateModuleBuilder);
+            return base.Visit(node);
         }
- 
-        private ModuleBuilder CreateModuleBuilder()
+
+        internal static Expression Replace(Expression expressionToAlter,
+            ConstantExpression subExpressionToFind, Expression replacementExpression)
         {
-            return AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("SimpleInjector.Compiled_" + this.containerId),
-                    AssemblyBuilderAccess.Run)
-                .DefineDynamicModule("SimpleInjector.CompiledModule");
+            var visitor = new SubExpressionReplacer(subExpressionToFind, replacementExpression);
+
+            return visitor.Visit(expressionToAlter);
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            return node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
         }
     }
 }

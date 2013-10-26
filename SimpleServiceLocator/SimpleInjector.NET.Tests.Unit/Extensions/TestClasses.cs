@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
-
-namespace SimpleInjector.Tests.Unit.Extensions
+﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
+    using System;
+    using System.Collections.ObjectModel;
+
     public interface ILogger
     {
         void Log(string message);

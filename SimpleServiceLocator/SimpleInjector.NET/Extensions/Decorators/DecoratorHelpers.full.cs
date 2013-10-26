@@ -26,9 +26,6 @@
 namespace SimpleInjector.Extensions.Decorators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using SimpleInjector.Advanced.Internal;
 
     internal static partial class DecoratorHelpers
@@ -38,7 +35,5 @@ namespace SimpleInjector.Extensions.Decorators
             ReadOnlyContainerControlledCollectionType =
                 new Lazy<Type>(ReadOnlyContainerControlledCollectionTypeBuilder.Build);
         }
-
-
     }
 }

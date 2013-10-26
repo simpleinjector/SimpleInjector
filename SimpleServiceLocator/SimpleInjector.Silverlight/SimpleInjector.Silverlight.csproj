@@ -131,6 +131,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
       <Link>Advanced\PropertyInjectionHelper.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\SubExpressionReplacer.cs">
+      <Link>Advanced\SubExpressionReplacer.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\CompilationHelpers.cs">
       <Link>CompilationHelpers.cs</Link>
     </Compile>

@@ -386,8 +386,7 @@
         {
             public TDependency BaseClassDependency { get; set; }
         }
-
-
+        
         public class SubClassServiceWithProperty<TDependency> : BaseClassServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }

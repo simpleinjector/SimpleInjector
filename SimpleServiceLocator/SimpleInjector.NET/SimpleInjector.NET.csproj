@@ -90,6 +90,7 @@
     <Compile Include="Advanced\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.full.cs" />
+    <Compile Include="Advanced\SubExpressionReplacer.cs" />
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />

@@ -32,7 +32,6 @@ namespace SimpleInjector.Extensions
     using System.Reflection;
     using SimpleInjector.Extensions.Decorators;
 
-
     /// <summary>Defines the accessibility of the types to search.</summary>
     /// <remarks>This type is not available in Silverlight.</remarks>
     public enum AccessibilityOption
@@ -44,6 +43,9 @@ namespace SimpleInjector.Extensions
         PublicTypesOnly = 1,
     }
 
+#if DEBUG
+    /// <summary>Behavior for the full .NET version of Simple Injector.</summary>
+#endif
     public static partial class OpenGenericBatchRegistrationExtensions
     {
         /// <summary>
@@ -471,16 +473,17 @@ namespace SimpleInjector.Extensions
             RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
                 includeInternals: accessibility == AccessibilityOption.AllTypes);
         }
-        private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType, 
+
+        private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType,
             IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
         {
             IsValidValue(accessibility, "accessibility");
 
-            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies, 
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies,
                 includeInternals: accessibility == AccessibilityOption.AllTypes);
         }
 
-        private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType, 
+        private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType,
             IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, AccessibilityOption accessibility)
         {
             Requires.IsNotNull(container, "container");

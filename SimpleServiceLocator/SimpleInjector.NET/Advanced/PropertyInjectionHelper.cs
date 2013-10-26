@@ -238,7 +238,7 @@ namespace SimpleInjector.Advanced
         {
             Delegate compiledDelegate = null;
 
-            TryCompileLambdaInDynamicAssembly(expression, ref compiledDelegate);
+            this.TryCompileLambdaInDynamicAssembly(expression, ref compiledDelegate);
 
             return compiledDelegate ?? expression.Compile();
         }

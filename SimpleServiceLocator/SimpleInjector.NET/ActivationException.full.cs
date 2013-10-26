@@ -28,6 +28,9 @@ namespace SimpleInjector
     using System;
     using System.Runtime.Serialization;
 
+#if DEBUG
+    /// <summary>Behavior for the full .NET version of Simple Injector.</summary>
+#endif
     [Serializable]
     public partial class ActivationException : Exception
     {
