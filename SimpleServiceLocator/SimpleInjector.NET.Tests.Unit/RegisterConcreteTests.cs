@@ -108,6 +108,38 @@
         }
 
         [TestMethod]
+        public void RegisterWithLifestyle_RegisteringTransaction_ReturnsNewInstanceOnEachCall()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<RealTimeProvider>(Lifestyle.Transient);
+
+            // Act
+            var instance1 = container.GetInstance<RealTimeProvider>();
+            var instance2 = container.GetInstance<RealTimeProvider>();
+
+            // Assert
+            Assert.AreNotSame(instance1, instance2);
+        }
+
+        [TestMethod]
+        public void RegisterWithLifestyle_RegisteringSingleton_ReturnsSameInstanceOnEveryCall()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var instance1 = container.GetInstance<RealTimeProvider>();
+            var instance2 = container.GetInstance<RealTimeProvider>();
+
+            // Assert
+            Assert.AreSame(instance1, instance2);
+        }
+
+        [TestMethod]
         public void Register_WithIncompleteSingletonRegistration_Succeeds()
         {
             // Arrange

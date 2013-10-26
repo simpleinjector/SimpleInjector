@@ -289,7 +289,7 @@ namespace SimpleInjector
                 this.expressionBuilt -= value;
             }
         }
-        
+
         /// <summary>
         /// Occurs directly after the creation of the <see cref="Expression" /> of a registered type is made,
         /// but before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching
@@ -408,7 +408,7 @@ namespace SimpleInjector
         /// <b>WARNING:</b> Registering to this event can have considerate impact on the performance of the 
         /// container, since the event will get triggered for every instance that is created by the container.
         /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly", Justification = 
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly", Justification =
             "InstanceCreatedEventHandler explicitly violates the design guidelines by having a sender that " +
             "is not System.Object and having an 'e' parameter that does not inherit from EventArgs. By " +
             "supplying the actual sender type (InstanceProducer) we make it easier for the user to handle " +
@@ -456,6 +456,27 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Registers that an  instance of <typeparamref name="TConcrete"/> will be returned when it 
+        /// is requested. The instance is cached according to the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <typeparamref name="TConcrete"/> has already been registered.
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
+        /// that can not be created by the container.</exception>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = @"
+                A design without a generic T would be unpractical, because the other overloads also take a 
+                generic T.")]
+        public void Register<TConcrete>(Lifestyle lifestyle) where TConcrete : class
+        {
+            this.Register<TConcrete, TConcrete>(lifestyle, "TConcrete", "TConcrete");
+        }
+
+        /// <summary>
         /// Registers that a new instance of <typeparamref name="TImplementation"/> will be returned every time a
         /// <typeparamref name="TService"/> is requested.
         /// </summary>
@@ -492,7 +513,7 @@ namespace SimpleInjector
         {
             this.Register<TService>(instanceCreator, Lifestyle.Transient);
         }
-        
+
         /// <summary>
         /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it 
         /// is requested (transient).
@@ -550,7 +571,7 @@ namespace SimpleInjector
         public void Register(Type serviceType, Func<object> instanceCreator)
         {
             this.Register(serviceType, instanceCreator, Lifestyle.Transient);
-        }     
+        }
 
         /// <summary>
         /// Registers a single concrete instance that will be constructed using constructor injection and will
@@ -645,7 +666,7 @@ namespace SimpleInjector
 
             this.Register<TService>(instanceCreator, Lifestyle.Singleton);
         }
-        
+
         /// <summary>
         /// Registers that the same instance of type <paramref name="implementation"/> will be returned every 
         /// time an instance of type <paramref name="serviceType"/> type is requested. If 
@@ -821,7 +842,7 @@ namespace SimpleInjector
 
             this.AddRegistration(serviceType, registration);
         }
-        
+
         /// <summary>
         /// Registers an <see cref="Action{T}"/> delegate that runs after the creation of instances that
         /// implement or derive from the given <typeparamref name="TService"/>. Please note that only instances
@@ -1014,12 +1035,12 @@ namespace SimpleInjector
             Requires.IsNotNull(singletons, "singletons");
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
-            var collection = 
+            var collection =
                 DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this, singletons);
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
         }
-        
+
         /// <summary>
         /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
         /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
@@ -1096,7 +1117,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
                 typeCanBeServiceType: true);
 
-            IContainerControlledCollection collection = 
+            IContainerControlledCollection collection =
                 DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, types);
 
             this.RegisterContainerControlledCollection(serviceType, collection);
@@ -1434,12 +1455,12 @@ namespace SimpleInjector
             this.AddRegistration(serviceType, registration);
         }
 
-        private void RegisterContainerControlledCollection(Type serviceType, 
+        private void RegisterContainerControlledCollection(Type serviceType,
             IContainerControlledCollection collection)
         {
             this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
 
-            var registration = DecoratorHelpers.CreateRegistrationForContainerControlledCollection(serviceType, 
+            var registration = DecoratorHelpers.CreateRegistrationForContainerControlledCollection(serviceType,
                 collection, this);
 
             this.AddRegistration(typeof(IEnumerable<>).MakeGenericType(serviceType), registration);
@@ -1453,7 +1474,7 @@ namespace SimpleInjector
 
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            var registration = 
+            var registration =
                 SingletonLifestyle.CreateSingleRegistration(enumerableServiceType, castedCollection, this);
 
             registration.IsCollection = true;
@@ -1585,7 +1606,7 @@ namespace SimpleInjector
 
             var producer = this.registrations[enumerableServiceType];
 
-            IContainerControlledCollection instance = 
+            IContainerControlledCollection instance =
                 DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
 
             if (instance != null)
