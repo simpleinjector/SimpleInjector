@@ -84,6 +84,8 @@
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\InitializationContext.cs" />
+    <Compile Include="Advanced\InstanceInitializationData.cs" />
     <Compile Include="Advanced\Internal\IndexableCollection.cs" />
     <Compile Include="Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
@@ -123,7 +125,6 @@
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.full.cs" />
     <Compile Include="Extensions\OpenGenericPredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
-    <Compile Include="Diagnostics\InstanceCreatedEventArgs.cs" />
     <Compile Include="FullSpecific\Helpers.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />

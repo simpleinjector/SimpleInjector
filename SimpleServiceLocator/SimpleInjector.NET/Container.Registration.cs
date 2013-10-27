@@ -137,12 +137,12 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// Please note that given example is just an uhhmm... example. In the case of the example the
-        /// <b>EmptyValidator&lt;T&gt;</b> can be registered using of the built-in 
+        /// <b>EmptyValidator&lt;T&gt;</b> can be better registered using of the built-in 
         /// <see cref="SimpleInjector.Extensions.OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container, Type, Type, Lifestyle)">RegisterOpenGeneric</see> 
         /// extension methods instead. These extension methods take care of any given generic type constraint
         /// and allow the implementation to be integrated into the container's pipeline, which allows
         /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
-        /// <see cref="RegisterInitializer">initializers</see> to be applied.
+        /// <see cref="RegisterInitializer{TService}">initializers</see> to be applied.
         /// </para>
         /// </example>
         public event EventHandler<UnregisteredTypeEventArgs> ResolveUnregisteredType
@@ -270,7 +270,7 @@ namespace SimpleInjector
         /// These extension methods take care of any given generic type constraint, allow to register decorators
         /// conditionally and allow the decorator to be integrated into the container's pipeline, which allows
         /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
-        /// <see cref="RegisterInitializer">initializers</see> to be applied.
+        /// <see cref="RegisterInitializer{TService}">initializers</see> to be applied.
         /// </para>
         /// </example>
         public event EventHandler<ExpressionBuiltEventArgs> ExpressionBuilt
@@ -398,37 +398,6 @@ namespace SimpleInjector
                 this.ThrowWhenContainerIsLocked();
 
                 this.expressionBuilding -= value;
-            }
-        }
-
-        /// <summary>
-        /// Occurs directly after the creation of an instance. Multiple delegates may handle the same service type.
-        /// </summary>
-        /// <remarks>
-        /// <b>WARNING:</b> Registering to this event can have considerate impact on the performance of the 
-        /// container, since the event will get triggered for every instance that is created by the container.
-        /// </remarks>
-        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly", Justification =
-            "InstanceCreatedEventHandler explicitly violates the design guidelines by having a sender that " +
-            "is not System.Object and having an 'e' parameter that does not inherit from EventArgs. By " +
-            "supplying the actual sender type (InstanceProducer) we make it easier for the user to handle " +
-            "this event, since this parameter is needed in the common use cases. The 'e' parameter is a " +
-            "struct to prevent unneeded object allocations and improve performance. Since EventArgs is a " +
-            "class, we cannot derive from EventArgs.")]
-        public event InstanceCreatedEventHandler InstanceCreated
-        {
-            add
-            {
-                this.ThrowWhenContainerIsLocked();
-
-                this.instanceCreated += value;
-            }
-
-            remove
-            {
-                this.ThrowWhenContainerIsLocked();
-
-                this.instanceCreated -= value;
             }
         }
 
@@ -977,11 +946,45 @@ namespace SimpleInjector
 
             this.ThrowWhenContainerIsLocked();
 
-            this.instanceInitializers.Add(new InstanceInitializer
-            {
-                ServiceType = typeof(TService),
-                Action = instanceInitializer,
-            });
+            this.instanceInitializers.Add(TypedInstanceInitializer.Create(instanceInitializer));
+        }
+
+        /// <summary>
+        /// Registers an <see cref="Action{InstanceInitializationData}"/> delegate that runs after the 
+        /// creation of instances for which the supplied <paramref name="predicate"/> returns true. Please 
+        /// note that only instances that are created by the container can be initialized this way.
+        /// </summary>
+        /// <param name="instanceInitializer">The delegate that will be called after the instance has been
+        /// constructed and before it is returned.</param>
+        /// <param name="predicate">The predicate that will be used to check whether the given delegate must
+        /// be applied to a registration or not. The given predicate will be called once for each registration
+        /// in the container.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when either the <paramref name="instanceInitializer"/> or <paramref name="predicate"/> are 
+        /// null references.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.</exception>
+        /// <remarks>
+        /// <para>
+        /// Note: Initializers are guaranteed to be executed in the order they are registered.
+        /// </para>
+        /// <para>
+        /// Note: The <paramref name="predicate"/> is <b>not</b> guaranteed to be called once per registration;
+        /// when a registration's instance is requested for the first time simultaniously over multiple thread,
+        /// the predicate might be called multiple times. The caller of this method is responsible of supplying
+        /// a predicate that is thread-safe.
+        /// </para>
+        /// </remarks>
+        public void RegisterInitializer(Action<InstanceInitializationData> instanceInitializer,
+            Predicate<InitializationContext> predicate)
+        {
+            Requires.IsNotNull(instanceInitializer, "instanceInitializer");
+            Requires.IsNotNull(predicate, "predicate");
+
+            this.ThrowWhenContainerIsLocked();
+
+            this.instanceInitializers.Add(ContextualInstanceInitializer.Create(instanceInitializer, predicate));
         }
 
         /// <summary>
@@ -1552,14 +1555,12 @@ namespace SimpleInjector
             }
         }
 
-        private Action<T>[] GetInstanceInitializersFor<T>(Type type)
+        private Action<T>[] GetInstanceInitializersFor<T>(Type type, InitializationContext context)
         {
-            var typeHierarchy = Helpers.GetTypeHierarchyFor(type);
-
             return (
                 from instanceInitializer in this.instanceInitializers
-                where typeHierarchy.Contains(instanceInitializer.ServiceType)
-                select Helpers.CreateAction<T>(instanceInitializer.Action))
+                where instanceInitializer.AppliesTo(type, context)
+                select instanceInitializer.CreateAction<T>(context))
                 .ToArray();
         }
 

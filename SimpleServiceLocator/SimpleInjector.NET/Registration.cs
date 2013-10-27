@@ -33,7 +33,6 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an
@@ -44,8 +43,8 @@ namespace SimpleInjector
     /// service type. <see cref="Expression"/>s returned from the 
     /// <see cref="Registration.BuildExpression()">BuildExpression</see> method can be intercepted by any event
     /// registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have 
-    /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> applied, and the caching 
-    /// particular to its lifestyle have been applied. Interception using the 
+    /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}(Action{TService})">initializers</see> 
+    /// applied, and the caching particular to its lifestyle have been applied. Interception using the 
     /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b> 
     /// be applied in the <b>Registration</b>, but will be applied in <see cref="InstanceProducer"/>.</remarks>
     /// <example>
@@ -69,11 +68,10 @@ namespace SimpleInjector
         private static readonly Action<object> NoOp = instance => { };
 
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
+        private readonly ThreadLocal<InstanceProducer> currentProducer = new ThreadLocal<InstanceProducer>();
         
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
         private Action<object> instanceInitializer;
-
-        private ThreadLocal<InstanceProducer> currentProducer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Registration"/> class.
@@ -227,7 +225,9 @@ namespace SimpleInjector
 
         internal Expression WrapWithInitializer(Type serviceType, Type implementationType, Expression expression)
         {
-            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType);
+            var context = new InitializationContext(this.GetCurrentProducer(), this);
+
+            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType, context);
 
             if (instanceInitializer != null)
             {
@@ -241,12 +241,7 @@ namespace SimpleInjector
 
         internal InstanceProducer GetCurrentProducer()
         {
-            if (this.Container.InstanceCreatedHandler != null && this.currentProducer != null)
-            {
-                return this.currentProducer.Value;
-            }
-
-            return null;
+            return this.currentProducer.Value;
         }
 
         /// <summary>
@@ -255,8 +250,8 @@ namespace SimpleInjector
         /// be intercepted by a 
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
         /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
-        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
-        /// appliable to the given <typeparamref name="TService"/> (if any).
+        /// registered <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
+        /// that are appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">
@@ -280,7 +275,7 @@ namespace SimpleInjector
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
         /// and the creation of the <typeparamref name="TImplementation"/> will have been wrapped with a 
         /// delegate that executes the registered 
-        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> 
+        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
         /// that are appliable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -327,8 +322,6 @@ namespace SimpleInjector
             
             expression = this.WrapWithInitializer<TService>(expression);
 
-            expression = this.WrapWithInstanceCreatedCallback<TService>(expression);
-
             return expression;
         }
 
@@ -359,8 +352,6 @@ namespace SimpleInjector
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TImplementation), expression);
 
             expression = this.WrapWithInitializer<TImplementation>(expression);
-
-            expression = this.WrapWithInstanceCreatedCallback<TImplementation>(expression);
 
             return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
         }
@@ -542,34 +533,15 @@ namespace SimpleInjector
         private Expression WrapWithInitializer<TImplementation>(Expression expression)
             where TImplementation : class
         {
-            Action<TImplementation> instanceInitializer = this.Container.GetInitializer<TImplementation>();
+            var context = new InitializationContext(this.GetCurrentProducer(), this);
+
+            Action<TImplementation> instanceInitializer = this.Container.GetInitializer<TImplementation>(context);
 
             if (instanceInitializer != null)
             {
                 // It's not possible to return a Expression that is as heavily optimized as the newExpression
                 // simply is, because the instance initializer must be called as well.
                 return BuildExpressionWithInstanceInitializer<TImplementation>(expression, instanceInitializer);
-            }
-
-            return expression;
-        }
-
-        private Expression WrapWithInstanceCreatedCallback<TImplementation>(Expression expression)
-        {
-            InstanceCreatedEventHandler handler = this.Container.InstanceCreatedHandler;
-            InstanceProducer producer = this.GetCurrentProducer();
-            Registration registration = this;
-
-            if (handler != null && producer != null)
-            {
-                Func<TImplementation, TImplementation> instanceCreatedWrapper = instance =>
-                {
-                    handler(producer, new InstanceCreatedEventArgs(registration, instance));
-
-                    return instance;
-                };
-
-                return Expression.Invoke(Expression.Constant(instanceCreatedWrapper), expression);
             }
 
             return expression;
@@ -630,38 +602,12 @@ namespace SimpleInjector
 
         private void SetCurrentProducer(InstanceProducer producer)
         {
-            if (this.Container.InstanceCreatedHandler == null)
-            {
-                return;
-            }
-
-            // Call initialize after the InstanceCreatedHandler == null to prevent unnecessarily creation
-            // of the ThreadLocal<T> object, since it takes up extra memory.
-            this.InitializeThreadLocalInstanceProducer();
-
             this.currentProducer.Value = producer;
-        }
-
-        private void InitializeThreadLocalInstanceProducer()
-        {
-            if (this.currentProducer == null)
-            {
-                lock (this.Container.SyncRoot)
-                {
-                    if (this.currentProducer == null)
-                    {
-                        this.currentProducer = new ThreadLocal<InstanceProducer>();
-                    }
-                }
-            }
         }
 
         private void ResetCurrentProducer()
         {
-            if (this.currentProducer != null)
-            {
-                this.currentProducer.Value = null;
-            }
+            this.currentProducer.Value = null;
         }
     }
 }

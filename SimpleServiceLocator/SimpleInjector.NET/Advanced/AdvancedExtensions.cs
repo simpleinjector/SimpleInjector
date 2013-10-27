@@ -82,11 +82,16 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = 
                 "We need to return a Action<TService> and we therefore need the generic type param.")]
+        [Obsolete(
+            "This method is obsolete and will be removed in a future version. Use Container." + 
+            "GetRegistration().Registration.InitializeInstance instead to initialize an existing instance.")]
         public static Action<TService> GetInitializer<TService>(this Container container)
-        {
+        {            
             Requires.IsNotNull(container, "container");
 
-            return container.GetInitializer<TService>();
+            InitializationContext dummyContext = null;
+
+            return container.GetInitializer<TService>(dummyContext);
         }
 
         /// <summary>

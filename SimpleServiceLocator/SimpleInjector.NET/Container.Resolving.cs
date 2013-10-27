@@ -262,14 +262,14 @@ namespace SimpleInjector
             propertyInjector.Inject(instance);
         }
 
-        internal Action<TService> GetInitializer<TService>()
+        internal Action<TImplementation> GetInitializer<TImplementation>(InitializationContext context)
         {
-            return this.GetInitializer<TService>(typeof(TService));
+            return this.GetInitializer<TImplementation>(typeof(TImplementation), context);
         }
 
-        internal Action<object> GetInitializer(Type serviceType)
+        internal Action<object> GetInitializer(Type implementationType, InitializationContext context)
         {
-            return this.GetInitializer<object>(serviceType);
+            return this.GetInitializer<object>(implementationType, context);
         }
 
         internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType)
@@ -280,9 +280,9 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(serviceType, buildProducer);
         }
 
-        private Action<TService> GetInitializer<TService>(Type serviceType)
+        private Action<T> GetInitializer<T>(Type implementationType, InitializationContext context)
         {
-            Action<TService>[] initializersForType = this.GetInstanceInitializersFor<TService>(serviceType);
+            Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
 
             if (initializersForType.Length <= 1)
             {

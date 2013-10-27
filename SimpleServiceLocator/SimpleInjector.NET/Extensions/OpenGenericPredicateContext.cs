@@ -74,7 +74,7 @@ namespace SimpleInjector.Extensions
             get
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType = {0}, ImplementationType = {1}, Handled = {2}",
+                    "ServiceType: {0}, ImplementationType: {1}, Handled: {2}",
                     this.ServiceType.ToFriendlyName(),
                     this.ImplementationType.ToFriendlyName(),
                     this.Handled);

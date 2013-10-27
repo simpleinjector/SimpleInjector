@@ -23,48 +23,34 @@
 */
 #endregion
 
-namespace SimpleInjector.Diagnostics
+namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
 
-    /// <summary>Represents the method that will handle an <see cref="InstanceCreatedEventArgs"/> event.</summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e"> An <see cref="InstanceCreatedEventArgs"/> that contains the event data.</param>
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "e",
-        Justification = "This is the event arguments and the convention is to name it 'e'.")]
-    public delegate void InstanceCreatedEventHandler(InstanceProducer sender, InstanceCreatedEventArgs e);
-    
     /// <summary>
-    /// Provides data for and interaction with the <see cref="Container.InstanceCreated">InstanceCreated</see> 
-    /// event of the <see cref="Container"/>.
+    /// Contains data that can be used to initialize a created instance. This data includes the actual
+    /// created <see cref="Instance"/> and the <see cref="Context"/> information about the created instance.
     /// </summary>
-#if DEBUG
-    [DebuggerDisplay("InstanceCreatedEventArgs (" + 
-        "ImplementationType: {SimpleInjector.Helpers.ToFriendlyName(Registration.ImplementationType)} )")]
-#endif
-    [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix",
-        Justification = "We can't inherit from EventArgs, but this structure represents an EventArgs.")]
-    public struct InstanceCreatedEventArgs : IEquatable<InstanceCreatedEventArgs>
+    public struct InstanceInitializationData : IEquatable<InstanceInitializationData>
     {
         // NOTE: Because of performance considerations, this type has been made a struct. This prevents Simple
-        // Injector from creating an extra reference type (the InstanceCreatedEventArgs) every time an instance
-        // is created. This would cause extra pressure on the GC.
-        private readonly Registration registration;
+        // Injector from creating an extra reference type every time an instance is created. This would cause 
+        // extra pressure on the GC.
+        private readonly InitializationContext context;
         private readonly object instance;
 
-        internal InstanceCreatedEventArgs(Registration registration, object instance)
+        internal InstanceInitializationData(InitializationContext context, object instance)
         {
-            this.registration = registration;
+            this.context = context;
             this.instance = instance;
         }
 
-        /// <summary>Gets the <see cref="Registration"/> that triggered the event.</summary>
-        /// <value>The <see cref="Registration"/>.</value>
-        public Registration Registration
+        /// <summary>Gets the <see cref="InitializationContext"/> with contextual information about the 
+        /// created instance.</summary>
+        /// <value>The <see cref="InitializationContext"/>.</value>
+        public InitializationContext Context
         {
-            get { return this.registration; }
+            get { return this.context; }
         }
 
         /// <summary>Gets the created instance.</summary>
@@ -79,7 +65,7 @@ namespace SimpleInjector.Diagnostics
         public override int GetHashCode()
         {
             return
-                (this.registration == null ? 0 : this.registration.GetHashCode()) ^
+                (this.context == null ? 0 : this.context.GetHashCode()) ^
                 (this.instance == null ? 0 : this.instance.GetHashCode());
         }
 
@@ -88,12 +74,12 @@ namespace SimpleInjector.Diagnostics
         /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is InstanceCreatedEventArgs))
+            if (!(obj is InstanceInitializationData))
             {
                 return false;
             }
 
-            return this.Equals((InstanceCreatedEventArgs)obj);
+            return this.Equals((InstanceInitializationData)obj);
         }
 
         /// <summary>
@@ -101,31 +87,31 @@ namespace SimpleInjector.Diagnostics
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(InstanceCreatedEventArgs other)
+        public bool Equals(InstanceInitializationData other)
         {
             return this == other;
         }
 
         /// <summary>
-        /// Indicates whether the values of two specified <see cref="InstanceCreatedEventArgs"/> objects are equal.
+        /// Indicates whether the values of two specified <see cref="InstanceInitializationData"/> objects are equal.
         /// </summary>
         /// <param name="first">The first object to compare.</param>
         /// <param name="second">The second object to compare.</param>
         /// <returns>True if a and b are equal; otherwise, false.</returns>
-        public static bool operator ==(InstanceCreatedEventArgs first, InstanceCreatedEventArgs second)
+        public static bool operator ==(InstanceInitializationData first, InstanceInitializationData second)
         {
-            return object.ReferenceEquals(first.registration, second.registration) &&
+            return object.ReferenceEquals(first.context, second.context) &&
                 object.ReferenceEquals(first.instance, second.instance);
         }
 
         /// <summary>
-        /// Indicates whether the values of two specified  <see cref="InstanceCreatedEventArgs"/>  objects are 
+        /// Indicates whether the values of two specified  <see cref="InstanceInitializationData"/>  objects are 
         /// not equal.
         /// </summary>
         /// <param name="first">The first object to compare.</param>
         /// <param name="second">The second object to compare.</param>
         /// <returns>True if a and b are not equal; otherwise, false.</returns>
-        public static bool operator !=(InstanceCreatedEventArgs first, InstanceCreatedEventArgs second)
+        public static bool operator !=(InstanceInitializationData first, InstanceInitializationData second)
         {
             return !(first == second);
         }

@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit.Advanced
+﻿#pragma warning disable 618
+namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
     using System.Collections.Generic;

@@ -60,7 +60,7 @@ namespace SimpleInjector
         private static long counter;
 
         private readonly object locker = new object();
-        private readonly List<InstanceInitializer> instanceInitializers = new List<InstanceInitializer>();
+        private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
 
@@ -84,8 +84,6 @@ namespace SimpleInjector
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
 
         private EventHandler<ExpressionBuiltEventArgs> expressionBuilt;
-
-        private InstanceCreatedEventHandler instanceCreated;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -118,6 +116,14 @@ namespace SimpleInjector
             this.containerId = Interlocked.Increment(ref counter);
 
             this.OnCreated();
+        }
+
+        // Wrapper for instance initializer delegates
+        private interface IInstanceInitializer
+        {
+            bool AppliesTo(Type implementationType, InitializationContext context);
+
+            Action<T> CreateAction<T>(InitializationContext context);
         }
 
         /// <summary>Gets the container options.</summary>
@@ -176,11 +182,6 @@ namespace SimpleInjector
         internal bool SuccesfullyVerified
         {
             get { return this.succesfullyVerified; }
-        }
-
-        internal InstanceCreatedEventHandler InstanceCreatedHandler
-        {
-            get { return this.instanceCreated; }
         }
 
         /// <summary>
@@ -363,12 +364,69 @@ namespace SimpleInjector
 
         partial void OnCreated();
 
-        /// <summary>Wrapper for instance initializer Action delegates.</summary>
-        private sealed class InstanceInitializer
+        private sealed class TypedInstanceInitializer : IInstanceInitializer
         {
-            internal Type ServiceType { get; set; }
+            private Type serviceType;
+            private object instanceInitializer;
 
-            internal object Action { get; set; }
+            public bool AppliesTo(Type implementationType, InitializationContext context)
+            {
+                var typeHierarchy = Helpers.GetTypeHierarchyFor(implementationType);
+
+                return typeHierarchy.Contains(this.serviceType);
+            }
+
+            public Action<T> CreateAction<T>(InitializationContext context)
+            {
+                return Helpers.CreateAction<T>(this.instanceInitializer);
+            }
+
+            internal static IInstanceInitializer Create<TImplementation>(
+                Action<TImplementation> instanceInitializer)
+            {
+                return new TypedInstanceInitializer
+                {
+                    serviceType = typeof(TImplementation),
+                    instanceInitializer = instanceInitializer
+                };
+            }
+        }
+
+        private sealed class ContextualInstanceInitializer : IInstanceInitializer
+        {
+            private Predicate<InitializationContext> predicate;
+            private Action<InstanceInitializationData> instanceInitializer;
+
+            public bool AppliesTo(Type implementationType, InitializationContext context)
+            {
+                if (context == null)
+                {
+                    // LEGACY: AdvancedExtensions.GetInitializer passes in a null context. We have to support
+                    // that.
+                    return false;
+                }
+
+                return this.predicate(context);
+            }
+
+            public Action<T> CreateAction<T>(InitializationContext context)
+            {
+                return instance =>
+                {
+                    this.instanceInitializer(new InstanceInitializationData(context, instance));
+                };
+            }
+
+            internal static IInstanceInitializer Create(
+                Action<InstanceInitializationData> instanceInitializer,
+                Predicate<InitializationContext> predicate)
+            {
+                return new ContextualInstanceInitializer
+                {
+                    instanceInitializer = instanceInitializer,
+                    predicate = predicate,
+                };
+            }
         }
     }
 }

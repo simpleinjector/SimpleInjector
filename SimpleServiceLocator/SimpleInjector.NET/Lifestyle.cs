@@ -290,9 +290,9 @@ namespace SimpleInjector
         /// when the type is resolved for the first time, and the framework will supply the factory with a
         /// <b>Func&lt;object&gt;</b> for creating new (transient) instances of that type (that might
         /// have been <see cref="Container.ExpressionBuilding">intercepted</see> and
-        /// <see cref="Container.RegisterInitializer">initializers</see> might have been applied). It is the
-        /// job of the <paramref name="lifestyleApplierFactory" /> to return a <b>Func&lt;object&gt;</b> that
-        /// applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the 
+        /// <see cref="Container.RegisterInitializer{TService}">initializers</see> might have been applied). 
+        /// It is the job of the <paramref name="lifestyleApplierFactory" /> to return a <b>Func&lt;object&gt;</b>
+        /// that applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the 
         /// <paramref name="lifestyleApplierFactory" /> will be stored for that registration (every 
         /// registration will store its own <b>Func&lt;object&gt;</b> delegate) and this delegate will be
         /// called everytime the service is resolved (by calling 

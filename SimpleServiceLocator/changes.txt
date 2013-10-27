@@ -23,9 +23,10 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		-[Core] New RegisterOpenGeneric overloads have been added that allow passing on a predicate that
 		 allows determining on a per-type basis whether the registered implementation should be applied.
 		 (work item 20284).		
-		-[Diagnostics] Created a public API for querying the container for diagnostic results (work item 20062)
-		-[Core] Container.InstanceCreated event added to get notified by the container when a new instance
-	     was created. (work item 19824).
+		-[Diagnostics] Created a public API for querying the container for diagnostic results (work item 20062).
+		-[Core] New Container.RegisterInitializer overload added that allows supplying more information about
+		 the context of the created instance (which Registration and InstanceProducer created the instance)
+		 (work item 19824).
 		-[Core] Container.Register<TConcrete>(Lifestyle) overload has been added. (Work item 20324).
 		-[Core] InstanceProducer.GetRelationships() method added to allow analyzing a registration's 
 		 dependencies (Work item 20235).
