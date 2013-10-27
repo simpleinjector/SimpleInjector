@@ -35,13 +35,13 @@ namespace SimpleInjector.Diagnostics
         {
         }
 
-        public bool Changed { get; private set; }
+        public bool HasChanged { get; private set; }
 
         protected override void InsertItem(int index, KnownRelationship item)
         {
             Requires.IsNotNull(item, "item");
 
-            this.Changed = true;
+            this.HasChanged = true;
 
             base.InsertItem(index, item);
         }
@@ -50,14 +50,14 @@ namespace SimpleInjector.Diagnostics
         {
             Requires.IsNotNull(item, "item");
 
-            this.Changed = true;
+            this.HasChanged = true;
 
             base.SetItem(index, item);
         }
 
         protected override void RemoveItem(int index)
         {
-            this.Changed = true;
+            this.HasChanged = true;
 
             base.RemoveItem(index);
         }

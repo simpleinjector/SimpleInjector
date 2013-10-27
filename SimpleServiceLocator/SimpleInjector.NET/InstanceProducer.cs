@@ -27,6 +27,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -92,7 +93,7 @@ namespace SimpleInjector
         private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
-        private KnownRelationship[] relationships;
+        private ReadOnlyCollection<KnownRelationship> relationships;
         private List<Action> verifiers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
@@ -260,6 +261,30 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>
+        /// Gets the collection of relationships for this instance that the container knows about.
+        /// This includes relationships between the registered type and its dependencies and relationships 
+        /// between applied decorators and their dependencies. Note that types that are not newed up by the 
+        /// container, property dependencies that are injected using the (legacy)
+        /// <see cref="Container.InjectProperties">InjectProperties</see> method, and
+        /// properties that are injected inside a custom delegate that is registered using the
+        /// <see cref="Container.RegisterInitializer{TService}">RegisterInitializer</see> method are unknown
+        /// to the container and are not returned from this method.
+        /// Also note that this method will return an empty collection when called before the the
+        /// registered type is requested from the container (or before <see cref="Container.Verify">Verify</see>
+        /// is called). 
+        /// </summary>
+        /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
+        public KnownRelationship[] GetRelationships()
+        {
+            if (this.relationships != null)
+            {
+                return this.relationships.ToArray();
+            }
+
+            return this.Registration.GetRelationships();
+        }
+
         // Throws an InvalidOperationException on failure.
         internal object Verify()
         {
@@ -295,14 +320,9 @@ namespace SimpleInjector
             }
         }
 
-        internal KnownRelationship[] GetRelationships()
-        {
-            return this.relationships ?? this.Registration.GetRelationships();
-        }
-
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
         {
-            this.relationships = relationships.Distinct().ToArray();
+            this.relationships = new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()

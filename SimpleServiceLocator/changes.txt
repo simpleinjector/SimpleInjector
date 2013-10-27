@@ -27,6 +27,8 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		-[Core] Container.InstanceCreated event added to get notified by the container when a new instance
 	     was created. (work item 19824).
 		-[Core] Container.Register<TConcrete>(Lifestyle) overload has been added. (Work item 20324).
+		-[Core] InstanceProducer.GetRelationships() method added to allow analyzing a registration's 
+		 dependencies (Work item 20235).
 
 	Changes:
 		-[Core] Diagnostics moved into a separate project.

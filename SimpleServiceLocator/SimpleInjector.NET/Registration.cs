@@ -54,16 +54,16 @@ namespace SimpleInjector
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
         // I'm still wondering whether it was better to use Dictionary<Thread, InstanceProducer> instead of
         // ThreadLocal<InstanceProducer>. That would have prevented me from having to write all this :-)
-        Justification = "This class references ThreadLocal<InstanceProducer> and ThreadLocal<T> implements " +
-            "IDisposable. Not letting Registration implement IDisposable however is not a problem, because:" +
-            "-Unless a user registers the InstanceCreated event, no ThreadLocal<T> will get created. " +
-            "-Registration objects will typically live as long as the AppDomain, so for those instances   " +
-            " disposing is not an issue.                                                                  " +
-            "-The InstanceProducers stored in the ThreadLocal<T> also live long and will be removed from  " +
-            " the ThreadLocal<T> during the call to BuildExpression(InstanceProducer) and the ThreadLocal " +
-            " wil because of this not keep those instances alive unnecessary.                             " +
-            "-ThreadLocal<T> implements a finalizer and the GC will eventually clean up those few         " +
-            " instances that are referenced in a Registration that gets dereferenced.")]
+        Justification = @"This class references ThreadLocal<InstanceProducer> and ThreadLocal<T> implements
+            IDisposable. Not letting Registration implement IDisposable however is not a problem, because:
+            -Unless a user registers the InstanceCreated event, no ThreadLocal<T> will get created. 
+            -Registration objects will typically live as long as the AppDomain, so for those instances   
+             disposing is not an issue.                                                                  
+            -The InstanceProducers stored in the ThreadLocal<T> also live long and will be removed from the 
+             ThreadLocal<T> during the call to BuildExpression(InstanceProducer) and the ThreadLocal will 
+             because of this not keep those instances alive unnecessary.                             
+            -ThreadLocal<T> implements a finalizer and the GC will eventually clean up those few instances
+             that are referenced in a Registration that gets dereferenced.")]
     public abstract class Registration
     {
         private static readonly Action<object> NoOp = instance => { };
@@ -91,23 +91,17 @@ namespace SimpleInjector
             this.Container = container;
         }
         
-        /// <summary>
-        /// Gets the type that this instance will create.
-        /// </summary>
+        /// <summary>Gets the type that this instance will create.</summary>
         /// <value>The type that this instance will create.</value>
         public abstract Type ImplementationType { get; }
 
-        /// <summary>
-        /// Gets the <see cref="Lifestyle"/> this that created this registration.
-        /// </summary>
+        /// <summary>Gets the <see cref="Lifestyle"/> this that created this registration.</summary>
         /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
         public Lifestyle Lifestyle { get; private set; }
 
         internal bool IsCollection { get; set; }
 
-        /// <summary>
-        /// Gets the <see cref="Container"/> instance for this registration.
-        /// </summary>
+        /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
         /// <value>The <see cref="Container"/> instance for this registration.</value>
         protected internal Container Container { get; private set; }
 

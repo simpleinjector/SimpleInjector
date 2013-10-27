@@ -318,7 +318,7 @@ namespace SimpleInjector
                 this.expressionBuilding(this, e);
 
                 // Optimization.
-                if (relationships.Changed)
+                if (relationships.HasChanged)
                 {
                     registration.ReplaceRelationships(e.KnownRelationships);
                 }
@@ -340,7 +340,7 @@ namespace SimpleInjector
 
                 this.expressionBuilt(this, e);
 
-                if (relationships.Changed)
+                if (relationships.HasChanged)
                 {
                     instanceProducer.ReplaceRelationships(e.KnownRelationships);
                 }
