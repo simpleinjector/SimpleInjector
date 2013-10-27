@@ -234,6 +234,11 @@ namespace SimpleInjector
         /// <summary>
         /// Injects all public writable properties of the given <paramref name="instance"/> that have a type
         /// that can be resolved by this container instance.
+        /// <b>NOTE:</b> This method will be removed in a future release. To use property injection,
+        /// implement a custom the <see cref="IPropertySelectionBehavior"/> instead. For more information,
+        /// read the 
+        /// <a href="https://simpleinjector.codeplex.com/wikipage?title=Extendibility-Points#Property-Injection">extendibility points</a> 
+        /// wiki.
         /// </summary>
         /// <param name="instance">The instance whos properties will be injected.</param>
         /// <exception cref="ArgumentNullException">
