@@ -194,9 +194,18 @@ namespace SimpleInjector.Extensions
         {
             return
                 from type in types
-                where type == serviceType ||
+                where type == serviceType || serviceType.IsVariantVersionOf(type) ||
                     (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
                 select type;
+        }
+
+        private static bool IsVariantVersionOf(this Type type, Type otherType)
+        {
+            return
+                type.IsGenericType &&
+                otherType.IsGenericType &&
+                type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() &&
+                type.IsAssignableFrom(otherType);
         }
     }
 }

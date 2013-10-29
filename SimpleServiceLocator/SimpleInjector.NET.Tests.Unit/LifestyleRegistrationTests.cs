@@ -205,6 +205,39 @@
             Assert.IsTrue(initializerCalled, "The initializer should have been called.");
         }
 
+        [TestMethod]
+        public void CreateRegistrationWithGeneric_RegisteringCovarientType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = 
+                Lifestyle.Transient.CreateProducer<ICovariant<object>, CovariantImplementation<string>>(
+                    container);
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+        }
+
+        [TestMethod]
+        public void CreateRegistrationWithType_RegisteringCovarientType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Transient.CreateProducer(
+                typeof(ICovariant<object>), typeof(CovariantImplementation<string>), container);
+
+            // Act
+            var instance = producer.GetInstance();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+        }
+
         public class ServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }

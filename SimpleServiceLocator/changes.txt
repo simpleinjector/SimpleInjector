@@ -45,6 +45,7 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		 even though the type was registered explicitly. (Work item 20272).
 		-[Core] RegisterOpenGeneric could fail because it would try to apply an incompatible implementation,
 		 because the generic type constraints weren't always validated correctly.
+		-[Core] Registration of variant types with RegisterAll failed (Work item 20366).
 	
 				
 Version 2.3.5 (v2.3.5 RTM) 2013-09-02

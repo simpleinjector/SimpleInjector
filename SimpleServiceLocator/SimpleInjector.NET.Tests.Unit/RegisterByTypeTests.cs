@@ -113,5 +113,20 @@
                     ex.Message.Contains(" is an open generic type."), "Actual: " + ex.Message);
             }
         }
+
+        [TestMethod]
+        public void RegisterByType_RegisteringCovarientType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(ICovariant<object>), typeof(CovariantImplementation<string>));
+
+            // Act
+            var instance = container.GetInstance<ICovariant<object>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+        }
     }
 }

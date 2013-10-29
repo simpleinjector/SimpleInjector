@@ -109,5 +109,20 @@
             container.Register<ConcreteTypeWithMultiplePublicConstructors, ConcreteTypeWithMultiplePublicConstructors>(
                 Lifestyle.Transient);
         }
+        
+        [TestMethod]
+        public void RegisterByGenericArgument_RegisteringCovarientType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICovariant<object>, CovariantImplementation<string>>();
+
+            // Act
+            var instance = container.GetInstance<ICovariant<object>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+        }
     }
 }

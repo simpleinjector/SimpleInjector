@@ -5,11 +5,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Reflection;
-    using System.Reflection.Emit;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Extensions;
 
     [TestClass]
@@ -287,7 +283,7 @@
                       but registering this type is not allowed to be registered"
                     .TrimInside(),
                     ex,
-                    "This call is expected to fail, since C# overload resolution will select the " + 
+                    "This call is expected to fail, since C# overload resolution will select the " +
                     "RegisterAll<TService> overload where TService is Type, which is unlikely what the " +
                     "use intended. We should throw an exception instead.");
             }
@@ -672,7 +668,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            
+
             // Act
             container.RegisterAll<object>(typeof(IDisposable));
         }
@@ -747,7 +743,7 @@
             container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             // Act
-            IReadOnlyCollection<IPlugin> collection = 
+            IReadOnlyCollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
 
             // Assert
@@ -767,7 +763,7 @@
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
             // Act
-            IReadOnlyCollection<IPlugin> collection = 
+            IReadOnlyCollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
 
             // Assert
@@ -783,7 +779,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            IReadOnlyCollection<IPlugin> collection = 
+            IReadOnlyCollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
 
             // Assert
@@ -839,6 +835,36 @@
             Assert.AreEqual(0, list.Count);
         }
 #endif
+
+        [TestMethod]
+        public void RegisterAllGeneric_RegisteringCovarientTypes_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICovariant<object>>(typeof(CovariantImplementation<string>));
+
+            // Act
+            var instances = container.GetAllInstances<ICovariant<object>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instances.Single(), typeof(CovariantImplementation<string>));
+        }
+
+        [TestMethod]
+        public void RegisterAllNonGeneric_RegisteringCovarientTypes_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(ICovariant<object>), new[] { typeof(CovariantImplementation<string>) });
+
+            // Act
+            var instances = container.GetAllInstances<ICovariant<object>>();
+
+            // Assert
+            Assert.IsInstanceOfType(instances.Single(), typeof(CovariantImplementation<string>));
+        }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {

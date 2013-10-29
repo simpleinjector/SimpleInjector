@@ -4,6 +4,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    public interface ICovariant<out T>
+    {
+    }
+
     public interface ITimeProvider
     {
         DateTime Now { get; }
@@ -162,5 +166,9 @@
         public ServiceWithUnregisteredDependencies(IDisposable a, IComparable b)
         {
         }
+    }
+
+    public class CovariantImplementation<T> : ICovariant<T>
+    {
     }
 }
