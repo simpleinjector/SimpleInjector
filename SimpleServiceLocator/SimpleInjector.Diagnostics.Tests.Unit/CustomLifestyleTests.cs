@@ -10,7 +10,6 @@
     [TestClass]
     public class CustomLifestyleTests
     {
-#if DEBUG
         private static readonly Lifestyle CustomLifestyle =
             Lifestyle.CreateCustom("Custom", creator => () => creator());
 
@@ -192,6 +191,5 @@
                 }
             }
         }
-#endif
     }
 }

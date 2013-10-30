@@ -38,10 +38,8 @@ namespace SimpleInjector
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
-#if DEBUG
-    /// <summary>
-    /// Methods for resolving instances.
-    /// </summary>
+#if !PUBLISH
+    /// <summary>Methods for resolving instances.</summary>
 #endif
     public partial class Container : IServiceProvider
     {

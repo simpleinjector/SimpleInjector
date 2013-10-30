@@ -31,7 +31,7 @@ namespace SimpleInjector
     using System.Reflection.Emit;
     using SimpleInjector.Diagnostics;
 
-#if DEBUG
+#if !PUBLISH
     /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
 #endif
     [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]

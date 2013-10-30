@@ -28,7 +28,7 @@ namespace SimpleInjector
     using System;
     using System.Runtime.Serialization;
 
-#if DEBUG
+#if !PUBLISH
     /// <summary>Behavior for the full .NET version of Simple Injector.</summary>
 #endif
     [Serializable]

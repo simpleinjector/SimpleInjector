@@ -775,7 +775,6 @@
             Assert.IsFalse(nullCommandHandlerIsDecorated);
         }
 
-#if DEBUG
         [TestMethod]
         public void GetRelationships_OnAPartiallyDecoratedCollection_ReturnsTheExpectedRelationships()
         {
@@ -813,7 +812,6 @@
             AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), @default.Dependency.ServiceType);
             AssertThat.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ImplementationType);
         }
-#endif
         
         [TestMethod]
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesAllInstancesThatShouldBeDecorated()
@@ -1333,7 +1331,6 @@
                 "Both handlers are expected to be initialized.");
         }
 
-#if DEBUG
         [TestMethod]
         public void GetRegistration_ContainerControlledCollectionWithDecorator_ContainsExpectedListOfRelationships()
         {
@@ -1398,7 +1395,6 @@
             Assert.IsTrue(expectedRelationship.Equals(relationships[0]),
                 "Actual relationship: " + RelationshipInfo.ToString(relationships[0]));
         }
-#endif
         
         [TestMethod]
         public void GetInstance_ContainerControlledCollectionWithDecorator_DecoratorGoesThroughCompletePipeLineIncludingExpressionBuilding()
@@ -1535,7 +1531,6 @@
             }
         }
         
-#if DEBUG
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForUncontrolledCollection_ContainsAddedRelationship()
         {
@@ -1609,7 +1604,6 @@
                 "should be added to the registration of the service type. Current: " +
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
-#endif
 
         [TestMethod]
         public void GetAllInstances_DecoratingEmptyCollectionWithLifestyleOtherThanTransientAndSingleton_Succeeds()
@@ -1663,7 +1657,6 @@
                 "we'd expect the decorator to be applied just once.");
         }
 
-#if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();
@@ -1672,7 +1665,6 @@
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient, dummyRegistration);
         }
-#endif
 
         private static void
             Assert_ExceptionContainsInfoAboutManualCollectionRegistrationMixedDecoratorsThatTakeAFunc(

@@ -9,7 +9,7 @@
     using SimpleInjector.Extensions;
 
     [TestClass]
-    public class OpenGenericRegistrationExtensionsTests
+    public partial class OpenGenericRegistrationExtensionsTests
     {
         [TestMethod]
         public void RegisterOpenGeneric_WithValidArguments_ReturnsExpectedTypeOnGetInstance()
@@ -814,32 +814,6 @@
             Assert.IsTrue(object.ReferenceEquals(t1, t2));
         }
 
-#if SILVERLIGHT
-        [TestMethod]
-        public void GetInstance_OnInternalTypeRegisteredAsOpenGeneric_ThrowsDescriptiveExceptionMessage()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(InternalEventHandler<>));
-
-            try
-            {
-                // Act
-                container.GetInstance<IEventHandler<int>>();
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains("InternalEventHandler<Int32>", ex);
-                AssertThat.ExceptionMessageContains("The security restrictions of your application's " + 
-                    "sandbox do not permit the creation of this type.", ex);    
-            }
-        }
-#endif
-
         [TestMethod]
         public void GetAllInstances_RegisterAllOpenGenericWithTypeConstraints_ResolvesExpectedTypes1()
         {
@@ -1106,7 +1080,6 @@
                 "The collection contains null elements.", action);
         }
 
-#if DEBUG && !SILVERLIGHT
         [TestMethod]
         public void GetRelationship_OnRegistrationBuiltByRegisterAllOpenGeneric_ReturnsTheExpectedRelationships()
         {
@@ -1136,7 +1109,6 @@
             Assert.AreEqual(expectedRelationship.Lifestyle, actualRelationship.Lifestyle);
             Assert.AreEqual(expectedRelationship.Dependency, actualRelationship.Dependency);
         }
-#endif
 
         [TestMethod]
         public void GetInstance_OnRegisteredPartialGenericType1_Succeeds()

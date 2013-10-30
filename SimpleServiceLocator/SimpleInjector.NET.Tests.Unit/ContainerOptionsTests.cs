@@ -1,5 +1,4 @@
-﻿#if DEBUG
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -595,4 +594,3 @@ namespace SimpleInjector.Tests.Unit
         }
     }
 }
-#endif

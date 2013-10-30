@@ -8,7 +8,6 @@
 
     using SimpleInjector.Diagnostics;
         
-#if DEBUG
     [TestClass]
     public class TypeGeneralizerTests
     {
@@ -185,5 +184,4 @@
         {
         }
     }
-#endif
 }

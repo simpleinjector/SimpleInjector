@@ -251,11 +251,7 @@
 
         private static string ToFriendlyName(Type type)
         {
-#if DEBUG
             return Helpers.ToFriendlyName(type);
-#else
-            return type.FullName;
-#endif
         }
     }
 }

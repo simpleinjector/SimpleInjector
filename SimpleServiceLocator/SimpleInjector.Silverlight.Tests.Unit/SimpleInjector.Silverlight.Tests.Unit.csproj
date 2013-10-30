@@ -238,9 +238,11 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\VerifyTests.cs">
       <Link>VerifyTests.cs</Link>
     </Compile>
+    <Compile Include="Advanced\PropertyInjectionTests.silverlight.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\OpenGenericRegistrationExtensionsTests.silverlight.cs" />
     <Compile Include="InjectPropertiesTests.Silverlight.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilverlightSpecificTests.cs" />

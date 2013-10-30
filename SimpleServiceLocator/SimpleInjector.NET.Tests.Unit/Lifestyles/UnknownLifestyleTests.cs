@@ -1,5 +1,4 @@
-﻿#if DEBUG
-namespace SimpleInjector.Tests.Unit.Lifestyles
+﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
 
@@ -83,4 +82,3 @@ namespace SimpleInjector.Tests.Unit.Lifestyles
         }
     }
 }
-#endif

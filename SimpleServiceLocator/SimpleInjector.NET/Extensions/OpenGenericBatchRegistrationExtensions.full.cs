@@ -43,7 +43,7 @@ namespace SimpleInjector.Extensions
         PublicTypesOnly = 1,
     }
 
-#if DEBUG
+#if !PUBLISH
     /// <summary>Behavior for the full .NET version of Simple Injector.</summary>
 #endif
     public static partial class OpenGenericBatchRegistrationExtensions

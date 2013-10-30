@@ -87,6 +87,7 @@
     <Compile Include="Advanced\DefaultConstructorVerificationBehaviorTests.cs" />
     <Compile Include="Advanced\IndexableCollectionsTests.cs" />
     <Compile Include="Advanced\PropertyInjectionTests.cs" />
+    <Compile Include="Advanced\PropertyInjectionTests.full.cs" />
     <Compile Include="AmbiguousTypesTests.cs" />
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContainerTests.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
+    <Compile Include="Extensions\BatchRegistrationExtensionsTests.full.cs" />
     <Compile Include="Extensions\DecoratorExtensionsCollectionTests.cs" />
     <Compile Include="Extensions\DecoratorExtensionsTests.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensionsTests.cs" />
@@ -109,6 +111,8 @@
     <Compile Include="ConsistencyTests.cs" />
     <Compile Include="InjectPropertiesTests.cs" />
     <Compile Include="ExpressionBuiltEventTests.cs" />
+    <Compile Include="InjectPropertiesTests.full.cs" />
+    <Compile Include="RegisterAllTests.full.cs" />
     <Compile Include="RegisterContextualInitializerTests.cs" />
     <Compile Include="InstanceProducerTests.cs" />
     <Compile Include="Lifestyles\CustomLifestyleTests.cs" />

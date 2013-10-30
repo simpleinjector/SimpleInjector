@@ -565,7 +565,6 @@
             Assert.IsFalse(handlerCalled, "The delegate was not removed correctly.");
         }
 
-#if DEBUG
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ExpressionBuildingEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
@@ -580,7 +579,6 @@
             // Act
             eventArgs.Expression = null;
         }
-#endif
 
         [TestMethod]
         public void GetInstance_ExpressionBuildingWithInvalidExpression_ThrowsAnDescriptiveException()
@@ -670,7 +668,6 @@
             }
         }
 
-#if DEBUG
         [TestMethod]
         public void GetInstance_ExpressionBuildingAddingKnownRelationship_GetRelationshipsContainsThatItem()
         {
@@ -700,7 +697,6 @@
             Assert.AreEqual(Lifestyle.Transient, relationship.Lifestyle);
             Assert.AreEqual(container.GetRegistration(typeof(Container)), relationship.Dependency);
         }
-#endif
 
         public class Order
         {

@@ -8,7 +8,7 @@
     using SimpleInjector.Advanced;
 
     [TestClass]
-    public class PropertyInjectionTests
+    public partial class PropertyInjectionTests
     {
         public interface IService
         {
@@ -168,45 +168,6 @@
             Assert_ContainsNoUninjectedProperties(service);
         }
 
-#if !SILVERLIGHT
-        [TestMethod]
-        public void InjectingAllProperties_OnPrivateTypeWithPrivateSetterProperty_Succeeds()
-        {
-            // Arrange
-            var container = CreateContainerThatInjectsAllProperties();
-
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
-
-            // Act
-            var service = container.GetInstance<PrivateServiceWithPrivateSetPropertyDependency<ITimeProvider>>();
-
-            // Assert
-            Assert.IsNotNull(service.Dependency);
-        }
-#else // SILVERLIGHT
-        [TestMethod]
-        public void InjectingAllProperties_OnPrivateTypeWithPrivateSetterPropertyInSilverlight_FailsWithDescriptiveMessage()
-        {
-            // Arrange
-            var container = CreateContainerThatInjectsAllProperties();
-
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
-
-            try
-            {
-                // Act
-                container.GetInstance<PrivateServiceWithPrivateSetPropertyDependency<ITimeProvider>>();
-            }
-            catch (Exception ex)
-            {
-                AssertThat.ExceptionMessageContains(@"
-                    The security restrictions of your application's sandbox do not permit the injection of 
-                    one of its properties.".TrimInside(), ex);
-            }
-        }
-#endif // SILVERLIGHT
-
-#if DEBUG
         [TestMethod]
         public void InjectAllProperties_OnTypeWithOnePropertyDependency_AddsThatDependencyAsKnownRelationship()
         {
@@ -232,7 +193,6 @@
             Assert.AreEqual(Lifestyle.Transient, relationships[0].Lifestyle);
             Assert.AreEqual(expectedDependency, relationships[0].Dependency);
         }
-#endif
 
         [TestMethod]
         public void InjectAllProperties_OnContainerUncontrolledSingleton_InjectsProperty()

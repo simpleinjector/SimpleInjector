@@ -38,10 +38,8 @@ namespace SimpleInjector
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
-#if DEBUG
-    /// <summary>
-    /// Methods for registration.
-    /// </summary>
+#if !PUBLISH
+    /// <summary>Methods for registration.</summary>
 #endif
     public partial class Container
     {
@@ -1529,14 +1527,6 @@ namespace SimpleInjector
                 VerifyProducers(producersToVerify);
             }
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
-
-            // TODO: Remove this check.
-#if DEBUG
-            if (maximumNumberOfIterations <= 0)
-            {
-                throw new InvalidOperationException("What kind of crazy configuration is this?");
-            }
-#endif
         }
 
         private static void VerifyProducers(InstanceProducer[] producersToVerify)

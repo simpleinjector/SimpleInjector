@@ -48,7 +48,6 @@
             Assert.IsTrue(container.IsLocked());
         }
 
-#if DEBUG
         [TestMethod]
         public void GetRelationships_AfterVerification_ReturnsTheExpectedRelationships()
         {
@@ -98,7 +97,6 @@
                 "The InstanceProducer for ITwo was expected to have no relationships. Current: " +
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
-#endif
 
         public class OneAndTwo : IOne, ITwo 
         {
