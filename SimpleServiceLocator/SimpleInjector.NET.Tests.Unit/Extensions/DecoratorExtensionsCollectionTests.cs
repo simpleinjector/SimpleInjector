@@ -22,6 +22,18 @@
             void DoSomething();
         }
 
+        public interface IBase
+        {
+        }
+
+        public interface IDerive : IBase
+        {
+        }
+
+        public class DeriveImplementation : IDerive
+        {
+        }
+
         [TestMethod]
         public void GetAllInstances_TypeDecorated1_ReturnsCollectionWithDecorators()
         {
@@ -1612,6 +1624,45 @@
             container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
         }
 
+        [TestMethod]
+        public void GetAllInstances_CollectionRegistrationWithTypeReferingBackToAnotherContainerRegistration_AllowsApplyingDecoratorsOnBothLevels()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IDerive, DeriveImplementation>();
+            container.RegisterDecorator(typeof(IDerive), typeof(DeriveDecorator));
+            container.RegisterAll<IBase>(typeof(IDerive));
+            container.RegisterDecorator(typeof(IBase), typeof(BaseDecorator));
+
+            // Act
+            var decorator = (BaseDecorator)container.GetAllInstances<IBase>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(decorator.Decoratee, typeof(DeriveDecorator),
+                "Since the collection element points back into a container's registration, we would expect " +
+                "the type to be decorated with that decorator as well.");
+        }
+
+        [TestMethod]
+        public void GetAllInstances_CollectionRegistrationWithTypeReferingBackToAnotherContainerRegistrationForSameBaseType_WillNotApplyDecoratorTwice()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IBase, DeriveImplementation>();
+            container.RegisterAll<IBase>(typeof(IBase));
+            container.RegisterDecorator(typeof(IBase), typeof(BaseDecorator));
+
+            // Act
+            var decorator = (BaseDecorator)container.GetAllInstances<IBase>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(decorator.Decoratee, typeof(DeriveImplementation),
+                "Since the collection element points back into a container's registration of the same type, " +
+                "we'd expect the decorator to be applied just once.");
+        }
+
 #if DEBUG
         private static KnownRelationship GetValidRelationship()
         {
@@ -1762,6 +1813,26 @@
 
             public void Handle(RealCommand command)
             {
+            }
+        }
+
+        public class BaseDecorator : IBase
+        {
+            public readonly IBase Decoratee;
+
+            public BaseDecorator(IBase decoratee)
+            {
+                this.Decoratee = decoratee;
+            }
+        }
+
+        public class DeriveDecorator : IDerive
+        {
+            public readonly IDerive Decoratee;
+
+            public DeriveDecorator(IDerive decoratee)
+            {
+                this.Decoratee = decoratee;
             }
         }
     }

@@ -144,7 +144,13 @@ namespace SimpleInjector.Advanced
                 // This producer will be automatically registered as external producer.
                 if (instanceProducer != null)
                 {
-                    return new InstanceProducer(typeof(TService), instanceProducer.Registration);
+                    if (instanceProducer.ServiceType == typeof(TService))
+                    {
+                        return instanceProducer;
+                    }
+
+                    return new InstanceProducer(typeof(TService),
+                        new ExpressionRegistration(instanceProducer.BuildExpression(), container));
                 }
 
                 if (!Helpers.IsConcreteType(implementationType))

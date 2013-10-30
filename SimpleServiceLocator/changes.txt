@@ -46,6 +46,10 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		-[Core] RegisterOpenGeneric could fail because it would try to apply an incompatible implementation,
 		 because the generic type constraints weren't always validated correctly.
 		-[Core] Registration of variant types with RegisterAll failed (Work item 20366).
+		-[Core] In special cases where one of the registered types in a RegisterAll registration would be 
+		 an abstract type (which points back to the container), the ExpressionBuilt event wasn't triggered
+		 for this abstract type and a decorator for this abstraction would not be applied (only the decorator
+		 for the collection type would be applied) (Work item 20367).
 	
 				
 Version 2.3.5 (v2.3.5 RTM) 2013-09-02
