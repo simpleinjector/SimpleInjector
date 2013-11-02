@@ -260,16 +260,6 @@
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj">
-      <Project>{97ef1e1a-a4a7-4496-8551-4ffe7234be9c}</Project>
-      <Name>SimpleInjector.Extensions.Silverlight</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
-      <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
-      <Name>SimpleInjector.Silverlight</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Diagnostics\" />
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +278,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.PCL\SimpleInjector.PCL.csproj">
+      <Project>{7eb69a84-e589-460d-aba2-43d34b12bc27}</Project>
+      <Name>SimpleInjector.PCL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

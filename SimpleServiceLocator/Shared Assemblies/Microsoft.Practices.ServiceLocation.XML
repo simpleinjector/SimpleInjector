@@ -33,23 +33,6 @@
             The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified. 
             </param>
         </member>
-        <member name="M:Microsoft.Practices.ServiceLocation.ActivationException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:System.Exception" /> class with serialized data.
-            </summary>
-            <param name="info">
-            The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown. 
-            </param>
-            <param name="context">
-            The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination. 
-            </param>
-            <exception cref="T:System.ArgumentNullException">
-            The <paramref name="info" /> parameter is null. 
-            </exception>
-            <exception cref="T:System.Runtime.Serialization.SerializationException">
-            The class name is null or <see cref="P:System.Exception.HResult" /> is zero (0). 
-            </exception>
-        </member>
         <member name="T:Microsoft.Practices.ServiceLocation.IServiceLocator">
             <summary>
             The generic Service Locator interface. This interface is used
@@ -114,32 +97,6 @@
             <exception cref="T:Microsoft.Practices.ServiceLocation.ActivationException">if there is are errors resolving
             the service instance.</exception>
             <returns>A sequence of instances of the requested <typeparamref name="TService"/>.</returns>
-        </member>
-        <member name="T:Microsoft.Practices.ServiceLocation.Properties.Resources">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivateAllExceptionMessage">
-            <summary>
-              Looks up a localized string similar to Activation error occurred while trying to get all instances of type {0}.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivationExceptionMessage">
-            <summary>
-              Looks up a localized string similar to Activation error occurred while trying to get instance of type {0}, key &quot;{1}&quot;.
-            </summary>
         </member>
         <member name="T:Microsoft.Practices.ServiceLocation.ServiceLocator">
             <summary>
@@ -275,6 +232,32 @@
             static accessor class.
             </summary>
             <returns>An <see cref="T:Microsoft.Practices.ServiceLocation.IServiceLocator"/>.</returns>
+        </member>
+        <member name="T:Microsoft.Practices.ServiceLocation.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivateAllExceptionMessage">
+            <summary>
+              Looks up a localized string similar to Activation error occured while trying to get all instances of type {0}.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Practices.ServiceLocation.Properties.Resources.ActivationExceptionMessage">
+            <summary>
+              Looks up a localized string similar to Activation error occured while trying to get instance of type {0}, key &quot;{1}&quot;.
+            </summary>
         </member>
     </members>
 </doc>

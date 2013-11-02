@@ -126,16 +126,6 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.Silverlight\SimpleInjector.Extensions.Silverlight.csproj">
-      <Project>{97EF1E1A-A4A7-4496-8551-4FFE7234BE9C}</Project>
-      <Name>SimpleInjector.Extensions.Silverlight</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Silverlight\SimpleInjector.Silverlight.csproj">
-      <Project>{3D1BDEB8-6B9A-4A35-8661-255BDF0ADAC6}</Project>
-      <Name>SimpleInjector.Silverlight</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -42,14 +42,6 @@ using System.Security;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d9c35e92-fae3-4ac1-8436-7b6cec3c0e8c")]
-
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
@@ -65,7 +57,8 @@ using System.Security;
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-[assembly: AllowPartiallyTrustedCallers]
+// NOTE: This attribute is not available in a Portable Class Library
+// [assembly: AllowPartiallyTrustedCallers]
 
 #if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
