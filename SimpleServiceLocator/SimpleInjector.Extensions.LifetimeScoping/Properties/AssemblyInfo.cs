@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
@@ -35,7 +35,8 @@ using System.Security;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2.4.0.0")]
+[assembly: AssemblyFileVersion("2.4.0.0")]
 
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
@@ -47,3 +48,9 @@ using System.Security;
     Target = "SimpleInjector.Extensions.LifetimeScoping",
     Justification = "We could consider merging this DLL with the core library, but this still leaves us" +
         "with a namespace with too few types (changing the namespace is a breaking change).")]
+
+#if PUBLISH
+#pragma warning disable 1699
+[assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
+#pragma warning restore 1699
+#endif

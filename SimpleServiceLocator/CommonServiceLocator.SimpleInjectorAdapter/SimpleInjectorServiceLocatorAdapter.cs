@@ -35,7 +35,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
     /// <summary>
     /// Translates calls from <see cref="IServiceLocator"/> to Simple Injector's container.
     /// </summary>
-    public class SimpleInjectorServiceLocatorAdapter : IServiceLocator
+    public class SimpleInjectorServiceLocatorAdapter : Microsoft.Practices.ServiceLocation.IServiceLocator
     {
         private const string NotSupportedMessage = "Keyed registration is not supported by the Simple Injector.";
 

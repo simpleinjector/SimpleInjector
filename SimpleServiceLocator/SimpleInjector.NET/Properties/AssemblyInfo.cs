@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010 S. van Deursen
+#region Copyright (c) 2010 S. van Deursen
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
  * Copyright (C) 2010 S. van Deursen
@@ -61,7 +61,8 @@ using System.Security;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2.4.0.0")]
+[assembly: AssemblyFileVersion("2.4.0.0")]
 
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
@@ -80,6 +81,12 @@ using System.Security;
     "92a1186525779360997c6e0e6153d6d8b1d25c7fe9359b2d230530e7ccccd02a32269ce22e4f1a" +
     "a313cd995f6ee682c88b24acf8e6c9f6ddc95094eaeafe39e626b3765fd9b4f2e7789c3a6ed1c4" +
     "a66dedb9")]
+#endif
+
+#if PUBLISH
+#pragma warning disable 1699
+[assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
+#pragma warning restore 1699
 #endif
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace",

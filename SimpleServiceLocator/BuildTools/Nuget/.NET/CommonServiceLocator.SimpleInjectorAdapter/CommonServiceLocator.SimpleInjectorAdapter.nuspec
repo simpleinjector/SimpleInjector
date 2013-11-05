@@ -8,7 +8,7 @@
     <projectUrl>http://simpleinjector.codeplex.com</projectUrl>
     <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
     <dependencies>
-      <dependency id="CommonServiceLocator" version="1.0" />
+      <dependency id="Portable.CommonServiceLocator" version="1.2.2" />
       <dependency id="SimpleInjector" version="{version}" />
     </dependencies>
     <id>CommonServiceLocator.SimpleInjectorAdapter</id>

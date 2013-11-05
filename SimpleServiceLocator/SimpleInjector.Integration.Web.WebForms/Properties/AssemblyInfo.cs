@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
@@ -36,6 +36,7 @@ using System.Security;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
@@ -46,3 +47,9 @@ using System.Security;
     Scope = "namespace", 
     Target = "SimpleInjector.Integration.Web.Forms",
     Justification = "We can't merge namespaces, because this basically is the only namespace in the assembly.")]
+
+#if PUBLISH
+#pragma warning disable 1699
+[assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
+#pragma warning restore 1699
+#endif

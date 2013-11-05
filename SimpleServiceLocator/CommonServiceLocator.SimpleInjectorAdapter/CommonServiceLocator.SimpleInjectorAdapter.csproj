@@ -43,20 +43,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Shared Assemblies\Microsoft.Practices.ServiceLocation.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SimpleInjector">
-      <HintPath>..\bin\PCL\SimpleInjector.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="SimpleInjectorServiceLocatorAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -77,11 +63,26 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\Shared Assemblies\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector">
+      <HintPath>..\bin\PCL\SimpleInjector.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets" />
+  <Target Name="BeforeBuild">
+    <Message Text="Updating AssemblyInfo to Version $(VersionNumber)">
+    </Message>
+    <Message Text="Writing to AssemblyInfo files in $(SolutionRoot)">
+    </Message>
+    <AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" AssemblyCopyright="" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)">
+    </AssemblyInfo>
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
   <Target Name="AfterBuild">
   </Target>
   -->
