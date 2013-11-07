@@ -99,14 +99,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Packaging", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{D1A45E86-CD79-4F65-AC0B-25A21166B1E9}"
 	ProjectSection(SolutionItems) = preProject
+		BuildTools\BetterAssemblyInfoTask.dll = BuildTools\BetterAssemblyInfoTask.dll
+		BuildTools\BetterAssemblyInfoTask.pdb = BuildTools\BetterAssemblyInfoTask.pdb
 		build.bat = build.bat
-		BuildTools\ILMerge.exe = BuildTools\ILMerge.exe
-		BuildTools\ILMerge.exe.config = BuildTools\ILMerge.exe.config
-		Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.dll = Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.dll
-		Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.xml = Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.xml
-		Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll = Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll
-		Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml = Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml
-		Shared Silverlight Assemblies\Readme.txt = Shared Silverlight Assemblies\Readme.txt
 		BuildTools\replace.exe = BuildTools\replace.exe
 		BuildTools\zip.vbs = BuildTools\zip.vbs
 	EndProjectSection
