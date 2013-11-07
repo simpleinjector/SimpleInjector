@@ -220,9 +220,9 @@ namespace SimpleInjector.Extensions.Decorators
 
             var collection = Activator.CreateInstance(allInstancesEnumerableType, arguments);
 
-            if (Helpers.IReadOnlyListType == null)
+            if (Helpers.IReadOnlyListType == null || ReadOnlyContainerControlledCollectionType.Value == null)
             {
-                // .NET 4.0
+                // .NET 4.0 or PCL
                 return (IContainerControlledCollection)collection;
             }
 
