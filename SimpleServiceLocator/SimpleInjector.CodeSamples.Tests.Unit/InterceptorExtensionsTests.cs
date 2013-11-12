@@ -370,8 +370,7 @@
                 "be transient, since the interceptor is created using a Func<T>, and there is no way to " +
                 "determine whether the delegate always returns the same or a new instance.");
         }
-
-
+        
         [TestMethod]
         public void InterceptWithFuncAndPredicate_InterceptingWithExpressionBuiltEventArgs_RunsSuccessfully()
         {
@@ -390,8 +389,7 @@
             command.Execute();
             logger.Log("foo");
         }
-
-
+        
         [TestMethod]
         public void InterceptWith_WithInterceptorWithNoPublicConstructor_ThrowsExpressiveException()
         {
