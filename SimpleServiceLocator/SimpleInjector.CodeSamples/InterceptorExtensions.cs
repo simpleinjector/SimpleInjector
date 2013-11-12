@@ -72,7 +72,7 @@
             var interceptWith = new InterceptionHelper(container)
             {
                 BuildInterceptorExpression = 
-                    () => BuildInterceptorExpression<TInterceptor>(container),
+                    e => BuildInterceptorExpression<TInterceptor>(container),
                 Predicate = type => predicate(type)
             };
 
@@ -90,7 +90,26 @@
             var interceptWith = new InterceptionHelper(container)
             {
                 BuildInterceptorExpression = 
-                    () => Expression.Invoke(Expression.Constant(interceptorCreator)),
+                    e => Expression.Invoke(Expression.Constant(interceptorCreator)),
+                Predicate = type => predicate(type)
+            };
+
+            container.ExpressionBuilt += interceptWith.OnExpressionBuilt;
+        }
+
+        public static void InterceptWith(this Container container,
+            Func<ExpressionBuiltEventArgs, IInterceptor> interceptorCreator,
+            Func<Type, bool> predicate)
+        {
+            RequiresIsNotNull(container, "container");
+            RequiresIsNotNull(interceptorCreator, "interceptorCreator");
+            RequiresIsNotNull(predicate, "predicate");
+
+            var interceptWith = new InterceptionHelper(container)
+            {
+                BuildInterceptorExpression = e => Expression.Invoke(
+                    Expression.Constant(interceptorCreator),
+                    Expression.Constant(e)),
                 Predicate = type => predicate(type)
             };
 
@@ -107,7 +126,7 @@
 
             var interceptWith = new InterceptionHelper(container)
             {
-                BuildInterceptorExpression = () => Expression.Constant(interceptor),
+                BuildInterceptorExpression = e => Expression.Constant(interceptor),
                 Predicate = predicate
             };
 
@@ -153,7 +172,7 @@
 
             internal Container Container { get; private set; }
 
-            internal Func<Expression> BuildInterceptorExpression { get; set; }
+            internal Func<ExpressionBuiltEventArgs, Expression> BuildInterceptorExpression { get; set; }
 
             internal Func<Type, bool> Predicate { get; set; }
 
@@ -188,7 +207,7 @@
             [DebuggerStepThrough]
             private Expression BuildProxyExpression(ExpressionBuiltEventArgs e)
             {
-                var interceptor = this.BuildInterceptorExpression();
+                var interceptor = this.BuildInterceptorExpression(e);
 
                 // Create call to 
                 // (ServiceType)Interceptor.CreateProxy(Type, IInterceptor, object)

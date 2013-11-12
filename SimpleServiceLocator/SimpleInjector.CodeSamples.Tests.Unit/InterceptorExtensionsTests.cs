@@ -371,6 +371,27 @@
                 "determine whether the delegate always returns the same or a new instance.");
         }
 
+
+        [TestMethod]
+        public void InterceptWithFuncAndPredicate_InterceptingWithExpressionBuiltEventArgs_RunsSuccessfully()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<ICommand, FakeCommand>();
+            container.RegisterSingle<ILogger, FakeLogger>();
+
+            container.InterceptWith(e => new BuiltInfoInterceptor(e), type => type.IsInterface);
+
+            // Act
+            var command = container.GetInstance<ICommand>();
+            var logger = container.GetInstance<ILogger>();
+
+            command.Execute();
+            logger.Log("foo");
+        }
+
+
         [TestMethod]
         public void InterceptWith_WithInterceptorWithNoPublicConstructor_ThrowsExpressiveException()
         {
@@ -466,6 +487,21 @@
 
         private class FakeInterceptor : IInterceptor
         {
+            public void Intercept(IInvocation invocation)
+            {
+                invocation.Proceed();
+            }
+        }
+
+        private class BuiltInfoInterceptor : IInterceptor
+        {
+            public ExpressionBuiltEventArgs BuildInfo { get; set; }
+
+            public BuiltInfoInterceptor(ExpressionBuiltEventArgs buildInfo)
+            {
+                this.BuildInfo = buildInfo;
+            }
+
             public void Intercept(IInvocation invocation)
             {
                 invocation.Proceed();
