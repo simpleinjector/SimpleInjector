@@ -7,6 +7,7 @@ namespace $rootnamespace$.App_Start
 
     using SimpleInjector;
     using SimpleInjector.Extensions;
+	using SimpleInjector.Integration.Web;
     using SimpleInjector.Integration.Web.Mvc;
     
     public static class SimpleInjectorInitializer
