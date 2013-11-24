@@ -41,6 +41,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="SimpleInjector, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\NET\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Extensions.LifetimeScoping, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core">
@@ -58,16 +66,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Settings.StyleCop" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
-      <Project>{D140D43C-B7AB-43B2-A287-394DF871EB56}</Project>
-      <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

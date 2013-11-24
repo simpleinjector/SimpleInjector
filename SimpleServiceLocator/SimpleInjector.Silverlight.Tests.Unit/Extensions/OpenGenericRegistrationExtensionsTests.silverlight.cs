@@ -3,6 +3,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
+    /// <summary>Tests for RegisterOpenGeneric under Silverlight.</summary>
     public partial class OpenGenericRegistrationExtensionsTests
     {
         [TestMethod]

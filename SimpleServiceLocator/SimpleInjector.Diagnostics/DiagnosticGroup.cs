@@ -44,8 +44,8 @@ namespace SimpleInjector.Diagnostics
             this.GroupType = groupType;
             this.Name = name;
             this.Description = description;
-            this.Children = children.ToList().AsReadOnly();
-            this.Results = results.ToList().AsReadOnly();
+            this.Children = new ReadOnlyCollection<DiagnosticGroup>(children.ToList());
+            this.Results = new ReadOnlyCollection<DiagnosticResult>(results.ToList());
 
             foreach (var child in this.Children)
             {

@@ -1,5 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
+    // Suppress the Obsolete warnings, since we want to test GetTypesToRegister overloads that are marked obsolete.
+#pragma warning disable 0618
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -10,8 +12,7 @@
 
     using SimpleInjector.Extensions;
 
-    // Suppress the Obsolete warnings, since we want to test GetTypesToRegister overloads that are marked obsolete.
-#pragma warning disable 0618
+    /// <summary>Normal tests.</summary>
     [TestClass]
     public partial class BatchRegistrationExtensionsTests
     {

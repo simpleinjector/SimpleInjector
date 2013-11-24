@@ -65,8 +65,17 @@
         {
             if (this.weakList.Capacity == this.weakList.Count)
             {
-                this.weakList.RemoveAll(weak => !weak.IsAlive);
+                this.RemoveAll(weak => !weak.IsAlive);
             }
+        }
+
+        private void RemoveAll(Predicate<WeakReference> match)
+        {
+            var items = this.weakList.Where(item => !match(item)).ToArray();
+
+            this.weakList.Clear();
+
+            this.weakList.AddRange(items);
         }
     }
 }

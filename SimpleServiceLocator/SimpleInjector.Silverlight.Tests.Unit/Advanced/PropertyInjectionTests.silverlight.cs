@@ -4,6 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
+    /// <summary>Tests for property injection for Silverlight version.</summary>
     public partial class PropertyInjectionTests
     {
         [TestMethod]

@@ -60,7 +60,6 @@ using System.Security;
 
 // NOTE: This attribute is not available in a Portable Class Library
 // [assembly: AllowPartiallyTrustedCallers]
-
 #if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 #endif

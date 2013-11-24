@@ -48,7 +48,7 @@ namespace SimpleInjector.Diagnostics
                 CreateDebugValue(registration, relationship, expectedDependencies.ToArray()))
         {
             this.Relationship = relationship;
-            this.ExpectedDependencies = expectedDependencies.ToList().AsReadOnly();
+            this.ExpectedDependencies = new ReadOnlyCollection<InstanceProducer>(expectedDependencies.ToList());
         }
 
         /// <summary>Gets the instance that describes the current relationship between the checked component

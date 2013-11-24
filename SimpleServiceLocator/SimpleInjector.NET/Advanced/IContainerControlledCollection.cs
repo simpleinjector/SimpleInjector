@@ -23,20 +23,15 @@
 */
 #endregion
 
-namespace SimpleInjector.Advanced.Internal
+namespace SimpleInjector.Advanced
 {
-    // Unfortunately we had to make this interface public to allow emitting an on the fly type that implements
-    // this interface.
-    // An IContainerControlledCollection is a special enumerable that can be used more efficiently by the 
-    // container to apply decorators to, with the biggest noticable difference that the registered predicate, 
-    // will be checked for each service in the collection.
     using System;
     using System.Collections;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
 
     /// <summary>This interface is not meant for public use.</summary>
-    public interface IContainerControlledCollection : IEnumerable
+    internal interface IContainerControlledCollection : IEnumerable
     {
         /// <summary>Please do not use.</summary>
         /// <returns>Do not use.</returns>

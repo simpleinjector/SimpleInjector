@@ -105,7 +105,8 @@ namespace SimpleInjector.Extensions
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)
         {
-            var appliedDecorators = info.AppliedDecorators.Select(d => d.DecoratorType).ToList().AsReadOnly();
+            var appliedDecorators = new ReadOnlyCollection<Type>(
+                info.AppliedDecorators.Select(d => d.DecoratorType).ToList());
 
             return new DecoratorPredicateContext(serviceType, info.ImplementationType, appliedDecorators,
                 expression);

@@ -8,6 +8,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
+    /// <summary>Tests for RegisterAll for the full .NET version.</summary>
     public partial class RegisterAllTests
     {
         [TestMethod]

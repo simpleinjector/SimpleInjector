@@ -44,7 +44,7 @@ namespace SimpleInjector.Diagnostics
             : base(serviceType, description, DiagnosticType.ContainerRegisteredComponent, 
                 relationships.ToArray())
         {
-            this.Relationships = relationships.ToList().AsReadOnly();
+            this.Relationships = new ReadOnlyCollection<KnownRelationship>(relationships.ToList());
         }
 
         /// <summary>Gets a collection of <see cref="KnownRelationship"/> instances that describe all 

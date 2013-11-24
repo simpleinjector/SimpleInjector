@@ -140,16 +140,6 @@
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
-      <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
-      <Name>SimpleInjector.Diagnostics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
@@ -174,7 +164,16 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
+      <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
+      <Name>SimpleInjector.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
+      <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
+      <Name>SimpleInjector.NET</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

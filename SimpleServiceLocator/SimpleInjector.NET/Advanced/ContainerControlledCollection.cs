@@ -29,13 +29,16 @@ namespace SimpleInjector.Advanced
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Lifestyles;
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal class ContainerControlledCollection<TService> : IndexableCollection<TService>, 
-        IContainerControlledCollection
+    internal class ContainerControlledCollection<TService> 
+#if NET45
+        : IList<TService>, IContainerControlledCollection, IReadOnlyList<TService>
+#else
+        : IList<TService>, IContainerControlledCollection
+#endif
     {
         private readonly Container container;
 
@@ -64,12 +67,17 @@ namespace SimpleInjector.Advanced
             // TODO: Make sure this method isn't called directly anymore.
         }
 
-        public override int Count
+        public int Count
         {
             get { return this.producers.Count; }
         }
 
-        public override TService this[int index]
+        bool ICollection<TService>.IsReadOnly
+        {
+            get { return true; }
+        }
+
+        public TService this[int index]
         {
             get
             {
@@ -78,8 +86,51 @@ namespace SimpleInjector.Advanced
 
             set
             {
-                throw IndexableCollection<TService>.GetNotSupportedBecauseCollectionIsReadOnlyException();
+                throw GetNotSupportedBecauseCollectionIsReadOnlyException();
             }
+        }
+
+        int IList<TService>.IndexOf(TService item)
+        {
+            throw GetNotSupportedException();
+        }
+
+        void IList<TService>.Insert(int index, TService item)
+        {
+            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+        }
+
+        void ICollection<TService>.Add(TService item)
+        {
+            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+        }
+
+        void ICollection<TService>.Clear()
+        {
+            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+        }
+
+        bool ICollection<TService>.Contains(TService item)
+        {
+            throw GetNotSupportedException();
+        }
+
+        void ICollection<TService>.CopyTo(TService[] array, int arrayIndex)
+        {
+            foreach (var item in this)
+            {
+                array[arrayIndex++] = item;
+            }
+        }
+
+        bool ICollection<TService>.Remove(TService item)
+        {
+            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
         }
 
         void IContainerControlledCollection.Append(Registration registration)
@@ -99,7 +150,7 @@ namespace SimpleInjector.Advanced
                 .ToArray();
         }
 
-        public override IEnumerator<TService> GetEnumerator()
+        public IEnumerator<TService> GetEnumerator()
         {
             foreach (var producer in this.producers)
             {
@@ -163,6 +214,16 @@ namespace SimpleInjector.Advanced
                 // This producer will be automatically registered as external producer.
                 return Lifestyle.Transient.CreateProducer(typeof(TService), implementationType, this.container);
             });
+        }
+
+        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException()
+        {
+            return new NotSupportedException("Collection is read-only.");
+        }
+
+        private static NotSupportedException GetNotSupportedException()
+        {
+            return new NotSupportedException();
         }
     }
 }

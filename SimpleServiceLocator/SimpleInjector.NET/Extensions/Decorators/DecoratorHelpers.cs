@@ -33,14 +33,9 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Advanced.Internal;
 
     internal static partial class DecoratorHelpers
     {
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline",
-            Justification = "Not possible.")]
-        private static readonly Lazy<Type> ReadOnlyContainerControlledCollectionType = new Lazy<Type>(() => null);
-
         private static readonly MethodInfo EnumerableSelectMethod =
             ExtensionHelpers.GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
 
@@ -220,16 +215,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             var collection = Activator.CreateInstance(allInstancesEnumerableType, arguments);
 
-            if (Helpers.IReadOnlyListType == null || ReadOnlyContainerControlledCollectionType.Value == null)
-            {
-                // .NET 4.0 or PCL
-                return (IContainerControlledCollection)collection;
-            }
-
-            // .NET 4.5 and up
-            return (IContainerControlledCollection)Activator.CreateInstance(
-                ReadOnlyContainerControlledCollectionType.Value.MakeGenericType(serviceType),
-                collection);
+            return (IContainerControlledCollection)collection;
         }
         
         private sealed class ContainerControlledCollectionRegistration : Registration

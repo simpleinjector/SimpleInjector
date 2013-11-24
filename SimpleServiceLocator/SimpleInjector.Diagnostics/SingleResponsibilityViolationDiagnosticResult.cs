@@ -43,7 +43,7 @@ namespace SimpleInjector.Diagnostics
                 GetDebugValue(implementationType, dependencies.ToArray()))
         {
             this.ImplementationType = implementationType;
-            this.Dependencies = dependencies.ToList().AsReadOnly();
+            this.Dependencies = new ReadOnlyCollection<InstanceProducer>(dependencies.ToList());
         }
 
         /// <summary>Gets the created type.</summary>

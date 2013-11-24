@@ -7,6 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
 
+    /// <summary>Tests for property injection.</summary>
     [TestClass]
     public partial class PropertyInjectionTests
     {

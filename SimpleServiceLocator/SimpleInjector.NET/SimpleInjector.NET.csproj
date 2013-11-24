@@ -10,13 +10,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleInjector</RootNamespace>
     <AssemblyName>SimpleInjector</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -42,25 +43,27 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\NET\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>
     </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\NET\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\NET\SimpleInjector.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>false</DebugSymbols>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -86,8 +89,6 @@
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
     <Compile Include="Advanced\InitializationContext.cs" />
     <Compile Include="Advanced\InstanceInitializationData.cs" />
-    <Compile Include="Advanced\Internal\IndexableCollection.cs" />
-    <Compile Include="Advanced\Internal\ReadOnlyContainerControlledCollectionTypeBuilder.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />
+    <Compile Include="Container.Resolving.full.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
@@ -112,10 +114,9 @@
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptorData.cs" />
     <Compile Include="Extensions\Decorators\DecoratorHelpers.cs" />
-    <Compile Include="Extensions\Decorators\DecoratorHelpers.full.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInfo.cs" />
     <Compile Include="Extensions\Decorators\DecoratorInterceptor.cs" />
-    <Compile Include="Advanced\Internal\IContainerControlledCollection.cs" />
+    <Compile Include="Advanced\IContainerControlledCollection.cs" />
     <Compile Include="Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs" />
     <Compile Include="Extensions\Decorators\ServiceTypeDecoratorInfo.cs" />
     <Compile Include="Extensions\GenericArgumentFinder.cs" />
@@ -152,7 +153,6 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
@@ -171,15 +171,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets"/>
-  <Target Name="BeforeBuild" >
-    <Message Text="Updating AssemblyInfo to Version $(VersionNumber)"></Message>
-    <Message Text="Writing to AssemblyInfo files in $(SolutionRoot)"></Message>
-    <AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" 
-                  AssemblyCopyright="" 
-                  AssemblyVersion="$(VersionNumber)"
-                  AssemblyFileVersion="$(VersionNumber)"
-                  >
+  <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets" />
+  <Target Name="BeforeBuild">
+    <Message Text="Updating AssemblyInfo to Version $(VersionNumber)">
+    </Message>
+    <Message Text="Writing to AssemblyInfo files in $(SolutionRoot)">
+    </Message>
+    <AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" AssemblyCopyright="" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)">
     </AssemblyInfo>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -187,5 +185,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-
 </Project>

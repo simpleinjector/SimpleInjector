@@ -493,12 +493,12 @@
 
         private class BuiltInfoInterceptor : IInterceptor
         {
-            public ExpressionBuiltEventArgs BuildInfo { get; set; }
-
             public BuiltInfoInterceptor(ExpressionBuiltEventArgs buildInfo)
             {
                 this.BuildInfo = buildInfo;
             }
+
+            public ExpressionBuiltEventArgs BuildInfo { get; set; }
 
             public void Intercept(IInvocation invocation)
             {

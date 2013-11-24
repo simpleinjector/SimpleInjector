@@ -32,8 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET", "Simpl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET.Tests.Unit", "SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj", "{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.Tests.Unit", "SimpleInjector.Extensions.Tests.Unit\SimpleInjector.Extensions.Tests.Unit.csproj", "{6A6980F3-5DF4-489C-9587-5BFE55A16250}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServiceLocator.SimpleInjectorAdapter", "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj", "{442373FD-50BC-4833-B791-6DCC681ABF31}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
@@ -94,8 +92,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.L
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit", "SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj", "{D0179570-BA08-4D7F-8AB7-FFD4B49CCE84}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D140D43C-B7AB-43B2-A287-394DF871EB56} = {D140D43C-B7AB-43B2-A287-394DF871EB56}
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Packaging", "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj", "{FFD1C3EE-5BF9-4A28-8565-21F7E437ACB6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", "{D1A45E86-CD79-4F65-AC0B-25A21166B1E9}"
 	ProjectSection(SolutionItems) = preProject
@@ -107,22 +112,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Wcf", "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj", "{D17385DB-BEA4-4B14-A195-DB9ADEC4E709}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.Web.Tests.Unit", "SimpleInjector.Integration.Web.Tests.Unit\SimpleInjector.Integration.Web.Tests.Unit.csproj", "{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.Silverlight.Tests.Unit", "SimpleInjector.Extensions.Silverlight.Tests\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj", "{8487C652-EF01-4D52-BE56-AC2ADE51C030}"
 EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "SimpleInjector.Documentation", "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj", "{DC974673-A490-4376-BECA-EEDE8A33579B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Diagnostics", "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj", "{3ECD7954-9C5E-4A62-9401-3F234FE1AEB6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7EB69A84-E589-460D-ABA2-43D34B12BC27} = {7EB69A84-E589-460D-ABA2-43D34B12BC27}
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Diagnostics.Tests.Unit", "SimpleInjector.Diagnostics.Tests.Unit\SimpleInjector.Diagnostics.Tests.Unit.csproj", "{5F94D509-5F4C-43F9-BF92-207DF2F3BB71}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3ECD7954-9C5E-4A62-9401-3F234FE1AEB6} = {3ECD7954-9C5E-4A62-9401-3F234FE1AEB6}
+		{7EB69A84-E589-460D-ABA2-43D34B12BC27} = {7EB69A84-E589-460D-ABA2-43D34B12BC27}
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.PCL", "SimpleInjector.PCL\SimpleInjector.PCL.csproj", "{7EB69A84-E589-460D-ABA2-43D34B12BC27}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 21
+		SccNumberOfProjects = 19
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -135,57 +150,51 @@ Global
 		SccProjectUniqueName3 = SimpleInjector.Silverlight.Tests.Unit\\SimpleInjector.Silverlight.Tests.Unit.csproj
 		SccProjectName3 = SimpleInjector.Silverlight.Tests.Unit
 		SccLocalPath3 = SimpleInjector.Silverlight.Tests.Unit
-		SccProjectUniqueName4 = SimpleInjector.Extensions.Tests.Unit\\SimpleInjector.Extensions.Tests.Unit.csproj
-		SccProjectName4 = SimpleInjector.Extensions.Tests.Unit
-		SccLocalPath4 = SimpleInjector.Extensions.Tests.Unit
-		SccProjectUniqueName5 = SimpleInjector.CodeSamples\\SimpleInjector.CodeSamples.csproj
-		SccProjectName5 = SimpleInjector.CodeSamples
-		SccLocalPath5 = SimpleInjector.CodeSamples
-		SccProjectUniqueName6 = SimpleInjector.CodeSamples.Tests.Unit\\SimpleInjector.CodeSamples.Tests.Unit.csproj
-		SccProjectName6 = SimpleInjector.CodeSamples.Tests.Unit
-		SccLocalPath6 = SimpleInjector.CodeSamples.Tests.Unit
-		SccProjectUniqueName7 = SimpleInjector.Integration.Web\\SimpleInjector.Integration.Web.csproj
-		SccProjectName7 = SimpleInjector.Integration.Web
-		SccLocalPath7 = SimpleInjector.Integration.Web
-		SccProjectUniqueName8 = SimpleInjector.Integration.Web.Mvc\\SimpleInjector.Integration.Web.Mvc.csproj
-		SccProjectName8 = SimpleInjector.Integration.Web.Mvc
-		SccLocalPath8 = SimpleInjector.Integration.Web.Mvc
-		SccProjectUniqueName9 = SimpleInjector.Extensions.LifetimeScoping\\SimpleInjector.Extensions.LifetimeScoping.csproj
-		SccProjectName9 = SimpleInjector.Extensions.LifetimeScoping
-		SccLocalPath9 = SimpleInjector.Extensions.LifetimeScoping
-		SccProjectUniqueName10 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj
-		SccProjectName10 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
-		SccLocalPath10 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
-		SccProjectUniqueName11 = SimpleInjector.Packaging\\SimpleInjector.Packaging.csproj
-		SccProjectName11 = SimpleInjector.Packaging
-		SccLocalPath11 = SimpleInjector.Packaging
-		SccProjectUniqueName12 = SimpleInjector.Integration.Wcf\\SimpleInjector.Integration.Wcf.csproj
-		SccProjectName12 = SimpleInjector.Integration.Wcf
-		SccLocalPath12 = SimpleInjector.Integration.Wcf
-		SccProjectUniqueName13 = SimpleInjector.Integration.Web.Tests.Unit\\SimpleInjector.Integration.Web.Tests.Unit.csproj
-		SccProjectName13 = SimpleInjector.Integration.Web.Tests.Unit
-		SccLocalPath13 = SimpleInjector.Integration.Web.Tests.Unit
-		SccProjectUniqueName14 = SimpleInjector.Extensions.Silverlight.Tests\\SimpleInjector.Extensions.Silverlight.Tests.Unit.csproj
-		SccProjectName14 = SimpleInjector.Extensions.Silverlight.Tests
-		SccLocalPath14 = SimpleInjector.Extensions.Silverlight.Tests
-		SccProjectUniqueName15 = SimpleInjector.NET\\SimpleInjector.NET.csproj
-		SccProjectName15 = SimpleInjector.NET
-		SccLocalPath15 = SimpleInjector.NET
-		SccProjectUniqueName16 = SimpleInjector.Documentation\\SimpleInjector.Documentation.shfbproj
-		SccProjectName16 = SimpleInjector.Documentation
-		SccLocalPath16 = SimpleInjector.Documentation
-		SccProjectUniqueName17 = SimpleInjector.Integration.Web.WebForms\\SimpleInjector.Integration.Web.Forms.csproj
-		SccProjectName17 = SimpleInjector.Integration.Web.WebForms
-		SccLocalPath17 = SimpleInjector.Integration.Web.WebForms
-		SccProjectUniqueName18 = SimpleInjector.Diagnostics\\SimpleInjector.Diagnostics.csproj
-		SccProjectName18 = SimpleInjector.Diagnostics
-		SccLocalPath18 = SimpleInjector.Diagnostics
-		SccProjectUniqueName19 = SimpleInjector.Diagnostics.Tests.Unit\\SimpleInjector.Diagnostics.Tests.Unit.csproj
-		SccProjectName19 = SimpleInjector.Diagnostics.Tests.Unit
-		SccLocalPath19 = SimpleInjector.Diagnostics.Tests.Unit
-		SccProjectUniqueName20 = SimpleInjector.PCL\\SimpleInjector.PCL.csproj
-		SccProjectName20 = SimpleInjector.PCL
-		SccLocalPath20 = SimpleInjector.PCL
+		SccProjectUniqueName4 = SimpleInjector.CodeSamples\\SimpleInjector.CodeSamples.csproj
+		SccProjectName4 = SimpleInjector.CodeSamples
+		SccLocalPath4 = SimpleInjector.CodeSamples
+		SccProjectUniqueName5 = SimpleInjector.CodeSamples.Tests.Unit\\SimpleInjector.CodeSamples.Tests.Unit.csproj
+		SccProjectName5 = SimpleInjector.CodeSamples.Tests.Unit
+		SccLocalPath5 = SimpleInjector.CodeSamples.Tests.Unit
+		SccProjectUniqueName6 = SimpleInjector.Integration.Web\\SimpleInjector.Integration.Web.csproj
+		SccProjectName6 = SimpleInjector.Integration.Web
+		SccLocalPath6 = SimpleInjector.Integration.Web
+		SccProjectUniqueName7 = SimpleInjector.Integration.Web.Mvc\\SimpleInjector.Integration.Web.Mvc.csproj
+		SccProjectName7 = SimpleInjector.Integration.Web.Mvc
+		SccLocalPath7 = SimpleInjector.Integration.Web.Mvc
+		SccProjectUniqueName8 = SimpleInjector.Extensions.LifetimeScoping\\SimpleInjector.Extensions.LifetimeScoping.csproj
+		SccProjectName8 = SimpleInjector.Extensions.LifetimeScoping
+		SccLocalPath8 = SimpleInjector.Extensions.LifetimeScoping
+		SccProjectUniqueName9 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit\\SimpleInjector.Extensions.LifetimeScoping.Tests.Unit.csproj
+		SccProjectName9 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+		SccLocalPath9 = SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+		SccProjectUniqueName10 = SimpleInjector.Packaging\\SimpleInjector.Packaging.csproj
+		SccProjectName10 = SimpleInjector.Packaging
+		SccLocalPath10 = SimpleInjector.Packaging
+		SccProjectUniqueName11 = SimpleInjector.Integration.Wcf\\SimpleInjector.Integration.Wcf.csproj
+		SccProjectName11 = SimpleInjector.Integration.Wcf
+		SccLocalPath11 = SimpleInjector.Integration.Wcf
+		SccProjectUniqueName12 = SimpleInjector.Integration.Web.Tests.Unit\\SimpleInjector.Integration.Web.Tests.Unit.csproj
+		SccProjectName12 = SimpleInjector.Integration.Web.Tests.Unit
+		SccLocalPath12 = SimpleInjector.Integration.Web.Tests.Unit
+		SccProjectUniqueName13 = SimpleInjector.NET\\SimpleInjector.NET.csproj
+		SccProjectName13 = SimpleInjector.NET
+		SccLocalPath13 = SimpleInjector.NET
+		SccProjectUniqueName14 = SimpleInjector.Documentation\\SimpleInjector.Documentation.shfbproj
+		SccProjectName14 = SimpleInjector.Documentation
+		SccLocalPath14 = SimpleInjector.Documentation
+		SccProjectUniqueName15 = SimpleInjector.Integration.Web.WebForms\\SimpleInjector.Integration.Web.Forms.csproj
+		SccProjectName15 = SimpleInjector.Integration.Web.WebForms
+		SccLocalPath15 = SimpleInjector.Integration.Web.WebForms
+		SccProjectUniqueName16 = SimpleInjector.Diagnostics\\SimpleInjector.Diagnostics.csproj
+		SccProjectName16 = SimpleInjector.Diagnostics
+		SccLocalPath16 = SimpleInjector.Diagnostics
+		SccProjectUniqueName17 = SimpleInjector.Diagnostics.Tests.Unit\\SimpleInjector.Diagnostics.Tests.Unit.csproj
+		SccProjectName17 = SimpleInjector.Diagnostics.Tests.Unit
+		SccLocalPath17 = SimpleInjector.Diagnostics.Tests.Unit
+		SccProjectUniqueName18 = SimpleInjector.PCL\\SimpleInjector.PCL.csproj
+		SccProjectName18 = SimpleInjector.PCL
+		SccLocalPath18 = SimpleInjector.PCL
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -216,16 +225,6 @@ Global
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}.Release|x86.ActiveCfg = Release|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{6A6980F3-5DF4-489C-9587-5BFE55A16250}.Release|x86.ActiveCfg = Release|Any CPU
 		{442373FD-50BC-4833-B791-6DCC681ABF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{442373FD-50BC-4833-B791-6DCC681ABF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{442373FD-50BC-4833-B791-6DCC681ABF31}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -346,18 +345,7 @@ Global
 		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7AA8D789-B026-47FE-BB7A-A2788AA3F39B}.Release|x86.ActiveCfg = Release|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8487C652-EF01-4D52-BE56-AC2ADE51C030}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{DC974673-A490-4376-BECA-EEDE8A33579B}.Release|Any CPU.ActiveCfg = Release|Any CPU

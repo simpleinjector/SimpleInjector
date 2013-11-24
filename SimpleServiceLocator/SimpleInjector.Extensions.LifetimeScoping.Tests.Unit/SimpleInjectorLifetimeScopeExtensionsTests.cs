@@ -1170,8 +1170,8 @@
                 "but they actually were disposed in the order: {1}. " +
                 "This order is important, because when a components gets disposed, it might still want to " +
                 "call the components it depends on, but at that time those components are already disposed.",
-                string.Join(", ", expectedOrderOfDisposal.Select(type => type.ToFriendlyName())),
-                string.Join(", ", actualOrderOfDisposal.Select(type => type.ToFriendlyName())));
+                string.Join(", ", expectedOrderOfDisposal.Select(type => type.Name)),
+                string.Join(", ", actualOrderOfDisposal.Select(type => type.Name)));
         }
 
         [TestMethod]
@@ -1224,8 +1224,8 @@
                 "but they actually were disposed in the order: {1}. " +
                 "Since PropertyDependency is injected as property into Inner, it is important that " +
                 "PropertyDependency is disposed after Inner.",
-                string.Join(", ", expectedOrderOfDisposal.Select(type => type.ToFriendlyName())),
-                string.Join(", ", actualOrderOfDisposal.Select(type => type.ToFriendlyName())));
+                string.Join(", ", expectedOrderOfDisposal.Select(type => type.Name)),
+                string.Join(", ", actualOrderOfDisposal.Select(type => type.Name)));
         }
 
         public class ConcreteCommand : ICommand

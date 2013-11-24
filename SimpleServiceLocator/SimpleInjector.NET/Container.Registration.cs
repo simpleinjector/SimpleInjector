@@ -32,7 +32,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;

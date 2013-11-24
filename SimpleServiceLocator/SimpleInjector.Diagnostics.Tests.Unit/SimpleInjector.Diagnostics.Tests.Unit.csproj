@@ -42,6 +42,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SimpleInjector, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\NET\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Diagnostics, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\PCL\SimpleInjector.Diagnostics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -75,16 +83,6 @@
     <Compile Include="TestHelpers.cs" />
     <Compile Include="TypeGeneralizerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
-      <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
-      <Name>SimpleInjector.Diagnostics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
-      <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
-      <Name>SimpleInjector.NET</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Settings.StyleCop" />

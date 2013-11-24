@@ -10,12 +10,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimpleInjector.Integration.Web.Mvc</RootNamespace>
     <AssemblyName>SimpleInjector.Integration.Web.Mvc</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -36,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\bin\NET\SimpleInjector.Integration.Web.Mvc.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SimpleInjector, Version=1.4.0.12049, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
@@ -54,15 +57,13 @@
     <Compile Include="SimpleInjectorMvcExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets"/>
-  <Target Name="BeforeBuild" >
-    <Message Text="Updating AssemblyInfo to Version $(VersionNumber)"></Message>
-    <Message Text="Writing to AssemblyInfo files in $(SolutionRoot)"></Message>
-    <AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" 
-                  AssemblyCopyright="" 
-                  AssemblyVersion="$(VersionNumber)"
-                  AssemblyFileVersion="$(VersionNumber)"
-                  >
+  <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets" />
+  <Target Name="BeforeBuild">
+    <Message Text="Updating AssemblyInfo to Version $(VersionNumber)">
+    </Message>
+    <Message Text="Writing to AssemblyInfo files in $(SolutionRoot)">
+    </Message>
+    <AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)" AssemblyCopyright="" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)">
     </AssemblyInfo>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -70,5 +71,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-
 </Project>

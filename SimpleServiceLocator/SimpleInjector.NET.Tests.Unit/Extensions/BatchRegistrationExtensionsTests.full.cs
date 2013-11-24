@@ -1,5 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
+    // Suppress the Obsolete warnings, since we want to test GetTypesToRegister overloads that are marked obsolete.
+#pragma warning disable 0618
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -7,8 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
-    // Suppress the Obsolete warnings, since we want to test GetTypesToRegister overloads that are marked obsolete.
-#pragma warning disable 0618
+    /// <summary>Tests for full .NET framework version.</summary>
     public partial class BatchRegistrationExtensionsTests
     {
         [TestMethod]
@@ -91,8 +92,7 @@
             // Assert
             Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
         }
-
-
+        
         [TestMethod]
         public void RegisterManySinglesForOpenGenericAccessibilityOptionEnumerable_WithValidTypeDefinitions_Succeeds()
         {

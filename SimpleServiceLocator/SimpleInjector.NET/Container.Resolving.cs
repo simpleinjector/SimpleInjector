@@ -34,7 +34,6 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
@@ -473,9 +472,16 @@ namespace SimpleInjector
                 return null;
             }
 
-            return 
-                this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType) ?? 
-                this.TryBuildEmptyCollectionInstanceProducerForReadOnly(serviceType);            
+            InstanceProducer producer = null;
+            
+            this.TryBuildCollectionInstanceProducerForReadOnly(serviceType, ref producer);
+            
+            if (producer != null)
+            {
+                return producer;
+            }
+
+            return this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
         }
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
@@ -507,34 +513,8 @@ namespace SimpleInjector
             return new InstanceProducer(enumerableType, registration);
         }
 
-        private InstanceProducer TryBuildEmptyCollectionInstanceProducerForReadOnly(Type serviceType)
-        {
-            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
-
-            if (serviceTypeDefinition == Helpers.IReadOnlyListType ||
-                serviceTypeDefinition == Helpers.IReadOnlyCollectionType)
-            {
-                Type elementType = serviceType.GetGenericArguments()[0];
-
-                var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
-
-                if (collection != null)
-                {
-                    var registration = SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this);
-
-                    var producer = new InstanceProducer(serviceType, registration);
-
-                    if (!((IEnumerable<object>)collection).Any())
-                    {
-                        producer.IsContainerAutoRegistered = true;
-                    }
-
-                    return producer;
-                }
-            }
-
-            return null;
-        }
+        partial void TryBuildCollectionInstanceProducerForReadOnly(Type serviceType, 
+            ref InstanceProducer producer);
 
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
             where TConcrete : class

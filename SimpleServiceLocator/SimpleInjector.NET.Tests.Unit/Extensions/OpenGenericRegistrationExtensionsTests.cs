@@ -8,6 +8,7 @@
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
 
+    /// <summary>Tests for testing RegisterOpenGeneric.</summary>
     [TestClass]
     public partial class OpenGenericRegistrationExtensionsTests
     {

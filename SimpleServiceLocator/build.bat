@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.4.0
-set prereleasePostfix=-beta2
+set prereleasePostfix=-beta3
 set buildNumber=0
 
 
@@ -27,7 +27,7 @@ set replace=%buildToolsPath%\replace.exe
 set compress=CScript %buildToolsPath%\zip.vbs
 set configuration=Release
 set defineConstantsNet=PUBLISH
-set defineConstandsPcl=PUBLISH;PCL
+set defineConstantsPcl=PUBLISH;PCL
 set targetPath=bin
 set targetPathNet=%targetPath%\NET
 set targetPathPcl=%targetPath%\PCL
@@ -35,7 +35,9 @@ set targetPathSilverlight=%targetPath%\Silverlight
 set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
 set v4targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
 set v45targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5"
-
+set net40ClientProfile=TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;DefineConstants="%defineConstantsNet%";Configuration=%configuration%
+set net40FullProfile=TargetFrameworkVersion=v4.0;TargetFrameworkProfile=;DefineConstants="%defineConstantsNet%";Configuration=%configuration%
+set net45Profile=TargetFrameworkVersion=v4.5;TargetFrameworkProfile=;DefineConstants="NET45;%defineConstantsNet%";Configuration=%configuration%
 
 set named_version=%version%%prereleasePostfix%
 
@@ -68,15 +70,20 @@ mkdir %targetPathPcl%
 
 copy "Shared Assemblies\*.*" %targetPathPcl%\*.*
 
-%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Core%
+%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net45Profile%
+ren %targetPathNet%\SimpleInjector.dll SimpleInjector_45.dll
+ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
+
+%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
+%msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Packaging%
+%msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+%msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Web%
+%msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Mvc%
+%msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Wcf%
+
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
-%msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Packaging%
-%msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
-%msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Integration_Web%
-%msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Integration_Mvc%
-%msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Integration_Wcf%
 
 
 echo BUILD DOCUMENTATION
@@ -92,8 +99,8 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\Portable\Documentation\SimpleInjector.chm
 
-copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
+copy bin\NET\SimpleInjector_45.dll Releases\v%named_version%\.NET\SimpleInjector.dll
+copy bin\NET\SimpleInjector_45.xml Releases\v%named_version%\.NET\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.xml
 
@@ -110,11 +117,23 @@ mkdir Releases\temp\Documentation
 copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 
 
+mkdir Releases\temp\NET45
+copy bin\NET\SimpleInjector_45.dll Releases\temp\NET45\SimpleInjector.dll
+copy bin\NET\SimpleInjector_45.xml Releases\temp\NET45\SimpleInjector.xml
+copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET45\SimpleInjector.Diagnostics.dll
+copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET45\SimpleInjector.Diagnostics.xml
+
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET40\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET40\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET40\SimpleInjector.Diagnostics.xml
+
+mkdir Releases\temp\NET45\CommonServiceLocator
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET45\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\NET45\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
+copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET45\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
+copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET45\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
 mkdir Releases\temp\NET40\CommonServiceLocator
 copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET40\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
@@ -122,11 +141,25 @@ copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\NET40\
 copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
 copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
+mkdir Releases\temp\NET45\Extensions
+copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
+copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET45\Extensions\SimpleInjector.Packaging.xml
+copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
+copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
+
 mkdir Releases\temp\NET40\Extensions
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
+
+mkdir Releases\temp\NET45\Integration
+copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.dll
+copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.xml
+copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.dll
+copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.xml
+copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.dll
+copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.xml
 
 mkdir Releases\temp\NET40\Integration
 copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
@@ -170,6 +203,10 @@ echo CREATING NUGET PACKAGES
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy bin\NET\SimpleInjector_45.dll Releases\temp\lib\net45\SimpleInjector.dll
+copy bin\NET\SimpleInjector_45.xml Releases\temp\lib\net45\SimpleInjector.xml
+copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net45\SimpleInjector.Diagnostics.dll
+copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net45\SimpleInjector.Diagnostics.xml
 copy bin\NET\SimpleInjector.dll Releases\temp\lib\net40-client\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net40-client\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.dll
@@ -278,9 +315,9 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.QuickStart.%named_version_Integration_Wcf%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
+echo Done!
 
 GOTO :EOF
-
 
 
 :strong_name_key_missing

@@ -2,6 +2,7 @@
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    /// <summary>Tests for property injection for the full .NET framework version.</summary>
     public partial class PropertyInjectionTests
     {
         [TestMethod]
