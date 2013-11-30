@@ -33,8 +33,7 @@
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.dll" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Forms.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Forms.dll" />
+      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Diagnostics.xml" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Diagnostics.dll" />
     </DocumentationSources>
     <HelpAttributes />
@@ -51,7 +50,7 @@
 <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace is part of the &lt;b&gt;SimpleInjector.Diagnostics.dll&lt;/b&gt; adds diagnostic capabilities to the framework.</NamespaceSummaryItem></NamespaceSummaries>
+<NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace is part of the &lt;b&gt;SimpleInjector.Diagnostics.dll&lt;/b&gt; and adds diagnostic capabilities to Simple Injector.</NamespaceSummaryItem></NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
@@ -65,7 +64,7 @@
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <IndentHtml>False</IndentHtml>
-    <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
+    <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
     <KeepLogFile>False</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CppCommentsFixup>False</CppCommentsFixup>

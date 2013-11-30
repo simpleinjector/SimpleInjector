@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.4.0
-set prereleasePostfix=-beta3
+set prereleasePostfix=
 set buildNumber=0
 
 
@@ -84,6 +84,9 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
+
+REM Build a .NET version of the Diagnostics. This is needed for the Documentation project.
+%msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.Net.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Core%
 
 
 echo BUILD DOCUMENTATION

@@ -4,7 +4,17 @@
 Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 
 	General description:
-	
+		The big new feature in this minor release is ther addition of a diagnostic API, which allows querying 
+		the container for diagnostic information. Since version 2.0, Simple Injector has allowed developers to
+		show diagnostic information while debugging. The new diagnostic API allows developers to request this 
+		information programmatically. This allows writing integration tests that verify the correctness of the 
+		container's configuration.
+
+		Besides this, there are lots of small improvements and bug fixes in the core library, such as the 
+		addition of the abstract ScopedLifestyle base class; the capability to resolve collections as 
+		IReadOnlyCollection<T> and IReadOnlyList<T>, and the possibility to register partial open generic 
+		types.
+
 	New features:
 		-[Core] Lifestyle.CreateProducer extension methods added to make creating InstanceProducer instances
 		 more convenient. (work item 19959).
@@ -30,6 +40,7 @@ Version 2.4.0 (v2.4.0 RTM) [no release date yet]
 		-[Core] Container.Register<TConcrete>(Lifestyle) overload has been added. (Work item 20324).
 		-[Core] InstanceProducer.GetRelationships() method added to allow analyzing a registration's 
 		 dependencies (Work item 20235).
+		-[Core] Allow registering partial open generic types (Work item 19926).
 
 	Changes:
 		-[Core] Diagnostics moved into a separate project.
