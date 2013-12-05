@@ -122,6 +122,8 @@ namespace SimpleInjector.Advanced
 
         void ICollection<TService>.CopyTo(TService[] array, int arrayIndex)
         {
+            Requires.IsNotNull(array, "array");
+
             foreach (var item in this)
             {
                 array[arrayIndex++] = item;

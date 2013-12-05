@@ -33,6 +33,8 @@ namespace SimpleInjector.Advanced
     {
         public void Verify(ParameterInfo parameter)
         {
+            Requires.IsNotNull(parameter, "parameter");
+
             if (parameter.ParameterType.IsValueType || parameter.ParameterType == typeof(string))
             {
                 string exceptionMessage = StringResources.ConstructorMustNotContainInvalidParameter(
