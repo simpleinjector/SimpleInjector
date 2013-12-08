@@ -49,14 +49,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{4305E634-E804-4476-A7AD-F22AA74185D4}"
 	ProjectSection(SolutionItems) = preProject
 		changes.txt = changes.txt
-		Documentation\ILMerge License.rtf = Documentation\ILMerge License.rtf
 		licence.txt = licence.txt
 		Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.dll = Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.dll
 		Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.xml = Shared Silverlight Assemblies\Microsoft.Silverlight.Testing.xml
 		Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll = Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll
 		Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml = Shared Silverlight Assemblies\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.xml
 		Shared Silverlight Assemblies\Readme.txt = Shared Silverlight Assemblies\Readme.txt
-		Documentation\Res_NDependWhiteBook_Assembly.pdf = Documentation\Res_NDependWhiteBook_Assembly.pdf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation Genaration", "Documentation Genaration", "{59B27DFA-E74B-4A06-8DF2-7DFBBE6B7C5D}"
