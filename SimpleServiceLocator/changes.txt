@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 2.4.0 (v2.4.0 RTM) [no release date yet]
+Version 2.4.0 (v2.4.0 RTM) 2013-12-08
 
 	General description:
 		The big new feature in this minor release is ther addition of a diagnostic API, which allows querying 
