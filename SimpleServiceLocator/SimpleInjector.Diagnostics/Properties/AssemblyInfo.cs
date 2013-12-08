@@ -64,6 +64,8 @@ using System.Security;
 [assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 #endif
 
+[assembly: SecurityTransparent]
+
 // During a publish build (using the build.bat) we need to compile this assembly with a strong name key, since 
 // we otherwise will not be able to access SimpleInjector.dll's internals. Although we could have done this
 // using delayed signing, it is considerably easier to do it this way.

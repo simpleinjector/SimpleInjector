@@ -41,6 +41,7 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
+[assembly: SecurityTransparent]
 
 #if PUBLISH
 #pragma warning disable 1699

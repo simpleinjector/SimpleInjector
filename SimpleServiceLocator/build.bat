@@ -88,7 +88,7 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
 REM Build a .NET version of the Diagnostics. This is needed for the Documentation project.
 %msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.Net.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Core%
 
-
+goto :EOF
 echo BUILD DOCUMENTATION
 
 %msbuild% "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"

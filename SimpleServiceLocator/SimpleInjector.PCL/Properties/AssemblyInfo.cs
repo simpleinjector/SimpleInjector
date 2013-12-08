@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
+using System.Security;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -45,6 +46,8 @@ using System.Runtime.CompilerServices;
     "a313cd995f6ee682c88b24acf8e6c9f6ddc95094eaeafe39e626b3765fd9b4f2e7789c3a6ed1c4" +
     "a66dedb9")]
 #endif
+
+[assembly: SecurityTransparent]
 
 #if PUBLISH
 #pragma warning disable 1699

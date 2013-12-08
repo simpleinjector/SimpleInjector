@@ -40,8 +40,6 @@ using System.Security;
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-[assembly: AllowPartiallyTrustedCallers]
-
 #if PUBLISH
 #pragma warning disable 1699
 [assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]

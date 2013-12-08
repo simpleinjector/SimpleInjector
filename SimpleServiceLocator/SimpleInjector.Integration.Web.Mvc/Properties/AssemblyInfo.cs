@@ -41,8 +41,6 @@ using System.Security;
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-[assembly: AllowPartiallyTrustedCallers]
-
 [module: SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
     MessageId = "Mvc",
     Justification = "Mvc is the word")]

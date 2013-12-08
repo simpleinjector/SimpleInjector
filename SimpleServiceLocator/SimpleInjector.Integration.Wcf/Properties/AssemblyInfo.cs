@@ -41,8 +41,6 @@ using System.Security;
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-[assembly: AllowPartiallyTrustedCallers]
-
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
     Scope = "namespace", 
     Target = "SimpleInjector.Integration.Wcf",
