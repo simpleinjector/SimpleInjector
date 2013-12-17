@@ -187,6 +187,9 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\TypeConstraintValidator.cs">
+      <Link>Extensions\TypeConstraintValidator.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>

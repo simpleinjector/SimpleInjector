@@ -60,7 +60,7 @@ namespace SimpleInjector.Extensions
                 this.isPartialOpenGenericImplementation = true;
             }
         }
-
+        
         internal bool OpenGenericImplementationCanBeAppliedToServiceType()
         {
             var openGenericBaseType = this.closedGenericBaseType.GetGenericTypeDefinition();

@@ -25,6 +25,11 @@
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
         internal Type ConcreteType { get; private set; }
 
+        internal bool TypeConstraintsAreSatisfied
+        {
+            get { return (new TypeConstraintValidator { Mapping = this }).AreTypeConstraintsSatisfied(); }
+        }
+
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
         /// <returns>True or false.</returns>

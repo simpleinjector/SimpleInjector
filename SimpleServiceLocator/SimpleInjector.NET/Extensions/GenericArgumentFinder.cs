@@ -75,7 +75,9 @@ namespace SimpleInjector.Extensions
             var argumentMappings = this.GetOpenServiceArgumentToConcreteTypeMappings();
 
             this.ConvertToOpenImplementationArgumentMappings(ref argumentMappings);
-            
+
+            RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
+
             this.RemoveDuplicateTypeArguments(ref argumentMappings);
 
             return argumentMappings.ToArray();
@@ -103,6 +105,16 @@ namespace SimpleInjector.Extensions
                 .ToArray();
 
             mappings = mappings.Distinct().ToArray();
+        }
+
+        private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
+            ref IEnumerable<ArgumentMapping> mappings)
+        {
+            mappings = (
+                from mapping in mappings
+                where mapping.TypeConstraintsAreSatisfied
+                select mapping)
+                .ToArray();
         }
 
         private void RemoveDuplicateTypeArguments(ref IEnumerable<ArgumentMapping> mappings)
