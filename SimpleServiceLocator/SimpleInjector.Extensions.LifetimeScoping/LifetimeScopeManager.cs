@@ -67,17 +67,18 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         internal LifetimeScope BeginLifetimeScope()
         {
-            var parentScope = this.threadLocalScopes.Value;
-
-            var scope = new LifetimeScope(this, parentScope);
-
-            this.threadLocalScopes.Value = scope;
-
-            return scope;
+            return this.threadLocalScopes.Value = 
+                new LifetimeScope(this, parentScope: this.threadLocalScopes.Value);
         }
 
         internal void EndLifetimeScope(LifetimeScope scope)
         {
+            while (!object.ReferenceEquals(this.threadLocalScopes.Value, scope))
+            {
+                // LifetimeScope.Dispose calls EndLifetimeScope again.
+                this.threadLocalScopes.Value.Dispose();
+            }
+
             this.threadLocalScopes.Value = scope.ParentScope;
         }
     }

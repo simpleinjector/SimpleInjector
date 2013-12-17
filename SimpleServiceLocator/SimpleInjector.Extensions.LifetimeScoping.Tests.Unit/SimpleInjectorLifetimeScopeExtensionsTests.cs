@@ -1228,6 +1228,98 @@
                 string.Join(", ", actualOrderOfDisposal.Select(type => type.Name)));
         }
 
+        [TestMethod]
+        public void WhenScopeEnds_DisposingAnOuterScope_DisposalAllItsInnerScopesAsWell()
+        {
+            // Arrange
+            const bool IsDisposed = true;
+
+            var container = new Container();
+
+            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
+
+            container.RegisterLifetimeScope<DisposableCommand>();
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                commands[command] = !IsDisposed;
+
+                command.Disposing += _ =>
+                {
+                    commands[command] = IsDisposed;
+                };
+            });
+
+            var outerScope = container.BeginLifetimeScope();
+
+            container.GetInstance<DisposableCommand>();
+
+            container.BeginLifetimeScope();
+
+            container.GetInstance<DisposableCommand>();
+
+            container.BeginLifetimeScope();
+
+            container.GetInstance<DisposableCommand>();
+
+            Assert.AreEqual(3, commands.Count);
+            Assert.IsFalse(commands.Any(c => c.Value == IsDisposed));
+
+            // Act
+            outerScope.Dispose();
+
+            // Assert
+            Assert.IsTrue(commands.All(c => c.Value == IsDisposed));
+        }
+        
+        [TestMethod]
+        public void WhenScopeEnds_DisposingAnMiddelScope_DisposalAllItsInnerScopesAsWellButNotTheOuterScope()
+        {
+            // Arrange
+            const bool IsDisposed = true;
+
+            var container = new Container();
+
+            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
+
+            container.RegisterLifetimeScope<DisposableCommand>();
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                commands[command] = !IsDisposed;
+
+                command.Disposing += _ =>
+                {
+                    commands[command] = IsDisposed;
+                };
+            });
+
+            var outerScope = container.BeginLifetimeScope();
+
+            try
+            {
+                container.GetInstance<DisposableCommand>();
+
+                var middelScope = container.BeginLifetimeScope();
+
+                container.GetInstance<DisposableCommand>();
+
+                container.BeginLifetimeScope();
+
+                container.GetInstance<DisposableCommand>();
+
+                // Act
+                middelScope.Dispose();
+
+                // Assert
+                Assert.AreEqual(2, commands.Count(c => c.Value == IsDisposed));
+            }
+            finally
+            {
+                outerScope.Dispose();
+            }
+        }
+        
         public class ConcreteCommand : ICommand
         {
             public void Execute()
