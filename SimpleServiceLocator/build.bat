@@ -70,7 +70,7 @@ mkdir %targetPathPcl%
 
 copy "Shared Assemblies\*.*" %targetPathPcl%\*.*
 
-%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net45Profile%
+%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Core%
 ren %targetPathNet%\SimpleInjector.dll SimpleInjector_45.dll
 ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
 
