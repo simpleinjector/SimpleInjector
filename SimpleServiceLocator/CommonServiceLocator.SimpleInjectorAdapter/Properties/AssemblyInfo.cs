@@ -12,7 +12,7 @@ using System.Security;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
 [assembly: AssemblyProduct("CommonServiceLocator.SimpleInjectorAdapter")]
-[assembly: AssemblyCopyright("Copyright © S. van Deursen 2011")]
+[assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

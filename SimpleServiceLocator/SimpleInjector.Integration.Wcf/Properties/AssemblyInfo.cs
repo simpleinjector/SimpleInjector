@@ -13,7 +13,7 @@ using System.Security;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SimpleInjector.Integration.Wcf")]
-[assembly: AssemblyCopyright("Copyright © 2012 S. van Deursen")]
+[assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

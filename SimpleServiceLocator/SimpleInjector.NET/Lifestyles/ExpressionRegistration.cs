@@ -1,7 +1,7 @@
-﻿#region Copyright (c) 2013 S. van Deursen
+﻿#region Copyright (c) 2013 Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (C) 2013 S. van Deursen
+ * Copyright (c) 2013 Simple Injector Contributors
  * 
  * To contact me, please visit my blog at http://www.cuttingedge.it/blogs/steven/ or mail to steven at 
  * cuttingedge.it.
