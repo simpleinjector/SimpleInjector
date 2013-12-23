@@ -166,6 +166,13 @@ namespace SimpleInjector.Extensions
             container.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
         }
 
+        public static void RegisterDecorator(this Container container, Type serviceType, 
+            Func<DecoratorPredicateContext, Type> decoratorTypeFactory,
+            Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
+        {
+            // TODO:
+        }
+
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 
         /// original registered <paramref name="serviceType"/>, by injecting that service type into the 
@@ -538,7 +545,7 @@ namespace SimpleInjector.Extensions
             Requires.IsDecorator(container, serviceType, decoratorType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,
                 decoratorType, "decoratorType");
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, 
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType,
                 "decoratorType");
         }
     }

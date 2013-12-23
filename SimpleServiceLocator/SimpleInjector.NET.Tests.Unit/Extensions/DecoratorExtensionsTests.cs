@@ -1131,9 +1131,10 @@
             try
             {
                 // Act
-                // BadCommandHandlerDecorator2<T, TUnresolved> contains an unmappable type argument TUnresolved.
+                // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains an unmappable 
+                // type argument TUnresolved.
                 container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(BadCommandHandlerDecorator2<,>));
+                    typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>));
 
                 // Assert
                 Assert.Fail("Exception was expected.");
@@ -1842,6 +1843,434 @@
             Assert.IsInstanceOfType(handler2, typeof(NonCacheableQueryHandler));
         }
 
+        [TestMethod]
+        public void RegisterDecoratorWithFactory_AllValidParameters_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            var validParameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            // Act
+            RegisterDecorator(validParameters);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithDecoratorReturningOpenGenericType_WrapsTheServiceWithTheClosedDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithPredicateReturningFalse_DoesNotWrapTheServiceWithTheDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.Predicate = context => false;
+            parameters.ServiceType = typeof(ICommandHandler<>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(RealCommandHandler));
+        }
+
+        [TestMethod]
+        public void GetInstance_OnDifferentServiceTypeThanRegisteredDecorator_DoesNotCallSuppliedPredicate()
+        {
+            // Arrange
+            bool predicateCalled = false;
+            bool decoratorTypeFactoryCalled = false;
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            parameters.Predicate = context =>
+            {
+                predicateCalled = true;
+                return false;
+            };
+
+            parameters.DecoratorTypeFactory = context =>
+            {
+                decoratorTypeFactoryCalled = true;
+                return typeof(TransactionHandlerDecorator<>);
+            };
+
+            RegisterDecorator(parameters);
+            
+            // Act
+            // Resolve some other type
+            try
+            {
+                container.GetInstance<INonGenericService>();
+            }
+            catch
+            {
+            }
+
+            // Assert
+            Assert.IsFalse(predicateCalled, "The predicate should not be called when a type is resolved " +
+                "that doesn't match the given service type (ICommandHandler<TCommand> in this case).");
+            Assert.IsFalse(decoratorTypeFactoryCalled, "The factory should not be called.");
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithPredicateReturningFalse_DoesNotCallTheFactory()
+        {
+            // Arrange
+            bool decoratorTypeFactoryCalled = false;
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.Predicate = context => false;
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            parameters.DecoratorTypeFactory = context =>
+            {
+                decoratorTypeFactoryCalled = true;
+                return typeof(TransactionHandlerDecorator<>);
+            };
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsFalse(decoratorTypeFactoryCalled, "The factory should not be called if the predicate " +
+                "returns false. This prevents the user from having to do specific handling when the " +
+                "decorator type can't be constructed because of generic type constraints.");
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningTypeBasedOnImplementationType_WrapsTheServiceWithTheExpectedDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(INonGenericService), typeof(RealNonGenericService));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(INonGenericService);
+            parameters.DecoratorTypeFactory = 
+                context => typeof(NonGenericServiceDecorator<>).MakeGenericType(context.ImplementationType);
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var service = container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.IsInstanceOfType(service, typeof(NonGenericServiceDecorator<RealNonGenericService>));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorReturningAnOpenGenericType_AppliesThatTypeOnlyWhenTypeConstraintsAreMet()
+        {
+            // Arrange
+            var container = new Container();
+
+            // SpecialCommand implements ISpecialCommand, but RealCommand does not.
+            container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
+            container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            // SpecialCommandHandlerDecorator has a "where T : ISpecialCommand" constraint.
+            parameters.DecoratorTypeFactory = context => typeof(SpecialCommandHandlerDecorator<>);
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var handler1 = container.GetInstance<ICommandHandler<SpecialCommand>>();
+            var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(SpecialCommandHandlerDecorator<SpecialCommand>));
+            Assert.IsInstanceOfType(handler2, typeof(NullCommandHandler<RealCommand>));
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            // Here we make a partial open-generic type by filling in the TUnresolved.
+            parameters.DecoratorTypeFactory = context =>
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>).MakeGenericType(
+                    typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>).GetGenericArguments().First(),
+                    context.ImplementationType);
+
+            RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            Assert.IsInstanceOfType(handler,
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<RealCommand, RealCommandHandler>));
+        }
+
+        [TestMethod]
+        public void GetInstance_WithClosedGenericServiceAndOpenGenericDecoratorReturnedByFactory_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = @"
+                Registering a closed generic service type with an open generic decorator is not supported. 
+                Instead, register the service type as open generic, and make sure the decoratorTypeFactory 
+                returns a closed generic type. The decoratorTypeFactory returned the type
+                TransactionHandlerDecorator<T> for service type ICommandHandler<RealCommand>."
+                .TrimInside();
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_WithClosedGenericServiceAndFactoryReturningIncompatibleClosedImplementation_FailsWithExpectedException()
+        {
+            // Arrange
+            string expectedMessage = @"
+                The supplied decoratorTypeFactory returned type TransactionHandlerDecorator<Int32> that 
+                does not implement ICommandHandler<RealCommand>"
+                .TrimInside();
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<int>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithMultiplePublicConstructors_ThrowsExceptedException()
+        {
+            // Arrange
+            string expectedMessage = "it should contain exactly one public constructor";
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+            
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+            parameters.DecoratorTypeFactory = context => typeof(MultipleConstructorsCommandHandlerDecorator<>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithNonGenericServiceAndFactoryReturningAnOpenGenericDecoratorType_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedMessage = 
+                "The supplied decorator NonGenericServiceDecorator<T> is an open generic type definition";
+
+            var container = new Container();
+
+            container.Register(typeof(INonGenericService), typeof(RealNonGenericService));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(INonGenericService);
+            parameters.DecoratorTypeFactory = context => typeof(NonGenericServiceDecorator<>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningTypeThatIsNotADecorator_ThrowsExceptedException()
+        {
+            // Arrange
+            string expectedMessage = @"
+                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as  
+                a decorator, its constructor must include a single parameter of type 
+                ICommandHandler<TCommand>"
+                .TrimInside();
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+            parameters.DecoratorTypeFactory = context => typeof(InvalidDecoratorCommandHandlerDecorator<>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithUnresolvableArgument_ThrowsExceptedException()
+        {
+            // Arrange
+            string expectedMessage = "contains unresolvable type arguments.";
+
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+
+            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains an unmappable 
+            // type argument TUnresolved.
+            parameters.DecoratorTypeFactory = 
+                context => typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>);
+
+            // Since the creation of the decorator type is delayed, the call to RegisterDecorator can't
+            // throw an exception.
+            RegisterDecorator(parameters);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void RegisterDecoratorWithFactory_InvalidDecoratorTypeFactory_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.DecoratorTypeFactory = null;
+
+            // Act
+            Action action = () => RegisterDecorator(parameters);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("decoratorTypeFactory", action);
+        }
+
+        [TestMethod]
+        public void RegisterDecoratorWithFactory_InvalidPredicate_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid(container);
+
+            parameters.Predicate = null;
+
+            // Act
+            Action action = () => RegisterDecorator(parameters);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("predicate", action);
+        }
+
+        private static void RegisterDecorator(RegisterDecoratorFactoryParameters parameters)
+        {
+            parameters.Container.RegisterDecorator(parameters.ServiceType, parameters.DecoratorTypeFactory,
+                parameters.Lifestyle, parameters.Predicate);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -1849,6 +2278,31 @@
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient, 
                 container.GetRegistration(typeof(Container)));
+        }
+
+        private class RegisterDecoratorFactoryParameters
+        {
+            public static RegisterDecoratorFactoryParameters CreateValid(Container container)
+            {
+                return new RegisterDecoratorFactoryParameters
+                {
+                    Container = container,
+                    ServiceType = typeof(ICommandHandler<>),
+                    DecoratorTypeFactory = context => typeof(AsyncCommandHandlerProxy<>),
+                    Lifestyle = Lifestyle.Transient,
+                    Predicate = context => true,
+                };
+            }
+
+            public Container Container { get; set; }
+
+            public Type ServiceType { get; set; }
+
+            public Func<DecoratorPredicateContext, Type> DecoratorTypeFactory { get; set; }
+
+            public Lifestyle Lifestyle { get; set; }
+
+            public Predicate<DecoratorPredicateContext> Predicate { get; set; }
         }
     }
 
@@ -2097,9 +2551,9 @@
     }
 
     // This is not a decorator, the class takes 2 generic types but wraps ICommandHandler<T>
-    public class BadCommandHandlerDecorator2<T, TUnresolved> : ICommandHandler<T>
+    public class CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> : ICommandHandler<T>
     {
-        public BadCommandHandlerDecorator2(ICommandHandler<T> handler)
+        public CommandHandlerDecoratorWithUnresolvableArgument(ICommandHandler<T> handler)
         {
         }
 

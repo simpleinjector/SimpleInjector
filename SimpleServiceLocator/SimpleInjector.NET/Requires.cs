@@ -124,11 +124,12 @@ namespace SimpleInjector
 
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
-            if (service.IsGenericType && !service.ContainsGenericParameters &&
-                implementation.IsGenericType && implementation.ContainsGenericParameters)
+            bool implementationIsOpen = implementation.IsGenericType && implementation.ContainsGenericParameters;
+            bool serviceTypeIsClosed = service.IsGenericType && !service.ContainsGenericParameters;
+
+            if (implementationIsOpen && serviceTypeIsClosed)
             {
-                throw new NotSupportedException(
-                    StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
+                throw new NotSupportedException(StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
             }
         }
 
