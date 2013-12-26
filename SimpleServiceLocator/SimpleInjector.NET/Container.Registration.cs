@@ -1519,7 +1519,7 @@ namespace SimpleInjector
 
                 producersToVerify = (
                     from registration in this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
-                    where !registration.Verified
+                    where !registration.HasSuccessfullyCreatedInstances
                     select registration)
                     .ToArray();
 

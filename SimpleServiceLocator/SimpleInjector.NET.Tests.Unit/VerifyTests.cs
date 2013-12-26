@@ -297,7 +297,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsInvalidOperationException()
         {
             // Arrange
@@ -309,9 +308,32 @@
             container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
 
             // Act
-            container.Verify();
-        }
+            Action action = () => container.Verify();
 
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+        
+        [TestMethod]
+        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntimeAndBuildExpressionCalledExplicitly_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginImpl>();
+
+            container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
+
+            container.GetRegistration(typeof(IPlugin)).BuildExpression();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "The call to BuildExpression should not trigger the verification of IPlugin to be skipped.");
+        }
+        
         [TestMethod]
         public void Verify_WithCollectionsResolvedThroughUnregisteredTypeResolution_StillVerifiesThoseCollections()
         {

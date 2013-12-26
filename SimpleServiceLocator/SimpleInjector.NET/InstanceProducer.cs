@@ -177,10 +177,7 @@ namespace SimpleInjector
         // when the producer is valid.
         internal Exception Exception { get; private set; }
 
-        internal bool Verified 
-        {
-            get { return this.expression.IsValueCreated; }
-        }
+        internal bool HasSuccessfullyCreatedInstances { get; private set; }
 
         internal string DebuggerDisplay
         {
@@ -231,6 +228,11 @@ namespace SimpleInjector
             if (instance == null)
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
+            }
+
+            if (this.HasSuccessfullyCreatedInstances == false)
+            {
+                this.HasSuccessfullyCreatedInstances = true;
             }
 
             return instance;
