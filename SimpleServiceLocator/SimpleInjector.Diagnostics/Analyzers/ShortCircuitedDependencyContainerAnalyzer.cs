@@ -107,9 +107,10 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             var possibleSkippedRegistrationsDescription = string.Join(" or ",
                 from possibleSkippedRegistration in possibleSkippedRegistrations
+                let name = possibleSkippedRegistration.ServiceType.ToFriendlyName()
+                orderby name
                 select string.Format(CultureInfo.InvariantCulture, "{0} ({1})",
-                    possibleSkippedRegistration.ServiceType.ToFriendlyName(),
-                    possibleSkippedRegistration.Lifestyle.Name));
+                    name, possibleSkippedRegistration.Lifestyle.Name));
 
             return string.Format(CultureInfo.InvariantCulture,
                 "{0} might incorrectly depend on unregistered type {1} ({2}) instead of {3}.",
