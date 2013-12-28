@@ -25,20 +25,21 @@
 
 namespace SimpleInjector.Advanced
 {
-    using System.Collections;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
 
-    /// <summary>This interface is not meant for public use.</summary>
-    internal interface IContainerControlledCollection : IEnumerable
+    internal sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
     {
-        /// <summary>Please do not use.</summary>
-        /// <returns>Do not use.</returns>
-        KnownRelationship[] GetRelationships();
+        internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
 
-        /// <summary>PLease do not use.</summary>
-        /// <param name="registration">Do not use.</param>
-        void Append(Registration registration);
+        public bool Equals(T x, T y)
+        {
+            return object.ReferenceEquals(x, y);
+        }
 
-        void VerifyCreatingProducers();
+        public int GetHashCode(T obj)
+        {
+            return RuntimeHelpers.GetHashCode(obj);
+        }
     }
 }

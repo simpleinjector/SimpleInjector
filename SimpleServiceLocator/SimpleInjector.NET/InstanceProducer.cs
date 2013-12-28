@@ -176,8 +176,21 @@ namespace SimpleInjector
         // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
         // when the producer is valid.
         internal Exception Exception { get; private set; }
+        
+        internal bool IsExpressionCreated
+        {
+            get { return this.expression.IsValueCreated; }
+        }
 
-        internal bool HasSuccessfullyCreatedInstances { get; private set; }
+        internal bool MustBeExplicitlyVerified
+        {
+            get { return this.verifiers != null; }
+        }
+
+        internal bool HasSuccessfullyCreatedInstances 
+        {
+            get { return this.validator == null; }
+        }
 
         internal string DebuggerDisplay
         {
@@ -228,11 +241,6 @@ namespace SimpleInjector
             if (instance == null)
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
-            }
-
-            if (this.HasSuccessfullyCreatedInstances == false)
-            {
-                this.HasSuccessfullyCreatedInstances = true;
             }
 
             return instance;
@@ -288,7 +296,21 @@ namespace SimpleInjector
         }
 
         // Throws an InvalidOperationException on failure.
-        internal object Verify()
+        internal Expression VerifyExpressionBuilding()
+        {
+            try
+            {
+                return this.BuildExpression();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    this.ServiceType, ex), ex);
+            }
+        }
+
+        // Throws an InvalidOperationException on failure.
+        internal object VerifyInstanceCreation()
         {
             object instance;
 

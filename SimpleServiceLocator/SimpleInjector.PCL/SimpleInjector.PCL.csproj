@@ -47,37 +47,37 @@
       <Link>ActivationException.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
-      <Link>Advanched\AdvancedExtensions.cs</Link>
+      <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\ConditionalHashSet.cs">
-      <Link>Advanched\ConditionalHashSet.cs</Link>
+      <Link>Advanced\ConditionalHashSet.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollection.cs">
-      <Link>Advanched\ContainerControlledCollection.cs</Link>
+      <Link>Advanced\ContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
-      <Link>Advanched\DefaultConstructorInjectionBehavior.cs</Link>
+      <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
-      <Link>Advanched\DefaultConstructorResolutionBehavior.cs</Link>
+      <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorVerificationBehavior.cs">
-      <Link>Advanched\DefaultConstructorVerificationBehavior.cs</Link>
+      <Link>Advanced\DefaultConstructorVerificationBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultPropertySelectionBehavior.cs">
-      <Link>Advanched\DefaultPropertySelectionBehavior.cs</Link>
+      <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorInjectionBehavior.cs">
-      <Link>Advanched\IConstructorInjectionBehavior.cs</Link>
+      <Link>Advanced\IConstructorInjectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorResolutionBehavior.cs">
-      <Link>Advanched\IConstructorResolutionBehavior.cs</Link>
+      <Link>Advanced\IConstructorResolutionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
-      <Link>Advanched\IConstructorVerificationBehavior.cs</Link>
+      <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IContainerControlledCollection.cs">
-      <Link>Advanched\IContainerControlledCollection.cs</Link>
+      <Link>Advanced\IContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\InitializationContext.cs">
       <Link>Advanced\InitializationContext.cs</Link>
@@ -86,16 +86,19 @@
       <Link>Advanced\InstanceInitializationData.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IPropertySelectionBehavior.cs">
-      <Link>Advanched\IPropertySelectionBehavior.cs</Link>
+      <Link>Advanced\IPropertySelectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\KnownRelationship.cs">
-      <Link>Advanched\KnownRelationship.cs</Link>
+      <Link>Advanced\KnownRelationship.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\OverriddenParameter.cs">
-      <Link>Advanched\OverriddenParameter.cs</Link>
+      <Link>Advanced\OverriddenParameter.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
-      <Link>Advanched\PropertyInjectionHelper.cs</Link>
+      <Link>Advanced\PropertyInjectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ReferenceEqualityComparer.cs">
+      <Link>Advanced\ReferenceEqualityComparer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\SubExpressionReplacer.cs">
       <Link>Advanced\SubExpressionReplacer.cs</Link>

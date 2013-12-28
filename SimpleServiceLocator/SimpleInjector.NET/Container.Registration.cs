@@ -1226,7 +1226,8 @@ namespace SimpleInjector
 
             try
             {
-                this.ValidateRegistrations();
+                this.VerifyIfAllExpressionsCanBeBuilt();
+                this.VerifyIfAllRootObjectsCanBeCreated();
                 this.succesfullyVerified = true;
             }
             finally
@@ -1503,44 +1504,95 @@ namespace SimpleInjector
             }
         }
 
-        private void ValidateRegistrations()
+        private void VerifyIfAllExpressionsCanBeBuilt()
         {
             int maximumNumberOfIterations = 10;
 
             InstanceProducer[] producersToVerify;
 
-            // The verification process can trigger the registration of new instance producers. Those new 
-            // producers need to be checked as well. That's why we have a loop here. But since a user could
-            // accidentally trigger the creation of new registrations during verify, we must set a sensible
-            // limit to the number of iterations.
+            // The process of building expressions can trigger the creation/registration of new instance 
+            // producers. Those new producers need to be checked as well. That's why we have a loop here. But 
+            // since a user could accidentally trigger the creation of new registrations during verify, we 
+            // must set a sensible limit to the number of iterations, to prevent the process from never 
+            // stopping.
             do
             {
                 maximumNumberOfIterations--;
 
                 producersToVerify = (
                     from registration in this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
-                    where !registration.HasSuccessfullyCreatedInstances
+                    where !registration.IsExpressionCreated
                     select registration)
                     .ToArray();
 
-                VerifyProducers(producersToVerify);
+                VerifyIfAllExpressionsCanBeBuilt(producersToVerify);
             }
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
         }
 
-        private static void VerifyProducers(InstanceProducer[] producersToVerify)
+        private void VerifyIfAllRootObjectsCanBeCreated()
+        {
+            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+
+            var nonRootProducers =
+                from producer in producers
+                from relationship in producer.GetRelationships()
+                select relationship.Dependency;
+
+            var rootProducers = 
+                producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
+
+            var producersThatMustBeExplicitlyVerified =
+                from producer in producers
+                where producer.MustBeExplicitlyVerified
+                select producer;
+
+            var producersToVerify = rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct();
+
+            VerifyInstanceCreation(producersToVerify.ToArray());
+        }
+
+        private static void VerifyIfAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)
         {
             foreach (var producer in producersToVerify)
             {
-                var instance = producer.Verify();
+                var expression = producer.VerifyExpressionBuilding();
 
-                if (producer.Registration.IsCollection)
-                {
-                    Type collectionType = producer.ServiceType;
-                    Type serviceType = collectionType.GetGenericArguments()[0];
+                VerifyInstanceProducersOfContainerControlledCollection(expression);
+            }
+        }
 
-                    Helpers.VerifyCollection((IEnumerable)instance, serviceType);
-                }
+        private static void VerifyInstanceProducersOfContainerControlledCollection(Expression expression)
+        {
+            ConstantExpression constant = expression as ConstantExpression;
+
+            if (constant != null && constant.Value is IContainerControlledCollection)
+            {
+                ((IContainerControlledCollection)constant.Value).VerifyCreatingProducers();
+            }
+        }
+
+        private static void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
+        {
+            foreach (var producer in producersToVerify)
+            {
+                var instance = producer.VerifyInstanceCreation();
+
+                VerifyContainerUncontrolledCollection(instance, producer);
+            }
+        }
+
+        private static void VerifyContainerUncontrolledCollection(object instance, InstanceProducer producer)
+        {
+            bool isContainerUncontrolledCollection =
+                producer.Registration.IsCollection && !(instance is IContainerControlledCollection);
+
+            if (isContainerUncontrolledCollection)
+            {
+                Type collectionType = producer.ServiceType;
+                Type serviceType = collectionType.GetGenericArguments()[0];
+
+                Helpers.VerifyCollection((IEnumerable)instance, serviceType);
             }
         }
 

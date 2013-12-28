@@ -90,6 +90,25 @@ namespace SimpleInjector.Advanced
             }
         }
 
+        // Throws an InvalidOperationException on failure.
+        public void VerifyCreatingProducers()
+        {
+            foreach (var lazy in this.producers)
+            {
+                try
+                {
+                    // We only check if the instance producer can be created. We don't verify building of the
+                    // expression. That will be done up the callstack.
+                    InstanceProducer producer = lazy.Value;
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                        typeof(TService), ex), ex);
+                }
+            }
+        }
+
         int IList<TService>.IndexOf(TService item)
         {
             throw GetNotSupportedException();

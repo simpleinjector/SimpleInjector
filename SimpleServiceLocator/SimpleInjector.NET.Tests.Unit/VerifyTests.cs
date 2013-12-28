@@ -367,6 +367,25 @@
             Assert.IsFalse(missingTypes.Any(), "Missing registrations: " + missingTypes.ToFriendlyNamesText());
         }
 
+        [TestMethod]
+        public void Verify_DecoratorWithDecorateeFactoryWithFailingDecorateeOfNonRootType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<PluginConsumer>();
+
+            container.Register<IPlugin, FailingConstructorPlugin<Exception>>();
+
+            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginProxy));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
         public class Service<T>
         {
             public Service(IEnumerable<T> collection)
@@ -377,6 +396,29 @@
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)
+            {
+            }
+        }
+
+        private sealed class FailingConstructorPlugin<TException> : IPlugin
+            where TException : Exception, new()
+        {
+            public FailingConstructorPlugin()
+            {
+                throw new TException();
+            }
+        }
+
+        private sealed class PluginProxy : IPlugin
+        {
+            public PluginProxy(Func<IPlugin> pluginFactory)
+            {
+            }
+        }
+
+        private sealed class PluginConsumer
+        {
+            public PluginConsumer(IPlugin plugin)
             {
             }
         }
