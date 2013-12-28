@@ -299,7 +299,7 @@ namespace SimpleInjector
 
         private void RegisterPropertyInjector(PropertyInjector injector)
         {
-            var copy = Helpers.MakeCopyOf(this.propertyInjectorCache);
+            var copy = this.propertyInjectorCache.MakeCopy();
 
             copy[injector.Type] = injector;
 
@@ -570,12 +570,12 @@ namespace SimpleInjector
         // swapping safes us from using locks.
         private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer)
         {
-            var snapshotCopy = Helpers.MakeCopyOf(this.registrations);
+            var snapshotCopy = this.registrations.MakeCopy();
 
             // This registration might already exist if it was added made by another thread. That's why we
             // need to use the indexer, instead of Add.
             snapshotCopy[serviceType] = instanceProducer;
-
+            
             // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
             // producer from being added after the snapshot has been made accessible to other threads.
             Thread.MemoryBarrier();
