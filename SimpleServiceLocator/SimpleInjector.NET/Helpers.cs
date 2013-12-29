@@ -114,10 +114,10 @@ namespace SimpleInjector
 
         internal static Dictionary<TKey, TValue> MakeCopy<TKey, TValue>(this Dictionary<TKey, TValue> source)
         {
-            // We pick an initial capacity of count + 1, because we'll be adding 1 item to this copy.
+            // We pick an initial capacity of count + 1, because we'll typically be adding 1 item to this copy.
             int initialCapacity = source.Count + 1;
 
-            var copy = new Dictionary<TKey, TValue>(initialCapacity);
+            var copy = new Dictionary<TKey, TValue>(initialCapacity, source.Comparer);
 
             foreach (var pair in source)
             {
