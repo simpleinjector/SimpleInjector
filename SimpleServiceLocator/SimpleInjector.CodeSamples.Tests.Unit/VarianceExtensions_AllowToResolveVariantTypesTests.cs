@@ -118,7 +118,7 @@
                 "There is an error in the container's contiguration. " +
                 "It is impossible to resolve type System.Action`1[System.ArgumentException], " +
                 "because there are 2 registrations that are applicable. " +
-                "Ambiguous registrations: System.Action`1[System.Object], System.Action`1[System.Exception].";
+                "Ambiguous registrations: ";
 
             this.container.RegisterSingle<Action<object>>(s => { });
             this.container.RegisterSingle<Action<Exception>>(s => { });
@@ -132,7 +132,10 @@
             }
             catch (ActivationException ex)
             {
-                Assert.AreEqual(expectedMessage, ex.Message);
+                Assert.IsTrue(ex.Message.Contains(expectedMessage), 
+                    "Expected: " + expectedMessage + " Actual: " + ex.Message);
+                Assert.IsTrue(ex.Message.Contains(typeof(Action<object>).Name));
+                Assert.IsTrue(ex.Message.Contains(typeof(Action<Exception>).Name));
             }
         }
 
