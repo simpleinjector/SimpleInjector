@@ -35,7 +35,7 @@ namespace SimpleInjector
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-
+    
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
@@ -68,7 +68,9 @@ namespace SimpleInjector
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
             new ConditionalHashSet<InstanceProducer>();
 
-        private Dictionary<Type, InstanceProducer> registrations = new Dictionary<Type, InstanceProducer>(40);
+        private Dictionary<Type, InstanceProducer> registrations = 
+            new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
+
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
