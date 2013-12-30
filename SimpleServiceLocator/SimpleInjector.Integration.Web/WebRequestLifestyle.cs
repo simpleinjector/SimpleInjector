@@ -26,11 +26,10 @@
 namespace SimpleInjector.Integration.Web
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Web;
-
     using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single HTTP Web Request.
@@ -175,6 +174,11 @@ namespace SimpleInjector.Integration.Web
             }
 
             SimpleInjectorWebExtensions.RegisterDisposableForEndWebRequest(context, disposable);
+        }
+
+        internal static new void DisposeInstances(IList<IDisposable> disposables)
+        {
+            ScopedLifestyle.DisposeInstances(disposables);
         }
 
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)

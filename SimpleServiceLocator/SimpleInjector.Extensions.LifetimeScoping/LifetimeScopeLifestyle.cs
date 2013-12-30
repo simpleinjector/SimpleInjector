@@ -26,10 +26,10 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-    using System.Linq.Expressions;
-
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using SimpleInjector.Advanced;
+using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
@@ -197,6 +197,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
 
             scope.RegisterForDisposal(disposable);
+        }
+
+        internal static new void DisposeInstances(IList<IDisposable> disposables)
+        {
+            ScopedLifestyle.DisposeInstances(disposables);
         }
 
         internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)

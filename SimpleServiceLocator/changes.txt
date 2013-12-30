@@ -6,11 +6,13 @@ Version vNext
 
 	Improvements:
 		-[Core] Improved performance of calls to Verify() and lowered the memory consumption of the container
-		 caused by a call to Verify(). (Work item 20083)
+		 caused by a call to Verify(). (work item 20083)
 
 	Bug fixes:
 		-[Core] Verify now only creates instances that are root objects. This prevents users from having to 
 		 write special case when extending the framework with methods such as RegisterWithContext.
+		-[Core/LifetimeScoping/Web/Wcf] Scoped lifestyles did not ensure that all instances where disposed.
+		 (work item 20579)
 
 
 Version 2.4.0 (v2.4.0 RTM) 2013-12-08

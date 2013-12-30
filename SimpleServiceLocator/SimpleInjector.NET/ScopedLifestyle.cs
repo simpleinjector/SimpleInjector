@@ -46,5 +46,44 @@
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
         public abstract void RegisterForDisposal(Container container, IDisposable disposable);
+
+        /// <summary>
+        /// Disposes the list of supplied <paramref name="disposables"/>. The list is iterated in reverse 
+        /// order (the first element in the list will be disposed last) and the method ensures that the
+        /// Dispose method of each element is called, regardless of any exceptions raised from any previously
+        /// called Dispose methods. If multiple exceptions are thrown, the last thrown exception will bubble
+        /// up the call stack.
+        /// </summary>
+        /// <param name="disposables">The list of objects to be disposed.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="disposables"/> is a null
+        /// reference.</exception>
+        protected internal static void DisposeInstances(IList<IDisposable> disposables)
+        {
+            Requires.IsNotNull(disposables, "disposables");
+
+            DisposeInstances(disposables, disposables.Count - 1);
+        }
+
+        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
+        // is called on each element, even if a previous instance threw an exception. 
+        private static void DisposeInstances(IList<IDisposable> disposables, int index)
+        {
+            try
+            {
+                while (index >= 0)
+                {
+                    disposables[index].Dispose();
+
+                    index--;
+                }
+            }
+            finally
+            {
+                if (index >= 0)
+                {
+                    DisposeInstances(disposables, index - 1);
+                }
+            }
+        }
     }
 }

@@ -257,13 +257,8 @@ namespace SimpleInjector
             {
                 // Dispose all instances in the opposite order in which they are created. This prevents
                 // prevents ObjectDisposedExceptions from being thrown when dependent services are called
-                // from within the Dispoe method.
-                for (int index = disposables.Count - 1; index >= 0; index--)
-                {
-                    disposables[index].Dispose();
-                }
-
-                context.Items[ObjectsToDisposeKey] = null;
+                // from within the Dispose method.
+                WebRequestLifestyle.DisposeInstances(disposables);
             }
         }
     }

@@ -26,10 +26,10 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
@@ -172,6 +172,11 @@ namespace SimpleInjector.Integration.Wcf
             }
 
             scope.RegisterForDisposal(disposable);
+        }
+
+        internal static new void DisposeInstances(IList<IDisposable> disposables)
+        {
+            ScopedLifestyle.DisposeInstances(disposables);
         }
 
         /// <summary>

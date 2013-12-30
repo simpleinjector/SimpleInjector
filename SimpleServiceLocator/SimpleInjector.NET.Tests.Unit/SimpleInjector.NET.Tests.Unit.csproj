@@ -133,6 +133,7 @@
     <Compile Include="RegisterSingleByTypeNonGenericTests.cs" />
     <Compile Include="RegisterSingleConcreteTests.cs" />
     <Compile Include="ResolveUnregisteredTypeEventTests.cs" />
+    <Compile Include="ScopedLifestyleTests.cs" />
     <Compile Include="TestClasses.cs" />
     <Compile Include="TestHelpers.cs" />
     <Compile Include="UnregisteredTypeEventArgsTests.cs" />
