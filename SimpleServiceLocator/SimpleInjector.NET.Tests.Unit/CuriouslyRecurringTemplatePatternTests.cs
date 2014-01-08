@@ -40,14 +40,14 @@
         }
 
         [TestMethod]
-        public void CuriouslyRecurringTemplatePatternTestsCanRegister()
+        public void RegisterOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
             container.RegisterOpenGeneric(typeof(IRepo<>), typeof(Repo<>));
         }
 
         [TestMethod]
-        public void CuriouslyRecurringTemplatePatternTestsCanResolve()
+        public void GetInstance_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
             container.RegisterOpenGeneric(typeof(IRepo<>), typeof(Repo<>));
@@ -55,14 +55,14 @@
         }
 
         [TestMethod]
-        public void CuriouslyRecurringTemplatePatternTestsCanRegisterAll()
+        public void RegisterAllOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
             container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(Repo<>), typeof(Repo2<>));
         }
 
         [TestMethod]
-        public void CuriouslyRecurringTemplatePatternTestsCanResolveAll()
+        public void GetAllInstances_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
             container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(Repo<>), typeof(Repo2<>));
