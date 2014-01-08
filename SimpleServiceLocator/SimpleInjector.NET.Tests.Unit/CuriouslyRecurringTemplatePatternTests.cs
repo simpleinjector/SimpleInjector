@@ -10,39 +10,34 @@
     [TestClass]
     public class CuriouslyRecurringTemplatePatternTests
     {
-        interface IEntity<T> where T : IEntity<T>
+        private interface IEntity<T> where T : IEntity<T>
         {
             Guid Id { get; set; }
         }
 
-        class Entity : IEntity<Entity>
+        private class Entity : IEntity<Entity>
         {
             public Guid Id { get; set; }
         }
 
-        class Repo<T> : IRepo<T> where T : class, IEntity<T>
+        private class Repo<T> : IRepo<T> where T : class, IEntity<T>
         {
             public Repo()
             {
-
             }
         }
 
-        class Repo2<T> : IRepo<T> where T : class, IEntity<T>
+        private class Repo2<T> : IRepo<T> where T : class, IEntity<T>
         {
             public Repo2()
             {
-
             }
         }
 
-        interface IRepo<T>
+        private interface IRepo<T>
             where T : class, IEntity<T>
         {
         }
-
-        // from this link
-        // https://simpleinjector.codeplex.com/workitem/20602
 
         [TestMethod]
         public void CuriouslyRecurringTemplatePatternTestsCanRegister()
