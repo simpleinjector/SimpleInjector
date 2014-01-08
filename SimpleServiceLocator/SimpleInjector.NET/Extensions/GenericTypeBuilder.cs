@@ -222,19 +222,21 @@ namespace SimpleInjector.Extensions
         {
             return (
                 from argument in type.GetGenericArguments()
-                from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument)
+                from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument, new List<Type>())
                 select nestedArgument)
                 .Distinct()
                 .ToArray();
         }
 
-        private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(Type argument)
+        private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(Type argument, IList<Type> processedArguments)
         {
+            processedArguments.Add(argument);
+
             if (argument.IsGenericParameter)
             {
                 var nestedArguments =
                     from constraint in argument.GetGenericParameterConstraints()
-                    from arg in GetNestedTypeArgumentsForTypeArgument(constraint)
+                    from arg in GetNestedTypeArgumentsForTypeArgument(constraint, processedArguments)
                     select arg;
 
                 return nestedArguments.Concat(new[] { argument });
@@ -246,8 +248,8 @@ namespace SimpleInjector.Extensions
             }
 
             return
-                from genericArgument in argument.GetGenericArguments()
-                from arg in GetNestedTypeArgumentsForTypeArgument(genericArgument)
+                from genericArgument in argument.GetGenericArguments().Except(processedArguments)
+                from arg in GetNestedTypeArgumentsForTypeArgument(genericArgument, processedArguments)
                 select arg;
         }
 

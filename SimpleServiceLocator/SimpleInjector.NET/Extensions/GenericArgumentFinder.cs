@@ -78,8 +78,6 @@ namespace SimpleInjector.Extensions
 
             RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
 
-            this.RemoveDuplicateTypeArguments(ref argumentMappings);
-
             return argumentMappings.ToArray();
         }
 
@@ -100,7 +98,7 @@ namespace SimpleInjector.Extensions
         {
             mappings = (
                 from mapping in mappings
-                from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping)
+                from newMapping in this.ConvertToOpenImplementationArgumentMappings(mapping, new List<Type>())
                 select newMapping)
                 .ToArray();
 
@@ -149,17 +147,19 @@ namespace SimpleInjector.Extensions
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(
-            ArgumentMapping mapping)
+            ArgumentMapping mapping, IList<Type> processedTypes)
         {
             // We are only interested in generic parameters
-            if (mapping.Argument.IsGenericArgument())
+            if (mapping.Argument.IsGenericArgument() && !processedTypes.Contains(mapping.Argument))
             {
+                processedTypes.Add(mapping.Argument);
+
                 if (this.implementationTypeDefinitionArguments.Contains(mapping.Argument))
                 {
                     // The argument is one of the type's generic arguments. We can directly return it.
                     yield return mapping;
 
-                    foreach (var arg in this.GetTypeConstraintArgumentMappingsRecursive(mapping))
+                    foreach (var arg in this.GetTypeConstraintArgumentMappingsRecursive(mapping, processedTypes))
                     {
                         yield return arg;
                     }
@@ -169,7 +169,7 @@ namespace SimpleInjector.Extensions
                     // The argument is not in the type's list, which means that the real type is (or are)
                     // buried in a generic type (i.e. Nullable<KeyValueType<TKey, TValue>>). This can result
                     // in multiple values.
-                    foreach (var arg in this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping))
+                    foreach (var arg in this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping, processedTypes))
                     {
                         yield return arg;
                     }
@@ -177,7 +177,7 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        private ArgumentMapping[] GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping)
+        private ArgumentMapping[] GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping, IList<Type> processedTypes)
         {
             IEnumerable<Type> constraints = Enumerable.Empty<Type>();
 
@@ -200,13 +200,13 @@ namespace SimpleInjector.Extensions
             return (
                 from constraint in constraints
                 let constraintMapping = new ArgumentMapping(constraint, mapping.ConcreteType)
-                from arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping).ToArray()
+                from arg in this.ConvertToOpenImplementationArgumentMappings(constraintMapping, processedTypes).ToArray()
                 select arg)
                 .ToArray();
         }
 
         private ArgumentMapping[] ConvertToOpenImplementationArgumentMappingsRecursive(
-            ArgumentMapping mapping)
+            ArgumentMapping mapping, IList<Type> processedTypes)
         {
             // If we're dealing with a generic type argument here (which means we're in the verification
             // phase testing open generic types), we must just return the mapping, because we can't deduce
@@ -221,13 +221,13 @@ namespace SimpleInjector.Extensions
             // Try to get mappings for each type in the type hierarchy that is compatible to the  argument.
             return (
                 from type in mapping.ConcreteType.GetTypeBaseTypesAndInterfacesFor(argumentTypeDefinition)
-                from arg in this.ConvertToOpenImplementationArgumentMappingsForType(mapping, type)
+                from arg in this.ConvertToOpenImplementationArgumentMappingsForType(mapping, type, processedTypes)
                 select arg)
                 .ToArray();
         }
 
         private ArgumentMapping[] ConvertToOpenImplementationArgumentMappingsForType(
-           ArgumentMapping mapping, Type type)
+           ArgumentMapping mapping, Type type, IList<Type> processedTypes)
         {
             var arguments = mapping.Argument.GetGenericArguments();
             var concreteTypes = type.GetGenericArguments();
@@ -242,7 +242,7 @@ namespace SimpleInjector.Extensions
 
             return (
                 from subMapping in ArgumentMapping.Zip(arguments, concreteTypes)
-                from arg in this.ConvertToOpenImplementationArgumentMappings(subMapping).ToArray()
+                from arg in this.ConvertToOpenImplementationArgumentMappings(subMapping, processedTypes).ToArray()
                 select arg)
                 .ToArray();
         }

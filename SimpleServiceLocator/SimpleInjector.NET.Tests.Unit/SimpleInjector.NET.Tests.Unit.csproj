@@ -94,6 +94,7 @@
     <Compile Include="AssertThat.cs" />
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="Advanced\KnownRelationshipTests.cs" />
+    <Compile Include="CuriouslyRecurringTemplatePatternTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewProxyTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
