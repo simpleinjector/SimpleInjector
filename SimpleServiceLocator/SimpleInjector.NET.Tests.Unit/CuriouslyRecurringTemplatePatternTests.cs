@@ -10,64 +10,59 @@
     [TestClass]
     public class CuriouslyRecurringTemplatePatternTests
     {
-        private interface IEntity<T> where T : IEntity<T>
-        {
-            Guid Id { get; set; }
-        }
-
-        private class Entity : IEntity<Entity>
-        {
-            public Guid Id { get; set; }
-        }
-
-        private class Repo<T> : IRepo<T> where T : class, IEntity<T>
-        {
-            public Repo()
-            {
-            }
-        }
-
-        private class Repo2<T> : IRepo<T> where T : class, IEntity<T>
-        {
-            public Repo2()
-            {
-            }
-        }
-
-        private interface IRepo<T>
-            where T : class, IEntity<T>
-        {
-        }
+        // These methods don't seem to really do anything but were used to 
+        // identify and fix a StackOverflowException and so have been left 
+        // in to capture the problem if it is erroneously reintroduced
 
         [TestMethod]
         public void RegisterOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(Repo<>));
-        }
-
-        [TestMethod]
-        public void GetInstance_CuriouslyRecurringTemplatePattern_Succeeds()
-        {
-            var container = new Container();
-            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(Repo<>));
-            var repo = container.GetInstance<IRepo<Entity>>();
+            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(RepoA<>));
         }
 
         [TestMethod]
         public void RegisterAllOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(Repo<>), typeof(Repo2<>));
+            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(RepoA<>), typeof(RepoB<>));
+        }
+
+        [TestMethod]
+        public void GetInstance_CuriouslyRecurringTemplatePattern_Succeeds()
+        {
+            var container = new Container();
+            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(RepoA<>));
+            var repo = container.GetInstance<IRepo<Entity>>();
         }
 
         [TestMethod]
         public void GetAllInstances_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(Repo<>), typeof(Repo2<>));
+            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(RepoA<>), typeof(RepoB<>));
             var repo = container.GetAllInstances<IRepo<Entity>>();
             AssertThat.Equals(repo.Count(), 2);
+        }
+
+        private interface IEntity<T> where T : IEntity<T>
+        {
+        }
+
+        private class Entity : IEntity<Entity>
+        {
+        }
+
+        private interface IRepo<T> where T : class, IEntity<T>
+        {
+        }
+
+        private class RepoA<T> : IRepo<T> where T : class, IEntity<T>
+        {
+        }
+
+        private class RepoB<T> : IRepo<T> where T : class, IEntity<T>
+        {
         }
     }
 }
