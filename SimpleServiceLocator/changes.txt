@@ -1,16 +1,22 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
-Version vNext
+
+Version 2.4.1 (v2.4.1 RTM) 2014-01-14
 
 	General description:
+		This patch release fixes a bug in the core library concerning registration of generic types. This
+		release also includes improvements to the Verify method.
 
 	Improvements:
 		-[Core] Improved performance of calls to Verify() and lowered the memory consumption of the container
 		 caused by a call to Verify(). (work item 20083)
-
-	Bug fixes:
 		-[Core] Verify now only creates instances that are root objects. This prevents users from having to 
 		 write special case when extending the framework with methods such as RegisterWithContext.
+
+	Bug fixes:
+		-[Core] Registering generic types using RegisterOpenGeneric and RegisterDecorator resulted in a
+		 stack overflow exception in case the generic type contained a type constraint that refered back to
+		 the type (a.k.a. Curiously Recurring Template Pattern). (work item 20602).
 		-[Core/LifetimeScoping/Web/Wcf] Scoped lifestyles did not ensure that all instances where disposed.
 		 (work item 20579)
 
