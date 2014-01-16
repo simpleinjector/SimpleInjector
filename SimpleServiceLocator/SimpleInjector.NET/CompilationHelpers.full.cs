@@ -178,7 +178,14 @@ namespace SimpleInjector
 
         private sealed class InternalUseFinderVisitor : ExpressionVisitor
         {
+            private bool partOfAssigmnent;
+
             public bool NeedsAccessToInternals { get; private set; }
+
+            public override Expression Visit(Expression node)
+            {
+                return base.Visit(node);
+            }
 
             protected override Expression VisitNew(NewExpression node)
             {
@@ -194,13 +201,43 @@ namespace SimpleInjector
                 return base.VisitMethodCall(node);
             }
 
+            protected override Expression VisitBinary(BinaryExpression node)
+            {
+                if (node.NodeType == ExpressionType.Assign)
+                {
+                    bool oldValue = this.partOfAssigmnent;
+
+                    try
+                    {
+                        this.partOfAssigmnent = true;
+
+                        return base.VisitBinary(node);
+                    }
+                    finally
+                    {
+                        this.partOfAssigmnent = oldValue;
+                    }
+                }
+
+                return base.VisitBinary(node);
+            }
+
+            protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
+            {
+                return base.VisitMemberAssignment(node);
+            }
+
             protected override Expression VisitMember(MemberExpression node)
             {
                 var property = node.Member as PropertyInfo;
 
                 if (node.NodeType == ExpressionType.MemberAccess && property != null)
                 {
-                    this.MayAccessExpression(IsPublic(property.DeclaringType) && property.GetSetMethod() != null);
+                    bool canDoPublicAssign = partOfAssigmnent && property.GetSetMethod() != null;
+                    bool canDoPublicRead = !partOfAssigmnent && property.GetGetMethod() != null;
+
+                    this.MayAccessExpression(IsPublic(property.DeclaringType) &&
+                        (canDoPublicAssign || canDoPublicRead));
                 }
 
                 return base.VisitMember(node);
