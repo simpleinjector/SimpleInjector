@@ -26,10 +26,9 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using SimpleInjector.Advanced;
-using SimpleInjector.Lifestyles;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the

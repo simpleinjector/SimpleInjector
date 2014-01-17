@@ -233,8 +233,8 @@ namespace SimpleInjector
 
                 if (node.NodeType == ExpressionType.MemberAccess && property != null)
                 {
-                    bool canDoPublicAssign = partOfAssigmnent && property.GetSetMethod() != null;
-                    bool canDoPublicRead = !partOfAssigmnent && property.GetGetMethod() != null;
+                    bool canDoPublicAssign = this.partOfAssigmnent && property.GetSetMethod() != null;
+                    bool canDoPublicRead = !this.partOfAssigmnent && property.GetGetMethod() != null;
 
                     this.MayAccessExpression(IsPublic(property.DeclaringType) &&
                         (canDoPublicAssign || canDoPublicRead));
