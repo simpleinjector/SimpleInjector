@@ -33,8 +33,13 @@ namespace SimpleInjector.Integration.Wcf
         {
             if (instance == null)
             {
-                throw new ArgumentNullException(paramName);
+                ThrowArgumentNullException(paramName);
             }
+        }
+
+        private static void ThrowArgumentNullException(string paramName)
+        {
+            throw new ArgumentNullException(paramName);
         }
     }
 }

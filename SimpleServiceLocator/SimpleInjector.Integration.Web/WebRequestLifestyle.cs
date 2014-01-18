@@ -46,16 +46,11 @@ namespace SimpleInjector.Integration.Web
     /// </example>
     public sealed class WebRequestLifestyle : ScopedLifestyle
     {
-        /// <summary>
-        /// A default <see cref="WebRequestLifestyle"/> instance that can be used for registering components
-        /// per web request. This instance will ensure created instance get disposed after the web request
-        /// ends.
-        /// </summary>
         internal static readonly Lifestyle WithDisposal = new WebRequestLifestyle();
 
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
-        private readonly bool dispose;
+        private readonly bool disposeInstances;
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -71,7 +66,7 @@ namespace SimpleInjector.Integration.Web
         /// </param>
         public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : base("Web Request")
         {
-            this.dispose = disposeInstanceWhenWebRequestEnds;
+            this.disposeInstances = disposeInstanceWhenWebRequestEnds;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -93,15 +88,8 @@ namespace SimpleInjector.Integration.Web
         /// in the context of a web request.</exception>
         public static void WhenCurrentRequestEnds(Container container, Action action)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(action, "action");
 
             var context = HttpContext.Current;
 
@@ -148,15 +136,8 @@ namespace SimpleInjector.Integration.Web
         /// in the context of a web request.</exception>
         public override void RegisterForDisposal(Container container, IDisposable disposable)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (disposable == null)
-            {
-                throw new ArgumentNullException("disposable");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(disposable, "disposable");
 
             var context = HttpContext.Current;
 
@@ -197,10 +178,7 @@ namespace SimpleInjector.Integration.Web
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            return new WebRequestRegistration<TService, TImplementation>(this, container)
-            {
-                Dispose = this.dispose
-            };
+            return new WebRequestRegistration<TService, TImplementation>(this, container, this.disposeInstances);
         }
 
         /// <summary>
@@ -217,27 +195,8 @@ namespace SimpleInjector.Integration.Web
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            return new WebRequestRegistration<TService>(this, container)
-            {
-                InstanceCreator = instanceCreator,
-                Dispose = this.dispose
-            };
-        }
-
-        private class WebRequestRegistration<TService> : WebRequestRegistration<TService, TService>
-            where TService : class
-        {
-            public WebRequestRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
-            public Func<TService> InstanceCreator { get; set; }
-
-            public override Func<TService> BuildTransientInstanceCreator()
-            {
-                return this.BuildTransientDelegate<TService>(this.InstanceCreator);
-            }
+            return new WebRequestRegistration<TService, TService>(this, container, this.disposeInstances, 
+                instanceCreator);
         }
 
         private class WebRequestRegistration<TService, TImplementation> : Registration
@@ -246,14 +205,18 @@ namespace SimpleInjector.Integration.Web
         {
             private readonly object key = new object();
 
+            private readonly bool disposeInstances;
+            private readonly Func<TService> userSuppliedInstanceCreator;
+
             private Func<TService> instanceCreator;
 
-            public WebRequestRegistration(Lifestyle lifestyle, Container container)
+            internal WebRequestRegistration(Lifestyle lifestyle, Container container,
+                bool disposeInstances, Func<TService> userSuppliedInstanceCreator = null)
                 : base(lifestyle, container)
             {
+                this.disposeInstances = disposeInstances;
+                this.userSuppliedInstanceCreator = userSuppliedInstanceCreator;
             }
-
-            public bool Dispose { get; set; }
 
             public override Type ImplementationType
             {
@@ -264,15 +227,10 @@ namespace SimpleInjector.Integration.Web
             {
                 if (this.instanceCreator == null)
                 {
-                    this.instanceCreator = this.BuildTransientInstanceCreator();
+                    this.instanceCreator = this.BuildInstanceCreator();
                 }
 
                 return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
-            }
-
-            public virtual Func<TService> BuildTransientInstanceCreator()
-            {
-                return this.BuildTransientDelegate<TService, TImplementation>();
             }
 
             public TService GetInstance()
@@ -299,6 +257,18 @@ namespace SimpleInjector.Integration.Web
                 return instance;
             }
 
+            private Func<TService> BuildInstanceCreator()
+            {
+                if (this.userSuppliedInstanceCreator == null)
+                {
+                    return this.BuildTransientDelegate<TService, TImplementation>();
+                }
+                else
+                {
+                    return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
+                }
+            }
+
             private TService GetInstanceWithoutContext()
             {
                 if (this.Container.IsVerifying())
@@ -308,16 +278,16 @@ namespace SimpleInjector.Integration.Web
                 }
 
                 throw new ActivationException("The " + typeof(TService).FullName + " is registered as " +
-                    "'PerWebRequest', but the instance is requested outside the context of a " +
-                    "HttpContext (HttpContext.Current is null). Make sure instances using this " +
+                    "'Web Request', but the instance is requested outside the context of a " +
+                    "web request (HttpContext.Current is null). Make sure instances using this " +
                     "lifestyle are not resolved during the application initialization phase and when " +
                     "running on a background thread. For resolving instances on background threads, " +
-                    "try registering this instance as 'Per Lifetime Scope': http://bit.ly/N1s8hN.");
+                    "try registering this instance as 'Per Lifetime Scope': https://bit.ly/N1s8hN.");
             }
 
             private void RegisterForDisposal(TService instance)
             {
-                if (this.Dispose)
+                if (this.disposeInstances)
                 {
                     var disposableInstance = instance as IDisposable;
 

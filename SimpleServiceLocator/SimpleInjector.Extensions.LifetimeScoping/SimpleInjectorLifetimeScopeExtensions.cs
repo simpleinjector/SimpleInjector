@@ -32,15 +32,14 @@ namespace SimpleInjector
     using System.Linq;
 
     using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Advanced;
     
     /// <summary>
     /// Extension methods for enabling lifetime scoping for the Simple Injector.
     /// </summary>
     public static class SimpleInjectorLifetimeScopeExtensions
     {
-        internal const string LifetimeScopingIsNotEnabledExceptionMessage =
-            "To enable lifetime scoping, please make sure the EnableLifetimeScoping extension method is " +
-            "called during the configuration of the container.";
+        private static readonly object managerKey = new object();
 
         /// <summary>
         /// Enables the lifetime scoping for the given <paramref name="container"/>. Lifetime scoping is
@@ -56,32 +55,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         public static void EnableLifetimeScoping(this Container container)
         {
+            // This method has become a no-op.
             Requires.IsNotNull(container, "container");
-
-            bool oldBehavior = container.Options.AllowOverridingRegistrations;
-
-            try
-            {
-                // Ensure a registered manager doesn't get overrided by disallowing overrides.
-                container.Options.AllowOverridingRegistrations = false;
-
-                container.RegisterSingle<LifetimeScopeManager>(new LifetimeScopeManager(null));
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Suppress the failure when LifetimeScopeManager has already been registered. This is a bit
-                // nasty, but probably the only way to do this.
-                // NOTE: We can't call GetCurrentRegistrations, because that might lock the container.
-                if (!ex.Message.Contains("already been registered"))
-                {
-                    // Typically, what will be thrown here will be a 'container locked' exception.
-                    throw;
-                }
-            }
-            finally
-            {
-                container.Options.AllowOverridingRegistrations = oldBehavior;
-            }
         }
 
         /// <summary>
@@ -266,8 +241,8 @@ namespace SimpleInjector
         /// <summary>
         /// Begins a new lifetime scope for the given <paramref name="container"/> on the current thread. 
         /// Services, registered with 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see> or using
-        /// the <see cref="LifetimeScopeLifestyle"/> and are requested within the same thread as where the 
+        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see> or
+        /// using the <see cref="LifetimeScopeLifestyle"/> and are requested within the same thread as where the 
         /// lifetime scope is created, are cached during the lifetime of that scope.
         /// The scope should be disposed explicitly when the scope ends.
         /// </summary>
@@ -277,13 +252,6 @@ namespace SimpleInjector
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
         /// not been called previously.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
-        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
-        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
-        /// by registering a service using one of the 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
-        /// overloads.
-        /// </exception>
         /// <example>
         /// <code lang="cs"><![CDATA[
         /// using (container.BeginLifetimeScope())
@@ -298,26 +266,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            IServiceProvider provider = container;
-
-            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
-
-            if (manager != null)
-            {
-                return manager.BeginLifetimeScope();
-            }
-
-            // When no LifetimeScopeManager is registered, this means that there are no lifetime scope
-            // registrations (since the first call to RegisterLifetimeScope also registers the singleton
-            // manager). However, since the user has called BeginLifetimeScope, he/she expects to be able to
-            // use it, for instance to allow disposing instances with a different/shorter lifetime than 
-            // Lifetime Scope (using the LifetimeScope.RegisterForDisposal method). For this to work however,
-            // we need a LifetimeScopeManager, but at this point it is impossible to register it, since
-            // BeginLifetimeScope will be called after the initialization phase. We have no other option than
-            // to inform the user about enabling lifetime scoping explicitly by throwing an exception. You
-            // might see this as a design flaw, but since this feature is implemented on top of the core 
-            // library (instead of being written inside of the core library), there is no other option.
-            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
+            return container.GetLifetimeScopeManager().BeginLifetimeScope();
         }
 
         /// <summary>
@@ -340,31 +289,32 @@ namespace SimpleInjector
         /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
-        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnableLifetimeScoping"/> is
-        /// not called. Lifetime scoping must be enabled by calling <see cref="EnableLifetimeScoping"/> or
-        /// by registering a service using one of the 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see>
-        /// overloads.
-        /// </exception>
         public static LifetimeScope GetCurrentLifetimeScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
-            IServiceProvider provider = container;
+            return container.GetLifetimeScopeManager().CurrentScope;
+        }
 
-            var manager = provider.GetService(typeof(LifetimeScopeManager)) as LifetimeScopeManager;
+        internal static LifetimeScopeManager GetLifetimeScopeManager(this Container container)
+        {
+            var manager = (LifetimeScopeManager)container.GetItem(managerKey);
 
-            if (manager != null)
+            if (manager == null)
             {
-                // CurrentScope can be null, when there is currently no scope.
-                return manager.CurrentScope;
+                lock (managerKey)
+                {
+                    manager = (LifetimeScopeManager)container.GetItem(managerKey);
+
+                    if (manager == null)
+                    {
+                        manager = new LifetimeScopeManager();
+                        container.SetItem(managerKey, manager);
+                    }
+                }
             }
 
-            // When no LifetimeScopeManager is registered, we explicitly throw an exception. 
-            // Otherwise this might lead users to think that they would actually register there
-            // transients for disposal, while there's no lifetime scope.
-            throw new InvalidOperationException(LifetimeScopingIsNotEnabledExceptionMessage);
+            return manager;
         }
     }
 }

@@ -1,6 +1,15 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vNext
+
+	General description:
+
+	Improvements:
+		[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping/EnablePerWcfOperationLifestyle 
+		when no lifetime scoped instances are registered.
+
+
 Version 2.4.1 (v2.4.1 RTM) 2014-01-14
 
 	General description:

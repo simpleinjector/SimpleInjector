@@ -44,16 +44,11 @@ namespace SimpleInjector.Integration.Wcf
     /// </example>
     public class WcfOperationLifestyle : ScopedLifestyle
     {
-        /// <summary>
-        /// A default <see cref="WcfOperationLifestyle"/> instance that can be used for registering components
-        /// per WCF Operation. This instance will ensure created instance get disposed after the WCF operation
-        /// ends.
-        /// </summary>
         internal static readonly Lifestyle WithDisposal = new WcfOperationLifestyle(true);
 
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
-        private readonly bool disposeInstanceWhenOperationEnds;
+        private readonly bool disposeInstances;
         
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -69,7 +64,7 @@ namespace SimpleInjector.Integration.Wcf
         /// </param>
         public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds) : base("WCF Operation")
         {
-            this.disposeInstanceWhenOperationEnds = disposeInstanceWhenOperationEnds;
+            this.disposeInstances = disposeInstanceWhenOperationEnds;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -91,15 +86,8 @@ namespace SimpleInjector.Integration.Wcf
         /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
         public static void WhenWcfOperationEnds(Container container, Action action)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(action, "action");
 
             var scope = container.GetCurrentWcfOperationScope();
 
@@ -146,15 +134,8 @@ namespace SimpleInjector.Integration.Wcf
         /// in the context of a WCF operation.</exception>
         public override void RegisterForDisposal(Container container, IDisposable disposable)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (disposable == null)
-            {
-                throw new ArgumentNullException("disposable");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(disposable, "disposable");
 
             var scope = container.GetCurrentWcfOperationScope();
 
@@ -193,12 +174,7 @@ namespace SimpleInjector.Integration.Wcf
                             "be created using the non-generic overloads in a sandbox.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            EnablePerWcfOperationLifestyle(container);
-
-            return new WcfOperationRegistration<TService, TImplementation>(this, container)
-            {
-                Dispose = this.disposeInstanceWhenOperationEnds
-            };
+            return new WcfOperationRegistration<TService, TImplementation>(this, container, this.disposeInstances);
         }
 
         /// <summary>
@@ -215,54 +191,26 @@ namespace SimpleInjector.Integration.Wcf
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
-            EnablePerWcfOperationLifestyle(container);
-
-            return new PerWcfOperationRegistration<TService>(this, container)
-            {
-                Dispose = this.disposeInstanceWhenOperationEnds,
-                InstanceCreator = instanceCreator
-            };
-        }
-
-        private static void EnablePerWcfOperationLifestyle(Container container)
-        {
-            try
-            {
-                SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle(container);
-            }
-            catch (InvalidOperationException)
-            {
-                // Thrown when the container is locked.
-            }
-        }
-
-        private sealed class PerWcfOperationRegistration<TService>
-            : WcfOperationRegistration<TService, TService>
-            where TService : class
-        {
-            internal PerWcfOperationRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
-            internal Func<TService> InstanceCreator { get; set; }
-
-            protected override Func<TService> BuildInstanceCreator()
-            {
-                return this.BuildTransientDelegate(this.InstanceCreator);
-            }
+            return new WcfOperationRegistration<TService, TService>(this, container, this.disposeInstances,
+                instanceCreator);
         }
 
         private class WcfOperationRegistration<TService, TImplementation> : Registration
             where TService : class
             where TImplementation : class, TService
         {
+            private readonly bool disposeInstances;
+            private readonly Func<TService> userSuppliedInstanceCreator;
+
             private Func<TService> instanceCreator;
             private WcfOperationScopeManager manager;
 
-            internal WcfOperationRegistration(Lifestyle lifestyle, Container container)
+            internal WcfOperationRegistration(Lifestyle lifestyle, Container container,
+                bool disposeInstances, Func<TService> userSuppliedInstanceCreator = null)
                 : base(lifestyle, container)
             {
+                this.disposeInstances = disposeInstances;
+                this.userSuppliedInstanceCreator = userSuppliedInstanceCreator;
             }
 
             public override Type ImplementationType
@@ -270,13 +218,11 @@ namespace SimpleInjector.Integration.Wcf
                 get { return typeof(TImplementation); }
             }
 
-            internal bool Dispose { get; set; }
-
             public override Expression BuildExpression()
             {
                 if (this.instanceCreator == null)
                 {
-                    this.manager = this.Container.GetInstance<WcfOperationScopeManager>();
+                    this.manager = this.Container.GetWcfOperationScopeManager();
 
                     this.instanceCreator = this.BuildInstanceCreator();
                 }
@@ -296,12 +242,19 @@ namespace SimpleInjector.Integration.Wcf
                     return this.GetInstanceWithoutScope();
                 }
 
-                return scope.GetInstance(this, this.instanceCreator, this.Dispose);
+                return scope.GetInstance(this, this.instanceCreator, this.disposeInstances);
             }
 
-            protected virtual Func<TService> BuildInstanceCreator()
+            private Func<TService> BuildInstanceCreator()
             {
-                return this.BuildTransientDelegate<TService, TImplementation>();
+                if (this.userSuppliedInstanceCreator == null)
+                {
+                    return this.BuildTransientDelegate<TService, TImplementation>();
+                }
+                else
+                {
+                    return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
+                }
             }
 
             private TService GetInstanceWithoutScope()
@@ -313,7 +266,7 @@ namespace SimpleInjector.Integration.Wcf
                 }
 
                 throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
-                    "'PerWcfOperation', but the instance is requested outside the context of a WCF " +
+                    "'Per Wcf Operation', but the instance is requested outside the context of a WCF " +
                     "operation.");
             }
         }

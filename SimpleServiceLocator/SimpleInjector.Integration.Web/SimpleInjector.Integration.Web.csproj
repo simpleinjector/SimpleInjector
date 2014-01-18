@@ -52,6 +52,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Requires.cs" />
     <Compile Include="WebRequestLifestyle.cs" />
     <Compile Include="SimpleInjectorWebExtensions.cs" />
     <Compile Include="SimpleInjectorWebInitializer.cs" />

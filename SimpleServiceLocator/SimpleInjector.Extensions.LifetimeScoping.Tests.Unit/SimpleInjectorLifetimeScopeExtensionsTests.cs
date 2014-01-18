@@ -68,28 +68,17 @@
         }
 
         [TestMethod]
-        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrationsAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrationsAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            try
-            {
-                // Act
-                container.BeginLifetimeScope();
-
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains(
-                    "please make sure the EnableLifetimeScoping extension method is called"),
-                    "Actual message: " + ex.Message);
-            }
+            // Act
+            container.BeginLifetimeScope();
         }
         
         [TestMethod]
-        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -98,23 +87,12 @@
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
-            try
-            {
-                // Act
-                container.Verify();
-
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains(
-                    "please make sure the EnableLifetimeScoping extension method is called"),
-                    "Actual message: ");
-            }
+            // Act
+            container.Verify();
         }
 
         [TestMethod]
-        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_ThrowsExpectedException()
+        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -125,19 +103,8 @@
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
-            try
-            {
-                // Act
-                container.Verify();
-
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains(
-                    "please make sure the EnableLifetimeScoping extension method is called"),
-                    "Actual message: " + ex.Message);
-            }
+            // Act
+            container.Verify();
         }
         
         [TestMethod]
@@ -193,20 +160,11 @@
             // Arrange
             var container = new Container();
 
-            try
-            {
-                // Act
-                container.GetCurrentLifetimeScope();
+            // Act
+            var scope = container.GetCurrentLifetimeScope();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains(
-                    "please make sure the EnableLifetimeScoping extension method is called"),
-                    "Actual message: " + ex.Message);
-            }
+            // Assert
+            Assert.IsNull(scope);
         }
 
         [TestMethod]
@@ -270,7 +228,7 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'LifetimeScope', but the instance is requested outside " +
+                    "The ICommand is registered as 'Lifetime Scope', but the instance is requested outside " +
                     "the context of a lifetime scope. Make sure you call container.BeginLifetimeScope() first."),
                     "Actual message: " + ex.Message);
             }

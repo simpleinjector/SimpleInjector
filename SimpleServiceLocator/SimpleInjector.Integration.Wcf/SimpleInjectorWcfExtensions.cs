@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.ServiceModel;
 
+    using SimpleInjector.Advanced;
     using SimpleInjector.Integration.Wcf;
 
     /// <summary>
@@ -40,10 +41,7 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWcfExtensions
     {
-        private const string WcfScopingIsNotEnabledExceptionMessage =
-            "To enable WCF request scoping, please make sure the SimpleInjectorWcfExtensions." +
-            "EnablePerWcfOperationScoping(Container) extension method is " +
-            "called during the configuration of the container.";
+        private static readonly object managerKey = new object();
 
         /// <summary>
         /// Registers the WCF services instances (public classes that implement an interface that
@@ -88,30 +86,8 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         public static void EnablePerWcfOperationLifestyle(this Container container)
         {
+            // This method has become a no-op.
             Requires.IsNotNull(container, "container");
-
-            bool oldBehavior = container.Options.AllowOverridingRegistrations;
-
-            try
-            {
-                // Ensure a registered manager doesn't get overrided by disallowing overrides.
-                container.Options.AllowOverridingRegistrations = false;
-
-                container.RegisterSingle<WcfOperationScopeManager>(new WcfOperationScopeManager(null));
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Suppress the failure when WcfOperationScopeManager has already been registered. This is a bit
-                // nasty, but probably the only way to do this.
-                if (!ex.Message.Contains("already been registered"))
-                {
-                    throw;
-                }
-            }
-            finally
-            {
-                container.Options.AllowOverridingRegistrations = oldBehavior;
-            }
         }
 
         /// <summary>
@@ -256,50 +232,37 @@ namespace SimpleInjector
         /// </exception>
         public static WcfOperationScope GetCurrentWcfOperationScope(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
-            IServiceProvider provider = container;
-
-            var manager = provider.GetService(typeof(WcfOperationScopeManager)) as WcfOperationScopeManager;
-
-            if (manager != null)
-            {
-                // CurrentScope can be null, when there is currently no scope.
-                return manager.CurrentScope;
-            }
-
-            // When no WcfRequestScopeManager is registered, we explicitly throw an exception. See the comments
-            // in the BeginWcfRequestScope method for more information.
-            throw new InvalidOperationException(WcfScopingIsNotEnabledExceptionMessage);
+            return container.GetWcfOperationScopeManager().CurrentScope;
         }
 
         internal static WcfOperationScope BeginWcfOperationScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
-            IServiceProvider provider = container;
+            return container.GetWcfOperationScopeManager().BeginScope();
+        }
 
-            var manager = provider.GetService(typeof(WcfOperationScopeManager)) as WcfOperationScopeManager;
+        internal static WcfOperationScopeManager GetWcfOperationScopeManager(this Container container)
+        {
+            var manager = (WcfOperationScopeManager)container.GetItem(managerKey);
 
-            if (manager != null)
+            if (manager == null)
             {
-                return manager.BeginScope();
+                lock (managerKey)
+                {
+                    manager = (WcfOperationScopeManager)container.GetItem(managerKey);
+
+                    if (manager == null)
+                    {
+                        manager = new WcfOperationScopeManager();
+                        container.SetItem(managerKey, manager);
+                    }
+                }
             }
 
-            // When no LifetimeScopeManager is registered, this means that there are no lifetime scope
-            // registrations (since the first call to RegisterLifetimeScope also registers the singleton
-            // manager). However, since the user has called BeginLifetimeScope, he/she expects to be able to
-            // use it, for instance to allow disposing instances with a different/shorter lifetime than 
-            // Lifetime Scope (using the LifetimeScope.RegisterForDisposal method). For this to work however,
-            // we need a LifetimeScopeManager, but at this point it is impossible to register it, since
-            // BeginLifetimeScope will be called after the initialization phase. We have no other option than
-            // to inform the user about enabling lifetime scoping explicitly by throwing an exception. You
-            // might see this as a design flaw, but since this feature is implemented on top of the core 
-            // library (instead of being written inside of the core library), there is no other option.
-            throw new InvalidOperationException(WcfScopingIsNotEnabledExceptionMessage);
+            return manager;
         }
 
         private static bool IsWcfServiceType(Type type)
