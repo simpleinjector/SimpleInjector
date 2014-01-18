@@ -1856,6 +1856,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithDecoratorReturningOpenGenericType_WrapsTheServiceWithTheClosedDecorator()
         {
             // Arrange
@@ -1878,6 +1879,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithPredicateReturningFalse_DoesNotWrapTheServiceWithTheDecorator()
         {
             // Arrange
@@ -1901,6 +1903,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_OnDifferentServiceTypeThanRegisteredDecorator_DoesNotCallSuppliedPredicate()
         {
             // Arrange
@@ -1946,6 +1949,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithPredicateReturningFalse_DoesNotCallTheFactory()
         {
             // Arrange
@@ -1978,6 +1982,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeBasedOnImplementationType_WrapsTheServiceWithTheExpectedDecorator()
         {
             // Arrange
@@ -2001,6 +2006,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorReturningAnOpenGenericType_AppliesThatTypeOnlyWhenTypeConstraintsAreMet()
         {
             // Arrange
@@ -2029,6 +2035,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
         {
             // Arrange
@@ -2057,6 +2064,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_WithClosedGenericServiceAndOpenGenericDecoratorReturnedByFactory_FailsWithExpectedException()
         {
             // Arrange
@@ -2089,6 +2097,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_WithClosedGenericServiceAndFactoryReturningIncompatibleClosedImplementation_FailsWithExpectedException()
         {
             // Arrange
@@ -2119,6 +2128,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithMultiplePublicConstructors_ThrowsExceptedException()
         {
             // Arrange
@@ -2145,6 +2155,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithNonGenericServiceAndFactoryReturningAnOpenGenericDecoratorType_ThrowsExpectedException()
         {
             // Arrange
@@ -2172,6 +2183,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeThatIsNotADecorator_ThrowsExceptedException()
         {
             // Arrange
@@ -2202,6 +2214,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithUnresolvableArgument_ThrowsExceptedException()
         {
             // Arrange
@@ -2232,6 +2245,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void RegisterDecoratorWithFactory_InvalidDecoratorTypeFactory_ThrowsArgumentNullException()
         {
             // Arrange
@@ -2249,6 +2263,7 @@
         }
 
         [TestMethod]
+        [Ignore]
         public void RegisterDecoratorWithFactory_InvalidPredicate_ThrowsArgumentNullException()
         {
             // Arrange
