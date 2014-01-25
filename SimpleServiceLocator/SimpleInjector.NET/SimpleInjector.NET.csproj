@@ -89,6 +89,8 @@
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
     <Compile Include="Advanced\InitializationContext.cs" />
     <Compile Include="Advanced\InstanceInitializationData.cs" />
+    <Compile Include="Advanced\Internal\LazyScope.cs" />
+    <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
@@ -136,6 +138,8 @@
     <Compile Include="Lifestyle.cs" />
     <Compile Include="Lifestyles\HybridRegistration.cs" />
     <Compile Include="Lifestyles\ScopedHybridLifestyle.cs" />
+    <Compile Include="Lifestyles\ScopedRegistration.cs" />
+    <Compile Include="Scope.cs" />
     <Compile Include="ScopedLifestyle.cs" />
     <Compile Include="Registration.cs" />
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />

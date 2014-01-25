@@ -63,33 +63,37 @@ namespace SimpleInjector.Lifestyles
             get { return this.lifestyleSelector() ? this.trueLifestyle : this.falseLifestyle; }
         }
 
+        // NOTE: Since the ScopedLifestyle.WhenScopeEnds is marked as virtual (which is unfortunate legacy), 
+        // custom scoped lifestyle implementations can override it, and we must therefore override it here to 
+        // make sure the custom WhenScopeEnds is called (not overriding it will skip the WhenScopeEnds of the 
+        // lifestyle and will forward the call directly to the Scope.
         public override void WhenScopeEnds(Container container, Action action)
         {
             this.CurrentLifestyle.WhenScopeEnds(container, action);
         }
 
+        // NOTE: This method is overridden for the same reason as WhenScopeEnds is.
         public override void RegisterForDisposal(Container container, IDisposable disposable)
         {
             this.CurrentLifestyle.RegisterForDisposal(container, disposable);
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "See base.CreateRegistration for more info.")]
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.lifestyleSelector,
-                this.trueLifestyle.CreateRegistration<TService, TImplementation>(container),
-                this.falseLifestyle.CreateRegistration<TService, TImplementation>(container),
-                this, container);
+            var trueProvider = this.trueLifestyle.CreateCurrentScopeProvider(container);
+            var falseProvider = this.falseLifestyle.CreateCurrentScopeProvider(container);
+
+            // NOTE: It is important to return a delegate that evaluates the lifestyleSelector on each call,
+            // instead of evaluating the lifestyleSelector directly and returning either the trueProvider or
+            // falseProvider. That behavior would be completely flawed, because that would burn the lifestyle
+            // that is active during the compilation of the InstanceProducer's delegate right into that
+            // delegate making the other lifestyle unavailable.
+            return () => this.lifestyleSelector() ? trueProvider() : falseProvider();
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+        protected internal override Scope GetCurrentScope(Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TService), this.lifestyleSelector,
-                this.trueLifestyle.CreateRegistration<TService>(instanceCreator, container),
-                this.falseLifestyle.CreateRegistration<TService>(instanceCreator, container),
-                this, container);
+            return this.CurrentLifestyle.GetCurrentScope(container);
         }
 
         private string GetHybridName()

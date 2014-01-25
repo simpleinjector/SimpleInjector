@@ -13,15 +13,6 @@
     [TestClass]
     public class SimpleInjectorLifetimeScopeExtensionsTests
     {
-        public interface ICommand
-        {
-            void Execute();
-        }
-
-        public interface IGeneric<T>
-        {
-        }
-
         [TestMethod]
         public void GetInstance_RegistrationUsingLifetimeScopeLifestyle_Succeeds()
         {
@@ -228,8 +219,8 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'Lifetime Scope', but the instance is requested outside " +
-                    "the context of a lifetime scope. Make sure you call container.BeginLifetimeScope() first."),
+                    "The ICommand is registered as 'Lifetime Scope' lifestyle, but the instance is requested " +
+                    "outside the context of a Lifetime Scope."),
                     "Actual message: " + ex.Message);
             }
         }
@@ -1077,7 +1068,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "This method can only be called within the context of an active lifetime scope."),
+                    "This method can only be called within the context of an active Lifetime Scope."),
                     "Actual: " + ex.Message);
             }
         }
@@ -1277,6 +1268,28 @@
                 outerScope.Dispose();
             }
         }
+
+        [TestMethod]
+        public void GetInstance_WithPossibleObjectGraphOptimizableRegistration_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterLifetimeScope<ICommand, DisposableCommand>();
+
+            container.Register<ClassDependingOn<ICommand>>();
+
+            // This registration can be optimized to prevent ICommand from being requested more than once from
+            // the LifetimeScopeLifestyleRegistration.GetInstance
+            container.Register<ClassDependingOn<ClassDependingOn<ICommand>, ClassDependingOn<ICommand>>>();
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                var instance =
+                    container.GetInstance<ClassDependingOn<ClassDependingOn<ICommand>, ClassDependingOn<ICommand>>>();
+            }
+        }
         
         public class ConcreteCommand : ICommand
         {
@@ -1292,6 +1305,13 @@
         public class ClassDependingOn<TDependency>
         {
             public ClassDependingOn(TDependency dependency)
+            {
+            }
+        }
+
+        public class ClassDependingOn<TDependency1, TDependency2>
+        {
+            public ClassDependingOn(TDependency1 dependency1, TDependency2 dependency2)
             {
             }
         }

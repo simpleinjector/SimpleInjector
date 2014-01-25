@@ -390,6 +390,84 @@
         }
 
         [TestMethod]
+        public void RegisterForDisposal_CalledOnCreatedScopedHybridWithFalseSelector_ForwardsCallToFalseLifestyleScope()
+        {
+            // Arrange
+            Scope trueScope = new Scope();
+            Scope falseScope = new Scope();
+
+            var trueLifestyle = new CustomScopedLifestyle(trueScope);
+            var falseLifestyle = new CustomScopedLifestyle(falseScope);
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => false, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+
+            // Assert
+            Assert.IsFalse(trueScope.GetDisposables().Any(), "TrueLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, falseScope.GetDisposables().Length, "FalseLifestyle was expected to be called.");
+        }
+
+        [TestMethod]
+        public void RegisterForDisposal_CalledOnCreatedScopedHybridWithTrueSelector_ForwardsCallToTrueLifestyleScope()
+        {
+            // Arrange
+            Scope trueScope = new Scope();
+            Scope falseScope = new Scope();
+
+            var trueLifestyle = new CustomScopedLifestyle(trueScope);
+            var falseLifestyle = new CustomScopedLifestyle(falseScope);
+
+            ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => true, trueLifestyle, falseLifestyle);
+
+            // Act
+            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+
+            // Assert
+            Assert.AreEqual(1, trueScope.GetDisposables().Length, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseScope.GetDisposables().Any(), "FalseLifestyle was NOT expected to be called.");
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesForDifferentLifestyles_ResolvesInstanceForBothLifestyles()
+        {
+            // Arrange
+            var container = new Container();
+
+            bool selectTrueLifestyle = true;
+
+            Scope trueScope = new Scope();
+            Scope falseScope = new Scope();
+
+            var trueLifestyle = new CustomScopedLifestyle(trueScope);
+            var falseLifestyle = new CustomScopedLifestyle(falseScope);
+
+            ScopedLifestyle hybrid = 
+                Lifestyle.CreateHybrid(() => selectTrueLifestyle, trueLifestyle, falseLifestyle);
+
+            container.Register<IDisposable, DisposableObject>(hybrid);
+
+            // Act
+            var instance1 = container.GetInstance<IDisposable>();
+
+            // Assert
+            Assert.AreEqual(1, trueScope.GetDisposables().Length, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseScope.GetDisposables().Any(), "FalseLifestyle was NOT expected to be called.");
+
+            // Act
+            // Here we flip the switch. Resolving the instance now should get a new instance from the other
+            // lifestyle
+            selectTrueLifestyle = false;
+
+            var instance2 = container.GetInstance<IDisposable>();
+
+            // Assert
+            Assert.AreEqual(1, falseScope.GetDisposables().Length, "FalseLifestyle was expected to be called this time.");
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2));
+        }
+
+        [TestMethod]
         public void WhenScopeEnds_CalledOnCreatedScopedHybridWithFalseSelector_ForwardsCallToFalseLifestyle()
         {
             // Arrange
@@ -473,9 +551,16 @@
                 this.realLifestyle = Lifestyle.Transient;
             }
 
+            public CustomScopedLifestyle(Scope scope) : this()
+            {
+                this.Scope = scope;
+            }
+
             public int WhenScopeEndsCallCount { get; private set; }
 
             public int RegisterForDisposalCallCount { get; private set; }
+
+            public Scope Scope { get; private set; }
 
             public override void WhenScopeEnds(Container container, Action action)
             {
@@ -483,6 +568,8 @@
                 Assert.IsNotNull(action, "action");
 
                 this.WhenScopeEndsCallCount++;
+
+                base.WhenScopeEnds(container, action);
             }
 
             public override void RegisterForDisposal(Container container, IDisposable disposable)
@@ -491,7 +578,14 @@
                 Assert.IsNotNull(disposable, "disposable");
 
                 this.RegisterForDisposalCallCount++;
+
+                base.RegisterForDisposal(container, disposable);
             }
+
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
+            {
+                return () => this.Scope ?? new Scope();
+            }            
 
             protected override int Length
             {

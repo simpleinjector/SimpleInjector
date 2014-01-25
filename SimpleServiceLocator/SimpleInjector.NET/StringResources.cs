@@ -507,5 +507,22 @@ namespace SimpleInjector
                 "UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception. {1}",
                 serviceType.ToFriendlyName(), exception.Message);
         }
+
+        internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType, 
+            ScopedLifestyle lifestyle)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The {0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
+                "context of a {1}.",
+                serviceType.ToFriendlyName(), 
+                lifestyle.Name);
+        }
+
+        internal static string ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(string lifestyleName)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "This method can only be called within the context of an active {0}.", 
+                lifestyleName);
+        }
     }
 }

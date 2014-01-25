@@ -41,7 +41,7 @@ namespace SimpleInjector
         {
             if (instance == null)
             {
-                throw new ArgumentNullException(paramName);
+                ThrowArgumentNullException(paramName);
             }
         }
 
@@ -366,6 +366,11 @@ namespace SimpleInjector
         {
             return constraint.IsGenericParameter || (constraint.IsGenericType &&
                 constraint.GetGenericArguments().Any(ContainsAnotherArgument));
+        }
+
+        private static void ThrowArgumentNullException(string paramName)
+        {
+            throw new ArgumentNullException(paramName);
         }
     }
 }

@@ -28,7 +28,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Web;
 
@@ -39,9 +38,6 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWebExtensions
     {
-        private static readonly object WebRequestEndActionsKey = new object();
-        private static readonly object ObjectsToDisposeKey = new object();
-
         /// <summary>
         /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
         /// request and ensures that -if <typeparamref name="TConcrete"/> implements 
@@ -63,10 +59,7 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             container.Register<TConcrete, TConcrete>(WebRequestLifestyle.WithDisposal);
         }
@@ -96,10 +89,7 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             container.Register<TService, TImplementation>(WebRequestLifestyle.WithDisposal);
         }
@@ -122,6 +112,9 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+
             RegisterPerWebRequest(container, instanceCreator, disposeInstanceWhenWebRequestEnds: true);
         }
 
@@ -146,15 +139,8 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
             
             container.Register<TService>(instanceCreator, 
                 WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));
@@ -180,10 +166,7 @@ namespace SimpleInjector
         /// returns null.</exception>
         public static void RegisterForDisposal(IDisposable disposable)
         {
-            if (disposable == null)
-            {
-                throw new ArgumentNullException("disposable");
-            }
+            Requires.IsNotNull(disposable, "disposable");
 
             var context = HttpContext.Current;
 
@@ -193,73 +176,7 @@ namespace SimpleInjector
                     "This method can only be called in the context of a web request.");
             }
 
-            RegisterDisposableForEndWebRequest(context, disposable);
-        }
-
-        internal static void RegisterDelegateForWebRequestEnd(HttpContext context, Action webRequestEnds)
-        {
-            var actions = (List<Action>)context.Items[WebRequestEndActionsKey];
-
-            if (actions == null)
-            {
-                context.Items[WebRequestEndActionsKey] = actions = new List<Action>();
-            }
-
-            actions.Add(webRequestEnds);
-        }
-
-        internal static void CleanUpWebRequest()
-        {
-            try
-            {
-                // Actions should be executed before disposing objects. Those actions will likely have effect
-                // on the objects that are about to be disposed.
-                ExecuteAllRegisteredEndWebRequestDelegates();
-            }
-            finally
-            {
-                DisposeAllRegisteredDisposables();
-            }
-        }
-
-        internal static void RegisterDisposableForEndWebRequest(HttpContext context, IDisposable disposable)
-        {
-            var disposables = (List<IDisposable>)context.Items[ObjectsToDisposeKey];
-
-            if (disposables == null)
-            {
-                context.Items[ObjectsToDisposeKey] = disposables = new List<IDisposable>();
-            }
-
-            disposables.Add(disposable);
-        }
-
-        private static void ExecuteAllRegisteredEndWebRequestDelegates()
-        {
-            var context = HttpContext.Current;
-
-            var actions = (List<Action>)context.Items[WebRequestEndActionsKey];
-
-            if (actions != null)
-            {
-                actions.ForEach(action => action());
-                context.Items[WebRequestEndActionsKey] = null;
-            }
-        }
-
-        private static void DisposeAllRegisteredDisposables()
-        {
-            var context = HttpContext.Current;
-
-            var disposables = (List<IDisposable>)context.Items[ObjectsToDisposeKey];
-
-            if (disposables != null)
-            {
-                // Dispose all instances in the opposite order in which they are created. This prevents
-                // prevents ObjectDisposedExceptions from being thrown when dependent services are called
-                // from within the Dispose method.
-                WebRequestLifestyle.DisposeInstances(disposables);
-            }
+            WebRequestLifestyle.RegisterForDisposal(disposable, context);
         }
     }
 }

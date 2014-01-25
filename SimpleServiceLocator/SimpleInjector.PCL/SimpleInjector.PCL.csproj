@@ -85,6 +85,12 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\InstanceInitializationData.cs">
       <Link>Advanced\InstanceInitializationData.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\LazyScope.cs">
+      <Link>Advanced\Internal\LazyScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\Internal\LazyScopedRegistration.cs">
+      <Link>Advanced\Internal\LazyScopedRegistration.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IPropertySelectionBehavior.cs">
       <Link>Advanced\IPropertySelectionBehavior.cs</Link>
     </Compile>
@@ -217,6 +223,9 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedHybridLifestyle.cs">
       <Link>Lifestyles\ScopedHybridLifestyle.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedRegistration.cs">
+      <Link>Lifestyles\ScopedRegistration.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\SingletonLifestyle.cs">
       <Link>Lifestyles\SingletonLifestyle.cs</Link>
     </Compile>
@@ -234,6 +243,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Requires.cs">
       <Link>Requires.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Scope.cs">
+      <Link>Scope.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\ScopedLifestyle.cs">
       <Link>ScopedLifestyle.cs</Link>

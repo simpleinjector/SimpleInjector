@@ -266,7 +266,7 @@ namespace SimpleInjector
 
             // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
             // but I don't feel like protecting us against such an obscure user bug.
-            return BuildDelegate<TService>(expression);
+            return this.BuildDelegate<TService>(expression);
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace SimpleInjector
         {
             Expression expression = this.BuildTransientExpression<TService, TImplementation>();
 
-            return BuildDelegate<TImplementation>(expression);
+            return this.BuildDelegate<TImplementation>(expression);
         }
 
         /// <summary>
@@ -569,11 +569,13 @@ namespace SimpleInjector
             }
         }
 
-        private static Func<TService> BuildDelegate<TService>(Expression expression)
+        private Func<TService> BuildDelegate<TService>(Expression expression)
             where TService : class
         {
             try
             {
+                expression = CompilationHelpers.OptimizeObjectGraph(this.Container, expression);
+
                 var newInstanceMethod =
                     Expression.Lambda<Func<TService>>(expression, new ParameterExpression[0]);
 

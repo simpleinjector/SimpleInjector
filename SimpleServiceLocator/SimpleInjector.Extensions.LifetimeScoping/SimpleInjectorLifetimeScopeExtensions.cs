@@ -29,17 +29,15 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-
-    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions.LifetimeScoping;
     
     /// <summary>
     /// Extension methods for enabling lifetime scoping for the Simple Injector.
     /// </summary>
     public static class SimpleInjectorLifetimeScopeExtensions
     {
-        private static readonly object managerKey = new object();
+        private static readonly object ManagerKey = new object();
 
         /// <summary>
         /// Enables the lifetime scoping for the given <paramref name="container"/>. Lifetime scoping is
@@ -296,20 +294,23 @@ namespace SimpleInjector
             return container.GetLifetimeScopeManager().CurrentScope;
         }
 
+        // This method will never return null.
         internal static LifetimeScopeManager GetLifetimeScopeManager(this Container container)
         {
-            var manager = (LifetimeScopeManager)container.GetItem(managerKey);
+            var manager = (LifetimeScopeManager)container.GetItem(ManagerKey);
 
+            // NOTE: This double-checked lock might be broken on certain processor architectures, but I don't
+            // know how to fix that.
             if (manager == null)
             {
-                lock (managerKey)
+                lock (ManagerKey)
                 {
-                    manager = (LifetimeScopeManager)container.GetItem(managerKey);
+                    manager = (LifetimeScopeManager)container.GetItem(ManagerKey);
 
                     if (manager == null)
                     {
                         manager = new LifetimeScopeManager();
-                        container.SetItem(managerKey, manager);
+                        container.SetItem(ManagerKey, manager);
                     }
                 }
             }

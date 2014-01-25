@@ -86,7 +86,7 @@
             {
                 Assert.IsTrue(ex.Message.Contains(typeof(ICommand).Name), "Actual: " + ex.Message);
                 Assert.IsTrue(
-                    ex.Message.Contains("the instance is requested outside the context of a web request"),
+                    ex.Message.Contains("the instance is requested outside the context of a Web Request"),
                     "Actual: " + ex.Message);
             }
         }

@@ -27,20 +27,37 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Base class for scoped lifestyles.
     /// </summary>
     public abstract class ScopedLifestyle : Lifestyle
     {
+        private readonly bool disposeInstances;
+
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
-        protected ScopedLifestyle(string name) : base(name)
+        protected ScopedLifestyle(string name)
+            : this(name, disposeInstances: true)
         {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
+        /// <param name="name">The user friendly name of this lifestyle.</param>
+        /// <param name="disposeInstances">Signals the lifestyle whether instances should be
+        /// disposed or not.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
+        /// or an empty string.</exception>
+        protected ScopedLifestyle(string name, bool disposeInstances)
+            : base(name)
+        {
+            this.disposeInstances = disposeInstances;
         }
 
         /// <summary>
@@ -53,7 +70,29 @@ namespace SimpleInjector
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
-        public abstract void WhenScopeEnds(Container container, Action action);
+        public virtual void WhenScopeEnds(Container container, Action action)
+        {
+            // NOTE: This method is made virtual for backwards compatibility :-(
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(action, "action");
+
+            var scope = this.GetCurrentScope(container);
+
+            if (scope == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
+            }
+
+            scope.WhenScopeEnds(action);
+        }
 
         /// <summary>
         /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
@@ -70,7 +109,95 @@ namespace SimpleInjector
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
-        public abstract void RegisterForDisposal(Container container, IDisposable disposable);
+        public virtual void RegisterForDisposal(Container container, IDisposable disposable)
+        {
+            // NOTE: This method is made virtual for backwards compatibility :-(
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(disposable, "disposable");
+
+            var scope = this.GetCurrentScope(container);
+
+            if (scope == null)
+            {
+                if (container.IsVerifying())
+                {
+                    // We're verifying the container, it's impossible to register the action somewhere, but
+                    // verification should absolutely not fail because of this.
+                    return;
+                }
+
+                throw new InvalidOperationException(
+                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
+            }
+
+            scope.RegisterForDisposal(disposable);
+        }
+
+        /// <summary>
+        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
+        /// the context of such scope.
+        /// </summary>
+        /// <param name="container">The container for which the delegate gets created.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
+        protected internal virtual Func<Scope> CreateCurrentScopeProvider(Container container)
+        {
+            // NOTE: This method is made virtual instead of abstract for backwards compatibility.
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected internal virtual Scope GetCurrentScope(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            Func<Scope> currentScopeProvider = this.CreateCurrentScopeProvider(container);
+
+            return currentScopeProvider.Invoke();
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            Container container)
+        {
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, "container");
+
+            return new ScopedRegistration<TService, TService>(this, container, this.disposeInstances, instanceCreator);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
+            Justification = @"See the description of the justification on the base class.")]
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            return new ScopedRegistration<TService, TImplementation>(this, container, this.disposeInstances);
+        }
 
         /// <summary>
         /// Disposes the list of supplied <paramref name="disposables"/>. The list is iterated in reverse 
@@ -84,31 +211,12 @@ namespace SimpleInjector
         /// reference.</exception>
         protected internal static void DisposeInstances(IList<IDisposable> disposables)
         {
+            // NOTE: This method is included for backwards compatibility :-(
             Requires.IsNotNull(disposables, "disposables");
 
-            DisposeInstances(disposables, disposables.Count - 1);
-        }
+            var list = disposables.ToList();
 
-        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
-        // is called on each element, even if a previous instance threw an exception. 
-        private static void DisposeInstances(IList<IDisposable> disposables, int index)
-        {
-            try
-            {
-                while (index >= 0)
-                {
-                    disposables[index].Dispose();
-
-                    index--;
-                }
-            }
-            finally
-            {
-                if (index >= 0)
-                {
-                    DisposeInstances(disposables, index - 1);
-                }
-            }
+            Scope.DisposeInstancesInReverseOrder(list, startingAsIndex: list.Count - 1);
         }
     }
 }

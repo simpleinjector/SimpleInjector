@@ -26,10 +26,8 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Runtime.CompilerServices;
     using System.Threading;
 
     /// <summary>
@@ -38,15 +36,10 @@ namespace SimpleInjector.Integration.Wcf
     /// This class is created implicitly and a current instance can be requested by calling
     /// <see cref="SimpleInjectorWcfExtensions.GetCurrentWcfOperationScope">GetCurrentWcfOperationScope</see>.
     /// </summary>
-    public sealed class WcfOperationScope : IDisposable
+    public sealed class WcfOperationScope : Scope
     {
-        private readonly Dictionary<Registration, object> lifetimeScopedInstances =
-            new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
-
         private readonly int initialThreadId;
         private WcfOperationScopeManager manager;
-        private List<Action> actions;
-        private List<IDisposable> disposables;
 
         internal WcfOperationScope(WcfOperationScopeManager manager)
         {
@@ -55,165 +48,47 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         /// <summary>
-        /// Registers the supplied <paramref name="disposable"/> to be disposed when the WCF request ends.
-        /// Calling this method is useful for instances that are registered with a lifecycle shorter than
-        /// that of the scope (where possibly multiple instances are created per scope, such as transient
-        /// services, that are registered with one of the <b>Register</b> overloads), but still need to be
-        /// disposed explicitly.
-        /// </summary>
-        /// <example>
-        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
-        /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="WcfOperationScope"/> in which context it is created:
-        /// <code lang="cs"><![CDATA[
-        /// container.Register<IService, ServiceImpl>();
-        /// container.RegisterInitializer<ServiceImpl>(instance =>
-        /// {
-        ///     var scope = container.GetCurrentLifetimeScope();
-        ///     if (scope != null) scope.RegisterForDisposal(instance);
-        /// });
-        /// ]]></code>
-        /// </example>
-        /// <param name="disposable">The disposable.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="disposable"/> is a null reference.</exception>        
-        public void RegisterForDisposal(IDisposable disposable)
-        {
-            if (disposable == null)
-            {
-                throw new ArgumentNullException("disposable");
-            }
-
-            if (this.disposables == null)
-            {
-                this.disposables = new List<IDisposable>();
-            }
-
-            this.disposables.Add(disposable);
-        }
-
-        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
         /// resources.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when <b>Dispose</b> was called on a different
-        /// thread than where this instance was constructed.</exception>
+        /// <param name="disposing">True to release both managed and unmanaged resources; false to release 
+        /// only unmanaged resources.</param>
         [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations",
             Justification = "This is the only reliable place where we can see that the scope has been " +
                             "used over multiple threads is here.")]
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (this.manager != null)
+            if (disposing && this.manager != null)
             {
                 if (this.initialThreadId != Thread.CurrentThread.ManagedThreadId)
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                        "It is not safe to use a LifetimeScope instance across threads. Make sure the " +
-                        "complete operation that the lifetime scope surrounds gets executed within the " +
-                        "same thread and make sure that the LifetimeScope instance gets disposed on the " +
+                        "It is not safe to use a WCF operation scope across threads. Make sure the " +
+                        "complete operation that the scope surrounds gets executed within the " +
+                        "same thread and make sure that the WCF operation scope instance gets disposed on the " +
                         "same thread as it gets created. Dispose was called on thread with ManagedThreadId " +
                         "{0}, but was created on thread with id {1}.", Thread.CurrentThread.ManagedThreadId,
                         this.initialThreadId));
                 }
 
-                // EndLifetimeScope should not be called from a different thread than where it was started.
-                // Calling this method from another thread could remove the wrong scope.
-                bool outerScopeEnded = this.manager.EndLifetimeScope();
+                bool outerScopeEnded = false;
 
-                // Prevent disposing all instances when we ended an inner scope.
-                if (outerScopeEnded)
+                try
                 {
-                    this.manager = null;
-
-                    this.CleanUpScope();
+                    // EndLifetimeScope should not be called from a different thread than where it was started.
+                    // Calling this method from another thread could remove the wrong scope.
+                    outerScopeEnded = this.manager.EndLifetimeScope();
                 }
-            }
-        }
-            
-        internal void RegisterDelegateForScopeEnd(Action action)
-        {
-            if (this.actions == null)
-            {
-                this.actions = new List<Action>();
-            }
-
-            this.actions.Add(action);
-        }
-
-        internal TService GetInstance<TService>(Registration key, Func<TService> instanceCreator,
-            bool disposeWhenLifetimeScopeEnds)
-            where TService : class
-        {
-            object instance;
-
-            if (!this.lifetimeScopedInstances.TryGetValue(key, out instance))
-            {
-                this.lifetimeScopedInstances[key] = instance = instanceCreator();
-
-                if (disposeWhenLifetimeScopeEnds)
+                finally
                 {
-                    var disposable = instance as IDisposable;
-
-                    if (disposable != null)
+                    // Prevent disposing all instances when we ended an inner scope.
+                    if (outerScopeEnded)
                     {
-                        this.RegisterForDisposal(disposable);
+                        this.manager = null;
+
+                        base.Dispose(true);
                     }
                 }
-            }
-
-            return (TService)instance;
-        }
-
-        private void CleanUpScope()
-        {
-            try
-            {
-                this.ExecuteAllRegisteredEndWebRequestDelegates();
-            }
-            finally
-            {
-                this.DisposeAllRegisteredDisposables();
-            }
-        }
-
-        private void ExecuteAllRegisteredEndWebRequestDelegates()
-        {
-            if (this.actions != null)
-            {
-                foreach (var action in this.actions)
-                {
-                    action();
-                }
-            }
-
-            this.actions = null;
-        }
-
-        private void DisposeAllRegisteredDisposables()
-        {
-            if (this.disposables != null)
-            {
-                // Dispose all instances in the opposite order in which they are created. This prevents
-                // prevents ObjectDisposedExceptions from being thrown when dependent services are called
-                // from within the Dispose method.
-                WcfOperationLifestyle.DisposeInstances(this.disposables);
-
-                this.disposables = null;
-            }            
-        }
-
-        private sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
-        {
-            internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
-
-            public bool Equals(T x, T y)
-            {
-                return object.ReferenceEquals(x, y);
-            }
-
-            public int GetHashCode(T obj)
-            {
-                return RuntimeHelpers.GetHashCode(obj);
             }
         }
     }

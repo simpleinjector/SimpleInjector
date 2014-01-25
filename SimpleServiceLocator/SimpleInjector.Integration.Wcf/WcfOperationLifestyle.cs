@@ -26,10 +26,6 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq.Expressions;
-    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
@@ -44,16 +40,15 @@ namespace SimpleInjector.Integration.Wcf
     /// </example>
     public class WcfOperationLifestyle : ScopedLifestyle
     {
-        internal static readonly Lifestyle WithDisposal = new WcfOperationLifestyle(true);
+        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle(true);
 
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
 
-        private readonly bool disposeInstances;
-        
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
-        public WcfOperationLifestyle() : this(disposeInstanceWhenOperationEnds: true)
+        public WcfOperationLifestyle() 
+            : this(disposeInstanceWhenOperationEnds: true)
         {
         }
 
@@ -62,9 +57,9 @@ namespace SimpleInjector.Integration.Wcf
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
         /// operation ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds) : base("WCF Operation")
+        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds)
+            : base("WCF Operation", disposeInstanceWhenOperationEnds)
         {
-            this.disposeInstances = disposeInstanceWhenOperationEnds;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -86,189 +81,32 @@ namespace SimpleInjector.Integration.Wcf
         /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
         public static void WhenWcfOperationEnds(Container container, Action action)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(action, "action");
-
-            var scope = container.GetCurrentWcfOperationScope();
-
-            if (scope == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException("This method can only be called within the context of " +
-                    "an active WCF operation.");
-            }
-
-            scope.RegisterDelegateForScopeEnd(action);
+            WithDisposal.WhenScopeEnds(container, action);
         }
 
         /// <summary>
-        /// Allows registering an <paramref name="action"/> delegate that will be called when the current WCF 
-        /// operation ends, but before the scope disposes any instances.
+        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
+        /// the context of such scope.
         /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="action">The delegate to run when the WCF operation ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
-        /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
-        public override void WhenScopeEnds(Container container, Action action)
+        /// <param name="container">The container for which the delegate gets created.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
+        protected override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            WhenWcfOperationEnds(container, action);
+            var manager = container.GetWcfOperationScopeManager();
+
+            return () => manager.CurrentScope;
         }
 
         /// <summary>
-        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
-        /// WCF operation ends.
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="disposable">The instance that should be disposed when the WCF operation ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
-        /// in the context of a WCF operation.</exception>
-        public override void RegisterForDisposal(Container container, IDisposable disposable)
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected override Scope GetCurrentScope(Container container)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(disposable, "disposable");
-
-            var scope = container.GetCurrentWcfOperationScope();
-
-            if (scope == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException("This method can only be called within the context of " +
-                    "an active WCF operation.");
-            }
-
-            scope.RegisterForDisposal(disposable);
-        }
-
-        internal static new void DisposeInstances(IList<IDisposable> disposables)
-        {
-            ScopedLifestyle.DisposeInstances(disposables);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "Supplying the generic type arguments is needed, since internal types can not " +
-                            "be created using the non-generic overloads in a sandbox.")]
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-        {
-            return new WcfOperationRegistration<TService, TImplementation>(this, container, this.disposeInstances);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
-        {
-            return new WcfOperationRegistration<TService, TService>(this, container, this.disposeInstances,
-                instanceCreator);
-        }
-
-        private class WcfOperationRegistration<TService, TImplementation> : Registration
-            where TService : class
-            where TImplementation : class, TService
-        {
-            private readonly bool disposeInstances;
-            private readonly Func<TService> userSuppliedInstanceCreator;
-
-            private Func<TService> instanceCreator;
-            private WcfOperationScopeManager manager;
-
-            internal WcfOperationRegistration(Lifestyle lifestyle, Container container,
-                bool disposeInstances, Func<TService> userSuppliedInstanceCreator = null)
-                : base(lifestyle, container)
-            {
-                this.disposeInstances = disposeInstances;
-                this.userSuppliedInstanceCreator = userSuppliedInstanceCreator;
-            }
-
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
-
-            public override Expression BuildExpression()
-            {
-                if (this.instanceCreator == null)
-                {
-                    this.manager = this.Container.GetWcfOperationScopeManager();
-
-                    this.instanceCreator = this.BuildInstanceCreator();
-                }
-
-                return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
-            }
-
-            // This method needs to be public, because the BuildExpression methods build a
-            // MethodCallExpression using this method, and this would fail in partial trust when the 
-            // method is not public.
-            public TService GetInstance()
-            {
-                var scope = this.manager.CurrentScope;
-
-                if (scope == null)
-                {
-                    return this.GetInstanceWithoutScope();
-                }
-
-                return scope.GetInstance(this, this.instanceCreator, this.disposeInstances);
-            }
-
-            private Func<TService> BuildInstanceCreator()
-            {
-                if (this.userSuppliedInstanceCreator == null)
-                {
-                    return this.BuildTransientDelegate<TService, TImplementation>();
-                }
-                else
-                {
-                    return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
-                }
-            }
-
-            private TService GetInstanceWithoutScope()
-            {
-                if (this.Container.IsVerifying())
-                {
-                    // Return a transient instance when this method is called during verification
-                    return this.instanceCreator();
-                }
-
-                throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
-                    "'Per Wcf Operation', but the instance is requested outside the context of a WCF " +
-                    "operation.");
-            }
+            return container.GetWcfOperationScopeManager().CurrentScope;
         }
     }
 }

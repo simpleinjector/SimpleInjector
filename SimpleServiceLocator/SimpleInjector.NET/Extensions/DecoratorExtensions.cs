@@ -166,12 +166,14 @@ namespace SimpleInjector.Extensions
             container.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
         }
 
+#if !PUBLISH
         public static void RegisterDecorator(this Container container, Type serviceType, 
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory,
             Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
         {
             // TODO:
         }
+#endif
 
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 

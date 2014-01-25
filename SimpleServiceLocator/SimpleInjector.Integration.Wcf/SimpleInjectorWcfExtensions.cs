@@ -41,7 +41,7 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWcfExtensions
     {
-        private static readonly object managerKey = new object();
+        private static readonly object ManagerKey = new object();
 
         /// <summary>
         /// Registers the WCF services instances (public classes that implement an interface that
@@ -246,18 +246,18 @@ namespace SimpleInjector
 
         internal static WcfOperationScopeManager GetWcfOperationScopeManager(this Container container)
         {
-            var manager = (WcfOperationScopeManager)container.GetItem(managerKey);
+            var manager = (WcfOperationScopeManager)container.GetItem(ManagerKey);
 
             if (manager == null)
             {
-                lock (managerKey)
+                lock (ManagerKey)
                 {
-                    manager = (WcfOperationScopeManager)container.GetItem(managerKey);
+                    manager = (WcfOperationScopeManager)container.GetItem(ManagerKey);
 
                     if (manager == null)
                     {
                         manager = new WcfOperationScopeManager();
-                        container.SetItem(managerKey, manager);
+                        container.SetItem(ManagerKey, manager);
                     }
                 }
             }

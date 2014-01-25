@@ -6,8 +6,12 @@ Version vNext
 	General description:
 
 	Improvements:
-		[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping/EnablePerWcfOperationLifestyle 
-		when no lifetime scoped instances are registered.
+		-[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping/EnablePerWcfOperationLifestyle 
+		 when no lifetime scoped instances are registered.
+		-[Core] Design of the ScopedLifestyle class improved to make it easier to create custom lifestyles.
+		-[Core/LifestyleScoping/Web/Wcf] Performance improvements for ScopeLifestyle derivatives. Resolving 
+		 the scope is now done once per compiled delegate and resolving an scoped instance from that scope is 
+		 also done just once per compiled delegate. (work item 20641)
 
 
 Version 2.4.1 (v2.4.1 RTM) 2014-01-14

@@ -439,12 +439,9 @@
                 this.realLifestyle = realLifestyle;
             }
 
-            public override void WhenScopeEnds(Container container, Action action)
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
             {
-            }
-
-            public override void RegisterForDisposal(Container container, IDisposable disposable)
-            {
+                throw new NotImplementedException();
             }
 
             protected override int Length

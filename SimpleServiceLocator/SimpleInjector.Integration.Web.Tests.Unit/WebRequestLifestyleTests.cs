@@ -65,7 +65,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This method can only be called in the context of a web request.", action);
+                "This method can only be called within the context of an active Web Request.", action);
         }
         
         [TestMethod]
@@ -157,7 +157,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This method can only be called in the context of a web request.", action);
+                "This method can only be called within the context of an active Web Request.", action);
         }
 
         [TestMethod]
@@ -248,7 +248,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This method can only be called in the context of a web request.", action);
+                "This method can only be called within the context of an active Web Request.", action);
         }
     }
 }

@@ -115,9 +115,9 @@ namespace SimpleInjector
 
             Func<object[], object> create = CompileDelegateInDynamicAssembly(container, lambda);
 
-            object[] contants = constantExpressions.Select(c => c.Value).ToArray();
+            object[] constants = constantExpressions.Select(c => c.Value).ToArray();
 
-            return () => create(contants);
+            return () => create(constants);
         }
 
         private static Func<object> CompileInDynamicAssemblyAsStatic(Container container, Expression expression)

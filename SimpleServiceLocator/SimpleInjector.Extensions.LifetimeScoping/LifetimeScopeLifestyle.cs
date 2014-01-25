@@ -71,11 +71,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </example>
     public sealed class LifetimeScopeLifestyle : ScopedLifestyle
     {
-        internal static readonly Lifestyle WithDisposal = new LifetimeScopeLifestyle(true);
+        internal static readonly LifetimeScopeLifestyle WithDisposal = new LifetimeScopeLifestyle(true);
 
         internal static readonly LifetimeScopeLifestyle NoDisposal = new LifetimeScopeLifestyle(false);
-
-        private readonly bool disposeInstances;
 
         /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -92,9 +90,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <see cref="IDisposable"/>. 
         /// </param>
         public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds)
-            : base("Lifetime Scope")
+            : base("Lifetime Scope", disposeInstanceWhenLifetimeScopeEnds)
         {
-            this.disposeInstances = disposeInstanceWhenLifetimeScopeEnds;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -116,191 +113,37 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
         public static void WhenCurrentScopeEnds(Container container, Action action)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(action, "action");
+            WithDisposal.WhenScopeEnds(container, action);
+        }
 
-            var scope = container.GetCurrentLifetimeScope();
-
-            if (scope == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException("This method can only be called within the context of " +
-                    "an active lifetime scope. Make sure you call container.BeginLifetimeScope() first.");
-            }
-
-            scope.RegisterDelegateForScopeEnd(action);
+        internal static LifetimeScopeLifestyle Get(bool withDisposal)
+        {
+            return withDisposal ? WithDisposal : NoDisposal;
         }
 
         /// <summary>
-        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
-        /// but before the scope disposes any instances.
+        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
+        /// the context of such scope.
         /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="action">The delegate to run when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
-        /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
-        public override void WhenScopeEnds(Container container, Action action)
+        /// <param name="container">The container for which the delegate gets created.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
+        protected override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            WhenCurrentScopeEnds(container, action);
+            var manager = container.GetLifetimeScopeManager();
+
+            return () => manager.CurrentScope;
         }
 
         /// <summary>
-        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
-        /// scope ends.
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
-        /// scope for the supplied <paramref name="container"/>.</exception>
-        public override void RegisterForDisposal(Container container, IDisposable disposable)
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected override Scope GetCurrentScope(Container container)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(disposable, "disposable");
-
-            var scope = container.GetCurrentLifetimeScope();
-
-            if (scope == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException("This method can only be called within the context of " +
-                    "an active lifetime scope. Make sure you call container.BeginLifetimeScope() first.");
-            }
-
-            scope.RegisterForDisposal(disposable);
-        }
-
-        internal static new void DisposeInstances(IList<IDisposable> disposables)
-        {
-            ScopedLifestyle.DisposeInstances(disposables);
-        }
-
-        internal static Lifestyle Get(bool disposeWhenLifetimeScopeEnds)
-        {
-            return disposeWhenLifetimeScopeEnds ? WithDisposal : NoDisposal;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-        {
-            return new LifetimeScopeRegistration<TService, TImplementation>(this, container, this.disposeInstances);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
-        {
-            return new LifetimeScopeRegistration<TService, TService>(this, container, this.disposeInstances, 
-                instanceCreator);
-        }
-        
-        private class LifetimeScopeRegistration<TService, TImplementation> : Registration
-            where TService : class
-            where TImplementation : class, TService
-        {
-            private readonly bool disposeInstances;
-            private readonly Func<TService> userSuppliedInstanceCreator;
-
-            private Func<TService> instanceCreator;
-            private LifetimeScopeManager manager;
-
-            internal LifetimeScopeRegistration(Lifestyle lifestyle, Container container,
-                bool disposeInstances, Func<TService> userSuppliedInstanceCreator = null)
-                : base(lifestyle, container)
-            {
-                this.disposeInstances = disposeInstances;
-                this.userSuppliedInstanceCreator = userSuppliedInstanceCreator;
-            }
-
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
-
-            public override Expression BuildExpression()
-            {
-                if (this.instanceCreator == null)
-                {
-                    this.manager = this.Container.GetLifetimeScopeManager();
-
-                    this.instanceCreator = this.BuildInstanceCreator();
-                }
-
-                return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
-            }
-
-            // This method needs to be public, because the BuildExpression methods build a
-            // MethodCallExpression using this method, and this would fail in partial trust when the 
-            // method is not public.
-            public TService GetInstance()
-            {
-                var scope = this.manager.CurrentScope;
-
-                if (scope == null)
-                {
-                    return this.GetInstanceWithoutScope();
-                }
-
-                return scope.GetInstance(this, this.instanceCreator, this.disposeInstances);
-            }
-
-            private Func<TService> BuildInstanceCreator()
-            {
-                if (this.userSuppliedInstanceCreator == null)
-                {
-                    return this.BuildTransientDelegate<TService, TImplementation>();
-                }
-                else
-                {
-                    return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
-                }
-            }
-
-            private TService GetInstanceWithoutScope()
-            {
-                if (this.Container.IsVerifying())
-                {
-                    // Return a transient instance when this method is called during verification
-                    return this.instanceCreator();
-                }
-
-                throw new ActivationException("The " + typeof(TService).Name + " is registered as " +
-                    "'Lifetime Scope', but the instance is requested outside the context of a lifetime " +
-                    "scope. Make sure you call container.BeginLifetimeScope() first.");
-            }
+            return container.GetLifetimeScopeManager().CurrentScope;
         }
     }
 }

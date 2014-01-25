@@ -27,9 +27,7 @@ namespace SimpleInjector.Integration.Web
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using System.Web;
-    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single HTTP Web Request.
@@ -46,11 +44,11 @@ namespace SimpleInjector.Integration.Web
     /// </example>
     public sealed class WebRequestLifestyle : ScopedLifestyle
     {
-        internal static readonly Lifestyle WithDisposal = new WebRequestLifestyle();
+        internal static readonly WebRequestLifestyle WithDisposal = new WebRequestLifestyle();
 
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
-        private readonly bool disposeInstances;
+        private static readonly object ScopeKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -64,9 +62,9 @@ namespace SimpleInjector.Integration.Web
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : base("Web Request")
+        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds)
+            : base("Web Request", disposeInstanceWhenWebRequestEnds)
         {
-            this.disposeInstances = disposeInstanceWhenWebRequestEnds;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -88,78 +86,7 @@ namespace SimpleInjector.Integration.Web
         /// in the context of a web request.</exception>
         public static void WhenCurrentRequestEnds(Container container, Action action)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(action, "action");
-
-            var context = HttpContext.Current;
-
-            if (context == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException(
-                    "This method can only be called in the context of a web request.");
-            }
-
-            SimpleInjectorWebExtensions.RegisterDelegateForWebRequestEnd(context, action);
-        }
-
-        /// <summary>
-        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
-        /// but before the scope disposes any instances.
-        /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="action">The delegate to run when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
-        /// in the context of a web request.</exception>
-        public override void WhenScopeEnds(Container container, Action action)
-        {
-            WhenCurrentRequestEnds(container, action);
-        }
-
-        /// <summary>
-        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
-        /// web request ends.
-        /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="disposable">The instance that should be disposed when the web request ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
-        /// in the context of a web request.</exception>
-        public override void RegisterForDisposal(Container container, IDisposable disposable)
-        {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(disposable, "disposable");
-
-            var context = HttpContext.Current;
-
-            if (context == null)
-            {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
-                throw new InvalidOperationException(
-                    "This method can only be called in the context of a web request.");
-            }
-
-            SimpleInjectorWebExtensions.RegisterDisposableForEndWebRequest(context, disposable);
-        }
-
-        internal static new void DisposeInstances(IList<IDisposable> disposables)
-        {
-            ScopedLifestyle.DisposeInstances(disposables);
+            WithDisposal.WhenScopeEnds(container, action);
         }
 
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
@@ -167,136 +94,68 @@ namespace SimpleInjector.Integration.Web
             return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        internal static void RegisterForDisposal(IDisposable disposable, HttpContext context)
         {
-            return new WebRequestRegistration<TService, TImplementation>(this, container, this.disposeInstances);
+            GetCurrentScope(context).RegisterForDisposal(disposable);
+        }
+
+        internal static void CleanUpWebRequest()
+        {
+            Scope scope = (Scope)HttpContext.Current.Items[ScopeKey];
+
+            if (scope != null)
+            {
+                scope.Dispose();
+            }
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
+        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
+        /// the context of such scope.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
+        /// <param name="container">The container for which the delegate gets created.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
+        protected override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            return new WebRequestRegistration<TService, TService>(this, container, this.disposeInstances, 
-                instanceCreator);
+            Requires.IsNotNull(container, "container");
+
+            return () => GetCurrentScope(HttpContext.Current);
         }
 
-        private class WebRequestRegistration<TService, TImplementation> : Registration
-            where TService : class
-            where TImplementation : class, TService
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected override Scope GetCurrentScope(Container container)
         {
-            private readonly object key = new object();
+            Requires.IsNotNull(container, "container");
 
-            private readonly bool disposeInstances;
-            private readonly Func<TService> userSuppliedInstanceCreator;
+            return GetCurrentScope(HttpContext.Current);
+        }
 
-            private Func<TService> instanceCreator;
-
-            internal WebRequestRegistration(Lifestyle lifestyle, Container container,
-                bool disposeInstances, Func<TService> userSuppliedInstanceCreator = null)
-                : base(lifestyle, container)
+        private static Scope GetCurrentScope(HttpContext context)
+        {
+            if (context == null)
             {
-                this.disposeInstances = disposeInstances;
-                this.userSuppliedInstanceCreator = userSuppliedInstanceCreator;
+                return null;
             }
 
-            public override Type ImplementationType
+            Scope scope = (Scope)context.Items[ScopeKey];
+
+            if (scope == null)
             {
-                get { return typeof(TImplementation); }
+                // If there are multiple container instances that run on the same request (which is a
+                // strange but valid scenario), all containers will get the same Scope instance for that
+                // request. This behavior is correct and even allows all instances that are registered for
+                // disposal to be disposed in reversed order of creation, independant of the container that
+                // created them.
+                context.Items[ScopeKey] = scope = new Scope();
             }
 
-            public override Expression BuildExpression()
-            {
-                if (this.instanceCreator == null)
-                {
-                    this.instanceCreator = this.BuildInstanceCreator();
-                }
-
-                return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
-            }
-
-            public TService GetInstance()
-            {
-                // This method needs to be public, because the BuildExpression extension methods build a
-                // MethodCallExpression using this method, and this would fail in partial trust when the 
-                // method is not public.
-                var context = HttpContext.Current;
-
-                if (context == null)
-                {
-                    return this.GetInstanceWithoutContext();
-                }
-
-                TService instance = (TService)context.Items[this.key];
-
-                if (instance == null)
-                {
-                    context.Items[this.key] = instance = this.instanceCreator();
-
-                    this.RegisterForDisposal(instance);
-                }
-
-                return instance;
-            }
-
-            private Func<TService> BuildInstanceCreator()
-            {
-                if (this.userSuppliedInstanceCreator == null)
-                {
-                    return this.BuildTransientDelegate<TService, TImplementation>();
-                }
-                else
-                {
-                    return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
-                }
-            }
-
-            private TService GetInstanceWithoutContext()
-            {
-                if (this.Container.IsVerifying())
-                {
-                    // Return a transient instance when this method is called during verification
-                    return this.instanceCreator();
-                }
-
-                throw new ActivationException("The " + typeof(TService).FullName + " is registered as " +
-                    "'Web Request', but the instance is requested outside the context of a " +
-                    "web request (HttpContext.Current is null). Make sure instances using this " +
-                    "lifestyle are not resolved during the application initialization phase and when " +
-                    "running on a background thread. For resolving instances on background threads, " +
-                    "try registering this instance as 'Per Lifetime Scope': https://bit.ly/N1s8hN.");
-            }
-
-            private void RegisterForDisposal(TService instance)
-            {
-                if (this.disposeInstances)
-                {
-                    var disposableInstance = instance as IDisposable;
-
-                    if (disposableInstance != null)
-                    {
-                        SimpleInjectorWebExtensions.RegisterForDisposal(disposableInstance);
-                    }
-                }
-            }
+            return scope;
         }
     }
 }

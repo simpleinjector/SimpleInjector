@@ -23,35 +23,44 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.Web
+namespace SimpleInjector.Advanced.Internal
 {
-    using System.Web;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Simple Injector web integration HTTP Module. This module is registered automatically by ASP.NET when
-    /// the assembly of this class is included in the application's bin folder. The module will trigger the
-    /// disposing of created instances that are flagged as needing to be disposed at the end of the web 
-    /// request.
+    /// This is an internal type. Only depend on this type when you want to be absolutely sure a future 
+    /// version of the framework will break your code.
     /// </summary>
-    public sealed class SimpleInjectorHttpModule : IHttpModule
+    [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
+        Justification = "This struct is not intended for public use.")]
+    public struct LazyScope
     {
-        /// <summary>Initializes a module and prepares it to handle requests.</summary>
-        /// <param name="context">An <see cref="HttpApplication"/> that provides access to the methods, 
-        /// properties, and events common to all application objects within an ASP.NET application.</param>
-        void IHttpModule.Init(HttpApplication context)
+        private Func<Scope> scopeFactory;
+        private Scope value;
+
+        /// <summary>Initializes a new instance of the <see cref="LazyScope"/> struct.</summary>
+        /// <param name="scopeFactory">The scope factory.</param>
+        public LazyScope(Func<Scope> scopeFactory)
         {
-            context.EndRequest += (sender, e) =>
-            {
-                WebRequestLifestyle.CleanUpWebRequest();
-            };
+            this.scopeFactory = scopeFactory;
+            this.value = null;
         }
 
-        /// <summary>
-        /// Disposes of the resources (other than memory) used by the module that implements 
-        /// <see cref="IHttpModule"/>.
-        /// </summary>
-        void IHttpModule.Dispose()
+        /// <summary>Gets the lazily initialized Scope of the current LazyScope instance.</summary>
+        /// <value>The current Scope or null.</value>
+        public Scope Value
         {
+            get
+            {
+                if (this.scopeFactory != null)
+                {
+                    this.value = this.scopeFactory.Invoke();
+                    this.scopeFactory = null;
+                }
+
+                return this.value;
+            }
         }
     }
 }
