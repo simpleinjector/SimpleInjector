@@ -47,15 +47,8 @@ namespace SimpleInjector.Diagnostics
             this.Children = new ReadOnlyCollection<DiagnosticGroup>(children.ToList());
             this.Results = new ReadOnlyCollection<DiagnosticResult>(results.ToList());
 
-            foreach (var child in this.Children)
-            {
-                child.Parent = this;
-            }
-
-            foreach (var result in this.Results)
-            {
-                result.Group = this;
-            }
+            this.InitializeChildren();
+            this.InitializeResults();
         }
 
         /// <summary>
@@ -94,5 +87,21 @@ namespace SimpleInjector.Diagnostics
         /// <summary>Gets the collection of <see cref="DiagnosticResult"/> instances.</summary>
         /// /// <value>A collection of <see cref="DiagnosticResult"/> elements.</value>
         public ReadOnlyCollection<DiagnosticResult> Results { get; private set; }
+
+        private void InitializeChildren()
+        {
+            foreach (var child in this.Children)
+            {
+                child.Parent = this;
+            }
+        }
+
+        private void InitializeResults()
+        {
+            foreach (var result in this.Results)
+            {
+                result.Group = this;
+            }
+        }
     }
 }
