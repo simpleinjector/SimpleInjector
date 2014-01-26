@@ -5,6 +5,7 @@
     using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -27,7 +28,7 @@
                 container.GetInstance<ICommand>();
             }
         }
-        
+
         [TestMethod]
         public void GetInstance_RegistrationUsingFuncLifetimeScopeLifestyle_Succeeds()
         {
@@ -1290,7 +1291,26 @@
                     container.GetInstance<ClassDependingOn<ClassDependingOn<ICommand>, ClassDependingOn<ICommand>>>();
             }
         }
-        
+
+        [TestMethod]
+        public void BuildExpression_ManuallyCompiledToDelegate_CanBeExecutedSuccessfully()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+
+            var factory = Expression.Lambda<Func<ICommand>>(
+                container.GetRegistration(typeof(ICommand)).BuildExpression())
+                .Compile();
+
+            using (container.BeginLifetimeScope())
+            {
+                // Act
+                factory();
+            }
+        }
+
         public class ConcreteCommand : ICommand
         {
             public void Execute()

@@ -78,6 +78,11 @@ namespace SimpleInjector.Lifestyles
             this.CurrentLifestyle.RegisterForDisposal(container, disposable);
         }
 
+        internal string GetHybridName()
+        {
+            return GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
+        }
+
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
             var trueProvider = this.trueLifestyle.CreateCurrentScopeProvider(container);
@@ -91,21 +96,9 @@ namespace SimpleInjector.Lifestyles
             return () => this.lifestyleSelector() ? trueProvider() : falseProvider();
         }
 
-        protected internal override Scope GetCurrentScope(Container container)
-        {
-            return this.CurrentLifestyle.GetCurrentScope(container);
-        }
-
-        private string GetHybridName()
-        {
-            return GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
-        }
-
         private static string GetHybridName(Lifestyle lifestyle)
         {
-            var hybrid = lifestyle as ScopedHybridLifestyle;
-
-            return hybrid != null ? hybrid.GetHybridName() : (lifestyle != null ? lifestyle.Name : "Null");
+            return HybridLifestyle.GetHybridName(lifestyle);
         }
     }
 }

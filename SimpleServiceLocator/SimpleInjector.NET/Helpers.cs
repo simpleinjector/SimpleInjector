@@ -51,11 +51,6 @@ namespace SimpleInjector
             return new Lazy<T>(() => value, LazyThreadSafetyMode.None);
         }
 
-        internal static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T element)
-        {
-            return source.Concat(Enumerable.Repeat(element, 1));
-        }
-
         internal static string ToCommaSeparatedText(this IEnumerable<string> values)
         {
             var names = values.ToArray();
@@ -188,24 +183,11 @@ namespace SimpleInjector
 
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
-            IEnumerable castedCollection;
+            // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
+            // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
+            var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 
-            if (typeof(IEnumerable<>).MakeGenericType(resultType).IsAssignableFrom(collection.GetType()))
-            {
-                // The collection is a IEnumerable<[ServiceType]>. We can simply cast it. 
-                // Better for performance
-                castedCollection = collection;
-            }
-            else
-            {
-                // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
-                // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
-                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
-
-                castedCollection = (IEnumerable)castMethod.Invoke(null, new[] { collection });
-            }
-
-            return castedCollection;
+            return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)

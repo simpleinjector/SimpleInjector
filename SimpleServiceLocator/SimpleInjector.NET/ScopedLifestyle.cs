@@ -33,7 +33,11 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>
-    /// Base class for scoped lifestyles.
+    /// Base class for scoped lifestyles. A scoped lifestyle caches instances for the duration of an implicitly
+    /// or explicitly defined scope. Such scope can be an (implicitly defined) web request or an explicitly
+    /// defined Lifetime Scope. The lifetime of instances registered with a scoped lifestyle is always equal
+    /// or bigger than one-instance-per-object-graph. In other words, a call to GetInstance() will never create
+    /// more than one instance of such registered type.
     /// </summary>
     public abstract class ScopedLifestyle : Lifestyle
     {

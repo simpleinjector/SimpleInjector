@@ -130,7 +130,6 @@
     <Compile Include="Extensions\OpenGenericPredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Extensions\TypeConstraintValidator.cs" />
-    <Compile Include="FullSpecific\Helpers.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />
     <Compile Include="Lifestyles\ExpressionRegistration.cs" />
     <Compile Include="Lifestyles\HybridLifestyle.cs" />

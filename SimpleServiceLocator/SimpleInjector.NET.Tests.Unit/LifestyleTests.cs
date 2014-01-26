@@ -123,7 +123,7 @@
             Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
             Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
         }
-        
+
         [TestMethod]
         public void GetInstance_OnProducerCreatedUsingLifestyleCreateProducer1_ExpressionBuildingGetsSuppliedWithExpectedServiceType()
         {
@@ -204,10 +204,61 @@
             Assert.AreEqual(expectedRegisteredServiceType, actualRegisteredServiceType,
                 "The RegisteredServiceType supplied to the ExpressionBuilding should be IPlugin.");
         }
-        
+
+        [TestMethod]
+        public void CreateRegistrationConcreteGeneric_WithNullArgument1_ThrowsArgumentNullException()
+        {
+            // Act
+            Action action = () => Lifestyle.Transient.CreateRegistration(null, new Container());
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("concreteType", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationConcreteGeneric_WithNullArgument2_ThrowsArgumentNullException()
+        {
+            // Act
+            Action action = () => Lifestyle.Transient.CreateRegistration(typeof(PluginImpl), null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("container", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationConcreteGeneric_WithNullArgument_ThrowsArgumentNullException()
+        {
+            // Act
+            Action action = () => Lifestyle.Transient.CreateRegistration<PluginImpl>(null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("container", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationConcreteNonGeneric_WithValidArguments_Succeeds()
+        {
+            // Act
+            var registration = Lifestyle.Transient.CreateRegistration(typeof(PluginImpl), new Container());
+
+            // Assert
+            Assert.IsNotNull(registration);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationConcreteGeneric_WithValidArguments_Succeeds()
+        {
+            // Act
+            var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(new Container());
+
+            // Assert
+            Assert.IsNotNull(registration);
+        }
+
         private sealed class FakeLifestyle : Lifestyle
         {
-            public FakeLifestyle(string name) : base(name)
+            public FakeLifestyle(string name)
+                : base(name)
             {
             }
 
@@ -222,7 +273,7 @@
                 throw new NotImplementedException();
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
                 throw new NotImplementedException();

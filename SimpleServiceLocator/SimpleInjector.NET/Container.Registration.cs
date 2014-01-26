@@ -1204,13 +1204,14 @@ namespace SimpleInjector
 
             try
             {
-                this.RegisterAllInternal(serviceType, collection.Cast<object>().MakeReadOnly());
+                this.RegisterAllInternal(serviceType, collection);
             }
             catch (MemberAccessException ex)
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw Helpers.CreateArgumentException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex), "serviceType", ex);
+                throw new ArgumentException(
+                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex) +
+                    "\nparamName: " + "serviceType", ex);
             }
         }
 
@@ -1467,8 +1468,10 @@ namespace SimpleInjector
             this.AddRegistration(typeof(IEnumerable<>).MakeGenericType(serviceType), registration);
         }
 
-        private void RegisterAllInternal(Type serviceType, IEnumerable readOnlyCollection)
+        private void RegisterAllInternal(Type serviceType, IEnumerable collection)
         {
+            IEnumerable readOnlyCollection = collection.Cast<object>().MakeReadOnly();
+
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
 
             this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);

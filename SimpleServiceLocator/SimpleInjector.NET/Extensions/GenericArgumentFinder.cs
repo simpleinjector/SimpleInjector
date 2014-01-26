@@ -115,37 +115,6 @@ namespace SimpleInjector.Extensions
                 .ToArray();
         }
 
-        private void RemoveDuplicateTypeArguments(ref IEnumerable<ArgumentMapping> mappings)
-        {
-            // Prevent removing duplicates when the type is open generic. This doesn't work when we're in the
-            // registration phase (where our serviceTypeToResolve is an open generic type).
-            if (this.areWeSearchingForAClosedGenericType)
-            {
-                // When a single type argument satisfies multiple concrete types (i.e. an TKey that can both 
-                // be an Int32 and Double), it is impossible to resolve it. Those duplicates will be removed. 
-                // This means that the open generic implementation is incompatible with the given arguments 
-                // and will later on prevent a closed generic implementation to be returned.
-                mappings = (
-                    from mapping in mappings
-                    group mapping by mapping.Argument into mappingGroup
-                    where mappingGroup.Count() == 1
-                    select mappingGroup.First())
-                    .ToArray();
-            }
-            else
-            {
-                // In this case we are in the verification phase and all we have is an open generic type. In
-                // that case it is possible that there is an argument with multiple mappings, but that
-                // doesn't necessarily mean that the implementation can't be used. We can just ignore the
-                // duplicate mappings (and pick one of them).
-                mappings = (
-                    from mapping in mappings
-                    group mapping by mapping.Argument into mappingGroup
-                    select mappingGroup.First())
-                    .ToArray();
-            }
-        }
-
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(
             ArgumentMapping mapping, IList<Type> processedTypes)
         {

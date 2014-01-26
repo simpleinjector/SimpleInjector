@@ -57,6 +57,25 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
+        internal static string GetHybridName(Lifestyle lifestyle)
+        {
+            var hybrid = lifestyle as HybridLifestyle;
+
+            if (hybrid != null)
+            {
+                return hybrid.GetHybridName();
+            }
+
+            var scopedHybrid = lifestyle as ScopedHybridLifestyle;
+
+            if (scopedHybrid != null)
+            {
+                return scopedHybrid.GetHybridName();
+            }
+
+            return lifestyle.Name;
+        }
+
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
             Justification = "See base.CreateRegistration for more info.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
@@ -79,13 +98,6 @@ namespace SimpleInjector.Lifestyles
         private string GetHybridName()
         {
             return GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
-        }
-
-        private static string GetHybridName(Lifestyle lifestyle)
-        {
-            var hybrid = lifestyle as HybridLifestyle;
-
-            return hybrid != null ? hybrid.GetHybridName() : (lifestyle != null ? lifestyle.Name : "Null");
         }
     }
 }

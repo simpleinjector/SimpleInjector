@@ -186,12 +186,7 @@ namespace SimpleInjector
         {
             get { return this.verifiers != null; }
         }
-
-        internal bool HasSuccessfullyCreatedInstances 
-        {
-            get { return this.validator == null; }
-        }
-
+        
         internal string DebuggerDisplay
         {
             get

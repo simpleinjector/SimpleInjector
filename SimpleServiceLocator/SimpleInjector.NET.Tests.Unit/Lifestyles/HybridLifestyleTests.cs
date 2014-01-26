@@ -535,6 +535,34 @@
             Assert.AreEqual(0, falseLifestyle.RegisterForDisposalCallCount, "FalseLifestyle was NOT expected to be called.");
         }
 
+        [TestMethod]
+        public void CreateHybrid_WithMixedHybridAndScopedHybrid1_CreatesExpectedLifestyleName()
+        {
+            // Act
+            var lifestyle = Lifestyle.CreateHybrid(() => true,
+                Lifestyle.CreateHybrid(() => true,
+                    new CustomScopedLifestyle("Custom1"),
+                    new CustomScopedLifestyle("Custom2")),
+                Lifestyle.Transient);
+
+            // Assert
+            Assert.AreEqual("Hybrid Custom1 / Custom2 / Transient", lifestyle.Name);
+        }
+
+        [TestMethod]
+        public void CreateHybrid_WithMixedHybridAndScopedHybrid2_CreatesExpectedLifestyleName()
+        {
+            // Act
+            var lifestyle = Lifestyle.CreateHybrid(() => true,
+                Lifestyle.CreateHybrid(() => true,
+                    Lifestyle.Transient,
+                    Lifestyle.Singleton),
+                new CustomScopedLifestyle("Custom1"));
+
+            // Assert
+            Assert.AreEqual("Hybrid Transient / Singleton / Custom1", lifestyle.Name);
+        }
+
         private class DisposableObject : IDisposable
         {
             public void Dispose()
@@ -546,7 +574,7 @@
         {
             private readonly Lifestyle realLifestyle;
 
-            public CustomScopedLifestyle() : base("Custom")
+            public CustomScopedLifestyle(string name = null) : base(name ?? "Custom")
             {
                 this.realLifestyle = Lifestyle.Transient;
             }
