@@ -25,6 +25,7 @@
 
 namespace SimpleInjector.Advanced.Internal
 {
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Lifestyles;
 
@@ -34,6 +35,7 @@ namespace SimpleInjector.Advanced.Internal
     /// </summary>
     /// <typeparam name="TService">Service type.</typeparam>
     /// <typeparam name="TImplementation">Implementation type.</typeparam>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
         Justification = "This struct is not intended for public use.")]
     public struct LazyScopedRegistration<TService, TImplementation>
