@@ -313,9 +313,9 @@
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
         }
-        
+
         [TestMethod]
-        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntimeAndBuildExpressionCalledExplicitly_ThrowsInvalidOperationException()
+        public void Verify_RegistrationWithDecoratorThatCanNotBeCreatedAtRuntimeAndBuildExpressionCalledExplicitly_ThrowsInvalidOperationException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -330,6 +330,8 @@
             Action action = () => container.Verify();
 
             // Assert
+            // This test verifies a bug: Calling InstanceProducer.BuildExpression flagged the producer to be 
+            // skipped when calling Verify() while it was still possible that creating the instance would fail.
             AssertThat.Throws<InvalidOperationException>(action,
                 "The call to BuildExpression should not trigger the verification of IPlugin to be skipped.");
         }
@@ -392,7 +394,15 @@
             {
             }
         }
-        
+
+        public sealed class FailingConstructorPluginDecorator : IPlugin
+        {
+            public FailingConstructorPluginDecorator(IPlugin plugin)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)
@@ -420,14 +430,6 @@
         {
             public PluginConsumer(IPlugin plugin)
             {
-            }
-        }
-
-        private sealed class FailingConstructorPluginDecorator : IPlugin
-        {
-            public FailingConstructorPluginDecorator(IPlugin plugin)
-            {
-                throw new NotImplementedException();
             }
         }
     }
