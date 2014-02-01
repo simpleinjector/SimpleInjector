@@ -98,7 +98,21 @@ namespace SimpleInjector.Integration.Web
 
         internal static void CleanUpWebRequest()
         {
-            Scope scope = (Scope)HttpContext.Current.Items[ScopeKey];
+            var context = HttpContext.Current;
+
+            if (context == null)
+            {
+                throw new InvalidOperationException("HttpContext.Current == null.");
+            }
+
+            var items = context.Items;
+
+            if (items == null)
+            {
+                throw new InvalidOperationException("HttpContext.Current.Items == null.");
+            }
+
+            Scope scope = (Scope)items[ScopeKey];
 
             if (scope != null)
             {
