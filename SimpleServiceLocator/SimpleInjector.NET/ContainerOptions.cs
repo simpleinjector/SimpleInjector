@@ -46,6 +46,10 @@ namespace SimpleInjector
     [DebuggerDisplay("{DebuggerDisplayDescription,nq}")]
     public class ContainerOptions
     {
+        // NOTE: This number should be low to prevent memory leaks, since dynamically created assemblies can't
+        // be unloaded.
+        private const int MaximumNumberOfContainersWithDynamicallyCreatedAssemblies = 5;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool? enableDynamicAssemblyCompilation;
 
@@ -204,7 +208,7 @@ namespace SimpleInjector
 
                 if (this.Container != null)
                 {
-                    return this.Container.ContainerId < 5;
+                    return this.Container.ContainerId < MaximumNumberOfContainersWithDynamicallyCreatedAssemblies;
                 }
 
                 return false;
