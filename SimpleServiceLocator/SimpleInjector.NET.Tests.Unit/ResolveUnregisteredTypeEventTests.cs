@@ -402,7 +402,8 @@
                                
                 Assert.IsNotNull(ex.InnerException, "No inner exception was supplied.");
                 Assert.IsTrue(innerExceptions.Contains(expectedInnerException),
-                    "The supplied inner exception was not the expected inner exception");
+                    "The supplied inner exception was not the expected inner exception. " +
+                    "Actual exception: " + ex.Message);
             }
         }
 
