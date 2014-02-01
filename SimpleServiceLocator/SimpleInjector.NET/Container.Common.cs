@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -52,6 +53,7 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
+    [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]
     public partial class Container
     {
         private static long counter;
@@ -113,8 +115,6 @@ namespace SimpleInjector
             this.RegisterSingle<Container>(this);
 
             this.containerId = Interlocked.Increment(ref counter);
-
-            this.OnCreated();
         }
 
         // Wrapper for instance initializer delegates
@@ -360,8 +360,6 @@ namespace SimpleInjector
                 }
             }
         }
-
-        partial void OnCreated();
 
         private sealed class TypedInstanceInitializer : IInstanceInitializer
         {

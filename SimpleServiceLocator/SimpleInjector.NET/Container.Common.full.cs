@@ -31,26 +31,20 @@ namespace SimpleInjector
 #if !PUBLISH
     /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
 #endif
-    [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]
     public partial class Container
     {
-        private Lazy<ModuleBuilder> moduleBuilder;
+        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(CreateModuleBuilder);
 
-        internal ModuleBuilder ModuleBuilder
+        internal static ModuleBuilder ModuleBuilder
         {
-            get { return this.moduleBuilder.Value; }
+            get { return LazyBuilder.Value; }
         }
 
-        partial void OnCreated()
-        {
-            this.moduleBuilder = new Lazy<ModuleBuilder>(this.CreateModuleBuilder);
-        }
- 
-        private ModuleBuilder CreateModuleBuilder()
+        private static ModuleBuilder CreateModuleBuilder()
         {
             return AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("SimpleInjector.Compiled_" + this.containerId),
-                    AssemblyBuilderAccess.Run)
+                new AssemblyName("SimpleInjector.Compiled"),
+                AssemblyBuilderAccess.Run)
                 .DefineDynamicModule("SimpleInjector.CompiledModule");
         }
     }

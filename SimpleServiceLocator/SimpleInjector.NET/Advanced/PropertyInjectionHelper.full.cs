@@ -40,7 +40,7 @@ namespace SimpleInjector.Advanced
         {
             try
             {
-                var @delegate = CompilationHelpers.CompileLambdaInDynamicAssembly(this.container, expression,
+                var @delegate = CompilationHelpers.CompileLambdaInDynamicAssembly(expression,
                     "DynamicPropertyInjector" + GetNextInjectorClassId(),
                     "InjectProperties");
 
