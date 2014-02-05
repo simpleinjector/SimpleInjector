@@ -25,6 +25,7 @@ namespace SimpleInjector.Advanced
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Lifestyles;
 
@@ -92,17 +93,7 @@ namespace SimpleInjector.Advanced
         {
             foreach (var lazy in this.producers)
             {
-                try
-                {
-                    // We only check if the instance producer can be created. We don't verify building of the
-                    // expression. That will be done up the callstack.
-                    InstanceProducer producer = lazy.Value;
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                        typeof(TService), ex), ex);
-                }
+                VerifyCreatingProducer(lazy);
             }
         }
 
@@ -180,7 +171,22 @@ namespace SimpleInjector.Advanced
         {
             return this.GetEnumerator();
         }
-        
+
+        private static object VerifyCreatingProducer(Lazy<InstanceProducer> lazy)
+        {
+            try
+            {
+                // We only check if the instance producer can be created. We don't verify building of the
+                // expression. That will be done up the callstack.
+                return lazy.Value;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    typeof(TService), ex), ex);
+            }
+        }
+
         private static IEnumerable<Registration> ConvertSingletonsToInstanceProducers(Container container,
             TService[] singletons)
         {

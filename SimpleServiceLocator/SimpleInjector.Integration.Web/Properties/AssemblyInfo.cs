@@ -1,8 +1,8 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
-using System.Security;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -45,3 +45,7 @@ using System.Security;
 [assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
 #pragma warning restore 1699
 #endif
+
+[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", 
+    Target = "SimpleInjector.Integration.Web",
+    Justification = "Can't do much about this.")]

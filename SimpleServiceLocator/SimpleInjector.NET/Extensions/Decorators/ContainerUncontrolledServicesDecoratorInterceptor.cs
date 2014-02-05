@@ -43,30 +43,27 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
-        private readonly ConstructorInfo decoratorConstructor;
-        private readonly Type decoratorType;
+
+        private ConstructorInfo decoratorConstructor;
+        private Type decoratorType;
 
         public ContainerUncontrolledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data,
             Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache,
-            ExpressionBuiltEventArgs e, Type registeredServiceType, Type decoratorType)
+            ExpressionBuiltEventArgs e, Type registeredServiceType)
             : base(data)
         {
             this.singletonDecoratedCollectionsCache = singletonDecoratedCollectionsCache;
             this.e = e;
             this.registeredServiceType = registeredServiceType;
-
-            this.decoratorConstructor = data.Container.Options.ConstructorResolutionBehavior
-                .GetConstructor(this.registeredServiceType, decoratorType);
-
-            // The actual decorator could be different. TODO: must... write... test... for... this.
-            this.decoratorType = this.decoratorConstructor.DeclaringType;
         }
+
+        internal DecoratorPredicateContext Context { get; private set; }
 
         protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
         }
-        
+
         internal bool SatisfiesPredicate()
         {
             // We don't have an expression at this point, since the instances are not created by the container.
@@ -74,12 +71,20 @@ namespace SimpleInjector.Extensions.Decorators
             // have defined.
             var expression = Expression.Constant(null, this.registeredServiceType);
 
-            return this.SatisfiesPredicate(this.e.InstanceProducer, this.registeredServiceType, expression, 
-                Lifestyle.Unknown);
+            this.Context = this.CreatePredicateContext(this.e.InstanceProducer, this.registeredServiceType, 
+                expression, Lifestyle.Unknown);
+
+            return this.SatisfiesPredicate(this.Context);
         }
 
-        internal void ApplyDecorator()
+        internal void ApplyDecorator(Type decoratorType)
         {
+            this.decoratorConstructor = this.Container.Options.ConstructorResolutionBehavior
+                .GetConstructor(this.e.RegisteredServiceType, decoratorType);
+
+            // The actual decorator could be different. TODO: must... write... test... for... this.
+            this.decoratorType = this.decoratorConstructor.DeclaringType;
+            
             var serviceInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer, 
                 this.registeredServiceType, Lifestyle.Unknown);
 

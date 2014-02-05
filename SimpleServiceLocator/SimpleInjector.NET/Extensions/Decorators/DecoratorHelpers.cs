@@ -198,9 +198,13 @@ namespace SimpleInjector.Extensions.Decorators
                 return true;
             }
 
+            if (!parameterType.IsGenericType || !serviceType.IsGenericType)
+            {
+                return false;
+            }
+
             return
-                serviceType.IsGenericType &&
-                parameterType.IsGenericType &&
+                (serviceType.ContainsGenericParameters || parameterType.IsGenericType) &&
                 serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
         }
 

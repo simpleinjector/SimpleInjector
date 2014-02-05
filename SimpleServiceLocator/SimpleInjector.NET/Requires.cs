@@ -211,6 +211,22 @@ namespace SimpleInjector
             }
         }
 
+        internal static void DecoratorFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
+            Type serviceType, Type implementationType)
+        {
+            try
+            {
+                Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                    serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType,
+                    implementationType,
+                    null);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ActivationException(ex.Message);
+            }
+        }
+
         internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
             Type implementationType, string parameterName)
         {
@@ -237,6 +253,28 @@ namespace SimpleInjector
                 throw new ArgumentException(
                     StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(
                         serviceType, decoratorType), parameterName);
+            }
+        }
+
+        internal static void HasFactoryCreatedDecorator(Container container, Type serviceType, Type decoratorType)
+        {
+            try
+            {
+                IsDecorator(container, serviceType, decoratorType, null);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ActivationException(ex.Message);
+            }
+        }
+
+        internal static void DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(Type decoratorType, 
+            Type serviceType)
+        {
+            if (!serviceType.IsAssignableFrom(decoratorType))
+            {
+                throw new ActivationException(StringResources.DecoratorTypeFactoryReturnedIncompatibleType(
+                    serviceType, decoratorType));
             }
         }
 

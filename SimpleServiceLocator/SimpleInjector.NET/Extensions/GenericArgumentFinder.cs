@@ -40,8 +40,6 @@ namespace SimpleInjector.Extensions
         private readonly IList<Type> implementationTypeDefinitionArguments;
         private readonly Type[] partialImplementationArguments;
 
-        private readonly bool areWeSearchingForAClosedGenericType;
-
         public GenericArgumentFinder(Type serviceTypeDefinition, Type serviceTypeToResolve,
             Type implementationTypeDefinition, Type partialOpenGenericImplementation)
         {
@@ -50,8 +48,6 @@ namespace SimpleInjector.Extensions
             this.implementationTypeDefinitionArguments = implementationTypeDefinition.GetGenericArguments();
             this.partialImplementationArguments =
                 (partialOpenGenericImplementation ?? implementationTypeDefinition).GetGenericArguments();
-
-            this.areWeSearchingForAClosedGenericType = !serviceTypeToResolve.ContainsGenericParameters;
         }
 
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation()

@@ -63,7 +63,7 @@ namespace SimpleInjector.Extensions.Decorators
         {
             this.TryToApplyDecorator(e);
 
-            this.TryToApplyCollectionDecorator(e);
+            this.TryToApplyDecoratorOnContainerUncontrolledCollections(e);
         }
 
         private void TryToApplyDecorator(ExpressionBuiltEventArgs e)
@@ -72,24 +72,63 @@ namespace SimpleInjector.Extensions.Decorators
 
             if (this.MustDecorate(e.RegisteredServiceType, out decoratorType))
             {
-                var decoratorInterceptor = 
-                    new ServiceDecoratorExpressionInterceptor(this.data, this.registrationsCache, e, decoratorType);
+                var decoratorInterceptor =
+                    new ServiceDecoratorExpressionInterceptor(this.data, this.registrationsCache, e);
 
                 if (decoratorInterceptor.SatisfiesPredicate())
                 {
-                    decoratorInterceptor.ApplyDecorator();
+                    if (this.data.DecoratorTypeFactory != null)
+                    {
+                        decoratorType = this.GetDecoratorTypeFromDecoratorFactory(
+                            e.RegisteredServiceType, decoratorInterceptor.Context);
+                    }
+                    
+                    if (decoratorType != null)
+                    {
+                        decoratorInterceptor.ApplyDecorator(decoratorType);
+                    }
                 }
             }
         }
 
-        private void TryToApplyCollectionDecorator(ExpressionBuiltEventArgs e)
+        private void TryToApplyDecoratorOnContainerUncontrolledCollections(ExpressionBuiltEventArgs e)
         {
-            if (IsCollectionType(e.RegisteredServiceType))
+            if (!IsCollectionType(e.RegisteredServiceType) ||
+                DecoratorHelpers.IsContainerControlledCollectionExpression(e.Expression))
             {
-                // NOTE: Container controlled collections will decorate themselves.
-                if (!DecoratorHelpers.IsContainerControlledCollectionExpression(e.Expression))
+                // NOTE: Decorators on controlled collections will be applied by the normal mechanism.
+                return;
+            }
+
+            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
+
+            Type decoratorType;
+
+            if (this.MustDecorate(serviceType, out decoratorType))
+            {
+                this.ApplyDecoratorOnContainerUncontrolledCollection(e, decoratorType);
+            }
+        }
+
+        private void ApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e,
+            Type decoratorType)
+        {
+            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
+
+            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(this.data,
+                this.singletonDecoratedCollectionsCache, e, serviceType);
+
+            if (uncontrolledInterceptor.SatisfiesPredicate())
+            {
+                if (this.data.DecoratorTypeFactory != null)
                 {
-                    this.TryToApplyDecoratorOnContainerUncontrolledCollection(e);
+                    decoratorType = this.GetDecoratorTypeFromDecoratorFactory(
+                        serviceType, uncontrolledInterceptor.Context);
+                }
+
+                if (decoratorType != null)
+                {
+                    uncontrolledInterceptor.ApplyDecorator(decoratorType);
                 }
             }
         }
@@ -99,30 +138,6 @@ namespace SimpleInjector.Extensions.Decorators
             return typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType);
         }
         
-        private void TryToApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e)
-        {
-            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
-
-            Type decoratorType;
-
-            if (this.MustDecorate(serviceType, out decoratorType))
-            {
-                this.ApplyDecoratorOnContainerUncontrolledCollection(e, serviceType, decoratorType);
-            }
-        }
-
-        private void ApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e, 
-            Type serviceType, Type decoratorType)
-        {
-            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(this.data, 
-                this.singletonDecoratedCollectionsCache, e, serviceType, decoratorType);
-
-            if (uncontrolledInterceptor.SatisfiesPredicate())
-            {
-                uncontrolledInterceptor.ApplyDecorator();
-            }
-        }
-
         private bool MustDecorate(Type serviceType, out Type decoratorType)
         {
             decoratorType = null;
@@ -139,6 +154,14 @@ namespace SimpleInjector.Extensions.Decorators
                 return false;
             }
 
+            if (this.data.DecoratorTypeFactory != null)
+            {
+                // Since a decorator type factory delegate has been registered, we must assume at this point
+                // that the decorator must be applied, because we can't call the factory at this point. The
+                // predicate must always be called before calling the factory.
+                return true;
+            }
+
             var results = this.BuildClosedGenericImplementation(serviceType);
 
             if (!results.ClosedServiceTypeSatisfiesAllTypeConstraints)
@@ -149,6 +172,41 @@ namespace SimpleInjector.Extensions.Decorators
             decoratorType = results.ClosedGenericImplementation;
 
             return true;
+        }
+
+        private Type GetDecoratorTypeFromDecoratorFactory(Type requestedServiceType, 
+            DecoratorPredicateContext context)
+        {
+            Type decoratorType = this.data.DecoratorTypeFactory(context);
+
+            if (decoratorType.ContainsGenericParameters)
+            {
+                if (!requestedServiceType.IsGenericType)
+                {
+                    throw new ActivationException(
+                        StringResources.TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(
+                            requestedServiceType, decoratorType));
+                }
+
+                Requires.DecoratorFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
+                    requestedServiceType, decoratorType);
+
+                var builder = new GenericTypeBuilder(requestedServiceType, decoratorType);
+
+                decoratorType = builder.BuildClosedGenericImplementation().ClosedGenericImplementation;
+
+                // decoratorType == null when type constraints don't match.
+                if (decoratorType != null)
+                {
+                    Requires.HasFactoryCreatedDecorator(this.data.Container, requestedServiceType, decoratorType);
+                }
+            }
+            else
+            {
+                Requires.DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(decoratorType, requestedServiceType);
+            }
+
+            return decoratorType;
         }
 
         private GenericTypeBuilder.BuildResult BuildClosedGenericImplementation(Type serviceType)

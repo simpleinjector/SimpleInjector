@@ -163,14 +163,101 @@ namespace SimpleInjector.Extensions
             container.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
         }
 
-#if !PUBLISH
+        /// <summary>
+        /// Ensures that the decorator type that is returned from <paramref name="decoratorTypeFactory"/> is 
+        /// supplied when the supplied <paramref name="predicate"/> returns <b>true</b> and cached with the given 
+        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by 
+        /// injecting that service type into the constructor of the decorator type that is returned by the
+        /// supplied <paramref name="decoratorTypeFactory"/>. 
+        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be 
+        /// applied to both open, closed, and non-generic service types.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The types returned from the <paramref name="decoratorTypeFactory"/> may be open-generic. The
+        /// container will try to fill in the generic parameters based on the resolved service type.
+        /// </para>
+        /// <para>
+        /// The <b>RegisterOpenGenericDecorator</b> method works by hooking onto the container's
+        /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
+        /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
+        /// decoration of types that are resolved using unregistered type resolution. The
+        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
+        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>. This allows you to
+        /// use <b>RegisterOpenGenericDecorator</b> on the same service type as <b>RegisterOpenGeneric</b>.
+        /// </para>
+        /// <para>
+        /// Multiple decorators can be applied to the same service type. The order in which they are registered
+        /// is the order they get applied in. This means that the decorator that gets registered first, gets
+        /// applied first, which means that the next registered decorator, will wrap the first decorator, which
+        /// wraps the original service type.
+        /// </para>
+        /// <para>
+        /// Constructor injection will be used on that type, and although it may have many constructor 
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
+        /// An exception will be thrown when this is not the case.
+        /// </para>
+        /// <para>
+        /// The type returned from <paramref name="decoratorTypeFactory"/> may have a constructor with an 
+        /// argument of type <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this 
+        /// case, the framework will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// decorator instance, but it will inject a <see cref="Func{T}"/> that allows
+        /// creating instances of the decorated type, according to the lifestyle of that type. This enables
+        /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
+        /// decorated instance within a certain scope (such as a lifetime scope).
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// The following is an example of the registration of a decorator through the factory delegate:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<ICommandHandler<MoveCustomerCommand>, MoveCustomerCommandHandler>();
+        /// 
+        /// container.RegisterDecorator(
+        ///     typeof(ICommandHandler<>),
+        ///     context => typeof(LoggingCommandHandler<,>).MakeGenericType(
+        ///         typeof(LoggingCommandHandler<,>).GetGenericArguments().First(),
+        ///         context.ImplementationType),
+        ///     Lifestyle.Transient,
+        ///     context => true);
+        ///     
+        /// var handler = container.GetInstance<ICommandHandler<MoveCustomerCommand>>();
+        /// 
+        /// Assert.IsInstanceOfType(handler,
+        ///     typeof(LoggingCommandHandler<MoveCustomerCommand, MoveCustomerCommandHandler>));
+        /// 
+        /// ]]></code>
+        /// The code above allows a generic <b>LoggingCommandHandler&lt;TCommand, TImplementation&gt;</b> to
+        /// be applied to command handlers, where the second generic argument will be filled in using the
+        /// contextual information.
+        /// </example>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="serviceType">The definition of the open generic service type that will
+        /// be wrapped by the decorator type returned by the supplied <paramref name="decoratorTypeFactory"/>.</param>
+        /// <param name="decoratorTypeFactory">A factory that allows building Type objects that define the
+        /// decorators to inject, based on the given contextual information. The delegate is allowed to return
+        /// open-generic types.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
+        /// <param name="predicate">The predicate that determines whether the decorator must be applied to a 
+        /// service type.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
+        /// an open generic type.</exception>
         public static void RegisterDecorator(this Container container, Type serviceType, 
-            Func<DecoratorPredicateContext, Type> decoratorTypeFactory,
-            Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
+            Func<DecoratorPredicateContext, Type> decoratorTypeFactory, Lifestyle lifestyle, 
+            Predicate<DecoratorPredicateContext> predicate)
         {
-            // TODO:
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(decoratorTypeFactory, "decoratorTypeFactory");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(predicate, "predicate");
+
+            var data = new DecoratorExpressionInterceptorData(container, serviceType, null,
+                predicate, lifestyle, decoratorTypeFactory);
+
+            container.ExpressionBuilt += new DecoratorInterceptor(data).ExpressionBuilt;
         }
-#endif
 
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 
@@ -536,10 +623,10 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(lifestyle, "lifestyle");
 
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, 
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
                 decoratorType, "serviceType");
 
-            Requires.ImplementationHasSelectableConstructor(container, serviceType, decoratorType, 
+            Requires.ImplementationHasSelectableConstructor(container, serviceType, decoratorType,
                 "decoratorType");
             Requires.IsDecorator(container, serviceType, decoratorType, "decoratorType");
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType,

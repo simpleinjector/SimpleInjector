@@ -33,31 +33,6 @@ namespace SimpleInjector.Advanced
     {
         private static long injectorClassCounter;
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
-                            "in that case.")]
-        private Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
-        {
-            try
-            {
-                var @delegate = CompilationHelpers.CompileLambdaInDynamicAssembly(expression,
-                    "DynamicPropertyInjector" + GetNextInjectorClassId(),
-                    "InjectProperties");
-
-                // Test the creation. Since we're using a dynamically created assembly, we can't create every
-                // delegate we can create using expression.Compile(), so we need to test this. We need to 
-                // store the created instance because we are not allowed to ditch that instance.
-                JitCompileDelegate(@delegate);
-
-                return @delegate;
-            }
-            catch
-            {
-                // The fallback
-                return expression.Compile();
-            }
-        }
-
         [SecuritySafeCritical]
         private static void JitCompileDelegate(Delegate @delegate)
         {
@@ -76,7 +51,32 @@ namespace SimpleInjector.Advanced
             if (this.container.Options.EnableDynamicAssemblyCompilation &&
                 !CompilationHelpers.ExpressionNeedsAccessToInternals(expression))
             {
-                compiledDelegate = this.CompileLambdaInDynamicAssemblyWithFallback(expression);
+                compiledDelegate = CompileLambdaInDynamicAssemblyWithFallback(expression);
+            }
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
+                            "in that case.")]
+        private static Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
+        {
+            try
+            {
+                var @delegate = CompilationHelpers.CompileLambdaInDynamicAssembly(expression,
+                    "DynamicPropertyInjector" + GetNextInjectorClassId(),
+                    "InjectProperties");
+
+                // Test the creation. Since we're using a dynamically created assembly, we can't create every
+                // delegate we can create using expression.Compile(), so we need to test this. We need to 
+                // store the created instance because we are not allowed to ditch that instance.
+                JitCompileDelegate(@delegate);
+
+                return @delegate;
+            }
+            catch
+            {
+                // The fallback
+                return expression.Compile();
             }
         }
     }

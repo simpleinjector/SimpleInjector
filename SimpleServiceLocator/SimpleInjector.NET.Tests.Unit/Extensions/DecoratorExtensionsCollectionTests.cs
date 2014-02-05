@@ -17,11 +17,6 @@
     [TestClass]
     public class DecoratorExtensionsCollectionTests
     {
-        public interface INonGenericService
-        {
-            void DoSomething();
-        }
-
         public interface IBase
         {
         }
@@ -812,7 +807,7 @@
             AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), @default.Dependency.ServiceType);
             AssertThat.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ImplementationType);
         }
-        
+
         [TestMethod]
         public void GetAllInstances_DecoratorRegisteredWithPredicate_DecoratesAllInstancesThatShouldBeDecorated()
         {
@@ -1395,7 +1390,7 @@
             Assert.IsTrue(expectedRelationship.Equals(relationships[0]),
                 "Actual relationship: " + RelationshipInfo.ToString(relationships[0]));
         }
-        
+
         [TestMethod]
         public void GetInstance_ContainerControlledCollectionWithDecorator_DecoratorGoesThroughCompletePipeLineIncludingExpressionBuilding()
         {
@@ -1405,7 +1400,7 @@
             var container = ContainerFactory.New();
 
             var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
-            
+
             container.RegisterAll<ICommandHandler<RealCommand>>(typesToRegister);
 
             // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
@@ -1530,7 +1525,7 @@
                     .TrimInside(), ex);
             }
         }
-        
+
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForUncontrolledCollection_ContainsAddedRelationship()
         {
@@ -1567,7 +1562,7 @@
                 "Any known relationships added to the decotator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
-        
+
         [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForControlledCollection_ContainsAddedRelationship()
         {
@@ -1577,7 +1572,7 @@
             var container = ContainerFactory.New();
 
             container.RegisterAll<ICommandHandler<RealCommand>>(
-                typeof(StubCommandHandler), 
+                typeof(StubCommandHandler),
                 typeof(RealCommandHandler));
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -1657,6 +1652,261 @@
                 "we'd expect the decorator to be applied just once.");
         }
 
+        [TestMethod]
+        public void GetAllInstances_ControlledCollectionDecoratedWithFactoryDefinedDecorator_WrapsTheExpectedDecorators()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+
+            container.RegisterDecorator(typeof(IPlugin),
+                decoratorTypeFactory: c => typeof(PluginDecorator<>).MakeGenericType(c.ImplementationType),
+                lifestyle: Lifestyle.Transient,
+                predicate: c => true);
+
+            // Act
+            var plugins = container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator<PluginImpl>));
+            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator<PluginImpl2>));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledCollectionDecoratedWithFactoryDefinedDecorator_WrapsTheExpectedDecorators()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<IPlugin> uncontrolledCollection = new IPlugin[] { new PluginImpl(), new PluginImpl2() };
+
+            container.RegisterAll<IPlugin>(uncontrolledCollection);
+
+            // For an uncontrolled collection the ImplementationType will equal the ServiceType, since the
+            // system knows nothing about the actual used instances.
+            container.RegisterDecorator(typeof(IPlugin),
+                decoratorTypeFactory: c => typeof(PluginDecorator<>).MakeGenericType(c.ImplementationType),
+                lifestyle: Lifestyle.Transient,
+                predicate: c => true);
+
+            // Act
+            var plugins = container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator<IPlugin>));
+            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator<IPlugin>));
+        }
+        
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorWithDecoratorReturningOpenGenericType_WrapsTheServiceWithTheClosedDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorWithPredicateReturningFalse_DoesNotWrapTheServiceWithTheDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.Predicate = context => false;
+            parameters.ServiceType = typeof(ICommandHandler<>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(RealCommandHandler));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorWithPredicateReturningFalse_DoesNotCallTheFactory()
+        {
+            // Arrange
+            bool decoratorTypeFactoryCalled = false;
+
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.Predicate = context => false;
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            parameters.DecoratorTypeFactory = context =>
+            {
+                decoratorTypeFactoryCalled = true;
+                return typeof(TransactionHandlerDecorator<>);
+            };
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.IsFalse(decoratorTypeFactoryCalled, @"
+                The factory should not be called if the predicate returns false. This prevents the user from 
+                having to do specific handling when the decorator type can't be constructed because of generic 
+                type constraints.");
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorWithFactoryReturningTypeBasedOnImplementationType_WrapsTheServiceWithTheExpectedDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<INonGenericService> uncontrolledCollection = new[] { new RealNonGenericService() };
+
+            container.RegisterAll<INonGenericService>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.ServiceType = typeof(INonGenericService);
+            parameters.DecoratorTypeFactory =
+                context => typeof(NonGenericServiceDecorator<>).MakeGenericType(context.ImplementationType);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var service = container.GetAllInstances<INonGenericService>().Single();
+
+            // Assert
+            // With uncontrolled collections, the container has no knowlegde about the actual elements of
+            // the collection (since those elements can change on every iteration), so the ImplementationType
+            // will in this case simply be the same as the ServiceType: INonGenericService.
+            Assert.IsInstanceOfType(service, typeof(NonGenericServiceDecorator<INonGenericService>));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorReturningAnOpenGenericType_AppliesThatTypeOnlyWhenTypeConstraintsAreMet()
+        {
+            // Arrange
+            var container = new Container();
+
+            // SpecialCommand implements ISpecialCommand, but RealCommand does not.
+            IEnumerable<ICommandHandler<SpecialCommand>> uncontrolledCollection1 = 
+                new[] { new NullCommandHandler<SpecialCommand>() };
+
+            container.RegisterAll<ICommandHandler<SpecialCommand>>(uncontrolledCollection1);
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection2 = 
+                new[] { new NullCommandHandler<RealCommand>() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection2);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            // SpecialCommandHandlerDecorator has a "where T : ISpecialCommand" constraint.
+            parameters.DecoratorTypeFactory = context => typeof(SpecialCommandHandlerDecorator<>);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var handler1 = container.GetAllInstances<ICommandHandler<SpecialCommand>>().Single();
+            var handler2 = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(SpecialCommandHandlerDecorator<SpecialCommand>));
+            Assert.IsInstanceOfType(handler2, typeof(NullCommandHandler<RealCommand>));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledRegisterDecoratorWithFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
+        {
+            // Arrange
+            var container = new Container();
+            
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.ServiceType = typeof(ICommandHandler<>);
+
+            // Here we make a partial open-generic type by filling in the TUnresolved.
+            parameters.DecoratorTypeFactory = context =>
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>)
+                    .MakePartialOpenGenericType(
+                        secondArgument: context.ImplementationType);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.AreEqual(handler.GetType().ToFriendlyName(),
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<RealCommand, ICommandHandler<RealCommand>>)
+                .ToFriendlyName());
+        }
+
+        [TestMethod]
+        public void GetAllInstances_UncontrolledWithClosedGenericServiceAndOpenGenericDecoratorReturnedByFactory_ReturnsDecoratedFactory()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            var parameters = RegisterDecoratorFactoryParameters.CreateValid();
+
+            parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
+            parameters.DecoratorTypeFactory = context => typeof(TransactionHandlerDecorator<>);
+
+            container.RegisterDecorator(parameters);
+
+            // Act
+            // Registering an closed generic service with an open generic decorator isn't supported by the
+            // 'normal' RegisterDecorator methods. This is a limitation in the underlying system. The system
+            // can't easily verify whether the open-generic decorator is assignable from the closed-generic
+            // service.
+            // The factory-supplying version doesn't have this limitation, since the factory is only called
+            // at resolve-time, which means there are no open-generic types to check. Everything is closed.
+            // So long story short: the following call will (or should) succeed.
+            var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            // Assert
+            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
+        }
+        
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();

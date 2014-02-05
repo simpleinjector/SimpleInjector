@@ -33,24 +33,19 @@ namespace SimpleInjector.Extensions.Decorators
         private readonly Dictionary<InstanceProducer, Registration> registrations;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
-        private readonly ConstructorInfo decoratorConstructor;
-        private readonly Type decoratorType;
+        private ConstructorInfo decoratorConstructor;
+        private Type decoratorType;
 
         public ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data,
-            Dictionary<InstanceProducer, Registration> registrations, ExpressionBuiltEventArgs e, 
-            Type decoratorType)
+            Dictionary<InstanceProducer, Registration> registrations, ExpressionBuiltEventArgs e)
             : base(data)
         {
             this.registrations = registrations;
             this.e = e;
             this.registeredServiceType = e.RegisteredServiceType;
-
-            this.decoratorConstructor = data.Container.Options.ConstructorResolutionBehavior
-                .GetConstructor(e.RegisteredServiceType, decoratorType);
-
-            // The actual decorator could be different. TODO: must... write... test... for... this.
-            this.decoratorType = this.decoratorConstructor.DeclaringType;
         }
+
+        internal DecoratorPredicateContext Context { get; private set; }
 
         protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
@@ -59,13 +54,19 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal bool SatisfiesPredicate()
         {
-            var context = this.CreatePredicateContext(this.e);
+            this.Context = this.CreatePredicateContext(this.e);
 
-            return this.SatisfiesPredicate(context);
+            return this.SatisfiesPredicate(this.Context);
         }
 
-        internal void ApplyDecorator()
+        internal void ApplyDecorator(Type decoratorType)
         {
+            this.decoratorConstructor = this.Container.Options.ConstructorResolutionBehavior
+                .GetConstructor(this.e.RegisteredServiceType, decoratorType);
+
+            // The actual decorator could be different. TODO: must... write... test... for... this.
+            this.decoratorType = this.decoratorConstructor.DeclaringType;
+
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
             // incorperated into the pipeline. This means that the ExpressionBuilding can be applied,
             // properties can be injected, and it can be wrapped with an initializer.
@@ -96,7 +97,7 @@ namespace SimpleInjector.Extensions.Decorators
             {
                 if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
                 {
-                    registration = this.CreateRegistration(this.registeredServiceType, 
+                    registration = this.CreateRegistration(this.registeredServiceType,
                         this.decoratorConstructor, this.e.Expression, this.e.InstanceProducer,
                         this.GetServiceTypeInfo(this.e));
 
@@ -113,7 +114,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(this.decoratorType, info.ImplementationType, this.Container, 
+            info.AddAppliedDecorator(this.decoratorType, info.ImplementationType, this.Container,
                 this.Lifestyle, this.e.Expression);
         }
     }

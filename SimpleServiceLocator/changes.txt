@@ -6,6 +6,8 @@ Version vNext
 	General description:
 
 	Improvements:
+		-[Core] New RegisterDecorator overload added that allows supplying a factory delegate for creating
+		 decorator types. (work item 20550)
 		-[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping/EnablePerWcfOperationLifestyle 
 		 when no lifetime scoped instances are registered.
 		-[Core] Design of the ScopedLifestyle class improved to make it easier to create custom lifestyles.

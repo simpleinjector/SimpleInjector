@@ -521,5 +521,30 @@ namespace SimpleInjector
                 "This method can only be called within the context of an active {0}.", 
                 lifestyleName);
         }
+
+        internal static string DecoratorFactoryReturnedNull(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The decorator type factory delegate that was registered for service type {0} returned null.",
+                serviceType.ToFriendlyName());
+        }
+
+        internal static string TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(
+            Type serviceType, Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The registered decorator type factory returned open generic type {0} while the registered " +
+                "service type {1} is not generic, making it impossible for a closed-generic decorator type " +
+                "to be constructed.",
+                decoratorType.ToFriendlyName(),
+                serviceType.ToFriendlyName());
+        }
+
+        internal static string DecoratorTypeFactoryReturnedIncompatibleType(Type serviceType, Type decoratorType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The registered decorator type factory returned type {0} which does not implement {1}.",
+                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+        }
     }
 }

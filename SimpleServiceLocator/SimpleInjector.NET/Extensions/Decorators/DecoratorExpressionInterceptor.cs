@@ -100,15 +100,6 @@ namespace SimpleInjector.Extensions.Decorators
             }
         }
 
-        protected bool SatisfiesPredicate(InstanceProducer registeredProducer, Type registeredServiceType,
-            Expression expression, Lifestyle lifestyle)
-        {
-            var context = 
-                this.CreatePredicateContext(registeredProducer, registeredServiceType, expression, lifestyle);
-
-            return this.SatisfiesPredicate(context);
-        }
-
         protected bool SatisfiesPredicate(DecoratorPredicateContext context)
         {
             return this.Predicate == null || this.Predicate(context);
