@@ -37,27 +37,29 @@ namespace SimpleInjector
         // is called (to ensure that it will run, because it tends to fail now and then) and the created
         // instance is returned through the out parameter. Note that NO created instance will be returned when
         // the expression is compiled using Expression.Compile)(.
-        internal static Func<object> CompileAndRun(Container container, Expression expression,
-            out object createdInstance)
+        internal static Func<TResult> CompileExpression<TResult>(Container container, Expression expression)
         {
-            createdInstance = null;
-
-            var constantExpression = expression as ConstantExpression;
-
             // Skip compiling if all we need to do is return a singleton.
-            if (constantExpression != null)
+            if (expression is ConstantExpression)
             {
-                return CreateConstantOptimizedExpression(constantExpression);
+                return CreateConstantValueDelegate<TResult>(expression);
             }
 
-            Func<object> compiledLambda = null;
+            Func<TResult> compiledLambda = null;
 
             expression = OptimizeObjectGraph(container, expression);
 
-            TryCompileAndExecuteInDynamicAssembly(container, expression, ref compiledLambda,
-                ref createdInstance);
+            // In the common case, the developer will/should only create a single container during the 
+            // lifetime of the application (this is the recommended approach). In this case, we can optimize
+            // the perf by compiling delegates in an dynamic assembly. We can't do this when the developer 
+            // creates many containers, because this will create a memory leak (dynamic assemblies are never 
+            // unloaded). We might however relax this constraint and optimize the first N container instances.
+            if (container.Options.EnableDynamicAssemblyCompilation)
+            {
+                TryCompileInDynamicAssembly<TResult>(expression, ref compiledLambda);
+            }
 
-            return compiledLambda ?? CompileLambda(expression);
+            return compiledLambda ?? CompileLambda<TResult>(expression);
         }
 
         internal static Expression OptimizeObjectGraph(Container container, Expression expression)
@@ -72,20 +74,22 @@ namespace SimpleInjector
             return expression;
         }
 
-        static partial void TryCompileAndExecuteInDynamicAssembly(Container container, Expression expression,
-            ref Func<object> compiledLambda, ref object createdInstance);
+        static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
+            ref Func<TResult> compiledLambda);
 
-        private static Func<object> CreateConstantOptimizedExpression(ConstantExpression expression)
+        private static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
         {
-            object singleton = expression.Value;
+            object value = ((ConstantExpression)expression).Value;
+
+            TResult singleton = (TResult)value;
 
             // This lambda will be a tiny little bit faster than a compiled delegate.
             return () => singleton;
         }
 
-        private static Func<object> CompileLambda(Expression expression)
+        private static Func<TResult> CompileLambda<TResult>(Expression expression)
         {
-            return Expression.Lambda<Func<object>>(expression).Compile();
+            return Expression.Lambda<Func<TResult>>(expression).Compile();
         }
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize

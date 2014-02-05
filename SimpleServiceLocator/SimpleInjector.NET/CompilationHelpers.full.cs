@@ -29,6 +29,8 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+    using System.Security;
     using System.Threading;
 
     internal static partial class CompilationHelpers
@@ -58,47 +60,27 @@ namespace SimpleInjector
             return visitor.NeedsAccessToInternals;
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "We can skip the exception, because we call the fallbackDelegate.")]
-        private static Func<object> CompileAndExecuteInDynamicAssemblyWithFallback(Expression expression, 
-            out object createdInstance)
+        [SecuritySafeCritical]
+        internal static void JitCompileDelegate(Delegate @delegate)
         {
-            try
-            {
-                var @delegate = CompileInDynamicAssembly(expression);
-
-                // Test the creation. Since we're using a dynamically created assembly, we can't create every
-                // delegate we can create using expression.Compile(), so we need to test this. We need to 
-                // store the created instance because we are not allowed to ditch that instance.
-                createdInstance = @delegate();
-
-                return @delegate;
-            }
-            catch
-            {
-                // The fallback. Here we don't execute the lambda, because this would mean that when the
-                // execution fails the lambda is not returned and the compiled delegate would never be cached,
-                // forcing a compilation hit on each call.
-                createdInstance = null;
-                return CompileLambda(expression);
-            }
+            RuntimeHelpers.PrepareDelegate(@delegate);
         }
 
-        private static Func<object> CompileInDynamicAssembly(Expression expression)
+        private static Func<TResult> CompileInDynamicAssembly<TResult>(Expression expression)
         {
             ConstantExpression[] constantExpressions = GetConstants(expression).Distinct().ToArray();
 
             if (constantExpressions.Any())
             {
-                return CompileInDynamicAssemblyAsClosure(expression, constantExpressions);
+                return CompileInDynamicAssemblyAsClosure<TResult>(expression, constantExpressions);
             }
             else
             {
-                return CompileInDynamicAssemblyAsStatic(expression);
+                return CompileInDynamicAssemblyAsStatic<TResult>(expression);
             }
         }
 
-        private static Func<object> CompileInDynamicAssemblyAsClosure(Expression originalExpression, 
+        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression originalExpression, 
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
@@ -108,18 +90,19 @@ namespace SimpleInjector
             var replacedExpression =
                 ReplaceConstantsWithArrayLookup(originalExpression, constantExpressions, constantsParameter);
 
-            var lambda = Expression.Lambda<Func<object[], object>>(replacedExpression, constantsParameter);
+            var lambda = Expression.Lambda<Func<object[], TResult>>(replacedExpression, constantsParameter);
 
-            Func<object[], object> create = CompileDelegateInDynamicAssembly(lambda);
+            Func<object[], TResult> create = CompileDelegateInDynamicAssembly(lambda);
 
             object[] constants = constantExpressions.Select(c => c.Value).ToArray();
 
             return () => create(constants);
         }
 
-        private static Func<object> CompileInDynamicAssemblyAsStatic(Expression expression)
+        private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
         {
-            var lambda = Expression.Lambda<Func<object>>(expression, new ParameterExpression[0]);
+            Expression<Func<TResult>> lambda = 
+                Expression.Lambda<Func<TResult>>(expression, new ParameterExpression[0]);
 
             return CompileDelegateInDynamicAssembly(lambda);
         }
@@ -152,23 +135,29 @@ namespace SimpleInjector
             return Interlocked.Increment(ref dynamicClassCounter);
         }
 
-        static partial void TryCompileAndExecuteInDynamicAssembly(Container container,
-            Expression expression, ref Func<object> compiledLambda, ref object createdInstance)
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
+                            "in that case.")]
+        static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
+            ref Func<TResult> compiledLambda)
         {
-            createdInstance = null;
             compiledLambda = null;
 
-            // In the common case, the developer will/should only create a single container during the 
-            // lifetime of the application (this is the recommended approach). In this case, we can optimize
-            // the perf by compiling delegates in an dynamic assembly. We can't do this when the developer 
-            // creates many containers, because this will create a memory leak (dynamic assemblies are never 
-            // unloaded). We might however relax this constraint and optimize the first N container instances.
-            // (where N is configurable)
-            if (container.Options.EnableDynamicAssemblyCompilation &&
-                !ExpressionNeedsAccessToInternals(expression))
+            if (!ExpressionNeedsAccessToInternals(expression))
             {
-                compiledLambda =
-                    CompileAndExecuteInDynamicAssemblyWithFallback(expression, out createdInstance);
+                try
+                {
+                    var @delegate = CompileInDynamicAssembly<TResult>(expression);
+
+                    // Test the creation. Since we're using a dynamically created assembly, we can't create every
+                    // delegate we can create using expression.Compile(), so we need to test this.
+                    JitCompileDelegate(@delegate);
+
+                    compiledLambda = @delegate;
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -181,6 +170,14 @@ namespace SimpleInjector
             public override Expression Visit(Expression node)
             {
                 return base.Visit(node);
+            }
+
+            internal void MayAccessExpression(bool mayAccess)
+            {
+                if (!mayAccess)
+                {
+                    this.NeedsAccessToInternals = true;
+                }
             }
 
             protected override Expression VisitNew(NewExpression node)
@@ -237,14 +234,6 @@ namespace SimpleInjector
                 }
 
                 return base.VisitMember(node);
-            }
-
-            private void MayAccessExpression(bool mayAccess)
-            {
-                if (!mayAccess)
-                {
-                    this.NeedsAccessToInternals = true;
-                }
             }
 
             private static bool IsPublic(Type type)

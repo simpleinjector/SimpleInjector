@@ -571,14 +571,7 @@ namespace SimpleInjector
         {
             try
             {
-                expression = CompilationHelpers.OptimizeObjectGraph(this.Container, expression);
-
-                var newInstanceMethod =
-                    Expression.Lambda<Func<TService>>(expression, new ParameterExpression[0]);
-
-                // We can't optimize this delegate using Helpers.CompileAndRun, since we don't have the ability
-                // to return the created instance.
-                return newInstanceMethod.Compile();
+                return CompilationHelpers.CompileExpression<TService>(this.Container, expression);
             }
             catch (Exception ex)
             {

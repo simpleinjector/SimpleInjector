@@ -25,24 +25,11 @@ namespace SimpleInjector.Advanced
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
-    using System.Security;
     using System.Threading;
 
     internal sealed partial class PropertyInjectionHelper
     {
         private static long injectorClassCounter;
-
-        [SecuritySafeCritical]
-        private static void JitCompileDelegate(Delegate @delegate)
-        {
-            RuntimeHelpers.PrepareDelegate(@delegate);
-        }
-
-        private static long GetNextInjectorClassId()
-        {
-            return Interlocked.Increment(ref injectorClassCounter);
-        }
 
         partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate compiledDelegate)
         {
@@ -67,17 +54,20 @@ namespace SimpleInjector.Advanced
                     "InjectProperties");
 
                 // Test the creation. Since we're using a dynamically created assembly, we can't create every
-                // delegate we can create using expression.Compile(), so we need to test this. We need to 
-                // store the created instance because we are not allowed to ditch that instance.
-                JitCompileDelegate(@delegate);
+                // delegate we can create using expression.Compile(), so we need to test this.
+                CompilationHelpers.JitCompileDelegate(@delegate);
 
                 return @delegate;
             }
             catch
             {
-                // The fallback
-                return expression.Compile();
+                return null;
             }
+        }
+
+        private static long GetNextInjectorClassId()
+        {
+            return Interlocked.Increment(ref injectorClassCounter);
         }
     }
 }

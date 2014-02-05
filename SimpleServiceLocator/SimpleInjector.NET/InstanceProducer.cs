@@ -209,17 +209,10 @@ namespace SimpleInjector
             {
                 if (this.instanceCreator == null)
                 {
-                    this.instanceCreator = this.BuildInstanceCreator(out instance);
+                    this.instanceCreator = this.BuildInstanceCreator();
+                }
 
-                    if (instance == null)
-                    {
-                        instance = this.instanceCreator();
-                    }
-                }
-                else
-                {
-                    instance = this.instanceCreator();
-                }
+                instance = this.instanceCreator();
 
                 this.RemoveValidator();
             }
@@ -362,14 +355,14 @@ namespace SimpleInjector
             }
         }
 
-        private Func<object> BuildInstanceCreator(out object createdInstance)
+        private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
             var expression = this.expression.Value;
 
             try
             {
-                return CompilationHelpers.CompileAndRun(this.Registration.Container, expression, out createdInstance);
+                return CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression);
             }
             catch (Exception ex)
             {
