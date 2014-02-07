@@ -159,7 +159,7 @@ using SimpleInjector.Lifestyles;
         public void GetInstance_ResolvingAnInterceptedTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -182,7 +182,7 @@ using SimpleInjector.Lifestyles;
         public void GetInstance_ResolvingAnInterceptedSingletonTypeThatDependsOnAContextDependentType_InjectsExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -203,7 +203,7 @@ using SimpleInjector.Lifestyles;
         public void GetInstance_ResolvingATypeThatDependsOnInterceptedTypeWithAContextDependentDependency_InjectsExpectedType()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
 
@@ -229,7 +229,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
@@ -249,7 +249,7 @@ using SimpleInjector.Lifestyles;
             // Arrange
             var hybrid = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
@@ -267,7 +267,7 @@ using SimpleInjector.Lifestyles;
         public void DecoratedInstance_DecoratorDependingOnContextDependencyResolvedAsRootType_AppliesContextCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
@@ -288,7 +288,7 @@ using SimpleInjector.Lifestyles;
         public void DecoratedInstance_DecoratorDependingOnContextDependencyResolvedAsSubType_AppliesContextCorrectly()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 

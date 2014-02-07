@@ -80,7 +80,7 @@ namespace SimpleInjector
             }
         }
 
-        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression originalExpression, 
+        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression expression, 
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
@@ -88,15 +88,29 @@ namespace SimpleInjector
             var constantsParameter = Expression.Parameter(typeof(object[]), "constants");
 
             var replacedExpression =
-                ReplaceConstantsWithArrayLookup(originalExpression, constantExpressions, constantsParameter);
+                ReplaceConstantsWithArrayLookup(expression, constantExpressions, constantsParameter);
 
             var lambda = Expression.Lambda<Func<object[], TResult>>(replacedExpression, constantsParameter);
 
             Func<object[], TResult> create = CompileDelegateInDynamicAssembly(lambda);
 
-            object[] constants = constantExpressions.Select(c => c.Value).ToArray();
+            // Test the creation. Since we're using a dynamically created assembly, we can't create every
+            // delegate we can create using expression.Compile(), so we need to test this.
+            JitCompileDelegate(create);
 
-            return () => create(constants);
+            object[] constants = constantExpressions.Select(constant => constant.Value).ToArray();
+
+            return () => // create(constants);
+            {
+                try
+                {
+                    return create(constants);
+                }
+                catch (TypeAccessException ex)
+                {
+                    throw new Exception(string.Format("{0}. {1}", replacedExpression.ToString(), ex.Message), ex);
+                }
+            };
         }
 
         private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
@@ -178,6 +192,13 @@ namespace SimpleInjector
                 {
                     this.NeedsAccessToInternals = true;
                 }
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                this.MayAccessExpression(node.Type.IsPublic);
+
+                return base.VisitConstant(node);
             }
 
             protected override Expression VisitNew(NewExpression node)

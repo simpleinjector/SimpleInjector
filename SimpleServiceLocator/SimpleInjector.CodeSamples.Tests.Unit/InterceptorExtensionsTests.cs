@@ -108,7 +108,7 @@
         public void InterceptWithGenericArgAndPredicate_InterceptingASingletonWithASingletonInterceptor_ResultsInASingletonProxy()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ICommand, FakeCommand>();
 
@@ -132,7 +132,7 @@
             // Arrange
             var logger = new FakeLogger();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(logger);
 
@@ -164,7 +164,7 @@
                 AfterText = " Done"
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
@@ -200,7 +200,7 @@
                 AfterText = " Done2"
             };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterSingle<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
@@ -244,7 +244,7 @@
         public void InterceptWithInstanceAndPredicate_InterceptingASingleton_ResultsInASingletonProxy()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var interceptor = new FakeInterceptor();
 
