@@ -1619,7 +1619,7 @@ namespace SimpleInjector
 
             if (!constructable)
             {
-                // After some doubt (and even after reading http://bit.ly/1CPDv9) I decided to throw an
+                // After some doubt (and even after reading https://bit.ly/1CPDv9) I decided to throw an
                 // ArgumentException when the given generic type argument was invalid. Mainly because a
                 // generic type argument is just an argument, and ArgumentException even allows us to supply 
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
