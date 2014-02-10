@@ -45,7 +45,7 @@ namespace SimpleInjector
         
         internal static Lazy<T> ToLazy<T>(T value)
         {
-            return new Lazy<T>(() => value, LazyThreadSafetyMode.None);
+            return new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
         }
 
         internal static string ToCommaSeparatedText(this IEnumerable<string> values)

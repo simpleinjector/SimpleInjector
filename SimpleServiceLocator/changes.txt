@@ -15,6 +15,9 @@ Version vNext
 		 the scope is now done once per compiled delegate and resolving an scoped instance from that scope is 
 		 also done just once per compiled delegate. (work item 20641)
 
+	Bug fixes:
+		-[Core] Concurrency bug fixed in collections registered with RegisterAllOpenGeneric. (work item 20681).
+
 
 Version 2.4.1 (v2.4.1 RTM) 2014-01-14
 
