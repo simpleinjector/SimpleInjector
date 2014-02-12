@@ -10,7 +10,7 @@ using System.Security;
 [assembly: AssemblyTitle("SimpleInjector.Packaging")]
 [assembly: AssemblyDescription("Allow packaging a set of services together for registration.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("SimpleInjector.Packaging")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

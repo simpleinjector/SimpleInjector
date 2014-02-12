@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CuttingEdge.ServiceLocation.Tests.Unit")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("CuttingEdge.ServiceLocation.Tests.Unit")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

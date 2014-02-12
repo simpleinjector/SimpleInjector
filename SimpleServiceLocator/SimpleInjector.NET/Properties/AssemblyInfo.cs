@@ -12,7 +12,7 @@ using System.Security;
 [assembly: AssemblyTitle("Simple Injector")]
 [assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("Simple Injector")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

@@ -11,7 +11,7 @@ using System.Security;
 [assembly: AssemblyTitle("SimpleInjector.Integration.Web.Mvc")]
 [assembly: AssemblyDescription("Integration library for ASP.NET MVC3 and up for the Simple Injector Inversion of Control library.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("SimpleInjector.Integration.Web.Mvc")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

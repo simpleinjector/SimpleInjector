@@ -10,7 +10,7 @@ using System.Security;
 [assembly: AssemblyTitle("CommonServiceLocator.SimpleInjectorAdapter")]
 [assembly: AssemblyDescription("Common Service Locator adapter for Simple Injector.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("CommonServiceLocator.SimpleInjectorAdapter")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

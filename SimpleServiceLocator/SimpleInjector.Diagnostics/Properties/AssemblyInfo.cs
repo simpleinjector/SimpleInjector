@@ -11,7 +11,7 @@ using System.Security;
 [assembly: AssemblyTitle("SimpleInjector.Diagnostics")]
 [assembly: AssemblyDescription("Diagnostics for Simple Injector")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("SimpleInjector.Diagnostics")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]

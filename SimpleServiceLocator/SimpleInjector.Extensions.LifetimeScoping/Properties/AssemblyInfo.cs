@@ -11,7 +11,7 @@ using System.Security;
 [assembly: AssemblyTitle("SimpleInjector.Extensions.LifetimeScoping")]
 [assembly: AssemblyDescription("Lifetime Scoping extensions for the Simple Injector")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cutting Edge Internet Technologies")]
+[assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("SimpleInjector.Extensions.LifetimeScoping")]
 [assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]
