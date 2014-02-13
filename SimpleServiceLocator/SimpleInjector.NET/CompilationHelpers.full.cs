@@ -100,17 +100,7 @@ namespace SimpleInjector
 
             object[] constants = constantExpressions.Select(constant => constant.Value).ToArray();
 
-            return () => // create(constants);
-            {
-                try
-                {
-                    return create(constants);
-                }
-                catch (TypeAccessException ex)
-                {
-                    throw new Exception(string.Format("{0}. {1}", replacedExpression.ToString(), ex.Message), ex);
-                }
-            };
+            return () => create(constants);
         }
 
         private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
