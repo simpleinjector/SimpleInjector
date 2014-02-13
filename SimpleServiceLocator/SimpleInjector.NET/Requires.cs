@@ -51,6 +51,14 @@ namespace SimpleInjector
                 throw new ArgumentException("Value can not be empty.", paramName);
             }
         }
+        
+        internal static void InstanceNotDisposed(bool instanceDisposed, string objectName)
+        {
+            if (instanceDisposed)
+            {
+                ThrowObjectDisposedException(objectName);
+            }
+        }
 
         internal static void IsReferenceType(Type type, string paramName)
         {
@@ -406,6 +414,11 @@ namespace SimpleInjector
         private static void ThrowArgumentNullException(string paramName)
         {
             throw new ArgumentNullException(paramName);
+        }
+
+        private static void ThrowObjectDisposedException(string objectName)
+        {
+            throw new ObjectDisposedException(objectName);
         }
     }
 }

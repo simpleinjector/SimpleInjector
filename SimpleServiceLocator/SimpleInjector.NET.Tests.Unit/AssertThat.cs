@@ -7,6 +7,24 @@
 
     public static class AssertThat
     {
+        public static void ThrowWithMostInner<TException>(Action action, string assertMessage = null)
+        {
+            try
+            {
+                action();
+
+                Assert.Fail("Action was expected to throw an exception. " + assertMessage);
+            }
+            catch (AssertFailedException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOfType(ex.GetExceptionChain().Last(), typeof(TException), assertMessage);
+            }
+        }
+
         public static void Throws<TException>(Action action, string assertMessage = null) 
             where TException : Exception
         {

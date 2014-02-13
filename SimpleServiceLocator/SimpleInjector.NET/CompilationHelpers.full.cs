@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Runtime.CompilerServices;
     using System.Security;
     using System.Threading;
+    using SimpleInjector.Advanced;
 
     internal static partial class CompilationHelpers
     {
@@ -52,12 +53,10 @@ namespace SimpleInjector
             return Delegate.CreateDelegate(lambda.Type, type.GetMethod(methodName), true);
         }
 
-        // This doesn't find all possible cases, but get's us close enough.
         internal static bool ExpressionNeedsAccessToInternals(Expression expression)
         {
-            var visitor = new InternalUseFinderVisitor();
-            visitor.Visit(expression);
-            return visitor.NeedsAccessToInternals;
+            // This doesn't find all possible cases, but get's us close enough.
+            return InternalsFinderVisitor.ContainsInternals(expression);
         }
 
         [SecuritySafeCritical]
@@ -114,9 +113,8 @@ namespace SimpleInjector
         private static Expression ReplaceConstantsWithArrayLookup(Expression expression,
             ConstantExpression[] constants, ParameterExpression constantsParameter)
         {
-            var indexizer = new ConstantArrayIndexizerVisitor(constants, constantsParameter);
-
-            return indexizer.Visit(expression);
+            return ConstantArrayIndexizerVisitor.ReplaceConstantsWithArrayIndexes(expression, 
+                constants, constantsParameter);
         }
 
         private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda)
@@ -127,11 +125,7 @@ namespace SimpleInjector
 
         private static List<ConstantExpression> GetConstants(Expression expression)
         {
-            var constantFinder = new ConstantFinderVisitor();
-
-            constantFinder.Visit(expression);
-
-            return constantFinder.Constants;
+            return ConstantFinderVisitor.FindConstants(expression);
         }
 
         private static long GetNextDynamicClassId()
@@ -162,138 +156,6 @@ namespace SimpleInjector
                 catch
                 {
                 }
-            }
-        }
-
-        private sealed class InternalUseFinderVisitor : ExpressionVisitor
-        {
-            private bool partOfAssigmnent;
-
-            public bool NeedsAccessToInternals { get; private set; }
-
-            public override Expression Visit(Expression node)
-            {
-                return base.Visit(node);
-            }
-
-            internal void MayAccessExpression(bool mayAccess)
-            {
-                if (!mayAccess)
-                {
-                    this.NeedsAccessToInternals = true;
-                }
-            }
-
-            protected override Expression VisitConstant(ConstantExpression node)
-            {
-                this.MayAccessExpression(node.Type.IsPublic);
-
-                return base.VisitConstant(node);
-            }
-
-            protected override Expression VisitNew(NewExpression node)
-            {
-                this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor.DeclaringType));
-
-                return base.VisitNew(node);
-            }
-
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                this.MayAccessExpression(node.Method.IsPublic && IsPublic(node.Method.DeclaringType));
-
-                return base.VisitMethodCall(node);
-            }
-
-            protected override Expression VisitBinary(BinaryExpression node)
-            {
-                if (node.NodeType == ExpressionType.Assign)
-                {
-                    bool oldValue = this.partOfAssigmnent;
-
-                    try
-                    {
-                        this.partOfAssigmnent = true;
-
-                        return base.VisitBinary(node);
-                    }
-                    finally
-                    {
-                        this.partOfAssigmnent = oldValue;
-                    }
-                }
-
-                return base.VisitBinary(node);
-            }
-
-            protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
-            {
-                return base.VisitMemberAssignment(node);
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                var property = node.Member as PropertyInfo;
-
-                if (node.NodeType == ExpressionType.MemberAccess && property != null)
-                {
-                    bool canDoPublicAssign = this.partOfAssigmnent && property.GetSetMethod() != null;
-                    bool canDoPublicRead = !this.partOfAssigmnent && property.GetGetMethod() != null;
-
-                    this.MayAccessExpression(IsPublic(property.DeclaringType) &&
-                        (canDoPublicAssign || canDoPublicRead));
-                }
-
-                return base.VisitMember(node);
-            }
-
-            private static bool IsPublic(Type type)
-            {
-                return type.IsPublic || type.IsNestedPublic;
-            }
-        }
-
-        private sealed class ConstantFinderVisitor : ExpressionVisitor
-        {
-            internal readonly List<ConstantExpression> Constants = new List<ConstantExpression>();
-
-            protected override Expression VisitConstant(ConstantExpression node)
-            {
-                if (!node.Type.IsPrimitive)
-                {
-                    this.Constants.Add(node);
-                }
-
-                return base.VisitConstant(node);
-            }
-        }
-
-        private sealed class ConstantArrayIndexizerVisitor : ExpressionVisitor
-        {
-            private readonly List<ConstantExpression> constantExpressions;
-            private readonly ParameterExpression constantsParameter;
-
-            public ConstantArrayIndexizerVisitor(ConstantExpression[] constantExpressions,
-                ParameterExpression constantsParameter)
-            {
-                this.constantExpressions = constantExpressions.ToList();
-                this.constantsParameter = constantsParameter;
-            }
-
-            protected override Expression VisitConstant(ConstantExpression node)
-            {
-                int index = this.constantExpressions.IndexOf(node);
-
-                if (index >= 0)
-                {
-                    return Expression.Convert(
-                        Expression.ArrayIndex(
-                            this.constantsParameter,
-                            Expression.Constant(index, typeof(int))),
-                        node.Type);
-                }
-
-                return base.VisitConstant(node);
             }
         }
     }

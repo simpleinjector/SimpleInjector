@@ -17,6 +17,8 @@
 
             var disposable = new DisposableObject();
 
+            Assert.IsFalse(disposable.IsDisposedOnce, "Test setup");
+
             var disposables = new List<IDisposable> { disposable };
 
             scope.RegisterForDisposal(disposable);
@@ -330,6 +332,116 @@
             {
                 Assert.IsTrue(object.ReferenceEquals(disposables.First().ExceptionToThrow, ex));
             }
+        }
+
+        [TestMethod]
+        public void Dispose_ScopedItemResolvedDuringScopeEndAction_GetsDisposed()
+        {
+            // Arrange
+            var disposable = new DisposableObject();
+
+            var scope = new Scope();
+
+            var container = new Container();
+
+            container.Register<DisposableObject>(() => disposable, new FakeScopedLifestyle(scope));
+
+            scope.WhenScopeEnds(() => container.GetInstance<DisposableObject>());
+
+            // Act
+            scope.Dispose();
+
+            // Assert
+            Assert.IsTrue(disposable.IsDisposedOnce);
+        }
+
+        [TestMethod]
+        public void Dispose_WhenDisposeEndsActionRegisteredDuringDisposal_CallsTheRegisteredDelegate()
+        {
+            // Arrange
+            bool actionCalled = false;
+
+            var disposable = new DisposableObject();
+
+            var scope = new Scope();
+
+            var container = new Container();
+
+            container.Register<DisposableObject>(() => disposable, new FakeScopedLifestyle(scope));
+            container.RegisterInitializer<DisposableObject>(instance =>
+            {
+                scope.WhenScopeEnds(() => actionCalled = true);
+            });
+
+            scope.WhenScopeEnds(() => container.GetInstance<DisposableObject>());
+
+            // Act
+            scope.Dispose();
+
+            // Assert
+            Assert.IsTrue(actionCalled);
+        }
+
+        [TestMethod]
+        public void RegisterForDisposal_CalledOnDisposedScope_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            scope.Dispose();
+
+            // Act
+            Action action = () => scope.RegisterForDisposal(new DisposableObject());
+
+            // Assert
+            AssertThat.Throws<ObjectDisposedException>(action,
+                "Calling RegisterForDisposal should throw an ObjectDisposedException.");
+        }
+
+        [TestMethod]
+        public void WhenScopeEnds_CalledOnDisposedScope_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            scope.Dispose();
+
+            // Act
+            Action action = () => scope.WhenScopeEnds(() => { });
+
+            // Assert
+            AssertThat.Throws<ObjectDisposedException>(action,
+                "Calling WhenScopeEnds should throw an ObjectDisposedException.");
+        }
+
+        // NOTE: This is a quite odd requirement, and I'm not really sure what to do with this. How should
+        // the framework handle a situation where an object that is being disposed, triggers the registration
+        // of a new disposable object. That's a quite bizarre case. I desided to throw an ObjectDisposedException,
+        // since it's pretty hard to ensure that this object will actually be both disposed and disposed in the
+        // correct order.
+        [TestMethod]
+        public void Dispose_RegisterForDisposalCalledOnScopeInDisposeMethodOfDisposedObject_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IDisposable>(() => new DisposableObject(), scopedLifestyle);
+
+            var disposable = new DisposableObject(disposing: _ => container.GetInstance<IDisposable>());
+
+            container.Register<DisposableObject>(() => disposable, scopedLifestyle);
+
+            container.GetInstance<DisposableObject>();
+
+            // Act
+            Action action = () => scope.Dispose();
+
+            // Assert
+            AssertThat.ThrowWithMostInner<ObjectDisposedException>(action);
         }
 
         private sealed class DisposableObject : IDisposable

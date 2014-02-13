@@ -89,6 +89,7 @@
     <Compile Include="Advanced\PropertyInjectionTests.cs" />
     <Compile Include="Advanced\PropertyInjectionTests.full.cs" />
     <Compile Include="AmbiguousTypesTests.cs" />
+    <Compile Include="CompilationTests.cs" />
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="AssertThat.cs" />

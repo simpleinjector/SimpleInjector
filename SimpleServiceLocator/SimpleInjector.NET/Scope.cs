@@ -41,6 +41,7 @@ namespace SimpleInjector
 
         private List<Action> scopeEndActions;
         private List<IDisposable> disposables;
+        private bool disposed;
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
@@ -52,7 +53,8 @@ namespace SimpleInjector
         public void WhenScopeEnds(Action action)
         {
             Requires.IsNotNull(action, "action");
-
+            Requires.InstanceNotDisposed(this.disposed, "Scope");
+            
             if (this.scopeEndActions == null)
             {
                 this.scopeEndActions = new List<Action>();
@@ -76,6 +78,7 @@ namespace SimpleInjector
         public void RegisterForDisposal(IDisposable disposable)
         {
             Requires.IsNotNull(disposable, "disposable");
+            Requires.InstanceNotDisposed(this.disposed, "Scope");
 
             if (this.disposables == null)
             {
@@ -141,6 +144,7 @@ namespace SimpleInjector
                 }
                 finally
                 {
+                    this.disposed = true;
                     this.DisposeAllRegisteredDisposables();
                 }
             }
@@ -152,9 +156,14 @@ namespace SimpleInjector
             {
                 try
                 {
-                    foreach (var action in this.scopeEndActions)
+                    int index = 0;
+
+                    // We can't use a foreach here, since a registered action could cause the registration of
+                    // a new actionn.
+                    while (index < this.scopeEndActions.Count)
                     {
-                        action.Invoke();
+                        this.scopeEndActions[index].Invoke();
+                        index++;
                     }
                 }
                 finally

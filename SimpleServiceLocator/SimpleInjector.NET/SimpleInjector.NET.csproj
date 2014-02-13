@@ -80,6 +80,8 @@
     <Compile Include="ActivationException.full.cs" />
     <Compile Include="Advanced\AdvancedExtensions.cs" />
     <Compile Include="Advanced\ConditionalHashSet.cs" />
+    <Compile Include="Advanced\ConstantArrayIndexizerVisitor.cs" />
+    <Compile Include="Advanced\ConstantFinderVisitor.cs" />
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />
@@ -89,6 +91,7 @@
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
     <Compile Include="Advanced\InitializationContext.cs" />
     <Compile Include="Advanced\InstanceInitializationData.cs" />
+    <Compile Include="Advanced\InternalsFinderVisitor.cs" />
     <Compile Include="Advanced\Internal\LazyScope.cs" />
     <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
