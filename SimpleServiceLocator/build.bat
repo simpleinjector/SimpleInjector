@@ -1,7 +1,7 @@
 @ECHO OFF
 
-set version=2.4.0
-set prereleasePostfix=
+set version=2.5.0
+set prereleasePostfix=-beta2
 set buildNumber=0
 
 
@@ -196,7 +196,8 @@ copy Help\Index.html Help\index.tmp
 del Help\Index.html
 copy Help\index.tmp Help\index.htm
 del Help\index.tmp
-%compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
+REM For some strange reason, the following call does not compress the complete help directory, while calling it manually does work
+REM %compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
 
 
 
