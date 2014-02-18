@@ -153,7 +153,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected internal virtual Scope GetCurrentScope(Container container)
+        public virtual Scope GetCurrentScope(Container container)
         {
             Requires.IsNotNull(container, "container");
 

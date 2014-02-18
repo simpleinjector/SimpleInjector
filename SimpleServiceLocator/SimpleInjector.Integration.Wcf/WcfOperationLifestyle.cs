@@ -101,7 +101,7 @@ namespace SimpleInjector.Integration.Wcf
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScope(Container container)
+        public override Scope GetCurrentScope(Container container)
         {
             return container.GetWcfOperationScopeManager().CurrentScope;
         }
