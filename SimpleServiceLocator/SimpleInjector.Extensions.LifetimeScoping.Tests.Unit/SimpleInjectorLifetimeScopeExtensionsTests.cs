@@ -1223,7 +1223,7 @@
         }
         
         [TestMethod]
-        public void WhenScopeEnds_DisposingAnMiddelScope_DisposalAllItsInnerScopesAsWellButNotTheOuterScope()
+        public void WhenScopeEnds_DisposingAnMiddleScope_DisposalAllItsInnerScopesAsWellButNotTheOuterScope()
         {
             // Arrange
             const bool IsDisposed = true;
@@ -1309,6 +1309,72 @@
                 // Act
                 factory();
             }
+        }
+
+        [TestMethod]
+        public void Dispose_OnlyDisposingMostOuterScopeWhileMostInnerScopeDisposeThrows_AlsoDisposesMiddleScopes()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+
+            var outerScope = container.BeginLifetimeScope();
+            var middleScope = container.BeginLifetimeScope();
+                    
+            var middleScopeInstance = container.GetInstance<DisposableCommand>();
+
+            var innerScope = container.BeginLifetimeScope();
+
+            var innerScopeInstance = container.GetInstance<DisposableCommand>();
+
+            Assert.AreNotSame(middleScopeInstance, innerScopeInstance, "Test setup fail.");
+
+            innerScopeInstance.Disposing += (s) =>
+            {
+                throw new Exception("Bang!");
+            };
+
+            try
+            {
+                // Act
+                outerScope.Dispose();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch
+            {
+                Assert.IsTrue(middleScopeInstance.HasBeenDisposed,
+                    "The LifetimeScope must ensure that all inner scopes are disposed, even if one of those " +
+                    "inner scopes throws an exception.");
+            }
+        }
+
+        [TestMethod]
+        public void Dispose_ObjectRegisteredForDisposalUsingRequestedCurrentLifetimeScope_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            var instanceToDispose = new DisposableCommand();
+
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+
+            using (container.BeginLifetimeScope())
+            {
+                var command = container.GetInstance<DisposableCommand>();
+
+                command.Disposing += s =>
+                {
+                    container.GetCurrentLifetimeScope().RegisterForDisposal(instanceToDispose);
+                };
+
+                // Act
+            }
+
+            // Assert
+            Assert.IsTrue(instanceToDispose.HasBeenDisposed);
         }
 
         public class ConcreteCommand : ICommand
@@ -1466,6 +1532,27 @@
         protected DisposableBase(Action<object> disposing)
         {
             this.disposing = disposing;
+        }
+
+        public void Dispose()
+        {
+            this.disposing(this);
+        }
+    }
+
+    public class DisposableLogger : ILogger, IDisposable
+    {
+        private static readonly Action<DisposableLogger> Empty = l => { };
+
+        private readonly Action<DisposableLogger> disposing;
+
+        public DisposableLogger(Action<DisposableLogger> disposing = null)
+        {
+            this.disposing = disposing ?? Empty;
+        }
+
+        public void Log(string message)
+        {
         }
 
         public void Dispose()

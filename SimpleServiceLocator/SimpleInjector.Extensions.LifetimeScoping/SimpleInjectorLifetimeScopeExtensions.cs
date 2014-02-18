@@ -1,4 +1,4 @@
-﻿#region Copyright Simple Injector Contributors
+﻿    #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
  * Copyright (c) 2013-2014 Simple Injector Contributors
@@ -296,8 +296,6 @@ namespace SimpleInjector
         {
             var manager = (LifetimeScopeManager)container.GetItem(ManagerKey);
 
-            // NOTE: This double-checked lock might be broken on certain processor architectures, but I don't
-            // know how to fix that.
             if (manager == null)
             {
                 lock (ManagerKey)

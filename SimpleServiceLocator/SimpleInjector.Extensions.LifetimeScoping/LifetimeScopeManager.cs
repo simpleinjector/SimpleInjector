@@ -57,17 +57,30 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
         internal void RemoveLifetimeScope(LifetimeScope scope)
         {
-            this.DisposeAllChildScopesOfScope(scope);
-
             this.threadLocalScopes.Value = scope.ParentScope;
         }
 
-        private void DisposeAllChildScopesOfScope(LifetimeScope scope)
+        internal void DisposeAllChildScopesOfScope(LifetimeScope scope)
         {
-            while (!object.ReferenceEquals(this.threadLocalScopes.Value, scope))
+            try
             {
-                // LifetimeScope.Dispose calls EndLifetimeScope again.
-                this.threadLocalScopes.Value.Dispose();
+                var current = this.threadLocalScopes.Value;
+
+                while (current != null && !object.ReferenceEquals(current, scope))
+                {
+                    // LifetimeScope.Dispose calls EndLifetimeScope again.
+                    this.threadLocalScopes.Value.Dispose();
+
+                    current = this.threadLocalScopes.Value;
+                }
+            }
+            catch
+            {
+                // In case of an exception, we recursively call DisposeAllChildScopesOfScope again. Not doing
+                // this would prevent scopes from being disposed in case one of their child scopes would throw
+                // an exception.
+                this.DisposeAllChildScopesOfScope(scope);
+                throw;
             }
         }
     }

@@ -60,6 +60,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
             if (disposing && this.manager != null)
             {
+                // EndLifetimeScope should not be called from a different thread than where it was started.
+                // Calling this method from another thread could remove the wrong scope.
                 if (this.initialThreadId != Thread.CurrentThread.ManagedThreadId)
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
@@ -73,15 +75,25 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
                 try
                 {
-                    // EndLifetimeScope should not be called from a different thread than where it was started.
-                    // Calling this method from another thread could remove the wrong scope.
-                    this.manager.RemoveLifetimeScope(this);
+                    this.manager.DisposeAllChildScopesOfScope(this);
                 }
                 finally
                 {
-                    this.manager = null;
-
-                    base.Dispose(disposing);
+                    try
+                    {
+                        base.Dispose(disposing);
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            this.manager.RemoveLifetimeScope(this);
+                        }
+                        finally
+                        {
+                            this.manager = null;
+                        }
+                    }
                 }
             }
         }
