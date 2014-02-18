@@ -82,6 +82,17 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        public override Scope GetCurrentScope(Container container)
+        {
+            return container.GetWcfOperationScopeManager().CurrentScope;
+        }
+
+        /// <summary>
         /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
         /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
         /// the context of such scope.
@@ -93,17 +104,6 @@ namespace SimpleInjector.Integration.Wcf
             var manager = container.GetWcfOperationScopeManager();
 
             return () => manager.CurrentScope;
-        }
-
-        /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
-        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
-        /// </summary>
-        /// <param name="container">The container instance that is related to the scope to return.</param>
-        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public override Scope GetCurrentScope(Container container)
-        {
-            return container.GetWcfOperationScopeManager().CurrentScope;
         }
     }
 }

@@ -86,6 +86,19 @@ namespace SimpleInjector.Integration.Web
             WithDisposal.WhenScopeEnds(container, action);
         }
 
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        public override Scope GetCurrentScope(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            return GetCurrentScope(HttpContext.Current);
+        }
+
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
         {
             return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
@@ -132,19 +145,6 @@ namespace SimpleInjector.Integration.Web
             Requires.IsNotNull(container, "container");
 
             return () => GetCurrentScope(HttpContext.Current);
-        }
-
-        /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
-        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
-        /// </summary>
-        /// <param name="container">The container instance that is related to the scope to return.</param>
-        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public override Scope GetCurrentScope(Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return GetCurrentScope(HttpContext.Current);
         }
 
         private static Scope GetCurrentScope(HttpContext context)
