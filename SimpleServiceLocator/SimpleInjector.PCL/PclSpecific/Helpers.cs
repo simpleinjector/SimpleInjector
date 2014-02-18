@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
 
     internal static partial class Helpers
     {
@@ -30,6 +31,16 @@ namespace SimpleInjector
             Exception innerException)
         {
             throw new ArgumentException(message, innerException);
+        }
+
+        internal static void ForEach<T>(this List<T> list, Action<T> action)
+        {
+            int size = list.Count;
+
+            for (int i = 0; i < size; i++)
+            {
+                action(list[i]);
+            }
         }
     }
 }

@@ -36,17 +36,26 @@ namespace SimpleInjector
     /// </remarks>
     public class Scope : IDisposable
     {
-        private readonly Dictionary<Registration, object> cachedInstances =
-            new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+        private const int MaxRecursion = 100;
 
+        private Dictionary<Registration, object> cachedInstances;
         private List<Action> scopeEndActions;
         private List<IDisposable> disposables;
         private bool disposed;
+        private int recursionDuringDisposalCounter;
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
         /// but before the scope disposes any instances.
         /// </summary>
+        /// <remarks>
+        /// During the call to <see cref="Scope.Dispose"/> all registered <see cref="Action"/> delegates are
+        /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
+        /// to run</b>. In case an exception is thrown during the call to <see cref="Dispose"/>, the 
+        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point. 
+        /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
+        /// hand, are guaranteed to be disposed.
+        /// </remarks>
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
@@ -54,7 +63,8 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(action, "action");
             Requires.InstanceNotDisposed(this.disposed, "Scope");
-            
+            this.PreventCyclicDependenciesDuringDisposal();
+
             if (this.scopeEndActions == null)
             {
                 this.scopeEndActions = new List<Action>();
@@ -68,9 +78,10 @@ namespace SimpleInjector
         /// scope ends.
         /// </summary>
         /// <remarks>
-        /// Note to implementers: Instances registered for disposal will have to be disposed in the opposite
-        /// order of registration, since disposable components might still need to call disposable dependencies
-        /// in their Dispose() method.
+        /// Instances that are registered for disposal, will be disposed in opposite order of registration and
+        /// they are guaranteed to be disposed when <see cref="Scope.Dispose"/> is called (even when exceptions
+        /// are thrown). This mimics the behavior of the C# and VB <code>using</code> statements, where the
+        /// <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
         /// </remarks>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
@@ -79,6 +90,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(disposable, "disposable");
             Requires.InstanceNotDisposed(this.disposed, "Scope");
+            this.PreventCyclicDependenciesDuringDisposal();
 
             if (this.disposables == null)
             {
@@ -110,24 +122,26 @@ namespace SimpleInjector
                 return GetScopelessInstance(registration);
             }
 
-            object instance;
-
-            if (!scope.cachedInstances.TryGetValue(registration, out instance))
+            if (scope.cachedInstances == null)
             {
-                scope.cachedInstances[registration] = instance = registration.InstanceCreator();
-
-                if (registration.RegisterForDisposal)
-                {
-                    var disposable = instance as IDisposable;
-
-                    if (disposable != null)
-                    {
-                        scope.RegisterForDisposal(disposable);
-                    }
-                }
+                scope.cachedInstances =
+                    new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
             }
 
-            return (TService)instance;
+            object instance;
+
+            if (scope.cachedInstances.TryGetValue(registration, out instance))
+            {
+                return (TService)instance;
+            }
+            else
+            {
+                TService service = registration.InstanceCreator.Invoke();
+
+                scope.AddInstanceToCache(service, registration);
+
+                return service;
+            }
         }
 
         /// <summary>
@@ -138,14 +152,71 @@ namespace SimpleInjector
         {
             if (disposing)
             {
+                bool operatingInException = false;
+
                 try
                 {
-                    this.ExecuteAllRegisteredEndScopeActions();
+                    while (this.scopeEndActions != null)
+                    {
+                        this.ExecuteAllRegisteredEndScopeActions();
+
+                        this.recursionDuringDisposalCounter++;
+                    }
+                }
+                catch
+                {
+                    operatingInException = true;
+                    throw;
                 }
                 finally
                 {
-                    this.disposed = true;
+                    // We must reset the counter here, because even if a recursion was detected in one of the 
+                    // actions, we still want to try disposing all instances.
+                    this.recursionDuringDisposalCounter = 0;
+
+                    try
+                    {
+                        this.DisposeRecursively(operatingInException);
+                    }
+                    finally
+                    {
+                        this.disposed = true;
+                    }
+                }
+            }
+        }
+
+        private void DisposeRecursively(bool operatingInException)
+        {
+            if (this.disposables != null || (!operatingInException && this.scopeEndActions != null))
+            {
+                this.recursionDuringDisposalCounter++;
+
+                try
+                {
                     this.DisposeAllRegisteredDisposables();
+
+                    if (!operatingInException)
+                    {
+                        this.ExecuteAllRegisteredEndScopeActions();
+                    }
+                }
+                catch
+                {
+                    // When an exception is thrown during disposing, we imediately stop executing all
+                    // registered actions, but continu disposing all cached instances. This simulates the
+                    // behavior of a using statement, where the actions are part of the try-block.
+                    operatingInException = true;
+                    throw;
+                }
+                finally
+                {
+                    // We must break out of the recursion when we reach MaxRecursion, because not doing so
+                    // could cause a stackoverflow. When we
+                    if (this.recursionDuringDisposalCounter <= MaxRecursion)
+                    {
+                        this.DisposeRecursively(operatingInException);
+                    }
                 }
             }
         }
@@ -154,22 +225,11 @@ namespace SimpleInjector
         {
             if (this.scopeEndActions != null)
             {
-                try
-                {
-                    int index = 0;
+                var actions = this.scopeEndActions;
 
-                    // We can't use a foreach here, since a registered action could cause the registration of
-                    // a new actionn.
-                    while (index < this.scopeEndActions.Count)
-                    {
-                        this.scopeEndActions[index].Invoke();
-                        index++;
-                    }
-                }
-                finally
-                {
-                    this.scopeEndActions = null;
-                }
+                this.scopeEndActions = null;
+
+                actions.ForEach(action => action.Invoke());
             }
         }
 
@@ -177,22 +237,24 @@ namespace SimpleInjector
         {
             if (this.disposables != null)
             {
-                try
-                {
-                    int lastIndex = this.disposables.Count - 1;
-                    DisposeInstancesInReverseOrder(this.disposables, startingAsIndex: lastIndex);
-                }
-                finally
-                {
-                    this.disposables = null;
-                }
+                var instances = this.disposables;
+
+                this.disposables = null;
+
+                DisposeInstancesInReverseOrder(instances);
             }
         }
 
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
         // is called on each element, even if a previous instance threw an exception. 
-        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables, int startingAsIndex)
+        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
+            int startingAsIndex = int.MinValue)
         {
+            if (startingAsIndex == int.MinValue)
+            {
+                startingAsIndex = disposables.Count - 1;
+            }
+
             try
             {
                 while (startingAsIndex >= 0)
@@ -226,6 +288,37 @@ namespace SimpleInjector
                 StringResources.TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(
                     typeof(TService),
                     registration.Lifestyle));
+        }
+
+        private void AddInstanceToCache<TService, TImplementation>(TService service,
+            ScopedRegistration<TService, TImplementation> registration)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            this.cachedInstances[registration] = service;
+
+            if (registration.RegisterForDisposal)
+            {
+                var disposable = service as IDisposable;
+
+                if (disposable != null)
+                {
+                    this.RegisterForDisposal(disposable);
+                }
+            }
+        }
+
+        private void PreventCyclicDependenciesDuringDisposal()
+        {
+            if (this.recursionDuringDisposalCounter > MaxRecursion)
+            {
+                ThrowRecursionException();
+            }
+        }
+
+        private static void ThrowRecursionException()
+        {
+            throw new InvalidOperationException(StringResources.RecursiveInstanceRegistrationDetected());
         }
     }
 }

@@ -549,5 +549,13 @@ namespace SimpleInjector
                 "The registered decorator type factory returned type {0} which does not implement {1}.",
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
+
+        internal static string RecursiveInstanceRegistrationDetected()
+        {
+            return
+                "A recursive registration of Action or IDisposable instances was detected during disposal " +
+                "of the scope. This is possibly caused by a component that is directly or indirectly " +
+                "depending on itself.";
+        }
     }
 }

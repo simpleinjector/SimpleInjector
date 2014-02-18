@@ -17,6 +17,8 @@ Version vNext
 
 	Bug fixes:
 		-[Core] Concurrency bug fixed in collections registered with RegisterAllOpenGeneric. (work item 20681).
+		-[Core] Scoped lifestyles now allow resolving new instances while they are being disposed. Those
+		 resolved instances will be disposed as well.
 
 
 Version 2.4.1 (v2.4.1 RTM) 2014-01-14

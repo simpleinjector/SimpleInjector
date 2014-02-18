@@ -414,13 +414,180 @@
                 "Calling WhenScopeEnds should throw an ObjectDisposedException.");
         }
 
-        // NOTE: This is a quite odd requirement, and I'm not really sure what to do with this. How should
-        // the framework handle a situation where an object that is being disposed, triggers the registration
-        // of a new disposable object. That's a quite bizarre case. I desided to throw an ObjectDisposedException,
-        // since it's pretty hard to ensure that this object will actually be both disposed and disposed in the
-        // correct order.
         [TestMethod]
-        public void Dispose_RegisterForDisposalCalledOnScopeInDisposeMethodOfDisposedObject_ThrowsObjectDisposedException()
+        public void Dispose_ScopedInstanceResolvedDuringDisposingScope_CreatesInstanceWithExpectedLifestyle()
+        {
+            // Arrange
+            IPlugin plugin1 = null;
+            IPlugin plugin2 = null;
+
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin(), scopedLifestyle);
+
+            container.Register<DisposableObject>(() => new DisposableObject(disposing: _ =>
+            {
+                plugin1 = container.GetInstance<IPlugin>();
+                plugin2 = container.GetInstance<IPlugin>();
+            }), scopedLifestyle);
+
+            container.GetInstance<DisposableObject>();
+
+            // Act
+            scope.Dispose();
+
+            // Assert
+            Assert.IsNotNull(plugin1);
+            Assert.AreSame(plugin1, plugin2);
+        }
+
+        [TestMethod]
+        public void Dispose_ScopedInstanceResolvedDuringDisposingScope_DisposesThisInstanceLast()
+        {
+            // Arrange
+            var disposedObjects = new List<object>();
+
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin(disposedObjects.Add), scopedLifestyle);
+            container.Register<IDisposable>(() => new DisposableObject(disposedObjects.Add), scopedLifestyle);
+            container.Register<DisposableObject>(() => new DisposableObject(_ =>
+            {
+                container.GetInstance<IPlugin>();
+            }), scopedLifestyle);
+
+            container.GetInstance<IDisposable>();
+            container.GetInstance<DisposableObject>();
+
+            // Act
+            scope.Dispose();
+
+            // Assert
+            Assert.IsInstanceOfType(disposedObjects.Last(), typeof(DisposablePlugin),
+                "Since the disposable logger is requested during disposal of the scope, it should be " +
+                "disposed after all other already created services have been disposed. " +
+                "In the given case, disposing DisposableLogger before the IDisposable registration becomes " +
+                "a problem when that registration starts using ILogger in its dispose method as well.");
+        }
+
+        [TestMethod]
+        public void Dispose_InstanceResolvedDuringDisposingScopeRegisteringEndAction_CallsThisAction()
+        {
+            // Arrange
+            bool actionCalled = false;
+
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<DisposableObject>(() => new DisposableObject(_ =>
+            {
+                container.GetInstance<IPlugin>();
+            }), scopedLifestyle);
+
+            container.Register<IPlugin>(() =>
+            {
+                scope.WhenScopeEnds(() => actionCalled = true);
+                return new DisposablePlugin();
+            }, Lifestyle.Transient);
+
+            container.GetInstance<DisposableObject>();
+
+            // Act
+            scope.Dispose();
+
+            // Assert
+            Assert.IsTrue(actionCalled);
+        }
+
+        [TestMethod]
+        public void Dispose_ExceptionThrownDuringDisposalAfterResolvingNewInstance_DisposesThatInstance()
+        {
+            // Arrange
+            bool newlyResolvedInstanceDisposed = false;
+
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(
+                () => new DisposablePlugin(disposing: _ => newlyResolvedInstanceDisposed = true), 
+                scopedLifestyle);
+
+            container.Register<DisposableObject>(() => new DisposableObject(disposing: _ =>
+                {
+                    container.GetInstance<IPlugin>();
+                    throw new Exception("Bang!");
+                }), scopedLifestyle);
+
+            container.GetInstance<DisposableObject>();
+
+            try
+            {
+                // Act
+                scope.Dispose();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch
+            {
+                Assert.IsTrue(newlyResolvedInstanceDisposed);
+            }
+        }
+
+        [TestMethod]
+        public void Dispose_ExceptionThrownDuringDisposalAfterResolvingNewInstance_DoesNotCallAnyNewActions()
+        {
+            // Arrange
+            bool scopeEndActionCalled = false;
+
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin());
+            container.RegisterInitializer<IPlugin>(
+                plugin => scope.WhenScopeEnds(() => scopeEndActionCalled = true));
+
+            container.Register<DisposableObject>(() => new DisposableObject(_ =>
+            {
+                container.GetInstance<IPlugin>();
+                throw new Exception("Bang!");
+            }), scopedLifestyle);
+
+            try
+            {
+                // Act
+                scope.Dispose();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch
+            {
+                Assert.IsFalse(scopeEndActionCalled,
+                    "In case of an exception, no actions will be further executed. This lowers the change " +
+                    "the new exceptions are thrown from other actions that cover up the original exception.");
+            }
+        }
+
+        [TestMethod]
+        public void Dispose_RecursiveResolveTriggeredInDispose_ThrowsDescriptiveException()
         {
             // Arrange
             var scope = new Scope();
@@ -429,19 +596,126 @@
 
             var container = new Container();
 
-            container.Register<IDisposable>(() => new DisposableObject(), scopedLifestyle);
+            container.Register<IPlugin>(() =>
+            {
+                var plugin = new DisposablePlugin(disposing: _ =>
+                {
+                    // Recursive dependency
+                    // Although really bad practice, this must not cause an infinit spin or a stackoverflow.
+                    container.GetInstance<IPlugin>();
+                });
 
-            var disposable = new DisposableObject(disposing: _ => container.GetInstance<IDisposable>());
+                scope.RegisterForDisposal(plugin);
 
-            container.Register<DisposableObject>(() => disposable, scopedLifestyle);
+                return plugin;
+            });
 
-            container.GetInstance<DisposableObject>();
+            container.GetInstance<IPlugin>();
 
             // Act
             Action action = () => scope.Dispose();
 
             // Assert
-            AssertThat.ThrowWithMostInner<ObjectDisposedException>(action);
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The registered delegate for type IPlugin threw an exception. A recursive registration of 
+                Action or IDisposable instances was detected during disposal of the scope. 
+                This is possibly caused by a component that is directly or indirectly depending on itself"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void Dispose_RecursiveResolveTriggeredDuringEndScopeAction_ThrowsDescriptiveException()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() =>
+            {
+                scope.WhenScopeEnds(() =>
+                {
+                    container.GetInstance<IPlugin>();
+                });
+
+                return new DisposablePlugin();
+            });
+
+            container.GetInstance<IPlugin>();
+
+            // Act
+            Action action = () => scope.Dispose();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The registered delegate for type IPlugin threw an exception. A recursive registration of 
+                Action or IDisposable instances was detected during disposal of the scope. 
+                This is possibly caused by a component that is directly or indirectly depending on itself"
+                .TrimInside(), 
+                action);
+        }
+        
+        [TestMethod]
+        public void Dispose_RecursiveResolveTriggeredDuringEndScopeAction_StillDisposesRegisteredDisposables()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            var disposable = new DisposableObject();
+
+            scope.RegisterForDisposal(disposable);
+
+            container.Register<IPlugin>(() =>
+            {
+                scope.WhenScopeEnds(() =>
+                {
+                    container.GetInstance<IPlugin>();
+                });
+
+                return new DisposablePlugin();
+            });
+
+            container.GetInstance<IPlugin>();
+
+            try
+            {
+                // Act
+                scope.Dispose();
+
+                Assert.Fail("Exception expected.");
+            }
+            catch
+            {
+                // Assert
+                Assert.IsTrue(disposable.IsDisposedOnce,
+                    "Even though there was a recursion detected when executing Action delegates, all " +
+                    "registered disposables should still get disposed.");
+            }
+        }
+
+        private class DisposablePlugin : IPlugin, IDisposable
+        {
+            private readonly Action<DisposablePlugin> disposing;
+
+            public DisposablePlugin(Action<DisposablePlugin> disposing = null)
+            {
+                this.disposing = disposing;
+            }
+
+            public void Dispose()
+            {
+                if (this.disposing != null)
+                {
+                    this.disposing(this);
+                }
+            }
         }
 
         private sealed class DisposableObject : IDisposable

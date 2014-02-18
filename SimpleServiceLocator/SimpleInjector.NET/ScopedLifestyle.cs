@@ -215,9 +215,7 @@ namespace SimpleInjector
             // NOTE: This method is included for backwards compatibility :-(
             Requires.IsNotNull(disposables, "disposables");
 
-            var list = disposables.ToList();
-
-            Scope.DisposeInstancesInReverseOrder(list, startingAsIndex: list.Count - 1);
+            Scope.DisposeInstancesInReverseOrder(disposables.ToList());
         }
     }
 }
