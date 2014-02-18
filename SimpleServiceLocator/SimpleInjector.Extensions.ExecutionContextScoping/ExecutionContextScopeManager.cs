@@ -37,8 +37,18 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope CurrentScope
         {
-            get { return (ExecutionContextScope)CallContext.LogicalGetData(this.key); }
-            private set { CallContext.LogicalSetData(this.key, value); }
+            get 
+            {
+                var wrapper = (ExecutionContextScopeWrapper)CallContext.LogicalGetData(this.key);
+
+                return wrapper != null ? wrapper.Scope : null;
+            }
+            private set 
+            {
+                var wrapper = value == null ? null : new ExecutionContextScopeWrapper(value);
+
+                CallContext.LogicalSetData(this.key, wrapper);
+            }
         }
 
         internal ExecutionContextScope BeginExecutionContextScope()
@@ -78,6 +88,17 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
                 // an exception.
                 this.DisposeAllChildScopesOfScope(scope);
                 throw;
+            }
+        }
+        
+        [Serializable]
+        internal sealed class ExecutionContextScopeWrapper : MarshalByRefObject
+        {
+            internal readonly ExecutionContextScope Scope;
+
+            internal ExecutionContextScopeWrapper(ExecutionContextScope scope)
+            {
+                this.Scope = scope;
             }
         }
     }

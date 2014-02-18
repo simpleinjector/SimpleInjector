@@ -84,9 +84,7 @@
             var container = new Container();
 
             // Act
-            using (container.BeginExecutionContextScope())
-            {
-            }
+            container.BeginExecutionContextScope();
         }
 
         [TestMethod]
