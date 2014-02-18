@@ -122,26 +122,7 @@ namespace SimpleInjector
                 return GetScopelessInstance(registration);
             }
 
-            if (scope.cachedInstances == null)
-            {
-                scope.cachedInstances =
-                    new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
-            }
-
-            object instance;
-
-            if (scope.cachedInstances.TryGetValue(registration, out instance))
-            {
-                return (TService)instance;
-            }
-            else
-            {
-                TService service = registration.InstanceCreator.Invoke();
-
-                scope.AddInstanceToCache(service, registration);
-
-                return service;
-            }
+            return scope.GetInstance<TService, TImplementation>(registration);
         }
 
         /// <summary>
@@ -183,6 +164,35 @@ namespace SimpleInjector
                         this.disposed = true;
                     }
                 }
+            }
+        }
+
+        private TService GetInstance<TService, TImplementation>(
+            ScopedRegistration<TService, TImplementation> registration)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            Requires.InstanceNotDisposed(this.disposed, "Scope");
+
+            if (this.cachedInstances == null)
+            {
+                this.cachedInstances =
+                    new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+            }
+
+            object instance;
+
+            if (this.cachedInstances.TryGetValue(registration, out instance))
+            {
+                return (TService)instance;
+            }
+            else
+            {
+                TService service = registration.InstanceCreator.Invoke();
+
+                this.AddInstanceToCache(service, registration);
+
+                return service;
             }
         }
 

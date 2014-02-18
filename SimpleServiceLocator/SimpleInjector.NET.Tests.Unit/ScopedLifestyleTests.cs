@@ -700,6 +700,31 @@
             }
         }
 
+        [TestMethod]
+        public void GetInstance_CalledOnADisposedScope_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var scope = new Scope();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin(), scopedLifestyle);
+
+            container.GetInstance<IPlugin>();
+
+            scope.Dispose();
+
+            // Act
+            Action action = () => container.GetInstance<IPlugin>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Cannot access a disposed object.",
+                action);
+        }
+
         private class DisposablePlugin : IPlugin, IDisposable
         {
             private readonly Action<DisposablePlugin> disposing;
