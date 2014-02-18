@@ -133,9 +133,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Diagnostics.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.PCL", "SimpleInjector.PCL\SimpleInjector.PCL.csproj", "{7EB69A84-E589-460D-ABA2-43D34B12BC27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.ExecutionContextScoping", "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.csproj", "{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit", "SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit\SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit.csproj", "{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 19
+		SccNumberOfProjects = 21
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
 		SccLocalPath0 = .
@@ -193,6 +200,12 @@ Global
 		SccProjectUniqueName18 = SimpleInjector.PCL\\SimpleInjector.PCL.csproj
 		SccProjectName18 = SimpleInjector.PCL
 		SccLocalPath18 = SimpleInjector.PCL
+		SccProjectUniqueName19 = SimpleInjector.Extensions.ExecutionContextScoping\\SimpleInjector.Extensions.ExecutionContextScoping.csproj
+		SccProjectName19 = SimpleInjector.Extensions.ExecutionContextScoping
+		SccLocalPath19 = SimpleInjector.Extensions.ExecutionContextScoping
+		SccProjectUniqueName20 = SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit\\SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit.csproj
+		SccProjectName20 = SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit
+		SccLocalPath20 = SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -379,6 +392,26 @@ Global
 		{7EB69A84-E589-460D-ABA2-43D34B12BC27}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7EB69A84-E589-460D-ABA2-43D34B12BC27}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7EB69A84-E589-460D-ABA2-43D34B12BC27}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}.Release|x86.ActiveCfg = Release|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{51B4BBAE-1CBB-4EC0-8FFA-DEC37977C8A9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
