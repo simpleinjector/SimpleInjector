@@ -69,7 +69,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                 while (current != null && !object.ReferenceEquals(current, scope))
                 {
                     // LifetimeScope.Dispose calls EndLifetimeScope again.
-                    this.threadLocalScopes.Value.Dispose();
+                    current.Dispose();
 
                     current = this.threadLocalScopes.Value;
                 }

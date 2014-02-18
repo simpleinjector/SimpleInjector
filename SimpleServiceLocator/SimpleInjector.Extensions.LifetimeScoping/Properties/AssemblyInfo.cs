@@ -42,7 +42,6 @@ using System.Security;
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: AllowPartiallyTrustedCallers]
-[assembly: SecurityTransparent]
 
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
     Scope = "namespace",
