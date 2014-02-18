@@ -43,6 +43,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
                 return wrapper != null ? wrapper.Scope : null;
             }
+
             private set 
             {
                 var wrapper = value == null ? null : new ExecutionContextScopeWrapper(value);
