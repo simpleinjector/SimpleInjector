@@ -95,6 +95,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         [Serializable]
         internal sealed class ExecutionContextScopeWrapper : MarshalByRefObject
         {
+            [NonSerializedAttribute]
             internal readonly ExecutionContextScope Scope;
 
             internal ExecutionContextScopeWrapper(ExecutionContextScope scope)
