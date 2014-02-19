@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <version>{version}</version>
+    <authors>S. van Deursen</authors>
+    <owners>S. van Deursen</owners>
+    <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
+    <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement#ExecutionContextScope</projectUrl>
+    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
+    <dependencies>
+      <dependency id="SimpleInjector" version="{versionCore}" />
+    </dependencies>
+    <id>SimpleInjector.Extensions.ExecutionContextScoping</id>
+    <title>Simple Injector Execution Context Scoping Extensions</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The Execution Context Scoping Extensions package adds an advanced new lifestyle called 'Execution Context Scope', which allows instances to live within an explicitly defined execution context scope (or logical call context) and get disposed when this scope ends.</description>
+    <summary>Execution context scoping extensions for the Simple Injector Inversion of Control library.</summary>
+    <copyright>S. van Deursen 2014</copyright>
+    <language>en-US</language>
+    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator lifestyle execution context scope scoping logical call async await</tags>
+  </metadata>
+</package>

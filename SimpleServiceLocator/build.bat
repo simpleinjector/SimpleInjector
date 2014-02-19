@@ -13,6 +13,7 @@ set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
 set version_Extensions_LifetimeScoping=%version_Core%
+set version_Extensions_ExecutionContextScoping=%version_Core%
 
 
 
@@ -49,6 +50,7 @@ set named_version_Integration_WebForms=%version_Integration_WebForms%%prerelease
 set named_version_Integration_Mvc=%version_Integration_Mvc%%prereleasePostfix%
 set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
 set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%%prereleasePostfix%
+set named_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
 set numeric_version_Packaging=%version_Packaging%.%buildNumber%
@@ -58,6 +60,7 @@ set numeric_version_Integration_WebForms=%version_Integration_WebForms%.%buildNu
 set numeric_version_Integration_Mvc=%version_Integration_Mvc%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
+set numeric_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%.%buildNumber%
 
 
 if not exist SimpleInjector.snk goto :strong_name_key_missing
@@ -77,6 +80,7 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Packaging%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+%msbuild% "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Extensions_ExecutionContextScoping%
 %msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Web%
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Mvc%
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Wcf%
@@ -148,6 +152,8 @@ copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleI
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET45\Extensions\SimpleInjector.Packaging.xml
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.xml
 
 mkdir Releases\temp\NET40\Extensions
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
@@ -257,6 +263,18 @@ copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%named_version_Extensions_LifetimeScoping%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%named_version_Extensions_LifetimeScoping%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
+
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.ExecutionContextScoping Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
+%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
+%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.ExecutionContextScoping.%named_version_Extensions_ExecutionContextScoping%.zip"
+ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.ExecutionContextScoping.%named_version_Extensions_ExecutionContextScoping%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
