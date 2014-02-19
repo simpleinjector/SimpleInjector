@@ -27,6 +27,7 @@
   </AssemblyReferenceDirectories> 
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.LifetimeScoping.dll" Analyze="True" AnalyzeAllChildren="True" />
+  <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Extensions.ExecutionContextScoping.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Wcf.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.dll" Analyze="True" AnalyzeAllChildren="True" />
   <Target Name="$(ProjectDir)/bin/NET/SimpleInjector.Integration.Web.Mvc.dll" Analyze="True" AnalyzeAllChildren="True" />
