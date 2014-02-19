@@ -212,10 +212,10 @@ namespace SimpleInjector
         /// reference.</exception>
         protected internal static void DisposeInstances(IList<IDisposable> disposables)
         {
-            // NOTE: This method is included for backwards compatibility :-(
+            // NOTE: This method is included for backwards compatibility :-(. It was added in 2.4.0.
             Requires.IsNotNull(disposables, "disposables");
 
-            Scope.DisposeInstancesInReverseOrder(disposables.ToList());
+            Helpers.DisposeInstancesInReverseOrder(disposables.ToList());
         }
     }
 }

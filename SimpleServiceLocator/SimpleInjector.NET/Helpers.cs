@@ -186,6 +186,34 @@ namespace SimpleInjector
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
+        
+        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
+        // is called on each element, even if a previous instance threw an exception. 
+        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
+            int startingAsIndex = int.MinValue)
+        {
+            if (startingAsIndex == int.MinValue)
+            {
+                startingAsIndex = disposables.Count - 1;
+            }
+
+            try
+            {
+                while (startingAsIndex >= 0)
+                {
+                    disposables[startingAsIndex].Dispose();
+
+                    startingAsIndex--;
+                }
+            }
+            finally
+            {
+                if (startingAsIndex >= 0)
+                {
+                    DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
+                }
+            }
+        }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)
         {
