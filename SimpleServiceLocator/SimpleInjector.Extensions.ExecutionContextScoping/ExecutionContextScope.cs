@@ -26,7 +26,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     /// Logical execution context and container specific cache for services that are registered with the
     /// the <see cref="ExecutionContextScopeLifestyle"/>.
     /// </summary>
-    public sealed class ExecutionContextScope : Scope
+    internal sealed class ExecutionContextScope : Scope
     {
         private ExecutionContextScopeManager manager;
 

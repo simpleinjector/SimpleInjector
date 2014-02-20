@@ -32,7 +32,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     /// <see cref="SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(Container)">BeginExecutionContextScope</see>
     /// method. An execution context scope flows with the logical execution context. Scopes can be nested and
     /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
-    /// the created scope gets <see cref="ExecutionContextScope.Dispose">disposed</see>. 
+    /// the created scope gets disposed. 
     /// </summary>
     /// <example>
     /// The following example shows the usage of the <b>ExecutionContextScopeLifestyle</b> class:
@@ -55,22 +55,22 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         /// <summary>Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
         /// The created and cached instance will be disposed when the created 
-        /// <see cref="ExecutionContextScope"/> instance gets disposed and when the created object implements 
+        /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>.
         /// </summary>
         public ExecutionContextScopeLifestyle()
-            : this(disposeInstanceWhenExecutionContextScopeEnds: true)
+            : this(disposeInstanceWhenScopeEnds: true)
         {
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.</summary>
-        /// <param name="disposeInstanceWhenExecutionContextScopeEnds">
+        /// <param name="disposeInstanceWhenScopeEnds">
         /// Specifies whether the created and cached instance will be disposed when the created 
-        /// <see cref="ExecutionContextScope"/> instance gets disposed and when the created object implements 
+        /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
-        public ExecutionContextScopeLifestyle(bool disposeInstanceWhenExecutionContextScopeEnds)
-            : base("Execution Context Scope", disposeInstanceWhenExecutionContextScopeEnds)
+        public ExecutionContextScopeLifestyle(bool disposeInstanceWhenScopeEnds)
+            : base("Execution Context Scope", disposeInstanceWhenScopeEnds)
         {
         }
 

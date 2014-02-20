@@ -117,7 +117,7 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            RegisterExecutionContextScope<TService>(container, instanceCreator, disposeWhenExecutionContextScopeEnds: true);
+            RegisterExecutionContextScope<TService>(container, instanceCreator, disposeWhenScopeEnds: true);
         }
 
         /// <summary>
@@ -156,14 +156,14 @@ namespace SimpleInjector
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned for
         /// each execution context scope that has been started using 
         /// <see cref="BeginExecutionContextScope">BeginExecutionContextScope</see>.  When the execution context scope is disposed, 
-        /// <paramref name="disposeWhenExecutionContextScopeEnds"/> is set to <b>true</b>, and the cached instance
+        /// <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached instance
         /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
         /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="disposeWhenExecutionContextScopeEnds">If set to <c>true</c> the cached instance will be
+        /// <param name="disposeWhenScopeEnds">If set to <c>true</c> the cached instance will be
         /// disposed at the end of its lifetime.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
@@ -177,27 +177,27 @@ namespace SimpleInjector
             Justification = "A design without a generic T would be unpractical, because we will lose " +
             "compile-time support.")]
         public static void RegisterExecutionContextScope<TService, TImplementation>(
-            this Container container, bool disposeWhenExecutionContextScopeEnds)
+            this Container container, bool disposeWhenScopeEnds)
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
             Requires.IsNotNull(container, "container");
 
-            container.Register<TService, TImplementation>(ExecutionContextScopeLifestyle.Get(disposeWhenExecutionContextScopeEnds));
+            container.Register<TService, TImplementation>(ExecutionContextScopeLifestyle.Get(disposeWhenScopeEnds));
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the lifetime of a given scope that has been started using
         /// <see cref="BeginExecutionContextScope">BeginExecutionContextScope</see>. When the execution context scope is disposed, 
-        /// <paramref name="disposeWhenExecutionContextScopeEnds"/> is set to <b>true</b>, and the cached instance
+        /// <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached instance
         /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
         /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="disposeWhenExecutionContextScopeEnds">If set to <c>true</c> the cached instance will be
+        /// <param name="disposeWhenScopeEnds">If set to <c>true</c> the cached instance will be
         /// disposed at the end of its lifetime.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when either the <paramref name="container"/>, or <paramref name="instanceCreator"/> are
@@ -206,13 +206,13 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         public static void RegisterExecutionContextScope<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenExecutionContextScopeEnds)
+            Func<TService> instanceCreator, bool disposeWhenScopeEnds)
             where TService : class
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            container.Register<TService>(instanceCreator, ExecutionContextScopeLifestyle.Get(disposeWhenExecutionContextScopeEnds));
+            container.Register<TService>(instanceCreator, ExecutionContextScopeLifestyle.Get(disposeWhenScopeEnds));
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace SimpleInjector
         /// The scope should be disposed explicitly when the scope ends.
         /// </summary>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="ExecutionContextScope"/> instance.</returns>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <example>
@@ -236,7 +236,7 @@ namespace SimpleInjector
         /// }
         /// ]]></code>
         /// </example>
-        public static ExecutionContextScope BeginExecutionContextScope(this Container container)
+        public static Scope BeginExecutionContextScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
@@ -244,13 +244,13 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the <see cref="ExecutionContextScope"/> that is currently in scope or <b>null</b> when no
-        /// <see cref="ExecutionContextScope"/> is currently in scope.
+        /// Gets the Execution Context <see cref="Scope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="Scope"/> is currently in scope.
         /// </summary>
         /// <example>
         /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
         /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="ExecutionContextScope"/> in which context it is created:
+        /// for disposal in the <see cref="Scope"/> in which context it is created:
         /// <code lang="cs"><![CDATA[
         /// container.Register<IService, ServiceImpl>();
         /// container.RegisterInitializer<ServiceImpl>(instance =>
@@ -260,10 +260,10 @@ namespace SimpleInjector
         /// ]]></code>
         /// </example>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="ExecutionContextScope"/> instance.</returns>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        public static ExecutionContextScope GetCurrentExecutionContextScope(this Container container)
+        public static Scope GetCurrentExecutionContextScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
@@ -275,8 +275,6 @@ namespace SimpleInjector
         {
             var manager = (ExecutionContextScopeManager)container.GetItem(ManagerKey);
 
-            // NOTE: This double-checked lock might be broken on certain processor architectures, but I don't
-            // know how to fix that.
             if (manager == null)
             {
                 lock (ManagerKey)
