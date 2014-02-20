@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2013 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,49 +22,34 @@
 
 namespace SimpleInjector.Integration.Web.Mvc
 {
-    using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Mvc;
 
-    internal sealed class SimpleInjectorFilterAttributeFilterProvider : FilterAttributeFilterProvider
+    // This is a better implementation https://bit.ly/1nrjnxD, but that would unfortunately be a breaking change.
+    internal sealed class SimpleInjectorLegacyFilterProvider : FilterAttributeFilterProvider
     {
-        private readonly ConcurrentDictionary<Type, Registration> registrations =
-            new ConcurrentDictionary<Type, Registration>();
+        private readonly Container container;
 
-        private readonly Func<Type, Registration> registrationFactory;
-
-        public SimpleInjectorFilterAttributeFilterProvider(Container container)
+        public SimpleInjectorLegacyFilterProvider(Container container)
             : base(false)
         {
-            this.registrationFactory =
-                concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
+            this.container = container;
         }
 
         public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext,
             ActionDescriptor actionDescriptor)
         {
-            Filter[] filters = this.GetBaseFilters(controllerContext, actionDescriptor);
+            var filters = base.GetFilters(controllerContext, actionDescriptor).ToArray();
 
-            foreach (var filter in filters)
+            for (int index = 0; index < filters.Length; index++)
             {
-                var instance = filter.Instance;
+                var filter = filters[index];
 
-                Registration registration =
-                    this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
-
-                registration.InitializeInstance(instance);
+                this.container.InjectProperties(filter.Instance);
             }
 
             return filters;
-        }
-
-        private Filter[] GetBaseFilters(ControllerContext controllerContext, ActionDescriptor actionDescriptor)
-        {
-            IEnumerable<Filter> filters = base.GetFilters(controllerContext, actionDescriptor);
-
-            return (filters as Filter[]) ?? filters.ToArray();
         }
     }
 }

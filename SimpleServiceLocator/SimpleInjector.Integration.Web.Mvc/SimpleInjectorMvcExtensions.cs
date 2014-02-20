@@ -56,6 +56,37 @@ namespace SimpleInjector
                 throw new ArgumentNullException("container");
             }
 
+            var singletonFilterProvider = new SimpleInjectorLegacyFilterProvider(container);
+
+            container.RegisterSingle<IFilterProvider>(singletonFilterProvider);
+
+            var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToList();
+
+            providers.ForEach(provider => FilterProviders.Providers.Remove(provider));
+
+            FilterProviders.Providers.Add(singletonFilterProvider);
+        }
+
+        /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
+        /// Simple Injector pipeline (https://bit.ly/MEau5L). This allows any registered property to be 
+        /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
+        /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
+        /// attributes.
+        /// </summary>
+        /// <param name="container">The container that should be used for injecting properties into attributes
+        /// that the MVC framework uses.</param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
+            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
+                            "grouped together.")]
+        public static void RegisterMvcIntegratedFilterProvider(this Container container)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
+
             var singletonFilterProvider = new SimpleInjectorFilterAttributeFilterProvider(container);
 
             container.RegisterSingle<IFilterProvider>(singletonFilterProvider);
