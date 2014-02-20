@@ -436,6 +436,7 @@ namespace SimpleInjector
 
             return (
                 from property in candidates
+                where serviceType != typeof(Container)
                 where propertySelector.SelectProperty(serviceType, property)
                 select property)
                 .ToArray();
