@@ -65,6 +65,7 @@ namespace SimpleInjector
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public void WhenScopeEnds(Action action)
         {
             lock (this.syncRoot)
@@ -95,6 +96,7 @@ namespace SimpleInjector
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public void RegisterForDisposal(IDisposable disposable)
         {
             lock (this.syncRoot)
