@@ -537,7 +537,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenExecutionContextScopeEnds: true);
+            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenScopeEnds: true);
 
             DisposableCommand instanceToDispose;
 
@@ -557,7 +557,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenExecutionContextScopeEnds: false);
+            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenScopeEnds: false);
 
             DisposableCommand instanceToDispose;
 
