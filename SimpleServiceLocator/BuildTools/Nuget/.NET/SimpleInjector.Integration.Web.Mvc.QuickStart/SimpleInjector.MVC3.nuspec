@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <version>{version}</version>
-    <authors>S. van Deursen</authors>
-    <owners>S. van Deursen</owners>
+    <authors>Simple Injector Contributors</authors>
+    <owners>Simple Injector Contributors</owners>
     <licenseUrl>http://simpleinjector.codeplex.com/license</licenseUrl>
     <projectUrl>http://simpleinjector.codeplex.com/wikipage?title=MVC%20Integration</projectUrl>
     <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
@@ -21,7 +21,7 @@
     <description>Quick Start for Simple Injector ASP.NET MVC integration. This package adds the needed dependencies and code examples to get started quickly with Simple Injector in an MVC application.</description>
     <summary>Quick Start for Simple Injector ASP.NET MVC integration.</summary>
     <releaseNotes></releaseNotes>
-    <copyright>S. van Deursen 2011 - 2013</copyright>
+    <copyright>Simple Injector Contributors 2011 - 2013</copyright>
     <language>en-US</language>
     <tags>quick start simpleinjector MVC MVC3 architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver ControllerFactory</tags>
   </metadata>
