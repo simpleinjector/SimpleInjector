@@ -157,7 +157,7 @@ namespace SimpleInjector
 
                     try
                     {
-                        this.DisposeScope();
+                        this.DisposeRecursively();
                     }
                     finally
                     {
@@ -167,65 +167,52 @@ namespace SimpleInjector
             }
         }
 
-        private void DisposeScope()
+        private void DisposeRecursively(bool operatingInException = false)
         {
-            bool operatingInException = false;
+            if (this.disposables == null && (operatingInException || this.scopeEndActions == null))
+            {
+                return;
+            }
+
+            this.recursionDuringDisposalCounter++;
 
             try
             {
-                while (this.scopeEndActions != null)
+                if (!operatingInException)
                 {
-                    this.ExecuteAllRegisteredEndScopeActions();
-
-                    this.recursionDuringDisposalCounter++;
+                    while (this.scopeEndActions != null)
+                    {
+                        this.ExecuteAllRegisteredEndScopeActions();
+                        this.recursionDuringDisposalCounter++;
+                    }
                 }
+
+                this.DisposeAllRegisteredDisposables();
             }
             catch
             {
-                operatingInException = true;
+                // When an exception is thrown during disposing, we immediately stop executing all
+                // registered actions, but continue disposing all cached instances. This simulates the
+                // behavior of a using statement, where the actions are part of the try-block.
+                bool firstException = !operatingInException;
+                
+                if (firstException)
+                {
+                    // We must reset the counter here, because even if a recursion was detected in one of the 
+                    // actions, we still want to try disposing all instances.
+                    this.recursionDuringDisposalCounter = 0;
+                    operatingInException = true;
+                }
+
                 throw;
             }
             finally
             {
-                // We must reset the counter here, because even if a recursion was detected in one of the 
-                // actions, we still want to try disposing all instances.
-                this.recursionDuringDisposalCounter = 0;
-
-                this.DisposeRecursively(operatingInException);
-            }
-        }
-
-        private void DisposeRecursively(bool operatingInException)
-        {
-            if (this.disposables != null || (!operatingInException && this.scopeEndActions != null))
-            {
-                this.recursionDuringDisposalCounter++;
-
-                try
+                // We must break out of the recursion when we reach MaxRecursion, because not doing so
+                // could cause a stack overflow.
+                if (this.recursionDuringDisposalCounter <= MaxRecursion)
                 {
-                    this.DisposeAllRegisteredDisposables();
-
-                    if (!operatingInException)
-                    {
-                        this.ExecuteAllRegisteredEndScopeActions();
-                    }
-                }
-                catch
-                {
-                    // When an exception is thrown during disposing, we immediately stop executing all
-                    // registered actions, but continue disposing all cached instances. This simulates the
-                    // behavior of a using statement, where the actions are part of the try-block.
-                    operatingInException = true;
-                    throw;
-                }
-                finally
-                {
-                    // We must break out of the recursion when we reach MaxRecursion, because not doing so
-                    // could cause a stack overflow.
-                    if (this.recursionDuringDisposalCounter <= MaxRecursion)
-                    {
-                        this.DisposeRecursively(operatingInException);
-                    }
+                    this.DisposeRecursively(operatingInException);
                 }
             }
         }
