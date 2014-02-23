@@ -118,27 +118,6 @@
         }
 
         [TestMethod]
-        public void RegisterExecutionContextScope_CalledASingleTime_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.RegisterExecutionContextScope<ConcreteCommand>();
-        }
-
-        [TestMethod]
-        public void RegisterExecutionContextScope_CalledMultipleTimes_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.RegisterExecutionContextScope<ConcreteCommand>();
-            container.RegisterExecutionContextScope<ICommand>(() => new ConcreteCommand());
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetCurrentExecutionContextScope_WithNullContainerArgument_ThrowsExpectedException()
         {
@@ -219,7 +198,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             try
             {
@@ -244,7 +223,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             // Act
             container.Verify();
@@ -256,7 +235,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             using (container.BeginExecutionContextScope())
             {
@@ -274,7 +253,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             using (container.BeginExecutionContextScope())
             {
@@ -293,7 +272,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             using (container.BeginExecutionContextScope())
             {
@@ -316,7 +295,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             using (container.BeginExecutionContextScope())
             {
@@ -341,7 +320,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand command;
 
@@ -437,7 +416,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand command;
 
@@ -457,7 +436,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             // Act
             using (container.BeginExecutionContextScope())
@@ -477,7 +456,7 @@
 
             container.RegisterSingle<DisposableCommand>();
 
-            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand singleton;
 
@@ -497,7 +476,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommand>(disposeWhenExecutionContextScopeEnds: true);
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle(true));
 
             DisposableCommand instanceToDispose;
 
@@ -517,7 +496,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommand>(disposeWhenExecutionContextScopeEnds: false);
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle(false));
 
             DisposableCommand instanceToDispose;
 
@@ -537,7 +516,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenScopeEnds: true);
+            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle(true));
 
             DisposableCommand instanceToDispose;
 
@@ -557,7 +536,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<IDisposable, DisposableCommand>(disposeWhenScopeEnds: false);
+            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle(false));
 
             DisposableCommand instanceToDispose;
 
@@ -577,7 +556,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand command;
 
@@ -600,8 +579,10 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<DisposableCommandWithOverriddenEquality1>();
-            container.RegisterExecutionContextScope<DisposableCommandWithOverriddenEquality2>();
+            var lifestyle = new ExecutionContextScopeLifestyle();
+
+            container.Register<DisposableCommandWithOverriddenEquality1>(lifestyle);
+            container.Register<DisposableCommandWithOverriddenEquality2>(lifestyle);
 
             // Act
             DisposableCommandWithOverriddenEquality1 command1;
@@ -641,7 +622,7 @@
             try
             {
                 // Act
-                container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+                container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -659,35 +640,7 @@
         {
             SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(null);
         }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterExecutionContextScopeTConcrete_WithNullArgument_ThrowsExpectedException()
-        {
-            SimpleInjectorExecutionContextScopeExtensions.RegisterExecutionContextScope<ConcreteCommand>(null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterExecutionContextScopeTServiceTImplementation_WithNullArgument_ThrowsExpectedException()
-        {
-            SimpleInjectorExecutionContextScopeExtensions.RegisterExecutionContextScope<ICommand, ConcreteCommand>(null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterExecutionContextScopeTServiceFunc_WithNullContainerArgument_ThrowsExpectedException()
-        {
-            SimpleInjectorExecutionContextScopeExtensions.RegisterExecutionContextScope<ICommand>(null, () => null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void RegisterExecutionContextScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()
-        {
-            SimpleInjectorExecutionContextScopeExtensions.RegisterExecutionContextScope<ICommand>(new Container(), null);
-        }
-
+        
         [TestMethod]
         public void GetInstance_ExecutionContextScopedInstanceWithInitializer_CallsInitializerOncePerExecutionContextScope()
         {
@@ -696,7 +649,7 @@
 
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
 
@@ -719,7 +672,7 @@
 
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand>(() => new ConcreteCommand());
+            container.Register<ICommand>(() => new ConcreteCommand(), new ExecutionContextScopeLifestyle());
 
             container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
 
@@ -740,7 +693,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
 
@@ -764,7 +717,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
 
@@ -792,7 +745,7 @@
             // Same as previous test, but now with RegisterDecorator called first.
             container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
 
-            container.RegisterExecutionContextScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             using (container.BeginExecutionContextScope())
             {
@@ -1003,7 +956,7 @@
 
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ConcreteCommand>();
+            container.Register<ConcreteCommand>(new ExecutionContextScopeLifestyle());
 
             try
             {
@@ -1043,9 +996,11 @@
             // Outer depends on Middle that depends on Inner. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.RegisterExecutionContextScope<Middle>();
-            container.RegisterExecutionContextScope<Inner>();
-            container.RegisterExecutionContextScope<Outer>();
+            var lifestyle = new ExecutionContextScopeLifestyle();
+
+            container.Register<Middle>(lifestyle);
+            container.Register<Inner>(lifestyle);
+            container.Register<Outer>(lifestyle);
 
             var scope = container.BeginExecutionContextScope();
 
@@ -1096,9 +1051,11 @@
             // Middle depends on Inner that depends on property PropertyDependency. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.RegisterExecutionContextScope<PropertyDependency>();
-            container.RegisterExecutionContextScope<Middle>();
-            container.RegisterExecutionContextScope<Inner>();
+            var lifestyle = new ExecutionContextScopeLifestyle();
+
+            container.Register<PropertyDependency>(lifestyle);
+            container.Register<Middle>(lifestyle);
+            container.Register<Inner>(lifestyle);
 
             // Act
             var scope = container.BeginExecutionContextScope();
@@ -1135,7 +1092,7 @@
 
             Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
 
-            container.RegisterExecutionContextScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {
@@ -1179,7 +1136,7 @@
 
             Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
 
-            container.RegisterExecutionContextScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {
@@ -1223,7 +1180,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterExecutionContextScope<ICommand, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             container.Register<ClassDependingOn<ICommand>>();
 

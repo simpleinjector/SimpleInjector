@@ -48,7 +48,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     /// }
     /// ]]></code>
     /// </example>
-    public sealed class ExecutionContextScopeLifestyle : ScopedLifestyle
+    public class ExecutionContextScopeLifestyle : ScopedLifestyle
     {
         internal static readonly ExecutionContextScopeLifestyle WithDisposal = new ExecutionContextScopeLifestyle(true);
         internal static readonly ExecutionContextScopeLifestyle NoDisposal = new ExecutionContextScopeLifestyle(false);
@@ -70,7 +70,18 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// <see cref="IDisposable"/>. 
         /// </param>
         public ExecutionContextScopeLifestyle(bool disposeInstanceWhenScopeEnds)
-            : base("Execution Context Scope", disposeInstanceWhenScopeEnds)
+            : this("Execution Context Scope", disposeInstanceWhenScopeEnds)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
+        /// </summary>
+        /// <param name="name">The user friendly name of this lifestyle.</param>
+        /// <param name="disposeInstanceWhenScopeEnds">
+        /// Specifies whether the created and cached instance will be disposed when the created.</param>
+        protected ExecutionContextScopeLifestyle(string name, bool disposeInstanceWhenScopeEnds)
+            : base(name, disposeInstanceWhenScopeEnds)
         {
         }
 
