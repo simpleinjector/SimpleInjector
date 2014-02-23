@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertThat.cs" />
+    <Compile Include="AutomaticFactoryExtensionsTests.cs" />
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
