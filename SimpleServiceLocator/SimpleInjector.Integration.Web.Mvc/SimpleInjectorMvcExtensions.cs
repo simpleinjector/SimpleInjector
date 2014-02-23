@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Web.Compilation;
     using System.Web.Mvc;
-
+    using SimpleInjector.Advanced;
     using SimpleInjector.Integration.Web.Mvc;
 
     /// <summary>
@@ -66,7 +66,7 @@ namespace SimpleInjector
 
             FilterProviders.Providers.Add(singletonFilterProvider);
         }
-
+        
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
         /// Simple Injector pipeline (https://bit.ly/MEau5L). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
