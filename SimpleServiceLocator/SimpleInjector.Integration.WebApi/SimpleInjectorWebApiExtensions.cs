@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
@@ -251,6 +252,59 @@ namespace SimpleInjector
             controllerTypes.ForEach(type => container.Register(type, type, Lifestyle.Transient));
         }
 
+        /// <summary>
+        /// Makes the current <see cref="T:System.Net.Http.HttpRequestMessage" /> resolvable by calling
+        /// <see cref="GetCurrentHttpRequestMessage(Container)">GetCurrentHttpRequestMessage</see>.
+        /// </summary>
+        /// <param name="container">The container instance for which HttpRequestMessageTracking should be
+        /// enabled.</param>
+        /// <param name="configuration">The application's configuration.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference 
+        /// (Nothing in VB).</exception>
+        public static void EnableHttpRequestMessageTracking(this Container container, 
+            HttpConfiguration configuration)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(configuration, "configuration");
+
+            if (configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
+            {
+                container.RegisterWebApiRequest<SimpleInjectorHttpRequestMessageProvider>(
+                    () => new SimpleInjectorHttpRequestMessageProvider());
+
+                configuration.MessageHandlers.Add(new SimpleInjectorHttpRequestMessageHandler(container));
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="HttpRequestMessage"/> instance for the current request.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <returns>The <see cref="HttpRequestMessage"/> for the current request.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <see cref="EnableHttpRequestMessageTracking"/> is called.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> argument
+        /// is a null reference (Nothing in VB).</exception>
+        public static HttpRequestMessage GetCurrentHttpRequestMessage(this Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            IServiceProvider provider = container;
+
+            var messageProvider = provider.GetService(typeof(SimpleInjectorHttpRequestMessageProvider))
+                as SimpleInjectorHttpRequestMessageProvider;
+
+            if (messageProvider == null)
+            {
+                throw new InvalidOperationException(
+                    "Resolving the current HttpRequestMessage has not been enabled. Make sure " +
+                    "container.EnableHttpRequestMessageTracking(GlobalConfiguration.Configuration) has " + 
+                    "been called during startup.");
+            }
+
+            return messageProvider.CurrentMessage;
+        }
+        
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)
         {
             IAssembliesResolver assembliesResolver = configuration.Services.GetAssembliesResolver();
