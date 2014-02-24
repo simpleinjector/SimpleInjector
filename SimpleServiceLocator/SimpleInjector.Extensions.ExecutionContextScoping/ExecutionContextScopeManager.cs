@@ -32,7 +32,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     [SecuritySafeCritical]
     internal sealed class ExecutionContextScopeManager
     {
-        private readonly object locker = new object();
+        private readonly object syncRoot = new object();
         private readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
         internal ExecutionContextScope CurrentScope
@@ -54,7 +54,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope BeginExecutionContextScope()
         {
-            lock (this.locker)
+            lock (this.syncRoot)
             {
                 var parentScope = this.CurrentScope;
                 var scope = new ExecutionContextScope(this, parentScope);
@@ -65,33 +65,23 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal void EndExecutionContextScope(ExecutionContextScope scope)
         {
-            this.CurrentScope = scope.ParentScope;
-        }
-
-        internal void DisposeAllChildScopesOfScope(ExecutionContextScope scope)
-        {
-            try
+            lock (this.syncRoot)
             {
-                var current = this.CurrentScope;
-
-                while (current != null && !object.ReferenceEquals(current, scope))
+                // Check if this object is in charge for maintaining the current scope (e.g. we are the currently registered scope or an ancestor of it).
+                if (scope.IsAncestorOfCurrentScope)
                 {
-                    // ExecutionContextScope.Dispose calls EndLifetimeScope again.
-                    current.Dispose();
-
-                    current = this.CurrentScope;
+                    if (scope.IsParentAlive)
+                    {
+                        this.CurrentScope = scope.ParentScope;
+                    }
+                    else
+                    {
+                        this.CurrentScope = null;       // there is no parent scope or the parent scope was disposed earlier
+                    }
                 }
             }
-            catch
-            {
-                // In case of an exception, we recursively call DisposeAllChildScopesOfScope again. Not doing
-                // this would prevent scopes from being disposed in case one of their child scopes would throw
-                // an exception.
-                this.DisposeAllChildScopesOfScope(scope);
-                throw;
-            }
         }
-        
+
         [Serializable]
         internal sealed class ExecutionContextScopeWrapper : MarshalByRefObject
         {

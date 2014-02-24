@@ -38,6 +38,34 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope ParentScope { get; private set; }
 
+
+        /// <summary>
+        /// Determines whether this object is the currenty registered execution context scope or an ancestor of it.
+        /// </summary>
+        internal bool IsAncestorOfCurrentScope
+        {
+            get
+            {
+                var currentScope = this.manager.CurrentScope;
+                while (currentScope != null)
+                {
+                    if (object.ReferenceEquals(this, currentScope))
+                    {
+                        return true;
+                    }
+
+                    currentScope = currentScope.ParentScope;
+                }
+
+                return false;
+            }
+        }
+
+        internal bool IsParentAlive
+        {
+            get { return this.ParentScope != null && this.ParentScope.IsAlive; }
+        }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
         /// resources.
@@ -50,24 +78,17 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             {
                 try
                 {
-                    this.manager.DisposeAllChildScopesOfScope(this);
+                    base.Dispose(disposing);
                 }
                 finally
                 {
                     try
                     {
-                        base.Dispose(disposing);
+                        this.manager.EndExecutionContextScope(this);
                     }
                     finally
                     {
-                        try
-                        {
-                            this.manager.EndExecutionContextScope(this);
-                        }
-                        finally
-                        {
-                            this.manager = null;
-                        }
+                        this.manager = null;
                     }
                 }
             }
