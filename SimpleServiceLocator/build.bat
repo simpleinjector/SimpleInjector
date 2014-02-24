@@ -12,9 +12,9 @@ set version_Integration_Web=%version_Core%
 set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
+set version_Integration_WebApi=%version_Core%
 set version_Extensions_LifetimeScoping=%version_Core%
 set version_Extensions_ExecutionContextScoping=%version_Core%
-
 
 
 call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
@@ -49,6 +49,7 @@ set named_version_Integration_Web=%version_Integration_Web%%prereleasePostfix%
 set named_version_Integration_WebForms=%version_Integration_WebForms%%prereleasePostfix%
 set named_version_Integration_Mvc=%version_Integration_Mvc%%prereleasePostfix%
 set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
+set named_version_Integration_WebApi=%version_Integration_WebApi%%prereleasePostfix%
 set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%%prereleasePostfix%
 set named_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%%prereleasePostfix%
 
@@ -59,6 +60,7 @@ set numeric_version_Integration_Web=%version_Integration_Web%.%buildNumber%
 set numeric_version_Integration_WebForms=%version_Integration_WebForms%.%buildNumber%
 set numeric_version_Integration_Mvc=%version_Integration_Mvc%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
+set numeric_version_Integration_WebApi=%version_Integration_WebApi%.%buildNumber%
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
 set numeric_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%.%buildNumber%
 
@@ -84,6 +86,7 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
 %msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Web%
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Mvc%
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Wcf%
+%msbuild% "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Integration_WebApi%
 
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
@@ -168,6 +171,8 @@ copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET45\Integrat
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.xml
 copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.dll
 copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.xml
+copy bin\NET\SimpleInjector.Integration.WebApi.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.dll
+copy bin\NET\SimpleInjector.Integration.WebApi.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.xml
 
 mkdir Releases\temp\NET40\Integration
 copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
@@ -334,6 +339,19 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 %replace% /source:Releases\temp\package\services\metadata\core-properties\a47c8b1328f541fc8a5cd4c0446d5fe1.psmdcp {version} %named_version_Integration_Wcf%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.QuickStart.%named_version_Integration_Wcf%.zip"
 ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.QuickStart.%named_version_Integration_Wcf%.zip" "*.nupkg"
+rmdir Releases\temp /s /q
+
+mkdir Releases\temp
+xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.WebApi Releases\temp /E /H
+attrib -r "%CD%\Releases\temp\*.*" /s /d
+copy bin\NET\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
+copy bin\NET\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
+%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
+%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version_Extensions_ExecutionContextScoping} %named_version_Extensions_ExecutionContextScoping%
+%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\package\services\metadata\core-properties\a3b1f940a1584e868b3266ff38ba4e08.psmdcp {version} %named_version_Integration_WebApi%
+%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.WebApi.%named_version_Integration_WebApi%.zip"
+ren "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.WebApi.%named_version_Integration_WebApi%.zip" "*.nupkg"
 rmdir Releases\temp /s /q
 
 echo Done!

@@ -37,6 +37,8 @@
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Diagnostics.dll" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll" />
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml" />
+      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.dll" />
+      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>
@@ -53,7 +55,8 @@
 <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
 <NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace is part of the &lt;b&gt;SimpleInjector.Diagnostics.dll&lt;/b&gt; and adds diagnostic capabilities to Simple Injector.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem></NamespaceSummaries>
+<NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="SimpleInjector.Integration.WebApi" isDocumented="True">The SimpleInjector.Integration.WebApi namespace is part of the &lt;b&gt;SimpleInjector.Integration.WebApi.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web API web applications.</NamespaceSummaryItem></NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
