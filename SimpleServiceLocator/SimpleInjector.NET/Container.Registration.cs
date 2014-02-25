@@ -1222,6 +1222,8 @@ namespace SimpleInjector
         {
             this.IsVerifying = true;
 
+            this.VerificationScope = new ContainerVerificationScope();
+
             try
             {
                 this.VerifyIfAllExpressionsCanBeBuilt();
@@ -1231,6 +1233,9 @@ namespace SimpleInjector
             finally
             {
                 this.IsVerifying = false;
+                var scopeToDispose = this.VerificationScope;
+                this.VerificationScope = null;
+                scopeToDispose.Dispose();
             }
         }
 
@@ -1665,6 +1670,14 @@ namespace SimpleInjector
                         serviceType);
 
                 throw new NotSupportedException(exceptionMessage);
+            }
+        }
+        
+        private sealed class ContainerVerificationScope : Scope
+        {
+            public override void WhenScopeEnds(Action action)
+            {
+                // No-op.
             }
         }
     }

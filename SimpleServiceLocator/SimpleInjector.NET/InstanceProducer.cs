@@ -310,10 +310,6 @@ namespace SimpleInjector
             try
             {
                 // Test the creator
-                // NOTE: We've got our first quirk in the design here: The returned object could implement
-                // IDisposable, but there is no way for us to know if we should actually dispose this 
-                // instance or not :-(. Disposing it could make us prevent a singleton from ever being
-                // used; not disposing it could make us leak resources :-(.
                 instance = this.GetInstance();
 
                 this.DoExtraVerfication();

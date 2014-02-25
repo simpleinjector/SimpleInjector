@@ -92,10 +92,8 @@ namespace SimpleInjector.Integration.Web
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public override Scope GetCurrentScope(Container container)
+        protected override Scope GetCurrentScopeCore(Container container)
         {
-            Requires.IsNotNull(container, "container");
-
             return GetCurrentScope(HttpContext.Current);
         }
 
@@ -161,7 +159,7 @@ namespace SimpleInjector.Integration.Web
                 // If there are multiple container instances that run on the same request (which is a
                 // strange but valid scenario), all containers will get the same Scope instance for that
                 // request. This behavior is correct and even allows all instances that are registered for
-                // disposal to be disposed in reversed order of creation, independant of the container that
+                // disposal to be disposed in reversed order of creation, independent of the container that
                 // created them.
                 context.Items[ScopeKey] = scope = new Scope();
             }

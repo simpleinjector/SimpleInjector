@@ -183,9 +183,11 @@ namespace SimpleInjector
             get { return this.succesfullyVerified; }
         }
 
+        internal Scope VerificationScope { get; private set; }
+
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
-        /// types, and all implictly registered instances. Implicit registrations are  all concrete 
+        /// types, and all implicitly registered instances. Implicit registrations are  all concrete 
         /// unregistered types that have been requested, all types that have been resolved using
         /// unregistered type resolution (using the <see cref="ResolveUnregisteredType"/> event), and
         /// requested unregistered collections. Note that the result of this method may change over time, 
@@ -193,7 +195,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
+        /// This method has a performance characteristic of O(n). Prevent from calling this in a performance
         /// critical path of the application.
         /// </para>
         /// <para>

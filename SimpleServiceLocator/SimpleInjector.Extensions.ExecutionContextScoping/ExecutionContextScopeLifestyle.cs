@@ -98,7 +98,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public override Scope GetCurrentScope(Container container)
+        protected override Scope GetCurrentScopeCore(Container container)
         {
             return container.GetExecutionContextScopeManager().CurrentScope;
         }

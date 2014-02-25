@@ -1,9 +1,18 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version 2.5.0 (v2.5 RTM)
 
 	General description:
+		The most prominent new feature is the addition of async/await support. This is supported by the
+		addition of a new ExecutionContextScoping package and the ExecutionContextScopeLifestyle. On top of 
+		this is the new Web API integration package that allows registering instances with a 
+		WebApiRequestLifestyle for both IIS-hosted and self-hosted Web API projects.
+
+		Besides these, there are lots of small improvements and bug fixes in the core library, such as the
+		ability to register a factory-factory delegate using the RegisterDecorator overloads, which allows
+		creating new decorator types based on contextual information.
+
 
 	New features:
 		-[ExecutionContextScoping] New SimpleInjector.Extensions.ExecutionContextScoping project has been
@@ -19,6 +28,8 @@ Version vNext
 		-[Core/LifestyleScoping/Web/Wcf] Performance improvements for ScopeLifestyle derivatives. Resolving 
 		 the scope is now done once per compiled delegate and resolving an scoped instance from that scope is 
 		 also done just once per compiled delegate. (work item 20641)
+		-[Core] A call to verify will now ensure deterministic disposal of the scoped instances that are
+		 created during verification. (work item 20773)
 
 	Bug fixes:
 		-[Core] Concurrency bug fixed in collections registered with RegisterAllOpenGeneric. (work item 20681).

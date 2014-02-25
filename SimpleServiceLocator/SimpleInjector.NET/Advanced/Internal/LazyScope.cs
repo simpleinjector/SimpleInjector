@@ -23,26 +23,28 @@
 namespace SimpleInjector.Advanced.Internal
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// This is an internal type. Only depend on this type when you want to be absolutely sure a future 
     /// version of the framework will break your code.
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
         Justification = "This struct is not intended for public use.")]
     public struct LazyScope
     {
+        private readonly Container container;
         private Func<Scope> scopeFactory;
         private Scope value;
 
         /// <summary>Initializes a new instance of the <see cref="LazyScope"/> struct.</summary>
         /// <param name="scopeFactory">The scope factory.</param>
-        public LazyScope(Func<Scope> scopeFactory)
+        /// <param name="container">The container.</param>
+        public LazyScope(Func<Scope> scopeFactory, Container container)
         {
             this.scopeFactory = scopeFactory;
+            this.container = container;
             this.value = null;
         }
 
@@ -54,7 +56,7 @@ namespace SimpleInjector.Advanced.Internal
             {
                 if (this.scopeFactory != null)
                 {
-                    this.value = this.scopeFactory.Invoke();
+                    this.value = this.scopeFactory.Invoke() ?? this.container.VerificationScope;
                     this.scopeFactory = null;
                 }
 

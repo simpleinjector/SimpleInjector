@@ -106,7 +106,7 @@ namespace SimpleInjector
         // After: 
         // Func<HomeController> factory = () =>
         // {
-        //     var scope1 = new LazyScope(scopeFactory1);
+        //     var scope1 = new LazyScope(scopeFactory1, container);
         //     var value1 = new LazyScopedRegistration<IRepository, RepositoryImpl>(reg1);
         //     var value2 = new LazyScopedRegistration<IService, ServiceImpl>(reg2);
         //
@@ -121,7 +121,7 @@ namespace SimpleInjector
             var lifestyleAssigmentExpressions = (
                 from lifestyleInfo in lifestyleInfos
                 let scopeFactory = lifestyleInfo.Lifestyle.CreateCurrentScopeProvider(container)
-                let newExpression = CreateNewLazyScopeExpression(scopeFactory)
+                let newExpression = CreateNewLazyScopeExpression(scopeFactory, container)
                 select Expression.Assign(lifestyleInfo.Variable, newExpression))
                 .ToArray();
 
@@ -147,11 +147,12 @@ namespace SimpleInjector
                         .Concat(new[] { optimizedExpression })));
         }
 
-        private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory)
+        private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container)
         {
             return Expression.New(
-                typeof(LazyScope).GetConstructor(new[] { typeof(Func<Scope>) }),
-                Expression.Constant(scopeFactory));
+                typeof(LazyScope).GetConstructor(new[] { typeof(Func<Scope>), typeof(Container) }),
+                Expression.Constant(scopeFactory, typeof(Func<Scope>)),
+                Expression.Constant(container, typeof(Container)));
         }
 
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)

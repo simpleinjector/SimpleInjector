@@ -65,6 +65,15 @@ namespace SimpleInjector
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
         /// but before the scope disposes any instances.
         /// </summary>
+        /// <remarks>
+        /// During the call to <see cref="Scope.Dispose()"/> all registered <see cref="Action"/> delegates are
+        /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
+        /// to run</b>. In case an exception is thrown during the call to <see cref="Scope.Dispose()"/>, the 
+        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point. 
+        /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
+        /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
+        /// to <see cref="Container.Verify" />.
+        /// </remarks>
         /// <param name="container">The <see cref="Container"/> instance.</param>
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
@@ -81,13 +90,6 @@ namespace SimpleInjector
 
             if (scope == null)
             {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
                 throw new InvalidOperationException(
                     StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
             }
@@ -120,13 +122,6 @@ namespace SimpleInjector
 
             if (scope == null)
             {
-                if (container.IsVerifying())
-                {
-                    // We're verifying the container, it's impossible to register the action somewhere, but
-                    // verification should absolutely not fail because of this.
-                    return;
-                }
-
                 throw new InvalidOperationException(
                     StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
             }
@@ -140,7 +135,20 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public virtual Scope GetCurrentScope(Container container)
+        public Scope GetCurrentScope(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            return this.GetCurrentScopeCore(container) ?? container.VerificationScope;
+        }
+
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected virtual Scope GetCurrentScopeCore(Container container)
         {
             Requires.IsNotNull(container, "container");
 

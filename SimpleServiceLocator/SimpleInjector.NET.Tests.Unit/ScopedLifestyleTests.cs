@@ -727,6 +727,112 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetCurrentScope_CalledOutsideOfVerification_ReturnsNull()
+        {
+            // Arrange
+            var scopedLifestyle = new FakeScopedLifestyle(scope: null);
+
+            // Act
+            var actualScope = scopedLifestyle.GetCurrentScope(new Container());
+
+            // Assert
+            Assert.IsNull(actualScope);
+        }
+
+        [TestMethod]
+        public void Verify_VerifyingAScopedInstance_DisposesThatInstance()
+        {
+            // Arrange
+            var disposable = new DisposableObject();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope: null);
+
+            var container = new Container();
+
+            container.Register<IDisposable>(() => disposable, scopedLifestyle);
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsTrue(disposable.IsDisposedOnce);
+        }
+
+        [TestMethod]
+        public void GetCurrentScope_CalledDuringVerification_ReturnsAScope()
+        {
+            // Arrange
+            Scope scopeDuringVerification = null;
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope: null);
+
+            var container = new Container();
+
+            container.Register<IDisposable>(() => new DisposableObject(), scopedLifestyle);
+
+            container.RegisterInitializer<IDisposable>(_ =>
+            {
+                scopeDuringVerification = scopedLifestyle.GetCurrentScope(container);
+            });
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsNotNull(scopeDuringVerification);
+        }
+
+        [TestMethod]
+        public void Verify_RegisterForDisposalCalledDuringVerification_EnsuresDisposalOfRegisteredDisposable()
+        {
+            // Arrange
+            var disposable = new DisposableObject();
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope: null);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin());
+
+            container.RegisterInitializer<IPlugin>(_ =>
+            {
+                scopedLifestyle.RegisterForDisposal(container, disposable);
+            });
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsTrue(disposable.IsDisposedOnce);
+        }
+
+        [TestMethod]
+        public void Verify_WhenScopeEndsCalledDuringVerification_WontCallActionWhenFinished()
+        {
+            // Arrange
+            bool actionCalled = false;
+
+            var scopedLifestyle = new FakeScopedLifestyle(scope: null);
+
+            var container = new Container();
+
+            container.Register<IPlugin>(() => new DisposablePlugin());
+
+            container.RegisterInitializer<IPlugin>(_ =>
+            {
+                scopedLifestyle.WhenScopeEnds(container, () => actionCalled = true);
+            });
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsFalse(actionCalled, 
+                "Any registered action delegates should not be called during verification " + 
+                "(but registration should succeed). Users are allowed to do any ");
+        }
+
         private class DisposablePlugin : IPlugin, IDisposable
         {
             private readonly Action<DisposablePlugin> disposing;
