@@ -16,8 +16,9 @@ Version 2.5.0 (v2.5 RTM)
 
 	New features:
 		-[ExecutionContextScoping] New SimpleInjector.Extensions.ExecutionContextScoping project has been
-		 added that allows defining a scope that flows through asynchronous operations.
+		 added that allows defining a scope that flows through asynchronous operations. (work item 20738)
 		-[WebApi] New SimpleInjector.Integration.WebApi project has been added that adds support for Web API.
+		 (work item 20082)
 
 	Improvements:
 		-[Core] New RegisterDecorator overload added that allows supplying a factory delegate for creating
