@@ -28,7 +28,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
+    /// Defines a lifestyle that caches instances during the lifetime of an explicitly defined scope using the
     /// <see cref="SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(Container)">BeginExecutionContextScope</see>
     /// method. An execution context scope flows with the logical execution context. Scopes can be nested and
     /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 

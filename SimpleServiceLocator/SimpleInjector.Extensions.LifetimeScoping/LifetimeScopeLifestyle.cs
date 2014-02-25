@@ -28,7 +28,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Defines a lifestyle that caches instances during the lifetime of an explictly defined scope using the
+    /// Defines a lifestyle that caches instances during the lifetime of an explicitly defined scope using the
     /// <see cref="SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(Container)">BeginLifetimeScope</see>
     /// method. A scope is thread-specific, each thread should define its own scope. Scopes can be nested and
     /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
