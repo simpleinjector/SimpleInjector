@@ -302,7 +302,7 @@ namespace SimpleInjector
                     "been called during startup.");
             }
 
-            return messageProvider.CurrentMessage;
+            return messageProvider.GetCurrentMessage();
         }
         
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)

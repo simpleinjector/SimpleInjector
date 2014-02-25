@@ -26,6 +26,18 @@ namespace SimpleInjector.Integration.WebApi
 
     internal sealed class SimpleInjectorHttpRequestMessageProvider
     {
-        internal HttpRequestMessage CurrentMessage;
+        // We explicitly don't use a property here, because that might conflict with a custom
+        // IPropertySelectionBehavior that the user might have used.
+        private HttpRequestMessage currentMessage;
+
+        internal void SetCurrentMessage(HttpRequestMessage currentMessage)
+        {
+            this.currentMessage = currentMessage;
+        }
+
+        internal HttpRequestMessage GetCurrentMessage()
+        {
+            return this.currentMessage;
+        }
     }
 }

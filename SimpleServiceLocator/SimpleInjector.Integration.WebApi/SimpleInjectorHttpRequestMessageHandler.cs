@@ -42,7 +42,7 @@ namespace SimpleInjector.Integration.WebApi
         {
             var provider = (SimpleInjectorHttpRequestMessageProvider)this.providerProducer.Value.GetInstance();
 
-            provider.CurrentMessage = request;
+            provider.SetCurrentMessage(request);
 
             return base.SendAsync(request, cancellationToken);
         }
