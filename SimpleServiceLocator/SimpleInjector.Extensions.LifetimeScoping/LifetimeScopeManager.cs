@@ -47,40 +47,24 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         internal LifetimeScope CurrentScope
         {
             get { return this.threadLocalScopes.Value; }
+            private set { this.threadLocalScopes.Value = value; }
         }
 
         internal LifetimeScope BeginLifetimeScope()
         {
-            return this.threadLocalScopes.Value = 
-                new LifetimeScope(this, parentScope: this.threadLocalScopes.Value);
+            return this.CurrentScope = new LifetimeScope(this, parentScope: this.CurrentScope);
         }
 
         internal void RemoveLifetimeScope(LifetimeScope scope)
         {
-            this.threadLocalScopes.Value = scope.ParentScope;
-        }
-
-        internal void DisposeAllChildScopesOfScope(LifetimeScope scope)
-        {
-            try
+            // If the scope is not the current scope or one of its ancestors, this means that either one of
+            // the scope's parents have already been disposed, or the scope is disposed on a completely
+            // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
+            // since would cause an invalid scope to be registered as the current scope (this scope will
+            // either be disposed or does not belong to the current execution context).
+            if (scope.IsCurrentScopeOrAncestor)
             {
-                var current = this.threadLocalScopes.Value;
-
-                while (current != null && !object.ReferenceEquals(current, scope))
-                {
-                    // LifetimeScope.Dispose calls EndLifetimeScope again.
-                    current.Dispose();
-
-                    current = this.threadLocalScopes.Value;
-                }
-            }
-            catch
-            {
-                // In case of an exception, we recursively call DisposeAllChildScopesOfScope again. Not doing
-                // this would prevent scopes from being disposed in case one of their child scopes would throw
-                // an exception.
-                this.DisposeAllChildScopesOfScope(scope);
-                throw;
+                this.CurrentScope = scope.ParentScope;
             }
         }
     }

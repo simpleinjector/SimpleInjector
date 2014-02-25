@@ -46,6 +46,27 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         }
 
         internal LifetimeScope ParentScope { get; private set; }
+        
+        // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
+        internal bool IsCurrentScopeOrAncestor
+        {
+            get
+            {
+                var currentScope = this.manager.CurrentScope;
+
+                while (currentScope != null)
+                {
+                    if (object.ReferenceEquals(this, currentScope))
+                    {
+                        return true;
+                    }
+
+                    currentScope = currentScope.ParentScope;
+                }
+
+                return false;
+            }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
@@ -75,24 +96,17 @@ namespace SimpleInjector.Extensions.LifetimeScoping
 
                 try
                 {
-                    this.manager.DisposeAllChildScopesOfScope(this);
+                    base.Dispose(disposing);
                 }
                 finally
                 {
                     try
                     {
-                        base.Dispose(disposing);
+                        this.manager.RemoveLifetimeScope(this);
                     }
                     finally
                     {
-                        try
-                        {
-                            this.manager.RemoveLifetimeScope(this);
-                        }
-                        finally
-                        {
-                            this.manager = null;
-                        }
+                        this.manager = null;
                     }
                 }
             }

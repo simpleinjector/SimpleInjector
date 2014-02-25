@@ -1179,98 +1179,6 @@
         }
 
         [TestMethod]
-        public void WhenScopeEnds_DisposingAnOuterScope_DisposalAllItsInnerScopesAsWell()
-        {
-            // Arrange
-            const bool IsDisposed = true;
-
-            var container = new Container();
-
-            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
-
-            container.RegisterLifetimeScope<DisposableCommand>();
-
-            container.RegisterInitializer<DisposableCommand>(command =>
-            {
-                commands[command] = !IsDisposed;
-
-                command.Disposing += _ =>
-                {
-                    commands[command] = IsDisposed;
-                };
-            });
-
-            var outerScope = container.BeginLifetimeScope();
-
-            container.GetInstance<DisposableCommand>();
-
-            container.BeginLifetimeScope();
-
-            container.GetInstance<DisposableCommand>();
-
-            container.BeginLifetimeScope();
-
-            container.GetInstance<DisposableCommand>();
-
-            Assert.AreEqual(3, commands.Count);
-            Assert.IsFalse(commands.Any(c => c.Value == IsDisposed));
-
-            // Act
-            outerScope.Dispose();
-
-            // Assert
-            Assert.IsTrue(commands.All(c => c.Value == IsDisposed));
-        }
-        
-        [TestMethod]
-        public void WhenScopeEnds_DisposingAnMiddleScope_DisposalAllItsInnerScopesAsWellButNotTheOuterScope()
-        {
-            // Arrange
-            const bool IsDisposed = true;
-
-            var container = new Container();
-
-            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
-
-            container.RegisterLifetimeScope<DisposableCommand>();
-
-            container.RegisterInitializer<DisposableCommand>(command =>
-            {
-                commands[command] = !IsDisposed;
-
-                command.Disposing += _ =>
-                {
-                    commands[command] = IsDisposed;
-                };
-            });
-
-            var outerScope = container.BeginLifetimeScope();
-
-            try
-            {
-                container.GetInstance<DisposableCommand>();
-
-                var middelScope = container.BeginLifetimeScope();
-
-                container.GetInstance<DisposableCommand>();
-
-                container.BeginLifetimeScope();
-
-                container.GetInstance<DisposableCommand>();
-
-                // Act
-                middelScope.Dispose();
-
-                // Assert
-                Assert.AreEqual(2, commands.Count(c => c.Value == IsDisposed));
-            }
-            finally
-            {
-                outerScope.Dispose();
-            }
-        }
-
-        [TestMethod]
         public void GetInstance_WithPossibleObjectGraphOptimizableRegistration_Succeeds()
         {
             // Arrange
@@ -1310,47 +1218,89 @@
                 factory();
             }
         }
-
+                
         [TestMethod]
-        public void Dispose_OnlyDisposingMostOuterScopeWhileMostInnerScopeDisposeThrows_AlsoDisposesMiddleScopes()
+        public void GetCurrentLifetimeScope_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            var instanceToDispose = new DisposableCommand();
 
-            var outerScope = container.BeginLifetimeScope();
-            var middleScope = container.BeginLifetimeScope();
-                    
-            var middleScopeInstance = container.GetInstance<DisposableCommand>();
-
-            var innerScope = container.BeginLifetimeScope();
-
-            var innerScopeInstance = container.GetInstance<DisposableCommand>();
-
-            Assert.AreNotSame(middleScopeInstance, innerScopeInstance, "Test setup fail.");
-
-            innerScopeInstance.Disposing += (s) =>
+            using (var outerScope = container.BeginLifetimeScope())
             {
-                throw new Exception("Bang!");
-            };
+                var middleScope = container.BeginLifetimeScope();
 
-            try
-            {
+                var innerScope = container.BeginLifetimeScope();
+
+                middleScope.Dispose();
+
                 // Act
-                outerScope.Dispose();
+                var actualScope = container.GetCurrentLifetimeScope();
 
                 // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch
-            {
-                Assert.IsTrue(middleScopeInstance.HasBeenDisposed,
-                    "The LifetimeScope must ensure that all inner scopes are disposed, even if one of those " +
-                    "inner scopes throws an exception.");
+                Assert.AreSame(outerScope, actualScope);
             }
         }
 
+        [TestMethod]
+        public void GetCurrentLifetimeScope_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            var instanceToDispose = new DisposableCommand();
+
+            using (var outerScope = container.BeginLifetimeScope())
+            {
+                var middleScope = container.BeginLifetimeScope();
+
+                var innerScope = container.BeginLifetimeScope();
+
+                middleScope.Dispose();
+                innerScope.Dispose();
+
+                // Act
+                var actualScope = container.GetCurrentLifetimeScope();
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Since the middle scope is already disposed, the current scope should be the outer.");
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            var instanceToDispose = new DisposableCommand();
+
+            using (var outerScope = container.BeginLifetimeScope())
+            {
+                var outerMiddleScope = container.BeginLifetimeScope();
+
+                var innerMiddleScope = container.BeginLifetimeScope();
+
+                var innerScope = container.BeginLifetimeScope();
+
+                // This will cause GetCurrentExecutionContextScope to become outerScope.
+                outerMiddleScope.Dispose();
+
+                // This should not cause BeginExecutionContextScope to change
+                innerScope.Dispose();
+
+                // Act
+                var actualScope = container.GetCurrentLifetimeScope();
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Even though the inner middle scope never got disposed, the inner scope should not " +
+                    "this scope upon disposal. The outer scope should retain focus.");
+            }
+        }
+        
         [TestMethod]
         public void Dispose_ObjectRegisteredForDisposalUsingRequestedCurrentLifetimeScope_DisposesThatInstance()
         {
