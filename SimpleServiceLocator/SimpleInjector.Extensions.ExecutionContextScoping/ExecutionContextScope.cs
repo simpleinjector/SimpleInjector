@@ -38,15 +38,14 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope ParentScope { get; private set; }
 
-
-        /// <summary>
-        /// Determines whether this object is the currenty registered execution context scope or an ancestor of it.
-        /// </summary>
-        internal bool IsAncestorOfCurrentScope
+        // Determines whether this instance is the currently registered execution context scope or an ancestor 
+        // of it.
+        internal bool IsCurrentScopeOrAncestor
         {
             get
             {
                 var currentScope = this.manager.CurrentScope;
+
                 while (currentScope != null)
                 {
                     if (object.ReferenceEquals(this, currentScope))
@@ -59,11 +58,6 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
                 return false;
             }
-        }
-
-        internal bool IsParentAlive
-        {
-            get { return this.ParentScope != null && this.ParentScope.IsAlive; }
         }
 
         /// <summary>

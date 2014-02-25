@@ -67,17 +67,14 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         {
             lock (this.syncRoot)
             {
-                // Check if this object is in charge for maintaining the current scope (e.g. we are the currently registered scope or an ancestor of it).
-                if (scope.IsAncestorOfCurrentScope)
+                // If the scope is not the current scope or one of its ancestors, this means that either one of
+                // the scope's parents have already been disposed, or the scope is disposed on a completely
+                // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
+                // since would cause an invalid scope to be registered as the current scope (this scope will
+                // either be disposed or does not belong to the current execution context).
+                if (scope.IsCurrentScopeOrAncestor)
                 {
-                    if (scope.IsParentAlive)
-                    {
-                        this.CurrentScope = scope.ParentScope;
-                    }
-                    else
-                    {
-                        this.CurrentScope = null;       // there is no parent scope or the parent scope was disposed earlier
-                    }
+                    this.CurrentScope = scope.ParentScope;
                 }
             }
         }

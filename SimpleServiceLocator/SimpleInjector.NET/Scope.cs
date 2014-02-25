@@ -33,13 +33,6 @@ namespace SimpleInjector
     /// </remarks>
     public class Scope : IDisposable
     {
-        private enum DisposeState
-        {
-            Alive,
-            Disposing,
-            Disposed
-        }
-
         private const int MaxRecursion = 100;
 
         private readonly object syncRoot = new object();
@@ -50,6 +43,12 @@ namespace SimpleInjector
         private DisposeState state = DisposeState.Alive;
         private int recursionDuringDisposalCounter;
 
+        private enum DisposeState
+        {
+            Alive,
+            Disposing,
+            Disposed
+        }
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
@@ -130,18 +129,6 @@ namespace SimpleInjector
             lock (scope.syncRoot)
             {
                 return scope.GetInstance<TService, TImplementation>(registration);
-            }
-        }
-
-        /// <summary>Indicates whether the scope is still alive and has not been disposed.</summary>
-        protected bool IsAlive
-        {
-            get
-            {
-                lock (this.syncRoot)
-                {
-                    return this.state == DisposeState.Alive;
-                }
             }
         }
 

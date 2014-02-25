@@ -84,11 +84,13 @@
             var container = new Container();
 
             // Act
-            container.BeginExecutionContextScope();
+            using (container.BeginExecutionContextScope())
+            {
+            }
         }
 
         [TestMethod]
-        public void Verify_WithExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
+        public void ContainerVerify_WithExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -102,7 +104,7 @@
         }
 
         [TestMethod]
-        public void Verify_WithHybridExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
+        public void ContainerVerify_WithHybridExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -135,10 +137,11 @@
             var container = new Container();
 
             // Act
-            var currentScope = container.GetCurrentExecutionContextScope();
-
-            // Assert
-            Assert.IsNull(currentScope);
+            using (var currentScope = container.GetCurrentExecutionContextScope())
+            {
+                // Assert
+                Assert.IsNull(currentScope);
+            }
         }
 
         [TestMethod]
@@ -148,10 +151,11 @@
             var container = new Container();
 
             // Act
-            var scope = container.GetCurrentExecutionContextScope();
-
-            // Assert
-            Assert.IsNull(scope);
+            using (var scope = container.GetCurrentExecutionContextScope())
+            {
+                // Assert
+                Assert.IsNull(scope);
+            }
         }
 
         [TestMethod]
@@ -203,7 +207,7 @@
             try
             {
                 // Act
-                var firstInstance = container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -218,7 +222,7 @@
         }
 
         [TestMethod]
-        public void Verify_WithoutExecutionContextScope_Succeeds()
+        public void ContainerVerify_WithoutExecutionContextScope_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -353,7 +357,7 @@
 
             // Assert
             Assert.IsFalse(command.HasBeenDisposed,
-                "The lifetime scope should not dispose objects that are not explicitly marked as such, since " +
+                "The execution scope should not dispose objects that are not explicitly marked as such, since " +
                 "this would allow the scope to accidentally dispose singletons.");
         }
 
@@ -370,8 +374,8 @@
             {
                 var scope = container.GetCurrentExecutionContextScope();
 
-                // The following line explictly registers the transient DisposableCommand for disposal when
-                // the lifetime scope ends.
+                // The following line explicitly registers the transient DisposableCommand for disposal when
+                // the execution context scope ends.
                 scope.RegisterForDisposal(instance);
             });
 
@@ -427,7 +431,7 @@
             }
 
             // Assert
-            Assert.IsTrue(command.HasBeenDisposed, "The lifetime scoped instance was expected to be disposed.");
+            Assert.IsTrue(command.HasBeenDisposed, "The execution scoped instance was expected to be disposed.");
         }
 
         [TestMethod]
@@ -732,7 +736,7 @@
                     "The decorator should be transient.");
 
                 Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
+                    "The decorated instance should be scoped per execution context. It seems to be transient.");
             }
         }
 
@@ -755,10 +759,10 @@
 
                 // Assert
                 Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
-                    "The decorator should be transient but seems to have a scoped lifetime.");
+                    "The decorator should be transient but seems to have a scoped lifestyle.");
 
                 Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
+                    "The decorated instance should be scoped per execution context. It seems to be transient.");
             }
         }
 
@@ -819,7 +823,7 @@
         }
 
         [TestMethod]
-        public void Verify_WithWhenScopeEndsRegistration_Succeeds()
+        public void ContainerVerify_WithWhenScopeEndsRegistration_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -854,11 +858,16 @@
                 lifestyle.WhenScopeEnds(container, () => { actionCallCount++; });
             });
 
-            using (container.BeginExecutionContextScope())
+            var scope = container.BeginExecutionContextScope();
+            
+            try
             {
                 container.GetInstance<DisposableCommand>();
-
+            }
+            finally
+            {
                 // Act
+                scope.Dispose();
             }
 
             // Assert
@@ -889,11 +898,16 @@
                 });
             });
 
-            using (container.BeginExecutionContextScope())
+            var scope = container.BeginExecutionContextScope();
+            
+            try
             {
                 instanceToDispose = container.GetInstance<DisposableCommand>();
-
+            }
+            finally
+            {
                 // Act
+                scope.Dispose();
             }
 
             // Assert
@@ -915,11 +929,16 @@
                 lifestyle.RegisterForDisposal(container, command);
             });
 
-            using (container.BeginExecutionContextScope())
+            var scope = container.BeginExecutionContextScope();
+
+            try
             {
                 transientInstanceToDispose = container.GetInstance<DisposableCommand>();
-
+            }
+            finally
+            {
                 // Act
+                scope.Dispose();
             }
 
             // Assert
@@ -931,10 +950,12 @@
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
             // Arrange
+            Container invalidArgument = null;
+
             var lifestyle = new ExecutionContextScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(null, () => { });
+            lifestyle.WhenScopeEnds(invalidArgument, () => { });
         }
 
         [TestMethod]
@@ -942,10 +963,12 @@
         public void WhenScopeEnds_NullActionArgument_ThrowsException()
         {
             // Arrange
+            Action invalidArgument = null;
+
             var lifestyle = new ExecutionContextScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(new Container(), null);
+            lifestyle.WhenScopeEnds(new Container(), invalidArgument);
         }
 
         [TestMethod]
@@ -1083,94 +1106,90 @@
         }
 
         [TestMethod]
-        public void WhenScopeEnds_DisposingAnOuterScope_DisposalAllItsInnerScopesAsWell()
+        public void GetCurrentExecutionContextScope_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
         {
             // Arrange
-            const bool IsDisposed = true;
-
             var container = new Container();
 
-            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
+            var instanceToDispose = new DisposableCommand();
 
             container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
-            container.RegisterInitializer<DisposableCommand>(command =>
+            using (var outerScope = container.BeginExecutionContextScope())
             {
-                commands[command] = !IsDisposed;
+                var middleScope = container.BeginExecutionContextScope();
 
-                command.Disposing += _ =>
-                {
-                    commands[command] = IsDisposed;
-                };
-            });
+                var innerScope = container.BeginExecutionContextScope();
 
-            var outerScope = container.BeginExecutionContextScope();
+                middleScope.Dispose();
 
-            container.GetInstance<DisposableCommand>();
+                // Act
+                var actualScope = container.GetCurrentExecutionContextScope();
 
-            container.BeginExecutionContextScope();
-
-            container.GetInstance<DisposableCommand>();
-
-            container.BeginExecutionContextScope();
-
-            container.GetInstance<DisposableCommand>();
-
-            Assert.AreEqual(3, commands.Count);
-            Assert.IsFalse(commands.Any(c => c.Value == IsDisposed));
-
-            // Act
-            outerScope.Dispose();
-
-            // Assert
-            Assert.IsTrue(commands.All(c => c.Value == IsDisposed));
+                // Assert
+                Assert.AreSame(outerScope, actualScope);
+            }
         }
 
         [TestMethod]
-        public void WhenScopeEnds_DisposingAnMiddelScope_DisposalAllItsInnerScopesAsWellButNotTheOuterScope()
+        public void GetCurrentExecutionContextScope_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
         {
             // Arrange
-            const bool IsDisposed = true;
-
             var container = new Container();
 
-            Dictionary<DisposableCommand, bool> commands = new Dictionary<DisposableCommand, bool>();
+            var instanceToDispose = new DisposableCommand();
 
             container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
-            container.RegisterInitializer<DisposableCommand>(command =>
+            using (var outerScope = container.BeginExecutionContextScope())
             {
-                commands[command] = !IsDisposed;
+                var middleScope = container.BeginExecutionContextScope();
 
-                command.Disposing += _ =>
-                {
-                    commands[command] = IsDisposed;
-                };
-            });
+                var innerScope = container.BeginExecutionContextScope();
 
-            var outerScope = container.BeginExecutionContextScope();
-
-            try
-            {
-                container.GetInstance<DisposableCommand>();
-
-                var middelScope = container.BeginExecutionContextScope();
-
-                container.GetInstance<DisposableCommand>();
-
-                container.BeginExecutionContextScope();
-
-                container.GetInstance<DisposableCommand>();
+                middleScope.Dispose();
+                innerScope.Dispose();
 
                 // Act
-                middelScope.Dispose();
+                var actualScope = container.GetCurrentExecutionContextScope();
 
                 // Assert
-                Assert.AreEqual(2, commands.Count(c => c.Value == IsDisposed));
+                Assert.AreSame(outerScope, actualScope,
+                    "Since the middle scope is already disposed, the current scope should be the outer.");
             }
-            finally
+        }
+
+        [TestMethod]
+        public void GetCurrentExecutionContextScope_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            var instanceToDispose = new DisposableCommand();
+
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+
+            using (var outerScope = container.BeginExecutionContextScope())
             {
-                outerScope.Dispose();
+                // This will cause GetCurrentExecutionContextScope to become outerScope.
+                var outerMiddleScope = container.BeginExecutionContextScope();
+
+                var innerMiddleScope = container.BeginExecutionContextScope();
+
+                var innerScope = container.BeginExecutionContextScope();
+
+                outerMiddleScope.Dispose();
+
+                // This should not cause BeginExecutionContextScope to change
+                innerScope.Dispose();
+
+                // Act
+                var actualScope = container.GetCurrentExecutionContextScope();
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Even though the inner middle scope never got disposed, the inner scope should not " +
+                    "this scope upon disposal. The outer scope should retain focus.");
             }
         }
 
@@ -1214,48 +1233,7 @@
                 factory();
             }
         }
-        
-        [TestMethod]
-        public void Dispose_OnlyDisposingMostOuterScopeWhileMostInnerScopeDisposeThrows_AlsoDisposesMiddleScopes()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
-
-            var outerScope = container.BeginExecutionContextScope();
-            var middleScope = container.BeginExecutionContextScope();
-
-            var middleScopeInstance = container.GetInstance<DisposableCommand>();
-
-            var innerScope = container.BeginExecutionContextScope();
-
-            var innerScopeInstance = container.GetInstance<DisposableCommand>();
-
-            Assert.AreNotSame(middleScopeInstance, innerScopeInstance, "Test setup fail.");
-
-            innerScopeInstance.Disposing += (s) =>
-            {
-                throw new Exception("Bang!");
-            };
-
-            try
-            {
-                // Act
-                outerScope.Dispose();
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch
-            {
-            }
-
-            Assert.IsTrue(middleScopeInstance.HasBeenDisposed,
-                "The LifetimeScope must ensure that all inner scopes are disposed, even if one of those " +
-                "inner scopes throws an exception.");
-        }
-
+     
         [TestMethod]
         public void Dispose_ObjectRegisteredForDisposalUsingRequestedCurrentLifetimeScope_DisposesThatInstance()
         {
