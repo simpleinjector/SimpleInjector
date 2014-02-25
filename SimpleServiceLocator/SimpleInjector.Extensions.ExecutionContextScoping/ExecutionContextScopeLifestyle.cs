@@ -103,11 +103,6 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             return container.GetExecutionContextScopeManager().CurrentScope;
         }
 
-        internal static ExecutionContextScopeLifestyle Get(bool withDisposal)
-        {
-            return withDisposal ? WithDisposal : NoDisposal;
-        }
-
         /// <summary>
         /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
         /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
