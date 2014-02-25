@@ -5,6 +5,10 @@ Version vNext
 
 	General description:
 
+	New features:
+		-[ExecutionContextScoping] New SimpleInjector.Extensions.ExecutionContextScoping package has been
+		 added that allows defining a scope that flows through asynchronous operations.
+
 	Improvements:
 		-[Core] New RegisterDecorator overload added that allows supplying a factory delegate for creating
 		 decorator types. (work item 20550)
