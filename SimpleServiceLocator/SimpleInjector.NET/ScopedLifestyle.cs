@@ -143,6 +143,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
+        /// the context of such scope.
+        /// </summary>
+        /// <param name="container">The container for which the delegate gets created.</param>
+        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
+        protected internal virtual Func<Scope> CreateCurrentScopeProvider(Container container)
+        {
+            // NOTE: This method is made virtual instead of abstract for backwards compatibility.
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
@@ -155,19 +168,6 @@ namespace SimpleInjector
             Func<Scope> currentScopeProvider = this.CreateCurrentScopeProvider(container);
 
             return currentScopeProvider.Invoke();
-        }
-
-        /// <summary>
-        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
-        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
-        /// the context of such scope.
-        /// </summary>
-        /// <param name="container">The container for which the delegate gets created.</param>
-        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected internal virtual Func<Scope> CreateCurrentScopeProvider(Container container)
-        {
-            // NOTE: This method is made virtual instead of abstract for backwards compatibility.
-            throw new NotImplementedException();
         }
 
         /// <summary>

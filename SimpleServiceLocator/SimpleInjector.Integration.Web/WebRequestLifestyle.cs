@@ -86,17 +86,6 @@ namespace SimpleInjector.Integration.Web
             WithDisposal.WhenScopeEnds(container, action);
         }
 
-        /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
-        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
-        /// </summary>
-        /// <param name="container">The container instance that is related to the scope to return.</param>
-        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container)
-        {
-            return GetCurrentScope(HttpContext.Current);
-        }
-
         internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
         {
             return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
@@ -129,6 +118,17 @@ namespace SimpleInjector.Integration.Web
             {
                 scope.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected override Scope GetCurrentScopeCore(Container container)
+        {
+            return GetCurrentScope(HttpContext.Current);
         }
 
         /// <summary>

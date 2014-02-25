@@ -113,6 +113,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             WithDisposal.WhenScopeEnds(container, action);
         }
 
+        internal static LifetimeScopeLifestyle Get(bool withDisposal)
+        {
+            return withDisposal ? WithDisposal : NoDisposal;
+        }
+
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
@@ -122,11 +127,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         protected override Scope GetCurrentScopeCore(Container container)
         {
             return container.GetLifetimeScopeManager().CurrentScope;
-        }
-
-        internal static LifetimeScopeLifestyle Get(bool withDisposal)
-        {
-            return withDisposal ? WithDisposal : NoDisposal;
         }
 
         /// <summary>
