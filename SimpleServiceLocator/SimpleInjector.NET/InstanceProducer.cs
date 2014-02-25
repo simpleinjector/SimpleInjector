@@ -183,6 +183,8 @@ namespace SimpleInjector
         {
             get { return this.verifiers != null; }
         }
+
+        internal bool InstanceSuccessfullyCreated { get; private set; }
         
         internal string DebuggerDisplay
         {
@@ -210,9 +212,15 @@ namespace SimpleInjector
                 if (this.instanceCreator == null)
                 {
                     this.instanceCreator = this.BuildInstanceCreator();
-                }
 
-                instance = this.instanceCreator();
+                    instance = this.instanceCreator();
+
+                    this.InstanceSuccessfullyCreated = true;
+                }
+                else
+                {
+                    instance = this.instanceCreator();
+                }
 
                 this.RemoveValidator();
             }

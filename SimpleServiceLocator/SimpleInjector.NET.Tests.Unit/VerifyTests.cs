@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
@@ -388,6 +389,21 @@
             AssertThat.Throws<InvalidOperationException>(action);
         }
 
+        [TestMethod]
+        public void Verify_RegisteredSingletonDelegateResolvingAnUnregisteredConcreteType_CreatesThatTypeJustOnce()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<IPlugin>(() => container.GetInstance<PluginWithCreationCounter>());
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.AreEqual(1, PluginWithCreationCounter.InstanceCount);
+        }
+
         public class Service<T>
         {
             public Service(IEnumerable<T> collection)
@@ -423,6 +439,21 @@
         {
             public PluginProxy(Func<IPlugin> pluginFactory)
             {
+            }
+        }
+
+        private sealed class PluginWithCreationCounter : IPlugin
+        {
+            private static int counter;
+
+            public PluginWithCreationCounter()
+            {
+                Interlocked.Increment(ref counter);
+            }
+
+            public static int InstanceCount
+            {
+                get { return counter; }
             }
         }
 

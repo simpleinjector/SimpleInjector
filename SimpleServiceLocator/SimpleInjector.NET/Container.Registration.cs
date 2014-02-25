@@ -1547,7 +1547,10 @@ namespace SimpleInjector
                 where producer.MustBeExplicitlyVerified
                 select producer;
 
-            var producersToVerify = rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct();
+            var producersToVerify = 
+                from producer in rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct()
+                where !producer.InstanceSuccessfullyCreated
+                select producer;
 
             VerifyInstanceCreation(producersToVerify.ToArray());
         }
