@@ -35,7 +35,7 @@ Version 2.4.1 (v2.4.1 RTM) 2014-01-14
 
 	Bug fixes:
 		-[Core] Registering generic types using RegisterOpenGeneric and RegisterDecorator resulted in a
-		 stack overflow exception in case the generic type contained a type constraint that refered back to
+		 stack overflow exception in case the generic type contained a type constraint that referred back to
 		 the type (a.k.a. Curiously Recurring Template Pattern). (work item 20602).
 		-[Core/LifetimeScoping/Web/Wcf] Scoped lifestyles did not ensure that all instances where disposed.
 		 (work item 20579)
@@ -44,7 +44,7 @@ Version 2.4.1 (v2.4.1 RTM) 2014-01-14
 Version 2.4.0 (v2.4.0 RTM) 2013-12-08
 
 	General description:
-		The big new feature in this minor release is ther addition of a diagnostic API, which allows querying 
+		The big new feature in this minor release is the addition of a diagnostic API, which allows querying 
 		the container for diagnostic information. Since version 2.0, Simple Injector has allowed developers to
 		show diagnostic information while debugging. The new diagnostic API allows developers to request this 
 		information programmatically. This allows writing integration tests that verify the correctness of the 
@@ -64,7 +64,7 @@ Version 2.4.0 (v2.4.0 RTM) 2013-12-08
 		 RegisterForDisposal method that users can interact with. (work item 19969)
 		-[Core] New Lifestyle.CreateHybrid method overload added that accepts two ScopedLifestyle instances
 		 and returns a hybrid ScopeLifestyle. (work item 19969)
-		-[Core] RegisterAll(Type, params Registration[]) overload added to make registring collections using
+		-[Core] RegisterAll(Type, params Registration[]) overload added to make registering collections using
 		 Registration instances more convenient. (work item 20001)
 		-[Core] New convenient Lifestyle.CreateRegistration overloads added that allow supplying a single 
 		 TConcrete type instead of TService and TImplementation.
@@ -150,7 +150,7 @@ Version 2.3.1 (v2.3.1 RTM)  2013-07-12
 Version 2.3.0 (v2.3 RTM)  2013-06-30
 
 	General description:
-		This minor release focusses on advanced and integration scenarios in the core library. Besides these 
+		This minor release focuses on advanced and integration scenarios in the core library. Besides these 
 		features, this release contains several bug fixes.
 
 	New features:
@@ -160,7 +160,7 @@ Version 2.3.0 (v2.3 RTM)  2013-06-30
 		 (work item 19745)
 		-[Core] RegisterAllOpenGeneric method (and overloads). They do to collections what RegisterOpenGeneric
 		 does to normal registrations. RegisterAllOpenGeneric allows registering a list of open generic types
-		 which will be tranformed to a list of matching closed generic types when a collection is requested.
+		 which will be transformed to a list of matching closed generic types when a collection is requested.
 		 (work item 19758)
 		-[Core] New RegisterAll(Type, IEnumerable<Registration>) overload added to make registering collections
 		 more consistent. (work item 19876)
@@ -183,7 +183,7 @@ Version 2.3.0 (v2.3 RTM)  2013-06-30
 		 DecoratorPredicateContext when decorating multiple registrations with the same service type. The
 		 internal cached used the service type as key, not the InstanceProducer itself. (work item 19780).
 		-[Core] The container did not check for possible cyclic dependencies while resolving collections,
-		 which could cause a stackoverflow exception. (work item 19849).
+		 which could cause a stack overflow exception. (work item 19849).
 		-[Core] The framework shows user friendly (C# like) type names in exception messages, but this failed
 		 when displaying a type that was a an array of generic types (example: Tuple<int>[]). In that case a 
 		 FormatException was thrown (work item 19847).
@@ -281,14 +281,14 @@ Version v2.1.0 (v2.1 RTM) 2013-03-19
 	
 	New features:
 		-[Core] IPropertySelectionBehavior interface added to allow users to override the default behavior
-		 (which is to not inject any properties). The default behaviour can be changed by replacing the
+		 (which is to not inject any properties). The default behavior can be changed by replacing the
 		 Container.Options.PropertySelectionBehavior property. (work item 19389)
 		-[Core] New warning added in the Diagnostic Services to warn about classes with too many dependencies.
 		 (work item 19428)
 
 	Bug fixes:
 		-[Core] Register<TService, TImplementation>(Lifestyle) did not verify whether TImplementation was a
-		 constructable type (in the default configuration this means that it is concrete, has one constructor,
+		 constructible type (in the default configuration this means that it is concrete, has one constructor,
 		 and no primitive constructor arguments). This resulted in a failure during when resolving the
 		 instance, but this was later than needed. (work item 19464)
 
@@ -334,7 +334,7 @@ Version v2.0.0 (v2.0 RTM) 2013-02-25
 		 hybrid lifestyles and a Lifestyle.CreateCustom() method to create a lifestyle based on a name and
 		 a supplied delegate. Other lifestyle classes are implemented in the integration and extension
 		 libraries.
-		-[Core] Register overloads added that take Lifetyle as argument.
+		-[Core] Register overloads added that take Lifestyle as argument.
 		-[Core] ExpressionBuilding event added. The ExpressionBuilding event gets fired right after the
 		 expression is built that creates a new instance, but before instance initializers and lifestyle
 		 caching gets added to the expression.
@@ -410,7 +410,7 @@ Version 1.next (not released yet)
 
 Version 1.6.1 (v1.6.1 RTM) 2012-12-12
 	General description:
-		The integration packages that were targetted at .NET 4.0 were incorrectly targetted at .NET 4.5. This
+		The integration packages that were targeted at .NET 4.0 were incorrectly targeted at .NET 4.5. This
 		was caused by a misconfiguration in the build script. This made it impossible to use those packages
 		when .NET 4.5 was not installed.
 
@@ -461,7 +461,7 @@ Version 1.5.0.12199 (v1.5.0 RTM) 2012-07-17
 		Other great improvements are in the RegisterDecorator extension methods of the Extensions project. 
 		The container now allows injecting a Func<ServiceType> into the decorator (besides injecting the 
 		decorated service type), which enabled more advanced scenarios where creation of the decorated type 
-		should be delayed (which is especially usefull when defining decorators for asynchronous execution and
+		should be delayed (which is especially useful when defining decorators for asynchronous execution and
 		lifetime scoping). New RegisterSingleDecorator extension methods have been added, which can improve 
 		performance and are especially useful when using Func<ServiceType> decorators. Support to decorating 
 		collections has been improved. In most situations the predicate will be called for each element in the
@@ -561,7 +561,7 @@ Version 1.4.1.12065 (v1.4.1 RTM) 2012-03-05
 Version 1.4.0.12049 (v1.4.0 RTM) 2012-02-18
 	General description:
 		Container.GetInitializer<T> method added to the core library, and RegisterManyForOpenGeneric in
-		extensions now execute initalizers on decorators.
+		extensions now execute initializers on decorators.
 
 	Code changes:
 		-[Core] The internal Container.GetInitializerFor<T> method has been made public and renamed to
@@ -611,7 +611,7 @@ Version 1.3.0.11343 (v1.3 RTM) 2011-12-09
 	
 	Bug Fixes:
 		-[Core] InjectProperties and GetRegistration failed in certain circumstances. (work item 16930)
-		-[Core] Calling the Verify method still resulted in a lockdown of the container, when the registered
+		-[Core] Calling the Verify method still resulted in a lock down of the container, when the registered
 		 delegates called back into the container. This made it impossible to verify a partially configured
 		 container.
 
