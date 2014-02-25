@@ -1171,13 +1171,13 @@
 
             using (var outerScope = container.BeginExecutionContextScope())
             {
-                // This will cause GetCurrentExecutionContextScope to become outerScope.
                 var outerMiddleScope = container.BeginExecutionContextScope();
 
                 var innerMiddleScope = container.BeginExecutionContextScope();
 
                 var innerScope = container.BeginExecutionContextScope();
 
+                // This will cause GetCurrentExecutionContextScope to become outerScope.
                 outerMiddleScope.Dispose();
 
                 // This should not cause BeginExecutionContextScope to change
