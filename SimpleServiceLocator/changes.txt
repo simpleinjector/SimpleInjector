@@ -6,14 +6,15 @@ Version vNext
 	General description:
 
 	New features:
-		-[ExecutionContextScoping] New SimpleInjector.Extensions.ExecutionContextScoping package has been
+		-[ExecutionContextScoping] New SimpleInjector.Extensions.ExecutionContextScoping project has been
 		 added that allows defining a scope that flows through asynchronous operations.
+		-[WebApi] New SimpleInjector.Integration.WebApi project has been added that adds support for Web API.
 
 	Improvements:
 		-[Core] New RegisterDecorator overload added that allows supplying a factory delegate for creating
 		 decorator types. (work item 20550)
-		-[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping/EnablePerWcfOperationLifestyle 
-		 when no lifetime scoped instances are registered.
+		-[LifetimeScoping/Wcf] Removed the need to explicitly call EnableLifetimeScoping /
+		 EnablePerWcfOperationLifestyle when no lifetime scoped instances are registered.
 		-[Core] Design of the ScopedLifestyle class improved to make it easier to create custom lifestyles.
 		-[Core/LifestyleScoping/Web/Wcf] Performance improvements for ScopeLifestyle derivatives. Resolving 
 		 the scope is now done once per compiled delegate and resolving an scoped instance from that scope is 
