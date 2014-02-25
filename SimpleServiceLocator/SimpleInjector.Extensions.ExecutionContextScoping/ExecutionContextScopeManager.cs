@@ -32,7 +32,6 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     [SecuritySafeCritical]
     internal sealed class ExecutionContextScopeManager
     {
-        private readonly object syncRoot = new object();
         private readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
         internal ExecutionContextScope CurrentScope
@@ -54,28 +53,22 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope BeginExecutionContextScope()
         {
-            lock (this.syncRoot)
-            {
-                var parentScope = this.CurrentScope;
-                var scope = new ExecutionContextScope(this, parentScope);
-                this.CurrentScope = scope;
-                return scope;
-            }
+            var parentScope = this.CurrentScope;
+            var scope = new ExecutionContextScope(this, parentScope);
+            this.CurrentScope = scope;
+            return scope;
         }
 
         internal void EndExecutionContextScope(ExecutionContextScope scope)
         {
-            lock (this.syncRoot)
+            // If the scope is not the current scope or one of its ancestors, this means that either one of
+            // the scope's parents have already been disposed, or the scope is disposed on a completely
+            // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
+            // since would cause an invalid scope to be registered as the current scope (this scope will
+            // either be disposed or does not belong to the current execution context).
+            if (scope.IsCurrentScopeOrAncestor)
             {
-                // If the scope is not the current scope or one of its ancestors, this means that either one of
-                // the scope's parents have already been disposed, or the scope is disposed on a completely
-                // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
-                // since would cause an invalid scope to be registered as the current scope (this scope will
-                // either be disposed or does not belong to the current execution context).
-                if (scope.IsCurrentScopeOrAncestor)
-                {
-                    this.CurrentScope = scope.ParentScope;
-                }
+                this.CurrentScope = scope.ParentScope;
             }
         }
 
