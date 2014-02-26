@@ -242,7 +242,7 @@ namespace SimpleInjector
         /// types to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
         /// reference (Nothing in VB).</exception>
-        public static void RegisterApiControllers(this Container container, HttpConfiguration configuration)
+        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(configuration, "configuration");
