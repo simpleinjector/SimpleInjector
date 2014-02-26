@@ -267,7 +267,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(configuration, "configuration");
 
-            if (configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
+            if (!configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
             {
                 container.RegisterWebApiRequest<SimpleInjectorHttpRequestMessageProvider>(
                     () => new SimpleInjectorHttpRequestMessageProvider());

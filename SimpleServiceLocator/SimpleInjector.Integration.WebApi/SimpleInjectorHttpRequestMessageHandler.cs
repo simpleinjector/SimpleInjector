@@ -40,6 +40,10 @@ namespace SimpleInjector.Integration.WebApi
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            // Make sure Web API has created an IDependencyScope for the current request. This will begin the
+            // ExecutionContextScope for the current request and allows the next GetInstance call to succeed.
+            request.GetDependencyScope();
+
             var provider = (SimpleInjectorHttpRequestMessageProvider)this.providerProducer.Value.GetInstance();
 
             provider.SetCurrentMessage(request);
