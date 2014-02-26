@@ -7,7 +7,7 @@ namespace $rootnamespace$.App_Start
 
     using SimpleInjector;
     using SimpleInjector.Extensions;
-	using SimpleInjector.Integration.Web;
+    using SimpleInjector.Integration.Web;
     using SimpleInjector.Integration.Web.Mvc;
     
     public static class SimpleInjectorInitializer
@@ -22,8 +22,6 @@ namespace $rootnamespace$.App_Start
 
             container.RegisterMvcControllers(Assembly.GetExecutingAssembly());
             
-            container.RegisterMvcAttributeFilterProvider();
-       
             container.Verify();
             
             DependencyResolver.SetResolver(new SimpleInjectorDependencyResolver(container));
