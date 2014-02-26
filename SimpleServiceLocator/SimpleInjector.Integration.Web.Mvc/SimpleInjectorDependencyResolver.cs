@@ -41,7 +41,7 @@ namespace SimpleInjector.Integration.Web.Mvc
     ///         // container.Register<IUserRepository, SqlUserRepository>();
     /// 
     ///         container.RegisterMvcControllers(Assembly.GetExecutingAssembly());
-    ///         container.RegisterMvcAttributeFilterProvider();
+    ///         container.RegisterMvcIntegratedFilterProvider();
     ///
     ///         // Create a new SimpleInjectorDependencyResolver that wraps the,
     ///         // container, and register that resolver in MVC.
@@ -58,7 +58,7 @@ namespace SimpleInjector.Integration.Web.Mvc
     /// ]]></code>
     /// The previous example show the use of the 
     /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcControllers">RegisterMvcControllers</see> and
-    /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider">RegisterMvcAttributeFilterProvider</see>
+    /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcIntegratedFilterProvider">RegisterMvcIntegratedFilterProvider</see>
     /// extension methods and how the <b>SimpleInjectorDependencyResolver</b> can be used to set the created
     /// <see cref="Container"/> instance as default dependency resolver in MVC.
     /// </example>
