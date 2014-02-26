@@ -24,6 +24,7 @@ namespace SimpleInjector.Integration.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Web.Http.Controllers;
     using System.Web.Http.Dependencies;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
@@ -107,6 +108,16 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The retrieved service.</returns>
         object IDependencyScope.GetService(Type serviceType)
         {
+            // By calling GetInstance instead of GetService when resolving a controller, we prevent the
+            // container from returning null when the controller isn't registered explicitly and can't be
+            // created because of an configuration error. GetInstance will throw a descriptive exception
+            // instead. Not doing this will cause Web API to throw a non-descriptive "Make sure that the 
+            // controller has a parameterless public constructor" exception.
+            if (!serviceType.IsAbstract && typeof(IHttpController).IsAssignableFrom(serviceType))
+            {
+                return this.container.GetInstance(serviceType);
+            }
+
             return ((IServiceProvider)this.container).GetService(serviceType);
         }
 
