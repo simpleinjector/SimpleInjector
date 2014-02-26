@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <version>{version}</version>
+    <authors>Simple Injector Contributors</authors>
+    <owners>Simple Injector Contributors</owners>
+    <licenseUrl>https://simpleinjector.codeplex.com/license</licenseUrl>
+    <projectUrl>https://simpleinjector.codeplex.com/wikipage?title=Web%20API%20Integration</projectUrl>
+    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
+    <dependencies>
+      <dependency id="WebActivator" version="1.4.4" />
+      <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="SimpleInjector.Integration.WebApi" version="{version_Integration_WebApi}" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
+    </frameworkAssemblies>
+    <id>SimpleInjector.Integration.WebApi.WebHost.QuickStart</id>
+    <title>Simple Injector ASP.NET Web API Integration Quick Start for IIS-hosted applications</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Quick Start for Simple Injector ASP.NET Web API integration for IIS-hosted applications. This package adds the needed dependencies and code examples to get started quickly with Simple Injector in an Web API application.</description>
+    <summary>Quick Start for Simple Injector ASP.NET Web API integration for IIS-hosted applications.</summary>
+    <releaseNotes></releaseNotes>
+    <copyright>Simple Injector Contributors 2014</copyright>
+    <language>en-US</language>
+    <tags>quick start simpleinjector Web API webapi web-api architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver</tags>
+  </metadata>
+</package>
