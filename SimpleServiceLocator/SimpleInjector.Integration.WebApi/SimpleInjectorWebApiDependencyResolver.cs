@@ -28,6 +28,47 @@ namespace SimpleInjector.Integration.WebApi
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>Simple Injector <see cref="IDependencyResolver"/> implementation.</summary>
+    /// <example>
+    /// The following example shows the usage of the <b>SimpleInjectorWebApiDependencyResolver</b> in an
+    /// Web API application:
+    /// <code lang="cs"><![CDATA[
+    /// using System.Web.Http;
+    /// using SimpleInjector;
+    /// using SimpleInjector.Integration.WebApi;
+    /// 
+    /// public static class WebApiConfig
+    /// {
+    ///     public static void Register(HttpConfiguration config)
+    ///     {
+    ///         var container = new Container();
+    /// 
+    ///         // Make the container registrations, example:
+    ///         // container.Register<IUserRepository, SqlUserRepository>();
+    /// 
+    ///         container.RegisterWebApiControllers(config);
+    ///         container.RegisterWebApiFilterProvider(config);
+    ///
+    ///         // Create a new SimpleInjectorDependencyResolver that wraps the,
+    ///         // container, and register that resolver in MVC.
+    /// 
+    ///         container.Verify();
+    /// 
+    ///         config.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
+    /// 
+    ///         config.Routes.MapHttpRoute(
+    ///             name: "DefaultApi",
+    ///             routeTemplate: "api/{controller}/{id}",
+    ///             defaults: new { id = RouteParameter.Optional }
+    ///         );
+    ///     }
+    /// }
+    /// ]]></code>
+    /// The previous example show the use of the 
+    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiControllers">RegisterWebApiControllers</see> and
+    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider">RegisterWebApiFilterProvider</see>
+    /// extension methods and how the <b>SimpleInjectorWebApiDependencyResolver</b> can be used to set the created
+    /// <see cref="Container"/> instance as default dependency resolver in Web API.
+    /// </example>
     public sealed class SimpleInjectorWebApiDependencyResolver : IDependencyResolver
     {
         private readonly Container container;
