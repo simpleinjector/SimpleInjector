@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="AttributedPropertyInjectionExtensions.cs" />
     <Compile Include="AutomaticFactoryExtensions.cs" />
+    <Compile Include="AutomaticParameterizedFactoryExtensions.cs" />
     <Compile Include="ContextualDecoratorExtensions.cs" />
     <Compile Include="KeyedFactory.cs" />
     <Compile Include="KeyedRegistrations.cs" />
