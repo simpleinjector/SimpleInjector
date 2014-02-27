@@ -134,8 +134,10 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "The creation of package type {0} failed. " + ex.Message), ex);
+                string message = string.Format(CultureInfo.InvariantCulture,
+                    "The creation of package type {0} failed. {1}", packageType.FullName, ex.Message);
+
+                throw new InvalidOperationException(message, ex);
             }
         }
     }
