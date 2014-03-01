@@ -15,7 +15,10 @@
     {
         public static void EnableAutomaticParameterizedFactories(this ContainerOptions options)
         {
-            if (GetBehavior(options.Container) != null) throw new InvalidOperationException("Already called.");
+            if (GetBehavior(options.Container) != null)
+            {
+                throw new InvalidOperationException("Already called.");
+            }
 
             var behavior = new AutomaticParameterizedFactoriesHelper(options);
 
@@ -38,8 +41,11 @@
         {
             var behavior = GetBehavior(container);
 
-            if (behavior == null) throw new InvalidOperationException(
-                "Make sure you call container.Options.EnableAutomaticParameterizedFactories() first.");
+            if (behavior == null)
+            {
+                throw new InvalidOperationException(
+                    "Make sure you call container.Options.EnableAutomaticParameterizedFactories() first.");
+            }
 
             behavior.RegisterFactoryProduct(typeof(TService), typeof(TImplementation));
 
@@ -115,7 +121,7 @@
             {
                 this.factoryType = factoryType;
                 this.container = container;
-                this.helper = GetBehavior(container);
+                this.helper = AutomaticParameterizedFactoryExtensions.GetBehavior(container);
             }
 
             public override IMessage Invoke(IMessage msg)
@@ -144,7 +150,7 @@
 
                 var method = (MethodInfo)message.MethodBase;
 
-                var parameters = CreateParameterValues(message);
+                var parameters = this.CreateParameterValues(message);
 
                 try
                 {
@@ -154,7 +160,7 @@
                 }
                 finally
                 {
-                    RestoreParameterValues(message, parameters);
+                    this.RestoreParameterValues(message, parameters);
                 }
             }
 
@@ -191,13 +197,14 @@
         {
             internal readonly ParameterInfo Parameter;
             internal readonly object FactoryValue;
-            internal object OldValue;
 
             internal ParameterValue(ParameterInfo parameter, object factoryValue)
             {
                 this.Parameter = parameter;
                 this.FactoryValue = factoryValue;
             }
+
+            internal object OldValue { get; set; }
         }
 
         private sealed class AutomaticParameterizedFactoriesHelper
@@ -208,6 +215,7 @@
             private readonly IConstructorInjectionBehavior originalInjectionBehavior;
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> serviceLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
+            
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> implementationLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
 
@@ -216,6 +224,34 @@
                 this.container = options.Container;
                 this.originalVerificationBehavior = options.ConstructorVerificationBehavior;
                 this.originalInjectionBehavior = options.ConstructorInjectionBehavior;
+            }
+
+            void IConstructorVerificationBehavior.Verify(ParameterInfo parameter)
+            {
+                if (this.FindThreadLocal(parameter) == null)
+                {
+                    this.originalVerificationBehavior.Verify(parameter);
+                }
+            }
+
+            Expression IConstructorInjectionBehavior.BuildParameterExpression(ParameterInfo parameter)
+            {
+                var local = this.FindThreadLocal(parameter);
+
+                if (local != null)
+                {
+                    if (parameter.ParameterType.IsValueType && this.container.IsVerifying())
+                    {
+                        throw new InvalidOperationException(
+                            "You can't use Verify() is the factory product contains value types.");
+                    }
+
+                    return Expression.Convert(
+                        Expression.Property(Expression.Constant(local), "Value"),
+                        parameter.ParameterType);
+                }
+
+                return this.originalInjectionBehavior.BuildParameterExpression(parameter);
             }
 
             // Called by RegisterFactory<TFactory>
@@ -240,34 +276,6 @@
                 {
                     this.implementationLocals[implementationType] = this.serviceLocals[serviceType];
                 }
-            }
-
-            void IConstructorVerificationBehavior.Verify(ParameterInfo parameter)
-            {
-                if (this.FindThreadLocal(parameter) == null)
-                {
-                    this.originalVerificationBehavior.Verify(parameter);
-                }
-            }
-
-            Expression IConstructorInjectionBehavior.BuildParameterExpression(ParameterInfo parameter)
-            {
-                var local = FindThreadLocal(parameter);
-
-                if (local != null)
-                {
-                    if (parameter.ParameterType.IsValueType && this.container.IsVerifying())
-                    {
-                        throw new InvalidOperationException(
-                            "You can't use Verify() is the factory product contains value types.");
-                    }
-
-                    return Expression.Convert(
-                        Expression.Property(Expression.Constant(local), "Value"),
-                        parameter.ParameterType);
-                }
-
-                return this.originalInjectionBehavior.BuildParameterExpression(parameter);
             }
 
             internal ThreadLocal<object> GetThreadLocal(Type serviceType, Type parameterType)

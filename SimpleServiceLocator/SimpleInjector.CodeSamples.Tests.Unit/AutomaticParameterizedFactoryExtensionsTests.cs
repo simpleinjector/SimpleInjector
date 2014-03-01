@@ -3,7 +3,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    class AutomaticParameterizedFactoryExtensionsTests
+    public class AutomaticParameterizedFactoryExtensionsTests
     {
         public interface IService
         {
