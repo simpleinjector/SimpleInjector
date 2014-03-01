@@ -29,15 +29,18 @@
 
             foreach (var filter in filters)
             {
-                IFilter instance = filter.Instance;
-
-                Registration registration =
-                    this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
-
-                registration.InitializeInstance(instance);
+                this.InitializeFilter(filter.Instance);
             }
 
             return filters;
+        }
+
+        internal void InitializeFilter(IFilter instance)
+        {
+            Registration registration =
+                this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
+
+            registration.InitializeInstance(instance);
         }
 
         private FilterInfo[] GetFilterInfos(HttpConfiguration configuration,
