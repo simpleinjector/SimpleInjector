@@ -14,7 +14,7 @@
     <id>SimpleInjector.Integration.Web.Mvc</id>
     <title>Simple Injector ASP.NET MVC Integration</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The Simple Injector ASP.NET MVC Integration.</description>
+    <description>Simple Injector ASP.NET MVC Integration.</description>
     <summary>ASP.NET MVC integration for Simple Injector.</summary>
     <copyright>Simple Injector Contributors 2011 - 2013</copyright>
     <language>en-US</language>

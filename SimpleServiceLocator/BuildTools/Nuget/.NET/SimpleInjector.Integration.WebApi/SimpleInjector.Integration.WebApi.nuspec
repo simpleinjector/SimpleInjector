@@ -15,7 +15,7 @@
     <id>SimpleInjector.Integration.WebApi</id>
     <title>Simple Injector ASP.NET Web API Integration</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The Simple Injector ASP.NET Web API Integration.</description>
+    <description>Simple Injector ASP.NET Web API Integration.</description>
     <summary>ASP.NET Web API integration for Simple Injector.</summary>
     <copyright>Simple Injector Contributors 2014</copyright>
     <language>en-US</language>
