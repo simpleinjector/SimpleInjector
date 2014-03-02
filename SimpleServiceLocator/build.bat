@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.5.0
-set prereleasePostfix=-beta2
+set prereleasePostfix=
 set buildNumber=0
 
 
@@ -75,11 +75,12 @@ mkdir %targetPathPcl%
 
 copy "Shared Assemblies\*.*" %targetPathPcl%\*.*
 
-%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Core%
-ren %targetPathNet%\SimpleInjector.dll SimpleInjector_45.dll
-ren %targetPathNet%\SimpleInjector.xml SimpleInjector_45.xml
-
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
+ren %targetPathNet%\SimpleInjector.dll SimpleInjector_40.dll
+ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
+
+%msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Core%
+
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Packaging%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
 %msbuild% "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Extensions_ExecutionContextScoping%
@@ -108,8 +109,8 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\Portable\Documentation\SimpleInjector.chm
 
-copy bin\NET\SimpleInjector_45.dll Releases\v%named_version%\.NET\SimpleInjector.dll
-copy bin\NET\SimpleInjector_45.xml Releases\v%named_version%\.NET\SimpleInjector.xml
+copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
+copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.xml
 
@@ -127,14 +128,14 @@ copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 
 
 mkdir Releases\temp\NET45
-copy bin\NET\SimpleInjector_45.dll Releases\temp\NET45\SimpleInjector.dll
-copy bin\NET\SimpleInjector_45.xml Releases\temp\NET45\SimpleInjector.xml
+copy bin\NET\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
+copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET45\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET45\SimpleInjector.Diagnostics.xml
 
 mkdir Releases\temp\NET40
-copy bin\NET\SimpleInjector.dll Releases\temp\NET40\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\temp\NET40\SimpleInjector.xml
+copy bin\NET\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
+copy bin\NET\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET40\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET40\SimpleInjector.Diagnostics.xml
 
@@ -217,12 +218,12 @@ echo CREATING NUGET PACKAGES
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\NET\SimpleInjector_45.dll Releases\temp\lib\net45\SimpleInjector.dll
-copy bin\NET\SimpleInjector_45.xml Releases\temp\lib\net45\SimpleInjector.xml
+copy bin\NET\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
+copy bin\NET\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net45\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net45\SimpleInjector.Diagnostics.xml
-copy bin\NET\SimpleInjector.dll Releases\temp\lib\net40-client\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\temp\lib\net40-client\SimpleInjector.xml
+copy bin\NET\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector.dll
+copy bin\NET\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.xml
 copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8\SimpleInjector.dll"
