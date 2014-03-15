@@ -6,7 +6,7 @@
     <owners>Simple Injector Contributors</owners>
     <licenseUrl>https://simpleinjector.codeplex.com/license</licenseUrl>
     <projectUrl>https://simpleinjector.org/</projectUrl>
-    <iconUrl>http://i3.codeplex.com/Download?ProjectName=simpleinjector&amp;DownloadId=629835</iconUrl>
+    <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <id>SimpleInjector</id>
     <title>Simple Injector</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
