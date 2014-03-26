@@ -272,7 +272,7 @@
             internal void RegisterFactoryProduct(Type serviceType, Type implementationType)
             {
                 // Create a mapping from implementationType to serviceType.
-                if (this.serviceLocals.ContainsKey(implementationType))
+                if (this.serviceLocals.ContainsKey(serviceType))
                 {
                     this.implementationLocals[implementationType] = this.serviceLocals[serviceType];
                 }
