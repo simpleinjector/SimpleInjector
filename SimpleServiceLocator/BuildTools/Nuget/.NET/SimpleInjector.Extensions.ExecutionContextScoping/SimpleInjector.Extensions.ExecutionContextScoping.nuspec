@@ -11,10 +11,10 @@
       <dependency id="SimpleInjector" version="{versionCore}" />
     </dependencies>
     <id>SimpleInjector.Extensions.ExecutionContextScoping</id>
-    <title>Simple Injector Execution Context Scoping Extensions</title>
+    <title>Simple Injector Execution Context Scoping</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The Execution Context Scoping Extensions package adds an advanced new lifestyle called 'Execution Context Scope', which allows instances to live within an explicitly defined execution context scope (or logical call context) and get disposed when this scope ends.</description>
-    <summary>Execution context scoping extensions for the Simple Injector Inversion of Control library.</summary>
+    <description>The Execution Context Scoping package adds an advanced new lifestyle called 'Execution Context Scope', which allows instances to live within an explicitly defined execution context scope (or logical call context) and get disposed when this scope ends.</description>
+    <summary>Execution context scoping for the Simple Injector Inversion of Control library.</summary>
     <copyright>Simple Injector Contributors 2014</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator lifestyle execution context scope scoping logical call async await</tags>
