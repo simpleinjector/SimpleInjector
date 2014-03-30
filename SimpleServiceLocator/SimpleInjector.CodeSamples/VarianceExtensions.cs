@@ -41,7 +41,7 @@
                         string.Join(", ", registrations.Select(r => string.Format("{0}", r.ServiceType)));
 
                     throw new ActivationException(string.Format("There is an error in the container's " +
-                        "contiguration. It is impossible to resolve type {0}, because there are " +
+                        "configuration. It is impossible to resolve type {0}, because there are " +
                         "{1} registrations that are applicable. Ambiguous registrations: {2}.",
                         serviceType, registrations.Length, names));
                 }

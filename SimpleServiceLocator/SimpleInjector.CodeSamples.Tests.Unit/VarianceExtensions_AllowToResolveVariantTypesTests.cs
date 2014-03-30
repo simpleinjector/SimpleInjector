@@ -115,7 +115,7 @@
         {
             // Arrange
             string expectedMessage =
-                "There is an error in the container's contiguration. " +
+                "There is an error in the container's configuration. " +
                 "It is impossible to resolve type System.Action`1[System.ArgumentException], " +
                 "because there are 2 registrations that are applicable. " +
                 "Ambiguous registrations: ";
