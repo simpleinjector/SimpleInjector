@@ -44,10 +44,7 @@ namespace SimpleInjector.Integration.Wcf
         public SimpleInjectorServiceHost(Container container, Type serviceType, params Uri[] baseAddresses)
             : base(serviceType, baseAddresses)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             this.container = container;
         }

@@ -26,11 +26,10 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using System.ServiceModel;
-
-    using SimpleInjector.Advanced;
     using SimpleInjector.Integration.Wcf;
 
     /// <summary>
@@ -57,19 +56,24 @@ namespace SimpleInjector
             {
                 assemblies = AppDomain.CurrentDomain.GetAssemblies();
             }
-            
-            var serviceTypes =
+
+            var serviceTypes = (
                 from assembly in assemblies
                 where !assembly.IsDynamic
                 from type in assembly.GetExportedTypes()
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
                 where IsWcfServiceType(type)
-                select type;
+                select type)
+                .ToArray();
+
+            VerifyConcurrencyMode(serviceTypes);
 
             foreach (Type serviceType in serviceTypes)
             {
-                container.Register(serviceType, serviceType, Lifestyle.Transient);
+                Lifestyle lifestyle = GetAppropriateLifestyle(serviceType);
+
+                container.Register(serviceType, serviceType, lifestyle);
             }
         }
 
@@ -194,7 +198,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            var lifestyle = 
+            var lifestyle =
                 disposeWhenRequestEnds ? WcfOperationLifestyle.WithDisposal : WcfOperationLifestyle.NoDisposal;
 
             container.Register<TService>(instanceCreator, lifestyle);
@@ -231,35 +235,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            return container.GetWcfOperationScopeManager().CurrentScope;
-        }
-
-        internal static WcfOperationScope BeginWcfOperationScope(this Container container)
-        {
-            Requires.IsNotNull(container, "container");
-
-            return container.GetWcfOperationScopeManager().BeginScope();
-        }
-
-        internal static WcfOperationScopeManager GetWcfOperationScopeManager(this Container container)
-        {
-            var manager = (WcfOperationScopeManager)container.GetItem(ManagerKey);
-
-            if (manager == null)
-            {
-                lock (ManagerKey)
-                {
-                    manager = (WcfOperationScopeManager)container.GetItem(ManagerKey);
-
-                    if (manager == null)
-                    {
-                        manager = new WcfOperationScopeManager();
-                        container.SetItem(ManagerKey, manager);
-                    }
-                }
-            }
-
-            return manager;
+            return WcfOperationLifestyle.GetCurrentScopeCore();
         }
 
         private static bool IsWcfServiceType(Type type)
@@ -274,6 +250,48 @@ namespace SimpleInjector
                 .Any();
 
             return typeIsDecorated || typesInterfacesAreDecorated;
+        }
+
+        private static void VerifyConcurrencyMode(Type[] serviceTypes)
+        {
+            foreach (Type serviceType in serviceTypes)
+            {
+                VerifyConcurrencyMode(serviceType);
+            }
+        }
+
+        private static void VerifyConcurrencyMode(Type wcfServiceType)
+        {
+            if (HasInvalidConcurrencyMode(wcfServiceType))
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    "The WCF service class {0} is configured with ConcurrencyMode Multiple, but this is not " +
+                    "supported by Simple Injector. Please change the ConcurrencyMode to Single.",
+                    wcfServiceType.FullName));
+            }
+        }
+
+        private static bool HasInvalidConcurrencyMode(Type wcfServiceType)
+        {
+            var attribute = GetServiceBehaviorAttribute(wcfServiceType);
+
+            return attribute != null && attribute.ConcurrencyMode == ConcurrencyMode.Multiple;
+        }
+
+        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType)
+        {
+            var attribute = GetServiceBehaviorAttribute(wcfServiceType);
+
+            bool singleton = attribute != null && attribute.InstanceContextMode != InstanceContextMode.Single;
+
+            return singleton ? Lifestyle.Singleton : Lifestyle.Transient;
+        }
+
+        private static ServiceBehaviorAttribute GetServiceBehaviorAttribute(Type type)
+        {
+            return type.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
+                .OfType<ServiceBehaviorAttribute>()
+                .FirstOrDefault();
         }
     }
 }

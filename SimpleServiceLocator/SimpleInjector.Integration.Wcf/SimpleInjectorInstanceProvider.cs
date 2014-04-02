@@ -23,6 +23,7 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.Diagnostics;
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Dispatcher;
@@ -45,7 +46,7 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
-            var scope = this.container.BeginWcfOperationScope();
+            var scope = instanceContext.BeginScope();
 
             try
             {
@@ -63,7 +64,14 @@ namespace SimpleInjector.Integration.Wcf
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            this.container.GetCurrentWcfOperationScope().Dispose();
+            Requires.IsNotNull(instanceContext, "instanceContext");
+
+            var scope = instanceContext.RemoveScope();
+
+            if (scope != null)
+            {
+                scope.Dispose();
+            }
         }
     }
 }

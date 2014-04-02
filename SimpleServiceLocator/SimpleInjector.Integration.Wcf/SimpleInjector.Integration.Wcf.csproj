@@ -51,10 +51,10 @@
     <Reference Include="System.ServiceModel.Activation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstanceContextExtensions.cs" />
     <Compile Include="WcfOperationLifestyle.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="WcfOperationScope.cs" />
-    <Compile Include="WcfOperationScopeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleInjectorInstanceProvider.cs" />
     <Compile Include="SimpleInjectorWcfExtensions.cs" />

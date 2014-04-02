@@ -1,6 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vNext
+
+	Bug fixes:
+		-[Wcf] Components that were registered as PerWcfOperation were not disposed when the WCF called
+		 ReleaseInstance on a different thread. There was also a memory leak related to this issue. This
+		 has been fixed as well.
+
+
 Version 2.5.0 (v2.5 RTM) 2014-03-02
 
 	General description:

@@ -38,10 +38,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <param name="container">The container.</param>
         public static void SetContainer(Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
+            Requires.IsNotNull(container, "container");
 
             if (SimpleInjectorServiceHostFactory.container != null)
             {
@@ -71,10 +68,7 @@ namespace SimpleInjector.Integration.Wcf
         /// reference.</exception>
         protected override ServiceHost CreateServiceHost(Type serviceType, Uri[] baseAddresses)
         {
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException("serviceType");
-            }
+            Requires.IsNotNull(serviceType, "serviceType");
 
             if (container == null)
             {

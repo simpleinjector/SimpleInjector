@@ -23,6 +23,7 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.ServiceModel;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
@@ -80,6 +81,15 @@ namespace SimpleInjector.Integration.Wcf
         {
             WithDisposal.WhenScopeEnds(container, action);
         }
+        
+        internal static WcfOperationScope GetCurrentScopeCore()
+        {
+            var operationContext = OperationContext.Current;
+
+            var instanceContext = operationContext != null ? operationContext.InstanceContext : null;
+
+            return instanceContext != null ? instanceContext.GetCurrentScope() : null;
+        }
 
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
@@ -89,7 +99,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
         protected override Scope GetCurrentScopeCore(Container container)
         {
-            return container.GetWcfOperationScopeManager().CurrentScope;
+            return GetCurrentScopeCore();
         }
 
         /// <summary>
@@ -101,9 +111,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
         protected override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            var manager = container.GetWcfOperationScopeManager();
-
-            return () => manager.CurrentScope;
+            return GetCurrentScopeCore;
         }
     }
 }

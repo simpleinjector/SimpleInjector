@@ -49,15 +49,8 @@ namespace SimpleInjector.Integration.Wcf
         public void ApplyDispatchBehavior(ServiceDescription serviceDescription,
             ServiceHostBase serviceHostBase)
         {
-            if (serviceDescription == null)
-            {
-                throw new ArgumentNullException("serviceDescription");
-            }
-
-            if (serviceHostBase == null)
-            {
-                throw new ArgumentNullException("serviceHostBase");
-            }
+            Requires.IsNotNull(serviceDescription, "serviceDescription");
+            Requires.IsNotNull(serviceHostBase, "serviceHostBase");
 
             var instanceProvider =
                 new SimpleInjectorInstanceProvider(this.container, serviceDescription.ServiceType);
