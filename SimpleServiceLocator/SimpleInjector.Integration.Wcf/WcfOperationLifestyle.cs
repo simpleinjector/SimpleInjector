@@ -26,7 +26,11 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel;
 
     /// <summary>
-    /// Defines a lifestyle that caches instances during the execution of a single WCF operation.
+    /// Defines a lifestyle that caches instances for the lifetime of a WCF service class. WCF allows service
+    /// classes to be (both implicitly and explicitly) configured to have a lifetime of <b>PerCall</b>, 
+    /// <b>PerSession</b> or <b>Single</b> using the <see cref="InstanceContextMode"/> enumeration. The
+    /// lifetime of WCF service classes is controlled by WCF and this lifestyle allows registrations to be
+    /// scoped according to the containing WCF service class.
     /// </summary>
     /// <example>
     /// The following example shows the usage of the <b>WcfOperationLifestyle</b> class:

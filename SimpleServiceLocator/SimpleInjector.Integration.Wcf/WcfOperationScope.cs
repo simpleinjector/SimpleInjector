@@ -36,5 +36,37 @@ namespace SimpleInjector.Integration.Wcf
     /// </summary>
     public sealed class WcfOperationScope : Scope
     {
+        private InstanceContext instanceContext;
+
+        internal WcfOperationScope(InstanceContext instanceContext)
+        {
+            this.instanceContext = instanceContext;
+        }
+
+        /// <summary>Releases all instances that are cached by the <see cref="WcfOperationScope"/> object.</summary>
+        /// <param name="disposing">False when only unmanaged resources should be released.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (this.instanceContext == null)
+            {
+                return;
+            }
+
+            try
+            {
+                base.Dispose(disposing);
+            }
+            finally
+            {
+                try
+                {
+                    this.instanceContext.RemoveScope();
+                }
+                finally
+                {
+                    this.instanceContext = null;
+                }
+            }
+        }
     }
 }

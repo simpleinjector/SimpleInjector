@@ -66,7 +66,7 @@ namespace SimpleInjector.Integration.Wcf
         {
             Requires.IsNotNull(instanceContext, "instanceContext");
 
-            var scope = instanceContext.RemoveScope();
+            var scope = instanceContext.GetCurrentScope();
 
             if (scope != null)
             {

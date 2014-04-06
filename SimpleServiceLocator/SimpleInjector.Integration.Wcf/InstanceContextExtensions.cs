@@ -35,8 +35,12 @@ namespace SimpleInjector.Integration.Wcf
 
             if (extension == null)
             {
-                extension = new SimpleInjectorInstanceContextExtension(new WcfOperationScope());
-                instanceContext.Extensions.Add(extension);
+                instanceContext.Extensions.Add(extension = new SimpleInjectorInstanceContextExtension());
+            }
+            
+            if (extension.Scope == null)
+            {
+                extension.Scope = new WcfOperationScope(instanceContext);
             }
 
             return extension.Scope;
@@ -54,30 +58,19 @@ namespace SimpleInjector.Integration.Wcf
             return extension != null ? extension.Scope : null;
         }
 
-        internal static WcfOperationScope RemoveScope(this InstanceContext instanceContext)
+        internal static void RemoveScope(this InstanceContext instanceContext)
         {
             var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
 
             if (extension != null)
             {
-                var scope = extension.Scope;
-
-                instanceContext.Extensions.Remove(extension);
-
-                return scope;
+                extension.Scope = null;
             }
-
-            return null;
         }
 
         private sealed class SimpleInjectorInstanceContextExtension : IExtension<InstanceContext>
         {
-            internal readonly WcfOperationScope Scope;
-
-            public SimpleInjectorInstanceContextExtension(WcfOperationScope scope)
-            {
-                this.Scope = scope;
-            }
+            internal WcfOperationScope Scope { get; set; }
 
             public void Attach(InstanceContext owner)
             {

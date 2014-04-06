@@ -37,8 +37,6 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWcfExtensions
     {
-        private static readonly object ManagerKey = new object();
-
         /// <summary>
         /// Registers the WCF services instances (public classes that implement an interface that
         /// is decorated with a <see cref="ServiceContractAttribute"/>) that are 
@@ -93,8 +91,8 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned during
-        /// the execution of a single Operation Contract. When the 
-        /// operation ends and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,
+        /// the WCF configured lifetime of the WCF service class. When the WCF service class is released by
+        /// WCF and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,
         /// the cached instance will be disposed as well.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
@@ -107,9 +105,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -120,9 +115,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned during
-        /// the execution of a single Operation Contract. When the 
-        /// operation ends and <typeparamref name="TImplementation"/> implements 
-        /// <see cref="IDisposable"/>, the cached instance will be disposed as well.
+        /// the WCF configured lifetime of the WCF service class. When the WCF service class is released by
+        /// WCF and <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached 
+        /// instance will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
@@ -135,9 +130,6 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterPerWcfOperation<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -150,9 +142,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
-        /// and returned instances are cached during the execution of a single Operation Contract.
-        /// When the operation ends, and the cached instance
-        /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
+        /// and returned instances are cached during the WCF configured lifetime of the WCF service class.
+        /// When the WCF service class is released by WCF and the cached instance implements 
+        /// <see cref="IDisposable"/>, that cached instance will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -175,10 +167,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
-        /// and returned instances are cached during the execution of a Operation Contract.
-        /// When the operation ends, 
-        /// <paramref name="disposeWhenRequestEnds"/> is set to <b>true</b>, and the cached instance
-        /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
+        /// and returned instances are cached during the WCF configured lifetime of the WCF service class.
+        /// When the WCF service class is released by WCF, <paramref name="disposeWhenRequestEnds"/> is set to
+        /// <b>true</b>, and the cached instance implements <see cref="IDisposable"/>, that cached instance 
+        /// will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
