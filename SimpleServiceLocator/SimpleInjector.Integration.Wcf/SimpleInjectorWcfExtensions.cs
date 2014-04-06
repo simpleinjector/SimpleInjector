@@ -274,7 +274,7 @@ namespace SimpleInjector
         {
             var attribute = GetServiceBehaviorAttribute(wcfServiceType);
 
-            bool singleton = attribute != null && attribute.InstanceContextMode != InstanceContextMode.Single;
+            bool singleton = attribute != null && attribute.InstanceContextMode == InstanceContextMode.Single;
 
             return singleton ? Lifestyle.Singleton : Lifestyle.Transient;
         }
