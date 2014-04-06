@@ -63,7 +63,7 @@
     <Rule Name="EnumsShouldHaveZeroValue" Enabled="True" />
     <Rule Name="EnumStorageShouldBeInt32" Enabled="True" />
     <Rule Name="ExceptionsShouldBePublic" Enabled="True" />
-    <Rule Name="GenericMethodsShouldProvideTypeParameter" Enabled="True" />
+    <Rule Name="GenericMethodsShouldProvideTypeParameter" Enabled="False" />
     <Rule Name="ICollectionImplementationsHaveStronglyTypedMembers" Enabled="True" />
     <Rule Name="ImplementIDisposableCorrectly" Enabled="True" />
     <Rule Name="ImplementStandardExceptionConstructors" Enabled="True" />
