@@ -51,6 +51,11 @@ using System.Security;
     MessageId = "Mvc",
     Justification = "Mvc is the word")]
 
+
+[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
+    Scope = "namespace", 
+    Target = "SimpleInjector.Integration.Web.Mvc")]
+
 #if PUBLISH
 #pragma warning disable 1699
 [assembly: AssemblyKeyFileAttribute("..\\SimpleInjector.snk")]
