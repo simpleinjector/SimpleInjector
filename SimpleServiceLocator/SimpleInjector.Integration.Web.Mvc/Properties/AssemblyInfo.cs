@@ -51,10 +51,10 @@ using System.Security;
     MessageId = "Mvc",
     Justification = "Mvc is the word")]
 
-
 [module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
     Scope = "namespace", 
-    Target = "SimpleInjector.Integration.Web.Mvc")]
+    Target = "SimpleInjector.Integration.Web.Mvc",
+    Justification = "There's not much we can do about this.")]
 
 #if PUBLISH
 #pragma warning disable 1699
