@@ -76,9 +76,6 @@ namespace SimpleInjector.Advanced
         /// </remarks>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
         /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = 
-                "We need to return a Action<TService> and we therefore need the generic type param.")]
         [Obsolete(
             "This method is obsolete and will be removed in a future version. Use Container." + 
             "GetRegistration().Registration.InitializeInstance instead to initialize an existing instance.")]

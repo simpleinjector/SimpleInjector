@@ -50,9 +50,6 @@ namespace SimpleInjector
         /// that can not be created by the container.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -79,9 +76,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterPerWebRequest<TService, TImplementation>(this Container container)
             where TService : class
             where TImplementation : class, TService

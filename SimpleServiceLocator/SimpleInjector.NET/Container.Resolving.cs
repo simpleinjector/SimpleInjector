@@ -43,8 +43,6 @@ namespace SimpleInjector
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <returns>The requested service instance.</returns>
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "This class already contains an overload that takes a Type.")]
         public TService GetInstance<TService>() where TService : class
         {
             // Performance optimization: This if check is a duplicate to save a call to LockContainer.
@@ -107,8 +105,6 @@ namespace SimpleInjector
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <returns>A sequence of instances of the requested TService.</returns>
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "This class already contains an overload that takes a Type.")]
         public IEnumerable<TService> GetAllInstances<TService>()
         {
             return this.GetInstance<IEnumerable<TService>>();

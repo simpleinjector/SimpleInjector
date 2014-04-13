@@ -58,9 +58,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterWebApiRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -86,9 +83,6 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterWebApiRequest<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -139,9 +133,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterWebApiRequest<TConcrete>(this Container container,
             bool disposeWhenScopeEnds)
             where TConcrete : class, IDisposable
@@ -170,9 +161,6 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterWebApiRequest<TService, TImplementation>(
             this Container container, bool disposeWhenScopeEnds)
             where TImplementation : class, TService, IDisposable
@@ -228,8 +216,11 @@ namespace SimpleInjector
             configuration.Services.RemoveAll(typeof(IFilterProvider), 
                 provider => provider is ActionDescriptorFilterProvider);
 
-            configuration.Services.Add(typeof(IFilterProvider),
-                new SimpleInjectorActionDescriptorFilterProvider(container));
+            var filterProvider = new SimpleInjectorActionDescriptorFilterProvider(container);
+
+            configuration.Services.Add(typeof(IFilterProvider), filterProvider);
+
+            container.SetItem(typeof(SimpleInjectorActionDescriptorFilterProvider), filterProvider);
         }
         
         /// <summary>
@@ -304,7 +295,36 @@ namespace SimpleInjector
 
             return messageProvider.GetCurrentMessage();
         }
-        
+
+        internal static void VerifyAttributes(this Container container, HttpConfiguration configuration)
+        {
+            //var filterProvider = (SimpleInjectorActionDescriptorFilterProvider)
+            //    container.GetItem(typeof(SimpleInjectorActionDescriptorFilterProvider));
+
+            //if (filterProvider == null)
+            //{
+            //    throw new InvalidOperationException(
+            //        "Please make sure RegisterWebApiFilterProvider is called first.");
+            //}
+
+            var controllerSelector = configuration.Services.GetHttpControllerSelector();
+            var actionSelector = configuration.Services.GetActionSelector();
+            
+            var filterAttributes =
+                from controller in controllerSelector.GetControllerMapping().Values
+                from action in actionSelector.GetActionMapping(controller).SelectMany(x => x)
+                from attribute in action.GetFilters().OfType<Attribute>().Cast<IFilter>()
+                group attribute by attribute.GetType() into typeGroup
+                select typeGroup.First();
+
+            foreach (var attribute in filterAttributes)
+            {
+                // filterProvider.InitializeFilter(attribute);
+                var registration = Lifestyle.Transient.CreateRegistration(attribute.GetType(), container);
+                registration.InitializeInstance(attribute);
+            }
+        }
+
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)
         {
             IAssembliesResolver assembliesResolver = configuration.Services.GetAssembliesResolver();

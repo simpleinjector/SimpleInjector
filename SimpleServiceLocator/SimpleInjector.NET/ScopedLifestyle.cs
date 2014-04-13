@@ -199,8 +199,6 @@ namespace SimpleInjector
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = @"See the description of the justification on the base class.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             Requires.IsNotNull(container, "container");

@@ -37,8 +37,6 @@ namespace SimpleInjector.Lifestyles
             get { return 1; }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "See base.CreateRegistration for more info.")]
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             return new TransientLifestyleRegistration<TService, TImplementation>(this, container);

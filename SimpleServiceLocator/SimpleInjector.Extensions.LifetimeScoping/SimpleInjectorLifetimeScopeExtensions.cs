@@ -72,9 +72,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -102,9 +99,6 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -158,9 +152,6 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because the other " +
-            "overloads also take a generic T.")]
         public static void RegisterLifetimeScope<TConcrete>(this Container container, 
             bool disposeWhenLifetimeScopeEnds)
             where TConcrete : class, IDisposable
@@ -191,9 +182,6 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter",
-            Justification = "A design without a generic T would be unpractical, because we will lose " +
-            "compile-time support.")]
         public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container, bool disposeWhenLifetimeScopeEnds)
             where TImplementation : class, TService, IDisposable
