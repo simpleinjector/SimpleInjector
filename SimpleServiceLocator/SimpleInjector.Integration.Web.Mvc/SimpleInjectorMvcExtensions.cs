@@ -49,6 +49,9 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
+        [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " + 
+            "release. Consider using RegisterMvcIntegratedFilterProvider instead. See https://bit.ly/1h0pJ4G",
+            error: false)]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
         {
             if (container == null)

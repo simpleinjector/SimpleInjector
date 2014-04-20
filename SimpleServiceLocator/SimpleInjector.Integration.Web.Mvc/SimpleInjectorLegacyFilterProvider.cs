@@ -46,7 +46,9 @@ namespace SimpleInjector.Integration.Web.Mvc
             {
                 var filter = filters[index];
 
+#pragma warning disable 618
                 this.container.InjectProperties(filter.Instance);
+#pragma warning restore 618
             }
 
             return filters;
