@@ -16,7 +16,9 @@
             var instance = new MoreThanTwoPropertiesAndWinFormsBindingContext();
 
             // Act
+#pragma warning disable 618
             container.InjectProperties(instance);
+#pragma warning restore 618
         }
 
         public class MoreThanTwoPropertiesAndWinFormsBindingContext : ClassWithBindingContext

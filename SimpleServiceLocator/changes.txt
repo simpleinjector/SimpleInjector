@@ -3,6 +3,16 @@
 
 Version vNext
 
+	General description:
+
+	New features:
+
+	Improvements/Changes:
+		[Core] Container.InjectProperties has been made obsolete. (work item 20945)
+
+
+Version 2.5.1 (v2.5.1 RTM) 2014-04-06
+
 	Bug fixes:
 		-[Wcf] Components that were registered as PerWcfOperation were not disposed when the WCF called
 		 ReleaseInstance on a different thread. There was also a memory leak related to this issue. This

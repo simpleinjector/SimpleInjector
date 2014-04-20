@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable 618
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Linq;
@@ -281,3 +282,4 @@
         }
     }
 }
+#pragma warning restore 618
