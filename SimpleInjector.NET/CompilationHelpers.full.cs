@@ -60,6 +60,7 @@ namespace SimpleInjector
         }
 
         [SecuritySafeCritical]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void JitCompileDelegate(Delegate @delegate)
         {
             RuntimeHelpers.PrepareDelegate(@delegate);
@@ -136,6 +137,7 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
                             "in that case.")]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
             ref Func<TResult> compiledLambda)
         {
@@ -147,8 +149,8 @@ namespace SimpleInjector
                 {
                     var @delegate = CompileInDynamicAssembly<TResult>(expression);
 
-                    // Test the creation. Since we're using a dynamically created assembly, we can't create every
-                    // delegate we can create using expression.Compile(), so we need to test this.
+                    // Test the creation. Since we're using a dynamically created assembly, we can't create 
+                    // every delegate we can create using expression.Compile(), so we need to test this.
                     JitCompileDelegate(@delegate);
 
                     compiledLambda = @delegate;

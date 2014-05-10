@@ -27,6 +27,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
     using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Lifestyles;
@@ -62,6 +63,7 @@ namespace SimpleInjector
             return compiledLambda ?? CompileLambda<TResult>(expression);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         internal static Expression OptimizeObjectGraph(Container container, Expression expression)
         {
             var lifestyleInfos = PerObjectGraphOptimizableRegistrationFinder.Find(expression, container);
@@ -77,6 +79,7 @@ namespace SimpleInjector
         static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
             ref Func<TResult> compiledLambda);
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
         {
             object value = ((ConstantExpression)expression).Value;
@@ -87,6 +90,7 @@ namespace SimpleInjector
             return () => singleton;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static Func<TResult> CompileLambda<TResult>(Expression expression)
         {
             return Expression.Lambda<Func<TResult>>(expression).Compile();
