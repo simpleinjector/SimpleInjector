@@ -296,35 +296,6 @@ namespace SimpleInjector
             return messageProvider.GetCurrentMessage();
         }
 
-        internal static void VerifyAttributes(this Container container, HttpConfiguration configuration)
-        {
-            //var filterProvider = (SimpleInjectorActionDescriptorFilterProvider)
-            //    container.GetItem(typeof(SimpleInjectorActionDescriptorFilterProvider));
-
-            //if (filterProvider == null)
-            //{
-            //    throw new InvalidOperationException(
-            //        "Please make sure RegisterWebApiFilterProvider is called first.");
-            //}
-
-            var controllerSelector = configuration.Services.GetHttpControllerSelector();
-            var actionSelector = configuration.Services.GetActionSelector();
-            
-            var filterAttributes =
-                from controller in controllerSelector.GetControllerMapping().Values
-                from action in actionSelector.GetActionMapping(controller).SelectMany(x => x)
-                from attribute in action.GetFilters().OfType<Attribute>().Cast<IFilter>()
-                group attribute by attribute.GetType() into typeGroup
-                select typeGroup.First();
-
-            foreach (var attribute in filterAttributes)
-            {
-                // filterProvider.InitializeFilter(attribute);
-                var registration = Lifestyle.Transient.CreateRegistration(attribute.GetType(), container);
-                registration.InitializeInstance(attribute);
-            }
-        }
-
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)
         {
             IAssembliesResolver assembliesResolver = configuration.Services.GetAssembliesResolver();
