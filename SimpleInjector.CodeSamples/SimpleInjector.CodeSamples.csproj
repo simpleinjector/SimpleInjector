@@ -74,6 +74,7 @@
     <Compile Include="AutomaticFactoryExtensions.cs" />
     <Compile Include="AutomaticParameterizedFactoryExtensions.cs" />
     <Compile Include="ContextualDecoratorExtensions.cs" />
+    <Compile Include="DisposableTransientLifestyle.cs" />
     <Compile Include="KeyedFactory.cs" />
     <Compile Include="KeyedRegistrations.cs" />
     <Compile Include="NamedContainer.cs" />

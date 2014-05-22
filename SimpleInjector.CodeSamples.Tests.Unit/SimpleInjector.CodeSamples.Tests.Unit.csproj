@@ -78,6 +78,7 @@
     <Compile Include="ContainerFactory.cs" />
     <Compile Include="ContextDependentExtensionsTests.cs" />
     <Compile Include="ContextualDecoratorExtensionsTests.cs" />
+    <Compile Include="DisposableTransientLifestyleTests.cs" />
     <Compile Include="KeyedFactoryTests.cs" />
     <Compile Include="KeyedRegistrationsTests.cs" />
     <Compile Include="RuntimeDecoratorExtensionsTests.cs" />
