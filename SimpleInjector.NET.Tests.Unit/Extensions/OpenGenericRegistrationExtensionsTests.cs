@@ -250,7 +250,7 @@
             container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
-            // Resolve an unregisterd concrete non-generic type.
+            // Resolve an unregistered concrete non-generic type.
             container.GetInstance<ConcreteCommand>();
         }
 
@@ -519,7 +519,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Atca
+            // Act
             Action action = () => container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
             
             // Assert
@@ -1450,7 +1450,7 @@
                 "Multiple observers of the ResolveUnregisteredType event",
                 action,
                 "GetInstance should fail because the framework should detect that more than one " +
-                "implemention of the requested service.");
+                "implementation of the requested service.");
         }
 
         [TestMethod]
@@ -1462,23 +1462,23 @@
             var container = ContainerFactory.New();
             container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
+                {
+                    if (c.Handled)
                     {
-                        if (c.Handled)
-                        {
-                            throw new InvalidOperationException("The test assumes handled is false at this time.");
-                        }
+                        throw new InvalidOperationException("The test assumes handled is false at this time.");
+                    }
 
-                        return c.ImplementationType.GetGenericArguments().Single() == typeof(int);
-                    });
+                    return c.ImplementationType.GetGenericArguments().Single() == typeof(int);
+                });
 
             container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c =>
-                    {
-                        // this is the test - we are checking that c.handled changed between
-                        // the registered Predicates for OpenGenericWithPredicate1<> and OpenGenericWithPredicate2<>
-                        handled = c.Handled;
-                        return c.ImplementationType.GetGenericArguments().Single() == typeof(long);
-                    });
+                {
+                    // this is the test - we are checking that c.handled changed between
+                    // the registered Predicates for OpenGenericWithPredicate1<> and OpenGenericWithPredicate2<>
+                    handled = c.Handled;
+                    return c.ImplementationType.GetGenericArguments().Single() == typeof(long);
+                });
 
             // Act
             handled = false;
@@ -1571,7 +1571,7 @@
         {
         }
 
-        // Note: This class deliberately implements a second IProducer. This will verify wether the code can
+        // Note: This class deliberately implements a second IProducer. This will verify whether the code can
         // handle types with multiple versions of the same interface.
         public class NullableProducer<T> : IProducer<T?>, IProducer<IValidate<T>>, IProducer<double>
             where T : struct
