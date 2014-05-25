@@ -105,7 +105,7 @@ namespace SimpleInjector
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Collection of items for type {0} has already been registeredand " +
+                "Collection of items for type {0} has already been registered and " +
                 "and the container is currently not configured to allow overriding registrations. " +
                 "To allow overriding the current registration, please create the container using the " +
                 "constructor overload that takes a {1} instance and set the " +
@@ -474,7 +474,7 @@ namespace SimpleInjector
 
         internal static string TheCollectionShouldContainAtleastOneElement()
         {
-            return "The supplied collection should contain atleast one element.";
+            return "The supplied collection should contain at least one element.";
         }
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
