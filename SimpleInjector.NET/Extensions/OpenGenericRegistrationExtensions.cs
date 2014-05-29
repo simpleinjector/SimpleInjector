@@ -195,7 +195,7 @@ namespace SimpleInjector.Extensions
         /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
         /// when a collection of <paramref name="openGenericServiceType"/> is requested. New instances of 
         /// the registered <paramref name="openGenericImplementations"/> will be returned whenever the
-        /// resolved collection is itereated.
+        /// resolved collection is iterated.
         /// </summary>
         /// <example>
         /// Please see the 
@@ -219,7 +219,7 @@ namespace SimpleInjector.Extensions
         /// Registers that instances of <paramref name="openGenericImplementations"/> will be returned 
         /// when a collection of <paramref name="openGenericServiceType"/> is requested. New instances of 
         /// the registered <paramref name="openGenericImplementations"/> will be returned whenever the
-        /// resolved collection is itereated.
+        /// resolved collection is iterated.
         /// </summary>
         /// <example>
         /// Please see the 
