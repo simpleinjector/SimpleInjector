@@ -1062,7 +1062,7 @@
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("openGenericImplementations", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied collection should contain atleast one element.", action);
+                "The supplied collection should contain at least one element.", action);
         }
         
         [TestMethod]
