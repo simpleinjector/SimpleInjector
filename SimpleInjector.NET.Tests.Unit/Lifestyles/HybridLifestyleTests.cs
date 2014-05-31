@@ -405,8 +405,8 @@
             hybrid.RegisterForDisposal(new Container(), new DisposableObject());
 
             // Assert
-            Assert.IsFalse(GetDisposables(trueScope).Any(), "TrueLifestyle was NOT expected to be called.");
-            Assert.AreEqual(1, GetDisposables(falseScope).Length, "FalseLifestyle was expected to be called.");
+            Assert.IsFalse(trueScope.GetDisposables().Any(), "TrueLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, falseScope.GetDisposables().Length, "FalseLifestyle was expected to be called.");
         }
 
         [TestMethod]
@@ -425,8 +425,8 @@
             hybrid.RegisterForDisposal(new Container(), new DisposableObject());
 
             // Assert
-            Assert.AreEqual(1, GetDisposables(trueScope).Length, "TrueLifestyle was expected to be called.");
-            Assert.IsFalse(GetDisposables(falseScope).Any(), "FalseLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, trueScope.GetDisposables().Length, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseScope.GetDisposables().Any(), "FalseLifestyle was NOT expected to be called.");
         }
 
         [TestMethod]
@@ -452,8 +452,8 @@
             var instance1 = container.GetInstance<IDisposable>();
 
             // Assert
-            Assert.AreEqual(1, GetDisposables(trueScope).Length, "TrueLifestyle was expected to be called.");
-            Assert.IsFalse(GetDisposables(falseScope).Any(), "FalseLifestyle was NOT expected to be called.");
+            Assert.AreEqual(1, trueScope.GetDisposables().Length, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseScope.GetDisposables().Any(), "FalseLifestyle was NOT expected to be called.");
 
             // Act
             // Here we flip the switch. Resolving the instance now should get a new instance from the other
@@ -463,7 +463,7 @@
             var instance2 = container.GetInstance<IDisposable>();
 
             // Assert
-            Assert.AreEqual(1, GetDisposables(falseScope).Length, "FalseLifestyle was expected to be called this time.");
+            Assert.AreEqual(1, falseScope.GetDisposables().Length, "FalseLifestyle was expected to be called this time.");
             Assert.IsFalse(object.ReferenceEquals(instance1, instance2));
         }
 
@@ -561,17 +561,6 @@
 
             // Assert
             Assert.AreEqual("Hybrid Transient / Singleton / Custom1", lifestyle.Name);
-        }
-
-        private static IDisposable[] GetDisposables(Scope scope)
-        {
-            var disposablesCollectionField = typeof(Scope)
-                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Single(f => typeof(IEnumerable<IDisposable>).IsAssignableFrom(f.FieldType));
-            
-            var disposables = (IEnumerable<IDisposable>)disposablesCollectionField.GetValue(scope);
-
-            return (disposables ?? Enumerable.Empty<IDisposable>()).ToArray();
         }
 
         private class DisposableObject : IDisposable

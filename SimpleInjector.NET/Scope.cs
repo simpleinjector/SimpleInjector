@@ -133,6 +133,17 @@ namespace SimpleInjector
             }
         }
 
+        // This method is called from within the test suite.
+        internal IDisposable[] GetDisposables()
+        {
+            if (this.disposables == null)
+            {
+                return new IDisposable[0];
+            }
+
+            return this.disposables.ToArray();
+        }
+
         /// <summary>
         /// Releases all instances that are cached by the <see cref="Scope"/> object.
         /// </summary>
