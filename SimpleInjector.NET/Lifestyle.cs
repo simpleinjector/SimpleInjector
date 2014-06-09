@@ -45,12 +45,12 @@ namespace SimpleInjector
     /// how returned instances should be cached. The core library contains two lifestyles out of the box. By
     /// supplying <see cref="Lifestyle.Transient">Lifestyle.Transient</see>, the registered instance is not
     /// cached; a new instance is returned every time it is requested or injected. By supplying
-    /// <see cref="Lifestyle.Singleton">Lifestyle.Singleton</see> instances can be cached indefinately; only
+    /// <see cref="Lifestyle.Singleton">Lifestyle.Singleton</see> instances can be cached indefinitely; only
     /// a single instance of the registered component will be returned by that container instance. Other
     /// lifestyles are defined in integration and extension packages. The 
     /// <see cref="Lifestyle.CreateCustom">CreateCustom</see> method allows defining a custom lifestyle and 
     /// the <see cref="Lifestyle.CreateHybrid(Func{bool}, Lifestyle, Lifestyle)">CreateHybrid</see> method 
-    /// allows creating a lifestle that mixes multiple other lifestyles.
+    /// allows creating a lifestyle that mixes multiple other lifestyles.
     /// </summary>
     /// <remarks>
     /// This type is abstract and can be overridden to implement a custom lifestyle.
@@ -292,7 +292,7 @@ namespace SimpleInjector
         /// that applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the 
         /// <paramref name="lifestyleApplierFactory" /> will be stored for that registration (every 
         /// registration will store its own <b>Func&lt;object&gt;</b> delegate) and this delegate will be
-        /// called everytime the service is resolved (by calling 
+        /// called every time the service is resolved (by calling 
         /// <code>container.GetInstance&lt;TService&gt;</code> or when that service is injected into another
         /// type). 
         /// </remarks>
