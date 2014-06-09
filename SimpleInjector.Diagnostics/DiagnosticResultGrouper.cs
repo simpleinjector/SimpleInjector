@@ -92,7 +92,7 @@ namespace SimpleInjector.Diagnostics
 
             if (childGroups.Length == 1)
             {
-                // This flatterns the hierarcy when there is just one item in the group.
+                // This flattens the hierarchy when there is just one item in the group.
                 return childGroups[0];
             }
 
