@@ -143,7 +143,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a delegate that that upon invocation return the current <see cref="Scope"/> for this
+        /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
         /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
         /// the context of such scope.
         /// </summary>
