@@ -248,7 +248,7 @@ namespace SimpleInjector
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
         /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
         /// registered <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
-        /// that are appliable to the given <typeparamref name="TService"/> (if any).
+        /// that are applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">
@@ -294,7 +294,7 @@ namespace SimpleInjector
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
         /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
         /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
-        /// appliable to the given <typeparamref name="TService"/> (if any).
+        /// applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">
