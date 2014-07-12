@@ -420,16 +420,16 @@
             container.Register<INodeFactory, NodeFactory>();
 
             // Act
-            // Simple Injector's goal is to prevent stackoverflow exceptions when building up object graphs. 
+            // Simple Injector's goal is to prevent stack overflow exceptions when building up object graphs. 
             // Since the creation of the INode types are delayed since an IEnumerable<T> is injected into the 
-            // NodeFactory (note that injecting an an IEnumerable<T> does trigger the creation of its 
+            // NodeFactory (note that injecting an IEnumerable<T> does trigger the creation of its 
             // instances; iterating the collection does), this can be revolved fine and there will be no
-            // stackoverflow. It is therefore not Simple Injector's job to disallow such construct. Having the 
+            // stack overflow. It is therefore not Simple Injector's job to disallow such construct. Having the 
             // circular reference in the code might be a problem, but the design might also be intentional and
             // could work just fine. Simple Injector should allow this.
             container.Verify();
 
-            // Extra check in case Verify doens't do its job.
+            // Extra check in case Verify doesn't do its job.
             container.GetAllInstances<INode>().ToArray();
         }
 
@@ -454,7 +454,7 @@
             // Act
             container.Verify();
 
-            // Extra check in case Verify doens't do its job.
+            // Extra check in case Verify doesn't do its job.
             container.GetAllInstances<INode>().ToArray();
         }
 
