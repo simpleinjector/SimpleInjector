@@ -197,7 +197,7 @@ namespace SimpleInjector
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
         /// </value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal bool EnableDynamicAssemblyCompilation
+        public bool EnableDynamicAssemblyCompilation
         {
             get
             {

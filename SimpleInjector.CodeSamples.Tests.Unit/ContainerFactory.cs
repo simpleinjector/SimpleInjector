@@ -8,9 +8,7 @@
         {
             var container = new Container();
 
-            typeof(ContainerOptions).GetProperty("EnableDynamicAssemblyCompilation", 
-                BindingFlags.Instance | BindingFlags.NonPublic)
-                .SetValue(container.Options, true);
+            container.Options.EnableDynamicAssemblyCompilation = true;
 
             return container;
         }
