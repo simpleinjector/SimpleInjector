@@ -24,9 +24,9 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
     using SimpleInjector.Advanced.Internal;
@@ -52,12 +52,17 @@ namespace SimpleInjector
 
             // In the common case, the developer will/should only create a single container during the 
             // lifetime of the application (this is the recommended approach). In this case, we can optimize
-            // the perf by compiling delegates in an dynamic assembly. We can't do this when the developer 
+            // the performance by compiling delegates in an dynamic assembly. We can't do this when the developer
             // creates many containers, because this will create a memory leak (dynamic assemblies are never 
             // unloaded). We might however relax this constraint and optimize the first N container instances.
             if (container.Options.EnableDynamicAssemblyCompilation)
             {
-                TryCompileInDynamicAssembly<TResult>(expression, ref compiledLambda);
+                // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in 
+                // the debugger with VS2013 (See work item 20904).
+                if (!Debugger.IsAttached)
+                {
+                    TryCompileInDynamicAssembly<TResult>(expression, ref compiledLambda);
+                }
             }
 
             return compiledLambda ?? CompileLambda<TResult>(expression);
