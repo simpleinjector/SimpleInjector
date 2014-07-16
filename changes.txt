@@ -3,10 +3,25 @@
 
 Version vNext
 
+	New features:
+		-[Wcf] SimpleInjectorServiceBehavior class added to make it easier for users to create self-hosted
+		 WCF services. (work item 20898)
+
 	Improvements/Changes:
 		-[Core] Container.InjectProperties has been made obsolete. (work item 20945)
 		-[Mvc] SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider has been marked obsolete. 
 		 (work item 20946)
+
+Version 2.5.2 (v2.5.2 RTM) 2014-07-13
+
+	New features:
+		-[Core] ContainerOptions.EnableDynamicAssemblyCompilation property has been added that can be used
+		 to prevent the container from doing dynamic assembly compilation, such as the issues related to
+		 work item 20677.
+
+	Bug fixes:
+		-[Core] Dynamic assembly compilation is suppressed when the debugger is attached to prevent problems
+		 with certain configurations of Visual Studio. (work item 20904)
 
 
 Version 2.5.1 (v2.5.1 RTM) 2014-04-06
