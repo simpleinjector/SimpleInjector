@@ -1,7 +1,7 @@
 #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -31,21 +31,44 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel.Description;
     using System.ServiceModel.Dispatcher;
 
-    internal class SimpleInjectorServiceBehavior : IServiceBehavior
+    /// <summary>
+    /// <see cref="IServiceBehavior"/> implementation for Simple Injector.
+    /// </summary>
+    public class SimpleInjectorServiceBehavior : IServiceBehavior
     {
         private readonly Container container;
 
+        /// <summary>Initializes a new instance of the <see cref="SimpleInjectorServiceBehavior"/> class.</summary>
+        /// <param name="container"></param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null reference.
+        /// </exception>
         public SimpleInjectorServiceBehavior(Container container)
         {
+            Requires.IsNotNull(container, "container");
+
             this.container = container;
         }
 
+        /// <summary>
+        /// Provides the ability to pass custom data to binding elements to support the contract implementation.
+        /// </summary>
+        /// <param name="serviceDescription">The service description of the service.</param>
+        /// <param name="serviceHostBase">The host of the service.</param>
+        /// <param name="endpoints">The service endpoints.</param>
+        /// <param name="bindingParameters">Custom objects to which binding elements have access.</param>
         public void AddBindingParameters(ServiceDescription serviceDescription,
             ServiceHostBase serviceHostBase, Collection<ServiceEndpoint> endpoints,
             BindingParameterCollection bindingParameters)
         {
         }
 
+        /// <summary>
+        /// Provides the ability to change run-time property values or insert custom extension objects such as 
+        /// error handlers, message or parameter interceptors, security extensions, and other custom extension 
+        /// objects.
+        /// </summary>
+        /// <param name="serviceDescription">The service description.</param>
+        /// <param name="serviceHostBase">The host that is currently being built.</param>
         public void ApplyDispatchBehavior(ServiceDescription serviceDescription,
             ServiceHostBase serviceHostBase)
         {
@@ -64,6 +87,12 @@ namespace SimpleInjector.Integration.Wcf
             }
         }
 
+        /// <summary>
+        /// Provides the ability to inspect the service host and the service description to confirm that the 
+        /// service can run successfully.
+        /// </summary>
+        /// <param name="serviceDescription">The service description.</param>
+        /// <param name="serviceHostBase">The service host that is currently being constructed.</param>
         public void Validate(ServiceDescription serviceDescription, ServiceHostBase serviceHostBase)
         {
         }
