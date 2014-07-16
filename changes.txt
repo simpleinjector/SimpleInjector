@@ -6,6 +6,8 @@ Version vNext
 	New features:
 		-[Wcf] SimpleInjectorServiceBehavior class added to make it easier for users to create self-hosted
 		 WCF services. (work item 20898)
+		-[Wcf] GetImplementedContracts method added to SimpleInjectorServiceHost to take it easier to add
+		 any custom behaviors to the implemented contracts.
 
 	Improvements/Changes:
 		-[Core] Container.InjectProperties has been made obsolete. (work item 20945)

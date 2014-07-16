@@ -39,7 +39,7 @@ namespace SimpleInjector.Integration.Wcf
         private readonly Container container;
 
         /// <summary>Initializes a new instance of the <see cref="SimpleInjectorServiceBehavior"/> class.</summary>
-        /// <param name="container"></param>
+        /// <param name="container">The container instance.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null reference.
         /// </exception>
         public SimpleInjectorServiceBehavior(Container container)

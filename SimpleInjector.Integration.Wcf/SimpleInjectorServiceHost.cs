@@ -23,7 +23,9 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.Collections.Generic;
     using System.ServiceModel;
+    using System.ServiceModel.Description;
 
     /// <summary>
     /// This service host is used to set up the service behavior that replaces the instance provider to use 
@@ -47,6 +49,13 @@ namespace SimpleInjector.Integration.Wcf
             Requires.IsNotNull(container, "container");
 
             this.container = container;
+        }
+
+        /// <summary>Gets the contracts implemented by the service hosted.</summary>
+        /// <returns>The collection of <see cref="ContractDescription"/>s.</returns>
+        public IEnumerable<ContractDescription> GetImplementedContracts()
+        {
+            return this.ImplementedContracts.Values;
         }
 
         /// <summary>Opens the channel dispatchers.</summary>
