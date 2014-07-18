@@ -81,6 +81,12 @@ namespace SimpleInjector
             return expression;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static Func<TResult> CompileLambda<TResult>(Expression expression)
+        {
+            return Expression.Lambda<Func<TResult>>(expression).Compile();
+        }
+
         static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
             ref Func<TResult> compiledLambda);
 
@@ -93,12 +99,6 @@ namespace SimpleInjector
 
             // This lambda will be a tiny little bit faster than a compiled delegate.
             return () => singleton;
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Func<TResult> CompileLambda<TResult>(Expression expression)
-        {
-            return Expression.Lambda<Func<TResult>>(expression).Compile();
         }
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize

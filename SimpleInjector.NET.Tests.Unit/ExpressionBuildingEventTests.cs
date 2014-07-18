@@ -663,7 +663,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "Error occurred while trying to build a delegate for type SqlUserRepository using " + 
+                    "Error occurred while trying to build a delegate for type IUserRepository using " + 
                     "the expression", ex);
             }
         }

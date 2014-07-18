@@ -94,11 +94,11 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Type {0} has already been registered and the container. If your intention is to resolve " +
-                "a collection of {0} implementations, use the RegisterAll overloads (more info:" +
-                " https://bit.ly/1duJ9bM). " +
-                "If your intention is to replace the existing registration with this new registration, you " +
-                "can allow overriding the current registration by setting Container.Options." +
-                "AllowOverridingRegistrations to true (more info: https://bit.ly/1g0R3Os).",
+                "a collection of {0} implementations, use the RegisterAll overloads. More info: " +
+                "https://bit.ly/1duJ9bM" +
+                ". If your intention is to replace the existing registration with this new registration, " +
+                "you can allow overriding the current registration by setting Container.Options." +
+                "AllowOverridingRegistrations to true. More info: https://bit.ly/1g0R3Os.",
                 serviceType.ToFriendlyName());
         }
 
@@ -359,18 +359,18 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to use {0} as a decorator, its constructor must include a " +
-                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being decorated. " +
-                "The parameter type {1} does not currently exist in the constructor of class {0}.",
+                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being " +
+                "decorated. The parameter type {1} does not currently exist in the constructor of class {0}.",
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
-        internal static string TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(Type decoratorType,
-            Type serviceType)
+        internal static string TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
+            Type decoratorType, Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to use {0} as a decorator, its constructor must include a " +
-                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being decorated. " +
-                "The parameter type {1} is defined multiple times in the constructor of class {0}.",
+                "single parameter of type {1} (or Func<{1}>) - i.e. the type of the instance that is being " +
+                "decorated. The parameter type {1} is defined multiple times in the constructor of class {0}.",
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 

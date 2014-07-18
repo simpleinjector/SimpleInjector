@@ -143,9 +143,9 @@ namespace SimpleInjector.Lifestyles
                 get { return typeof(TService); }
             }
 
-            protected override TService CreateInstance()
+            protected override Expression BuildTransientExpression()
             {
-                return this.BuildTransientDelegate<TService>(this.instanceCreator)();
+                return this.BuildTransientExpression<TService>(this.instanceCreator);
             }
         }
 
@@ -164,9 +164,9 @@ namespace SimpleInjector.Lifestyles
                 get { return typeof(TImplementation); }
             }
 
-            protected override TService CreateInstance()
+            protected override Expression BuildTransientExpression()
             {
-                return this.BuildTransientDelegate<TService, TImplementation>()();
+                return this.BuildTransientExpression<TService, TImplementation>();
             }
         }
 
@@ -190,17 +190,42 @@ namespace SimpleInjector.Lifestyles
                 return Expression.Constant(this.lazyInstance.Value, typeof(TService));
             }
 
-            protected abstract TService CreateInstance();
+            protected abstract Expression BuildTransientExpression();
 
             private TService CreateInstanceWithNullCheck()
             {
-                var instance = this.CreateInstance();
+                var expression = this.BuildTransientExpression();
+
+                Func<TService> func = CompileExpression(expression);
+
+                var instance = func();
 
                 EnsureInstanceIsNotNull(instance);
 
                 return instance;
             }
 
+            private static Func<TService> CompileExpression(Expression expression)
+            {
+                Func<TService> func;
+
+                try
+                {
+                    // Don't call BuildTransientDelegate, because that might do optimizations that are simply
+                    // not needed, since the delegate will be called just once.
+                    func = CompilationHelpers.CompileLambda<TService>(expression);
+                }
+                catch (Exception ex)
+                {
+                    string message = StringResources.ErrorWhileBuildingDelegateFromExpression(
+                        typeof(TService), expression, ex);
+
+                    throw new ActivationException(message, ex);
+                }
+
+                return func;
+            }
+            
             private static void EnsureInstanceIsNotNull(object instance)
             {
                 if (instance == null)
