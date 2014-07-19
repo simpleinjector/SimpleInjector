@@ -272,6 +272,11 @@ namespace SimpleInjector.Extensions.Decorators
         {
             if (IsDecorateeFactoryDependencyParameter(parameter, serviceType))
             {
+                // We can't call CompilationHelpers.CompileExpression here, because it has a generic type and
+                // we don't know the type at runtime here. We need to do some refactoring to CompilationHelpers
+                // to get that working.
+                expression = CompilationHelpers.OptimizeObjectGraph(this.Container, expression);
+
                 var instanceCreator =
                     Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
 
