@@ -185,6 +185,8 @@ namespace SimpleInjector
         }
 
         internal bool InstanceSuccessfullyCreated { get; private set; }
+
+        internal bool VerifiersAreSuccessfullyCalled { get; private set; }
         
         internal string DebuggerDisplay
         {
@@ -311,8 +313,6 @@ namespace SimpleInjector
             {
                 // Test the creator
                 instance = this.GetInstance();
-
-                this.DoExtraVerfication();
             }
             catch (Exception ex)
             {
@@ -346,11 +346,21 @@ namespace SimpleInjector
             this.isValid = null;
         }
 
-        private void DoExtraVerfication()
+        internal void DoExtraVerfication()
         {
-            foreach (var verify in this.GetVerifiers())
+            try
             {
-                verify();
+                foreach (var verify in this.GetVerifiers())
+                {
+                    verify();
+                }
+
+                this.VerifiersAreSuccessfullyCalled = true;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                    this.ServiceType, ex), ex);
             }
         }
 

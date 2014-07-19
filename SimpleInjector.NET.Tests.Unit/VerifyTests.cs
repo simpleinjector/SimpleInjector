@@ -404,6 +404,27 @@
             Assert.AreEqual(1, PluginWithCreationCounter.InstanceCount);
         }
 
+        [TestMethod]
+        public void Verify_DecoratorWithFuncDecorateeWithFailingConstructor_ThrowsTheExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, FailingPlugin>();
+            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginProxy));
+
+            // This call will succeed, because it resolves: "new PluginProxy(() => new FailingPlugin())" and
+            // that will not call the FailingPlugin constructor.
+            container.GetInstance<IPlugin>();
+
+            // Act
+            // This should still throw an exception.
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
         public class Service<T>
         {
             public Service(IEnumerable<T> collection)
@@ -439,6 +460,14 @@
         {
             public PluginProxy(Func<IPlugin> pluginFactory)
             {
+            }
+        }
+
+        private sealed class FailingPlugin : IPlugin
+        {
+            public FailingPlugin()
+            {
+                throw new Exception();
             }
         }
 

@@ -309,7 +309,7 @@ namespace SimpleInjector
         /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
         /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> 
         /// property and might have supplied an <see cref="Expression"/> of a different type. The order in
-        /// which these events are registered might be of importantance to you.
+        /// which these events are registered might be of importance to you.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
@@ -947,7 +947,7 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// Note: The <paramref name="predicate"/> is <b>not</b> guaranteed to be called once per registration;
-        /// when a registration's instance is requested for the first time simultaniously over multiple thread,
+        /// when a registration's instance is requested for the first time simultaneously over multiple thread,
         /// the predicate might be called multiple times. The caller of this method is responsible of supplying
         /// a predicate that is thread-safe.
         /// </para>
@@ -1256,7 +1256,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> instance and are therefore applied once. <see cref="ExpressionBuilt"/> 
         /// events on the other hand get applied to the <b>Expression</b> of the <see cref="InstanceProducer"/>.
         /// Since each <b>AddRegistration</b> gets its own instance producer (that wraps the 
-        /// <b>Registration</b> instance), this means that that <b>ExpressionBuilt</b> events will be 
+        /// <b>Registration</b> instance), this means that the <b>ExpressionBuilt</b> events will be 
         /// applied for each registered service type.
         /// </para>
         /// <para>
@@ -1517,7 +1517,7 @@ namespace SimpleInjector
 
             var producersToVerify = 
                 from producer in rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct()
-                where !producer.InstanceSuccessfullyCreated
+                where !producer.InstanceSuccessfullyCreated || !producer.VerifiersAreSuccessfullyCalled
                 select producer;
 
             VerifyInstanceCreation(producersToVerify.ToArray());
@@ -1569,9 +1569,17 @@ namespace SimpleInjector
         {
             foreach (var producer in producersToVerify)
             {
-                var instance = producer.VerifyInstanceCreation();
+                if (!producer.InstanceSuccessfullyCreated)
+                {
+                    var instance = producer.VerifyInstanceCreation();
 
-                VerifyContainerUncontrolledCollection(instance, producer);
+                    VerifyContainerUncontrolledCollection(instance, producer);
+                }
+
+                if (!producer.VerifiersAreSuccessfullyCalled)
+                {
+                    producer.DoExtraVerfication();
+                }
             }
         }
 
