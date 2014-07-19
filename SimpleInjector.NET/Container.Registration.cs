@@ -1200,8 +1200,8 @@ namespace SimpleInjector
 
             try
             {
-                this.VerifyIfAllExpressionsCanBeBuilt();
-                this.VerifyIfAllRootObjectsCanBeCreated();
+                this.VerifyThatAllExpressionsCanBeBuilt();
+                this.VerifyThatAllRootObjectsCanBeCreated();
                 this.succesfullyVerified = true;
             }
             finally
@@ -1483,7 +1483,7 @@ namespace SimpleInjector
             }
         }
 
-        private void VerifyIfAllExpressionsCanBeBuilt()
+        private void VerifyThatAllExpressionsCanBeBuilt()
         {
             int maximumNumberOfIterations = 10;
 
@@ -1509,7 +1509,7 @@ namespace SimpleInjector
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
         }
 
-        private void VerifyIfAllRootObjectsCanBeCreated()
+        private void VerifyThatAllRootObjectsCanBeCreated()
         {
             var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
 
