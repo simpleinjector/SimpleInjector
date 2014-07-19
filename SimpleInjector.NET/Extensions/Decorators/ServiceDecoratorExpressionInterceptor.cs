@@ -68,7 +68,7 @@ namespace SimpleInjector.Extensions.Decorators
             this.decoratorType = this.decoratorConstructor.DeclaringType;
 
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
-            // incorperated into the pipeline. This means that the ExpressionBuilding can be applied,
+            // incorporated into the pipeline. This means that the ExpressionBuilding can be applied,
             // properties can be injected, and it can be wrapped with an initializer.
             var registration = this.CreateRegistration();
 

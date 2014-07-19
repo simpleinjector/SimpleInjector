@@ -323,6 +323,9 @@ namespace SimpleInjector
             return instance;
         }
 
+        // A verifier is an Action delegate that will be called during the object creation step in the
+        // verification process (when the user calls Verify()) to enable verification of the whole object 
+        // graph.
         internal void AddVerifier(Action action)
         {
             lock (this.locker)

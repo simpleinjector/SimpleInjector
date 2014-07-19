@@ -155,7 +155,7 @@ namespace SimpleInjector.Extensions.Decorators
         {
             ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
 
-            decorateeExpression = GetExpressionForDecorateeDependencyParameterOrNull(
+            decorateeExpression = this.GetExpressionForDecorateeDependencyParameterOrNull(
                 decorateeParameter, serviceType, decorateeExpression);
 
             var currentProducer = info.GetCurrentInstanceProducer();
@@ -202,12 +202,12 @@ namespace SimpleInjector.Extensions.Decorators
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 
-        protected static Expression GetExpressionForDecorateeDependencyParameterOrNull(
+        protected Expression GetExpressionForDecorateeDependencyParameterOrNull(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
             return
                 BuildExpressionForDecorateeDependencyParameter(parameter, serviceType, expression) ??
-                BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
+                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
                 null;
         }
         
@@ -267,7 +267,7 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
-        private static Expression BuildExpressionForDecorateeFactoryDependencyParameter(
+        private Expression BuildExpressionForDecorateeFactoryDependencyParameter(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
             if (IsDecorateeFactoryDependencyParameter(parameter, serviceType))

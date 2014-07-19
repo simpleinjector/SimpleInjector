@@ -143,7 +143,7 @@ namespace SimpleInjector.Extensions.Decorators
                 GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor);
 
             decorateeExpression = 
-                DecoratorExpressionInterceptor.GetExpressionForDecorateeDependencyParameterOrNull(
+                this.GetExpressionForDecorateeDependencyParameterOrNull(
                     decorateeParameter, this.registeredServiceType, decorateeExpression);
 
             var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();

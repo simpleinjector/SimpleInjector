@@ -1504,27 +1504,16 @@ namespace SimpleInjector
                     select registration)
                     .ToArray();
 
-                VerifyIfAllExpressionsCanBeBuilt(producersToVerify);
+                VerifyThatAllExpressionsCanBeBuilt(producersToVerify);
             }
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
         }
 
         private void VerifyThatAllRootObjectsCanBeCreated()
         {
-            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+            var rootProducers = this.GetRootRegistrations();
 
-            var nonRootProducers =
-                from producer in producers
-                from relationship in producer.GetRelationships()
-                select relationship.Dependency;
-
-            var rootProducers = 
-                producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
-
-            var producersThatMustBeExplicitlyVerified =
-                from producer in producers
-                where producer.MustBeExplicitlyVerified
-                select producer;
+            var producersThatMustBeExplicitlyVerified = this.GetProducersThatNeedExplicitVerification();
 
             var producersToVerify = 
                 from producer in rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct()
@@ -1534,7 +1523,29 @@ namespace SimpleInjector
             VerifyInstanceCreation(producersToVerify.ToArray());
         }
 
-        private static void VerifyIfAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)
+        private IEnumerable<InstanceProducer> GetRootRegistrations()
+        {
+            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+
+            var nonRootProducers =
+                from producer in producers
+                from relationship in producer.GetRelationships()
+                select relationship.Dependency;
+
+            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
+        }
+
+        private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
+        {
+            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+
+            return
+                from producer in producers
+                where producer.MustBeExplicitlyVerified
+                select producer;
+        }
+
+        private static void VerifyThatAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)
         {
             foreach (var producer in producersToVerify)
             {
