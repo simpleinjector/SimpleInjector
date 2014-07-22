@@ -259,6 +259,18 @@ namespace SimpleInjector
             return base.GetType();
         }
 
+        internal IEnumerable<InstanceProducer> GetRootRegistrations()
+        {
+            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+
+            var nonRootProducers =
+                from producer in producers
+                from relationship in producer.GetRelationships()
+                select relationship.Dependency;
+
+            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
+        }
+
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
             bool includeExternalProducers = true)
         {

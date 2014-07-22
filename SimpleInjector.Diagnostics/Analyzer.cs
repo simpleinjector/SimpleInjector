@@ -23,7 +23,9 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
-    using System.Linq;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
     /// <summary>
     /// Entry point for doing diagnostic analysis on <see cref="Container"/> instances.
@@ -51,13 +53,7 @@ namespace SimpleInjector.Diagnostics
         public static DiagnosticResult[] Analyze(Container container)
         {
             Requires.IsNotNull(container, "container");
-
-            if (!container.SuccesfullyVerified)
-            {
-                throw new InvalidOperationException(
-                    "Please make sure that Container.Verify() is called on the supplied container instance. " +
-                    "Only successfully verified container instance can be analyzed.");
-            }
+            RequiresContainerToBeVerified(container);
 
             var producersToAnalyse = container.GetCurrentRegistrations();
 
@@ -78,6 +74,73 @@ namespace SimpleInjector.Diagnostics
                 from result in analyzerResults.Results
                 select result)
                 .ToArray();
+        }
+
+        internal static IEnumerable<RegistrationInfo> GetRootRegistrations(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+            RequiresContainerToBeVerified(container);
+
+            return container.GetRootRegistrations().Select(ToRegistrationInfo);
+        }
+
+        private static RegistrationInfo ToRegistrationInfo(InstanceProducer producer)
+        {
+            // TODO: Recreate decorator structure.
+            // TODO: How to handle collections?
+            // TODO: How to deal with groups of types  (Generic registrations?)? Should there be a 'group' thing?
+            return new RegistrationInfo(
+                producer.ServiceType,
+                producer.Registration.ImplementationType,
+                producer.Lifestyle, // This is not the right lifestyle.
+                producer.GetRelationships().Select(r => ToRegistrationInfo(r.Dependency)));
+        }
+        
+        private static void RequiresContainerToBeVerified(Container container)
+        {
+            if (!container.SuccesfullyVerified)
+            {
+                throw new InvalidOperationException(
+                    "Please make sure that Container.Verify() is called on the supplied container instance. " +
+                    "Only successfully verified container instance can be analyzed.");
+            }
+        }
+    }
+
+    internal class RegistrationInfo
+    {
+        internal RegistrationInfo(Type serviceType, Type implementationType, Lifestyle lifestyle,
+            IEnumerable<RegistrationInfo> dependencies)
+        {
+            this.ServiceType = serviceType;
+            this.ImplementationType = implementationType;
+            this.Lifestyle = lifestyle;
+            this.Dependencies = new ReadOnlyCollection<RegistrationInfo>(dependencies.ToList());
+        }
+
+        public Type ServiceType { get; set; }
+
+        public Type ImplementationType { get; set; }
+
+        public Lifestyle Lifestyle { get; private set; }
+
+        public ReadOnlyCollection<RegistrationInfo> Dependencies { get; private set; }
+
+        public override string ToString()
+        {
+            return this.Visualize(indentingDepth: 0);
+        }
+
+        internal string Visualize(int indentingDepth)
+        {
+            var visualizedDependencies =
+                from dependency in this.Dependencies
+                select Environment.NewLine + dependency.Visualize(indentingDepth + 1);
+
+            return string.Format("{0}new {1}({2})",
+                new string('\t', indentingDepth) +
+                this.ImplementationType.ToFriendlyName(),
+                string.Join(",", visualizedDependencies));
         }
     }
 }

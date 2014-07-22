@@ -1523,18 +1523,6 @@ namespace SimpleInjector
             VerifyInstanceCreation(producersToVerify.ToArray());
         }
 
-        private IEnumerable<InstanceProducer> GetRootRegistrations()
-        {
-            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
-
-            var nonRootProducers =
-                from producer in producers
-                from relationship in producer.GetRelationships()
-                select relationship.Dependency;
-
-            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
-        }
-
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
         {
             var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);

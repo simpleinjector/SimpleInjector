@@ -25,12 +25,24 @@ namespace SimpleInjector.Advanced
     using System.Linq.Expressions;
     using System.Reflection;
 
+    // An Overridden parameter prevents the Registration class from calling back into the container to build
+    // an expression for the given constructor parameter. Instead the Registration will 
     internal struct OverriddenParameter
     {
+        // The parameter to ignore.
         internal readonly ParameterInfo Parameter;
-        internal readonly Expression Expression;
-        internal readonly InstanceProducer Producer;
+
+        // The place holder to temporarily inject into the constructor instead so the complete expression can
+        // go through the interception pipeline.
         internal readonly ConstantExpression PlaceHolder;
+        
+        // The final expression that will replace the place holder after the expression went through the
+        // interception pipeline.
+        internal readonly Expression Expression;
+
+        // The producer of the dependency. This is used to build up the relationships collection and is used
+        // for diagnostics.
+        internal readonly InstanceProducer Producer;
 
         internal OverriddenParameter(ParameterInfo parameter, Expression expression, InstanceProducer producer)
         {

@@ -45,8 +45,6 @@ namespace SimpleInjector.Extensions.Decorators
             this.registeredServiceType = e.RegisteredServiceType;
         }
 
-        internal DecoratorPredicateContext Context { get; private set; }
-
         protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }

@@ -2295,6 +2295,28 @@
             AssertThat.ThrowsWithParamName<ArgumentNullException>("predicate", action);
         }
 
+        [TestMethod]
+        public void GetInstance_DecoratorDependingOnDecoratorPredicateContext_ContainsTheExpectedContext()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ContextualHandlerDecorator<>));
+
+            // Act
+            var decorator = 
+                (ContextualHandlerDecorator<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>();
+
+            DecoratorPredicateContext context = decorator.Context;
+
+            // Assert
+            Assert.AreSame(typeof(RealCommandHandler), context.ImplementationType);
+            Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2473,6 +2495,23 @@
         }
 
         public ICommandHandler<T> Decorated { get; private set; }
+
+        public void Handle(T command)
+        {
+        }
+    }
+
+    public class ContextualHandlerDecorator<T> : ICommandHandler<T>
+    {
+        public ContextualHandlerDecorator(ICommandHandler<T> decorated, DecoratorPredicateContext context)
+        {
+            this.Decorated = decorated;
+            this.Context = context;
+        }
+
+        public ICommandHandler<T> Decorated { get; private set; }
+
+        public DecoratorPredicateContext Context { get; private set; }
 
         public void Handle(T command)
         {

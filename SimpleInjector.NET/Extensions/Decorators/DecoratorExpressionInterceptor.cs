@@ -44,6 +44,9 @@ namespace SimpleInjector.Extensions.Decorators
             this.data = data;
         }
 
+        // Must be set after construction.
+        internal DecoratorPredicateContext Context { get; set; }
+
         protected Container Container
         {
             get { return this.data.Container; }
@@ -153,23 +156,12 @@ namespace SimpleInjector.Extensions.Decorators
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
             Expression decorateeExpression, InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
         {
-            ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
-
-            decorateeExpression = this.GetExpressionForDecorateeDependencyParameterOrNull(
-                decorateeParameter, serviceType, decorateeExpression);
-
-            var currentProducer = info.GetCurrentInstanceProducer();
-
-            if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
-            {
-                AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
-
-                currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);
-            }
+            var overriddenParameters = this.CreateOverriddenParameters(serviceType, decoratorConstructor, 
+                decorateeExpression, realProducer, info);
 
             return this.Lifestyle.CreateRegistration(serviceType,
                 decoratorConstructor.DeclaringType, this.Container,
-                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer));
+                overriddenParameters);
         }
 
         protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)
@@ -240,6 +232,46 @@ namespace SimpleInjector.Extensions.Decorators
             Action verifier = GetVerifierFromDecorateeExpression(decorateeExpression);
 
             producer.AddVerifier(verifier);
+        }
+
+        private OverriddenParameter[] CreateOverriddenParameters(Type serviceType,
+            ConstructorInfo decoratorConstructor, Expression decorateeExpression,
+            InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
+        {
+            ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
+
+            decorateeExpression = this.GetExpressionForDecorateeDependencyParameterOrNull(
+                decorateeParameter, serviceType, decorateeExpression);
+
+            var currentProducer = info.GetCurrentInstanceProducer();
+
+            if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
+            {
+                AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
+
+                currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);
+            }
+
+            var decorateeOverriddenParameter =
+                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
+
+            IEnumerable<OverriddenParameter> predicateContextOverriddenParameters = 
+                this.CreateOverriddenPredicateContextParameters(serviceType, decoratorConstructor, currentProducer);
+
+            var overriddenParameters = (new[] { decorateeOverriddenParameter })
+                .Concat(predicateContextOverriddenParameters);
+
+            return overriddenParameters.ToArray();
+        }
+
+        private IEnumerable<OverriddenParameter> CreateOverriddenPredicateContextParameters(Type serviceType, 
+            ConstructorInfo decoratorConstructor, InstanceProducer currentProducer)
+        {
+            return
+                from parameter in decoratorConstructor.GetParameters()
+                where parameter.ParameterType == typeof(DecoratorPredicateContext)
+                let contextExpression = Expression.Constant(this.Context)
+                select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
         private static Action GetVerifierFromDecorateeExpression(Expression decorateeExpression)

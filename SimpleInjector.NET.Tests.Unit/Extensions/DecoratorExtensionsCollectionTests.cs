@@ -1906,7 +1906,56 @@
             // Assert
             Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
         }
-        
+
+        [TestMethod]
+        public void GetAllInstances_ContainerControlledDecoratorDependingOnDecoratorPredicateContext_ContainsTheExpectedContext()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(typeof(RealCommandHandler));
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ContextualHandlerDecorator<>));
+
+            // Act
+            var decorator = (ContextualHandlerDecorator<RealCommand>)
+                container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            DecoratorPredicateContext context = decorator.Context;
+
+            // Assert
+            Assert.AreSame(typeof(RealCommandHandler), context.ImplementationType);
+            Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());
+        }
+                
+        [TestMethod]
+        public void GetAllInstances_ContainerUncontrolledDecoratorDependingOnDecoratorPredicateContext_ContainsTheExpectedContext()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEnumerable<ICommandHandler<RealCommand>> uncontrolledCollection = new[] { new RealCommandHandler() };
+
+            container.RegisterAll<ICommandHandler<RealCommand>>(uncontrolledCollection);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ContextualHandlerDecorator<>));
+
+            // Act
+            var decorator = (ContextualHandlerDecorator<RealCommand>)
+                container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
+
+            DecoratorPredicateContext context = decorator.Context;
+
+            // Assert
+            Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());
+
+            // NOTE: Since this is an container uncontrolled collection, the container does not know the
+            // exact type of the command handler, only its interface type is available.
+            Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ImplementationType);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();

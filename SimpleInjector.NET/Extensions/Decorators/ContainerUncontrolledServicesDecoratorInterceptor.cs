@@ -57,8 +57,6 @@ namespace SimpleInjector.Extensions.Decorators
             this.registeredServiceType = registeredServiceType;
         }
 
-        internal DecoratorPredicateContext Context { get; private set; }
-
         protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
@@ -139,19 +137,44 @@ namespace SimpleInjector.Extensions.Decorators
                 
         private Registration CreateRegistrationForUncontrolledCollection(Expression decorateeExpression)
         {
-            ParameterInfo decorateeParameter = 
+            var overriddenParameters = this.CreateOverriddenParameters(decorateeExpression);
+
+            // Create the decorator as transient. Caching is applied later on.
+            return Lifestyle.Transient.CreateRegistration(this.registeredServiceType,
+                this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+        }
+
+        private OverriddenParameter[] CreateOverriddenParameters(Expression decorateeExpression)
+        {
+            ParameterInfo decorateeParameter =
                 GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor);
 
-            decorateeExpression = 
+            decorateeExpression =
                 this.GetExpressionForDecorateeDependencyParameterOrNull(
                     decorateeParameter, this.registeredServiceType, decorateeExpression);
 
             var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();
 
-            // Create the decorator as transient. Caching is applied later on.
-            return Lifestyle.Transient.CreateRegistration(this.registeredServiceType,
-                this.decoratorConstructor.DeclaringType, this.Container,
-                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer));
+            var decorateeOverriddenParameter =
+                new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
+
+            IEnumerable<OverriddenParameter> predicateContextOverriddenParameters = 
+                this.CreateOverriddenPredicateContextParameters(currentProducer);
+
+            var overriddenParameters = (new[] { decorateeOverriddenParameter })
+                .Concat(predicateContextOverriddenParameters);
+
+            return overriddenParameters.ToArray();
+        }
+
+        private IEnumerable<OverriddenParameter> CreateOverriddenPredicateContextParameters(
+            InstanceProducer currentProducer)
+        {
+            return
+                from parameter in this.decoratorConstructor.GetParameters()
+                where parameter.ParameterType == typeof(DecoratorPredicateContext)
+                let contextExpression = Expression.Constant(this.Context)
+                select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
         // Creates an expression that calls a Func<T, T> delegate that takes in the service and returns
