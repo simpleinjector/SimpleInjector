@@ -440,6 +440,21 @@
             }
         }
 
+        public sealed class PluginProxy : IPlugin
+        {
+            public PluginProxy(Func<IPlugin> pluginFactory)
+            {
+            }
+        }
+
+        public sealed class FailingPlugin : IPlugin
+        {
+            public FailingPlugin()
+            {
+                throw new Exception();
+            }
+        }
+
         private sealed class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)
@@ -453,21 +468,6 @@
             public FailingConstructorPlugin()
             {
                 throw new TException();
-            }
-        }
-
-        private sealed class PluginProxy : IPlugin
-        {
-            public PluginProxy(Func<IPlugin> pluginFactory)
-            {
-            }
-        }
-
-        private sealed class FailingPlugin : IPlugin
-        {
-            public FailingPlugin()
-            {
-                throw new Exception();
             }
         }
 
