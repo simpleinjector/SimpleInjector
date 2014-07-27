@@ -410,7 +410,14 @@ namespace SimpleInjector
 
             this.Registration.Container.OnExpressionBuilt(e, this);
 
-            this.overriddenLifestyle = e.Lifestyle;
+            if (e.ReplacedRegistration != null)
+            {
+                this.Registration = e.ReplacedRegistration;
+            }
+            else
+            {
+                this.overriddenLifestyle = e.Lifestyle;
+            }
 
             return e.Expression;
         }

@@ -23,9 +23,11 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Diagnostics;
+    using System.Linq;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Entry point for doing diagnostic analysis on <see cref="Container"/> instances.
@@ -55,11 +57,11 @@ using System.Linq;
             Requires.IsNotNull(container, "container");
             RequiresContainerToBeVerified(container);
 
-            var producersToAnalyse = container.GetCurrentRegistrations();
+            var producersToAnalyze = GetProducersToAnalyze(container);
 
             var analyzerResultsCollection = (
                 from analyzer in ContainerAnalyzerProvider.Analyzers
-                let results = analyzer.Analyze(producersToAnalyse)
+                let results = analyzer.Analyze(producersToAnalyze)
                 where results.Any()
                 select new { Results = results, Analyzer = analyzer })
                 .ToArray();
@@ -76,26 +78,31 @@ using System.Linq;
                 .ToArray();
         }
 
-        internal static IEnumerable<RegistrationInfo> GetRootRegistrations(Container container)
+        internal static InstanceProducer[] GetProducersToAnalyze(Container container)
         {
-            Requires.IsNotNull(container, "container");
-            RequiresContainerToBeVerified(container);
-
-            return container.GetRootRegistrations().Select(ToRegistrationInfo);
+            return (
+                from producer in container.GetCurrentRegistrations()
+                from p in GetSelfDependentProducers(producer)
+                select p)
+                .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
+                .ToArray();
         }
 
-        private static RegistrationInfo ToRegistrationInfo(InstanceProducer producer)
+        private static IEnumerable<InstanceProducer> GetSelfDependentProducers(InstanceProducer producer)
         {
-            // TODO: Recreate decorator structure.
-            // TODO: How to handle collections?
-            // TODO: How to deal with groups of types  (Generic registrations?)? Should there be a 'group' thing?
-            return new RegistrationInfo(
-                producer.ServiceType,
-                producer.Registration.ImplementationType,
-                producer.Lifestyle, // This is not the right lifestyle.
-                producer.GetRelationships().Select(r => ToRegistrationInfo(r.Dependency)));
+            yield return producer;
+
+            foreach (var relationship in producer.GetRelationships())
+            {
+                yield return relationship.Dependency;
+
+                foreach (var dependentProducer in GetSelfDependentProducers(relationship.Dependency))
+                {
+                    yield return dependentProducer;
+                }
+            }
         }
-        
+
         private static void RequiresContainerToBeVerified(Container container)
         {
             if (!container.SuccesfullyVerified)
@@ -104,43 +111,6 @@ using System.Linq;
                     "Please make sure that Container.Verify() is called on the supplied container instance. " +
                     "Only successfully verified container instance can be analyzed.");
             }
-        }
-    }
-
-    internal class RegistrationInfo
-    {
-        internal RegistrationInfo(Type serviceType, Type implementationType, Lifestyle lifestyle,
-            IEnumerable<RegistrationInfo> dependencies)
-        {
-            this.ServiceType = serviceType;
-            this.ImplementationType = implementationType;
-            this.Lifestyle = lifestyle;
-            this.Dependencies = new ReadOnlyCollection<RegistrationInfo>(dependencies.ToList());
-        }
-
-        public Type ServiceType { get; set; }
-
-        public Type ImplementationType { get; set; }
-
-        public Lifestyle Lifestyle { get; private set; }
-
-        public ReadOnlyCollection<RegistrationInfo> Dependencies { get; private set; }
-
-        public override string ToString()
-        {
-            return this.Visualize(indentingDepth: 0);
-        }
-
-        internal string Visualize(int indentingDepth)
-        {
-            var visualizedDependencies =
-                from dependency in this.Dependencies
-                select Environment.NewLine + dependency.Visualize(indentingDepth + 1);
-
-            return string.Format("{0}new {1}({2})",
-                new string('\t', indentingDepth) +
-                this.ImplementationType.ToFriendlyName(),
-                string.Join(",", visualizedDependencies));
         }
     }
 }

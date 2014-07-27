@@ -23,10 +23,11 @@
 namespace SimpleInjector.Extensions.Decorators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using SimpleInjector.Lifestyles;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using SimpleInjector.Advanced;
+using SimpleInjector.Lifestyles;
 
     // A list of all decorators applied to a given service type.
     internal sealed class ServiceTypeDecoratorInfo
@@ -57,10 +58,13 @@ namespace SimpleInjector.Extensions.Decorators
         }
 
         internal void AddAppliedDecorator(Type decoratorType, Type originalImplementationType,
-            Container container, Lifestyle lifestyle, Expression decoratedExpression)
+            Container container, Lifestyle lifestyle, Expression decoratedExpression, 
+            IEnumerable<KnownRelationship> decoratorRelationships = null)
         {
             var registration = new ExpressionRegistration(decoratedExpression, originalImplementationType,
                 lifestyle, container);
+
+            registration.ReplaceRelationships(decoratorRelationships ?? Enumerable.Empty<KnownRelationship>());
 
             var producer = new InstanceProducer(this.registeredServiceType, registration);
 

@@ -1,7 +1,9 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Extensions;
 
     [TestClass]
     public class AnalyzerTests

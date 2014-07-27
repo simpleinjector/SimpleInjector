@@ -214,17 +214,9 @@
             // Assert
             Assert.AreEqual(2, actualContexts.Count, "Two event args were expected.");
 
-            Assert.AreSame(
-                expected: container.GetRegistration(typeof(ICommandHandler<RealCommand>)), 
-                actual: actualContexts.First().Context.Producer);
+            Assert.IsInstanceOfType(actualContexts.First().Instance, typeof(StubCommandHandler));
 
-            Assert.AreSame(
-                expected: container.GetRegistration(typeof(ICommandHandler<RealCommand>)).Registration, 
-                actual: actualContexts.First().Context.Registration);
-
-            Assert.AreEqual(
-                expected: typeof(RealCommandHandlerDecorator), 
-                actual: actualContexts.Second().Context.Registration.ImplementationType);
+            Assert.IsInstanceOfType(actualContexts.Second().Instance, typeof(RealCommandHandlerDecorator));
 
             Assert.AreSame(decorator, actualContexts.Second().Instance);
         }
@@ -251,9 +243,7 @@
             // Assert
             Assert.AreEqual(3, actualContexts.Count, "Three event args were expected.");
 
-            Assert.AreEqual(
-                expected: container.GetRegistration(typeof(ICommandHandler<RealCommand>)).Registration,
-                actual: actualContexts.First().Context.Registration);
+            Assert.IsInstanceOfType(actualContexts.First().Instance, typeof(StubCommandHandler));
 
             Assert.AreSame(decorator1.Decorated, actualContexts.First().Instance);
 

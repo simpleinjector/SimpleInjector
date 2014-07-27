@@ -25,6 +25,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     internal sealed class ServiceDecoratorExpressionInterceptor : DecoratorExpressionInterceptor
     {
@@ -68,23 +69,21 @@ namespace SimpleInjector.Extensions.Decorators
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
             // incorporated into the pipeline. This means that the ExpressionBuilding can be applied,
             // properties can be injected, and it can be wrapped with an initializer.
-            var registration = this.CreateRegistration();
+            var decoratorRegistration = this.CreateRegistrationForDecorator();
 
-            this.ReplaceOriginalExpression(registration);
+            this.ReplaceOriginalExpression(decoratorRegistration);
 
-            this.e.KnownRelationships.AddRange(registration.GetRelationships());
-
-            this.AddAppliedDecoratorToPredicateContext();
+            this.AddAppliedDecoratorToPredicateContext(decoratorRegistration.GetRelationships());
         }
 
-        private void ReplaceOriginalExpression(Registration registration)
+        private void ReplaceOriginalExpression(Registration decoratorRegistration)
         {
-            this.e.Expression = registration.BuildExpression(this.e.InstanceProducer);
+            this.e.Expression = decoratorRegistration.BuildExpression(this.e.InstanceProducer);
 
-            this.e.Lifestyle = this.Lifestyle;
+            this.e.ReplacedRegistration = decoratorRegistration;
         }
 
-        private Registration CreateRegistration()
+        private Registration CreateRegistrationForDecorator()
         {
             Registration registration;
 
@@ -106,14 +105,15 @@ namespace SimpleInjector.Extensions.Decorators
             return registration;
         }
 
-        private void AddAppliedDecoratorToPredicateContext()
+        private void AddAppliedDecoratorToPredicateContext(
+            IEnumerable<KnownRelationship> decoratorRelationships)
         {
             var info = this.GetServiceTypeInfo(this.e);
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(this.decoratorType, info.ImplementationType, this.Container,
-                this.Lifestyle, this.e.Expression);
+                this.Lifestyle, this.e.Expression, decoratorRelationships);
         }
     }
 }

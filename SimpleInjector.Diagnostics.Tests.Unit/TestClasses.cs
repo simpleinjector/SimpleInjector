@@ -135,6 +135,16 @@
         {
         }
     }
+    
+    public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    {
+        public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+
+        public ICommandHandler<TCommand> Decoratee { get; private set; }
+    }
 
     public class PluginImpl : IPlugin
     {
@@ -152,6 +162,16 @@
         }
 
         public IPlugin Decoratee { get; private set; }
+    }
+
+    public class PluginProxy : IPlugin
+    {
+        public PluginProxy(Func<IPlugin> decorateeFactory)
+        {
+            this.DecorateeFactory = decorateeFactory;
+        }
+
+        public Func<IPlugin> DecorateeFactory { get; private set; }
     }
 
     public class PluginWithDependencyOfType<TDependency> : IPlugin

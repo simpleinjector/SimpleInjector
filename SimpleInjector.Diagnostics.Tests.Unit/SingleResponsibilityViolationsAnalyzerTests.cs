@@ -159,6 +159,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             
             container.Verify();
 
+            var ip = container.GetRegistration(typeof(IPlugin));
+
             // Act
             var items = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
 

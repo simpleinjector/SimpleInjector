@@ -125,8 +125,12 @@ namespace SimpleInjector.Extensions.Decorators
                 // registeredProducer here, since the lifestyle of the original producer can change after
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
-                return new InstanceProducer(registeredServiceType,
-                    new ExpressionRegistration(originalExpression, implementationType, lifestyle, this.Container));
+                var registration = 
+                    new ExpressionRegistration(originalExpression, implementationType, lifestyle, this.Container);
+
+                registration.ReplaceRelationships(registeredProducer.GetRelationships());
+
+                return new InstanceProducer(registeredServiceType, registration);
             };
 
             return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
