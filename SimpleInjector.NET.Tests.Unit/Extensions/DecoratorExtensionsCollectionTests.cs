@@ -1559,7 +1559,7 @@
 
             // Assert
             Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
-                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "Any known relationships added to the decorator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
 
@@ -1595,7 +1595,7 @@
 
             // Assert
             Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),
-                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "Any known relationships added to the decorator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type. Current: " +
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
