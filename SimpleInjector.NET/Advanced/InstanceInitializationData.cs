@@ -35,7 +35,10 @@ namespace SimpleInjector.Advanced
         // NOTE: Because of performance considerations, this type has been made a struct. This prevents Simple
         // Injector from creating an extra reference type every time an instance is created. This would cause 
         // extra pressure on the GC.
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly InitializationContext context;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly object instance;
 
         internal InstanceInitializationData(InitializationContext context, object instance)
