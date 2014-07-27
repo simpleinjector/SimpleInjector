@@ -23,11 +23,13 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Contains data that can be used to initialize a created instance. This data includes the actual
     /// created <see cref="Instance"/> and the <see cref="Context"/> information about the created instance.
     /// </summary>
+    [DebuggerDisplay("InstanceInitializationData ({context.DebuggerDisplay,nq})")]
     public struct InstanceInitializationData : IEquatable<InstanceInitializationData>
     {
         // NOTE: Because of performance considerations, this type has been made a struct. This prevents Simple
