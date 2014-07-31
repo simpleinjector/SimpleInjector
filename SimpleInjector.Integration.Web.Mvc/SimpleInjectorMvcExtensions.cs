@@ -25,6 +25,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
@@ -46,10 +47,12 @@ namespace SimpleInjector
         /// that the MVC framework uses.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when a MVC filter provider has already been registered for a different container.</exception>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
-        [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " + 
+        [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " +
             "release. Consider using RegisterMvcIntegratedFilterProvider instead. See https://bit.ly/1h0pJ4G",
             error: false)]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
@@ -58,6 +61,8 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("container");
             }
+
+            RequiresFilterProviderNotRegistered(container);
 
             var singletonFilterProvider = new SimpleInjectorLegacyFilterProvider(container);
 
@@ -69,7 +74,7 @@ namespace SimpleInjector
 
             FilterProviders.Providers.Add(singletonFilterProvider);
         }
-        
+
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
         /// Simple Injector pipeline (https://bit.ly/MEau5L). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
@@ -80,6 +85,8 @@ namespace SimpleInjector
         /// that the MVC framework uses.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when a MVC filter provider has already been registered for a different container.</exception>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
@@ -89,6 +96,8 @@ namespace SimpleInjector
             {
                 throw new ArgumentNullException("container");
             }
+
+            RequiresFilterProviderNotRegistered(container);
 
             var singletonFilterProvider = new SimpleInjectorFilterAttributeFilterProvider(container);
 
@@ -154,6 +163,33 @@ namespace SimpleInjector
                 where type.Name.EndsWith("Controller", StringComparison.Ordinal)
                 select type)
                 .ToArray();
+        }
+
+        private static void RequiresFilterProviderNotRegistered(Container container)
+        {
+            if (FilterProviderAlreadyRegisteredForDifferentContainer(container))
+            {
+                throw new InvalidOperationException(
+                    "An MVC filter provider has already been registered for a different Container instance. " +
+                    "Registering MVC filter providers for different containers is not supported by this method.");
+            }
+        }
+
+        private static bool FilterProviderAlreadyRegisteredForDifferentContainer(Container container)
+        {
+            var integratedProviders =
+                from provider in FilterProviders.Providers.OfType<SimpleInjectorFilterAttributeFilterProvider>()
+                let differentContainer = !object.ReferenceEquals(container, provider.Container)
+                where differentContainer
+                select provider;
+
+            var legacyProviders =
+                from provider in FilterProviders.Providers.OfType<SimpleInjectorLegacyFilterProvider>()
+                let differentContainer = !object.ReferenceEquals(container, provider.Container)
+                where differentContainer
+                select provider;
+
+            return integratedProviders.Any() || legacyProviders.Any();
         }
     }
 }

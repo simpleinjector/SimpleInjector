@@ -35,12 +35,16 @@ namespace SimpleInjector.Integration.Web.Mvc
 
         private readonly Func<Type, Registration> registrationFactory;
 
-        public SimpleInjectorFilterAttributeFilterProvider(Container container)
+        internal SimpleInjectorFilterAttributeFilterProvider(Container container)
             : base(false)
         {
+            this.Container = container;
+
             this.registrationFactory =
                 concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
         }
+
+        internal Container Container { get; private set; }
 
         public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext,
             ActionDescriptor actionDescriptor)

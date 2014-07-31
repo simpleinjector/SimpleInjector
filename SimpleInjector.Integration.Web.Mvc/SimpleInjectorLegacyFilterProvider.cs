@@ -29,13 +29,13 @@ namespace SimpleInjector.Integration.Web.Mvc
     // This is a better implementation https://bit.ly/1nrjnxD, but that would unfortunately be a breaking change.
     internal sealed class SimpleInjectorLegacyFilterProvider : FilterAttributeFilterProvider
     {
-        private readonly Container container;
-
-        public SimpleInjectorLegacyFilterProvider(Container container)
+        internal SimpleInjectorLegacyFilterProvider(Container container)
             : base(false)
         {
-            this.container = container;
+            this.Container = container;
         }
+
+        internal Container Container { get; private set; }
 
         public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext,
             ActionDescriptor actionDescriptor)
@@ -47,7 +47,7 @@ namespace SimpleInjector.Integration.Web.Mvc
                 var filter = filters[index];
 
 #pragma warning disable 618
-                this.container.InjectProperties(filter.Instance);
+                this.Container.InjectProperties(filter.Instance);
 #pragma warning restore 618
             }
 
