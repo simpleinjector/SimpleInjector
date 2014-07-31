@@ -557,5 +557,11 @@ namespace SimpleInjector
                 "of the scope. This is possibly caused by a component that is directly or indirectly " +
                 "depending on itself.";
         }
+
+        internal static string GetRootRegistrationsCanNotBeCalledBeforeVerify()
+        {
+            return 
+                "Root registrations can't be determined before Verify is called. Please call Verify first.";
+        }
     }
 }

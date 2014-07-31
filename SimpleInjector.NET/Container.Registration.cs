@@ -1511,7 +1511,7 @@ namespace SimpleInjector
 
         private void VerifyThatAllRootObjectsCanBeCreated()
         {
-            var rootProducers = this.GetRootRegistrations();
+            var rootProducers = this.GetRootRegistrations(includeInvalidContainerRegisteredTypes: true);
 
             var producersThatMustBeExplicitlyVerified = this.GetProducersThatNeedExplicitVerification();
 

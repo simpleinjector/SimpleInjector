@@ -85,24 +85,30 @@ namespace SimpleInjector.Diagnostics.Debugger
         {
             var registrations = this.container.GetCurrentRegistrations();
 
+            var rootRegistrations = this.container.GetRootRegistrations();
+
             return new DebuggerViewItem[]
             {
                 DebuggerGeneralWarningsContainerAnalyzer.Analyze(this.container),
                 new DebuggerViewItem(
                     name: "Registrations",
                     description: "Count = " + registrations.Length,
-                    value: registrations)
+                    value: registrations),
+                new DebuggerViewItem(
+                    name: "Root Registrations",
+                    description: "Count = " + rootRegistrations.Length,
+                    value: rootRegistrations)
             };
         }
 
-        private static DebuggerViewItem[] GetDebuggerTypeProxyFailureResults(Exception ex)
+        private static DebuggerViewItem[] GetDebuggerTypeProxyFailureResults(Exception exception)
         {
             return new[] 
             {
                 new DebuggerViewItem(
                     "Failure", 
                     "We're so so sorry. The Debugger Type Proxy failed to initialize.", 
-                    ex)
+                    exception)
             };
         }
     }

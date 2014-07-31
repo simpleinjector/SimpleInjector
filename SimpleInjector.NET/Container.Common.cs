@@ -213,6 +213,46 @@ namespace SimpleInjector
             return this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: false);
         }
 
+        /// <summary>
+        /// Returns an array with the current registrations for root objects. Root objects are registrations
+        /// that are in the root of the object graph, meaning that no other registrations is depending on
+        /// them.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This method has a performance characteristic of O(n). Prevent from calling this in a performance
+        /// critical path of the application.
+        /// </para>
+        /// <para>
+        /// This list contains the root objects of all explicitly registered types, and all implicitly 
+        /// registered instances. Implicit registrations are all concrete unregistered types that have been 
+        /// requested, all types that have been resolved using unregistered type resolution (using the 
+        /// <see cref="ResolveUnregisteredType"/> event), and requested unregistered collections. Note that 
+        /// the result of this method may change over time, because of these implicit registrations.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
+        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either 
+        /// always return a producer that is able to return the expected instance. Because of this, do not 
+        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/> 
+        /// by reference. The way of comparing lists is by the actual type. The type of each instance is 
+        /// guaranteed to be unique in the returned list.
+        /// </para>
+        /// </remarks>
+        /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before
+        /// <see cref="Verify"/> has been successfully called.</exception>
+        public InstanceProducer[] GetRootRegistrations()
+        {
+            if (!this.succesfullyVerified)
+            {
+                throw new InvalidOperationException(
+                    StringResources.GetRootRegistrationsCanNotBeCalledBeforeVerify());
+            }
+
+            return this.GetRootRegistrations(includeInvalidContainerRegisteredTypes: false);
+        }
+
         /// <summary>Determines whether the specified System.Object is equal to the current System.Object.
         /// </summary>
         /// <param name="obj">The System.Object to compare with the current System.Object.</param>
@@ -259,16 +299,18 @@ namespace SimpleInjector
             return base.GetType();
         }
 
-        internal IEnumerable<InstanceProducer> GetRootRegistrations()
+        internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
         {
-            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+            var producers = this.GetCurrentRegistrations(
+                includeInvalidContainerRegisteredTypes: includeInvalidContainerRegisteredTypes);
 
             var nonRootProducers =
                 from producer in producers
                 from relationship in producer.GetRelationships()
                 select relationship.Dependency;
 
-            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance);
+            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
+                .ToArray();
         }
 
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
