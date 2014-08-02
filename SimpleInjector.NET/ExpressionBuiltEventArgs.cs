@@ -102,6 +102,8 @@ namespace SimpleInjector
         /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
         public Collection<KnownRelationship> KnownRelationships { get; internal set; }
 
+        // For now we keep this property internal. We can open it up when there is a valid use case for doing
+        // so. Currently only the decorator subsystem needs to be able to change the registration.
         internal Registration ReplacedRegistration { get; set; }
 
         internal InstanceProducer InstanceProducer { get; set; }
