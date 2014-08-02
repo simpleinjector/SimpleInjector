@@ -1,6 +1,7 @@
 namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics.Analyzers;
@@ -286,6 +287,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
 
             // Assert
+            // We expect two violations here, since the decorator is wrapping two different registrations.
             Assert.AreEqual("2 possible single responsibility violations.", results.Description);
         }
 

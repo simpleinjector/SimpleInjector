@@ -82,21 +82,23 @@ namespace SimpleInjector.Diagnostics
         {
             return (
                 from producer in container.GetCurrentRegistrations()
-                from p in GetSelfDependentProducers(producer)
+                from p in GetSelfAndDependentProducers(producer)
                 select p)
                 .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
                 .ToArray();
         }
 
-        private static IEnumerable<InstanceProducer> GetSelfDependentProducers(InstanceProducer producer)
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer)
         {
+            // Return self
             yield return producer;
 
+            // Return dependent producers
             foreach (var relationship in producer.GetRelationships())
             {
                 yield return relationship.Dependency;
 
-                foreach (var dependentProducer in GetSelfDependentProducers(relationship.Dependency))
+                foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency))
                 {
                     yield return dependentProducer;
                 }

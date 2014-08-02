@@ -23,6 +23,7 @@
 namespace SimpleInjector.Diagnostics.Debugger
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -97,7 +98,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                 new DebuggerViewItem(
                     name: "Root Registrations",
                     description: "Count = " + rootRegistrations.Length,
-                    value: rootRegistrations)
+                    value: this.GroupProducers(rootRegistrations))
             };
         }
 
@@ -110,6 +111,70 @@ namespace SimpleInjector.Diagnostics.Debugger
                     "We're so so sorry. The Debugger Type Proxy failed to initialize.", 
                     exception)
             };
+        }
+        private object[] GroupProducers(IEnumerable<InstanceProducer> producers)
+        {
+            return this.GroupProducers(producers, level: 0);
+        }
+
+        private object[] GroupProducers(IEnumerable<InstanceProducer> producers, int level)
+        {
+            return (
+                from producer in producers
+                group producer by TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(producer.ServiceType, level) 
+                    into resultGroup
+                select this.BuildProducerGroup(resultGroup.Key, resultGroup.ToArray(), level + 1))
+                .ToArray();
+        }
+
+        private object BuildProducerGroup(Type groupType, 
+            InstanceProducer[] producersForGroup, int level)
+        {
+            if (producersForGroup.Length == 1)
+            {
+                var producer = producersForGroup[0];
+
+                // This flattens the hierarchy when there is just one item in the group.
+                return new DebuggerViewItem(
+                    name: Helpers.ToFriendlyName(producer.ServiceType),
+                    description: producer.DebuggerDisplay,
+                    value: producersForGroup[0]);
+            }
+
+            if (groupType.ContainsGenericParameters)
+            {
+                return this.BuildGenericGroup(groupType, producersForGroup, level);
+            }
+            else
+            {
+                return this.BuildNonGenericGroup(groupType, producersForGroup);
+            }
+        }
+
+        private object BuildGenericGroup(Type groupType, 
+            InstanceProducer[] producersForGroup, int level)
+        {
+            object[] childGroups = this.GroupProducers(producersForGroup, level);
+
+            if (childGroups.Length == 1)
+            {
+                // This flattens the hierarchy when there is just one item in the group.
+                return childGroups[0];
+            }
+
+            return new DebuggerViewItem(
+                name: Helpers.ToFriendlyName(groupType),
+                description: "Count = " + producersForGroup.Length,
+                value: childGroups);
+        }
+
+        private DebuggerViewItem BuildNonGenericGroup(Type closedType,
+            InstanceProducer[] producersForGroup)
+        {
+            return new DebuggerViewItem(
+                name: Helpers.ToFriendlyName(closedType),
+                description: "Count = " + producersForGroup.Length,
+                value: producersForGroup.ToArray());
         }
     }
 }
