@@ -61,7 +61,7 @@ using SimpleInjector.Lifestyles;
             Container container, Lifestyle lifestyle, Expression decoratedExpression, 
             IEnumerable<KnownRelationship> decoratorRelationships = null)
         {
-            var registration = new ExpressionRegistration(decoratedExpression, originalImplementationType,
+            var registration = new ExpressionRegistration(decoratedExpression, decoratorType,
                 lifestyle, container);
 
             registration.ReplaceRelationships(decoratorRelationships ?? Enumerable.Empty<KnownRelationship>());
