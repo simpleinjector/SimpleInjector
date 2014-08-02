@@ -94,7 +94,7 @@ namespace SimpleInjector
         /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
         /// Debug View. Change the contents of this collection to represent the changes made to the
         /// <see cref="ExpressionBuildingEventArgs.Expression">Expression</see> property (if any). This allows
-        /// the Diagnostics Debug View to analyse those new relationships as well.
+        /// the Diagnostics Debug View to analyze those new relationships as well.
         /// </summary>
         /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
         public Collection<KnownRelationship> KnownRelationships { get; internal set; }
