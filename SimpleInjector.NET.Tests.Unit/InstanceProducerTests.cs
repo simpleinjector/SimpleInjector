@@ -98,6 +98,37 @@
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
 
+        [TestMethod]
+        public void VisualizeObjectGraph_NestedObjectGraphWithMultipleDecorators_BuildsTheExpectedGraph()
+        {
+            // Arrange
+            string expectedObjectGraph =
+@"PluginDecorator(
+    PluginDecoratorWithDependencyOfType<FakeTimeProvider>(
+        FakeTimeProvider(),
+        PluginDecorator<Int32>(
+            PluginWithDependencyOfType<RealTimeProvider>(
+                RealTimeProvider()))))";
+
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginWithDependencyOfType<RealTimeProvider>>();
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator<int>));
+            container.RegisterDecorator(typeof(IPlugin), 
+                typeof(PluginDecoratorWithDependencyOfType<FakeTimeProvider>));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            container.Verify();
+
+            var pluginProducer = container.GetRegistration(typeof(IPlugin));
+
+            // Act
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph();
+
+            // Assert
+            Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
+
         public class OneAndTwo : IOne, ITwo 
         {
         }

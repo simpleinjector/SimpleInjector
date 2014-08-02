@@ -290,6 +290,28 @@ namespace SimpleInjector
             return this.Registration.GetRelationships();
         }
 
+        /// <summary>
+        /// Builds a string representation of the object graph with the current instance as root of the
+        /// graph.
+        /// </summary>
+        /// <returns>A string representation of the object graph.</returns>
+        public string VisualizeObjectGraph()
+        {
+            return this.Visualize(indentingDepth: 0);
+        }
+
+        internal string Visualize(int indentingDepth)
+        {
+            var visualizedDependencies =
+                from relationship in this.GetRelationships()
+                select Environment.NewLine + relationship.Dependency.Visualize(indentingDepth + 1);
+
+            return string.Format("{0}{1}({2})",
+                new string(' ', indentingDepth * 4),
+                this.ImplementationType.ToFriendlyName(),
+                string.Join(",", visualizedDependencies));
+        }
+
         // Throws an InvalidOperationException on failure.
         internal Expression VerifyExpressionBuilding()
         {
@@ -495,6 +517,11 @@ namespace SimpleInjector
             public KnownRelationship[] Relationships
             {
                 get { return this.instanceProducer.GetRelationships(); }
+            }
+
+            public string DependencyGraph
+            {
+                get { return this.instanceProducer.Visualize(indentingDepth: 0); }
             }
         }
     }

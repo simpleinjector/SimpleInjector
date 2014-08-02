@@ -142,9 +142,26 @@
         public IPlugin Decoratee { get; private set; }
     }
 
-    public class PluginWithDependencyOfType<TDependency> : IPlugin
+    public class PluginDecoratorWithDependencyOfType<TDependency> : IPlugin
+    {
+        public PluginDecoratorWithDependencyOfType(TDependency dependency, IPlugin decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+
+        public IPlugin Decoratee { get; private set; }
+    }
+
+    public class PluginWithPropertyDependencyOfType<TDependency> : IPlugin
     {
         public TDependency Dependency { get; set; }
+    }
+
+    public class PluginWithDependencyOfType<TDependency> : IPlugin
+    {
+        public PluginWithDependencyOfType(TDependency dependency)
+        {
+        }
     }
     
     public class PluginManager

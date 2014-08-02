@@ -122,12 +122,12 @@
             container.RegisterSingle<ITimeProvider, RealTimeProvider>();
 
             // MyPlugin contains a TimeProvider property of type ITimeProvider.
-            container.Register<PluginWithDependencyOfType<ITimeProvider>>(() => null);
+            container.Register<PluginWithPropertyDependencyOfType<ITimeProvider>>(() => null);
 
             try
             {
                 // Act
-                container.GetInstance<PluginWithDependencyOfType<ITimeProvider>>();
+                container.GetInstance<PluginWithPropertyDependencyOfType<ITimeProvider>>();
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -135,7 +135,9 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The registered delegate for type PluginWithDependencyOfType<ITimeProvider> returned null."),
+                    "The registered delegate for type " + 
+                    typeof(PluginWithPropertyDependencyOfType<ITimeProvider>).ToFriendlyName() + 
+                    " returned null."),
                     "Actual: " + ex.Message);
             }
         }

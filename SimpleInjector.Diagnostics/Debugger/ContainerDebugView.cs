@@ -112,6 +112,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                     exception)
             };
         }
+
         private object[] GroupProducers(IEnumerable<InstanceProducer> producers)
         {
             return this.GroupProducers(producers, level: 0);
