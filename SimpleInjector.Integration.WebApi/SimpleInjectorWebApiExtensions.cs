@@ -199,7 +199,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
-        /// Simple Injector pipeline (https://bit.ly/MEau5L). This allows any registered property to be 
+        /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
         /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
         /// attributes.

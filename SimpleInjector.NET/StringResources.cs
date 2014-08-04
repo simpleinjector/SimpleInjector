@@ -95,10 +95,10 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "Type {0} has already been registered and the container. If your intention is to resolve " +
                 "a collection of {0} implementations, use the RegisterAll overloads. More info: " +
-                "https://bit.ly/1duJ9bM" +
+                "https://simpleinjector.org/coll1" +
                 ". If your intention is to replace the existing registration with this new registration, " +
                 "you can allow overriding the current registration by setting Container.Options." +
-                "AllowOverridingRegistrations to true. More info: https://bit.ly/1g0R3Os.",
+                "AllowOverridingRegistrations to true. More info: https://simpleinjector.org/ovrrd.",
                 serviceType.ToFriendlyName());
         }
 

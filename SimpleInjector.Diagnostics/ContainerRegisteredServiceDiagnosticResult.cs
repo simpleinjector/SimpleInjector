@@ -32,7 +32,7 @@ namespace SimpleInjector.Diagnostics
     /// Diagnostic result for a warning about a concrete type that was not registered explicitly and was not 
     /// resolved using unregistered type resolution, but was created by the container using the transient 
     /// lifestyle.
-    /// For more information, see: https://simpleinjector.codeplex.com/wikipage?title=UnregisteredTypes.
+    /// For more information, see: https://simpleinjector.org/diaut.
     /// </summary>
     public class ContainerRegisteredServiceDiagnosticResult : DiagnosticResult
     {

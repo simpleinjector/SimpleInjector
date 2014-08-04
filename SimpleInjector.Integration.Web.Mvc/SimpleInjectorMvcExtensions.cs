@@ -53,7 +53,8 @@ namespace SimpleInjector
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
         [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " +
-            "release. Consider using RegisterMvcIntegratedFilterProvider instead. See https://bit.ly/1h0pJ4G",
+            "release. Consider using RegisterMvcIntegratedFilterProvider instead. " + 
+            "See https://simpleinjector.org/depr2",
             error: false)]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
         {
@@ -76,7 +77,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
-        /// Simple Injector pipeline (https://bit.ly/MEau5L). This allows any registered property to be 
+        /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
         /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
         /// attributes.

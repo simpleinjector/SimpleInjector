@@ -1,6 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // http://simpleinjector.codeplex.com/wikipage?title=ExpirationExtensionMethod
+    // https://simpleinjector.codeplex.com/wikipage?title=ExpirationExtensionMethod
     using System;
     using System.Linq.Expressions;
 

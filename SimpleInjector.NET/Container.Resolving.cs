@@ -227,8 +227,7 @@ namespace SimpleInjector
         /// <b>NOTE:</b> This method will be removed in a future release. To use property injection,
         /// implement a custom the <see cref="IPropertySelectionBehavior"/> instead. For more information,
         /// read the 
-        /// <a href="https://simpleinjector.codeplex.com/wikipage?title=Extendibility-Points#Property-Injection">extendibility points</a> 
-        /// wiki.
+        /// <a href="https://simpleinjector.org/xtppr">extendibility points</a> wiki.
         /// </summary>
         /// <param name="instance">The instance whose properties will be injected.</param>
         /// <exception cref="ArgumentNullException">
@@ -237,7 +236,7 @@ namespace SimpleInjector
         /// failed due to security constraints of the sandbox. This can happen when injecting properties
         /// on an internal type in a Silverlight sandbox, or when running in partial trust.</exception>
         [Obsolete("Container.InjectProperties has been deprecated and will be removed in a future release. " +
-            "See https://bit.ly/1jWlo2S.", error: false)]
+            "See https://simpleinjector.org/depr1.", error: false)]
         public void InjectProperties(object instance)
         {
             Requires.IsNotNull(instance, "instance");

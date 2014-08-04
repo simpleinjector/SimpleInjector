@@ -28,7 +28,7 @@
     );
     */
 
-    // http://simpleinjector.codeplex.com/wikipage?title=InterceptionExtensions
+    // https://simpleinjector.codeplex.com/wikipage?title=InterceptionExtensions
     using System;
     using System.Diagnostics;
     using System.Linq;

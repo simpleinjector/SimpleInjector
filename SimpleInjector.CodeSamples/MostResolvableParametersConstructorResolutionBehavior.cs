@@ -1,6 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // http://simpleinjector.codeplex.com/discussions/353520
+    // https://simpleinjector.codeplex.com/discussions/353520
     using System;
     using System.Diagnostics;
     using System.Globalization;
