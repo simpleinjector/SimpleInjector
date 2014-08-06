@@ -127,6 +127,17 @@ copy licence.txt Releases\temp\licence.txt
 mkdir Releases\temp\Documentation
 copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 
+mkdir Releases\temp\Portable
+copy bin\PCL\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
+copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
+copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\Portable\SimpleInjector.Diagnostics.dll
+copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\Portable\SimpleInjector.Diagnostics.xml
+
+mkdir Releases\temp\Portable\CommonServiceLocator
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
+copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
+copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
 mkdir Releases\temp\NET45
 copy bin\NET\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
@@ -184,17 +195,6 @@ copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integrat
 copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
 copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.xml
 
-mkdir Releases\temp\Portable
-copy bin\PCL\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
-copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\Portable\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\Portable\SimpleInjector.Diagnostics.xml
-
-mkdir Releases\temp\Portable\CommonServiceLocator
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
-copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Runtime Library v%named_version%.zip"
 
 rmdir Releases\temp /s /q
