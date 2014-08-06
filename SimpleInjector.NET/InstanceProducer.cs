@@ -295,8 +295,19 @@ namespace SimpleInjector
         /// graph.
         /// </summary>
         /// <returns>A string representation of the object graph.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
+        /// done directly and explicitly by the user on this instance, indirectly by calling
+        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
+        /// instance, or by calling <see cref="Container.Verify">Verify</see> on the container.</exception>
         public string VisualizeObjectGraph()
         {
+            if (!this.IsExpressionCreated)
+            {
+                throw new InvalidOperationException(
+                    StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
+            }
+
             return this.Visualize(indentingDepth: 0);
         }
 
