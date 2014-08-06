@@ -563,5 +563,10 @@ namespace SimpleInjector
             return 
                 "Root registrations can't be determined before Verify is called. Please call Verify first.";
         }
+
+        internal static string VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated()
+        {
+            return "This method can only be called after GetInstance() or BuildExpression() have been called.";
+        }
     }
 }
