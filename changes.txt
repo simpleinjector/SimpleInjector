@@ -4,6 +4,10 @@
 Version vNext
 
 	New features:
+		-[Core] InstanceProducer.VisualizeObjectGraph() method added to allow visualizing the object graph
+		 of an registration. Feature also added in the debugger view. (work item 20954).
+		-[Core] Container.GetRootRegistrations() method added that allows retrieving all root registrations.
+		 The container debugger view now also shows root registrations. (work item 20955).
 		-[Wcf] SimpleInjectorServiceBehavior class added to make it easier for users to create self-hosted
 		 WCF services. (work item 20898)
 		-[Wcf] GetImplementedContracts method added to SimpleInjectorServiceHost to take it easier to add
