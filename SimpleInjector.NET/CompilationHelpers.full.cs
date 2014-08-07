@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -36,9 +37,14 @@ namespace SimpleInjector
 
     internal static partial class CompilationHelpers
     {
+        // The 5000th delegate and up will not use dynamic assembly compilation to prevent memory leaks when
+        // the user accidentally keeps creating new InstanceProducer instances. This means there can be a
+        // multitude of registrations, since not all registrations will trigger delegate compilation.
+        private const long DynamicAssemblyCompilationThreshold = 5000;
+
         private static long dynamicClassCounter;
 
-        internal static Delegate CompileLambdaInDynamicAssembly(LambdaExpression lambda, string typeName, 
+        internal static Delegate CompileLambdaInDynamicAssembly(LambdaExpression lambda, string typeName,
             string methodName)
         {
             TypeBuilder typeBuilder = Container.ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
@@ -80,7 +86,7 @@ namespace SimpleInjector
             }
         }
 
-        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression expression, 
+        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression expression,
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
@@ -105,7 +111,7 @@ namespace SimpleInjector
 
         private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
         {
-            Expression<Func<TResult>> lambda = 
+            Expression<Func<TResult>> lambda =
                 Expression.Lambda<Func<TResult>>(expression, new ParameterExpression[0]);
 
             return CompileDelegateInDynamicAssembly(lambda);
@@ -114,7 +120,7 @@ namespace SimpleInjector
         private static Expression ReplaceConstantsWithArrayLookup(Expression expression,
             ConstantExpression[] constants, ParameterExpression constantsParameter)
         {
-            return ConstantArrayIndexizerVisitor.ReplaceConstantsWithArrayIndexes(expression, 
+            return ConstantArrayIndexizerVisitor.ReplaceConstantsWithArrayIndexes(expression,
                 constants, constantsParameter);
         }
 
@@ -135,12 +141,25 @@ namespace SimpleInjector
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
+            Justification = "Not all delegates can be JITted. We fall back to the slower expression.Compile " +
                             "in that case.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static partial void TryCompileInDynamicAssembly<TResult>(Expression expression, 
+        static partial void TryCompileInDynamicAssembly<TResult>(Expression expression,
             ref Func<TResult> compiledLambda)
         {
+            // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in 
+            // the debugger with VS2013 (See work item 20904).
+            if (Debugger.IsAttached)
+            {
+                return;
+            }
+
+            if (Interlocked.Read(ref dynamicClassCounter) >= DynamicAssemblyCompilationThreshold)
+            {
+                // Stop doing dynamic assembly compilation.
+                return;
+            }
+
             compiledLambda = null;
 
             if (!ExpressionNeedsAccessToInternals(expression))
