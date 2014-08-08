@@ -317,7 +317,7 @@ namespace SimpleInjector
                 from relationship in this.GetRelationships()
                 select Environment.NewLine + relationship.Dependency.Visualize(indentingDepth + 1);
 
-            return string.Format("{0}{1}({2})",
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
                 new string(' ', indentingDepth * 4),
                 this.ImplementationType.ToFriendlyName(),
                 string.Join(",", visualizedDependencies));
