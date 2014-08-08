@@ -1,9 +1,8 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
 
@@ -127,6 +126,26 @@
 
             // Assert
             Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
+
+        [TestMethod]
+        public void VisualizeObjectGraph_WhenCalledBeforeInstanceIsCreated_ThrowsAnInvalidOperationException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<RealTimeProvider>();
+
+            InstanceProducer producer = container.GetRegistration(typeof(RealTimeProvider));
+
+            // Act
+            Action action = () => producer.VisualizeObjectGraph();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "When the instance hasn't been created or the Expression hasn't been built, there's not yet " +
+                "enough information to visualize the object graph. Instead of returning an incorrect result " +
+                "we expect the library to throw an exception here.");
         }
 
         public class OneAndTwo : IOne, ITwo 
