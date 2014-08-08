@@ -24,6 +24,7 @@ namespace SimpleInjector.Integration.Wcf
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.ServiceModel;
     using System.ServiceModel.Description;
 
@@ -53,6 +54,9 @@ namespace SimpleInjector.Integration.Wcf
 
         /// <summary>Gets the contracts implemented by the service hosted.</summary>
         /// <returns>The collection of <see cref="ContractDescription"/>s.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
+            Justification = "The base class already has a protected ImplementedContracts property, " +
+                "so that name was already taken.")]
         public IEnumerable<ContractDescription> GetImplementedContracts()
         {
             return this.ImplementedContracts.Values;
