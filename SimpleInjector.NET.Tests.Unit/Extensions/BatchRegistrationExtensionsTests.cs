@@ -102,7 +102,9 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                Assembly.GetExecutingAssembly());
         }
 
         [TestMethod]
@@ -110,7 +112,11 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            // We've got these concrete public implementations: Concrete1, Concrete2, Concrete3
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl = container.GetInstance<IService<string, object>>();
@@ -125,7 +131,9 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
+                AccessibilityOption.PublicTypesOnly, 
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl = container.GetInstance<IService<int, string>>();
@@ -140,7 +148,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -155,7 +166,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly, 
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -170,7 +184,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient,
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
+                AccessibilityOption.PublicTypesOnly,
+                Lifestyle.Transient,
                 Assembly.GetExecutingAssembly());
 
             // Act
@@ -186,7 +203,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton,
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly, 
+                Lifestyle.Singleton,
                 Assembly.GetExecutingAssembly());
 
             // Act
@@ -204,7 +224,11 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Singleton, assemblies);
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
+                AccessibilityOption.PublicTypesOnly, 
+                Lifestyle.Singleton, 
+                assemblies);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -242,7 +266,8 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), assemblies);
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly, assemblies);
         }
 
         [TestMethod]
@@ -262,7 +287,9 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl = container.GetInstance<IService<float, double>>();
@@ -277,7 +304,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                Assembly.GetExecutingAssembly());
 
             // Act
             var impl = container.GetInstance<IService<Type, Type>>();
@@ -466,7 +496,9 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), assemblies);
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                AccessibilityOption.PublicTypesOnly,
+                assemblies);
         }
 
         [TestMethod]
@@ -668,6 +700,70 @@
 
             // Act
             result.ToArray();
+        }
+
+        [TestMethod]
+        public void GetTypesToRegisterOverload1_WithoutAccessibilityOption_ReturnsInternalTypes()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
+                container, 
+                typeof(IService<,>), 
+                typeof(IService<,>).Assembly);
+
+            // Assert
+            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
+        }
+
+        [TestMethod]
+        public void GetTypesToRegisterOverload2_WithoutAccessibilityOption_ReturnsInternalTypes()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
+                container,
+                typeof(IService<,>),
+                assemblies);
+
+            // Assert
+            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
+        }
+
+        [TestMethod]
+        public void GetTypesToRegisterOverload3_WithoutAccessibilityOption_ReturnsInternalTypes()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
+                typeof(IService<,>),
+                typeof(IService<,>).Assembly);
+
+            // Assert
+            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
+        }
+
+        [TestMethod]
+        public void GetTypesToRegisterOverload4_WithoutAccessibilityOption_ReturnsInternalTypes()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
+            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
+                typeof(IService<,>),
+                assemblies);
+
+            // Assert
+            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
         }
 
         [TestMethod]
@@ -909,7 +1005,7 @@
         }
 
         // Internal type.
-        private class Concrete4 : IService<decimal, decimal>
+        private class InternalConcrete4 : IService<decimal, decimal>
         {
         }
 

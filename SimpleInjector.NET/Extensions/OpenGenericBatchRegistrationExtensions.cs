@@ -88,7 +88,7 @@ namespace SimpleInjector.Extensions
             "incorrectly return any decorators.";
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types in the given set of
+        /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with a transient lifetime.
         /// </summary>
@@ -101,7 +101,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
@@ -110,7 +110,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
+        /// Registers all concrete, non-generic, public and internal types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with a transient lifetime.
         /// </summary>
@@ -123,7 +123,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
@@ -132,7 +132,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types in the given set of
+        /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with the supplied <paramref name="lifestyle"/>. When a found type implements multiple 
         /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
@@ -149,7 +149,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, params Assembly[] assemblies)
@@ -158,7 +158,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
+        /// Registers all concrete, non-generic, public and internal types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with the supplied <paramref name="lifestyle"/>. When a found type implements multiple 
         /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
@@ -175,7 +175,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Assembly> assemblies)
@@ -184,7 +184,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Allows registration of all concrete, public, non-generic types that are located in the given set of 
+        /// Allows registration of all concrete, public and internal, non-generic types that are located in the given set of 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
         /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
         /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
@@ -212,7 +212,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Allows registration of all concrete, public, non-generic types that are located in the given set of 
+        /// Allows registration of all concrete, public and internal, non-generic types that are located in the given set of 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>, 
         /// by supplying a <see cref="BatchRegistrationCallback"/> delegate, that will be called for each 
         /// found closed generic implementation of the given <paramref name="openGenericServiceType"/>.
@@ -240,7 +240,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
+        /// Registers all concrete, non-generic, public and internal types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given 
         /// <paramref name="openGenericServiceType"/> with a singleton lifetime.
         /// </summary>
@@ -253,7 +253,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
@@ -264,7 +264,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Registers all concrete, non-generic, publicly exposed types that are located in the given 
+        /// Registers all concrete, non-generic, public and internal types that are located in the given 
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with a singleton lifetime.
         /// </summary>
@@ -277,7 +277,7 @@ namespace SimpleInjector.Extensions
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple publicly exposed types that implement the same 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
@@ -836,7 +836,7 @@ namespace SimpleInjector.Extensions
         }
 
         /// <summary>
-        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// Returns all public and internal types that are located in the supplied <paramref name="assemblies"/> 
         /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
@@ -871,11 +871,11 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             params Assembly[] assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies, includeInternals: true);
         }
 
         /// <summary>
-        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// Returns all public and internal types that are located in the supplied <paramref name="assemblies"/> 
         /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// </summary>
         /// <remarks>
@@ -909,11 +909,12 @@ namespace SimpleInjector.Extensions
         public static IEnumerable<Type> GetTypesToRegister(Type openGenericServiceType,
             IEnumerable<Assembly> assemblies)
         {
-            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies: assemblies);
+            return GetTypesToRegisterInternal(null, openGenericServiceType, assemblies: assemblies,
+                includeInternals: true);
         }
 
         /// <summary>
-        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// Returns all public and internal types that are located in the supplied <paramref name="assemblies"/> 
         /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// Types that are considered to be decorators are not returned.
         /// </summary>
@@ -951,11 +952,12 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies,
+                includeInternals: true);
         }
 
         /// <summary>
-        /// Returns all public types that are located in the supplied <paramref name="assemblies"/> 
+        /// Returns all public and internal types that are located in the supplied <paramref name="assemblies"/> 
         /// and implement or inherit from the supplied <paramref name="openGenericServiceType"/>.
         /// Types that are considered to be decorators are not returned.
         /// </summary>
@@ -992,12 +994,13 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(container, "container");
 
-            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies);
+            return GetTypesToRegisterInternal(container, openGenericServiceType, assemblies,
+                includeInternals: true);
         }
 
         private static void RegisterManyForOpenGenericInternal(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle,
-            bool includeInternal = false)
+            bool includeInternal = true)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(lifestyle, "lifestyle");
@@ -1053,7 +1056,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static void RegisterManySinglesForOpenGenericInternal(Container container,
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals = false)
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals = true)
         {
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
@@ -1065,7 +1068,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType, 
-            IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, bool includeInternals = false)
+            IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, bool includeInternals = true)
         {
             Requires.IsNotNull(assemblies, "assemblies");
 
@@ -1075,7 +1078,7 @@ namespace SimpleInjector.Extensions
         }
 
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType,
-            IEnumerable<Assembly> assemblies, bool includeInternals = false)
+            IEnumerable<Assembly> assemblies, bool includeInternals)
         {
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(assemblies, "assemblies");

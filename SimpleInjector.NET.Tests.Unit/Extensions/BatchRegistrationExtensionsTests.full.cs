@@ -22,8 +22,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(Concrete4),
-                "Internal type Concrete4 should be found.");
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
         }
 
         [TestMethod]
@@ -50,6 +49,135 @@
             // Act
             container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
                 assemblies);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload1_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload2_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), assemblies);
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload3_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                (s, i) => container.Register(s, i[0]),
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload4_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+                (s, i) => container.Register(s, i[0]),
+                assemblies);
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload5_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient, 
+                Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericOverload6_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient, assemblies);
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+        
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericOverload1_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+        }
+
+        [TestMethod]
+        public void RegisterManySinglesForOpenGenericOverload2_AccessibilityOption_RegistersInternalTypes()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
+            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), assemblies);
+
+            // Act
+            var impl = container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
         }
     }
 }
