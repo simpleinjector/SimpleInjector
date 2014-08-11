@@ -255,12 +255,14 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " + 
+            "Lifestyle.Singleton, assemblies) instead.", error: false)]
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies);
+            RegisterManyForOpenGeneric(container, openGenericServiceType, Lifestyle.Singleton, assemblies);
         }
 
         /// <summary>
@@ -279,12 +281,14 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " +
+            "Lifestyle.Singleton, assemblies) instead.", error: false)]
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies);
+            RegisterManyForOpenGeneric(container, openGenericServiceType, Lifestyle.Singleton, assemblies);
         }
 
         /// <summary>
@@ -401,10 +405,45 @@ namespace SimpleInjector.Extensions
         /// <paramref name="typesToRegister"/> collection that implement the same closed version of the
         /// supplied <paramref name="openGenericServiceType"/>.
         /// </exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " +
+            "Lifestyle.Singleton, typesToRegister) instead.", error: false)]
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, params Type[] typesToRegister)
         {
-            RegisterManySinglesForOpenGeneric(container, openGenericServiceType,
+            RegisterManyForOpenGeneric(container, openGenericServiceType, Lifestyle.Singleton,
+                (IEnumerable<Type>)typesToRegister);
+        }
+
+        /// <summary>
+        /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
+        /// given <paramref name="openGenericServiceType"/> with the supplied <see cref="lifestyle"/>.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will return the exact same instance.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="lifestyle">The lifestyle the registrations are made in.</param>
+        /// <param name="typesToRegister">The list of types that must be registered according to the given
+        /// <paramref name="openGenericServiceType"/> definition.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>, 
+        /// <paramref name="openGenericServiceType"/>, or <paramref name="typesToRegister"/> contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="typesToRegister"/> contains a null
+        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
+        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
+        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">Thrown when there are multiple types in the given
+        /// <paramref name="typesToRegister"/> collection that implement the same closed version of the
+        /// supplied <paramref name="openGenericServiceType"/>.
+        /// </exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, Lifestyle lifestyle, params Type[] typesToRegister)
+        {
+            RegisterManyForOpenGeneric(container, openGenericServiceType, lifestyle, 
                 (IEnumerable<Type>)typesToRegister);
         }
 
@@ -431,13 +470,49 @@ namespace SimpleInjector.Extensions
         /// <paramref name="typesToRegister"/> collection that implement the same closed version of the
         /// supplied <paramref name="openGenericServiceType"/>.
         /// </exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " +
+            "Lifestyle.Singleton, typesToRegister) instead.", error: false)]
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> typesToRegister)
         {
+            container.RegisterManyForOpenGeneric(openGenericServiceType, Lifestyle.Singleton, typesToRegister);
+        }
+        
+        /// <summary>
+        /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
+        /// given <paramref name="openGenericServiceType"/> with the supplied <see cref="lifestyle"/>.
+        /// When a found type implements multiple 
+        /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
+        /// service types will return the exact same instance.
+        /// </summary>
+        /// <param name="container">The container to make the registrations in.</param>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="lifestyle">The lifestyle the registrations are made in.</param>
+        /// <param name="typesToRegister">The list of types that must be registered according to the given
+        /// <paramref name="openGenericServiceType"/> definition.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/>, 
+        /// <paramref name="openGenericServiceType"/>, or <paramref name="typesToRegister"/> contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="typesToRegister"/> contains a null
+        /// (Nothing in VB) element, when the <paramref name="openGenericServiceType"/> is not an open generic
+        /// type, or one of the types supplied in <paramref name="typesToRegister"/> does not implement a 
+        /// closed version of <paramref name="openGenericServiceType"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">Thrown when there are multiple types in the given
+        /// <paramref name="typesToRegister"/> collection that implement the same closed version of the
+        /// supplied <paramref name="openGenericServiceType"/>.
+        /// </exception>
+        public static void RegisterManyForOpenGeneric(this Container container,
+            Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Type> typesToRegister)
+        {
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
             BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
-                container.Register(closedServiceType, types.Single(), Lifestyle.Singleton);
+                container.Register(closedServiceType, types.Single(), lifestyle);
             };
 
             RegisterManyForOpenGeneric(openGenericServiceType, typesToRegister, callback);
@@ -634,10 +709,15 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same closed generic 
         /// version of the given <paramref name="openGenericServiceType"/>.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " +
+            "accessibility, Lifestyle.Singleton, assemblies) instead.", error: false)]
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies, accessibility);
+            container.RegisterManyForOpenGeneric(openGenericServiceType, accessibility, Lifestyle.Singleton, 
+                assemblies);
         }
 
         /// <summary>
@@ -658,11 +738,16 @@ namespace SimpleInjector.Extensions
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete("RegisterManySinglesForOpenGeneric has been deprecated and will be removed in a future " +
+            "release. Please call container.RegisterManyForOpenGeneric(openGenericServiceType, " +
+            "accessibility, Lifestyle.Singleton, assemblies) instead.", error: false)]
+
         public static void RegisterManySinglesForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                accessibility);
+            container.RegisterManyForOpenGeneric(openGenericServiceType, accessibility, Lifestyle.Singleton,
+                assemblies);
         }
 
         /// <summary>
@@ -1055,18 +1140,6 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        private static void RegisterManySinglesForOpenGenericInternal(Container container,
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, bool includeInternals = true)
-        {
-            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
-            {
-                RequiresSingleImplementation(closedServiceType, implementations);
-                container.Register(closedServiceType, implementations.Single(), Lifestyle.Singleton);
-            };
-
-            RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, includeInternals);
-        }
-
         private static void RegisterManyForOpenGenericInternal(Container container, Type openGenericServiceType, 
             IEnumerable<Assembly> assemblies, BatchRegistrationCallback callback, bool includeInternals = true)
         {
@@ -1200,16 +1273,6 @@ namespace SimpleInjector.Extensions
 
             RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies,
                 lifestyle, accessibility == AccessibilityOption.AllTypes);
-        }
-
-        private static void RegisterManySinglesForOpenGenericInternal(Container container, Type openGenericServiceType,
-            IEnumerable<Assembly> assemblies, AccessibilityOption accessibility)
-        {
-            Requires.IsNotNull(container, "container");
-            IsValidValue(accessibility, "accessibility");
-
-            RegisterManySinglesForOpenGenericInternal(container, openGenericServiceType, assemblies,
-                includeInternals: accessibility == AccessibilityOption.AllTypes);
         }
 
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, Type openGenericServiceType,
