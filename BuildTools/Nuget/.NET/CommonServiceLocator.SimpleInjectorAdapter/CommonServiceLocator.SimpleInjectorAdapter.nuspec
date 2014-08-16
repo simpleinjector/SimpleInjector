@@ -14,10 +14,10 @@
     <id>CommonServiceLocator.SimpleInjectorAdapter</id>
     <title>CommonServiceLocator.SimpleInjectorAdapter</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>An adapter to implement CommonServiceLocator on top of the Simple Injector.</description>
-    <summary>An adapter to implement CommonServiceLocator on top of the Simple Injector.</summary>
+    <description>An adapter to implement CommonServiceLocator on top of Simple Injector.</description>
+    <summary>An adapter to implement CommonServiceLocator on top of Simple Injector.</summary>
     <copyright>Simple Injector Contributors 2010 - 2013</copyright>
     <language>en-US</language>
-    <tags>simpleinjector architecture CommonServiceLocator dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator</tags>
+    <tags>simpleinjector architecture CommonServiceLocator dependency-injection DI easy easy-to-use Inversion-of-Control IOC silverlight mono wp8 pcl</tags>
   </metadata>
 </package>
