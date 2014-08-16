@@ -418,7 +418,7 @@ namespace SimpleInjector.Extensions
 
         /// <summary>
         /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
-        /// given <paramref name="openGenericServiceType"/> with the supplied <see cref="lifestyle"/>.
+        /// given <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>.
         /// When a found type implements multiple 
         /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
         /// service types will return the exact same instance.
@@ -482,7 +482,7 @@ namespace SimpleInjector.Extensions
         
         /// <summary>
         /// Registers all supplied <paramref name="typesToRegister"/> by a closed generic definition of the
-        /// given <paramref name="openGenericServiceType"/> with the supplied <see cref="lifestyle"/>.
+        /// given <paramref name="openGenericServiceType"/> with the supplied <paramref name="lifestyle"/>
         /// When a found type implements multiple 
         /// closed-generic versions of the given <paramref name="openGenericServiceType"/>, both closed-generic
         /// service types will return the exact same instance.
