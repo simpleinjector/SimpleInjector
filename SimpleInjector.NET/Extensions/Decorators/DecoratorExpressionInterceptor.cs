@@ -42,6 +42,8 @@ namespace SimpleInjector.Extensions.Decorators
         protected DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
         {
             this.data = data;
+
+            this.Lifestyle = data.Lifestyle;
         }
 
         // Must be set after construction.
@@ -52,10 +54,7 @@ namespace SimpleInjector.Extensions.Decorators
             get { return this.data.Container; }
         }
 
-        protected Lifestyle Lifestyle
-        {
-            get { return this.data.Lifestyle; }
-        }
+        protected Lifestyle Lifestyle { get; set; }
 
         // The decorator type definition (possibly open generic).
         protected Type DecoratorTypeDefinition
@@ -260,7 +259,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
 
             IEnumerable<OverriddenParameter> predicateContextOverriddenParameters = 
-                this.CreateOverriddenPredicateContextParameters(serviceType, decoratorConstructor, currentProducer);
+                this.CreateOverriddenPredicateContextParameters(decoratorConstructor, currentProducer);
 
             var overriddenParameters = (new[] { decorateeOverriddenParameter })
                 .Concat(predicateContextOverriddenParameters);
@@ -268,7 +267,7 @@ namespace SimpleInjector.Extensions.Decorators
             return overriddenParameters.ToArray();
         }
 
-        private IEnumerable<OverriddenParameter> CreateOverriddenPredicateContextParameters(Type serviceType, 
+        private IEnumerable<OverriddenParameter> CreateOverriddenPredicateContextParameters(
             ConstructorInfo decoratorConstructor, InstanceProducer currentProducer)
         {
             return

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,7 +25,8 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
+    using System.Linq.Expressions;
+    using System.Reflection;
     using SimpleInjector.Advanced;
 
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
@@ -36,7 +37,7 @@ namespace SimpleInjector
     /// 
     /// container.Register<ITimeProvider, DefaultTimeProvider>();
     /// 
-    /// // Use of ContainerOptions clas here.
+    /// // Use of ContainerOptions class here.
     /// container.Options.AllowOverridingRegistrations = true;
     /// 
     /// // Replaces the previous registration of ITimeProvider
@@ -65,6 +66,9 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IPropertySelectionBehavior propertyBehavior;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ILifestyleSelectionBehavior lifestyleBehavior;
+        
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         public ContainerOptions()
         {
@@ -72,6 +76,7 @@ namespace SimpleInjector
             this.verificationBehavior = new DefaultConstructorVerificationBehavior();
             this.injectionBehavior = new DefaultConstructorInjectionBehavior(() => this.Container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
+            this.lifestyleBehavior = new TransientLifestyleSelectionBehavior();
         }
 
         /// <summary>
@@ -81,7 +86,10 @@ namespace SimpleInjector
         /// <value>The value indicating whether the container allows overriding registrations.</value>
         public bool AllowOverridingRegistrations { get; set; }
 
-        /// <summary>Gets or sets the constructor resolution behavior.</summary>
+        /// <summary>
+        /// Gets or sets the constructor resolution behavior. By default, the container only supports types
+        /// that have a single public constructor.
+        /// </summary>
         /// <value>The constructor resolution behavior.</value>
         /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
@@ -107,7 +115,10 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>Gets or sets the constructor resolution behavior.</summary>
+        /// <summary>
+        /// Gets or sets the constructor verification behavior. The container's default behavior is to
+        /// disallow constructors with value types and strings.
+        /// </summary>
         /// <value>The constructor resolution behavior.</value>
         /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
@@ -153,7 +164,10 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>Gets or sets the property selection behavior.</summary>
+        /// <summary>
+        /// Gets or sets the property selection behavior. The container's default behavior is to do no
+        /// property injection.
+        /// </summary>
         /// <value>The property selection behavior.</value>
         /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
@@ -175,7 +189,32 @@ namespace SimpleInjector
                 this.propertyBehavior = value;
             }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the lifestyle selection behavior. The container's default behavior is to make
+        /// registrations using the <see cref="Lifestyle.Transient"/> lifestyle.</summary>
+        /// <value>The lifestyle selection behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public ILifestyleSelectionBehavior LifestyleSelectionBehavior
+        {
+            get
+            {
+                return this.lifestyleBehavior;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, "value");
+
+                this.ThrowWhenContainerHasRegistrations("LifestyleSelectionBehavior");
+
+                this.lifestyleBehavior = value;
+            }
+        }
+
         /// <summary>
         /// Gets the container to which this <b>ContainerOptions</b> instance belongs to or <b>null</b> when
         /// this instance hasn't been applied to a <see cref="Container"/> yet.
@@ -192,7 +231,7 @@ namespace SimpleInjector
         /// force more container instances to use dynamic assemblies. Note that creating an infinite number
         /// of <see cref="Container"/> instances (for instance one per web request) with this property set to
         /// <b>true</b> will result in a memory leak; dynamic assemblies take up memory and will only be
-        /// unloaded when the app domain is unloaded.
+        /// unloaded when the AppDomain is unloaded.
         /// </summary>
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
         /// </value>
@@ -251,6 +290,11 @@ namespace SimpleInjector
                     descriptions.Add("Custom Property Selection");
                 }
 
+                if (!(this.LifestyleSelectionBehavior is TransientLifestyleSelectionBehavior))
+                {
+                    descriptions.Add("Custom Lifestyle Selection");
+                }
+                
                 if (descriptions.Count == 0)
                 {
                     descriptions.Add("Default Configuration");
@@ -258,6 +302,45 @@ namespace SimpleInjector
 
                 return string.Join(", ", descriptions);
             }
+        }
+
+        internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)
+        {
+            var constructor = this.ConstructorResolutionBehavior.GetConstructor(serviceType, implementationType);
+
+            if (constructor == null)
+            {
+                throw new ActivationException(StringResources.ConstructorResolutionBehaviorReturnedNull(
+                    this.ConstructorResolutionBehavior, serviceType, implementationType));
+            }
+
+            return constructor;
+        }
+
+        internal Expression BuildParameterExpression(ParameterInfo parameter)
+        {
+            Expression expression = this.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+
+            if (expression == null)
+            {
+                throw new ActivationException(StringResources.ConstructorInjectionBehaviorReturnedNull(
+                    this.ConstructorInjectionBehavior, parameter));
+            }
+
+            return expression;
+        }
+
+        internal Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        {
+            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(serviceType, implementationType);
+
+            if (lifestyle == null)
+            {
+                throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
+                    this.LifestyleSelectionBehavior, serviceType, implementationType));
+            }
+
+            return lifestyle;
         }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)

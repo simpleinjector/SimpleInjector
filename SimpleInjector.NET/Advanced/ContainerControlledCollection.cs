@@ -207,7 +207,7 @@ namespace SimpleInjector.Advanced
             // container.RegisterAll<ILogger>(typeof(ILogger));
             return new Lazy<InstanceProducer>(() =>
             {
-                // If the the elementType is explicitly registered (using Register) we select this registration
+                // If the elementType is explicitly registered (using Register) we select this registration
                 // (but we skip any implicit registrations, sine there could be more than one and it would
                 // be unclear which one to pick).
                 var instanceProducer = 
@@ -236,7 +236,9 @@ namespace SimpleInjector.Advanced
                 
                 // In case there is no registration, we create a new one.
                 // This producer will be automatically registered as external producer.
-                return Lifestyle.Transient.CreateProducer(typeof(TService), implementationType, this.container);
+                Lifestyle lifestyle = this.container.SelectionBasedLifestyle;
+
+                return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
             });
         }
 

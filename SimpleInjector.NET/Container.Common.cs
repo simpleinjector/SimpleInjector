@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+using SimpleInjector.Lifestyles;
     
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
@@ -115,6 +116,8 @@ namespace SimpleInjector
             this.RegisterSingle<Container>(this);
 
             this.containerId = Interlocked.Increment(ref counter);
+
+            this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(options);
         }
 
         // Wrapper for instance initializer delegates
@@ -128,6 +131,12 @@ namespace SimpleInjector
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; private set; }
+
+        /// <summary>
+        /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is 
+        /// returned from the registered container.Options.LifestyleSelectionBehavior.
+        /// </summary>
+        internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; private set; }
 
         internal object SyncRoot
         {

@@ -213,7 +213,7 @@ namespace SimpleInjector
             if (this.Container.Options.PropertySelectionBehavior is DefaultPropertySelectionBehavior)
             {
                 // Performance tweak. DefaultPropertySelectionBehavior never injects any properties.
-                // This speeds up the the initialization phase.
+                // This speeds up the initialization phase.
                 return expressionToWrap;
             }
 
@@ -375,9 +375,8 @@ namespace SimpleInjector
 
         private Expression BuildNewExpression(Type serviceType, Type implementationType)
         {
-            var resolutionBehavior = this.Container.Options.ConstructorResolutionBehavior;
-
-            ConstructorInfo constructor = resolutionBehavior.GetConstructor(serviceType, implementationType);
+            ConstructorInfo constructor = 
+                this.Container.Options.SelectConstructor(serviceType, implementationType);
 
             this.AddConstructorParametersAsKnownRelationship(constructor);
 
@@ -396,7 +395,10 @@ namespace SimpleInjector
             {
                 var overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
-                parameters.Add(overriddenExpression ?? this.BuildParameterExpressionFor(parameter));
+                var parameterExpression = 
+                    overriddenExpression ?? this.Container.Options.BuildParameterExpression(parameter);
+
+                parameters.Add(parameterExpression);
             }
 
             return parameters.ToArray();
@@ -496,21 +498,6 @@ namespace SimpleInjector
             {
                 this.AddRelationship(relationship);
             }
-        }
-
-        private Expression BuildParameterExpressionFor(ParameterInfo parameter)
-        {
-            var injectionBehavior = this.Container.Options.ConstructorInjectionBehavior;
-
-            var expression = injectionBehavior.BuildParameterExpression(parameter);
-
-            if (expression == null)
-            {
-                throw new ActivationException(
-                    StringResources.ConstructorInjectionBehaviorReturnedNull(injectionBehavior, parameter));
-            }
-
-            return expression;
         }
 
         private static Expression WrapWithNullChecker<TService>(Expression expression)

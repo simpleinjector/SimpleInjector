@@ -25,12 +25,13 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.ServiceModel;
-    using SimpleInjector.Integration.Wcf;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.ServiceModel;
+using SimpleInjector.Advanced;
+using SimpleInjector.Integration.Wcf;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with WCF services.
@@ -69,7 +70,8 @@ namespace SimpleInjector
 
             foreach (Type serviceType in serviceTypes)
             {
-                Lifestyle lifestyle = GetAppropriateLifestyle(serviceType);
+                Lifestyle lifestyle = 
+                    GetAppropriateLifestyle(serviceType, container.Options.LifestyleSelectionBehavior);
 
                 container.Register(serviceType, serviceType, lifestyle);
             }
@@ -270,13 +272,14 @@ namespace SimpleInjector
             return attribute != null && attribute.ConcurrencyMode == ConcurrencyMode.Multiple;
         }
 
-        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType)
+        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType, 
+            ILifestyleSelectionBehavior behavior)
         {
             var attribute = GetServiceBehaviorAttribute(wcfServiceType);
 
             bool singleton = attribute != null && attribute.InstanceContextMode == InstanceContextMode.Single;
 
-            return singleton ? Lifestyle.Singleton : Lifestyle.Transient;
+            return singleton ? Lifestyle.Singleton : behavior.SelectLifestyle(wcfServiceType, wcfServiceType);
         }
 
         private static ServiceBehaviorAttribute GetServiceBehaviorAttribute(Type type)

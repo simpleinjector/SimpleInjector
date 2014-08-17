@@ -40,7 +40,7 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
-        /// <paramref name="parameter"/>.</returns>
+        /// <paramref name="parameter"/>. This method never returns null.</returns>
         Expression BuildParameterExpression(ParameterInfo parameter);
     }
 }

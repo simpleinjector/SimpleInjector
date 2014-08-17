@@ -11,10 +11,7 @@
             this Container container, Type serviceType, Type decoratorType,
             Predicate<DecoratorPredicateContext> runtimePredicate)
         {
-            container.RegisterRuntimeDecorator(
-                serviceType, decoratorType,
-                Lifestyle.Transient,
-                runtimePredicate);
+            container.RegisterRuntimeDecorator(serviceType, decoratorType, null, runtimePredicate);
         }
 
         public static void RegisterRuntimeDecorator(
@@ -27,12 +24,21 @@
 
             compileTimePredicate = compileTimePredicate ?? (context => true);
 
-            container.RegisterDecorator(serviceType, decoratorType, lifestyle, c =>
+            Predicate<DecoratorPredicateContext> predicate = c =>
             {
                 bool mustDecorate = compileTimePredicate(c);
                 localContext.Value = mustDecorate ? c : null;
                 return mustDecorate;
-            });
+            };
+
+            if (lifestyle == null)
+            {
+                container.RegisterDecorator(serviceType, decoratorType, predicate);
+            }
+            else
+            {
+                container.RegisterDecorator(serviceType, decoratorType, lifestyle, predicate);
+            }
 
             container.ExpressionBuilt += (s, e) =>
             {

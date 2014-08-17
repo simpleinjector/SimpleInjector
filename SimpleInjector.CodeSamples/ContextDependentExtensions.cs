@@ -45,6 +45,7 @@
             Func<TService> rootFactory = 
                 () => contextBasedFactory(DependencyContext.Root);
 
+            // Should always be transient!
             container.Register<TService>(rootFactory, Lifestyle.Transient);
 
             // Allow the Func<DependencyContext, TService> to be 

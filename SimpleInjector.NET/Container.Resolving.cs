@@ -515,7 +515,7 @@ namespace SimpleInjector
         {
             if (this.IsConcreteConstructableType(typeof(TConcrete)))
             {
-                var registration = Lifestyle.Transient.CreateRegistration<TConcrete, TConcrete>(this);
+                var registration = this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
             }
@@ -528,7 +528,8 @@ namespace SimpleInjector
             if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
                 this.IsConcreteConstructableType(concreteType))
             {
-                var registration = Lifestyle.Transient.CreateRegistration(concreteType, concreteType, this);
+                var registration = 
+                    this.SelectionBasedLifestyle.CreateRegistration(concreteType, concreteType, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(concreteType, registration);
             }

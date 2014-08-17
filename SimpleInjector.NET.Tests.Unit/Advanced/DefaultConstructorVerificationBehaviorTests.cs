@@ -8,17 +8,6 @@
     public class DefaultConstructorVerificationBehaviorTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorVerificationBehavior_SetWithNullValue_ThrowsException()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            // Act
-            options.ConstructorVerificationBehavior = null;
-        }
-
-        [TestMethod]
         public void Verify_TValueTypeParameter_ThrowsExpectedException()
         {
             // Arrange

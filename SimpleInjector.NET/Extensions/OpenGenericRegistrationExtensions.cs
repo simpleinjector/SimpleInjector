@@ -53,8 +53,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
+            Requires.IsNotNull(container, "container");
+
             RegisterOpenGeneric(container, openGenericServiceType, openGenericImplementation,
-                Lifestyle.Transient);
+                container.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -235,7 +237,9 @@ namespace SimpleInjector.Extensions
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> openGenericImplementations)
         {
-            RegisterAllOpenGeneric(container, openGenericServiceType, Lifestyle.Transient,
+            Requires.IsNotNull(container, "container");
+
+            RegisterAllOpenGeneric(container, openGenericServiceType, container.SelectionBasedLifestyle,
                 (IEnumerable<Type>)openGenericImplementations);
         }
 

@@ -57,9 +57,8 @@ using SimpleInjector.Lifestyles;
             return this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
         }
 
-        internal void AddAppliedDecorator(Type decoratorType, Type originalImplementationType,
-            Container container, Lifestyle lifestyle, Expression decoratedExpression, 
-            IEnumerable<KnownRelationship> decoratorRelationships = null)
+        internal void AddAppliedDecorator(Type decoratorType, Container container, Lifestyle lifestyle, 
+            Expression decoratedExpression, IEnumerable<KnownRelationship> decoratorRelationships = null)
         {
             var registration = new ExpressionRegistration(decoratedExpression, decoratorType,
                 lifestyle, container);

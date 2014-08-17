@@ -126,7 +126,7 @@ namespace SimpleInjector
         {
             foreach (var controllerType in GetControllerTypesToRegister(container, assemblies))
             {
-                container.Register(controllerType, controllerType, Lifestyle.Transient);
+                container.Register(controllerType, controllerType);
             }
         }
 

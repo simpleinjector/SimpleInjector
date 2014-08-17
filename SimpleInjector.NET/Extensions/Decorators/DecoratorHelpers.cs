@@ -112,8 +112,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             try
             {
-                constructorToCheck =
-                    container.Options.ConstructorResolutionBehavior.GetConstructor(serviceType, typeToCheck);
+                constructorToCheck = container.Options.SelectConstructor(serviceType, typeToCheck);
             }
             catch (ActivationException)
             {

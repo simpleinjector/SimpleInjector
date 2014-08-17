@@ -58,10 +58,16 @@ namespace SimpleInjector.Extensions.Decorators
             return this.SatisfiesPredicate(this.Context);
         }
 
-        internal void ApplyDecorator(Type decoratorType)
+        internal void ApplyDecorator(Type closedDecoratorType)
         {
-            this.decoratorConstructor = this.Container.Options.ConstructorResolutionBehavior
-                .GetConstructor(this.e.RegisteredServiceType, decoratorType);
+            this.decoratorConstructor = 
+                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, closedDecoratorType);
+
+            if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
+            {
+                this.Lifestyle = 
+                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, closedDecoratorType);
+            }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.
             this.decoratorType = this.decoratorConstructor.DeclaringType;
@@ -112,8 +118,8 @@ namespace SimpleInjector.Extensions.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(this.decoratorType, info.ImplementationType, this.Container,
-                this.Lifestyle, this.e.Expression, decoratorRelationships);
+            info.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle, this.e.Expression, 
+                decoratorRelationships);
         }
     }
 }

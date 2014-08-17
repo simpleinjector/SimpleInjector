@@ -264,11 +264,17 @@ namespace SimpleInjector.Extensions
         /// original registered <paramref name="serviceType"/>, by injecting that service type into the 
         /// constructor of the supplied <paramref name="decoratorType"/>. Multiple decorators may be applied 
         /// to the same <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and 
-        /// non-generic service types. A new <paramref name="decoratorType"/> will always be returned (the
-        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the 
-        /// wrapped service.
+        /// non-generic service types. By default, a new <paramref name="decoratorType"/> instance will be 
+        /// returned on each request (according the <see cref="Lifestyle.Transient">Transient</see> lifestyle),
+        /// independently of the lifestyle of the wrapped service.
         /// </summary>
         /// <remarks>
+        /// <para>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </para>
         /// <para>
         /// The <b>RegisterDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
@@ -448,7 +454,9 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/>.</exception>
         public static void RegisterDecorator(this Container container, Type serviceType, Type decoratorType)
         {
-            container.RegisterDecoratorCore(serviceType, decoratorType, null, Lifestyle.Transient);
+            Requires.IsNotNull(container, "container");
+
+            container.RegisterDecoratorCore(serviceType, decoratorType, null, container.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -457,11 +465,17 @@ namespace SimpleInjector.Extensions
         /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the 
         /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same 
         /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic 
-        /// service types. A new <paramref name="decoratorType"/> will always be returned (the
-        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the 
-        /// wrapped service.
+        /// service types. By default, a new <paramref name="decoratorType"/> instance will be returned on 
+        /// each request (according the <see cref="Lifestyle.Transient">Transient</see> lifestyle), 
+        /// independently of the lifestyle of the wrapped service.
         /// </summary>
         /// <remarks>
+        /// <para>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </para>
         /// <para>
         /// The <b>RegisterOpenGenericDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
@@ -515,9 +529,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterDecorator(this Container container, Type serviceType, Type decoratorType,
             Predicate<DecoratorPredicateContext> predicate)
         {
+            Requires.IsNotNull(container, "container");
             Requires.IsNotNull(predicate, "predicate");
 
-            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, Lifestyle.Transient);
+            container.RegisterDecoratorCore(serviceType, decoratorType, predicate, container.SelectionBasedLifestyle);
         }
 
         /// <summary>

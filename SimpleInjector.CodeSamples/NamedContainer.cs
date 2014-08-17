@@ -25,7 +25,7 @@
             where TImplementation : class, TService
             where TService : class
         {
-            this.Register<TService, TImplementation>(Lifestyle.Transient, name);
+            this.Register<TService, TImplementation>(this.SelectLifestyle<TService, TImplementation>(), name);
         }
 
         public void Register<TService, TImplementation>(Lifestyle lifestyle, string name)
@@ -38,9 +38,9 @@
 
         public void Register(Type serviceType, Type implementationType, string name)
         {
-            this.Register(serviceType, implementationType, Lifestyle.Transient, name);
+            this.Register(serviceType, implementationType, this.SelectLifestyle(serviceType, implementationType), name);
         }
-
+        
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle, string name)
         {
             var reg = lifestyle.CreateRegistration(serviceType, implementationType, this);
@@ -50,7 +50,7 @@
         public void Register<TService>(Func<TService> instanceCreator, string name)
             where TService : class
         {
-            this.Register<TService>(instanceCreator, Lifestyle.Transient, name);
+            this.Register<TService>(instanceCreator, this.SelectLifestyle(typeof(TService), typeof(TService)), name);
         }
 
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle, string name)
@@ -101,6 +101,16 @@
                     producer.GetInstance();
                 }
             }
+        }
+
+        private Lifestyle SelectLifestyle<TService, TImplementation>()
+        {
+            return this.SelectLifestyle(typeof(TService), typeof(TImplementation));
+        }
+
+        private Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        {
+            return this.Options.LifestyleSelectionBehavior.SelectLifestyle(serviceType, implementationType);
         }
     }
 }

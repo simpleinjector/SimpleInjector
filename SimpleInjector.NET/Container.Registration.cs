@@ -397,11 +397,14 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
-        /// is requested (transient). Note that calling this method is redundant in most scenarios, because
-        /// the container will return a new instance for unregistered concrete types. Registration is needed
-        /// when the security restrictions of the application's sandbox don't allow the container to create
-        /// such type.
+        /// is requested (transient).
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 
@@ -411,7 +414,7 @@ namespace SimpleInjector
         /// that can not be created by the container.</exception>
         public void Register<TConcrete>() where TConcrete : class
         {
-            this.Register<TConcrete, TConcrete>(Lifestyle.Transient, "TConcrete", "TConcrete");
+            this.Register<TConcrete, TConcrete>(this.SelectionBasedLifestyle, "TConcrete", "TConcrete");
         }
 
         /// <summary>
@@ -433,8 +436,14 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TImplementation"/> will be returned every time a
-        /// <typeparamref name="TService"/> is requested.
+        /// <typeparamref name="TService"/> is requested (transient).
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
@@ -447,7 +456,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            this.Register<TService, TImplementation>(Lifestyle.Transient, "TService", "TImplementation");
+            this.Register<TService, TImplementation>(this.SelectionBasedLifestyle, "TService", "TImplementation");
         }
 
         /// <summary>
@@ -455,6 +464,12 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/>. The delegate is expected to always return a new instance on
         /// each call.
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
@@ -464,13 +479,19 @@ namespace SimpleInjector
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
-            this.Register<TService>(instanceCreator, Lifestyle.Transient);
+            this.Register<TService>(instanceCreator, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
         /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it 
         /// is requested (transient).
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <param name="concreteType">The concrete type that will be registered.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null 
         /// references (Nothing in VB).</exception>
@@ -483,7 +504,7 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type concreteType)
         {
-            this.Register(concreteType, concreteType, Lifestyle.Transient, "concreteType", "concreteType");
+            this.Register(concreteType, concreteType, this.SelectionBasedLifestyle, "concreteType", "concreteType");
         }
 
         /// <summary>
@@ -491,6 +512,12 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and 
         /// <paramref name="implementation"/> represent the same type, the type is registered by itself.
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="implementation">The actual type that will be returned when requested.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
@@ -505,12 +532,19 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, Type implementation)
         {
-            this.Register(serviceType, implementation, Lifestyle.Transient, "serviceType", "implementation");
+            this.Register(serviceType, implementation, this.SelectionBasedLifestyle, 
+                "serviceType", "implementation");
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <paramref name="serviceType"/>.
         /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
@@ -523,7 +557,7 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, Func<object> instanceCreator)
         {
-            this.Register(serviceType, instanceCreator, Lifestyle.Transient);
+            this.Register(serviceType, instanceCreator, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -1382,8 +1416,7 @@ namespace SimpleInjector
 
             try
             {
-                var constructor = this.Options.ConstructorResolutionBehavior
-                    .GetConstructor(serviceType, implementationType);
+                var constructor = this.Options.SelectConstructor(serviceType, implementationType);
 
                 this.Options.ConstructorVerificationBehavior.Verify(constructor);
             }

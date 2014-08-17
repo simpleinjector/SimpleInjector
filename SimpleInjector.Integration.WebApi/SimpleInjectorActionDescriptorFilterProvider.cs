@@ -18,6 +18,7 @@
 
         internal SimpleInjectorActionDescriptorFilterProvider(Container container)
         {
+            // We can always use transient, since caching is not required, only initialization.
             this.registrationFactory =
                 concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
         }

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -74,7 +74,7 @@ namespace SimpleInjector
 
             var pageTypes = GetConcreteTypesThatDeriveFrom<Page>(assemblies);
 
-            container.RegisterBatchAsConcreteTransient(pageTypes);
+            container.RegisterBatchAsConcrete(pageTypes);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace SimpleInjector
 
             var userControlTypes = GetConcreteTypesThatDeriveFrom<UserControl>(assemblies);
 
-            container.RegisterBatchAsConcreteTransient(userControlTypes);
+            container.RegisterBatchAsConcrete(userControlTypes);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace SimpleInjector
                 where !typeof(HttpApplication).IsAssignableFrom(type)
                 select type;
 
-            container.RegisterBatchAsConcreteTransient(handlerTypes);
+            container.RegisterBatchAsConcrete(handlerTypes);
         }
     
         private static IEnumerable<Assembly> GetAssemblies()
@@ -185,11 +185,11 @@ namespace SimpleInjector
                 select type;
         }
 
-        private static void RegisterBatchAsConcreteTransient(this Container container, IEnumerable<Type> types)
+        private static void RegisterBatchAsConcrete(this Container container, IEnumerable<Type> types)
         {
             foreach (Type concreteType in types)
             {
-                container.Register(concreteType, concreteType, Lifestyle.Transient);
+                container.Register(concreteType);
             }
         }
     }

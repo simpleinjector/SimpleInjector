@@ -40,6 +40,7 @@ namespace SimpleInjector.Integration.Web.Mvc
         {
             this.Container = container;
 
+            // We can always use transient, since caching is not required, only initialization.
             this.registrationFactory =
                 concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
         }
@@ -53,12 +54,7 @@ namespace SimpleInjector.Integration.Web.Mvc
 
             foreach (var filter in filters)
             {
-                var instance = filter.Instance;
-
-                Registration registration =
-                    this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
-
-                registration.InitializeInstance(instance);
+                this.InitializeInstance(filter.Instance);
             }
 
             return filters;
@@ -69,6 +65,14 @@ namespace SimpleInjector.Integration.Web.Mvc
             IEnumerable<Filter> filters = base.GetFilters(controllerContext, actionDescriptor);
 
             return (filters as Filter[]) ?? filters.ToArray();
+        }
+
+        private void InitializeInstance(object instance)
+        {
+            Registration registration =
+                this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
+
+            registration.InitializeInstance(instance);
         }
     }
 }

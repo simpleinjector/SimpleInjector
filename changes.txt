@@ -4,6 +4,9 @@
 Version vNext
 
 	New features:
+		-[Core] New Container.Options.LifestyleSelectionBehavior extendibility point added to allow overriding
+		 the container's behavior to register type's with the Transient lifestyle. This is especially useful
+		 for batch-registration scenarios. (work item 20965)
 		-[Core] DecoratorPredicateContext can now be injected into a decorator that is registered using the
 		 RegisterDecorator extension methods. (work item 20959)
 		-[Core] InstanceProducer.VisualizeObjectGraph() method added to allow visualizing the object graph

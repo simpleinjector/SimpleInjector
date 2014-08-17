@@ -75,9 +75,7 @@ namespace SimpleInjector
         {
             if (!service.IsAssignableFrom(implementation))
             {
-                throw new ArgumentException(
-                    StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
-                    paramName);
+                ThrowSuppliedTypeDoesNotInheritFromOrImplement(service, implementation, paramName);
             }
         }
 
@@ -282,7 +280,7 @@ namespace SimpleInjector
             string paramName)
         {
             ConstructorInfo decoratorConstructor = 
-                container.Options.ConstructorResolutionBehavior.GetConstructor(serviceType, decoratorType);
+                container.Options.SelectConstructor(serviceType, decoratorType);
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
             Requires.DecoratesBaseTypes(serviceType, decoratorConstructor, paramName);
@@ -406,6 +404,14 @@ namespace SimpleInjector
         private static void ThrowArgumentNullException(string paramName)
         {
             throw new ArgumentNullException(paramName);
+        }
+
+        private static void ThrowSuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation,
+            string paramName)
+        {
+            throw new ArgumentException(
+                StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
+                paramName);
         }
     }
 }

@@ -240,7 +240,7 @@ namespace SimpleInjector
 
             var controllerTypes = GetControllerTypesFromConfiguration(configuration);
 
-            controllerTypes.ForEach(type => container.Register(type, type, Lifestyle.Transient));
+            controllerTypes.ForEach(type => container.Register(type, type));
         }
 
         /// <summary>

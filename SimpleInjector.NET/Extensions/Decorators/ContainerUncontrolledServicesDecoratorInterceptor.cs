@@ -77,8 +77,14 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal void ApplyDecorator(Type decoratorType)
         {
-            this.decoratorConstructor = this.Container.Options.ConstructorResolutionBehavior
-                .GetConstructor(this.e.RegisteredServiceType, decoratorType);
+            this.decoratorConstructor = 
+                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, decoratorType);
+
+            if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
+            {
+                this.Lifestyle = 
+                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, decoratorType);
+            }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.
             this.decoratorType = this.decoratorConstructor.DeclaringType;
@@ -94,8 +100,8 @@ namespace SimpleInjector.Extensions.Decorators
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceInfo.AddAppliedDecorator(this.decoratorType, this.registeredServiceType, this.Container, 
-                this.Lifestyle, decoratedExpression);
+            serviceInfo.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle, 
+                decoratedExpression);
 
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }

@@ -520,6 +520,21 @@
         }
 
         [TestMethod]
+        public void DebuggerDisplayDescription_WithOverriddenLifestyleSelectionBehavior_ReturnsExpectedMessage()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            options.LifestyleSelectionBehavior = new AlternativeLifestyleSelectionBehavior();
+
+            // Act
+            var description = options.DebuggerDisplayDescription;
+
+            // Assert
+            Assert.AreEqual("Custom Lifestyle Selection", description);
+        }
+
+        [TestMethod]
         public void DebuggerDisplayDescription_WithAllCustomValues_ReturnsExpectedMessage()
         {
             // Arrange
@@ -530,6 +545,7 @@
             options.ConstructorVerificationBehavior = new AlternativeConstructorVerificationBehavior();
             options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
             options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
+            options.LifestyleSelectionBehavior = new AlternativeLifestyleSelectionBehavior();
 
             // Act
             var description = options.DebuggerDisplayDescription;
@@ -540,8 +556,42 @@
                 Custom Constructor Resolution,
                 Custom Constructor Verification,
                 Custom Constructor Injection,
-                Custom Property Selection
+                Custom Property Selection,
+                Custom Lifestyle Selection
                 ".TrimInside(), description);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorVerificationBehavior_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            // Act
+            options.ConstructorVerificationBehavior = null;
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void PropertySelectionBehavior_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            // Act
+            options.PropertySelectionBehavior = null;
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void LifestyleSelectionBehavior_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = new ContainerOptions();
+
+            // Act
+            options.LifestyleSelectionBehavior = null;
         }
 
         private static MemberInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
@@ -588,6 +638,14 @@
         private sealed class AlternativePropertySelectionBehavior : IPropertySelectionBehavior
         {
             public bool SelectProperty(Type serviceType, PropertyInfo property)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private sealed class AlternativeLifestyleSelectionBehavior : ILifestyleSelectionBehavior
+        {
+            public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
             {
                 throw new NotImplementedException();
             }

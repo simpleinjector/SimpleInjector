@@ -144,7 +144,14 @@
 
             foreach (var tuple in implementations)
             {
-                this.container.Register(tuple.Item2, tuple.Item2, tuple.Item3);
+                if (tuple.Item3 == null)
+                {
+                    this.container.Register(tuple.Item2, tuple.Item2);
+                }
+                else
+                {
+                    this.container.Register(tuple.Item2, tuple.Item2, tuple.Item3);
+                }
             }
 
             int index = 0;
@@ -180,7 +187,7 @@
 
             public void Register(Type implementationType, TKey key)
             {
-                this.Register(implementationType, key, Lifestyle.Transient);
+                this.Register(implementationType, key, null);
             }
 
             public void Register(Type implementationType, TKey key, Lifestyle lifestyle)

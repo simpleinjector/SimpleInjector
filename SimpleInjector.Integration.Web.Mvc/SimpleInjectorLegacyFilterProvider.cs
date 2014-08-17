@@ -26,7 +26,6 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System.Linq;
     using System.Web.Mvc;
 
-    // This is a better implementation https://bit.ly/1nrjnxD, but that would unfortunately be a breaking change.
     internal sealed class SimpleInjectorLegacyFilterProvider : FilterAttributeFilterProvider
     {
         internal SimpleInjectorLegacyFilterProvider(Container container)

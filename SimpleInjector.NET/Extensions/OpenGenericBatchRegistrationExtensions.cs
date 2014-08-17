@@ -106,7 +106,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, Lifestyle.Transient);
+            Requires.IsNotNull(container, "container");
+
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies,
+                container.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -128,7 +131,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
-            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, Lifestyle.Transient);
+            Requires.IsNotNull(container, "container");
+
+            container.RegisterManyForOpenGenericInternal(openGenericServiceType, assemblies, 
+                container.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -343,7 +349,7 @@ namespace SimpleInjector.Extensions
             BatchRegistrationCallback callback = (closedServiceType, types) =>
             {
                 RequiresSingleImplementation(closedServiceType, types);
-                container.Register(closedServiceType, types.Single(), Lifestyle.Transient);
+                container.Register(closedServiceType, types.Single());
             };
 
             RegisterManyForOpenGeneric(openGenericServiceType, typesToRegister, callback);
@@ -539,7 +545,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility, Lifestyle.Transient,
+            Requires.IsNotNull(container, "container");
+
+            RegisterManyForOpenGeneric(container, openGenericServiceType, accessibility, 
+                container.SelectionBasedLifestyle,
                 (IEnumerable<Assembly>)assemblies);
         }
 

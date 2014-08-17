@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,26 +23,22 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Reflection;
 
     /// <summary>
-    /// Defines the container's behavior for finding a suitable constructor for the creation of a type.
-    /// Set the <see cref="ContainerOptions.ConstructorResolutionBehavior">ConstructorResolutionBehavior</see> 
+    /// Defines the container's behavior for selecting the lifestyle for a registration in case no lifestyle
+    /// is explicitly supplied.
+    /// Set the <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> 
     /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
-    /// of the container.
+    /// of the container. By default, when no lifestyle is explicitly supplied, the 
+    /// <see cref="Lifestyle.Transient">Transient</see> lifestyle is used.
     /// </summary>
-    public interface IConstructorResolutionBehavior
+    public interface ILifestyleSelectionBehavior
     {
-        /// <summary>
-        /// Gets the given <paramref name="implementationType"/>'s constructor that can be used by the 
-        /// container to create that instance.
-        /// </summary>
-        /// <param name="serviceType">Type of the abstraction that is requested.</param>
-        /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
-        /// <returns>
-        /// The <see cref="ConstructorInfo"/>. This method never returns null.
-        /// </returns>
-        /// <exception cref="ActivationException">Thrown when no suitable constructor could be found.</exception>
-        ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
+        /// <summary>Selects the lifestyle based on the supplied type information.</summary>
+        /// <param name="serviceType">Type of the abstraction that is registered.</param>
+        /// <param name="implementationType">Type of the implementation to that is registered.</param>
+        /// <returns>The suited <see cref="Lifestyle"/> for the given type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when either one of the arguments is a null reference.</exception>
+        Lifestyle SelectLifestyle(Type serviceType, Type implementationType);
     }
 }

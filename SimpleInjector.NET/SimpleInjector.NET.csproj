@@ -85,10 +85,12 @@
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\TransientLifestyleSelectionBehavior.cs" />
     <Compile Include="Advanced\DefaultPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\IConstructorVerificationBehavior.cs" />
+    <Compile Include="Advanced\ILifestyleSelectionBehavior.cs" />
     <Compile Include="Advanced\InitializationContext.cs" />
     <Compile Include="Advanced\InstanceInitializationData.cs" />
     <Compile Include="Advanced\InternalsFinderVisitor.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Advanced\KnownRelationship.cs" />
     <Compile Include="Lifestyle.cs" />
     <Compile Include="Lifestyles\HybridRegistration.cs" />
+    <Compile Include="Lifestyles\LifestyleSelectionBehaviorProxyLifestyle.cs" />
     <Compile Include="Lifestyles\ScopedHybridLifestyle.cs" />
     <Compile Include="Lifestyles\ScopedRegistration.cs" />
     <Compile Include="Scope.cs" />

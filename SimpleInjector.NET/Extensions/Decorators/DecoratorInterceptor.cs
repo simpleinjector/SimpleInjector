@@ -68,9 +68,9 @@ namespace SimpleInjector.Extensions.Decorators
 
         private void TryToApplyDecorator(ExpressionBuiltEventArgs e)
         {
-            Type decoratorType;
+            Type closedDecoratorType;
 
-            if (this.MustDecorate(e.RegisteredServiceType, out decoratorType))
+            if (this.MustDecorate(e.RegisteredServiceType, out closedDecoratorType))
             {
                 var decoratorInterceptor =
                     new ServiceDecoratorExpressionInterceptor(this.data, this.registrationsCache, e);
@@ -79,13 +79,13 @@ namespace SimpleInjector.Extensions.Decorators
                 {
                     if (this.data.DecoratorTypeFactory != null)
                     {
-                        decoratorType = this.GetDecoratorTypeFromDecoratorFactory(
+                        closedDecoratorType = this.GetDecoratorTypeFromDecoratorFactory(
                             e.RegisteredServiceType, decoratorInterceptor.Context);
                     }
                     
-                    if (decoratorType != null)
+                    if (closedDecoratorType != null)
                     {
-                        decoratorInterceptor.ApplyDecorator(decoratorType);
+                        decoratorInterceptor.ApplyDecorator(closedDecoratorType);
                     }
                 }
             }

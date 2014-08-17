@@ -49,7 +49,10 @@
 
             behavior.RegisterFactoryProduct(typeof(TService), typeof(TImplementation));
 
-            container.Register<TService, TImplementation>(lifestyle ?? Lifestyle.Transient);
+            lifestyle = lifestyle ?? container.Options.LifestyleSelectionBehavior
+                .SelectLifestyle(typeof(TService), typeof(TImplementation));
+
+            container.Register<TService, TImplementation>(lifestyle);
         }
 
         public static void RegisterParameterizedFactory<TFactory>(this Container container)

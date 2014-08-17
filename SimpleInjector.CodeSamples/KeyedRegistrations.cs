@@ -6,8 +6,6 @@
 
     public class KeyedRegistrations<TKey, TService> : IEnumerable<TService> where TService : class
     {
-        private static readonly Lifestyle DefaultLifestyle = Lifestyle.Transient;
-
         private readonly List<InstanceProducer> producers = new List<InstanceProducer>();
         private readonly Dictionary<TKey, InstanceProducer> keyedProducers;
         private readonly Container container;
@@ -34,7 +32,7 @@
 
         public void Register(Type implementationType, TKey key)
         {
-            this.Register(implementationType, key, DefaultLifestyle);
+            this.Register(implementationType, key, this.GetDefaultLifestyle(implementationType));
         }
 
         public void Register(Type implementationType, TKey key, Lifestyle lifestyle)
@@ -44,7 +42,7 @@
         
         public void Register(Func<TService> instanceCreator, TKey key)
         {
-            this.Register(instanceCreator, key, DefaultLifestyle);
+            this.Register(instanceCreator, key, this.GetDefaultLifestyle(typeof(TService)));
         }
 
         public void Register(Func<TService> instanceCreator, TKey key, Lifestyle lifestyle)
@@ -76,6 +74,12 @@
 
             this.keyedProducers.Add(key, producer);
             this.producers.Add(producer);
+        }
+
+        private Lifestyle GetDefaultLifestyle(Type implementationType)
+        {
+            return this.container.Options.LifestyleSelectionBehavior
+                .SelectLifestyle(typeof(TService), implementationType);
         }
     }
 }

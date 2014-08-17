@@ -278,12 +278,42 @@ namespace SimpleInjector
                 "returned a null reference after its BuildParameterExpression(ParameterInfo) method was " +
                 "supplied with the argument of type {1} with name '{2}' from the constructor of type {3}. " +
                 "{4}.BuildParameterExpression implementations should never return null, but should throw " +
-                "an {5} with an expressive message instead.",
-                injectionBehavior.GetType().Namespace + "." + injectionBehavior.GetType().ToFriendlyName(),
+                "a {5} with an expressive message instead.",
+                injectionBehavior.GetType().ToFriendlyName(),
                 parameter.ParameterType.ToFriendlyName(), parameter.Name,
                 parameter.Member.DeclaringType.ToFriendlyName(),
                 typeof(IConstructorInjectionBehavior).Name,
                 typeof(ActivationException).FullName);
+        }
+
+        internal static string ConstructorResolutionBehaviorReturnedNull(
+            IConstructorResolutionBehavior selectionBehavior, Type serviceType, Type implementationType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The {0} that was registered through Container.Options.ConstructorResolutionBehavior " +
+                "returned a null reference after its GetConstructor(Type, Type) method was " +
+                "supplied with values '{1}' for serviceType and '{2}' for implementationType. " +
+                "{3}.GetConstructor implementations should never return null, but should throw " +
+                "a {4} with an expressive message instead.",
+                selectionBehavior.GetType().ToFriendlyName(),
+                serviceType.ToFriendlyName(), 
+                implementationType.ToFriendlyName(),
+                typeof(IConstructorResolutionBehavior).Name,
+                typeof(ActivationException).FullName);
+        }
+
+        internal static string LifestyleSelectionBehaviorReturnedNull(
+            ILifestyleSelectionBehavior selectionBehavior, Type serviceType, Type implementationType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The {0} that was registered through Container.Options.LifestyleSelectionBehavior " +
+                "returned a null reference after its SelectLifestyle(Type, Type) method was " +
+                "supplied with values '{1}' for serviceType and '{2}' for implementationType. " +
+                "{3}.SelectLifestyle implementations should never return null.",
+                selectionBehavior.GetType().ToFriendlyName(),
+                serviceType.ToFriendlyName(), 
+                implementationType.ToFriendlyName(),
+                typeof(ILifestyleSelectionBehavior).Name);
         }
 
         internal static string RegistrationReturnedNullFromBuildExpression(
