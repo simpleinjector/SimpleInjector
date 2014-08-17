@@ -70,6 +70,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttributeBasedLifestyleSelectionBehavior.cs" />
     <Compile Include="AttributedPropertyInjectionExtensions.cs" />
     <Compile Include="AutomaticFactoryExtensions.cs" />
     <Compile Include="AutomaticParameterizedFactoryExtensions.cs" />
