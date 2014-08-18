@@ -6,7 +6,8 @@
 
     public enum CreationPolicy { Transient, Scoped, Singleton }
 
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, 
+        Inherited = false, AllowMultiple = false)]
     public sealed class CreationPolicyAttribute : Attribute
     {
         public CreationPolicyAttribute(CreationPolicy policy)
