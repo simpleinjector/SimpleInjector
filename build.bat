@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=2.6.0
-set prereleasePostfix=-beta1
+set prereleasePostfix=
 set buildNumber=0 
 
 
@@ -219,6 +219,7 @@ echo CREATING NUGET PACKAGES
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net45\SimpleInjector.Diagnostics.dll
@@ -227,10 +228,10 @@ copy bin\NET\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector
 copy bin\NET\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.xml
-copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8\SimpleInjector.dll"
-copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8\SimpleInjector.xml"
-copy bin\PCL\SimpleInjector.Diagnostics.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8\SimpleInjector.Diagnostics.dll"
-copy bin\PCL\SimpleInjector.Diagnostics.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8\SimpleInjector.Diagnostics.xml"
+copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.dll"
+copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.xml"
+copy bin\PCL\SimpleInjector.Diagnostics.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Diagnostics.dll"
+copy bin\PCL\SimpleInjector.Diagnostics.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Diagnostics.xml"
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
@@ -240,8 +241,9 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\CommonServiceLocator.SimpleInjectorAdapter Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8\CommonServiceLocator.SimpleInjectorAdapter.dll"
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8\CommonServiceLocator.SimpleInjectorAdapter.xml"
+del Releases\temp\.gitignore /s /q
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\CommonServiceLocator.SimpleInjectorAdapter.dll"
+copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\CommonServiceLocator.SimpleInjectorAdapter.xml"
 %replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\1fea7be7f6324eb68593116ecd0864e4.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\CommonServiceLocator.SimpleInjectorAdapter.%named_version_Core%.zip"
@@ -251,6 +253,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\net40-client\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\net40-client\SimpleInjector.Packaging.xml
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
@@ -263,6 +266,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.LifetimeScoping Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
@@ -275,6 +279,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.ExecutionContextScoping Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
 copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
@@ -287,6 +292,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.dll
 copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %named_version_Integration_Web%
@@ -299,6 +305,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Mvc Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
 copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version} %named_version_Integration_Mvc%
@@ -312,6 +319,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Mvc.QuickStart Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %named_version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Mvc} %named_version_Integration_Mvc%
@@ -323,6 +331,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.dll
 copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
@@ -335,6 +344,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf.QuickStart Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {version} %named_version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {version_Integration_Wcf} %named_version_Integration_Wcf%
@@ -346,6 +356,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.WebApi Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
 copy bin\NET\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
@@ -359,6 +370,7 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.WebApi.WebHost.QuickStart Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
+del Releases\temp\.gitignore /s /q
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {version} %named_version_Integration_WebApi%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {version_Integration_WebApi} %named_version_Integration_WebApi%
