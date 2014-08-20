@@ -75,7 +75,10 @@ namespace SimpleInjector.Integration.Wcf
                 throw new InvalidOperationException("The operation failed. Please call the " +
                     typeof(SimpleInjectorServiceHostFactory).FullName + ".SetContainer(Container) method " +
                     "supplying the application's " + typeof(Container).FullName + " instance during " +
-                    "application startup (for instance inside the Application_Start event of the Global.asax).");
+                    "application startup (for instance inside the Application_Start event of the Global.asax). " +
+                    "In case you're running on non-HTTP protocols such as net.tcp and net.pipe that is " +
+                    "supported by the Windows Activation Service (WAS), you can use AppInitialize to call " +
+                    "this method. For more info on this, go here: https://simpleinjector.org/wcfwas.");
             }
 
             return new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
