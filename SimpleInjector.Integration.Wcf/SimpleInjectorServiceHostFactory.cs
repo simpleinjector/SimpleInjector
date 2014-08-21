@@ -77,8 +77,8 @@ namespace SimpleInjector.Integration.Wcf
                     "supplying the application's " + typeof(Container).FullName + " instance during " +
                     "application startup (for instance inside the Application_Start event of the Global.asax). " +
                     "In case you're running on non-HTTP protocols such as net.tcp and net.pipe that is " +
-                    "supported by the Windows Activation Service (WAS), you can use AppInitialize to call " +
-                    "this method. For more info on this, go here: https://simpleinjector.org/wcfwas.");
+                    "supported by the Windows Activation Service (WAS), please see the WCF integration " +
+                    "documentation: https://simpleinjector.org/wcf.");
             }
 
             return new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
