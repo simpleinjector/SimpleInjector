@@ -28,7 +28,7 @@ namespace SimpleInjector.Integration.WebApi
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single ASP.NET Web API Request.
     /// Unless explicitly stated otherwise, instances created by this lifestyle will be disposed at the end
-    /// of the Weg API request. Do note that this lifestyle requires the <see cref="SimpleInjectorWebApiDependencyResolver"/>
+    /// of the Web API request. Do note that this lifestyle requires the <see cref="SimpleInjectorWebApiDependencyResolver"/>
     /// to be registered in the Web API configuration.
     /// </summary>
     /// <example>
