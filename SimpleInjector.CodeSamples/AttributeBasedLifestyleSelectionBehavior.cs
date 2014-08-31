@@ -4,7 +4,12 @@
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    public enum CreationPolicy { Transient, Scoped, Singleton }
+    public enum CreationPolicy 
+    {
+        Transient, 
+        Scoped, 
+        Singleton 
+    }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, 
         Inherited = false, AllowMultiple = false)]
