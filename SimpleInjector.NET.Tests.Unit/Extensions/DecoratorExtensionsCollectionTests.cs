@@ -1922,7 +1922,7 @@
             var decorator = (ContextualHandlerDecorator<RealCommand>)
                 container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
-            DecoratorPredicateContext context = decorator.Context;
+            DecoratorContext context = decorator.Context;
 
             // Assert
             Assert.AreSame(typeof(RealCommandHandler), context.ImplementationType);
@@ -1946,7 +1946,7 @@
             var decorator = (ContextualHandlerDecorator<RealCommand>)
                 container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
-            DecoratorPredicateContext context = decorator.Context;
+            DecoratorContext context = decorator.Context;
 
             // Assert
             Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());

@@ -2310,7 +2310,7 @@
             var decorator = 
                 (ContextualHandlerDecorator<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>();
 
-            DecoratorPredicateContext context = decorator.Context;
+            DecoratorContext context = decorator.Context;
 
             // Assert
             Assert.AreSame(typeof(RealCommandHandler), context.ImplementationType);
@@ -2503,7 +2503,7 @@
 
     public class ContextualHandlerDecorator<T> : ICommandHandler<T>
     {
-        public ContextualHandlerDecorator(ICommandHandler<T> decorated, DecoratorPredicateContext context)
+        public ContextualHandlerDecorator(ICommandHandler<T> decorated, DecoratorContext context)
         {
             this.Decorated = decorated;
             this.Context = context;
@@ -2511,7 +2511,7 @@
 
         public ICommandHandler<T> Decorated { get; private set; }
 
-        public DecoratorPredicateContext Context { get; private set; }
+        public DecoratorContext Context { get; private set; }
 
         public void Handle(T command)
         {

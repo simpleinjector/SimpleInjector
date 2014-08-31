@@ -259,7 +259,7 @@ namespace SimpleInjector.Extensions.Decorators
                 new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
 
             IEnumerable<OverriddenParameter> predicateContextOverriddenParameters = 
-                this.CreateOverriddenPredicateContextParameters(decoratorConstructor, currentProducer);
+                this.CreateOverriddenDecoratorContextParameters(decoratorConstructor, currentProducer);
 
             var overriddenParameters = (new[] { decorateeOverriddenParameter })
                 .Concat(predicateContextOverriddenParameters);
@@ -267,13 +267,13 @@ namespace SimpleInjector.Extensions.Decorators
             return overriddenParameters.ToArray();
         }
 
-        private IEnumerable<OverriddenParameter> CreateOverriddenPredicateContextParameters(
+        private IEnumerable<OverriddenParameter> CreateOverriddenDecoratorContextParameters(
             ConstructorInfo decoratorConstructor, InstanceProducer currentProducer)
         {
             return
                 from parameter in decoratorConstructor.GetParameters()
-                where parameter.ParameterType == typeof(DecoratorPredicateContext)
-                let contextExpression = Expression.Constant(this.Context)
+                where parameter.ParameterType == typeof(DecoratorContext)
+                let contextExpression = Expression.Constant(new DecoratorContext(this.Context))
                 select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
