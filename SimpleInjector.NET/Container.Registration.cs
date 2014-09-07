@@ -1055,9 +1055,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <typeparamref name="TService"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
+        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -1075,8 +1078,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a collection of instances of <paramref name="serviceTypes"/> to be returned when
-        /// a collection of <typeparamref name="TService"/> objects is requested.
+        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -1094,9 +1101,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers an collection of <paramref name="serviceTypes"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
+        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -1129,9 +1139,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers an collection of <paramref name="registrations"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
+        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
@@ -1150,9 +1163,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers an collection of <paramref name="registrations"/>, which instances will be resolved when
-        /// enumerating the set returned when a collection of <paramref name="serviceType"/> objects is 
-        /// requested. On enumeration the container is called for each type in the list.
+        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances

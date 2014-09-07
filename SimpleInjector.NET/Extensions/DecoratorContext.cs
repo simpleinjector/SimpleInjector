@@ -31,7 +31,7 @@ namespace SimpleInjector.Extensions
 
     /// <summary>
     /// An instance of this type can be injected into constructors of decorator classes that are registered
-    /// using <see cref="DecoratorExtensions.RegisterDecorator">RegisterDecorator</see>. This type contains 
+    /// using <see cref="DecoratorExtensions">RegisterDecorator</see>. This type contains 
     /// contextual information about the applied decoration and it allows users to examine the given instance 
     /// to make runtime decisions.
     /// </summary>
