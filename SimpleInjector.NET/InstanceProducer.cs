@@ -84,10 +84,10 @@ namespace SimpleInjector
         private static readonly Action[] NoVerifiers = new Action[0];
 
         private readonly object locker = new object();
+        private readonly Lazy<Expression> expression;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
-        private Lazy<Expression> expression;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
         private ReadOnlyCollection<KnownRelationship> relationships;
@@ -109,9 +109,9 @@ namespace SimpleInjector
             this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
 
             // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
-            // of registration doesn't have to be registered, sine it will either always be registered
+            // of registration doesn't have to be registered, since it will either always be registered
             // in the registrations dictionary anyway, or it is used to build up an InstanceProducer (by
-            // the decorator sub system) that is only used for diagnosis. Allowing the latter producers to
+            // the decorator sub system) that is only used for diagnostics. Allowing the latter producers to
             // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
             // producers needlessly.
             if (!(registration is ExpressionRegistration))
@@ -136,9 +136,7 @@ namespace SimpleInjector
         /// <value>A <see cref="Type"/> instance.</value>
         public Type ServiceType { get; private set; }
 
-        /// <summary>
-        /// Gets the <see cref="Registration"/> instance for this instance.
-        /// </summary>
+        /// <summary>Gets the <see cref="Registration"/> instance for this instance.</summary>
         /// <value>The <see cref="Registration"/>.</value>
         public Registration Registration { get; private set; }
 
