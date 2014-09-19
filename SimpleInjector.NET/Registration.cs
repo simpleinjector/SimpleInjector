@@ -305,7 +305,8 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
-            Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
+            Expression expression =
+                WrapWithCyclicDependencyChecker<TService>(instanceCreator);
             
             expression = WrapWithNullChecker<TService>(expression);
 
@@ -316,6 +317,16 @@ namespace SimpleInjector
             expression = this.WrapWithInitializer<TService>(expression);
 
             return expression;
+        }
+
+        private static Expression WrapWithCyclicDependencyChecker<TService>(Func<TService> instanceCreator)
+        {
+            Func<Func<TService>, TService> cyclicDependencyCheckerDelegate = 
+                new DelegateCyclicDependencyValidator<TService>().PreventCyclicDependencies;
+
+            return Expression.Invoke(
+                Expression.Constant(cyclicDependencyCheckerDelegate),
+                Expression.Constant(instanceCreator));
         }
 
         /// <summary>
@@ -580,6 +591,36 @@ namespace SimpleInjector
         private void ResetCurrentProducer()
         {
             this.currentProducer.Value = null;
+        }
+
+        private sealed class DelegateCyclicDependencyValidator<TService>
+        {
+            private CyclicDependencyValidator validator = new CyclicDependencyValidator(typeof(TService));
+
+            public TService PreventCyclicDependencies(Func<TService> instanceCreator)
+            {
+                validator.CheckForRecursiveCalls();
+
+                TService instance;
+
+                try
+                {
+                    instance = instanceCreator();
+
+                    if (validator != null)
+                    {
+                        validator = null;
+                    }
+                }
+                catch
+                {
+                    validator.Reset();
+
+                    throw;
+                }
+
+                return instance;
+            }
         }
     }
 }
