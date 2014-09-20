@@ -26,6 +26,7 @@ Version vNext
 		-[Core] RegisterManyForOpenGeneric overloads now register all types by default instead of only
 		 public types. (work item 20964)
 		-[Core] Container.InjectProperties has been made obsolete. (work item 20945)
+		-[Core] Improved cyclic dependency detection. (work item 20969)
 		-[Mvc] SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider has been marked obsolete. 
 		 (work item 20946)
 
