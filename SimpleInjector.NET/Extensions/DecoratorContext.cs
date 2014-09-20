@@ -90,15 +90,9 @@ namespace SimpleInjector.Extensions
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
+        internal string DebuggerDisplay
         {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType = {0}, ImplementationType = {1}",
-                    this.ServiceType.ToFriendlyName(),
-                    this.ImplementationType.ToFriendlyName());
-            }
+            get { return this.context.DebuggerDisplay; }
         }
     }
 }

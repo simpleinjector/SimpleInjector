@@ -1925,8 +1925,13 @@
             DecoratorContext context = decorator.Context;
 
             // Assert
+            Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ServiceType);
             Assert.AreSame(typeof(RealCommandHandler), context.ImplementationType);
             Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());
+            Assert.AreEqual("new TransactionHandlerDecorator`1(new RealCommandHandler())",
+                context.Expression.ToString());
+            Assert.AreEqual("ServiceType = ICommandHandler<RealCommand>, ImplementationType = RealCommandHandler", 
+                context.DebuggerDisplay);
         }
                 
         [TestMethod]
@@ -1953,6 +1958,7 @@
 
             // NOTE: Since this is an container uncontrolled collection, the container does not know the
             // exact type of the command handler, only its interface type is available.
+            Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ServiceType);
             Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ImplementationType);
         }
 

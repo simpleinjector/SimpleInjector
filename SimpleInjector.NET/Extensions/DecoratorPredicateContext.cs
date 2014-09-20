@@ -88,7 +88,7 @@ namespace SimpleInjector.Extensions
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
+        internal string DebuggerDisplay
         {
             get
             {
