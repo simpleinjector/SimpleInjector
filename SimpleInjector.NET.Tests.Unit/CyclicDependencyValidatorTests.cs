@@ -220,7 +220,93 @@
         }
 
         [TestMethod]
-        public void GetInstance_RequestingTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
+        public void Verify_DelegateRegistrationDependingOnItself_Throws()
+        {
+            // Arrange
+            var container = new Container();
+
+            // One depends on ITwo
+            container.Register<One>();
+
+            int count = 0;
+
+            container.Register<ITwo>(() =>
+            {
+                if (count++ > 5)
+                {
+                    Assert.Fail("Stack overflow detected");
+                }
+
+                return container.GetInstance<ITwo>();
+            });
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>("depending on itself", action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_DelegateRegistrationDependingOnItself_Throws()
+        {
+            // Arrange
+            var container = new Container();
+
+            // One depends on ITwo
+            container.Register<One>();
+
+            int count = 0;
+
+            container.Register<ITwo>(() =>
+            {
+                if (count++ > 5)
+                {
+                    Assert.Fail("Stack overflow detected");
+                }
+
+                return container.GetInstance<ITwo>();
+            });
+
+            // Act
+            Action action = () => container.GetInstance<One>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("depending on itself", action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_DelegateRegistrationDependingIndirectlyOnItselfThroughRootType_Throws()
+        {
+            // Arrange
+            var container = new Container();
+
+            // One depends on ITwo
+            container.Register<One>();
+
+            int count = 0;
+
+            container.Register<ITwo>(() =>
+            {
+                if (count++ > 5)
+                {
+                    Assert.Fail("Stack overflow detected");
+                }
+
+                return new Two(container.GetInstance<One>());
+            });
+
+            container.GetRegistration(typeof(One)).BuildExpression();
+
+            // Act
+            Action action = () => container.GetInstance<One>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("depending on itself", action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RequestingRootTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -232,6 +318,30 @@
             {
                 // Act
                 container.GetInstance<IOne>();
+
+                // Assert
+                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
+            }
+            catch (ActivationException)
+            {
+                // This exception is expected.
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_RequestingOnRootTypeDependingIndirectlyOnItselfThroughDelegateRegistration_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ComponentDependingOn<IOne>>();
+            container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
+            container.Register<ITwo>(() => new Two(container.GetInstance<IOne>()));
+
+            try
+            {
+                // Act
+                container.GetInstance<ComponentDependingOn<IOne>>();
 
                 // Assert
                 Assert.Fail("An exception was expected, because A depends indirectly on itself.");
@@ -554,6 +664,16 @@
         {
             public Two(IOne one)
             {
+            }
+        }
+
+        private sealed class ComponentDependingOn<TDependency>
+        {
+            public readonly TDependency Dependency;
+
+            public ComponentDependingOn(TDependency dependency)
+            {
+                this.Dependency = dependency;
             }
         }
 

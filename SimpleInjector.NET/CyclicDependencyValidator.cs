@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013 - 2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -34,8 +34,8 @@ namespace SimpleInjector
     /// </summary>
     internal sealed class CyclicDependencyValidator
     {
-        private readonly Type typeToValidate;
-        private readonly List<Thread> threads = new List<Thread>();
+        private readonly Type typeToValidate;      
+        private List<Thread> threads;
 
         internal CyclicDependencyValidator(Type typeToValidate)
         {
@@ -48,6 +48,11 @@ namespace SimpleInjector
             // We can lock on this, because RecursiveDependencyValidator is an internal type.
             lock (this)
             {
+                if (this.threads == null)
+                {
+                    this.threads = new List<Thread>(1);
+                }
+
                 // We store the current thread to prevent the validator to incorrectly fail when two threads
                 // simultaneously trigger the validation.
                 if (this.threads.Contains(Thread.CurrentThread))
@@ -63,13 +68,22 @@ namespace SimpleInjector
             }
         }
 
-        // Removes the curent thread from the list of threads.
+        // Removes the current thread from the list of threads.
         internal void RollBack()
         {
-            // We can lock on this, because RecursiveDependencyValidator is an internal type.
             lock (this)
             {
                 this.threads.Remove(Thread.CurrentThread);
+
+                if (this.threads.Count == 0)
+                {
+                    // An InstanceProducer instance holds a reference to a CyclicDependencyValidator instance,
+                    // but will only remove a reference to it when GetInstance is called on that producer
+                    // (which only happens for root types). So since the CyclicDependencyValidator instances
+                    // will typically stay referenced, we remove the list to lower the amount of memory that
+                    // will be in use by Simple Injector.
+                    this.threads = null;
+                }
             }            
         }
     }

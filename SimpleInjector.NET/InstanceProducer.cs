@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013 - 2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -252,15 +252,21 @@ namespace SimpleInjector
             {
                 var expression = this.expression.Value;
 
-                this.RemoveValidator();
-
                 return expression;
             }
             catch (Exception ex)
             {
-                this.validator.Reset();
-
                 throw this.GetErrorForTryingToGetInstanceOfType(ex);
+            }
+            finally
+            {
+                // NOTE:  We don't remove the cyclic dependency validator while building the expression.
+                // Instead we reset it so it can be checked later on again. We do this because only if 
+                // GetInstance has been called we can know for sure that there's no cyclic dependency. There 
+                // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into 
+                // the container manually. This will not be detected during building the expression, because 
+                // the delegate won't (always) get executed at this point.
+                this.validator.Reset();
             }
         }
 
