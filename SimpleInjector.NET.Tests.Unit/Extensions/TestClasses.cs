@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
     public interface ILogger
@@ -157,6 +158,156 @@
     }
 
     public struct StructCommand
+    {
+    }
+    
+    public struct StructEvent : IAuditableEvent
+    {
+    }
+
+    public class DefaultConstructorEvent
+    {
+        public DefaultConstructorEvent()
+        {
+        }
+    }
+
+    public class NoDefaultConstructorEvent
+    {
+        public NoDefaultConstructorEvent(IValidate<int> dependency)
+        {
+        }
+    }
+
+    public class ClassEvent
+    {
+    }
+
+    public class AuditableEvent : IAuditableEvent
+    {
+    }
+
+    public class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent>
+        where TEvent : IAuditableEvent
+    {
+    }
+
+    public class NewConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : new()
+    {
+    }
+
+    public class StructConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : struct
+    {
+    }
+
+    public class ClassConstraintEventHandler<TClassEvent> : IEventHandler<TClassEvent>
+        where TClassEvent : class
+    {
+    }
+
+    public abstract class AbstractEventHandler<TEvent> : IEventHandler<TEvent>
+    {
+    }
+
+    public class EventHandlerWithLoggerDependency<TEvent> : IEventHandler<TEvent>
+    {
+        public EventHandlerWithLoggerDependency(ILogger logger)
+        {
+        }
+    }
+
+    public class MonoDictionary<T> : Dictionary<T, T>
+    {
+    }
+
+    public class SneakyMonoDictionary<T, TUnused> : Dictionary<T, T>
+    {
+    }
+
+    // Note: This class deliberately implements a second IProducer. This will verify whether the code can
+    // handle types with multiple versions of the same interface.
+    public class NullableProducer<T> : IProducer<T?>, IProducer<IValidate<T>>, IProducer<double>
+        where T : struct
+    {
+    }
+
+    public sealed class ServiceImpl<TA, TB> : IService<TA, TB>
+    {
+    }
+
+    public sealed class ServiceImplWithMultipleCtors<TA, TB> : IService<TA, TB>
+    {
+        public ServiceImplWithMultipleCtors()
+        {
+        }
+
+        public ServiceImplWithMultipleCtors(int x)
+        {
+        }
+    }
+
+    public sealed class ServiceImplWithDependency<TA, TB> : IService<TA, TB>
+    {
+        public ServiceImplWithDependency(IProducer<int> producer)
+        {
+        }
+    }
+
+    // The type constraint will prevent the type from being created when the arguments are ordered
+    // incorrectly.
+    public sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
+        where B : struct
+        where A : class
+    {
+    }
+
+    public class Bar
+    {
+    }
+
+    public class Baz : IBar<Bar>
+    {
+    }
+
+    public class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
+    {
+    }
+
+    public class ServiceWhereTInIsTOut<TA, TB> : IService<TA, TB> where TA : TB
+    {
+    }
+
+    public class NonGenericEventHandler : IEventHandler<ClassEvent>
+    {
+    }
+
+    public class ServiceWithDependency<TDependency>
+    {
+        public ServiceWithDependency(TDependency dependency)
+        {
+            this.Dependency = dependency;
+        }
+
+        public TDependency Dependency { get; private set; }
+    }
+
+    public class Implementation<X, TUnused1, TUnused2, Y> : IInterface<X, X, Y>
+    {
+    }
+
+    public interface IOpenGenericWithPredicate<T>
+    {
+    }
+
+    public class OpenGenericWithPredicate1<T> : IOpenGenericWithPredicate<T>
+    {
+    }
+
+    public class OpenGenericWithPredicate2<T> : IOpenGenericWithPredicate<T>
+    {
+    }
+
+    internal class InternalEventHandler<TEvent> : IEventHandler<TEvent>
     {
     }
 }

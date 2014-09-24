@@ -154,8 +154,11 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\DecoratorExtensionsTests.cs">
       <Link>Extensions\DecoratorExtensionsTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\OpenGenericRegistrationExtensionsTests.cs">
-      <Link>Extensions\OpenGenericRegistrationExtensionsTests.cs</Link>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterAllOpenGenericTests.cs">
+      <Link>Extensions\RegisterAllOpenGenericTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterOpenGenericTests.cs">
+      <Link>Extensions\RegisterOpenGenericTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\TestClasses.cs">
       <Link>Extensions\TestClasses.cs</Link>

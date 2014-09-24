@@ -105,7 +105,8 @@
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.full.cs" />
     <Compile Include="Extensions\DecoratorExtensionsCollectionTests.cs" />
     <Compile Include="Extensions\DecoratorExtensionsTests.cs" />
-    <Compile Include="Extensions\OpenGenericRegistrationExtensionsTests.cs" />
+    <Compile Include="Extensions\RegisterOpenGenericTests.cs" />
+    <Compile Include="Extensions\RegisterAllOpenGenericTests.cs" />
     <Compile Include="Extensions\TestClasses.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
     <Compile Include="GetInstanceTests.cs" />
