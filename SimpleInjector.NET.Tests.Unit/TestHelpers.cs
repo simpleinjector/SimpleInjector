@@ -1,9 +1,9 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
 
     internal static class TestHelpers
     {

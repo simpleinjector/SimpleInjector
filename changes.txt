@@ -27,6 +27,8 @@ Version vNext
 		 public types. (work item 20964)
 		-[Core] Container.InjectProperties has been made obsolete. (work item 20945)
 		-[Core] Improved cyclic dependency detection. (work item 20969)
+		-[Core] More expressive exception is thrown in case an open generic type is being resolved
+		 (work item 20970).
 		-[Mvc] SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider has been marked obsolete. 
 		 (work item 20946)
 

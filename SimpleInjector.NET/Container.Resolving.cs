@@ -382,6 +382,11 @@ namespace SimpleInjector
                 this.ThrowNotConstructableException(serviceType);
             }
 
+            if (serviceType.ContainsGenericParameters)
+            {
+                throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
+            }
+
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
         }
 

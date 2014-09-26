@@ -66,6 +66,16 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found.", serviceType.ToFriendlyName());
         }
+        
+        internal static string OpenGenericTypesCanNotBeResolved(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The request for type {0} is invalid because it is an open generic type: it is only " +
+                "possible to instantiate instances of closed generic types. A generic type is closed if " +
+                "all of its type parameters have been substituted with types that are recognized by the " +
+                "compiler.",
+                serviceType.ToFriendlyName());
+        }
 
         internal static string ConfigurationInvalidCreatingInstanceFailed(Type serviceType,
             Exception exception)

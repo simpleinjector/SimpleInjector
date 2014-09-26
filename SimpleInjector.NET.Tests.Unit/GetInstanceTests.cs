@@ -112,20 +112,24 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithNastyOpenGenericType_ThrowsExpectedException()
+        public void GetInstance_WithOpenGenericType_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Lazy<Func<TResult>>
-            var nastyOpenGenericType = typeof(Lazy<>).MakeGenericType(typeof(Func<>));
+            var nastyOpenGenericType = typeof(Lazy<>);
 
             // Act
             Action action = () => container.GetInstance(nastyOpenGenericType);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "No registration for type Lazy<Func<TResult>> could be found.", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The request for type Lazy<T> is invalid because it is an open generic type: it is only 
+                possible to instantiate instances of closed generic types. A generic type is closed if all of 
+                its type parameters have been substituted with types that are recognized by the compiler."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -139,7 +143,22 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "No registration for type IEnumerable<IEnumerable<T>> could be found.", action);
+                "The request for type IEnumerable<IEnumerable<T>> is invalid", action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_RequestingAnPartiallyOpenGenericType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.GetInstance(typeof(ICollection<>).MakeGenericType(typeof(List<>)));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The request for type ICollection<List<T>> is invalid",
+                action);
         }
 
         [TestMethod]
