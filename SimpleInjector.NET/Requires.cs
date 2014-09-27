@@ -166,21 +166,6 @@ namespace SimpleInjector
             ServiceIsAssignableFromImplementations(serviceType, typesToRegister, paramName, typeCanBeServiceType);
         }
 
-        internal static void TypesAreAllGenericTypeDefinitions(IEnumerable<Type> openGenericImplementations, 
-            string paramName)
-        {
-            var invalidType = (
-                from type in openGenericImplementations
-                where !type.IsGenericTypeDefinition
-                select type)
-                .FirstOrDefault();
-            
-            if (invalidType != null)
-            {
-                Requires.TypeIsOpenGeneric(invalidType, paramName);
-            }
-        }
-
         internal static void ImplementationHasSelectableConstructor(Container container, Type serviceType,
             Type implementationType, string paramName)
         {
@@ -195,17 +180,14 @@ namespace SimpleInjector
         internal static void ImplementationsAllHaveSelectableConstructor(Container container,
             Type openGenericServiceType, IEnumerable<Type> openGenericImplementations, string paramName)
         {
-            string message = null;
-
-            var invalidType = (
-                from type in openGenericImplementations
-                where !container.IsConstructableType(openGenericServiceType, type, out message)
-                select type)
-                .SingleOrDefault();
-
-            if (invalidType != null)
+            foreach (Type type in openGenericImplementations)
             {
-                throw new ArgumentException(message, paramName);
+                string message = null;
+
+                if (!container.IsConstructableType(openGenericServiceType, type, out message))
+                {
+                    throw new ArgumentException(message, paramName);
+                }
             }
         }
 
