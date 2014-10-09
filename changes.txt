@@ -1,9 +1,10 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version 2.6.0 (v2.6.0 RTM)
 
 	New features:
+		-[Core] RegisterAll now allows registering open-generic types as well. (work item 20971)
 		-[Core] New Container.Options.LifestyleSelectionBehavior extendibility point added to allow overriding
 		 the container's behavior to register type's with the Transient lifestyle. This is especially useful
 		 for batch-registration scenarios. (work item 20965)

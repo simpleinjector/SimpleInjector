@@ -1216,7 +1216,7 @@
             catch (InvalidOperationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    The constructor of the type LoggingHandlerDecorator1<RealCommand> 
+                    The constructor of type LoggingHandlerDecorator1<RealCommand> 
                     contains the parameter of type ILogger with name 'logger' that is 
                     not registered.".TrimInside(), ex);
             }

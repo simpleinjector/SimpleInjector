@@ -126,7 +126,7 @@ namespace SimpleInjector
         internal static string ParameterTypeMustBeRegistered(Type implementationType, ParameterInfo parameter)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The constructor of the type {3} contains the parameter of type {0} with name '{1}' that is " +
+                "The constructor of type {3} contains the parameter of type {0} with name '{1}' that is " +
                 "not registered. Please ensure {0} is registered in the container, or change the " +
                 "constructor of {2}.",
                 parameter.ParameterType.ToFriendlyName(), parameter.Name, implementationType.ToFriendlyName(),

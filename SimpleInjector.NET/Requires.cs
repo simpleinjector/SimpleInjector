@@ -207,6 +207,16 @@ namespace SimpleInjector
             }
         }
 
+        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(Type serviceType,
+            Type[] implementationTypes, string parameterName)
+        {
+            foreach (Type implementationType in implementationTypes)
+            {
+                OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType,
+                    parameterName);
+            }
+        }
+
         internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
             Type implementationType, string parameterName)
         {

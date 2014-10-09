@@ -7,6 +7,7 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit.Extensions;
 
     /// <summary>Tests for RegisterAll.</summary>
     [TestClass]
@@ -762,6 +763,387 @@
 
             // Assert
             Assert.IsInstanceOfType(instances.Single(), typeof(CovariantImplementation<string>));
+        }
+
+        [TestMethod]
+        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder1()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // This is a mix of open, closed and non-generic types.
+                typeof(NewConstraintEventHandler<>), // IEventHandler<T> where T : new()
+                typeof(StructConstraintEventHandler<>), // IEventHandler<T> where T : struct
+                typeof(StructEventHandler), // IEventHandler<StructEvent>
+                typeof(AuditableEventEventHandler), // IEventHandler<AuditableEvent>
+                typeof(ClassConstraintEventHandler<AuditableEvent>), // IEventHandler<AuditableEvent>
+                typeof(ClassConstraintEventHandler<ClassEvent>), // IEventHandler<ClassEvent>
+                typeof(AuditableEventEventHandler<>), // IEventHandler<T> where T : IAuditableEvent
+            };
+
+            Type resolvedHandlerType = typeof(IEventHandler<StructEvent>);
+
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(StructConstraintEventHandler<StructEvent>),
+                typeof(StructEventHandler),
+                typeof(AuditableEventEventHandler<StructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(resolvedHandlerType)
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder2()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // This is a mix of open, closed and non-generic types.
+                typeof(AuditableEventEventHandler<>),
+                typeof(NewConstraintEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+                typeof(StructEventHandler),
+                typeof(AuditableEventEventHandler),
+                typeof(ClassConstraintEventHandler<AuditableEvent>),
+                typeof(ClassConstraintEventHandler<ClassEvent>),
+            };
+
+            Type resolvedHandlerType = typeof(IEventHandler<AuditableEvent>);
+
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(AuditableEventEventHandler<AuditableEvent>),
+                typeof(NewConstraintEventHandler<AuditableEvent>),
+                typeof(AuditableEventEventHandler),
+                typeof(ClassConstraintEventHandler<AuditableEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(resolvedHandlerType)
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder3()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // This is a mix of open, closed and non-generic types.
+                typeof(AuditableEventEventHandler<>),
+                typeof(NewConstraintEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+                typeof(StructEventHandler),
+                typeof(AuditableEventEventHandler),
+                typeof(ClassConstraintEventHandler<AuditableEvent>),
+                typeof(ClassConstraintEventHandler<ClassEvent>),
+            };
+
+            Type resolvedHandlerType = typeof(IEventHandler<NoDefaultConstructorEvent>);
+
+            Type[] expectedHandlerTypes = new Type[]
+            {
+                // Empty
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(resolvedHandlerType)
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingAnTypeThatHasNoConcreteImplementations_ResolvesApplicableOpenGenericTypes()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // This is a mix of open, closed and non-generic types.
+                typeof(AuditableEventEventHandler<>),
+                typeof(NewConstraintEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+                typeof(StructEventHandler),
+                typeof(AuditableEventEventHandler),
+                typeof(ClassConstraintEventHandler<AuditableEvent>),
+                typeof(ClassConstraintEventHandler<ClassEvent>),
+            };
+
+            Type resolvedHandlerType = typeof(IEventHandler<AuditableStructEvent>);
+
+            Type[] expectedHandlerTypes = new Type[]
+            {
+                typeof(AuditableEventEventHandler<AuditableStructEvent>),
+                typeof(NewConstraintEventHandler<AuditableStructEvent>),
+                typeof(StructConstraintEventHandler<AuditableStructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(resolvedHandlerType)
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+        
+        [TestMethod]
+        public void RegisterAll_SuppliedWithATypeThatContainsUnresolvableTypeArguments_ThrowsDescriptiveException()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                typeof(AuditableEventEventHandler<>),
+                typeof(NewConstraintEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+
+                // This one is the ugly bugger!
+                typeof(AuditableEventEventHandlerWithUnknown<>),
+            };
+
+            Type resolvedHandlerType = typeof(IEventHandler<AuditableEvent>);
+
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type AuditableEventEventHandlerWithUnknown<TUnknown> contains unresolvable " +
+                "type arguments. The type would never be resolved and is therefore not suited to be used.",
+                action);
+        }
+
+        // This is a regression test. This bug existed since the introduction of the RegisterAllOpenGeneric.
+        [TestMethod]
+        public void GetAllInstances_MultipleTypesWithConstructorContainingPrimivive_ThrowsExpectedException()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // Multiple types that can't be built caused by them having multiple constructors.
+                typeof(EventHandlerWithConstructorContainingPrimitive<StructEvent>),
+                typeof(EventHandlerWithConstructorContainingPrimitive<StructEvent>),
+            };
+
+            var container = new Container();
+
+            // RegisterAll will not throw an exception, because registration is forwarded back into the
+            // container, and it could be possible that someone does a registration like:
+            // container.RegisterOpeNGeneric(typeof(EventHandlerWithConstructorContainingPrimitive<>), typeof(X))
+            // where X is a type with one constructor.
+            container.RegisterAll(typeof(IEventHandler<>), registeredTypes);
+
+            // Act
+            Action action = () => container.GetAllInstances(typeof(IEventHandler<StructEvent>)).ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The constructor of type EventHandlerWithConstructorContainingPrimitive<StructEvent>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithNonGenericType_DelegatesBackIntoTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register<StructEventHandler>(Lifestyle.Singleton);
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<StructEvent>>();
+
+            Assert.AreSame(handlers.Single(), handlers.Single(), "The container didn't delegate back.");
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithClosedGenericType_DelegatesBackIntoTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register<ClassConstraintEventHandler<AuditableEvent>>(Lifestyle.Singleton);
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(ClassConstraintEventHandler<AuditableEvent>)
+            });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>();
+
+            Assert.AreSame(handlers.Single(), handlers.Single(), "The container didn't delegate back.");
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithOpenGenericType_DelegatesBackIntoTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGeneric(typeof(NewConstraintEventHandler<>),
+                typeof(NewConstraintEventHandler<>), Lifestyle.Singleton);
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(NewConstraintEventHandler<>)
+            });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<DefaultConstructorEvent>>();
+
+            Assert.AreSame(handlers.Single(), handlers.Single(), "The container didn't delegate back.");
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithClosedGenericType_DelegatesBackIntoTheContainerToOpenGenericRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.RegisterOpenGeneric(
+                typeof(NewConstraintEventHandler<>),
+                typeof(NewConstraintEventHandler<>), 
+                Lifestyle.Singleton);
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(NewConstraintEventHandler<DefaultConstructorEvent>)
+            });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<DefaultConstructorEvent>>();
+
+            Assert.AreSame(handlers.Single(), handlers.Single(), "The container didn't delegate back.");
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithOpenGenericType_DelegatesBackIntoTheContainerToCloseRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register<ClassConstraintEventHandler<AuditableEvent>>(Lifestyle.Singleton);
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(ClassConstraintEventHandler<>)
+            });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>();
+
+            Assert.AreSame(handlers.Single(), handlers.Single(), "The container didn't delegate back.");
+        }
+
+        [TestMethod]
+        public void RegisterAll_WithAbstractType_DelegatesBackIntoTheContainerToCloseRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            container.Register<IEventHandler<AuditableEvent>, ClassConstraintEventHandler<AuditableEvent>>();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(IEventHandler<>)
+            });
+
+            // Assert
+            var handler = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();
+
+            Assert.IsInstanceOfType(handler, typeof(ClassConstraintEventHandler<AuditableEvent>));
+        }
+
+        [TestMethod]
+        public void Verify_ClosedTypeWithUnregisteredDependency_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                // This closed generic type has an ILogger constructor dependency, but ILogger is not 
+                // registered, and Verify() should catch this.
+                typeof(EventHandlerWithDependency<AuditableEvent, ILogger>)
+            });
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Please ensure ILogger is registered in the container",
+                action);
+        }
+
+        [TestMethod]
+        public void Verify_OpenTypeWithUnregisteredDependencyThatIsPartOfCollectionWithNonGenericType_ThrowsExpectedException()
+        {
+            // Arrange
+            Type unregisteredDependencyType = typeof(ILogger);
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                // This open generic type has an ILogger constructor dependency, but ILogger is not registered,
+                // and since it will be part of collection that contains a non-generic type (the collection
+                // IEnumerable<IEventHandler<StructEvent>>) Verify() should be able to catch this.
+                typeof(EventHandlerWithDependency<,>)
+                    .MakePartialOpenGenericType(secondArgument: typeof(ILogger)),
+                typeof(StructEventHandler),
+            });
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Please ensure ILogger is registered in the container",
+                action);
         }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)

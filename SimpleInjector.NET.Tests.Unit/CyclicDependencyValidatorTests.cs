@@ -543,12 +543,17 @@
             container.GetAllInstances<INode>().ToArray();
         }
 
+        // NOTE: In previous versions the .Verify() in this test would not throw an exception, but a bug fix
+        // caused this behavior to change and now an exception is thrown.
         [TestMethod]
-        public void Verify_DelayedCyclicReferenceWithDecorator_ShouldSucceed()
+        public void Verify_DelayedCyclicReferenceWithDecorator_StillThrowsException()
         {
             // Arrange
             var container = new Container();
 
+            container.Register<NodeOne>();
+
+            // NodeOne depends on INodeFactory
             container.RegisterAll<INode>(typeof(NodeOne));
 
             // With the previous releases of Simple Injector the use of a decorator would cause collections to
@@ -562,10 +567,12 @@
             container.Register<INodeFactory, NodeFactory>();
 
             // Act
-            container.Verify();
+            Action action = () => container.Verify();
 
-            // Extra check in case Verify doesn't do its job.
-            container.GetAllInstances<INode>().ToArray();
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "NodeOne is directly or indirectly depending on itself.",
+                action);
         }
 
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)

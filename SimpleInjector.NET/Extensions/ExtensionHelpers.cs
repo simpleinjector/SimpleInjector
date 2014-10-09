@@ -174,7 +174,19 @@ namespace SimpleInjector.Extensions
             var thisType = new[] { type };
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
-
+        
+        internal static Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType,
+            IEnumerable<Type> openGenericImplementations)
+        {
+            return (
+                from openGenericImplementation in openGenericImplementations
+                let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
+                let result = builder.BuildClosedGenericImplementation()
+                where result.ClosedServiceTypeSatisfiesAllTypeConstraints
+                select result.ClosedGenericImplementation)
+                .ToArray();
+        }
+        
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type baseType = type.BaseType ?? (type != typeof(object) ? typeof(object) : null);

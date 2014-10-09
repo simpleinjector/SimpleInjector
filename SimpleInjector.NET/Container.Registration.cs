@@ -1122,21 +1122,29 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(serviceTypes, "serviceTypes");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
             // Make a copy for correctness and performance.
             Type[] types = serviceTypes.ToArray();
 
             Requires.DoesNotContainNullValues(types, "serviceTypes");
-            Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
+
             Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
                 typeCanBeServiceType: true);
 
-            IContainerControlledCollection collection =
-                DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, types);
+            if (serviceType.ContainsGenericParameters)
+            {
+                this.RegisterAllGeneric(serviceType, types);
+            }
+            else
+            {
+                Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
 
-            this.RegisterContainerControlledCollection(serviceType, collection);
-        }
+                IContainerControlledCollection collection =
+                    DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, types);
+
+                this.RegisterContainerControlledCollection(serviceType, collection);
+            }
+        }   
 
         /// <summary>
         /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
@@ -1703,6 +1711,51 @@ namespace SimpleInjector
             }
         }
         
+        private void RegisterAllGeneric(Type openGenericServiceType, Type[] genericImplementations)
+        {
+            // NOTE: In fact the supplied types are don't all have to be open, they can be closed and 
+            // non-generic as well, and they don't have to be implementations, they can be abstractions as 
+            // well.
+            var openGenericImplementations = genericImplementations.Where(t => t.ContainsGenericParameters)
+                .ToArray();
+
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(openGenericServiceType,
+                openGenericImplementations, "serviceTypes");
+
+            var closedServiceTypes = GetClosedServicesTypes(openGenericServiceType, genericImplementations);
+
+            foreach (Type closedServiceType in closedServiceTypes)
+            {
+                Type[] closedImplementations = ExtensionHelpers.GetClosedGenericImplementationsFor(
+                    closedServiceType, genericImplementations);
+
+                // Make an explicit registration for this closed service type.
+                this.RegisterAll(closedServiceType, closedImplementations);
+            }
+
+            // Register the collection using unregistered type resolution.
+            var resolver = new UnregisteredAllResolver
+            {
+                OpenGenericServiceType = openGenericServiceType,
+                OpenGenericImplementations = openGenericImplementations,
+                Container = this,
+            };
+
+            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+        }
+
+        private static IEnumerable<Type> GetClosedServicesTypes(Type openGenericServiceType,
+            IEnumerable<Type> openGenericImplementations)
+        {
+            var closedServiceTypes =
+                from implementation in openGenericImplementations
+                where !implementation.ContainsGenericParameters
+                from service in implementation.GetBaseTypesAndInterfacesFor(openGenericServiceType)
+                select service;
+
+            return closedServiceTypes.Distinct();
+        }
+
         private sealed class ContainerVerificationScope : Scope
         {
             public override void WhenScopeEnds(Action action)

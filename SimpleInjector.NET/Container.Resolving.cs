@@ -203,22 +203,7 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
-
-            var producer = this.GetRegistrationEvenIfInvalid(serviceType);
-
-            bool producerIsValid = producer != null && producer.IsValid;
-
-            if (!producerIsValid && throwOnFailure)
-            {
-                this.ThrowInvalidRegistrationException(serviceType, producer);
-            }
-
-            // Prevent returning invalid producers
-            return producerIsValid ? producer : null;
+            return this.GetRegistration(serviceType, throwOnFailure, autoCreateConcreteTypes: true);
         }
 
         /// <summary>
@@ -253,6 +238,27 @@ namespace SimpleInjector
             propertyInjector.Inject(instance);
         }
 
+        internal InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure,
+            bool autoCreateConcreteTypes)
+        {
+            if (!this.locked)
+            {
+                this.LockContainer();
+            }
+
+            var producer = this.GetRegistrationEvenIfInvalid(serviceType, autoCreateConcreteTypes);
+
+            bool producerIsValid = producer != null && producer.IsValid;
+
+            if (!producerIsValid && throwOnFailure)
+            {
+                this.ThrowInvalidRegistrationException(serviceType, producer);
+            }
+
+            // Prevent returning invalid producers
+            return producerIsValid ? producer : null;
+        }
+
         internal Action<TImplementation> GetInitializer<TImplementation>(InitializationContext context)
         {
             return this.GetInitializer<TImplementation>(typeof(TImplementation), context);
@@ -263,10 +269,12 @@ namespace SimpleInjector
             return this.GetInitializer<object>(implementationType, context);
         }
 
-        internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType)
+        internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType, 
+            bool autoCreateConcreteTypes = true)
         {
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
-            Func<InstanceProducer> buildProducer = () => this.BuildInstanceProducerForType(serviceType);
+            Func<InstanceProducer> buildProducer =
+                () => this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
 
             return this.GetInstanceProducerForType(serviceType, buildProducer);
         }
@@ -410,10 +418,16 @@ namespace SimpleInjector
             return this.BuildInstanceProducerForType(typeof(TService), buildInstanceProducerForConcreteType);
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType)
+        private InstanceProducer BuildInstanceProducerForType(Type serviceType, 
+            bool autoCreateConcreteTypes = true)
         {
-            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType =
-                () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType);
+            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType = () => null;
+
+            if (autoCreateConcreteTypes)
+            {
+                tryBuildInstanceProducerForConcreteType =
+                    () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType);
+            }
 
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcreteType);
         }

@@ -177,7 +177,7 @@ namespace SimpleInjector.Advanced
             try
             {
                 // We only check if the instance producer can be created. We don't verify building of the
-                // expression. That will be done up the callstack.
+                // expression. That will be done up the call stack.
                 return lazy.Value;
             }
             catch (Exception ex)
@@ -207,39 +207,67 @@ namespace SimpleInjector.Advanced
             // container.RegisterAll<ILogger>(typeof(ILogger));
             return new Lazy<InstanceProducer>(() =>
             {
-                // If the elementType is explicitly registered (using Register) we select this registration
-                // (but we skip any implicit registrations, sine there could be more than one and it would
-                // be unclear which one to pick).
-                var instanceProducer = 
-                    this.container.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true, 
-                        includeExternalProducers: false)
-                        .FirstOrDefault(p => p.ServiceType == implementationType);
+                // If the implementationType is explicitly registered (using a Register call) we select this 
+                // producer (but we skip any implicit registrations or anything that is assignable, since 
+                // there could be more than one and it would be unclear which one to pick).
+                var instanceProducer = this.GetExplicitRegisteredInstanceProducer(implementationType);
 
-                // If there is such a producer registered we return a new one with the collection's type.
-                // This producer will be automatically registered as external producer.
-                if (instanceProducer != null)
+                // If that doesn't result in a producer, we request a registration using unregistered type
+                // resolution, were we prevent concrete types from being created by the container, since
+                // the creation of concrete type would 'pollute' the list of registrations, and might result
+                // in two registrations (since below we need to create a new instance producer out of it),
+                // and that might cause duplicate diagnostic warnings.
+                if (instanceProducer == null)
                 {
-                    if (instanceProducer.ServiceType == typeof(TService))
-                    {
-                        return instanceProducer;
-                    }
-
-                    return new InstanceProducer(typeof(TService),
-                        new ExpressionRegistration(instanceProducer.BuildExpression(), container));
+                    instanceProducer = 
+                        this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
                 }
 
-                if (!Helpers.IsConcreteType(implementationType))
+                // If that still hasn't resulted in a producer, we create a new producer and return (or throw
+                // an exception in case the implementation type is not a concrete type).
+                if (instanceProducer == null)
                 {
-                    // This method will throw an (expressive) exception since implementationType is not concrete.
-                    this.container.GetRegistration(implementationType, throwOnFailure: true);
+                    return this.CreateNewExternalProducer(implementationType);
                 }
-                
-                // In case there is no registration, we create a new one.
-                // This producer will be automatically registered as external producer.
-                Lifestyle lifestyle = this.container.SelectionBasedLifestyle;
 
-                return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
+                // If there is such a producer registered we return a new one with the service type.
+                // This producer will be automatically registered as external producer.
+                if (instanceProducer.ServiceType == typeof(TService))
+                {
+                    return instanceProducer;
+                }
+
+                return new InstanceProducer(typeof(TService),
+                    new ExpressionRegistration(instanceProducer.BuildExpression(), this.container));
             });
+        }
+
+        private InstanceProducer GetExplicitRegisteredInstanceProducer(Type implementationType)
+        {
+            return this.container.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true, 
+                includeExternalProducers: false)
+                .FirstOrDefault(p => p.ServiceType == implementationType);
+        }
+
+        private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
+        {
+            return this.container.GetRegistration(implementationType,
+                throwOnFailure: false,
+                autoCreateConcreteTypes: false);
+        }
+
+        private InstanceProducer CreateNewExternalProducer(Type implementationType)
+        {
+            if (!Helpers.IsConcreteType(implementationType))
+            {
+                // This method will throw an (expressive) exception since implementationType is not concrete.
+                this.container.GetRegistration(implementationType, throwOnFailure: true);
+            }
+
+            Lifestyle lifestyle = this.container.SelectionBasedLifestyle;
+
+            // This producer will be automatically registered as external producer.
+            return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
         }
 
         private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException()

@@ -281,10 +281,12 @@
         public void Verify_OnCollection_IteratesTheCollectionOnce()
         {
             // Arrange
-            int expectedNumberOfCreatedPlugins = 1;
+            const int ExpectedNumberOfCreatedPlugins = 1;
             int actualNumberOfCreatedPlugins = 0;
 
             var container = ContainerFactory.New();
+
+            container.Register<PluginImpl>();
 
             container.RegisterAll<IPlugin>(typeof(PluginImpl));
 
@@ -294,7 +296,7 @@
             container.Verify();
 
             // Assert
-            Assert.AreEqual(expectedNumberOfCreatedPlugins, actualNumberOfCreatedPlugins);
+            Assert.AreEqual(ExpectedNumberOfCreatedPlugins, actualNumberOfCreatedPlugins);
         }
 
         [TestMethod]

@@ -27,6 +27,7 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
@@ -353,7 +354,6 @@ namespace SimpleInjector.Extensions
             Requires.DoesNotContainNullValues(openGenericImplementations, "openGenericImplementations");
             Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, 
                 openGenericImplementations, "openGenericImplementations", typeCanBeServiceType: true);
-            Requires.TypesAreAllGenericTypeDefinitions(openGenericImplementations, "openGenericImplementations");
 
             Requires.ImplementationsAllHaveSelectableConstructor(container, openGenericServiceType,
                 openGenericImplementations, "openGenericImplementations");
@@ -368,7 +368,7 @@ namespace SimpleInjector.Extensions
 
             container.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
         }
-
+        
         private static void ValidateRegisterOpenGenericRequirements(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle,
             Predicate<OpenGenericPredicateContext> predicate)
@@ -525,13 +525,8 @@ namespace SimpleInjector.Extensions
 
             private Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
             {
-                return (
-                    from openGenericImplementation in this.OpenGenericImplementations
-                    let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
-                    let result = builder.BuildClosedGenericImplementation()
-                    where result.ClosedServiceTypeSatisfiesAllTypeConstraints
-                    select result.ClosedGenericImplementation)
-                    .ToArray();
+                return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
+                    this.OpenGenericImplementations);
             }
 
             private Registration GetContainerControlledRegistrationFromCache(
@@ -558,15 +553,24 @@ namespace SimpleInjector.Extensions
             {
                 var registrations = (
                     from closedGenericImplementation in closedGenericImplementations
-                    select this.Lifestyle.CreateRegistration(closedServiceType,
-                        closedGenericImplementation, this.Container))
+                    select this.CreateRegistrationForClosedGenericImplementation(
+                        closedServiceType,
+                        closedGenericImplementation))
                     .ToArray();
 
-                var collection = DecoratorHelpers.CreateContainerControlledCollection(
-                    closedServiceType, this.Container, registrations);
+                IContainerControlledCollection collection = 
+                    DecoratorHelpers.CreateContainerControlledCollection(closedServiceType, this.Container, 
+                        registrations);
 
                 return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
                     collection, this.Container);
+            }
+
+            private Registration CreateRegistrationForClosedGenericImplementation(Type closedServiceType,
+                Type closedGenericImplementation)
+            {
+                return this.Lifestyle.CreateRegistration(closedServiceType, closedGenericImplementation, 
+                    this.Container);
             }
         }
     }

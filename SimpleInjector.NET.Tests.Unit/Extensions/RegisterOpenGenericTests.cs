@@ -259,7 +259,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<AuditableEvent>));
@@ -267,7 +267,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(WhereConstraintEventHandler<AuditableEvent>),
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(AuditableEventEventHandler<AuditableEvent>),
                 "if we resolve IEventHandler<AuditableEvent> then WhereConstraintEventHandler<AuditableEvent> should be activated");
         }
 
@@ -277,7 +277,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<DefaultConstructorEvent>));
@@ -293,7 +293,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(WhereConstraintEventHandler<>));
+            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
@@ -303,7 +303,7 @@
                 "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
                 "should be activated");
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(WhereConstraintEventHandler<StructEvent>),
+            Assert.IsInstanceOfType(producer.GetInstance(), typeof(AuditableEventEventHandler<StructEvent>),
                 "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
                 "should be activated");
         }
@@ -722,7 +722,7 @@
                     ex);
 
                 AssertThat.ExceptionMessageContains(@"                                                                     
-                    The constructor of the type DefaultStuffDoer<Boolean> 
+                    The constructor of type DefaultStuffDoer<Boolean> 
                     contains the parameter of type IService<Boolean, Int32> with name 'service' that 
                     is not registered.".TrimInside(),
                     ex);
@@ -755,7 +755,7 @@
                     ex.Message);
 
                 AssertThat.StringContains(@"                                                                     
-                    The constructor of the type DefaultStuffDoer<Boolean> contains the parameter 
+                    The constructor of type DefaultStuffDoer<Boolean> contains the parameter 
                     of type IService<Boolean, Int32>  with name 'service' that is not registered."
                     .TrimInside(),
                     ex.Message);

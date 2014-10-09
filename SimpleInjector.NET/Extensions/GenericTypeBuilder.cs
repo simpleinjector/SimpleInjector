@@ -84,18 +84,24 @@ namespace SimpleInjector.Extensions
 
         internal BuildResult BuildClosedGenericImplementation()
         {
-            var serviceType = this.FindMatchingOpenGenericServiceType();
-
-            if (serviceType != null && this.SafisfiesPartialTypeArguments(serviceType))
+            // Performance optimization: In case the user registers a very large set with mainly non-generic
+            // types, we see a considerable performance improvement by adding this simple check.
+            if (this.openGenericImplementation.IsGenericType ||
+                this.closedGenericBaseType.IsAssignableFrom(this.openGenericImplementation))
             {
-                Type closedGenericImplementation =
-                    this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
+                var serviceType = this.FindMatchingOpenGenericServiceType();
 
-                // closedGenericImplementation will be null when there was a mismatch on type constraints.
-                if (closedGenericImplementation != null && 
-                    this.closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
+                if (serviceType != null && this.SafisfiesPartialTypeArguments(serviceType))
                 {
-                    return BuildResult.Valid(closedGenericImplementation);
+                    Type closedGenericImplementation =
+                        this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
+
+                    // closedGenericImplementation will be null when there was a mismatch on type constraints.
+                    if (closedGenericImplementation != null &&
+                        this.closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
+                    {
+                        return BuildResult.Valid(closedGenericImplementation);
+                    }
                 }
             }
 

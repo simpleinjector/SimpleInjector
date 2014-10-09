@@ -33,7 +33,7 @@ namespace SimpleInjector
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-using SimpleInjector.Lifestyles;
+    using SimpleInjector.Lifestyles;
     
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
@@ -224,8 +224,7 @@ using SimpleInjector.Lifestyles;
 
         /// <summary>
         /// Returns an array with the current registrations for root objects. Root objects are registrations
-        /// that are in the root of the object graph, meaning that no other registrations is depending on
-        /// them.
+        /// that are in the root of the object graph, meaning that no other registration is depending on it.
         /// </summary>
         /// <remarks>
         /// <para>

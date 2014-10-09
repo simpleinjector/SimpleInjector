@@ -187,8 +187,24 @@
     {
     }
 
-    public class WhereConstraintEventHandler<TEvent> : IEventHandler<TEvent>
-        where TEvent : IAuditableEvent
+    public struct AuditableStructEvent : IAuditableEvent
+    {
+    }
+
+    public class StructEventHandler : IEventHandler<StructEvent>
+    {
+    }
+
+    public class AuditableEventEventHandler : IEventHandler<AuditableEvent>
+    {
+    }
+
+    public class AuditableEventEventHandler<TAuditableEvent> : IEventHandler<TAuditableEvent>
+        where TAuditableEvent : IAuditableEvent
+    {
+    }
+
+    public class AuditableEventEventHandlerWithUnknown<TUnknown> : IEventHandler<AuditableEvent>
     {
     }
 
@@ -212,6 +228,20 @@
     public class EventHandlerWithLoggerDependency<TEvent> : IEventHandler<TEvent>
     {
         public EventHandlerWithLoggerDependency(ILogger logger)
+        {
+        }
+    }
+    
+    public class EventHandlerWithConstructorContainingPrimitive<T> : IEventHandler<T>
+    {
+        public EventHandlerWithConstructorContainingPrimitive(int somePrimitive)
+        {
+        }
+    }
+
+    public class EventHandlerWithDependency<T, TDependency> : IEventHandler<T>
+    {
+        public EventHandlerWithDependency(TDependency dependency)
         {
         }
     }

@@ -436,7 +436,7 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains("The constructor of the type " +
+                Assert.IsTrue(ex.Message.Contains("The constructor of type " +
                     "InterceptorExtensionsTests+InterceptorWithDependencyOnLogger contains the parameter " +
                     "of type ILogger with name 'logger' that is not registered."),
                     "Actual: " + ex.Message);

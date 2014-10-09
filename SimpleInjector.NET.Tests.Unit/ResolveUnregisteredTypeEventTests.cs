@@ -114,7 +114,7 @@
             // Arrange
             string expectedMessage = @"
                 No registration for type RealUserService could be found and an implicit registration could not 
-                be made. The constructor of the type RealUserService contains the parameter of type 
+                be made. The constructor of type RealUserService contains the parameter of type 
                 IUserRepository with name 'repository' that is not registered. Please ensure IUserRepository 
                 is registered in the container, or change the constructor of RealUserService."
                 .TrimInside();

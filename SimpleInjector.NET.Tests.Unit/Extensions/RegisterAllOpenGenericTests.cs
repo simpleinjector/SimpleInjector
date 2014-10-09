@@ -142,35 +142,27 @@
         }
 
         [TestMethod]
-        public void RegisterAllOpenGeneric_SuppliedWithNonGenericType_ThrowsExpectedException()
+        public void RegisterAllOpenGeneric_SuppliedWithCompatibleNonGenericType_Succeeds()
         {
             // Arrange
-            Type invalidType = typeof(NonGenericEventHandler);
+            Type compatibleNonGenericType = typeof(NonGenericEventHandler);
 
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterAllOpenGeneric(typeof(IEventHandler<>), invalidType);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "NonGenericEventHandler is not an open generic type.", action);
+            container.RegisterAllOpenGeneric(typeof(IEventHandler<>), compatibleNonGenericType);
         }
 
         [TestMethod]
-        public void RegisterAllOpenGeneric_SuppliedWithAClosedGenericType_ThrowsExpectedException()
+        public void RegisterAllOpenGeneric_SuppliedWithCompatibleClosedGenericType_Succeeds()
         {
             // Arrange
-            Type invalidType = typeof(ClassConstraintEventHandler<object>);
+            Type compatibleClosedGenericType = typeof(ClassConstraintEventHandler<object>);
 
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterAllOpenGeneric(typeof(IEventHandler<>), invalidType);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "ClassConstraintEventHandler<Object> is not an open generic type.", action);
+            container.RegisterAllOpenGeneric(typeof(IEventHandler<>), compatibleClosedGenericType);
         }
 
         [TestMethod]
@@ -304,6 +296,29 @@
             Assert.AreEqual(expectedRelationship.ImplementationType, actualRelationship.ImplementationType);
             Assert.AreEqual(expectedRelationship.Lifestyle, actualRelationship.Lifestyle);
             Assert.AreEqual(expectedRelationship.Dependency, actualRelationship.Dependency);
+        }
+        
+        // This is a regression test. This bug existed since the introduction of the RegisterAllOpenGeneric.
+        [TestMethod]
+        public void GetAllInstances_MultipleTypesWithConstructorContainingPrimivive_ThrowsExpectedException()
+        {
+            // Arrange
+            Type[] registeredTypes = new[]
+            {
+                // Multiple types that can't be built caused by them having multiple constructors.
+                typeof(EventHandlerWithConstructorContainingPrimitive<>),
+                typeof(EventHandlerWithConstructorContainingPrimitive<>),
+            };
+
+            var container = new Container();
+
+            // Act
+            Action action = () => container.RegisterAllOpenGeneric(typeof(IEventHandler<>), registeredTypes);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The constructor of type EventHandlerWithConstructorContainingPrimitive<T>",
+                action);
         }
 
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
