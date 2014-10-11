@@ -259,6 +259,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription
         {
             get
