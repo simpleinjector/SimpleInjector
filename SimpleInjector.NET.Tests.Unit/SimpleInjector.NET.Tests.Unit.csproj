@@ -117,6 +117,7 @@
     <Compile Include="InjectPropertiesTests.cs" />
     <Compile Include="ExpressionBuiltEventTests.cs" />
     <Compile Include="InjectPropertiesTests.full.cs" />
+    <Compile Include="InstanceProducerInlineVisualizerTests.cs" />
     <Compile Include="RegisterAllTests.full.cs" />
     <Compile Include="RegisterContextualInitializerTests.cs" />
     <Compile Include="InstanceProducerTests.cs" />

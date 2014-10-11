@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Text;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -171,7 +172,7 @@ namespace SimpleInjector
         // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
         // when the producer is valid.
         internal Exception Exception { get; private set; }
-        
+
         internal bool IsExpressionCreated
         {
             get { return this.expression.IsValueCreated; }
@@ -185,12 +186,12 @@ namespace SimpleInjector
         internal bool InstanceSuccessfullyCreated { get; private set; }
 
         internal bool VerifiersAreSuccessfullyCalled { get; private set; }
-        
+
         internal string DebuggerDisplay
         {
             get
             {
-                return string.Format(CultureInfo.InvariantCulture, 
+                return string.Format(CultureInfo.InvariantCulture,
                     "ServiceType = {0}, Lifestyle = {1}",
                     this.ServiceType.ToFriendlyName(), this.Lifestyle.Name);
             }
@@ -312,19 +313,32 @@ namespace SimpleInjector
                     StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
             }
 
-            return this.Visualize(indentingDepth: 0);
+            return this.VisualizeIndentedObjectGraph(indentingDepth: 0);
         }
 
-        internal string Visualize(int indentingDepth)
+        internal string VisualizeIndentedObjectGraph(int indentingDepth)
         {
             var visualizedDependencies =
                 from relationship in this.GetRelationships()
-                select Environment.NewLine + relationship.Dependency.Visualize(indentingDepth + 1);
+                select Environment.NewLine + 
+                    relationship.Dependency.VisualizeIndentedObjectGraph(indentingDepth + 1);
 
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
                 new string(' ', indentingDepth * 4),
                 this.ImplementationType.ToFriendlyName(),
                 string.Join(",", visualizedDependencies));
+        }
+
+        internal string VisualizeInlinedAndTruncatedObjectGraph(int maxLength)
+        {
+            string implementationName = this.ImplementationType.ToFriendlyName();
+
+            var visualizedDependencies = 
+                this.VisualizeInlinedDependencies(maxLength - implementationName.Length - 2);
+
+            return string.Format(CultureInfo.InvariantCulture, "{0}({1})",
+                implementationName,
+                string.Join(", ", visualizedDependencies));
         }
 
         // Throws an InvalidOperationException on failure.
@@ -503,6 +517,48 @@ namespace SimpleInjector
             }
         }
 
+        private IEnumerable<string> VisualizeInlinedDependencies(int maxLength)
+        {
+            var relationships = new Stack<KnownRelationship>(this.GetRelationships().Reverse());
+
+            if (!relationships.Any())
+            {
+                yield break;
+            }
+
+            while (maxLength > 0 && relationships.Any())
+            {
+                var relationship = relationships.Pop();
+
+                bool lastDependency = !relationships.Any();
+
+                string childGraph = relationship.Dependency.VisualizeInlinedAndTruncatedObjectGraph(
+                    !lastDependency ? maxLength - ", ...".Length : maxLength);
+
+                maxLength -= childGraph.Length;
+
+                bool displayingThisGraphWillCauseAnOverflow =
+                    (!lastDependency && maxLength < ", ...".Length) || maxLength < 0;
+
+                if (displayingThisGraphWillCauseAnOverflow)
+                {
+                    yield return "...";
+                    yield break;
+                }
+                else
+                {
+                    yield return childGraph;
+                }
+
+                maxLength -= ", ".Length;
+            }
+
+            if (relationships.Any())
+            {
+                yield return "...";
+            }
+        }
+
         internal sealed class InstanceProducerDebugView
         {
             private readonly InstanceProducer instanceProducer;
@@ -534,9 +590,19 @@ namespace SimpleInjector
                 get { return this.instanceProducer.GetRelationships(); }
             }
 
+            // By using the TruncatedDependencyGraph as value of this DependencyGraph property, we allow the
+            // graph to be shown in compact form in the debugger in-line value field, but still allow the
+            // complete formatted object graph to be shown when the user opens the text visualizer.
+            [DebuggerDisplay(value: "{TruncatedDependencyGraph,nq}")]
             public string DependencyGraph
             {
-                get { return this.instanceProducer.Visualize(indentingDepth: 0); }
+                get { return this.instanceProducer.VisualizeIndentedObjectGraph(indentingDepth: 0); }
+            }
+
+            [DebuggerHidden]
+            private string TruncatedDependencyGraph
+            {
+                get { return this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160); }
             }
         }
     }

@@ -198,4 +198,37 @@
     public class CovariantImplementation<T> : ICovariant<T>
     {
     }
+
+    public class Consumer
+    {
+        public Consumer(Dep1 first, Dep2 second)
+        {
+        }
+    }
+
+    public class Dep1
+    {
+        public Dep1(FirstSub c, SecondSub d, ThirdSub e)
+        {
+        }
+    }
+
+    public class Dep2
+    {
+        public Dep2(FirstSub c, SecondSub d)
+        {
+        }
+    }
+
+    public class FirstSub
+    {
+    }
+
+    public class SecondSub
+    {
+    }
+
+    public class ThirdSub
+    {
+    }
 }
