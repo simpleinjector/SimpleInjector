@@ -5,7 +5,7 @@
     <authors>Simple Injector Contributors</authors>
     <owners>Simple Injector Contributors</owners>
     <licenseUrl>https://simpleinjector.codeplex.com/license</licenseUrl>
-    <projectUrl>https://simpleinjector.codeplex.com/wikipage?title=ObjectLifestyleManagement#ExecutionContextScope</projectUrl>
+    <projectUrl>https://simpleinjector.readthedocs.org/en/latest/lifetimes.html#per-execution-context-scope</projectUrl>
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
