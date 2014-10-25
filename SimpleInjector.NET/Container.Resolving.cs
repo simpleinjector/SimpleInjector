@@ -557,9 +557,13 @@ namespace SimpleInjector
         {
             if (this.IsConcreteConstructableType(typeof(TConcrete)))
             {
-                var registration = this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
+                return GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
+                {
+                    var registration = 
+                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
 
-                return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
+                    return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
+                });
             }
 
             return null;
@@ -570,13 +574,40 @@ namespace SimpleInjector
             if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
                 this.IsConcreteConstructableType(concreteType))
             {
-                var registration = 
-                    this.SelectionBasedLifestyle.CreateRegistration(concreteType, concreteType, this);
+                return GetOrBuildInstanceProducerForConcreteUnregisteredType(concreteType, () =>
+                {
+                    var registration =
+                        this.SelectionBasedLifestyle.CreateRegistration(concreteType, concreteType, this);
 
-                return BuildInstanceProducerForConcreteUnregisteredType(concreteType, registration);
+                    return BuildInstanceProducerForConcreteUnregisteredType(concreteType, registration);
+                });
             }
 
             return null;
+        }
+
+        private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(Type concreteType,
+            Func<InstanceProducer> instanceProducerBuilder)
+        {
+            // We need to take a lock here to make sure that we never create multiple InstanceProducer
+            // instances for the same concrete type, which is a problem when the LifestyleSelectionBehavior
+            // has been overridden. For instance in case the overridden behavior returns a Singleton lifestyle,
+            // but the concrete type is requested concurrently over multiple threads, not taking the lock
+            // could cause two InstanceProducers to be created, which might cause two instances from being
+            // created.
+            lock (this.unregisteredConcreteTypeInstanceProducers)
+            {
+                InstanceProducer producer;
+
+                if (!this.unregisteredConcreteTypeInstanceProducers.TryGetValue(concreteType, out producer))
+                {
+                    producer = instanceProducerBuilder.Invoke();
+
+                    this.unregisteredConcreteTypeInstanceProducers[concreteType] = producer;
+                }
+
+                return producer;
+            }
         }
 
         private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType, 

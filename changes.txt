@@ -4,11 +4,12 @@
 Version vNext
 
 	New features:
-		[Core] Added support for resolving IList<T> and ICollection<T>. (work item 20981)
+		-[Core] Added support for resolving IList<T> and ICollection<T>. (work item 20981)
 
 	Bug fixes:
-		[Core] Improved the exception messages in case unregistered delegates are resolved. (work item 20980)
-
+		-[Core] Improved the exception messages in case unregistered delegates are resolved. (work item 20980)
+		-[Core] Resolving unregistered concrete type with overloaded lifestyle selection behavior wasn't
+		 thread-safe. (work item 20976)
 
 Version 2.6.0 (v2.6.0 RTM) 2014-10-14
 

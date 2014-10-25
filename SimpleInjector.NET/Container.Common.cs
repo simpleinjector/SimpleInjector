@@ -71,6 +71,9 @@ namespace SimpleInjector
         private Dictionary<Type, InstanceProducer> registrations = 
             new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
 
+        private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
+            new Dictionary<Type, InstanceProducer>();
+
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
