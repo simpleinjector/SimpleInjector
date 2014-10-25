@@ -106,7 +106,6 @@
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />
-    <Compile Include="Container.Resolving.full.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />

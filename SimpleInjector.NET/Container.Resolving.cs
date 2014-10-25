@@ -471,7 +471,7 @@ namespace SimpleInjector
 
             Type[] arguments = serviceType.GetGenericArguments();
 
-            // IEnumerable<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
+            // IEnumerable<T>, IList<T>, ICollection<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
             if (serviceType.ContainsGenericParameters || arguments.Length != 1)
             {
                 return null;
@@ -485,16 +485,8 @@ namespace SimpleInjector
                 return null;
             }
 
-            InstanceProducer producer = null;
-            
-            this.TryBuildCollectionInstanceProducerForReadOnly(serviceType, ref producer);
-            
-            if (producer != null)
-            {
-                return producer;
-            }
-
-            return this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
+            return this.TryBuildCollectionInstanceProducer(serviceType) 
+                ?? this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
         }
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
@@ -526,8 +518,39 @@ namespace SimpleInjector
             return new InstanceProducer(enumerableType, registration);
         }
 
-        partial void TryBuildCollectionInstanceProducerForReadOnly(Type serviceType, 
-            ref InstanceProducer producer);
+        private InstanceProducer TryBuildCollectionInstanceProducer(Type serviceType)
+        {
+            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+
+            if (
+#if NET45
+                serviceTypeDefinition == typeof(IReadOnlyList<>) ||
+                serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
+#endif
+                serviceTypeDefinition == typeof(IList<>) ||
+                serviceTypeDefinition == typeof(ICollection<>))
+            {
+                Type elementType = serviceType.GetGenericArguments()[0];
+
+                var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
+
+                if (collection != null)
+                {
+                    var registration = SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this);
+
+                    var producer = new InstanceProducer(serviceType, registration);
+
+                    if (!((IEnumerable<object>)collection).Any())
+                    {
+                        producer.IsContainerAutoRegistered = true;
+                    }
+
+                    return producer;
+                }
+            }
+
+            return null;
+        }
 
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
             where TConcrete : class

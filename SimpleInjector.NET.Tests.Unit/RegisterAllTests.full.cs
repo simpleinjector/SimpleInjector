@@ -1,10 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
@@ -21,7 +18,7 @@
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
-                container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
+                container.GetInstance<ClassDependingOn<IReadOnlyCollection<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(2, collection.Count);
@@ -41,7 +38,7 @@
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
-                container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
+                container.GetInstance<ClassDependingOn<IReadOnlyCollection<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(2, collection.Count);
@@ -57,7 +54,7 @@
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
-                container.GetInstance<ClassDependingOnIReadOnlyCollection<IPlugin>>().Collection;
+                container.GetInstance<ClassDependingOn<IReadOnlyCollection<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(0, collection.Count);
@@ -72,7 +69,8 @@
             container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             // Act
-            IReadOnlyList<IPlugin> list = container.GetInstance<ClassDependingOnIReadOnlyList<IPlugin>>().List;
+            IReadOnlyList<IPlugin> list = 
+                container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(2, list.Count);
@@ -91,7 +89,8 @@
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
             // Act
-            IReadOnlyList<IPlugin> list = container.GetInstance<ClassDependingOnIReadOnlyList<IPlugin>>().List;
+            IReadOnlyList<IPlugin> list = 
+                container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(2, list.Count);
@@ -106,30 +105,11 @@
             var container = ContainerFactory.New();
 
             // Act
-            IReadOnlyList<IPlugin> list = container.GetInstance<ClassDependingOnIReadOnlyList<IPlugin>>().List;
+            IReadOnlyList<IPlugin> list = 
+                container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(0, list.Count);
-        }
-
-        private class ClassDependingOnIReadOnlyCollection<T>
-        {
-            public ClassDependingOnIReadOnlyCollection(IReadOnlyCollection<T> collection)
-            {
-                this.Collection = collection;
-            }
-
-            public IReadOnlyCollection<T> Collection { get; private set; }
-        }
-
-        private class ClassDependingOnIReadOnlyList<T>
-        {
-            public ClassDependingOnIReadOnlyList(IReadOnlyList<T> list)
-            {
-                this.List = list;
-            }
-
-            public IReadOnlyList<T> List { get; private set; }
         }
     }
 }

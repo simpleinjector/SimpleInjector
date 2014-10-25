@@ -1146,6 +1146,109 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetInstance_TypeDependingOnICollection_InjectsTheRegisteredCollection()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+
+            // Act
+            ICollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ICollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, collection.Count);
+            Assert.IsInstanceOfType(collection.First(), typeof(PluginImpl));
+            Assert.IsInstanceOfType(collection.Second(), typeof(PluginImpl2));
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnICollection_InjectsTheRegisteredCollectionOfDecorators()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            ICollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ICollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, collection.Count);
+            Assert.IsInstanceOfType(collection.First(), typeof(PluginDecorator));
+            Assert.IsInstanceOfType(collection.Second(), typeof(PluginDecorator));
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnICollection_InjectsEmptyCollectionWhenNoInstancesRegistered()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            ICollection<IPlugin> collection = 
+                container.GetInstance<ClassDependingOn<ICollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(0, collection.Count);
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnIList_InjectsTheRegisteredList()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+
+            // Act
+            IList<IPlugin> list = container.GetInstance<ClassDependingOn<IList<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, list.Count);
+            Assert.IsInstanceOfType(list[0], typeof(PluginImpl));
+            Assert.IsInstanceOfType(list[1], typeof(PluginImpl2));
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnIList_InjectsTheRegisteredListOfDecorators()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            IList<IPlugin> list =
+                container.GetInstance<ClassDependingOn<IList<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, list.Count);
+            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
+            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnIList_InjectsEmptyListWhenNoInstancesRegistered()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            IList<IPlugin> list =
+                container.GetInstance<ClassDependingOn<IList<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(0, list.Count);
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -1196,6 +1299,16 @@
             }
 
             public IEnumerable<IPlugin> Plugins { get; private set; }
+        }
+
+        private class ClassDependingOn<TDependency>
+        {
+            public ClassDependingOn(TDependency dependency)
+            {
+                this.Dependency = dependency;
+            }
+
+            public TDependency Dependency { get; private set; }
         }
     }
 }

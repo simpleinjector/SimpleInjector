@@ -96,6 +96,48 @@
         }
 
         [TestMethod]
+        public void Analyze_ComponentDependingOnUnregisteredICollection_ReturnsWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<Consumer<ICollection<ILogger>>>();
+
+            container.Verify();
+
+            // Act
+            var results =
+                Analyzer.Analyze(container).OfType<ContainerRegisteredServiceDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual(
+                "Consumer<ICollection<ILogger>> depends on container-registered type ICollection<ILogger>.",
+                results.Single().Description);
+        }
+
+        [TestMethod]
+        public void Analyze_ComponentDependingOnUnregisteredIList_ReturnsWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<Consumer<IList<ILogger>>>();
+
+            container.Verify();
+
+            // Act
+            var results =
+                Analyzer.Analyze(container).OfType<ContainerRegisteredServiceDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual(
+                "Consumer<IList<ILogger>> depends on container-registered type IList<ILogger>.",
+                results.Single().Description);
+        }
+
+        [TestMethod]
         public void Analyze_ComponentDependingOnReadOnlyCollectionForRegisteredCollection_DoesNotReturnsAWarning()
         {
             // Arrange
