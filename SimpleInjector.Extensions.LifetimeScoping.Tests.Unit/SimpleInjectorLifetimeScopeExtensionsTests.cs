@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+﻿#pragma warning disable 618
+namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -1511,3 +1512,4 @@
         }
     }
 }
+#pragma warning restore 618
