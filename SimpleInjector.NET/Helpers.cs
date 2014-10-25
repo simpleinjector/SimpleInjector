@@ -132,11 +132,19 @@ namespace SimpleInjector
             ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
 
+        internal static bool IsConcreteConstructableType(Type serviceType)
+        {
+            // While array types are in fact concrete, we can not create them and creating them would be
+            // pretty useless.
+            return !serviceType.ContainsGenericParameters && IsConcreteType(serviceType);
+        }
+
         internal static bool IsConcreteType(Type serviceType)
         {
             // While array types are in fact concrete, we can not create them and creating them would be
             // pretty useless.
-            return !serviceType.IsAbstract && !serviceType.ContainsGenericParameters && !serviceType.IsArray;
+            return !serviceType.IsAbstract && !serviceType.IsArray && serviceType != typeof(object) && 
+                !typeof(Delegate).IsAssignableFrom(serviceType);
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.

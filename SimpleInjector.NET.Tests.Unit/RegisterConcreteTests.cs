@@ -201,6 +201,21 @@
             }
         }
 
+        [TestMethod]
+        public void RegisterConcrete_RegisteringADelegate_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Register<Func<object>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The given type Func<Object> is not a concrete type. " +
+                "Please use one of the other overloads to register this type.", action);
+        }
+        
         public abstract class AbstractTypeWithSinglePublicConstructor
         {
             public AbstractTypeWithSinglePublicConstructor()

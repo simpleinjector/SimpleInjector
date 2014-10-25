@@ -231,6 +231,26 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingAnUnregisteredDelegate_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            try
+            {
+                // Act
+                container.GetInstance<Func<object>>();
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                Assert.AreEqual("No registration for type Func<Object> could be found.", ex.Message);
+            }
+        }
+
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
 
         public class SomeGenericNastyness<TBla>

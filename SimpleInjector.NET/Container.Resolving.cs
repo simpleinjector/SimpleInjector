@@ -385,7 +385,7 @@ namespace SimpleInjector
 
         private void ThrowMissingInstanceProducerException(Type serviceType)
         {
-            if (Helpers.IsConcreteType(serviceType))
+            if (Helpers.IsConcreteConstructableType(serviceType))
             {
                 this.ThrowNotConstructableException(serviceType);
             }
