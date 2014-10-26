@@ -597,15 +597,15 @@
             
             // Act
             // CompositeService<T> depends on IGeneric<T>[] (array)
-            Action action = () => container.GetInstance<CompositeService<string>>();
+            Action action = () => container.GetInstance<CompositeService<int>>();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("IGeneric<String>[]", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("Nullable<Int32>[]", action);
         }
 
-        public class CompositeService<T>
+        public class CompositeService<T> where T : struct
         {
-            public CompositeService(IGeneric<T>[] dependencies)
+            public CompositeService(Nullable<T>[] dependencies)
             {
             }
         }

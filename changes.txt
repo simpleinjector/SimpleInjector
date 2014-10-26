@@ -5,6 +5,7 @@ Version vNext
 
 	New features:
 		-[Core] Added support for resolving IList<T> and ICollection<T>. (work item 20981)
+		-[Core] Added support for resolving arrays. (work item 20982)
 
 	Bug fixes:
 		-[Core] Improved the exception messages in case unregistered delegates are resolved. (work item 20980)

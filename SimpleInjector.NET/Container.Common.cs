@@ -68,11 +68,11 @@ namespace SimpleInjector
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
             new ConditionalHashSet<InstanceProducer>();
 
-        private Dictionary<Type, InstanceProducer> registrations = 
-            new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
-
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
+
+        private Dictionary<Type, InstanceProducer> registrations = 
+            new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
 
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
 

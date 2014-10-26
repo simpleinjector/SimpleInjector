@@ -1249,6 +1249,163 @@
             Assert.AreEqual(0, list.Count);
         }
 
+        [TestMethod]
+        public void GetInstance_OnTypeWithArrayArgumentAfterCallingRegisterArrays_InjectsExpectedNumberOfArguments()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            ICommand singletonCommand = new ConcreteCommand();
+
+            container.RegisterAll<ICommand>(singletonCommand);
+
+            // Act
+            var composite = container.GetInstance<CompositeCommand>();
+
+            // Assert
+            Assert.IsNotNull(composite.Commands);
+            Assert.AreEqual(1, composite.Commands.Length);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnTypeWithArrayArgumentAfterCallingRegisterArrays_InjectsExpectedElement()
+        {
+            // Arrange
+            var expectedCommand = new ConcreteCommand();
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommand>(expectedCommand);
+
+            // Act
+            var composite = container.GetInstance<CompositeCommand>();
+
+            // Assert
+            Assert.AreEqual(expectedCommand, composite.Commands[0]);
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnContainerControlledCollection_InjectsANewArrayOnEachRequest()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommand>(typeof(ConcreteCommand));
+
+            // Act
+            var composite = container.GetInstance<CompositeCommand>();
+
+            composite.Commands[0] = null;
+
+            composite = container.GetInstance<CompositeCommand>();
+
+            // Assert
+            Assert.IsNotNull(composite.Commands[0],
+                "The element in the array is expected NOT to be null. When it is null, it means that the " +
+                "array has been cached.");
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnContainerControlledSingletons_StillInjectsANewArrayOnEachRequest()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommand>(new ConcreteCommand());
+
+            // Act
+            var composite = container.GetInstance<CompositeCommand>();
+
+            composite.Commands[0] = null;
+
+            composite = container.GetInstance<CompositeCommand>();
+
+            // Assert
+            Assert.IsNotNull(composite.Commands[0],
+                "The element in the array is expected NOT to be null. When it is null, it means that the " +
+                "array has been cached.");
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnContainerUncontrolledCollection_StillInjectsANewArrayOnEachRequest()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            List<ICommand> commands = new List<ICommand>();
+
+            // Add a first command
+            commands.Add(new ConcreteCommand());
+
+            container.RegisterAll<ICommand>(commands);
+
+            container.GetInstance<CompositeCommand>();
+
+            // Add yet another command
+            commands.Add(new ConcreteCommand());
+
+            // Act
+            var composite = container.GetInstance<CompositeCommand>();
+
+            // Assert
+            Assert.AreEqual(2, composite.Commands.Length, "The IEnumerable<ICommand> collection should be " +
+                "cached by its reference, and not by its current content, because that content is allowed " +
+                "to change.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_RequestingArrayRegistrationContainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<ICommand>(typeof(ConcreteCommand));
+
+            // Act
+            var registration = container.GetRegistration(typeof(ICommand[]));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+        
+        [TestMethod]
+        public void GetRegistration_RequestingArrayRegistrationUncontainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<ICommand> commands = new List<ICommand> { new ConcreteCommand() };
+
+            container.RegisterAll<ICommand>(commands);
+
+            // Act
+            var registration = container.GetRegistration(typeof(ICommand[]));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+
+        [TestMethod]
+        public void GetRegistration_RequestingArrayRegistrationContainerControlledCollectionThatOnlyContainsSingletons_StillHasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterSingle<ConcreteCommand>();
+
+            container.RegisterAll<ICommand>(typeof(ConcreteCommand));
+
+            // Act
+            var registration = container.GetRegistration(typeof(ICommand[]));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle,
+                "We still expect the transient lifestyle here, since a new array is created every time. " +
+                "We might change this in the future or make the diagnostic services smarter, but this is " +
+                "quite hard and probably not useful at all. Instead of injecting arrays, users should be " +
+                "injecting streams anyway.");
+        }
+        
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -1309,6 +1466,16 @@
             }
 
             public TDependency Dependency { get; private set; }
+        }
+
+        private sealed class CompositeCommand
+        {
+            public CompositeCommand(ICommand[] commands)
+            {
+                this.Commands = commands;
+            }
+
+            public ICommand[] Commands { get; private set; }
         }
     }
 }
