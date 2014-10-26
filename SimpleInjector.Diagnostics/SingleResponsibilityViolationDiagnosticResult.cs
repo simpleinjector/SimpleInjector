@@ -30,7 +30,7 @@ namespace SimpleInjector.Diagnostics
 
     /// <summary>
     /// Diagnostic result that warns about a component that depends on (too) many services.
-    /// For more information, see: https://simpleinjector.codeplex.com/wikipage?title=PotentialSingleResponsibilityViolations.
+    /// For more information, see: https://simpleinjector.org/diasr.
     /// </summary>
     public class SingleResponsibilityViolationDiagnosticResult : DiagnosticResult
     {
