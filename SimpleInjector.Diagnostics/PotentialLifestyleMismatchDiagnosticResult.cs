@@ -28,7 +28,7 @@ namespace SimpleInjector.Diagnostics
     /// <summary>
     /// Diagnostic result for a warning about a
     /// component that depends on a service with a lifestyle that is shorter than that of the component.
-    /// For more information, see: https://simpleinjector.codeplex.com/wikipage?title=PotentialLifestyleMismatches.
+    /// For more information, see: https://simpleinjector.org/dialm.
     /// </summary>
     public class PotentialLifestyleMismatchDiagnosticResult : DiagnosticResult
     {

@@ -34,7 +34,7 @@ namespace SimpleInjector.Diagnostics
     /// component that depends on an unregistered concrete type and this concrete type has a lifestyle that is 
     /// different than the lifestyle of an explicitly registered type that uses this concrete type as its 
     /// implementation.
-    /// For more information, see: https://simpleinjector.codeplex.com/wikipage?title=ShortCircuitedDependencies.
+    /// For more information, see: https://simpleinjector.org/diasc.
     /// </summary>
     public class ShortCircuitedDependencyDiagnosticResult : DiagnosticResult
     {
