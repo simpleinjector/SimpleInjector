@@ -437,6 +437,7 @@ namespace SimpleInjector
         {
             return
                 this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
+                this.TryBuildArrayInstanceProducer(serviceType) ??
                 this.TryBuildInstanceProducerForCollection(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
         }
@@ -460,12 +461,6 @@ namespace SimpleInjector
             {
                 return null;
             }
-        }
-
-        private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
-        {
-            return this.TryBuildArrayInstanceProducer(serviceType)
-                ?? this.TryBuildInstanceProducerForGenericCollection(serviceType);
         }
 
         private InstanceProducer TryBuildArrayInstanceProducer(Type serviceType)
@@ -541,7 +536,7 @@ namespace SimpleInjector
             return producer;
         }
 
-        private InstanceProducer TryBuildInstanceProducerForGenericCollection(Type serviceType)
+        private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
         {
             if (!IsGenericCollectionType(serviceType))
             {
