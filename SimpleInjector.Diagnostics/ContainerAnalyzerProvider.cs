@@ -35,6 +35,7 @@ namespace SimpleInjector.Diagnostics
                 new ShortCircuitedDependencyContainerAnalyzer(),
                 new SingleResponsibilityViolationsAnalyzer(),
                 new ContainerRegisteredServiceContainerAnalyzer(),
+                new TornLifestyleContainerAnalyzer()
             });
     }
 }

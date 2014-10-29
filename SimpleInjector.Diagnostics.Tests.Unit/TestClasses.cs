@@ -4,6 +4,22 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    public interface IFoo
+    {
+    }
+
+    public interface IFooExt : IFoo
+    {
+    }
+
+    public interface IBar
+    {
+    }
+
+    public interface IBarExt : IBar
+    {
+    }
+        
     public interface ILogger
     {
     }
@@ -319,6 +335,24 @@
             IGeneric<float> dependency4,
             IGeneric<char> dependency5,
             IGeneric<decimal> dependency6)
+        {
+        }
+    }
+
+    public class FooBar : IFoo, IBar, IFooExt, IBarExt
+    {
+    }
+
+    public class FooDecorator : IFoo
+    {
+        public FooDecorator(IFoo decoratee)
+        {
+        }
+    }
+
+    public class BarDecorator : IBar
+    {
+        public BarDecorator(IBar decoratee)
         {
         }
     }

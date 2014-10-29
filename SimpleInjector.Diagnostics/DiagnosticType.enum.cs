@@ -56,10 +56,16 @@ namespace SimpleInjector.Diagnostics
         ShortCircuitedDependency,
 
         /// <summary>
-        /// Diagnostic type that warns when a
-        /// component depends on (too) many services.
+        /// Diagnostic type that warns when a component depends on (too) many services.
         /// For more information, see: https://simpleinjector.org/diasr.
         /// </summary>
-        SingleResponsibilityViolation
+        SingleResponsibilityViolation,
+
+        /// <summary>
+        /// Diagnostic type that warns when a multiple registrations map to the same implementation type and
+        /// lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
+        /// For more information, see: https://simpleinjector.org/diatl.
+        /// </summary>
+        TornLifestyle
     }
 }

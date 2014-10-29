@@ -36,7 +36,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public string Name
         {
-            get { return "Unregistered types"; }
+            get { return "Container-registered components"; }
         }
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)

@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyzer.cs" />
+    <Compile Include="Analyzers\TornLifestyleContainerAnalyzer.cs" />
     <Compile Include="ContainerAnalyzerProvider.cs" />
     <Compile Include="Debugger\ContainerDebugView.cs" />
     <Compile Include="Analyzers\ContainerRegisteredServiceContainerAnalyzer.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="IContainerAnalyzer.cs" />
     <Compile Include="LifestyleMismatchChecker.cs" />
     <Compile Include="Analyzers\PotentialLifestyleMismatchContainerAnalyzer.cs" />
+    <Compile Include="TornLifestyleDiagnosticResult.cs" />
     <Compile Include="PotentialLifestyleMismatchDiagnosticResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Analyzers\ShortCircuitedDependencyContainerAnalyzer.cs" />

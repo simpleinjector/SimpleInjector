@@ -68,6 +68,7 @@
     <Compile Include="Helpers\DebuggerViewItemExtensions.cs" />
     <Compile Include="Helpers\DiagnosticGroupExtensions.cs" />
     <Compile Include="LifestyleMismatchServicesTests.cs" />
+    <Compile Include="TornLifestyleContainerAnalyzerTests.cs" />
     <Compile Include="PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="ShortCircuitContainerAnalyzerTests.cs" />
     <Compile Include="SingleResponsibilityViolationsAnalyzerTests.cs" />
@@ -83,6 +84,10 @@
     <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
       <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
       <Name>SimpleInjector.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
+      <Project>{d140d43c-b7ab-43b2-a287-394df871eb56}</Project>
+      <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
