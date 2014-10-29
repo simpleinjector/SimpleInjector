@@ -43,17 +43,20 @@ namespace SimpleInjector.Diagnostics.Analyzers
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
-            
-            return count + 
-                (count == 1 ? "component possibly short circuits" : "components") +
-                " to concrete unregistered types.";
+
+            if (count == 1)
+            {
+                return "1 component possibly short circuits to a concrete unregistered type.";
+            }
+
+            return count + " components possibly short circuit to a concrete unregistered type.";
         }
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
 
-            return count == 1 ? "1 short circuited component." : count + " short circuited components.";
+            return count == 1 ? "1 short circuited component." : (count + " short circuited components.");
         }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
