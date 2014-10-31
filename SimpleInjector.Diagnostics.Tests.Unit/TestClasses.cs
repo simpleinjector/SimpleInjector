@@ -343,6 +343,14 @@
     {
     }
 
+    public class FooBarSub : FooBar
+    {
+    }
+
+    public class ChocolateBar : IFoo, IBar, IFooExt, IBarExt
+    {
+    }
+
     public class FooDecorator : IFoo
     {
         public FooDecorator(IFoo decoratee)

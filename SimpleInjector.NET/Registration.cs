@@ -96,6 +96,10 @@ namespace SimpleInjector
 
         internal bool IsCollection { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether this registration object contains a user 
+        /// supplied instanceCreator factory delegate.</summary>
+        internal bool WrapsInstanceCreationDelegate { get; set; }
+
         /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
         /// <value>The <see cref="Container"/> instance for this registration.</value>
         protected internal Container Container { get; private set; }

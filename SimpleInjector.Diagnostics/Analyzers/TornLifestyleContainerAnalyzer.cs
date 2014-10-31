@@ -59,6 +59,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             IEnumerable<InstanceProducer[]> tornRegistrationGroups =
                 from producer in producers
                 where producer.Registration.Lifestyle != Lifestyle.Transient
+                where !producer.Registration.WrapsInstanceCreationDelegate
                 group producer by producer.Registration into registrationGroup
                 let registration = registrationGroup.Key
                 let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }

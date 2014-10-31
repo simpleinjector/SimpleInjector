@@ -458,14 +458,17 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
         /// <paramref name="container"/> are null references (Nothing in VB).</exception>
-        public Registration CreateRegistration<TService>(Func<TService> instanceCreator,
-            Container container)
+        public Registration CreateRegistration<TService>(Func<TService> instanceCreator, Container container)
             where TService : class
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotNull(container, "container");
 
-            return this.CreateRegistrationCore<TService>(instanceCreator, container);
+            var registration = this.CreateRegistrationCore<TService>(instanceCreator, container);
+
+            registration.WrapsInstanceCreationDelegate = true;
+
+            return registration;
         }
                 
         /// <summary>

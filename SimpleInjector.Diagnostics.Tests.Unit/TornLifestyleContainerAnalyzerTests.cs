@@ -30,8 +30,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
@@ -69,8 +68,7 @@
             container.Verify(); 
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(4, results.Length, Actual(results));
@@ -97,8 +95,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
@@ -121,8 +118,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
@@ -142,8 +138,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
@@ -164,8 +159,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
@@ -196,8 +190,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
             
             // Assert
             Assert.AreEqual(4, results.Length, Actual(results));
@@ -218,8 +211,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
@@ -237,8 +229,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
@@ -258,8 +249,7 @@
             container.Verify();
 
             // Act
-            var results = Analyzer.Analyze(container)
-                .OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
@@ -282,6 +272,72 @@
             // Assert
             Assert.AreEqual(typeof(IBar).Name, results[0].Name);
             Assert.AreEqual(typeof(IFoo).Name, results[1].Name);
+        }
+
+        [TestMethod]
+        public void Analyze_TwoDelegateRegistrationsForTheSameAbstractServiceType_DoesNotReturnAWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            var reg1 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new FooBar(), container);
+            var reg2 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new ChocolateBar(), container);
+
+            container.RegisterAll(typeof(IFoo), reg1, reg2);
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, 
+                "Since the two registrations both use a delegate, there's no way of knowing what the actual " +
+                "implementation type is, and we should therefore not see a warning in this case. " +
+                Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_TwoDelegateRegistrationsForTheSameConcreteServiceType_DoesNotReturnAWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBar(), container);
+            var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBarSub(), container);
+
+            container.RegisterAll(typeof(IFoo), reg1, reg2);
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length,
+                "Since the two registrations both use a delegate, there's no way of knowing what the actual " +
+                "implementation type is, and we should therefore not see a warning in this case. " +
+                Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_TwoSingletonRegistrationsForTheSameConcreteType_ReturnsTheExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+            var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+
+            container.RegisterAll(typeof(IFoo), reg1, reg2);
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, results.Length, Actual(results));
         }
 
         private static void Assert_ContainsDescription(TornLifestyleDiagnosticResult[] results,
