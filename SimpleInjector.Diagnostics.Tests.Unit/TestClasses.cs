@@ -252,19 +252,6 @@
     {
     }
 
-    public class PluginWith6Dependencies : IPlugin
-    {
-        public PluginWith6Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6)
-        {
-        }
-    }
-
     public class PluginWith7Dependencies : IPlugin
     {
         public PluginWith7Dependencies(
@@ -279,16 +266,32 @@
         }
     }
 
-    public class AnotherPluginWith7Dependencies : IPlugin
+    public class PluginWith8Dependencies : IPlugin
     {
-        public AnotherPluginWith7Dependencies(
+        public PluginWith8Dependencies(
             IGeneric<int> dependency1,
             IGeneric<byte> dependency2,
             IGeneric<double> dependency3,
             IGeneric<float> dependency4,
             IGeneric<char> dependency5,
             IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
+            IGeneric<int?> dependency7,
+            IGeneric<decimal?> dependency8)
+        {
+        }
+    }
+
+    public class AnotherPluginWith8Dependencies : IPlugin
+    {
+        public AnotherPluginWith8Dependencies(
+            IGeneric<int> dependency1,
+            IGeneric<byte> dependency2,
+            IGeneric<double> dependency3,
+            IGeneric<float> dependency4,
+            IGeneric<char> dependency5,
+            IGeneric<decimal> dependency6,
+            IGeneric<int?> dependency7,
+            IGeneric<decimal?> dependency8)
         {
         }
     }
@@ -305,16 +308,17 @@
         }
     }
 
-    public class PluginDecoratorWith7Dependencies : IPlugin
+    public class PluginDecoratorWith8Dependencies : IPlugin
     {
-        public PluginDecoratorWith7Dependencies(
+        public PluginDecoratorWith8Dependencies(
             IPlugin decoratee,
             IGeneric<byte> dependency2,
             IGeneric<double> dependency3,
             IGeneric<float> dependency4,
             IGeneric<char> dependency5,
             IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
+            IGeneric<int?> dependency7,
+            IGeneric<decimal?> dependency8)
         {
         }
     }

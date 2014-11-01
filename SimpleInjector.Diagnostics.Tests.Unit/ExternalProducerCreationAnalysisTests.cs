@@ -85,7 +85,7 @@
 
             container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
 
-            container.RegisterAll<IPlugin>(typeof(PluginWith7Dependencies));
+            container.RegisterAll<IPlugin>(typeof(PluginWith8Dependencies));
 
             container.Verify();
             

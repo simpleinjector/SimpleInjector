@@ -35,7 +35,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_OnValidConfiguration_ReturnsNull()
         {
             // Arrange
-            Container container = CreateContainerWithRegistrations(typeof(PluginWith6Dependencies));
+            Container container = CreateContainerWithRegistrations(typeof(PluginWith7Dependencies));
 
             container.Verify();
 
@@ -75,7 +75,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_OnConfigurationWithOneViolation_ReturnsThatViolation()
         {
             // Arrange
-            Container container = CreateContainerWithRegistrations(typeof(PluginWith7Dependencies));
+            Container container = CreateContainerWithRegistrations(typeof(PluginWith8Dependencies));
 
             container.Verify();
 
@@ -84,9 +84,9 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             // Assert
             Assert.AreEqual(1, results.Length);
-            Assert.AreEqual(typeof(PluginWith7Dependencies).Name, results[0].Name);
-            Assert.AreEqual(typeof(PluginWith7Dependencies).Name + 
-                " has 7 dependencies which might indicate a SRP violation.",
+            Assert.AreEqual(typeof(PluginWith8Dependencies).Name, results[0].Name);
+            Assert.AreEqual(typeof(PluginWith8Dependencies).Name + 
+                " has 8 dependencies which might indicate a SRP violation.",
                 results[0].Description);
         }
 
@@ -96,15 +96,15 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             // Arrange
             var expectedImplementationTypeInformation = new DebuggerViewItem(
                 name: "ImplementationType",
-                description: typeof(PluginWith7Dependencies).Name,
-                value: typeof(PluginWith7Dependencies));
+                description: typeof(PluginWith8Dependencies).Name,
+                value: typeof(PluginWith8Dependencies));
 
             var expectedDependenciesInformation = new DebuggerViewItem(
                 name: "Dependencies",
-                description: "7 dependencies.",
+                description: "8 dependencies.",
                 value: null);
 
-            Container container = CreateContainerWithRegistrations(typeof(PluginWith7Dependencies));
+            Container container = CreateContainerWithRegistrations(typeof(PluginWith8Dependencies));
 
             container.Verify();
 
@@ -125,8 +125,8 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         {
             // Arrange
             Container container = CreateContainerWithRegistrations(
-                typeof(PluginWith7Dependencies),
-                typeof(AnotherPluginWith7Dependencies));
+                typeof(PluginWith8Dependencies),
+                typeof(AnotherPluginWith8Dependencies));
 
             container.Verify();
 
@@ -136,17 +136,17 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             // Assert
             Assert.AreEqual(2, results.Length);
 
-            var plugin1 = results.Single(r => r.Name == typeof(PluginWith7Dependencies).Name);
+            var plugin1 = results.Single(r => r.Name == typeof(PluginWith8Dependencies).Name);
 
             Assert.AreEqual(
-                typeof(PluginWith7Dependencies).Name + " has 7 dependencies which might indicate a SRP violation.",
+                typeof(PluginWith8Dependencies).Name + " has 8 dependencies which might indicate a SRP violation.",
                 plugin1.Description);
 
-            var plugin2 = results.Single(r => r.Name == typeof(AnotherPluginWith7Dependencies).Name);
+            var plugin2 = results.Single(r => r.Name == typeof(AnotherPluginWith8Dependencies).Name);
             
             Assert.AreEqual(
-                typeof(AnotherPluginWith7Dependencies).Name + 
-                " has 7 dependencies which might indicate a SRP violation.",
+                typeof(AnotherPluginWith8Dependencies).Name + 
+                " has 8 dependencies which might indicate a SRP violation.",
                 plugin2.Description);
         }
 
@@ -154,9 +154,9 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_ConfigurationWithTwoViolationsOnSingleService_ReturnsOneViewItemForBothViolations()
         {
             // Arrange
-            Container container = CreateContainerWithRegistration<IPlugin, PluginWith7Dependencies>();
+            Container container = CreateContainerWithRegistration<IPlugin, PluginWith8Dependencies>();
 
-            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith8Dependencies));
             
             container.Verify();
 
@@ -176,9 +176,9 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_ConfigurationWithTwoViolationsOnSingleService_ReturnsOneViewItemThatWrapsFirstViolation()
         {
             // Arrange
-            Container container = CreateContainerWithRegistration<IPlugin, PluginWith7Dependencies>();
+            Container container = CreateContainerWithRegistration<IPlugin, PluginWith8Dependencies>();
 
-            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith8Dependencies));
 
             container.Verify();
 
@@ -187,12 +187,12 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             var items = results.Single().Value as DebuggerViewItem[];
 
-            var item = items.Single(i => i.Description.Contains(typeof(PluginWith7Dependencies).Name));
+            var item = items.Single(i => i.Description.Contains(typeof(PluginWith8Dependencies).Name));
 
             // Assert
             Assert.AreEqual("IPlugin", item.Name);
-            Assert.AreEqual(typeof(PluginWith7Dependencies).Name + 
-                " has 7 dependencies which might indicate a SRP violation.",
+            Assert.AreEqual(typeof(PluginWith8Dependencies).Name + 
+                " has 8 dependencies which might indicate a SRP violation.",
                 item.Description);
         }
 
@@ -200,9 +200,9 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_ConfigurationWithTwoViolationsOnSingleService_ReturnsOneViewItemThatWrapsSecondViolation()
         {
             // Arrange
-            Container container = CreateContainerWithRegistration<IPlugin, PluginWith7Dependencies>();
+            Container container = CreateContainerWithRegistration<IPlugin, PluginWith8Dependencies>();
 
-            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith8Dependencies));
 
             container.Verify();
 
@@ -211,12 +211,12 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 
             var items = results.Single().Value as DebuggerViewItem[];
 
-            var item = items.Single(i => i.Description.Contains(typeof(PluginDecoratorWith7Dependencies).Name));
+            var item = items.Single(i => i.Description.Contains(typeof(PluginDecoratorWith8Dependencies).Name));
 
             // Assert
             Assert.AreEqual("IPlugin", item.Name);
-            Assert.AreEqual(typeof(PluginDecoratorWith7Dependencies).Name + 
-                " has 7 dependencies which might indicate a SRP violation.",
+            Assert.AreEqual(typeof(PluginDecoratorWith8Dependencies).Name + 
+                " has 8 dependencies which might indicate a SRP violation.",
                 item.Description);
         }
 
@@ -226,7 +226,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             // Arrange
             Container container = CreateContainerWithRegistrations(Type.EmptyTypes);
 
-            container.RegisterAll<IPlugin>(typeof(PluginWith7Dependencies));
+            container.RegisterAll<IPlugin>(typeof(PluginWith8Dependencies));
 
             container.Verify();
 
@@ -237,7 +237,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             Assert.IsNotNull(results, "A warning should have been detected.");
             Assert.AreEqual(1, results.Length);
             Assert.AreEqual(
-                typeof(PluginWith7Dependencies).Name + " has 7 dependencies which might indicate a SRP violation.",
+                typeof(PluginWith8Dependencies).Name + " has 8 dependencies which might indicate a SRP violation.",
                 results[0].Description);
         }
 
@@ -276,7 +276,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             Container container = CreateContainerWithRegistrations(Type.EmptyTypes);
 
             // This decorator has too many dependencies
-            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith7Dependencies));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith8Dependencies));
 
             // Non of these types have too many dependencies.
             container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(SomePluginImpl));
