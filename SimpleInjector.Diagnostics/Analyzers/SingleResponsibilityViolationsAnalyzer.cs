@@ -29,7 +29,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
-        private const int MaximumValidNumberOfDependencies = 6;
+        private const int MaximumValidNumberOfDependencies = 7;
 
         public DiagnosticType DiagnosticType
         {
