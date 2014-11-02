@@ -28,7 +28,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Linq;
     using SimpleInjector.Advanced;
 
-    internal sealed class ShortCircuitedDependencyContainerAnalyzer : IContainerAnalyzer
+    internal sealed class ShortCircuitedDependencyAnalyzer : IContainerAnalyzer
     {
         public DiagnosticType DiagnosticType
         {

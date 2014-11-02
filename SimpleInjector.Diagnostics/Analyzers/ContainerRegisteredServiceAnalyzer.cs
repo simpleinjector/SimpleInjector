@@ -27,7 +27,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Linq;
     using SimpleInjector.Advanced;
 
-    internal sealed class ContainerRegisteredServiceContainerAnalyzer : IContainerAnalyzer
+    internal sealed class ContainerRegisteredServiceAnalyzer : IContainerAnalyzer
     {
         public DiagnosticType DiagnosticType
         {
