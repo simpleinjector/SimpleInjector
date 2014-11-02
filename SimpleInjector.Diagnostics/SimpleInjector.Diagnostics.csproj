@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyzer.cs" />
+    <Compile Include="Analyzers\DisposableTransientComponentAnalyzer.cs" />
     <Compile Include="Analyzers\TornLifestyleContainerAnalyzer.cs" />
     <Compile Include="ContainerAnalyzerProvider.cs" />
     <Compile Include="Debugger\ContainerDebugView.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="DiagnosticResult.cs" />
     <Compile Include="DiagnosticResultGrouper.cs" />
     <Compile Include="DiagnosticType.enum.cs" />
+    <Compile Include="DisposableTransientComponentDiagnosticResult.cs" />
     <Compile Include="IContainerAnalyzer.cs" />
     <Compile Include="LifestyleMismatchChecker.cs" />
     <Compile Include="Analyzers\PotentialLifestyleMismatchAnalyzer.cs" />

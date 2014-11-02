@@ -252,6 +252,13 @@
     {
     }
 
+    public class DisposablePlugin : IPlugin, IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
     public class PluginWith7Dependencies : IPlugin
     {
         public PluginWith7Dependencies(

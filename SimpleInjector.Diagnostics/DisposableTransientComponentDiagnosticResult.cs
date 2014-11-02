@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,21 +22,24 @@
 
 namespace SimpleInjector.Diagnostics
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using SimpleInjector.Diagnostics.Analyzers;
+    using System;
+    using SimpleInjector.Advanced;
 
-    internal static class ContainerAnalyzerProvider
+    /// <summary>
+    /// Diagnostic result for a warning about a component that is registered as transient, but implements 
+    /// <see cref="IDisposable"/>.
+    /// For more information, see: https://simpleinjector.org/diadt.
+    /// </summary>
+    public class DisposableTransientComponentDiagnosticResult : DiagnosticResult
     {
-        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = 
-            new ReadOnlyCollection<IContainerAnalyzer>(new List<IContainerAnalyzer>
-            {
-                new PotentialLifestyleMismatchAnalyzer(),
-                new ShortCircuitedDependencyAnalyzer(),
-                new SingleResponsibilityViolationsAnalyzer(),
-                new ContainerRegisteredServiceAnalyzer(),
-                new TornLifestyleContainerAnalyzer(),
-                new DisposableTransientComponentAnalyzer()
-            });
+        internal DisposableTransientComponentDiagnosticResult(Type serviceType, InstanceProducer registration, 
+            string description)
+            : base(serviceType, description, DiagnosticType.DisposableTransientComponent, registration)
+        {
+        }
+
+        /// <summary>Gets the object that describes the relationship between the component and its dependency.</summary>
+        /// <value>A <see cref="KnownRelationship"/> instance.</value>
+        public InstanceProducer Registration { get; private set; }
     }
 }
