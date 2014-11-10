@@ -66,7 +66,8 @@
         IService<T, int> Service { get; }
     }
 
-    public interface IEventHandler<TEvent>
+    // This interface is contravariant, since TEvent is defined with the 'in' keyword.
+    public interface IEventHandler<in TEvent>
     {
     }
 

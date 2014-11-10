@@ -176,14 +176,17 @@ namespace SimpleInjector.Extensions
         }
         
         internal static Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType,
-            IEnumerable<Type> openGenericImplementations)
+            IEnumerable<Type> openGenericImplementations, bool includeVariantTypes = true)
         {
             return (
                 from openGenericImplementation in openGenericImplementations
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
-                where result.ClosedServiceTypeSatisfiesAllTypeConstraints
-                select result.ClosedGenericImplementation)
+                where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
+                    includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
+                select result.ClosedServiceTypeSatisfiesAllTypeConstraints 
+                    ? result.ClosedGenericImplementation
+                    : openGenericImplementation)
                 .ToArray();
         }
         

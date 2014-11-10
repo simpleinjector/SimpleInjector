@@ -1405,7 +1405,32 @@
                 "quite hard and probably not useful at all. Instead of injecting arrays, users should be " +
                 "injecting streams anyway.");
         }
-        
+
+        [TestMethod]
+        public void GetAllInstances_RequestingAContravariantInterface_ResolvesAllAssignableImplementations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent.
+            var expectedHandlerTypes = new[]
+            {
+                typeof(CustomerMovedEventHandler), // IEventHandler<CustomerMovedEvent>
+                typeof(CustomerMovedAbroadEventHandler) // IEventHandler<CustomerMovedAbroadEvent>
+            };
+
+            // IEventHandler<in TEvent> is contravariant.
+            container.RegisterAll(typeof(IEventHandler<>), expectedHandlerTypes);
+
+            // Act
+            var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
+            Type[] actualHandlerTypes = handlers.Select(handler => handler.GetType()).ToArray();
+
+            // Assert
+            Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
+                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -1420,6 +1445,28 @@
             Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
             Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);
             Assert.IsNotInstanceOfType(collection, typeof(ICollection<T>), assertMessage);
+        }
+
+        // Events
+        public class CustomerMovedEvent
+        {
+        }
+
+        public class CustomerMovedAbroadEvent : CustomerMovedEvent
+        {
+        }
+
+        public class SpecialCustomerMovedEvent : CustomerMovedEvent
+        {
+        }
+
+        // Handler implementations
+        public class CustomerMovedEventHandler : IEventHandler<CustomerMovedEvent>
+        {
+        }
+
+        public class CustomerMovedAbroadEventHandler : IEventHandler<CustomerMovedAbroadEvent>
+        {
         }
 
         private sealed class LeftEnumerable<T> : IEnumerable<T>

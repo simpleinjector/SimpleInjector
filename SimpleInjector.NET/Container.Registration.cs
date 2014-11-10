@@ -1713,9 +1713,8 @@ namespace SimpleInjector
         
         private void RegisterAllGeneric(Type openGenericServiceType, Type[] genericImplementations)
         {
-            // NOTE: In fact the supplied types are don't all have to be open, they can be closed and 
-            // non-generic as well, and they don't have to be implementations, they can be abstractions as 
-            // well.
+            // NOTE: In fact the supplied types don't all have to be open, they can be closed and non-generic 
+            // as well, and they don't have to be implementations, they can be abstractions as well.
             var openGenericImplementations = genericImplementations.Where(t => t.ContainsGenericParameters)
                 .ToArray();
 

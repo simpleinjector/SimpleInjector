@@ -526,7 +526,7 @@ namespace SimpleInjector.Extensions
             private Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
             {
                 return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
-                    this.OpenGenericImplementations);
+                    this.OpenGenericImplementations, includeVariantTypes: false);
             }
 
             private Registration GetContainerControlledRegistrationFromCache(
