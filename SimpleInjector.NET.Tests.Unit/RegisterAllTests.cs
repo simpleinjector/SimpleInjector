@@ -1431,6 +1431,30 @@
                 "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
         }
 
+        [TestMethod]
+        public void GetAllInstances_RequestingAContravariantInterfaceWhenARegistrationForAClosedServiceTypeIsMade_ResolvesTheAssignableImplementation()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent.
+            var expectedHandlerTypes = new[]
+            {
+                typeof(CustomerMovedEventHandler), // IEventHandler<CustomerMovedEvent>
+            };
+
+            // IEventHandler<in TEvent> is contravariant.
+            container.RegisterAll<IEventHandler<CustomerMovedEvent>>(expectedHandlerTypes);
+
+            // Act
+            var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
+
+            // Assert
+            Assert.IsTrue(handlers.Any(), "Since IEventHandler<CustomerMovedEvent> is assignable from " +
+                "IEventHandler<CustomerMovedAbroadEvent> (because of the in-keyword) the " +
+                "CustomerMovedEventHandler should have been resolved here.");
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +

@@ -1131,7 +1131,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
                 typeCanBeServiceType: true);
 
-            if (serviceType.ContainsGenericParameters)
+            if (serviceType.IsGenericType)
             {
                 this.RegisterAllGeneric(serviceType, types);
             }
@@ -1715,11 +1715,8 @@ namespace SimpleInjector
         {
             // NOTE: In fact the supplied types don't all have to be open, they can be closed and non-generic 
             // as well, and they don't have to be implementations, they can be abstractions as well.
-            var openGenericImplementations = genericImplementations.Where(t => t.ContainsGenericParameters)
-                .ToArray();
-
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(openGenericServiceType,
-                openGenericImplementations, "serviceTypes");
+                genericImplementations, "serviceTypes");
 
             var closedServiceTypes = GetClosedServicesTypes(openGenericServiceType, genericImplementations);
 
@@ -1729,14 +1726,18 @@ namespace SimpleInjector
                     closedServiceType, genericImplementations);
 
                 // Make an explicit registration for this closed service type.
-                this.RegisterAll(closedServiceType, closedImplementations);
+                IContainerControlledCollection collection = 
+                    DecoratorHelpers.CreateContainerControlledCollection(closedServiceType, this, 
+                        closedImplementations);
+
+                this.RegisterContainerControlledCollection(closedServiceType, collection);
             }
 
             // Register the collection using unregistered type resolution.
             var resolver = new UnregisteredAllResolver
             {
-                OpenGenericServiceType = openGenericServiceType,
-                OpenGenericImplementations = openGenericImplementations,
+                OpenGenericServiceType = openGenericServiceType.GetGenericTypeDefinition(),
+                OpenGenericImplementations = genericImplementations,
                 Container = this,
             };
 
