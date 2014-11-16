@@ -94,7 +94,7 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <remarks>
         /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
-        /// percausions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
+        /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
         /// </remarks>
         /// <param name="container">The container.</param>
         /// <param name="key">The key of the item to retrieve.</param>
@@ -114,7 +114,7 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <remarks>
         /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
-        /// percausions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
+        /// percussions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
         /// </remarks>
         /// <param name="container">The container.</param>
         /// <param name="key">The key of the item to insert or override.</param>
