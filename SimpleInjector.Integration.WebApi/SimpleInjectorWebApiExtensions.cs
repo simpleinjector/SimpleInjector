@@ -24,7 +24,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -41,6 +40,8 @@ namespace SimpleInjector
     {
         private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle(true);
         private static readonly Lifestyle LifestyleNoDisposal = new WebApiRequestLifestyle(false);
+
+        private static bool httpRequestMessageTrackingEnabled;
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned within the
@@ -260,11 +261,10 @@ namespace SimpleInjector
 
             if (!configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
             {
-                container.RegisterWebApiRequest<SimpleInjectorHttpRequestMessageProvider>(
-                    () => new SimpleInjectorHttpRequestMessageProvider());
-
                 configuration.MessageHandlers.Add(new SimpleInjectorHttpRequestMessageHandler(container));
             }
+
+            httpRequestMessageTrackingEnabled = true;
         }
 
         /// <summary>
@@ -280,12 +280,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, "container");
 
-            IServiceProvider provider = container;
-
-            var messageProvider = provider.GetService(typeof(SimpleInjectorHttpRequestMessageProvider))
-                as SimpleInjectorHttpRequestMessageProvider;
-
-            if (messageProvider == null)
+            if (!httpRequestMessageTrackingEnabled)
             {
                 throw new InvalidOperationException(
                     "Resolving the current HttpRequestMessage has not been enabled. Make sure " +
@@ -293,7 +288,7 @@ namespace SimpleInjector
                     "been called during startup.");
             }
 
-            return messageProvider.GetCurrentMessage();
+            return SimpleInjectorHttpRequestMessageProvider.CurrentMessage;
         }
 
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)

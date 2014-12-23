@@ -22,22 +22,41 @@
 
 namespace SimpleInjector.Integration.WebApi
 {
+    using System;
     using System.Net.Http;
+    using System.Runtime.Remoting.Messaging;
 
-    internal sealed class SimpleInjectorHttpRequestMessageProvider
+    internal static class SimpleInjectorHttpRequestMessageProvider
     {
-        // We explicitly don't use a property here, because that might conflict with a custom
-        // IPropertySelectionBehavior that the user might have used.
-        private HttpRequestMessage currentMessage;
+        private static readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
-        internal void SetCurrentMessage(HttpRequestMessage currentMessage)
+        internal static HttpRequestMessage CurrentMessage
         {
-            this.currentMessage = currentMessage;
+            get
+            {
+                var wrapper = (HttpRequestMessageWrapper)CallContext.LogicalGetData(key);
+
+                return wrapper != null ? wrapper.Message : null;
+            }
+
+            set
+            {
+                var wrapper = value == null ? null : new HttpRequestMessageWrapper(value);
+
+                CallContext.LogicalSetData(key, wrapper);
+            }
         }
 
-        internal HttpRequestMessage GetCurrentMessage()
+        [Serializable]
+        internal sealed class HttpRequestMessageWrapper : MarshalByRefObject
         {
-            return this.currentMessage;
+            [NonSerializedAttribute]
+            internal readonly HttpRequestMessage Message;
+
+            internal HttpRequestMessageWrapper(HttpRequestMessage message)
+            {
+                this.Message = message;
+            }
         }
     }
 }
