@@ -6,10 +6,17 @@ Version 2.7.0 (v2.7.0 RTM)
 	New features:
 		-[Core] Added support for resolving IList<T> and ICollection<T>. (work item 20981)
 		-[Core] Added support for resolving arrays. (work item 20982)
-		-[Core] Added 'thorn lifestyle' diagnostic warning (work item 20975).
+		-[Core] Added 'torn lifestyle' diagnostic warning (work item 20975).
 		-[Core] Added 'disposable transient' diagnostic warning (work item 20957).
 		-[Core] Added support for resolving assignable variant implementations in collections registered
 		 with RegisterAll (work item 20984).
+
+
+Version 2.6.2 (v2.6.2 RTM) 2014-12-24
+
+	Bug fixes:
+		-[WebApi] The GetCurrentHttpRequestMessage() method returned null inside a nested execution context 
+		 scope. (work item 20987).
 
 
 Version 2.6.1 (v2.6.1 RTM) 2014-10-26
