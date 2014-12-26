@@ -28,13 +28,13 @@ namespace SimpleInjector.Integration.WebApi
 
     internal static class SimpleInjectorHttpRequestMessageProvider
     {
-        private static readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
+        private static readonly string Key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
         internal static HttpRequestMessage CurrentMessage
         {
             get
             {
-                var wrapper = (HttpRequestMessageWrapper)CallContext.LogicalGetData(key);
+                var wrapper = (HttpRequestMessageWrapper)CallContext.LogicalGetData(Key);
 
                 return wrapper != null ? wrapper.Message : null;
             }
@@ -43,7 +43,7 @@ namespace SimpleInjector.Integration.WebApi
             {
                 var wrapper = value == null ? null : new HttpRequestMessageWrapper(value);
 
-                CallContext.LogicalSetData(key, wrapper);
+                CallContext.LogicalSetData(Key, wrapper);
             }
         }
 
