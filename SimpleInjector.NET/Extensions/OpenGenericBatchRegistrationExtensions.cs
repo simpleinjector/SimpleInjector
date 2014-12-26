@@ -1203,7 +1203,8 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(callback, "callback");
             Requires.DoesNotContainNullValues(typesToRegister, "typesToRegister");
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
-            Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, typesToRegister, "typesToRegister");
+            Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, typesToRegister, 
+                "typesToRegister", typeCanBeServiceType: false);
 
             RegisterOpenGenericInternal(openGenericServiceType, typesToRegister, callback);
         }

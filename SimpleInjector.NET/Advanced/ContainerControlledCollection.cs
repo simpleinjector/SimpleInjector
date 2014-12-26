@@ -25,7 +25,6 @@ namespace SimpleInjector.Advanced
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Lifestyles;
 
@@ -40,29 +39,12 @@ namespace SimpleInjector.Advanced
     {
         private readonly Container container;
 
-        private List<Lazy<InstanceProducer>> producers;
+        private List<Lazy<InstanceProducer>> producers = new List<Lazy<InstanceProducer>>();
 
         // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledCollection(Container container, Type[] serviceTypes)
+        public ContainerControlledCollection(Container container)
         {
             this.container = container;
-            this.producers = serviceTypes.Select(this.ToLazyInstanceProducer).ToList();
-        }
-
-        // This constructor needs to be public. It is called using reflection.
-        public ContainerControlledCollection(Container container, IEnumerable<Registration> registrations)
-        {
-            this.container = container;
-            this.producers = registrations.Select(ToLazyInstanceProducer).ToList();
-        }
-
-        // This constructor needs to be public. It is called using reflection.
-        // Note: the parameter order is swapped to remove the ambiguity between the other ctors when using
-        // Activator.CreateInstance.
-        public ContainerControlledCollection(TService[] singletons, Container container)
-            : this(container, ConvertSingletonsToInstanceProducers(container, singletons))
-        {
-            // TODO: Make sure this method isn't called directly anymore.
         }
 
         public int Count
@@ -142,11 +124,16 @@ namespace SimpleInjector.Advanced
             throw GetNotSupportedBecauseCollectionIsReadOnlyException();
         }
 
-        void IContainerControlledCollection.Append(Registration registration)
+        void IContainerControlledCollection.Clear()
         {
             this.container.ThrowWhenContainerIsLocked();
 
-            this.producers.Add(ToLazyInstanceProducer(registration));
+            this.producers.Clear();
+        }
+
+        void IContainerControlledCollection.Append(ContainerControlledItem registration)
+        {
+            this.producers.Add(this.ToLazyInstanceProducer(registration));
         }
 
         KnownRelationship[] IContainerControlledCollection.GetRelationships()
@@ -187,12 +174,16 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private static IEnumerable<Registration> ConvertSingletonsToInstanceProducers(Container container,
-            TService[] singletons)
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration)
         {
-            return
-                from instance in singletons
-                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, container);
+            if (registration.Registration != null)
+            {
+                return ToLazyInstanceProducer(registration.Registration);
+            }
+            else
+            {
+                return this.ToLazyInstanceProducer(registration.ImplementationType);
+            }
         }
 
         private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration)

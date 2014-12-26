@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -70,7 +70,10 @@ namespace SimpleInjector
 
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
-
+        
+        private readonly Dictionary<Type, ContainerControlledCollectionResolver> unregisteredAllResolvers =
+            new Dictionary<Type, ContainerControlledCollectionResolver>();
+        
         private Dictionary<Type, InstanceProducer> registrations = 
             new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
 
@@ -140,11 +143,6 @@ namespace SimpleInjector
         /// returned from the registered container.Options.LifestyleSelectionBehavior.
         /// </summary>
         internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; private set; }
-
-        internal object SyncRoot
-        {
-            get { return this.locker; }
-        }
 
         internal long ContainerId
         {

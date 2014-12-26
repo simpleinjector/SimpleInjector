@@ -22,8 +22,10 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>This interface is not meant for public use.</summary>
     internal interface IContainerControlledCollection : IEnumerable
@@ -34,8 +36,34 @@ namespace SimpleInjector.Advanced
 
         /// <summary>PLease do not use.</summary>
         /// <param name="registration">Do not use.</param>
-        void Append(Registration registration);
+        void Append(ContainerControlledItem registration);
+        
+        void Clear();
 
         void VerifyCreatingProducers();
+    }
+
+    internal static class ContainerControlledCollectionExtensions
+    {
+        internal static void AppendAll(this IContainerControlledCollection collection,
+            IEnumerable<ContainerControlledItem> registrations)
+        {
+            foreach (ContainerControlledItem registration in registrations)
+            {
+                collection.Append(registration);
+            }
+        }
+
+        internal static void AppendAll(this IContainerControlledCollection collection,
+            IEnumerable<Type> serviceTypes)
+        {
+            collection.AppendAll(serviceTypes.Select(type => new ContainerControlledItem(type)));
+        }
+
+        internal static void AppendAll(this IContainerControlledCollection collection,
+            IEnumerable<Registration> registrations)
+        {
+            collection.AppendAll(registrations.Select(registration => new ContainerControlledItem(registration)));
+        }
     }
 }

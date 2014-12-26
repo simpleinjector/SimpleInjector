@@ -6,6 +6,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class AdvancedExtensionsTests
@@ -117,7 +118,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Act
             container.AppendToCollection(typeof(object), CreateRegistration(container));
         }
-        
+
         [TestMethod]
         public void AppendToCollection_WithNullContainerArgument_ThrowsException()
         {
@@ -141,7 +142,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             Type invalidServiceType = null;
 
             // Act
-            Action action = 
+            Action action =
                 () => container.AppendToCollection(invalidServiceType, CreateRegistration(container));
 
             // Assert
@@ -190,7 +191,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
 
-            container.AppendToCollection(typeof(IPlugin), registration);            
+            container.AppendToCollection(typeof(IPlugin), registration);
 
             // Act
             var instance = container.GetAllInstances<IPlugin>().Single();
@@ -299,6 +300,143 @@ namespace SimpleInjector.Tests.Unit.Advanced
                 with one of the other RegisterAll overloads is appending is required."
                 .TrimInside(),
                 action);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegistrationAppendedToExistingOpenGenericRegistration_ResolvesTheExtectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(StructEventHandler),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+
+            var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
+
+            container.AppendToCollection(typeof(IEventHandler<>), registration);
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_MultipleAppendedOpenGenericTypes_ResolvesTheExpectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(StructConstraintEventHandler<StructEvent>),
+                typeof(AuditableEventEventHandler<StructEvent>)
+            };
+
+            var container = ContainerFactory.New();
+
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_MultipleOpenGenericTypesAppendedToPreRegistrationWithOpenGenericType_ResolvesTheExpectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(StructConstraintEventHandler<StructEvent>),
+                typeof(AuditableEventEventHandler<StructEvent>)
+            };
+
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RegistrationAppendedToExistingRegistrationForSameClosedType_ResolvesTheInstanceWithExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] 
+            { 
+                // Here we make a closed registration; this causes an explicit registration for the
+                // IEventHandlerStructEvent> collection.
+                typeof(NewConstraintEventHandler<StructEvent>),
+            });
+
+            var registration = Lifestyle.Singleton
+                .CreateRegistration(typeof(StructConstraintEventHandler<StructEvent>), container);
+
+            container.AppendToCollection(typeof(IEventHandler<>), registration);
+
+            // Act
+            var handler1 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
+            var handler2 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(StructConstraintEventHandler<StructEvent>));
+            Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
+        }
+        
+        [TestMethod]
+        public void GetAllInstances_DelegatedRegistrationAppendedToExistingRegistrationForSameClosedType_ResolvesTheInstanceWithExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] 
+            { 
+                typeof(NewConstraintEventHandler<StructEvent>),
+            });
+
+            var registration = Lifestyle.Singleton.CreateRegistration(
+                typeof(IEventHandler<StructEvent>),
+                () => new StructConstraintEventHandler<StructEvent>(),
+                container);
+
+            container.AppendToCollection(typeof(IEventHandler<>), registration);
+
+            // Act
+            var handler1 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
+            var handler2 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(StructConstraintEventHandler<StructEvent>));
+            Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
         }
 
         [TestMethod]

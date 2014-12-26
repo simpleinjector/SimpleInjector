@@ -681,10 +681,12 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IUserRepository), new[] 
+            IEnumerable<Registration> registrations = new[] 
             { 
                 Lifestyle.Transient.CreateRegistration<IUserRepository, SqlUserRepository>(container)
-            });
+            };
+
+            container.RegisterAll(typeof(IUserRepository), registrations);
 
             // Act
             var repository = container.GetAllInstances<IUserRepository>().Single();
@@ -1453,6 +1455,21 @@
             Assert.IsTrue(handlers.Any(), "Since IEventHandler<CustomerMovedEvent> is assignable from " +
                 "IEventHandler<CustomerMovedAbroadEvent> (because of the in-keyword) the " +
                 "CustomerMovedEventHandler should have been resolved here.");
+        }
+        
+        [TestMethod]
+        public void RegisterAllEnumerableRegistration_NullArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<Registration> registrations = null;
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(IPlugin), registrations);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("registrations", action);
         }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)

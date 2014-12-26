@@ -559,8 +559,9 @@ namespace SimpleInjector.Extensions
                     .ToArray();
 
                 IContainerControlledCollection collection = 
-                    DecoratorHelpers.CreateContainerControlledCollection(closedServiceType, this.Container, 
-                        registrations);
+                    DecoratorHelpers.CreateContainerControlledCollection(closedServiceType, this.Container);
+
+                collection.AppendAll(registrations);
 
                 return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
                     collection, this.Container);

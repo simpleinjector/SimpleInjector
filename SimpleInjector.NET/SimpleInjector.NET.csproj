@@ -102,7 +102,8 @@
     <Compile Include="Advanced\PropertyInjectionHelper.full.cs" />
     <Compile Include="Advanced\ReferenceEqualityComparer.cs" />
     <Compile Include="Advanced\SubExpressionReplacer.cs" />
-    <Compile Include="Advanced\UnregisteredAllResolver.cs" />
+    <Compile Include="Advanced\ContainerControlledItem.cs" />
+    <Compile Include="Advanced\ContainerControlledCollectionResolver.cs" />
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />

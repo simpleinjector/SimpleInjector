@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -88,6 +88,8 @@ namespace SimpleInjector
             return name + "<" + string.Join(", ", argumentNames) + ">";
         }
 
+        // This makes the collection immutable for the consumer. The creator might still be able to change
+        // the collection in the background.
         internal static IEnumerable<T> MakeReadOnly<T>(this IEnumerable<T> collection)
         {
             bool typeIsReadOnlyCollection = collection is ReadOnlyCollection<T>;

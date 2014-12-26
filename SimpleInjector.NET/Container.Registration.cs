@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -1026,6 +1026,7 @@ namespace SimpleInjector
 
             registration.IsCollection = true;
 
+            // This is a container uncontrolled collection
             this.AddRegistration(typeof(IEnumerable<TService>), registration);
         }
 
@@ -1048,8 +1049,11 @@ namespace SimpleInjector
             Requires.IsNotNull(singletons, "singletons");
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
-            var collection =
-                DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this, singletons);
+            var collection = DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this);
+
+            collection.AppendAll(
+                from instance in singletons
+                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this));
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
         }
@@ -1124,50 +1128,16 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceTypes, "serviceTypes");
 
             // Make a copy for correctness and performance.
-            Type[] types = serviceTypes.ToArray();
+            Type[] serviceTypesCopy = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(types, "serviceTypes");
-
-            Requires.ServiceIsAssignableFromImplementations(serviceType, types, "serviceTypes",
+            Requires.DoesNotContainNullValues(serviceTypesCopy, "serviceTypes");
+            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypesCopy, "serviceTypes",
                 typeCanBeServiceType: true);
+            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypesCopy,
+                "serviceTypes");
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypesCopy, "serviceTypes");
 
-            if (serviceType.IsGenericType)
-            {
-                this.RegisterAllGeneric(serviceType, types);
-            }
-            else
-            {
-                Requires.DoesNotContainOpenGenericTypes(types, "serviceTypes");
-
-                IContainerControlledCollection collection =
-                    DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, types);
-
-                this.RegisterContainerControlledCollection(serviceType, collection);
-            }
-        }   
-
-        /// <summary>
-        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
-        /// </summary>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
-        /// reference (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
-        /// <paramref name="serviceType"/> is
-        /// not assignable from one of the given <paramref name="registrations"/> elements.
-        /// </exception>
-        public void RegisterAll(Type serviceType, params Registration[] registrations)
-        {
-            this.RegisterAll(serviceType, (IEnumerable<Registration>)registrations);
+            this.AppendToCollectionInternal(serviceType, serviceTypesCopy);
         }
 
         /// <summary>
@@ -1191,22 +1161,46 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
         {
+            Requires.IsNotNull(registrations, "registrations");
+
+            this.RegisterAll(serviceType, registrations.ToArray());
+        }
+
+        /// <summary>
+        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
+        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
+        /// <paramref name="serviceType"/> is
+        /// not assignable from one of the given <paramref name="registrations"/> elements.
+        /// </exception>
+        public void RegisterAll(Type serviceType, params Registration[] registrations)
+        {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registrations, "registrations");
             Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
-            // Make a copy for correctness and performance.
+            // Make a copy for correctness.
             registrations = registrations.ToArray();
 
             Requires.DoesNotContainNullValues(registrations, "registrations");
-
+            Requires.AreRegistrationsForThisContainer(this, registrations, "registrations");
             Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, "registrations",
                 typeCanBeServiceType: true);
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, "registrations");
 
-            IContainerControlledCollection collection =
-                DecoratorHelpers.CreateContainerControlledCollection(serviceType, this, registrations);
-
-            this.RegisterContainerControlledCollection(serviceType, collection);
+            this.AppendToCollectionInternal(serviceType, registrations);
         }
 
         /// <summary>
@@ -1226,9 +1220,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(collection, "collection");
-
             Requires.IsNotOpenGenericType(serviceType, "serviceType");
-
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
             try
@@ -1376,7 +1368,9 @@ namespace SimpleInjector
         /// </exception>
         public void AddRegistration(Type serviceType, Registration registration)
         {
-            this.VerifyServiceTypeAndRegistrationArguments(serviceType, registration);
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registration, "registration");
+            Requires.IsRegistrationForThisContainer(this, registration, "registration");
 
             this.ThrowWhenContainerIsLocked();
             this.ThrowWhenTypeAlreadyRegistered(serviceType);
@@ -1396,29 +1390,6 @@ namespace SimpleInjector
         internal void RemoveExternalProducer(InstanceProducer producer)
         {
             this.externalProducers.Remove(producer);
-        }
-
-        // This method is internal to prevent the main API of the framework from being 'polluted'. The
-        // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
-        // exposure.
-        internal void RegisterAllAppend(Type serviceType, Registration registration)
-        {
-            this.VerifyServiceTypeAndRegistrationArguments(serviceType, registration);
-
-            this.ThrowWhenContainerIsLocked();
-
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
-
-            if (collectionRegistered)
-            {
-                this.AppendToExistingRegistration(serviceType, registration);
-            }
-            else
-            {
-                this.RegisterAll(serviceType, new[] { registration });
-            }
         }
 
         internal void ThrowWhenContainerIsLocked()
@@ -1450,6 +1421,171 @@ namespace SimpleInjector
             }
 
             return errorMessage == null;
+        }
+        
+        // This method is internal to prevent the main API of the framework from being 'polluted'. The
+        // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
+        // exposure.
+        internal void AppendToCollectionInternal(Type serviceType, params Registration[] registrations)
+        {
+            this.AppendToCollectionInternal(serviceType,
+                registrations.Select(r => new ContainerControlledItem(r)).ToArray());
+        }
+
+        internal void AppendToCollectionInternal(Type serviceType, params Type[] serviceTypes)
+        {
+            // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
+            // abstract.
+            this.AppendToCollectionInternal(serviceType,
+                serviceTypes.Select(type => new ContainerControlledItem(type)).ToArray());
+        }
+
+        internal void AppendToCollectionInternal(Type serviceType, ContainerControlledItem[] registrations)
+        {
+            this.ThrowWhenContainerIsLocked();
+
+            if (serviceType.IsGenericType)
+            {
+                this.AppendToGenericCollection(serviceType, registrations);
+            }
+            else
+            {
+                this.AppendToNonGenericCollection(serviceType, registrations);
+            }
+        }
+
+        private void AppendToGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
+        {
+            ContainerControlledCollectionResolver resolver = this.GetUnregisteredAllResolver(serviceType);
+
+            resolver.AppendAll(registrations);
+
+            foreach (Type closedServiceType in resolver.GetAllKnownClosedServiceTypes())
+            {
+                // When registering a generic collection, the container keeps track of all open and closed
+                // elements in the resolver. This resolver allows unregistered type resolution and this allows
+                // all closed versions of the collection to be resolved. But if we only used unregistered type
+                // resolution, this could cause these registrations to be hidden from the verification 
+                // mechanism in case the collections are root types in the application. This could cause the
+                // container to verify, while still failing at runtime when resolving a collection.
+                // So besides this unregistered type resolution, we also explicitly register all closed-generic
+                // collections that we can determine here.
+                var closedItems = resolver.GetClosedContainerControlledItemsFor(closedServiceType);
+                this.RebuildClosedGenericCollection(closedServiceType, closedItems);
+            }
+        }
+
+        private ContainerControlledCollectionResolver GetUnregisteredAllResolver(Type serviceType)
+        {
+            ContainerControlledCollectionResolver resolver;
+
+            Type openGenericServiceType = serviceType.GetGenericTypeDefinition();
+
+            if (!this.unregisteredAllResolvers.TryGetValue(openGenericServiceType, out resolver))
+            {
+                resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
+
+                this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+
+                this.unregisteredAllResolvers.Add(openGenericServiceType, resolver);
+            }
+
+            return resolver;
+        }
+
+        private void RebuildClosedGenericCollection(Type closedServiceType,
+            ContainerControlledItem[] closedContainerControlledItems)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
+
+            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
+
+            if (collectionRegistered)
+            {
+                this.RebuildExistingClosedGenericCollection(closedServiceType, closedContainerControlledItems);
+            }
+            else
+            {
+                this.RegisterContainerControlledCollection(closedServiceType, closedContainerControlledItems);
+            }
+        }
+
+        private void RebuildExistingClosedGenericCollection(Type closedServiceType,
+            ContainerControlledItem[] closedContainerControlledItems)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
+
+            var producer = this.registrations[enumerableServiceType];
+
+            IContainerControlledCollection instance =
+                DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
+
+            if (instance == null)
+            {
+                ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(closedServiceType);
+            }
+
+            // If the collection is already registered, this means that the user called AppendToCollection.
+            // Although we can try to append to the collections, the easiest thing to do is just clear the
+            // collection and build it up again.
+            instance.Clear();
+
+            instance.AppendAll(closedContainerControlledItems);
+        }
+
+        private void AppendToNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
+
+            if (collectionRegistered)
+            {
+                this.AppendToExistingNonGenericCollection(serviceType, registrations);
+            }
+            else
+            {
+                this.RegisterContainerControlledCollection(serviceType, registrations);
+            }
+        }
+
+        private void AppendToExistingNonGenericCollection(Type serviceType,
+            ContainerControlledItem[] registrations)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var producer = this.registrations[enumerableServiceType];
+
+            IContainerControlledCollection instance =
+                DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
+
+            if (instance == null)
+            {
+                ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(serviceType);
+            }
+
+            instance.AppendAll(registrations);
+        }
+
+        private static void ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+            Type serviceType)
+        {
+            string exceptionMessage =
+                StringResources.AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+                    serviceType);
+
+            throw new NotSupportedException(exceptionMessage);
+        }
+
+        private void RegisterContainerControlledCollection(Type serviceType,
+            ContainerControlledItem[] registrations)
+        {
+            IContainerControlledCollection collection =
+                DecoratorHelpers.CreateContainerControlledCollection(serviceType, this);
+
+            collection.AppendAll(registrations);
+
+            this.RegisterContainerControlledCollection(serviceType, collection);
         }
 
         private void Register<TService, TImplementation>(Lifestyle lifestyle, string serviceTypeParamName,
@@ -1516,6 +1652,7 @@ namespace SimpleInjector
 
             registration.IsCollection = true;
 
+            // This is a container-uncontrolled collection
             this.AddRegistration(enumerableServiceType, registration);
         }
 
@@ -1671,89 +1808,6 @@ namespace SimpleInjector
                 // the name of the argument. No developer will be surprise to see an ArgEx in this case.
                 throw new ArgumentException(message, parameterName);
             }
-        }
-
-        private void VerifyServiceTypeAndRegistrationArguments(Type serviceType, Registration registration)
-        {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
-
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
-
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
-
-            Requires.IsRegistrationForThisContainer(this, registration, "registration");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
-                "registration");
-        }
-
-        private void AppendToExistingRegistration(Type serviceType, Registration registration)
-        {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            var producer = this.registrations[enumerableServiceType];
-
-            IContainerControlledCollection instance =
-                DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
-
-            if (instance != null)
-            {
-                instance.Append(registration);
-            }
-            else
-            {
-                string exceptionMessage =
-                    StringResources.AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
-                        serviceType);
-
-                throw new NotSupportedException(exceptionMessage);
-            }
-        }
-        
-        private void RegisterAllGeneric(Type openGenericServiceType, Type[] genericImplementations)
-        {
-            // NOTE: In fact the supplied types don't all have to be open, they can be closed and non-generic 
-            // as well, and they don't have to be implementations, they can be abstractions as well.
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(openGenericServiceType,
-                genericImplementations, "serviceTypes");
-
-            var closedServiceTypes = GetClosedServicesTypes(openGenericServiceType, genericImplementations);
-
-            foreach (Type closedServiceType in closedServiceTypes)
-            {
-                Type[] closedImplementations = ExtensionHelpers.GetClosedGenericImplementationsFor(
-                    closedServiceType, genericImplementations);
-
-                // Make an explicit registration for this closed service type.
-                IContainerControlledCollection collection = 
-                    DecoratorHelpers.CreateContainerControlledCollection(closedServiceType, this, 
-                        closedImplementations);
-
-                this.RegisterContainerControlledCollection(closedServiceType, collection);
-            }
-
-            // Register the collection using unregistered type resolution.
-            var resolver = new UnregisteredAllResolver
-            {
-                OpenGenericServiceType = openGenericServiceType.GetGenericTypeDefinition(),
-                OpenGenericImplementations = genericImplementations,
-                Container = this,
-            };
-
-            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
-        }
-
-        private static IEnumerable<Type> GetClosedServicesTypes(Type openGenericServiceType,
-            IEnumerable<Type> openGenericImplementations)
-        {
-            var closedServiceTypes =
-                from implementation in openGenericImplementations
-                where !implementation.ContainsGenericParameters
-                from service in implementation.GetBaseTypesAndInterfacesFor(openGenericServiceType)
-                select service;
-
-            return closedServiceTypes.Distinct();
         }
 
         private sealed class ContainerVerificationScope : Scope

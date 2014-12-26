@@ -148,8 +148,52 @@ namespace SimpleInjector.Advanced
             Registration registration)
         {
             Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(registration, "registration");
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
-            container.RegisterAllAppend(serviceType, registration);
+            Requires.IsRegistrationForThisContainer(container, registration, "registration");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
+                registration.ImplementationType, "registration");
+
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, new[] { registration }, 
+                "registration");
+
+            container.AppendToCollectionInternal(serviceType, registration);
+        }
+
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterAll</b> overloads.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="implementationType">The implementation type to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterAll</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public static void AppendToCollection(this Container container, Type serviceType,
+            Type implementationType)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
+                implementationType, "implementationType");
+
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, 
+                new[] { implementationType }, "implementationType");
+
+            container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
         internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)

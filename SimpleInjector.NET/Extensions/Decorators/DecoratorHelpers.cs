@@ -62,24 +62,17 @@ namespace SimpleInjector.Extensions.Decorators
             return controlledRegistration.Collection;
         }
 
-        internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
-            Container container, Type[] serviceTypes)
+        internal static IContainerControlledCollection CreateContainerControlledCollection(
+            Type serviceType, Container container)
         {
-            return CreateContainerControlledCollectionInternal(serviceType, container, serviceTypes);
-        }
+            Type allInstancesEnumerableType =
+                typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
 
-        internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
-            Container container, IEnumerable<Registration> registrations)
-        {
-            return CreateContainerControlledCollectionInternal(serviceType, container, registrations);
-        }
+            var collection = Activator.CreateInstance(allInstancesEnumerableType, new object[] { container });
 
-        internal static IContainerControlledCollection CreateContainerControlledCollection(Type serviceType,
-            Container container, object arrayOfSingletons)
-        {
-            return CreateContainerControlledCollectionInternal(serviceType, arrayOfSingletons, container);
+            return (IContainerControlledCollection)collection;
         }
-
+     
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
             var constantExpression = enumerableExpression as ConstantExpression;
@@ -206,17 +199,6 @@ namespace SimpleInjector.Extensions.Decorators
                 serviceType.GetGenericTypeDefinition() == parameterType.GetGenericTypeDefinition();
         }
 
-        private static IContainerControlledCollection CreateContainerControlledCollectionInternal(
-            Type serviceType, params object[] arguments)
-        {
-            Type allInstancesEnumerableType =
-                typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
-
-            var collection = Activator.CreateInstance(allInstancesEnumerableType, arguments);
-
-            return (IContainerControlledCollection)collection;
-        }
-        
         private sealed class ContainerControlledCollectionRegistration : Registration
         {
             private readonly Type serviceType;

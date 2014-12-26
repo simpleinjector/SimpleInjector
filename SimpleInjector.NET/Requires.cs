@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -109,14 +109,19 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DoesNotContainOpenGenericTypes(IEnumerable<Type> serviceTypes, string paramName)
+        internal static void DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(Type serviceType,
+            IEnumerable<Type> serviceTypes, string paramName)
         {
-            foreach (var type in serviceTypes)
+            Type openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters);
+
+            if (!serviceType.IsGenericType && openGenericType != null)
             {
-                IsNotOpenGenericType(type, paramName);
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(openGenericType),
+                    paramName);
             }
         }
-
+        
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
             bool implementationIsOpen = implementation.IsGenericType && implementation.ContainsGenericParameters;
@@ -208,7 +213,14 @@ namespace SimpleInjector
         }
 
         internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(Type serviceType,
-            Type[] implementationTypes, string parameterName)
+            IEnumerable<Registration> registrations, string parameterName)
+        {
+            OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType,
+                registrations.Select(registration => registration.ImplementationType), parameterName);
+        }
+
+        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(Type serviceType,
+            IEnumerable<Type> implementationTypes, string parameterName)
         {
             foreach (Type implementationType in implementationTypes)
             {
@@ -220,8 +232,7 @@ namespace SimpleInjector
         internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
             Type implementationType, string parameterName)
         {
-            if (serviceType.ContainsGenericParameters && 
-                implementationType.ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters && implementationType.ContainsGenericParameters)
             {
                 var builder = new GenericTypeBuilder(serviceType, implementationType);
 
@@ -276,6 +287,15 @@ namespace SimpleInjector
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
             Requires.DecoratesBaseTypes(serviceType, decoratorConstructor, paramName);
+        }
+
+        internal static void AreRegistrationsForThisContainer(Container container,
+            IEnumerable<Registration> registrations, string paramName)
+        {
+            foreach (Registration registration in registrations)
+            {
+                IsRegistrationForThisContainer(container, registration, paramName);
+            }
         }
 
         internal static void IsRegistrationForThisContainer(Container container, Registration registration,
@@ -385,12 +405,6 @@ namespace SimpleInjector
                 decoratorType, validConstructorArgumentTypes);
 
             throw new ArgumentException(message, paramName);
-        }
-
-        private static bool ContainsAnotherArgument(Type constraint)
-        {
-            return constraint.IsGenericParameter || (constraint.IsGenericType &&
-                constraint.GetGenericArguments().Any(ContainsAnotherArgument));
         }
 
         private static void ThrowArgumentNullException(string paramName)

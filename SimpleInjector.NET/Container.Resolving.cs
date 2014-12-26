@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2014 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -629,7 +629,7 @@ namespace SimpleInjector
         {
             Type elementType = enumerableType.GetGenericArguments()[0];
 
-            var collection = DecoratorHelpers.CreateContainerControlledCollection(elementType, this, new Type[0]);
+            var collection = DecoratorHelpers.CreateContainerControlledCollection(elementType, this);
 
             var registration = new ExpressionRegistration(Expression.Constant(collection, enumerableType), this);
 

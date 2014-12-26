@@ -162,22 +162,9 @@
         {
             public readonly IEnumerable<IEventHandler<TEvent>> Handlers;
 
-            public MultipleDispatchEventHandler(Container container)
+            public MultipleDispatchEventHandler(IEnumerable<IEventHandler<TEvent>> handlers)
             {
-                var enumType = typeof(IEnumerable<IEventHandler<TEvent>>);
-
-                // Calling ToArray() ensures that GetCurrentRegistrations() will only get called once.
-                var handlersCollection = (
-                    from registration in container.GetCurrentRegistrations()
-                    where enumType.IsAssignableFrom(registration.ServiceType)
-                    select registration.GetInstance())
-                    .Cast<IEnumerable<IEventHandler<TEvent>>>()
-                    .ToArray();
-
-                this.Handlers =
-                    from handlers in handlersCollection
-                    from handler in handlers
-                    select handler;
+                this.Handlers = handlers;
             }
 
             void IEventHandler<TEvent>.Handle(TEvent e)

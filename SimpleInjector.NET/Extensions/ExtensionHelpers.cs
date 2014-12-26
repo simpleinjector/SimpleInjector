@@ -30,6 +30,7 @@ namespace SimpleInjector.Extensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Helper methods for the extensions.
@@ -102,7 +103,11 @@ namespace SimpleInjector.Extensions
 
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            return implementation.GetBaseTypesAndInterfacesFor(service).Any();
+            bool serviceIsGenericTypeDefinitionOfImplementation =
+                implementation.IsGenericType && implementation.GetGenericTypeDefinition() == service;
+
+            return serviceIsGenericTypeDefinitionOfImplementation ||
+                implementation.GetBaseTypesAndInterfacesFor(service).Any();
         }
 
         // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
@@ -174,22 +179,38 @@ namespace SimpleInjector.Extensions
             var thisType = new[] { type };
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
-        
+
         internal static Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType,
             IEnumerable<Type> openGenericImplementations, bool includeVariantTypes = true)
         {
-            return (
+            var openItems =
                 from openGenericImplementation in openGenericImplementations
+                select new ContainerControlledItem(openGenericImplementation);
+
+            var closedItems = GetClosedGenericImplementationsFor(closedGenericServiceType, openItems,
+                includeVariantTypes);
+
+            return closedItems.Select(item => item.ImplementationType).ToArray();
+        }
+
+        internal static ContainerControlledItem[] GetClosedGenericImplementationsFor(
+            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems, 
+            bool includeVariantTypes = true)
+        {
+            return (
+                from item in containerControlledItems
+                let openGenericImplementation = item.ImplementationType
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
                 where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
                     includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
-                select result.ClosedServiceTypeSatisfiesAllTypeConstraints 
+                let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
                     ? result.ClosedGenericImplementation
-                    : openGenericImplementation)
+                    : openGenericImplementation
+                select item.Registration != null ? item : new ContainerControlledItem(closedImplementation))
                 .ToArray();
         }
-        
+
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type baseType = type.BaseType ?? (type != typeof(object) ? typeof(object) : null);

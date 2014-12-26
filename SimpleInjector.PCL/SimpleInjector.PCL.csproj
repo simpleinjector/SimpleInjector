@@ -55,6 +55,12 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollection.cs">
       <Link>Advanced\ContainerControlledCollection.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollectionResolver.cs">
+      <Link>Advanced\ContainerControlledCollectionResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledItem.cs">
+      <Link>Advanced\ContainerControlledItem.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
       <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
@@ -114,9 +120,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\TransientLifestyleSelectionBehavior.cs">
       <Link>Advanced\TransientLifestyleSelectionBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\UnregisteredAllResolver.cs">
-      <Link>Advanced\UnregisteredAllResolver.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\CompilationHelpers.cs">
       <Link>CompilationHelpers.cs</Link>

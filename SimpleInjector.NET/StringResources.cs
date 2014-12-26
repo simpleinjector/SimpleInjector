@@ -264,6 +264,14 @@ namespace SimpleInjector
                 typeof(OpenGenericBatchRegistrationExtensions).FullName);
         }
 
+        internal static string SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type {0} is an open generic type. This type cannot be used for registration " +
+                "of collections of non-generic types.",
+                type.ToFriendlyName());
+        }
+
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation)
         {
             return string.Format(CultureInfo.InvariantCulture,

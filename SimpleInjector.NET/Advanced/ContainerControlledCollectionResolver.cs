@@ -35,16 +35,34 @@ namespace SimpleInjector.Advanced
     // ContainerControlledCollection<T>) to allow lifestyles of individual registrations to be overridden and 
     // this allows abstractions to be used as types. This isn't supported by RegisterAllOpenGeneric and 
     // changing this would be a breaking change. That's why we need both of them.
-    internal sealed class UnregisteredAllResolver
+    internal sealed class ContainerControlledCollectionResolver
     {
+        internal readonly Type OpenGenericServiceType;
+        internal readonly Container Container;
+
+        private readonly List<ContainerControlledItem> registrations = new List<ContainerControlledItem>();
+        private readonly IEnumerable<Type> openGenericImplementations;
+
         private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
             new Dictionary<Type, Registration>();
 
-        internal Type OpenGenericServiceType { get; set; }
+        internal ContainerControlledCollectionResolver(Container container, Type opengenericServiceType)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(opengenericServiceType, "opengenericServiceType");
 
-        internal IEnumerable<Type> OpenGenericImplementations { get; set; }
+            this.Container = container;
+            this.OpenGenericServiceType = opengenericServiceType;
 
-        internal Container Container { get; set; }
+            this.openGenericImplementations =
+                from registration in this.registrations
+                select registration.ImplementationType;
+        }
+
+        internal void AppendAll(params ContainerControlledItem[] registrations)
+        {
+            this.registrations.AddRange(registrations);
+        }
 
         internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
         {
@@ -54,32 +72,45 @@ namespace SimpleInjector.Advanced
 
                 if (this.OpenGenericServiceType.IsGenericTypeDefinitionOf(closedServiceType))
                 {
-                    Type[] closedGenericImplementations =
-                        this.GetClosedGenericImplementationsFor(closedServiceType);
+                    Registration registration;
 
-                    if (closedGenericImplementations.Any())
+                    if (this.TryGetContainerControlledRegistrationFromCache(closedServiceType, out registration))
                     {
-                        Registration registration = this.GetContainerControlledRegistrationFromCache(
-                            closedServiceType, closedGenericImplementations);
-
                         e.Register(registration);
                     }
                 }
             }
         }
 
-        private Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
+        internal Type[] GetAllKnownClosedServiceTypes()
         {
-            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
-                this.OpenGenericImplementations);
+            var closedServiceTypes =
+                from implementation in this.openGenericImplementations
+                where !implementation.ContainsGenericParameters
+                from service in implementation.GetBaseTypesAndInterfacesFor(this.OpenGenericServiceType)
+                select service;
+
+            return closedServiceTypes.Distinct().ToArray();
         }
 
-        private Registration GetContainerControlledRegistrationFromCache(
-            Type closedServiceType, Type[] closedGenericImplementations)
+        internal Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
+        {
+            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
+                this.openGenericImplementations);
+        }
+
+        internal ContainerControlledItem[] GetClosedContainerControlledItemsFor(Type closedGenericServiceType)
+        {
+            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType, this.registrations);
+        }
+
+        private bool TryGetContainerControlledRegistrationFromCache(Type closedServiceType,
+            out Registration registration)
         {
             lock (this.lifestyleRegistrationCache)
             {
-                Registration registration;
+                Type[] closedGenericImplementations =
+                    this.GetClosedGenericImplementationsFor(closedServiceType);
 
                 if (!this.lifestyleRegistrationCache.TryGetValue(closedServiceType, out registration))
                 {
@@ -89,7 +120,8 @@ namespace SimpleInjector.Advanced
                     this.lifestyleRegistrationCache[closedServiceType] = registration;
                 }
 
-                return registration;
+                // If there are no implementations, no registration need to be made.
+                return closedGenericImplementations.Any();
             }
         }
 
@@ -97,7 +129,9 @@ namespace SimpleInjector.Advanced
             Type[] closedGenericImplementations)
         {
             IContainerControlledCollection collection = DecoratorHelpers.CreateContainerControlledCollection(
-                closedServiceType, this.Container, closedGenericImplementations);
+                closedServiceType, this.Container);
+
+            collection.AppendAll(closedGenericImplementations);
 
             return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
                 collection, this.Container);
