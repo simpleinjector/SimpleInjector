@@ -66,6 +66,8 @@ namespace SimpleInjector.Advanced
             
             if (producer == null)
             {
+                container.Options.ConstructorVerificationBehavior.Verify(parameter);
+
                 throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
                     parameter.Member.DeclaringType, parameter));
             }

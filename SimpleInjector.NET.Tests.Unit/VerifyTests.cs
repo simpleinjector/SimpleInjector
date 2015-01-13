@@ -427,6 +427,32 @@
             AssertThat.Throws<InvalidOperationException>(action);
         }
 
+        [TestMethod]
+        public void Verify_RegisterAllRegistrationWithTypeReferencingAPrimitiveType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll<IPlugin>(typeof(PluginWithBooleanDependency));
+
+            // Act
+            Action action = () => container.Verify();
+            
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                contains parameter 'isInUserContext' of type Boolean which can not be used for constructor 
+                injection because it is a value type."
+                .TrimInside(),
+                action);
+        }
+
+        public class PluginWithBooleanDependency : IPlugin
+        {
+            public PluginWithBooleanDependency(bool isInUserContext)
+            {
+            }
+        }
+
         public class Service<T>
         {
             public Service(IEnumerable<T> collection)
