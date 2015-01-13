@@ -1472,6 +1472,44 @@
             AssertThat.ThrowsWithParamName<ArgumentNullException>("registrations", action);
         }
 
+        [TestMethod]
+        public void RegisterAll_MultipleRegistrationsForDifferentClosedVersions_InfluenceOtherRegistrations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Type[] expectedHandlerTypes = new[] 
+            {
+                typeof(CustomerMovedAbroadEventHandler),
+                typeof(CustomerMovedEventHandler)
+            };
+
+            // IEventHandler<in TEvent> is contravariant.
+            container.RegisterAll(typeof(IEventHandler<CustomerMovedAbroadEvent>), new[] 
+            {
+                typeof(CustomerMovedAbroadEventHandler) 
+            });
+
+            container.RegisterAll(typeof(IEventHandler<CustomerMovedEvent>), new Type[] 
+            {
+                typeof(CustomerMovedEventHandler) 
+            });
+
+            // Act
+            var handlers = container.GetAllInstances<IEventHandler<CustomerMovedAbroadEvent>>();
+            var actualHandlerTypes = handlers.Select(handler => handler.GetType()).ToArray();
+
+            // Assert
+            Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
+                @"The registrations for IEventHandler<CustomerMovedEvent> that are assignable to 
+                IEventHandler<CustomerMovedAbroadEvent> are expected to 'flow' to the 
+                IEventHandler<CustomerMovedAbroadEvent> collection, because the expected way for users to
+                register generic types by supplying the RegisterAll(Type, Type[]) overload as follows:
+                container.RegisterManyForOpenGeneric(type, container.RegisterAll, assemblies)."
+                .TrimInside() +
+                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
