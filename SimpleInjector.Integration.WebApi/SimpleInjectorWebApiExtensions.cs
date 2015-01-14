@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -293,10 +293,47 @@ namespace SimpleInjector
 
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)
         {
-            IAssembliesResolver assembliesResolver = configuration.Services.GetAssembliesResolver();
-            IHttpControllerTypeResolver typeResolver = configuration.Services.GetHttpControllerTypeResolver();
+            IAssembliesResolver assembliesResolver = GetAssembliesResolver(configuration);
+
+            IHttpControllerTypeResolver typeResolver = GetHttpControllerTypeResolver(configuration);
 
             return typeResolver.GetControllerTypes(assembliesResolver).ToList();
+        }
+
+        private static IAssembliesResolver GetAssembliesResolver(HttpConfiguration configuration)
+        {
+            try
+            {
+                return configuration.Services.GetAssembliesResolver();
+            }
+            catch (Exception ex)
+            {
+                // For a still unknown reason, the Services.GetAssembliesResolver can throw an exception.
+                // See: https://stackoverflow.com/questions/27927199
+                string message = string.Format(
+                    "There was an error retrieving the {0}. {1}",
+                    typeof(IAssembliesResolver).FullName,
+                    ex.Message);
+
+                throw new InvalidOperationException(message, ex);
+            }
+        }
+
+        private static IHttpControllerTypeResolver GetHttpControllerTypeResolver(HttpConfiguration configuration)
+        {
+            try
+            {
+                return configuration.Services.GetHttpControllerTypeResolver();
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format(
+                    "There was an error retrieving the {0}. {1}",
+                    typeof(IHttpControllerTypeResolver).FullName,
+                    ex.Message);
+
+                throw new InvalidOperationException(message, ex);
+            }
         }
 
         private static Lifestyle GetLifestyle(bool dispose)
