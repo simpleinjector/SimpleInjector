@@ -81,6 +81,8 @@ namespace SimpleInjector
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
         /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
         /// attributes.
+        /// <b>Please note that attributes are cached by MVC, so only dependencies should be injected that
+        /// have the singleton lifestyle.</b>
         /// </summary>
         /// <param name="container">The container that should be used for injecting properties into attributes
         /// that the MVC framework uses.</param>

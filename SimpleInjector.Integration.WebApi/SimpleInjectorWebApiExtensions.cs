@@ -203,7 +203,9 @@ namespace SimpleInjector
         /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
         /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
-        /// attributes.
+        /// attributes. 
+        /// <b>Please note that attributes are cached by Web API, so only dependencies should be injected that
+        /// have the singleton lifestyle.</b>
         /// </summary>
         /// <param name="container">The container that should be used.</param>
         /// <param name="configuration">The <see cref="HttpConfiguration"/>.</param>
