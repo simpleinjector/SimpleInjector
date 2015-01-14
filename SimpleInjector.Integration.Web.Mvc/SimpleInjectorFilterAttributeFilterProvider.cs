@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -40,9 +40,8 @@ namespace SimpleInjector.Integration.Web.Mvc
         {
             this.Container = container;
 
-            // We can always use transient, since caching is not required, only initialization.
             this.registrationFactory =
-                concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
+                concreteType => Lifestyle.Singleton.CreateRegistration(concreteType, container);
         }
 
         internal Container Container { get; private set; }

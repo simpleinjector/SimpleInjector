@@ -17,7 +17,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple Injector ASP.NET Web API Integration.</description>
     <summary>ASP.NET Web API integration for Simple Injector.</summary>
-    <copyright>Simple Injector Contributors 2014</copyright>
+    <copyright>Simple Injector Contributors 2014-2015</copyright>
     <language>en-US</language>
     <tags>simpleinjector Web API webapi architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver</tags>
   </metadata>
