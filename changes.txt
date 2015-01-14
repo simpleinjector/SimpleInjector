@@ -11,6 +11,9 @@ Version 2.7.0 (v2.7.0 RTM)
 		-[Core] Added support for resolving assignable variant implementations in collections registered
 		 with RegisterAll (work item 20984).
 		-[Core] AppendToCollection extension methods now support open-generic types (work item 20985).
+		-[WebApi] New RegisterWebApiControllers overload added to the SimpleInjectorWebApiExtensions class
+		 that allows specifying the assemblies to search through. This is useful during testing where the
+		 default IAssemblyResolver can't be used. (work item 20990).
 
 	Bug fixes:
 		-[Core]: In case a constructor of a type contained a primitive dependency, while the type was resolved

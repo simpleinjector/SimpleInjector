@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
@@ -241,7 +242,32 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(configuration, "configuration");
 
-            var controllerTypes = GetControllerTypesFromConfiguration(configuration);
+            IEnumerable<Assembly> assemblies = GetAvailableApplicationAssemblies(configuration);
+
+            RegisterWebApiControllers(container, configuration, assemblies);
+        }
+
+        /// <summary>
+        /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
+        /// method uses the configured <see cref="IHttpControllerTypeResolver"/> to determine which controller
+        /// types to register.
+        /// </summary>
+        /// <param name="container">The container the controllers should be registered in.</param>
+        /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
+        /// types to register.</param>
+        /// <param name="assemblies">The assemblies to search.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
+        /// reference (Nothing in VB).</exception>
+        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration,
+            IEnumerable<Assembly> assemblies)
+        {
+            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(configuration, "configuration");
+            Requires.IsNotNull(assemblies, "assemblies");
+
+            IAssembliesResolver assembliesResolver = new AssembliesResolver(assemblies);
+
+            var controllerTypes = GetControllerTypesFromConfiguration(configuration, assembliesResolver);
 
             controllerTypes.ForEach(type => container.Register(type, type));
         }
@@ -292,17 +318,44 @@ namespace SimpleInjector
 
             return SimpleInjectorHttpRequestMessageProvider.CurrentMessage;
         }
-
-        private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration)
+        
+        private static IEnumerable<Assembly> GetAvailableApplicationAssemblies(HttpConfiguration configuration)
         {
-            IAssembliesResolver assembliesResolver = GetAssembliesResolver(configuration);
+            IAssembliesResolver assembliesResolver = GetRegisteredAssembliesResolver(configuration);
 
+            try
+            {
+                return assembliesResolver.GetAssemblies();
+            }
+            catch (InvalidOperationException ex)
+            {
+                if (!ex.Message.Contains("pre-start"))
+                {
+                    throw;
+                }
+
+                throw new InvalidOperationException(ex.Message + " " +
+                    "Please note that the RegisterWebApiControllers(Container, HttpConfiguration) overload " +
+                    "makes use of the configured IAssembliesResolver. Web API's default IAssembliesResolver " +
+                    "uses the System.Web.Compilation.BuildManager, which can't be used in the pre-start " +
+                    "initialization phase or outside the context of ASP.NET (e.g. when running unit tests). " + 
+                    "Either make sure you call the RegisterWebApiControllers method at a later point in " + 
+                    "time, register a custom IAssembliesResolver that does not depend on the BuildManager, " +
+                    "or supply a list of assemblies manually using the " +
+                    "RegisterWebApiControllers(Container, HttpConfiguration, IEnumerable<Assembly>) " +
+                    "overload.", ex);
+            }
+        }
+        
+        private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration,
+            IAssembliesResolver assembliesResolver)
+        {
             IHttpControllerTypeResolver typeResolver = GetHttpControllerTypeResolver(configuration);
 
             return typeResolver.GetControllerTypes(assembliesResolver).ToList();
         }
 
-        private static IAssembliesResolver GetAssembliesResolver(HttpConfiguration configuration)
+        private static IAssembliesResolver GetRegisteredAssembliesResolver(HttpConfiguration configuration)
         {
             try
             {
@@ -341,6 +394,21 @@ namespace SimpleInjector
         private static Lifestyle GetLifestyle(bool dispose)
         {
             return dispose ? LifestyleWithDisposal : LifestyleNoDisposal;
+        }
+
+        private sealed class AssembliesResolver : IAssembliesResolver
+        {
+            private readonly ICollection<Assembly> assemblies;
+
+            public AssembliesResolver(IEnumerable<Assembly> assemblies)
+            {
+                this.assemblies = assemblies.ToList().AsReadOnly();
+            }
+
+            public ICollection<Assembly> GetAssemblies()
+            {
+                return this.assemblies;
+            }
         }
     }
 }
