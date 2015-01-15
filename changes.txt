@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 2.7.0 (v2.7.0 RTM)
+Version 2.7.0 (v2.7.0 RTM) 2015-01-15
 
 	New features:
 		-[Core] Added support for resolving IList<T> and ICollection<T>. (work item 20981)
