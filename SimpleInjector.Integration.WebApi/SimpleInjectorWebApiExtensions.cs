@@ -363,10 +363,9 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                // For a still unknown reason, the Services.GetAssembliesResolver can throw an exception.
                 // See: https://stackoverflow.com/questions/27927199
                 string message = string.Format(
-                    "There was an error retrieving the {0}. {1}",
+                    "There was an error retrieving the {0}. Are you missing a binding redirect? {1}",
                     typeof(IAssembliesResolver).FullName,
                     ex.Message);
 
@@ -383,7 +382,7 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 string message = string.Format(
-                    "There was an error retrieving the {0}. {1}",
+                    "There was an error retrieving the {0}. Are you missing a binding redirect? {1}",
                     typeof(IHttpControllerTypeResolver).FullName,
                     ex.Message);
 
