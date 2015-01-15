@@ -23,10 +23,11 @@
 namespace SimpleInjector.Integration.WebApi
 {
     using System;
-    using System.Collections.Generic;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Dependencies;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
+using System.Collections.Generic;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Dependencies;
+using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>Simple Injector <see cref="IDependencyResolver"/> implementation.</summary>
     /// <example>
@@ -65,7 +66,7 @@ namespace SimpleInjector.Integration.WebApi
     /// }
     /// ]]></code>
     /// The previous example show the use of the 
-    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiControllers">RegisterWebApiControllers</see> and
+    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiControllers(Container, HttpConfiguration)">RegisterWebApiControllers</see> and
     /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider">RegisterWebApiFilterProvider</see>
     /// extension methods and how the <b>SimpleInjectorWebApiDependencyResolver</b> can be used to set the created
     /// <see cref="Container"/> instance as default dependency resolver in Web API.
@@ -74,7 +75,7 @@ namespace SimpleInjector.Integration.WebApi
     {
         private readonly Container container;
         private readonly Scope scope;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class.
         /// </summary>
