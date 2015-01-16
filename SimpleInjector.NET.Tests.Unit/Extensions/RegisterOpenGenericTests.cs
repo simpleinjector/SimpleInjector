@@ -6,7 +6,7 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
-
+    
     /// <summary>Tests for testing RegisterOpenGeneric.</summary>
     [TestClass]
     public partial class RegisterOpenGenericTests
@@ -1188,6 +1188,27 @@
             // Assert
             Assert.IsTrue(handled);
         }
+
+        // This is a regression test. This test fails on .NET 4.0 and 4.5 builds (but not on PCL).
+        [TestMethod]
+        public void GetInstance_RegistrationOfTypeWithDeductableTypeArgument_ResolvesTheTypeCorrectly()
+        {
+            // Arrange
+            Type expectedType =
+                typeof(UpdateCommandHandler<SpecialEntity, UpdateCommand<SpecialEntity>>);
+
+            var container = new Container();
+
+            // UpdateCommandHandler<TEntity, TCommand> has generic type constraints, allowing the TEntity to 
+            // be deduced by the IComandHandler<T> interface.
+            container.RegisterOpenGeneric(typeof(ICommandHandler<>), typeof(UpdateCommandHandler<,>));
+
+            // Act
+            var actualInstance = container.GetInstance<ICommandHandler<UpdateCommand<SpecialEntity>>>();
+
+            // Assert
+            Assert.IsInstanceOfType(actualInstance, expectedType);
+        }
     }
 
     public sealed class DefaultStuffDoer<T> : IDoStuff<T>
@@ -1198,5 +1219,22 @@
         }
 
         public IService<T, int> Service { get; private set; }
+    }
+
+    public class SpecialEntity
+    {
+    }
+
+    public class UpdateCommand<TEntity> 
+    {
+    }
+
+    public class UpdateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand>
+        where TEntity : SpecialEntity
+        where TCommand : UpdateCommand<TEntity>
+    {
+        public void Handle(TCommand command)
+        {
+        }
     }
 }
