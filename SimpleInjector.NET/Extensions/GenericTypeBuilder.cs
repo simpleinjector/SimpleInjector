@@ -33,19 +33,19 @@ namespace SimpleInjector.Extensions
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
-        [DebuggerDisplay("{Helpers.ToFriendlyName(closedGenericBaseType)}")]
+        [DebuggerDisplay("{Helpers.ToFriendlyName(closedGenericBaseType),nq}")]
         private readonly Type closedGenericBaseType;
-        
-        [DebuggerDisplay("{Helpers.ToFriendlyName(openGenericImplementation)}")]
+
+        [DebuggerDisplay("{Helpers.ToFriendlyName(openGenericImplementation),nq}")]
         private readonly Type openGenericImplementation;
-        
-        [DebuggerDisplay("{Helpers.ToFriendlyName(partialOpenGenericImplementation)}")]
+
+        [DebuggerDisplay("{(partialOpenGenericImplementation == null ? \"null\" : Helpers.ToFriendlyName(partialOpenGenericImplementation)),nq}")]
         private readonly Type partialOpenGenericImplementation;
 
         private readonly bool isPartialOpenGenericImplementation;
       
         public GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
-        {          
+        {    
             this.closedGenericBaseType = closedGenericBaseType;
 
             this.openGenericImplementation = openGenericImplementation;
@@ -152,9 +152,12 @@ namespace SimpleInjector.Extensions
                 .Distinct()
                 .ToArray();
 
-            return
+            var candidates = (
                 from type in openGenericBaseTypes
-                select this.ToCandicateServiceType(type);
+                select this.ToCandicateServiceType(type))
+                .ToArray();
+
+            return candidates;
         }
 
         private CandicateServiceType ToCandicateServiceType(Type openCandidateServiceType)
@@ -205,7 +208,7 @@ namespace SimpleInjector.Extensions
 
         private bool SafisfiesPartialTypeArguments(Type[] arguments)
         {
-            // Map the parial open generic type arguments to the concrete arguments.
+            // Map the partial open generic type arguments to the concrete arguments.
             var mappings =
                 this.partialOpenGenericImplementation.GetGenericArguments()
                 .Zip(arguments, ArgumentMapping.Create);
