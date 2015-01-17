@@ -122,23 +122,17 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
+            // Act
+            Action action = () => 
                 container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator<>));
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
-                    The supplied decorator NonGenericServiceDecorator<T> is an open
-                    generic type definition".TrimInside(),
-                    ex.Message);
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied decorator NonGenericServiceDecorator<T> is an open
+                generic type definition".TrimInside(),
+                action);
 
-                AssertThat.ExceptionContainsParamName(ex, "decoratorType");
-            }
+            AssertThat.ThrowsWithParamName("decoratorType", action);
         }
 
         [TestMethod]
@@ -211,20 +205,13 @@
 
             container.RegisterSingle<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(
-                    typeof(ICommandHandler<RealCommand>),
-                    typeof(TransactionHandlerDecorator<>));
+            // Act
+            Action action = () => container.RegisterDecorator(
+                typeof(ICommandHandler<RealCommand>),
+                typeof(TransactionHandlerDecorator<>));
 
-                // Assert
-                Assert.Fail("Exception excepted.");
-            }
-            catch (NotSupportedException ex)
-            {
-                AssertThat.ExceptionMessageContains(expectedMessage, ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(expectedMessage, action);
         }
 
         [TestMethod]
@@ -313,20 +300,14 @@
             // Decorator implements ICommandHandler<RealCommand>
             Type nonGenericDecorator = typeof(RealCommandHandlerDecorator);
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(nonMathcingClosedGenericServiceType, nonGenericDecorator);
+            // Act
+            Action action = 
+                () => container.RegisterDecorator(nonMathcingClosedGenericServiceType, nonGenericDecorator);
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    "The supplied type RealCommandHandlerDecorator does not " +
-                    "implement ICommandHandler<Int32>", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type RealCommandHandlerDecorator does not implement ICommandHandler<Int32>", 
+                action);
         }
 
         [TestMethod]
@@ -436,18 +417,11 @@
             // Decorator1Handler depends on ILogger, but ILogger is not registered.
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
 
-            try
-            {
-                // Act
-                var handler = container.GetInstance<ICommandHandler<RealCommand>>();
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("ILogger"), "Actual message: " + ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("ILogger", action);
         }
 
         [TestMethod]
@@ -616,7 +590,7 @@
 
             var container = ContainerFactory.New();
 
-            // Because we registere a Func<TServiceType> there is no way we can determine the implementation 
+            // Because we register a Func<TServiceType> there is no way we can determine the implementation 
             // type. In that case the ImplementationType should equal the ServiceType.
             container.Register<ICommandHandler<RealCommand>>(() => new StubCommandHandler());
 
@@ -648,9 +622,9 @@
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(LogExceptionCommandHandlerDecorator<>), c =>
+                typeof(LogExceptionCommandHandlerDecorator<>), context =>
                 {
-                    actualPredicateImplementationType = c.ImplementationType;
+                    actualPredicateImplementationType = context.ImplementationType;
                     return true;
                 });
 
@@ -702,9 +676,9 @@
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>),
-                typeof(LogExceptionCommandHandlerDecorator<>), c =>
+                typeof(LogExceptionCommandHandlerDecorator<>), context =>
                 {
-                    predicateExpressionOnSecondCall = c.Expression;
+                    predicateExpressionOnSecondCall = context.Expression;
                     return true;
                 });
 
@@ -842,19 +816,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(MultipleConstructorsCommandHandlerDecorator<>));
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(MultipleConstructorsCommandHandlerDecorator<>));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains("it should contain exactly one public constructor", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "it should contain exactly one public constructor",
+                action);
         }
 
         [TestMethod]
@@ -863,22 +832,16 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(InvalidDecoratorCommandHandlerDecorator<>));
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(InvalidDecoratorCommandHandlerDecorator<>));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
-                    For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as  
-                    a decorator, its constructor must include a single parameter of type 
-                    ICommandHandler<TCommand>".TrimInside(), ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as  
+                a decorator, its constructor must include a single parameter of type 
+                ICommandHandler<T>".TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -887,21 +850,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(InvalidDecoratorCommandHandlerDecorator<>));
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(InvalidDecoratorCommandHandlerDecorator<>));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
-                    does not currently exist in the constructor".TrimInside(),
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "does not currently exist in the constructor",
+                action);
         }
 
         [TestMethod]
@@ -910,20 +866,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(InvalidDecoratorCommandHandlerDecorator2<>));
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(InvalidDecoratorCommandHandlerDecorator2<>));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains("is defined multiple times in the constructor",
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "is defined multiple times in the constructor",
+                action);
         }
 
         [TestMethod]
@@ -932,19 +882,16 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(ICommandHandler<>), typeof(KeyValuePair<,>));
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
+            // Act
+            Action action = 
+                () => container.RegisterDecorator(typeof(ICommandHandler<>), typeof(KeyValuePair<,>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                     The supplied type KeyValuePair<TKey, TValue> does not implement 
                     ICommandHandler<TCommand>.
                     ".TrimInside(),
-                    ex.Message);
-            }
+                action);
         }
 
         [TestMethod]
@@ -1078,21 +1025,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.RegisterDecorator(typeof(INonGenericService),
-                    typeof(NonGenericServiceDecoratorWithBothDecorateeAndFunc));
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(INonGenericService),
+                typeof(NonGenericServiceDecoratorWithBothDecorateeAndFunc));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    "single parameter of type INonGenericService (or Func<INonGenericService>)",
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "single parameter of type INonGenericService (or Func<INonGenericService>)",
+                action);
         }
 
         [TestMethod]
@@ -1101,25 +1041,16 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // BadCommandHandlerDecorator1<T> implements ICommandHandler<int> but wraps ICommandHandler<T>
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(BadCommandHandlerDecorator1));
+            // Act
+            // BadCommandHandlerDecorator1<T> implements ICommandHandler<int> but wraps ICommandHandler<byte>
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                  typeof(BadCommandHandlerDecorator1));
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    @"its constructor should have an argument of one of the following types:
-                    ICommandHandler<Int32> and Func<ICommandHandler<Int32>>".TrimInside(),
-                    ex.Message);
-
-                AssertThat.ExceptionContainsParamName(ex, "decoratorType");
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                must include a single parameter of type ICommandHandler<Int32> (or Func<ICommandHandler<Int32>>)"
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -1128,25 +1059,18 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains an unmappable 
-                // type argument TUnresolved.
-                container.RegisterDecorator(typeof(ICommandHandler<>),
-                    typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>));
+            // Act
+            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains a not-mappable 
+            // type argument TUnresolved.
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>));
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(
-                    @"contains unresolvable type arguments.",
-                    ex.Message);
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "contains unresolvable type arguments.",
+                action);
 
-                AssertThat.ExceptionContainsParamName(ex, "decoratorType");
-            }
+            AssertThat.ThrowsWithParamName("decoratorType", action);
         }
 
         [TestMethod]
@@ -1205,21 +1129,15 @@
             // LoggingHandlerDecorator1 depends on ILogger, which is not registered.
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
 
-            try
-            {
-                // Act
-                container.Verify();
+            // Act
+            Action action = () => container.Verify();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains(@"
-                    The constructor of type LoggingHandlerDecorator1<RealCommand> 
-                    contains the parameter of type ILogger with name 'logger' that is 
-                    not registered.".TrimInside(), ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The constructor of type LoggingHandlerDecorator1<RealCommand> 
+                contains the parameter of type ILogger with name 'logger' that is 
+                not registered.".TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -1749,7 +1667,7 @@
 
             // Assert
             Assert.IsTrue(relationships.Contains(expectedRelationship),
-                "Any known relationships added to the decotator during the ExpressionBuilding event " +
+                "Any known relationships added to the decorator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type.");
         }
 
