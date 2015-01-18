@@ -5,6 +5,7 @@
     using System.Threading;
     using SimpleInjector.Extensions;
 
+    // https://simpleinjector.readthedocs.org/en/latest/RuntimeDecorators.html
     public static class RuntimeDecoratorExtensions
     {
         public static void RegisterRuntimeDecorator(

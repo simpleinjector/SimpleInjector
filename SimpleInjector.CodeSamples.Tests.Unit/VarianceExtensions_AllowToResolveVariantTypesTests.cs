@@ -3,14 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Extensions;
 
     /// <summary>
     /// Variance Scenario 1: Single registration, single resolve.
-    /// Per service, a single type is registered and and a single instance is always requested.
+    /// Per service, a single type is registered and a single instance is always requested.
     /// If that requested instance is missing, the nearest compatible registered type is returned.
     /// </summary>
     [TestClass]
@@ -21,7 +19,7 @@
         
         public VarianceExtensions_AllowToResolveVariantTypesTests()
         {
-            this.container.AllowToResolveVariantTypes();
+            this.container.Options.AllowToResolveVariantTypes();
         }
 
         public interface IInvariantInterface<T>
@@ -40,7 +38,7 @@
             this.container.Register<IEventHandler<CustomerMovedEvent>, CustomerMovedEventHandler>();
 
             // Act
-            var handler = this.container.GetInstance<IEventHandler<SpecialCustomerMovedEvent>>();
+            var handler = this.container.GetInstance<IEventHandler<CustomerMovedAbroadEvent>>();
 
             // Assert
             Assert.IsInstanceOfType(handler, typeof(CustomerMovedEventHandler));
@@ -55,7 +53,7 @@
                 new InvariantClass<CustomerMovedEvent>());
 
             // Act
-            this.container.GetInstance(typeof(IInvariantInterface<SpecialCustomerMovedEvent>));
+            this.container.GetInstance(typeof(IInvariantInterface<CustomerMovedAbroadEvent>));
         }
 
         [TestMethod]
@@ -147,7 +145,7 @@
         {
         }
 
-        public class SpecialCustomerMovedEvent : CustomerMovedEvent
+        public class CustomerMovedAbroadEvent : CustomerMovedEvent
         {
         }
 

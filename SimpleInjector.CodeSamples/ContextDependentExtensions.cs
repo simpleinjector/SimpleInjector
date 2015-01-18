@@ -1,6 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // https://simpleinjector.codeplex.com/wikipage?title=ContextDependentExtensions
+    // https://simpleinjector.readthedocs.org/en/latest/ContextDependentExtensions.html
     using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
