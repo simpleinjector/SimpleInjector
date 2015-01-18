@@ -9,6 +9,8 @@ Version vNext
 		-[Core] In some special cases Simple Injector was not able to resolve generic types, where one of the
 		 generic type arguments was deducible from the others using the generic type constraints
 		 (work item 20994).
+		-[Core] Decorators that contained two parameters of different closed-generic versions of the decorated
+		 interface couldn't be registered (work item 20995).
 
 
 Version 2.7.0 (v2.7.0 RTM) 2015-01-15

@@ -358,6 +358,14 @@ namespace SimpleInjector
 
             if (numberOfServiceTypeDependencies == 0)
             {
+                // We must get the real type to be decorated to prevent the exception message from being
+                // confusing to the user.
+                // At this point we know that the decorator type implements an service type in some way
+                // (either open or closed), so we this call will return at least one record.
+                serviceType = DecoratorHelpers.GetDecoratingBaseTypeCandidates(serviceType,
+                    decoratorConstructor.DeclaringType)
+                    .First();
+
                 ThrowMustContainTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);           
             }
             else
@@ -378,8 +386,9 @@ namespace SimpleInjector
         private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(Type serviceType,
             ConstructorInfo decoratorConstructor, string paramName)
         {
-            string message = StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
-                decoratorConstructor.DeclaringType, serviceType);
+            string message = 
+                StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
+                    decoratorConstructor.DeclaringType, serviceType);
 
             throw new ArgumentException(message, paramName);
         }
@@ -392,17 +401,18 @@ namespace SimpleInjector
 
             if (!decoratesBaseTypes)
             {
-                ThrowMustDecorateBaseType(serviceType, decoratorConstructor.DeclaringType, paramName);
+                ThrowMustDecorateBaseType(serviceType, decoratorConstructor, paramName);
             }
         }
 
-        private static void ThrowMustDecorateBaseType(Type serviceType, Type decoratorType, string paramName)
+        private static void ThrowMustDecorateBaseType(Type serviceType, ConstructorInfo decoratorConstructor, 
+            string paramName)
         {
             var validConstructorArgumentTypes =
-                DecoratorHelpers.GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorType);
+                DecoratorHelpers.GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorConstructor);
 
             string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                decoratorType, validConstructorArgumentTypes);
+                decoratorConstructor.DeclaringType, validConstructorArgumentTypes);
 
             throw new ArgumentException(message, paramName);
         }

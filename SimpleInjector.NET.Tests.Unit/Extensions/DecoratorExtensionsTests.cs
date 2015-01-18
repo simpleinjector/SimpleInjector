@@ -868,7 +868,7 @@
 
             // Act
             Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
-                typeof(InvalidDecoratorCommandHandlerDecorator2<>));
+                typeof(InvalidCommandHandlerDecoratorWithTwoDecoratees<>));
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -919,6 +919,22 @@
 
             // Assert
             Assert.IsInstanceOfType(handler, typeof(RealCommandHandlerDecorator));
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_SupplyingTypeThatIsNotADecorator_ThrowsException4()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
+                typeof(InvalidCommandHandlerDecoratorWithDecorateeAndFactory<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "is defined multiple times in the constructor",
+                action);
         }
 
         [TestMethod]
@@ -2235,6 +2251,103 @@
             Assert.AreSame(typeof(TransactionHandlerDecorator<RealCommand>), context.AppliedDecorators.Single());
         }
 
+        [TestMethod]
+        public void GetInstance_DecoratorWithDecorateeAndDependencyOfTheSameOpenGenericType_ResolveCorrectly()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+            container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
+
+            // Create: CommandHandlerDecoratorWithDependency<T, ICommandHandler<SpecialCommand>>
+            Type decoratorType =
+                typeof(CommandHandlerDecoratorWithDependency<,>).MakePartialOpenGenericType(
+                    secondArgument: typeof(ICommandHandler<SpecialCommand>));
+
+            // We need to prevent the nested command handler from being decorated.
+            container.RegisterDecorator(typeof(ICommandHandler<>), decoratorType,
+                context => context.ServiceType != typeof(ICommandHandler<SpecialCommand>));
+
+            // Act
+            // Here we resolve the following dependency chain:
+            // new CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<SpecialCommand>>(
+            //     new NullCommandHandler<SpecialCommand>(), // the dependency
+            //     new RealCommandHandler()) // the decoratee
+            var decorator = container.GetInstance<ICommandHandler<RealCommand>>()
+                as CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<SpecialCommand>>;
+
+            // Assert
+            Assert.IsNotNull(decorator.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstance_DecoratorWithDecorateeAndDependencyOfTheSameOpenGenericTypeCausingACyclicDependency_ThrowExpectedException1()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+            container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
+
+            // Create: CommandHandlerDecoratorWithDependency<T, ICommandHandler<SpecialCommand>>
+            Type decoratorType =
+                typeof(CommandHandlerDecoratorWithDependency<,>).MakePartialOpenGenericType(
+                    secondArgument: typeof(ICommandHandler<SpecialCommand>));
+
+            // Here we allow the nested command handler to be decorated. And this should fail.
+            container.RegisterDecorator(typeof(ICommandHandler<>), decoratorType, context => true);
+
+            // Act
+            // Here we try to resolve the following dependency chain:
+            // new CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<RealCommand>>(
+            //     new CommandHandlerDecoratorWithDependency<SpecialCommand, ICommandHandler<SpecialCommand>>(
+            //         new CommandHandlerDecoratorWithDependency<SpecialCommand, ICommandHandler<SpecialCommand>>(
+            //             // stack overflow
+            //     new RealCommandHandler()) // the decoratee
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                CommandHandlerDecoratorWithDependency<SpecialCommand, ICommandHandler<SpecialCommand>> is
+                directly or indirectly depending on itself"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_DecoratorWithDecorateeAndDependencyOfTheSameOpenGenericTypeCausingACyclicDependency_ThrowExpectedException2()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
+            container.Register<ICommandHandler<SpecialCommand>, NullCommandHandler<SpecialCommand>>();
+
+            // Create: CommandHandlerDecoratorWithDependency<T, ICommandHandler<RealCommand>>
+            Type decoratorType =
+                typeof(CommandHandlerDecoratorWithDependency<,>).MakePartialOpenGenericType(
+                    secondArgument: typeof(ICommandHandler<RealCommand>));
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), decoratorType);
+
+            // Act
+            // Here we try to resolve the following dependency chain:
+            // new CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<RealCommand>>(
+            //     new CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<RealCommand>>(
+            //         new CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<RealCommand>>(
+            //             // stack overflow
+            //     new RealCommandHandler()) // the decoratee
+            Action action = () => container.GetInstance<ICommandHandler<RealCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                CommandHandlerDecoratorWithDependency<RealCommand, ICommandHandler<RealCommand>> is
+                directly or indirectly depending on itself"
+                .TrimInside(),
+                action);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2335,10 +2448,10 @@
         }
     }
 
-    public class InvalidDecoratorCommandHandlerDecorator2<T> : ICommandHandler<T>
+    public class InvalidCommandHandlerDecoratorWithTwoDecoratees<T> : ICommandHandler<T>
     {
         // This is not a decorator as it expects more than one ICommandHandler<T> parameter.
-        public InvalidDecoratorCommandHandlerDecorator2(ICommandHandler<T> decorated1,
+        public InvalidCommandHandlerDecoratorWithTwoDecoratees(ICommandHandler<T> decorated1,
             ICommandHandler<T> decorated2, ILogger logger)
         {
         }
@@ -2549,7 +2662,7 @@
         {
         }
     }
-
+  
     public class HandlerDecoratorWithPropertiesBase
     {
         public int Item1 { get; set; }
@@ -2653,6 +2766,37 @@
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+    }
+
+    public class InvalidCommandHandlerDecoratorWithDecorateeAndFactory<T> : ICommandHandler<T>
+    {
+        // This is not a decorator as it expects more than one ICommandHandler<T> parameter.
+        public InvalidCommandHandlerDecoratorWithDecorateeAndFactory(ICommandHandler<T> decorated,
+            Func<ICommandHandler<T>> decoratedFactory)
+        {
+        }
+
+        public void Handle(T command)
+        {
+        }
+    }
+
+    public class CommandHandlerDecoratorWithDependency<TCommand, TDependency> : ICommandHandler<TCommand>
+    {
+        public readonly TDependency Dependency;
+        public readonly ICommandHandler<TCommand> Decoratee;
+
+        public CommandHandlerDecoratorWithDependency(
+            TDependency dependency,
+            ICommandHandler<TCommand> decoratee)
+        {
+            this.Dependency = dependency;
+            this.Decoratee = decoratee;
+        }
+
+        public void Handle(TCommand command)
+        {
         }
     }
 

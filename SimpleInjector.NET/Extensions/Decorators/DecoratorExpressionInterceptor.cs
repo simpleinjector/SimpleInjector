@@ -209,11 +209,22 @@ namespace SimpleInjector.Extensions.Decorators
         protected static ParameterInfo GetDecorateeParameter(Type serviceType, 
             ConstructorInfo decoratorConstructor)
         {
-            return (
+            // Although we partly check for duplicate arguments during registration phase, we must do it here
+            // as well, because some registrations are allowed while not all closed-generic implementations
+            // can be resolved.
+            var parameters = (
                 from parameter in decoratorConstructor.GetParameters()
-                where IsDecorateeParameter(parameter, serviceType)
+                where DecoratorHelpers.IsDecorateeParameter(parameter.ParameterType, serviceType)
                 select parameter)
-                .Single();
+                .ToArray();
+
+            if (parameters.Length > 1)
+            {
+                throw new ActivationException(
+                    StringResources.TypeDependsOnItself(decoratorConstructor.DeclaringType));
+            }
+            
+            return parameters.Single();
         }
 
         protected InstanceProducer CreateDecorateeFactoryProducer(ParameterInfo parameter)
