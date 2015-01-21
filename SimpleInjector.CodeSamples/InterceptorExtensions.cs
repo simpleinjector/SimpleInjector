@@ -46,6 +46,8 @@
 
     public interface IInvocation
     {
+        IMethodCallMessage Message { get; }
+
         object InvocationTarget { get; }
 
         object ReturnValue { get; set; }
@@ -258,6 +260,8 @@
 
         private sealed class InterceptorProxy : RealProxy
         {
+            private static readonly MethodBase getType = typeof(object).GetMethod("GetType");
+
             private object realInstance;
             private IInterceptor interceptor;
 
@@ -274,7 +278,16 @@
             {
                 if (msg is IMethodCallMessage)
                 {
-                    return this.InvokeMethodCall((IMethodCallMessage)msg);
+                    var message = (IMethodCallMessage)msg;
+
+                    if (object.ReferenceEquals(message.MethodBase, getType))
+                    {
+                        return this.Bypass(message);
+                    }
+                    else
+                    {
+                        return this.InvokeMethodCall(message);
+                    }
                 }
 
                 return msg;
@@ -293,6 +306,13 @@
                 this.interceptor.Intercept(invocation);
 
                 return new ReturnMessage(invocation.ReturnValue, null, 0, null, message);
+            }
+
+            private IMessage Bypass(IMethodCallMessage message)
+            {
+                object value = message.MethodBase.Invoke(this.realInstance, message.Args);
+
+                return new ReturnMessage(value, null, 0, null, message);
             }
 
             private class Invocation : IInvocation
