@@ -30,9 +30,9 @@ namespace SimpleInjector.Integration.WebApi
     using System.Web.Http.Controllers;
     using System.Web.Http.Filters;
 
-    internal sealed class SimpleInjectorActionDescriptorFilterProvider : ActionDescriptorFilterProvider, 
-        IFilterProvider
+    internal sealed class SimpleInjectorActionDescriptorFilterProvider : IFilterProvider
     {
+        private readonly ActionDescriptorFilterProvider baseProvider = new ActionDescriptorFilterProvider();
         private readonly ConcurrentDictionary<Type, Registration> registrations =
             new ConcurrentDictionary<Type, Registration>();
 
@@ -44,10 +44,10 @@ namespace SimpleInjector.Integration.WebApi
                 concreteType => Lifestyle.Singleton.CreateRegistration(concreteType, container);
         }
 
-        public new IEnumerable<FilterInfo> GetFilters(HttpConfiguration configuration, 
+        public IEnumerable<FilterInfo> GetFilters(HttpConfiguration configuration, 
             HttpActionDescriptor actionDescriptor)
         {
-            FilterInfo[] filters = this.GetFilterInfos(configuration, actionDescriptor);
+            FilterInfo[] filters = this.baseProvider.GetFilters(configuration, actionDescriptor).ToArray();
 
             foreach (var filter in filters)
             {
@@ -63,14 +63,6 @@ namespace SimpleInjector.Integration.WebApi
                 this.registrations.GetOrAdd(instance.GetType(), this.registrationFactory);
 
             registration.InitializeInstance(instance);
-        }
-
-        private FilterInfo[] GetFilterInfos(HttpConfiguration configuration,
-            HttpActionDescriptor actionDescriptor)
-        {
-            IEnumerable<FilterInfo> filters = base.GetFilters(configuration, actionDescriptor);
-
-            return (filters as FilterInfo[]) ?? filters.ToArray();
         }
     }
 }
