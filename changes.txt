@@ -10,7 +10,7 @@ Version vNext
 		-[Core] Decorators that contained two parameters of different closed-generic versions of the decorated
 		 interface couldn't be registered (work item 20995).
 		-[Core] Resolving an unregistered concrete type failed if it was registered as part of a collection
-		 (word item 21000).
+		 (work item 21000).
 
 
 Version 2.7.0 (v2.7.0 RTM) 2015-01-15
