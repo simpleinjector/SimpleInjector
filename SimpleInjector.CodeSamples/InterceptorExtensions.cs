@@ -260,7 +260,7 @@
 
         private sealed class InterceptorProxy : RealProxy
         {
-            private static readonly MethodBase getType = typeof(object).GetMethod("GetType");
+            private static readonly MethodBase GetTypeMethod = typeof(object).GetMethod("GetType");
 
             private object realInstance;
             private IInterceptor interceptor;
@@ -280,7 +280,7 @@
                 {
                     var message = (IMethodCallMessage)msg;
 
-                    if (object.ReferenceEquals(message.MethodBase, getType))
+                    if (object.ReferenceEquals(message.MethodBase, GetTypeMethod))
                     {
                         return this.Bypass(message);
                     }

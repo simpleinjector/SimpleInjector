@@ -11,7 +11,7 @@
     public static class AttributedPropertyInjectionExtensions
     {
         [DebuggerStepThrough]
-        public static void AutowirePropertiesWithAttribute<TAttribute>(this ContainerOptions options)
+        public static void AutoWirePropertiesWithAttribute<TAttribute>(this ContainerOptions options)
             where TAttribute : Attribute
         {
             options.PropertySelectionBehavior =
