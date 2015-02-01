@@ -276,7 +276,8 @@ namespace SimpleInjector
             Func<InstanceProducer> buildProducer =
                 () => this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
 
-            return this.GetInstanceProducerForType(serviceType, buildProducer);
+            return this.GetInstanceProducerForType(serviceType, buildProducer, 
+                suppressRegisteringUnexistingProducersForConcreteTypes: !autoCreateConcreteTypes);
         }
 
         private Action<T> GetInitializer<T>(Type implementationType, InitializationContext context)
@@ -328,7 +329,8 @@ namespace SimpleInjector
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
         private InstanceProducer GetInstanceProducerForType(Type serviceType,
-            Func<InstanceProducer> buildInstanceProducer)
+            Func<InstanceProducer> buildInstanceProducer, 
+            bool suppressRegisteringUnexistingProducersForConcreteTypes = false)
         {
             InstanceProducer instanceProducer = null;
 
@@ -337,8 +339,13 @@ namespace SimpleInjector
                 var producer = buildInstanceProducer();
 
                 // Always register the producer, even if it is null. This improves performance for the
-                // GetService and GetRegistration methods.
-                this.RegisterInstanceProducer(serviceType, producer);
+                // GetService and GetRegistration methods. Exception to this rule is when this method is
+                // called while suppressRegisteringUnexistingProducersForConcreteTypes is true, because this
+                // causes us to invalidly flag the registration is invalid.
+                if (producer != null || !suppressRegisteringUnexistingProducersForConcreteTypes)
+                {
+                    this.RegisterInstanceProducer(serviceType, producer);
+                }
 
                 return producer;
             }

@@ -1510,6 +1510,22 @@
                 "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
         }
 
+        // This is a regression test for bug:
+        [TestMethod]
+        public void GetInstance_OnAnUnregisteredConcreteInstanceRegisteredAsPartOfACollection_ShouldSucceed()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<ITimeProvider>(typeof(RealTimeProvider));
+
+            container.Verify();
+
+            // Act
+            // This fails in v2.6 and v2.7 when the call is preceded with a call to Verify().
+            var instance = container.GetInstance<RealTimeProvider>();
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
