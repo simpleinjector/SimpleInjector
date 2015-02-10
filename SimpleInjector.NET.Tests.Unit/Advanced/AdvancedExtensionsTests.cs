@@ -326,8 +326,36 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
+        }
+        
+        [TestMethod]
+        public void GetAllInstances_RegistrationPrependedToExistingOpenGenericRegistration_ResolvesTheExtectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(StructEventHandler),
+                typeof(NewConstraintEventHandler<StructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
+
+            container.AppendToCollection(typeof(IEventHandler<>), registration);
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -353,8 +381,40 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
+        }
+        
+        [TestMethod]
+        public void GetAllInstances_MultipleAppendedOpenGenericTypesMixedWithClosedGenericRegisterAll_ResolvesTheExpectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(AuditableEventEventHandler<StructEvent>),
+                typeof(StructConstraintEventHandler<StructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+
+            container.RegisterAll(typeof(IEventHandler<StructEvent>), new[] 
+            { 
+                typeof(AuditableEventEventHandler<StructEvent>) 
+            });
+
+            container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            // Act
+            Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
+                .Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.AreEqual(
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -381,8 +441,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]

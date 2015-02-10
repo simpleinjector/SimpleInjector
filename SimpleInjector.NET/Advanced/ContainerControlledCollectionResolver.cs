@@ -40,8 +40,7 @@ namespace SimpleInjector.Advanced
         internal readonly Type OpenGenericServiceType;
         internal readonly Container Container;
 
-        private readonly List<ContainerControlledItem> registrations = new List<ContainerControlledItem>();
-        private readonly IEnumerable<Type> openGenericImplementations;
+        private readonly List<RegistrationGroup> registrationGroups = new List<RegistrationGroup>();
 
         private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
             new Dictionary<Type, Registration>();
@@ -53,15 +52,27 @@ namespace SimpleInjector.Advanced
 
             this.Container = container;
             this.OpenGenericServiceType = opengenericServiceType;
-
-            this.openGenericImplementations =
-                from registration in this.registrations
-                select registration.ImplementationType;
         }
 
-        internal void AppendAll(params ContainerControlledItem[] registrations)
+        internal void AddRegistrations(Type serviceType, ContainerControlledItem[] registrations,
+            bool append, bool allowOverridingRegistrations)
         {
-            this.registrations.AddRange(registrations);
+            if (!append)
+            {
+                if (allowOverridingRegistrations)
+                {
+                    this.RemoveRegistrationsToOverride(serviceType);
+                }
+
+                this.CheckForOverlappingRegistrations(serviceType);
+            }
+
+            this.registrationGroups.Add(new RegistrationGroup 
+            {
+                ServiceType = serviceType, 
+                Items = registrations,
+                Appended = append
+            });
         }
 
         internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
@@ -85,7 +96,9 @@ namespace SimpleInjector.Advanced
         internal Type[] GetAllKnownClosedServiceTypes()
         {
             var closedServiceTypes =
-                from implementation in this.openGenericImplementations
+                from registrationGroup in this.registrationGroups
+                from item in registrationGroup.Items
+                let implementation = item.ImplementationType
                 where !implementation.ContainsGenericParameters
                 from service in implementation.GetBaseTypesAndInterfacesFor(this.OpenGenericServiceType)
                 select service;
@@ -95,13 +108,27 @@ namespace SimpleInjector.Advanced
 
         internal Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType)
         {
-            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
-                this.openGenericImplementations);
+            return ExtensionHelpers.GetClosedGenericImplementationsFor(
+                closedGenericServiceType,
+                from item in this.GetItemsFor(closedGenericServiceType)
+                select item.ImplementationType);
         }
 
         internal ContainerControlledItem[] GetClosedContainerControlledItemsFor(Type closedGenericServiceType)
         {
-            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType, this.registrations);
+            // NOTE: Performance bottleneck in 2.7
+            return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
+                this.GetItemsFor(closedGenericServiceType));
+        }
+
+        private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType)
+        {
+            return
+                from registrationGroup in this.registrationGroups
+                where registrationGroup.ServiceType.ContainsGenericParameters ||
+                    closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
+                from item in registrationGroup.Items
+                select item;
         }
 
         private bool TryGetContainerControlledRegistrationFromCache(Type closedServiceType,
@@ -135,6 +162,37 @@ namespace SimpleInjector.Advanced
 
             return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
                 collection, this.Container);
+        }
+
+        private void RemoveRegistrationsToOverride(Type serviceType)
+        {
+            this.registrationGroups.RemoveAll(group => group.ServiceType == serviceType || group.Appended);
+        }
+
+        private void CheckForOverlappingRegistrations(Type serviceType)
+        {
+            var overlappingGroups =
+                from registrationGroup in this.registrationGroups
+                where !registrationGroup.Appended
+                where registrationGroup.ServiceType == serviceType 
+                    || serviceType.ContainsGenericParameters
+                    || registrationGroup.ServiceType.ContainsGenericParameters
+                select registrationGroup;
+
+            if (overlappingGroups.Any())
+            {
+                throw new InvalidOperationException(
+                    StringResources.MixingCallsToRegisterAllIsNotSupported(serviceType));
+            }
+        }
+
+        private class RegistrationGroup
+        {
+            internal Type ServiceType { get; set; }
+
+            internal ContainerControlledItem[] Items { get; set; }
+
+            internal bool Appended { get; set; }
         }
     }
 }

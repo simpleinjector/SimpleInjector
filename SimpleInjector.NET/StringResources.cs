@@ -616,5 +616,13 @@ namespace SimpleInjector
         {
             return "This method can only be called after GetInstance() or BuildExpression() have been called.";
         }
+
+        internal static string MixingCallsToRegisterAllIsNotSupported(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Mixing calls to RegisterAll for the same open-generic service type is not supported. " + 
+                "Consider making one single call to RegisterAll(typeof({0}), types).",
+                Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
+        }
     }
 }

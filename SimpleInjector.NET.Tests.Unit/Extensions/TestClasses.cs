@@ -102,6 +102,13 @@
         }
     }
 
+    public sealed class NullLogger : ILogger
+    {
+        public void Log(string message)
+        {
+        }
+    }
+
     public sealed class NullValidator<T> : IValidate<T>
     {
         public void Validate(T instance)

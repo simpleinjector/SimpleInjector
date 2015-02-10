@@ -60,32 +60,17 @@ namespace SimpleInjector
             return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
         }
 
+        // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
+        internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
+        {
+            return genericTypeDefinition.ToFriendlyName(arguments => 
+                string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
+        }
+
         internal static string ToFriendlyName(this Type type)
         {
-            if (type.IsArray)
-            {
-                return type.GetElementType().ToFriendlyName() + "[]";
-            }
-
-            string name = type.Name;
-
-            if (type.IsNested && !type.IsGenericParameter)
-            {
-                name = type.DeclaringType.ToFriendlyName() + "+" + type.Name;
-            }
-
-            var genericArguments = GetGenericArguments(type);
-
-            if (!genericArguments.Any())
-            {
-                return name;
-            }
-
-            name = name.Substring(0, name.IndexOf('`'));
-
-            var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
-
-            return name + "<" + string.Join(", ", argumentNames) + ">";
+            return type.ToFriendlyName(arguments =>
+                string.Join(", ", arguments.Select(argument => argument.ToFriendlyName()).ToArray()));
         }
 
         // This makes the collection immutable for the consumer. The creator might still be able to change
@@ -223,6 +208,32 @@ namespace SimpleInjector
                     DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
                 }
             }
+        }
+
+        private static string ToFriendlyName(this Type type, Func<Type[], string> argumentsFormatter)
+        {
+            if (type.IsArray)
+            {
+                return type.GetElementType().ToFriendlyName(argumentsFormatter) + "[]";
+            }
+
+            string name = type.Name;
+
+            if (type.IsNested && !type.IsGenericParameter)
+            {
+                name = type.DeclaringType.ToFriendlyName(argumentsFormatter) + "+" + type.Name;
+            }
+
+            var genericArguments = GetGenericArguments(type);
+
+            if (!genericArguments.Any())
+            {
+                return name;
+            }
+
+            name = name.Substring(0, name.IndexOf('`'));
+
+            return name + "<" + argumentsFormatter(genericArguments.ToArray()) + ">";
         }
 
         private static IEnumerable<Type> GetBaseTypes(Type type)

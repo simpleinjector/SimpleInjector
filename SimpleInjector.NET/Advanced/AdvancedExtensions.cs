@@ -71,7 +71,7 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <param name="container">The container.</param>
         /// <remarks>
-        /// This method has a performance caracteristic of O(n). Prevent from calling this in a performance
+        /// This method has a performance characteristic of O(n). Prevent from calling this in a performance
         /// critical path of the application.
         /// </remarks>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>

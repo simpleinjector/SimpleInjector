@@ -8,6 +8,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class ContainerOptionsTests
@@ -35,7 +36,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringRegistrations()
         {
             // Arrange
@@ -44,19 +44,179 @@
                 AllowOverridingRegistrations = false
             });
 
-            try
-            {
-                container.Register<IUserRepository, SqlUserRepository>();
-            }
-            catch
-            {
-                Assert.Fail("Test setup fail. This call is expected to succeed.");
-            }
+            container.Register<IUserRepository, SqlUserRepository>();
 
             // Act
-            container.Register<IUserRepository, InMemoryUserRepository>();
+            Action action = () => container.Register<IUserRepository, InMemoryUserRepository>();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverridingRegistrationOfNonGenericCollections()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.RegisterAll(typeof(ILogger), new[] { typeof(NullLogger) });
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(ILogger), new[] { typeof(NullLogger) });
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverridingRegistrationOfCollections()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] 
+            {
+                typeof(ClassConstraintEventHandler<ClassEvent>) 
+            });
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalse_ContainerAllowsRegistrationOfUnrelatedCollections()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+
+            // Act
+            container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
+
+            // Assert
+            Assert.IsInstanceOfType(container.GetAllInstances<IEventHandler<ClassEvent>>().Single(), 
+                typeof(NonGenericEventHandler));
+
+            Assert.IsInstanceOfType(container.GetAllInstances<IEventHandler<AuditableEvent>>().Single(), 
+                typeof(AuditableEventEventHandler));
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsOverridingRegistrationOfCollections()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = true
+            });
+
+            container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+
+            // Act
+            container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] 
+            {
+                typeof(ClassConstraintEventHandler<ClassEvent>) 
+            });
+
+            var handlers = container.GetAllInstances<IEventHandler<ClassEvent>>().Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(ClassConstraintEventHandler<ClassEvent>),
+                "Actual: " + handlers.ToFriendlyNamesText());
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowDuplicateRegistrationsForAnOpenGenericType()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsDuplicateRegistrationsForAnOpenGenericType()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = true
+            });
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+
+            // Act
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(AuditableEventEventHandler),
+                "Actual: " + handlers.ToFriendlyNamesText());
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalse_ContainerAllowsRegistratingUnrelatedOpenGenericCollections()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = false
+            });
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
+
+            // Act
+            container.RegisterAll(typeof(IValidate<>), new[] { typeof(NullValidator<int>) });
+        }
+        
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrue_ContainerReplacesAppendedRegistrationsAsWell()
+        {
+            // Arrange
+            var container = new Container(new ContainerOptions
+            {
+                AllowOverridingRegistrations = true
+            });
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+
+            container.AppendToCollection(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
+
+            // Act
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
+
+            // Assert
+            Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(AuditableEventEventHandler),
+                "Actual: " + handlers.ToFriendlyNamesText());
+        }
+        
         [TestMethod]
         public void AllowOverridingRegistrations_SetToFalse_ContainerThrowsExpectedExceptionMessage()
         {

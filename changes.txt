@@ -4,6 +4,14 @@
 Version vNext
 
 	Bug fixes:
+		-[Core] Registering collections using RegisterManyForOpenGeneric while supplying RegisterAll as 
+		 callback delegate caused duplicate registrations in case a type implemented multiple closed versions
+		 of the same abstraction (work item 20996).
+
+
+Version 2.7.1 (v2.7.1 RTM) 2015-02-01
+
+	Bug fixes:
 		-[Core] In some special cases Simple Injector was not able to resolve generic types, where one of the
 		 generic type arguments was deducible from the others using the generic type constraints
 		 (work item 20994).

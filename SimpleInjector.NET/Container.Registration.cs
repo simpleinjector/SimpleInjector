@@ -1137,7 +1137,7 @@ namespace SimpleInjector
                 "serviceTypes");
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypesCopy, "serviceTypes");
 
-            this.AppendToCollectionInternal(serviceType, serviceTypesCopy);
+            this.RegisterCollectionInternal(serviceType, serviceTypesCopy);
         }
 
         /// <summary>
@@ -1200,7 +1200,7 @@ namespace SimpleInjector
                 typeCanBeServiceType: true);
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, "registrations");
 
-            this.AppendToCollectionInternal(serviceType, registrations);
+            this.RegisterCollectionInternal(serviceType, registrations);
         }
 
         /// <summary>
@@ -1426,39 +1426,59 @@ namespace SimpleInjector
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
         // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
         // exposure.
-        internal void AppendToCollectionInternal(Type serviceType, params Registration[] registrations)
+        internal void AppendToCollectionInternal(Type serviceType, Registration registration)
         {
-            this.AppendToCollectionInternal(serviceType,
-                registrations.Select(r => new ContainerControlledItem(r)).ToArray());
+            this.RegisterCollectionInternal(serviceType,
+                new[] { new ContainerControlledItem(registration) },
+                appending: true);
         }
 
-        internal void AppendToCollectionInternal(Type serviceType, params Type[] serviceTypes)
+        internal void AppendToCollectionInternal(Type serviceType, Type implementationType)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
-            this.AppendToCollectionInternal(serviceType,
+            this.RegisterCollectionInternal(serviceType,
+                new[] { new ContainerControlledItem(implementationType) },
+                appending: true);
+        }
+
+        private void RegisterCollectionInternal(Type serviceType, Registration[] registrations)
+        {
+            this.RegisterCollectionInternal(serviceType,
+                registrations.Select(r => new ContainerControlledItem(r)).ToArray());
+        }
+
+        private void RegisterCollectionInternal(Type serviceType, Type[] serviceTypes)
+        {
+            // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
+            // abstract.
+            this.RegisterCollectionInternal(serviceType,
                 serviceTypes.Select(type => new ContainerControlledItem(type)).ToArray());
         }
 
-        internal void AppendToCollectionInternal(Type serviceType, ContainerControlledItem[] registrations)
+        private void RegisterCollectionInternal(Type serviceType, ContainerControlledItem[] registrations,
+            bool appending = false)
         {
             this.ThrowWhenContainerIsLocked();
-
+            
             if (serviceType.IsGenericType)
             {
-                this.AppendToGenericCollection(serviceType, registrations);
+                this.RegisterGenericCollection(serviceType, registrations, appending);
             }
             else
             {
-                this.AppendToNonGenericCollection(serviceType, registrations);
+                this.RegisterNonGenericCollection(serviceType, registrations, appending);
             }
         }
 
-        private void AppendToGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
+        private void RegisterGenericCollection(Type serviceType, ContainerControlledItem[] registrations,
+            bool appending)
         {
             ContainerControlledCollectionResolver resolver = this.GetUnregisteredAllResolver(serviceType);
 
-            resolver.AppendAll(registrations);
+            resolver.AddRegistrations(serviceType, registrations, 
+                append: appending, 
+                allowOverridingRegistrations: this.Options.AllowOverridingRegistrations);
 
             foreach (Type closedServiceType in resolver.GetAllKnownClosedServiceTypes())
             {
@@ -1533,10 +1553,22 @@ namespace SimpleInjector
             instance.AppendAll(closedContainerControlledItems);
         }
 
+        private void RegisterNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations,
+            bool appending)
+        {
+            if (appending)
+            {
+                this.AppendToNonGenericCollection(serviceType, registrations);
+            }
+            else
+            {
+                this.RegisterContainerControlledCollection(serviceType, registrations);
+            }
+        }
+
         private void AppendToNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
         {
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
             bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
 
             if (collectionRegistered)

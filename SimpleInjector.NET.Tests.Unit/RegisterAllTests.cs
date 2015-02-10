@@ -1510,7 +1510,7 @@
                 "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
         }
 
-        // This is a regression test for bug:
+        // This is a regression test for bug: 21000.
         [TestMethod]
         public void GetInstance_OnAnUnregisteredConcreteInstanceRegisteredAsPartOfACollection_ShouldSucceed()
         {
@@ -1524,6 +1524,50 @@
             // Act
             // This fails in v2.6 and v2.7 when the call is preceded with a call to Verify().
             var instance = container.GetInstance<RealTimeProvider>();
+        }
+
+        [TestMethod]
+        public void RegisterAll_ForClosedGenericCollectionAfterACallOfThatOpenGenericVersion_Fails()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+
+            // Act
+            Action action = () => container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[]
+            {
+                typeof(AuditableEventEventHandler)
+            });
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Mixing calls to RegisterAll for the same open-generic service type is not supported. Consider
+                making one single call to RegisterAll(typeof(IEventHandler<>), types)."
+                .TrimInside(),
+                action);
+        }
+        
+        [TestMethod]
+        public void RegisterAll_ForAnOpenGenericCollectionAfterACallOfAClosedGenericVersion_Fails()
+        {
+            // Arrange
+            var container = new Container();
+
+            Action action = () => container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[]
+            {
+                typeof(AuditableEventEventHandler)
+            });
+
+            // Act 
+            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Mixing calls to RegisterAll for the same open-generic service type is not supported. Consider
+                making one single call to RegisterAll(typeof(IEventHandler<>), types)."
+                .TrimInside(),
+                action);
         }
 
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)

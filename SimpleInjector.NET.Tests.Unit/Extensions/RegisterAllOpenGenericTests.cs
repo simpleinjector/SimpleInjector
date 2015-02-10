@@ -321,6 +321,24 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetAllInstances_Scenario_Behavior()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterAll, new Type[]
+            {
+                typeof(HandlerWithTwoImplementations)
+            });
+
+            // Act
+            var handlers = container.GetAllInstances<IEventHandler<int>>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, handlers.Length, handlers.Select(h => h.GetType()).ToFriendlyNamesText());
+        }
+
         private static void Assert_RegisterAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
         {
@@ -340,5 +358,9 @@
             Assert.IsTrue(expectedTypes.SequenceEqual(actualTypes),
                 "Actual: " + actualTypes.ToFriendlyNamesText());
         }
+    }
+
+    public class HandlerWithTwoImplementations : IEventHandler<int>, IEventHandler<double>
+    { 
     }
 }
