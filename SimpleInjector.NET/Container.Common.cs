@@ -71,7 +71,7 @@ namespace SimpleInjector
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
         
-        private readonly Dictionary<Type, ContainerControlledCollectionResolver> unregisteredAllResolvers =
+        private readonly Dictionary<Type, ContainerControlledCollectionResolver> registerAllResolvers =
             new Dictionary<Type, ContainerControlledCollectionResolver>();
         
         private Dictionary<Type, InstanceProducer> registrations = 

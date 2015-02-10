@@ -45,6 +45,8 @@ namespace SimpleInjector.Advanced
         private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
             new Dictionary<Type, Registration>();
 
+        private bool verified;
+
         internal ContainerControlledCollectionResolver(Container container, Type opengenericServiceType)
         {
             Requires.IsNotNull(container, "container");
@@ -93,6 +95,28 @@ namespace SimpleInjector.Advanced
             }
         }
 
+        internal void RegisterAllClosedGenericCollections(object sender, EventArgs e)
+        {
+            if (!this.verified)
+            {
+                this.verified = true;
+
+                foreach (Type closedServiceType in this.GetAllKnownClosedServiceTypes())
+                {
+                    // When registering a generic collection, the container keeps track of all open and closed
+                    // elements in the resolver. This resolver allows unregistered type resolution and this allows
+                    // all closed versions of the collection to be resolved. But if we only used unregistered type
+                    // resolution, this could cause these registrations to be hidden from the verification 
+                    // mechanism in case the collections are root types in the application. This could cause the
+                    // container to verify, while still failing at runtime when resolving a collection.
+                    // So besides this unregistered type resolution, we also explicitly register all closed-generic
+                    // collections that we can determine here.
+                    var closedItems = this.GetClosedContainerControlledItemsFor(closedServiceType);
+                    this.Container.RebuildClosedGenericCollection(closedServiceType, closedItems);
+                }
+            }
+        }
+
         internal Type[] GetAllKnownClosedServiceTypes()
         {
             var closedServiceTypes =
@@ -116,7 +140,6 @@ namespace SimpleInjector.Advanced
 
         internal ContainerControlledItem[] GetClosedContainerControlledItemsFor(Type closedGenericServiceType)
         {
-            // NOTE: Performance bottleneck in 2.7
             return ExtensionHelpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
                 this.GetItemsFor(closedGenericServiceType));
         }
@@ -136,8 +159,8 @@ namespace SimpleInjector.Advanced
         {
             lock (this.lifestyleRegistrationCache)
             {
-                Type[] closedGenericImplementations =
-                    this.GetClosedGenericImplementationsFor(closedServiceType);
+                ContainerControlledItem[] closedGenericImplementations =
+                    this.GetClosedContainerControlledItemsFor(closedServiceType);
 
                 if (!this.lifestyleRegistrationCache.TryGetValue(closedServiceType, out registration))
                 {
@@ -153,7 +176,7 @@ namespace SimpleInjector.Advanced
         }
 
         private Registration BuildContainerControlledRegistration(Type closedServiceType,
-            Type[] closedGenericImplementations)
+            ContainerControlledItem[] closedGenericImplementations)
         {
             IContainerControlledCollection collection = DecoratorHelpers.CreateContainerControlledCollection(
                 closedServiceType, this.Container);

@@ -7,6 +7,8 @@ Version vNext
 		-[Core] Registering collections using RegisterManyForOpenGeneric while supplying RegisterAll as 
 		 callback delegate caused duplicate registrations in case a type implemented multiple closed versions
 		 of the same abstraction (work item 20996).
+		-[Core] Calling RegisterAll many times (i.e. in combination with RegisterManyForOpenGeneric) caused
+		 severe performance problems (work item 21001).
 
 
 Version 2.7.1 (v2.7.1 RTM) 2015-02-01

@@ -395,6 +395,9 @@ namespace SimpleInjector
             }
         }
 
+        // Allows getting notified when Verify() is called.
+        internal event EventHandler<EventArgs> Verifying = (s, e) => { };
+
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
         /// is requested (transient).
@@ -1250,6 +1253,7 @@ namespace SimpleInjector
 
             try
             {
+                this.Verifying(this, EventArgs.Empty);
                 this.VerifyThatAllExpressionsCanBeBuilt();
                 this.VerifyThatAllRootObjectsCanBeCreated();
                 this.succesfullyVerified = true;
@@ -1442,6 +1446,23 @@ namespace SimpleInjector
                 appending: true);
         }
 
+        internal void RebuildClosedGenericCollection(Type closedServiceType,
+            ContainerControlledItem[] closedContainerControlledItems)
+        {
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
+
+            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
+
+            if (collectionRegistered)
+            {
+                this.RebuildExistingClosedGenericCollection(closedServiceType, closedContainerControlledItems);
+            }
+            else
+            {
+                this.RegisterContainerControlledCollection(closedServiceType, closedContainerControlledItems);
+            }
+        }
+
         private void RegisterCollectionInternal(Type serviceType, Registration[] registrations)
         {
             this.RegisterCollectionInternal(serviceType,
@@ -1479,20 +1500,6 @@ namespace SimpleInjector
             resolver.AddRegistrations(serviceType, registrations, 
                 append: appending, 
                 allowOverridingRegistrations: this.Options.AllowOverridingRegistrations);
-
-            foreach (Type closedServiceType in resolver.GetAllKnownClosedServiceTypes())
-            {
-                // When registering a generic collection, the container keeps track of all open and closed
-                // elements in the resolver. This resolver allows unregistered type resolution and this allows
-                // all closed versions of the collection to be resolved. But if we only used unregistered type
-                // resolution, this could cause these registrations to be hidden from the verification 
-                // mechanism in case the collections are root types in the application. This could cause the
-                // container to verify, while still failing at runtime when resolving a collection.
-                // So besides this unregistered type resolution, we also explicitly register all closed-generic
-                // collections that we can determine here.
-                var closedItems = resolver.GetClosedContainerControlledItemsFor(closedServiceType);
-                this.RebuildClosedGenericCollection(closedServiceType, closedItems);
-            }
         }
 
         private ContainerControlledCollectionResolver GetUnregisteredAllResolver(Type serviceType)
@@ -1501,33 +1508,17 @@ namespace SimpleInjector
 
             Type openGenericServiceType = serviceType.GetGenericTypeDefinition();
 
-            if (!this.unregisteredAllResolvers.TryGetValue(openGenericServiceType, out resolver))
+            if (!this.registerAllResolvers.TryGetValue(openGenericServiceType, out resolver))
             {
                 resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
 
                 this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+                this.Verifying += resolver.RegisterAllClosedGenericCollections;
 
-                this.unregisteredAllResolvers.Add(openGenericServiceType, resolver);
+                this.registerAllResolvers.Add(openGenericServiceType, resolver);
             }
 
             return resolver;
-        }
-
-        private void RebuildClosedGenericCollection(Type closedServiceType,
-            ContainerControlledItem[] closedContainerControlledItems)
-        {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
-
-            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
-
-            if (collectionRegistered)
-            {
-                this.RebuildExistingClosedGenericCollection(closedServiceType, closedContainerControlledItems);
-            }
-            else
-            {
-                this.RegisterContainerControlledCollection(closedServiceType, closedContainerControlledItems);
-            }
         }
 
         private void RebuildExistingClosedGenericCollection(Type closedServiceType,
