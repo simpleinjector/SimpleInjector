@@ -515,13 +515,20 @@ namespace SimpleInjector.Extensions
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
 
-            BatchRegistrationCallback callback = (closedServiceType, types) =>
+            var implementationGroups = new Dictionary<Type, List<Type>>();
+
+            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
-                RequiresSingleImplementation(closedServiceType, types);
-                container.Register(closedServiceType, types.Single(), lifestyle);
+                RequiresSingleImplementation(closedServiceType, implementations);
+
+                var implementation = implementations.Single();
+
+                Add(implementationGroups, implementation, closedServiceType);
             };
 
             RegisterManyForOpenGeneric(openGenericServiceType, typesToRegister, callback);
+
+            RegisterTypes(container, lifestyle, implementationGroups);
         }
 
         /// <summary>
@@ -1099,7 +1106,7 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(lifestyle, "lifestyle");
 
-            var typesToRegister = new Dictionary<Type, List<Type>>();
+            var implementationGroups = new Dictionary<Type, List<Type>>();
 
             BatchRegistrationCallback callback = (closedServiceType, implementations) =>
             {
@@ -1107,13 +1114,13 @@ namespace SimpleInjector.Extensions
 
                 var implementation = implementations.Single();
 
-                Add(typesToRegister, implementation, closedServiceType);
+                Add(implementationGroups, implementation, closedServiceType);
             };
 
             RegisterManyForOpenGenericInternal(container, openGenericServiceType, assemblies, callback, 
                 includeInternal);
 
-            RegisterTypes(container, lifestyle, typesToRegister);
+            RegisterTypes(container, lifestyle, implementationGroups);
         }
 
         private static void Add(Dictionary<Type, List<Type>> typesToRegister, Type implementation,
@@ -1141,7 +1148,7 @@ namespace SimpleInjector.Extensions
         private static void RegisterType(Container container, Lifestyle lifestyle, Type implementation, 
             List<Type> closedServiceTypes)
         {
-            var registration = lifestyle.CreateRegistration(closedServiceTypes[0], implementation, container);
+            var registration = lifestyle.CreateRegistration(implementation, container);
 
             foreach (var closedServiceType in closedServiceTypes)
             {

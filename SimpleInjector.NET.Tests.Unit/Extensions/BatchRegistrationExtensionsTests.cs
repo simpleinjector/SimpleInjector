@@ -888,6 +888,56 @@
                 assemblies);
         }
 
+        // This is a regression test for work item 21002
+        [TestMethod]
+        public void RegisterManyForOpenGenericAssembly_RegistersTypeWithTheeImplementations_ResolvesThatTypeAsExpected()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Just registers RequestGroup in three groups.
+            container.RegisterManyForOpenGeneric(typeof(IHandler<,>), Lifestyle.Singleton,
+                typeof(RequestGroup).Assembly);
+
+            container.RegisterDecorator(typeof(IHandler<,>), typeof(RequestDecorator<,>));
+
+            // Act
+            // RequestGroup implements all three these interfaces.
+            var decorator1 = container.GetInstance<IHandler<Query1, int>>() as RequestDecorator<Query1, int>;
+
+            // This call fails in v2.1.0 to v2.7.1
+            var decorator2 = container.GetInstance<IHandler<Query2, double>>() as RequestDecorator<Query2, double>;
+            var decorator3 = container.GetInstance<IHandler<Query3, double>>() as RequestDecorator<Query3, double>;
+
+            // Assert
+            Assert.AreSame(decorator1.Decoratee, decorator2.Decoratee);
+            Assert.AreSame(decorator2.Decoratee, decorator3.Decoratee);
+        }
+
+        [TestMethod]
+        public void RegisterManyForOpenGenericTypes_RegistersTypeWithTheeImplementations_ResolvesThatTypeAsExpected()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterManyForOpenGeneric(typeof(IHandler<,>), Lifestyle.Singleton, new Type[]
+            {
+                typeof(RequestGroup)
+            });
+
+            container.RegisterDecorator(typeof(IHandler<,>), typeof(RequestDecorator<,>));
+
+            // Act
+            // RequestGroup implements all three these interfaces.
+            var decorator1 = container.GetInstance<IHandler<Query1, int>>() as RequestDecorator<Query1, int>;
+            var decorator2 = container.GetInstance<IHandler<Query2, double>>() as RequestDecorator<Query2, double>;
+            var decorator3 = container.GetInstance<IHandler<Query3, double>>() as RequestDecorator<Query3, double>;
+
+            // Assert
+            Assert.AreSame(decorator1.Decoratee, decorator2.Decoratee);
+            Assert.AreSame(decorator2.Decoratee, decorator3.Decoratee);
+        }
+
         private static void Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(
             Type[] inputTypes, Type[] expectedTypes)
         {
@@ -1010,6 +1060,45 @@
         }
 
         #endregion
+    }
+
+
+    public interface IRequest<TResponse>
+    {
+    }
+
+    public interface IHandler<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
+    {
+    }
+
+    public class RequestGroup :
+        IHandler<Query1, int>,
+        IHandler<Query2, double>,
+        IHandler<Query3, double>
+    {
+    }
+
+    public class Query1 : IRequest<int>
+    {
+    }
+
+    public class Query2 : IRequest<double>
+    {
+    }
+
+    public class Query3 : IRequest<double>
+    {
+    }
+
+    class RequestDecorator<TRequest, TResponse> : IHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    {
+        public RequestDecorator(IHandler<TRequest, TResponse> decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+
+        public IHandler<TRequest, TResponse> Decoratee { get; private set; }
     }
     #pragma warning restore 0618
 }

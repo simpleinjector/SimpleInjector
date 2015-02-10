@@ -9,6 +9,11 @@ Version vNext
 		 of the same abstraction (work item 20996).
 		-[Core] Calling RegisterAll many times (i.e. in combination with RegisterManyForOpenGeneric) caused
 		 severe performance problems (work item 21001).
+		-[Core] The RegisterManyForOpenGeneric overloads that accepted a list of types, did not use the
+		 supplied lifestyle correctly, which could cause registrations with a torn lifestyle.
+		-[Core] In case the RegisterManyForOpenGeneric overloads that accepted a list of assemblies, registered
+		 a type that implemented the given service type multiple times using the singleton lifestyle, it
+		 became impossible to apply a decorator to this type (work item 21002).
 
 
 Version 2.7.1 (v2.7.1 RTM) 2015-02-01
