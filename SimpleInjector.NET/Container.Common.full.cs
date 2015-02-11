@@ -47,5 +47,11 @@ namespace SimpleInjector
                 AssemblyBuilderAccess.Run)
                 .DefineDynamicModule("SimpleInjector.CompiledModule");
         }
+
+        [DebuggerStepThrough]
+        partial void GetStackTrace(ref string stackTrace)
+        {
+            stackTrace = new StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
+        }
     }
 }

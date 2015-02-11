@@ -96,6 +96,11 @@ namespace SimpleInjector
 
         internal bool IsCollection { get; set; }
 
+        internal virtual bool MustBeVerified
+        {
+            get { return false; }
+        }
+
         /// <summary>Gets or sets a value indicating whether this registration object contains a user 
         /// supplied instanceCreator factory delegate.</summary>
         internal bool WrapsInstanceCreationDelegate { get; set; }

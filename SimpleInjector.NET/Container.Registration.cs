@@ -396,6 +396,8 @@ namespace SimpleInjector
         }
 
         // Allows getting notified when Verify() is called.
+        // This event is currently only used by RegisterAll to make sure that as many registered types can
+        // be verified.
         internal event EventHandler<EventArgs> Verifying = (s, e) => { };
 
         /// <summary>
@@ -1404,7 +1406,8 @@ namespace SimpleInjector
             {
                 if (this.locked)
                 {
-                    throw new InvalidOperationException(StringResources.ContainerCanNotBeChangedAfterUse());
+                    throw new InvalidOperationException(StringResources.ContainerCanNotBeChangedAfterUse(
+                        this.stackTraceThatLockedTheContainer));
                 }
             }
         }
@@ -1444,23 +1447,6 @@ namespace SimpleInjector
             this.RegisterCollectionInternal(serviceType,
                 new[] { new ContainerControlledItem(implementationType) },
                 appending: true);
-        }
-
-        internal void RebuildClosedGenericCollection(Type closedServiceType,
-            ContainerControlledItem[] closedContainerControlledItems)
-        {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
-
-            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
-
-            if (collectionRegistered)
-            {
-                this.RebuildExistingClosedGenericCollection(closedServiceType, closedContainerControlledItems);
-            }
-            else
-            {
-                this.RegisterContainerControlledCollection(closedServiceType, closedContainerControlledItems);
-            }
         }
 
         private void RegisterCollectionInternal(Type serviceType, Registration[] registrations)
@@ -1513,35 +1499,12 @@ namespace SimpleInjector
                 resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
 
                 this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
-                this.Verifying += resolver.RegisterAllClosedGenericCollections;
+                this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
 
                 this.registerAllResolvers.Add(openGenericServiceType, resolver);
             }
 
             return resolver;
-        }
-
-        private void RebuildExistingClosedGenericCollection(Type closedServiceType,
-            ContainerControlledItem[] closedContainerControlledItems)
-        {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
-
-            var producer = this.registrations[enumerableServiceType];
-
-            IContainerControlledCollection instance =
-                DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
-
-            if (instance == null)
-            {
-                ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(closedServiceType);
-            }
-
-            // If the collection is already registered, this means that the user called AppendToCollection.
-            // Although we can try to append to the collections, the easiest thing to do is just clear the
-            // collection and build it up again.
-            instance.Clear();
-
-            instance.AppendAll(closedContainerControlledItems);
         }
 
         private void RegisterNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations,

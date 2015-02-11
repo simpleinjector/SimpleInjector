@@ -30,6 +30,8 @@ namespace SimpleInjector.Advanced
     /// <summary>This interface is not meant for public use.</summary>
     internal interface IContainerControlledCollection : IEnumerable
     {
+        bool AllProducersVerified { get; }
+
         /// <summary>Please do not use.</summary>
         /// <returns>Do not use.</returns>
         KnownRelationship[] GetRelationships();

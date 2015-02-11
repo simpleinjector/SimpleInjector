@@ -240,6 +240,11 @@ namespace SimpleInjector.Extensions.Decorators
                 get { return this.serviceType; }
             }
 
+            internal override bool MustBeVerified
+            {
+                get { return !this.Collection.AllProducersVerified; }
+            }
+
             internal IContainerControlledCollection Collection { get; private set; }
 
             public override Expression BuildExpression()

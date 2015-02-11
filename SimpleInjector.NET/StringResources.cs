@@ -30,15 +30,23 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static string ContainerCanNotBeChangedAfterUse()
+        internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
         {
-            return "The container can't be changed after the first call to GetInstance, GetAllInstances " +
+            string message = "The container can't be changed after the first call to GetInstance, GetAllInstances " +
                 "and Verify.";
+
+            if (stackTrace == null)
+            {
+                return message;
+            }
+
+            return message + 
+                " The following stack trace describes the location where the container was locked:" +
+                Environment.NewLine + Environment.NewLine + stackTrace;
         }
 
         internal static string DelegateForTypeReturnedNull(Type serviceType)

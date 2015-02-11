@@ -7,6 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class VerifyTests
@@ -445,6 +446,65 @@
                 injection because it is a value type."
                 .TrimInside(),
                 action);
+        }
+
+        [TestMethod]
+        public void Verify_LockedContainer_Succeeds1()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginImpl>();
+
+            container.GetInstance<Container>();
+
+            // Act
+            // This call must succeed. Many users are depending on this behavior.
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_LockedContainerWithRegisterAllRegisterationForOpenGenericType_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(StructEventHandler),
+                typeof(AuditableEventEventHandler),
+                typeof(AuditableEventEventHandler<>),
+            });
+
+            container.GetInstance<Container>();
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_ResolvingACollectionOfSingletonsBeforeAndAfterCallingVerify_ShouldStillYieldTheSameInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new Type[]
+            {
+                typeof(StructEventHandler),
+            });
+
+            container.AppendToCollection(typeof(IEventHandler<>),
+                Lifestyle.Singleton.CreateRegistration<AuditableEventEventHandler>(container));
+
+            var handler = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();
+
+            container.Verify();
+
+            // Act
+            var handler2 = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();
+
+            // Assert
+            Assert.AreSame(handler, handler2);
         }
 
         public class PluginWithBooleanDependency : IPlugin

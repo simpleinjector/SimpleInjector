@@ -88,6 +88,8 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration has been verified (at least once).
         private bool succesfullyVerified;
 
+        private string stackTraceThatLockedTheContainer;
+
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
 
@@ -411,7 +413,7 @@ namespace SimpleInjector
                 }
             }
         }
-        
+
         /// <summary>Prevents any new registrations to be made to the container.</summary>
         internal void LockContainer()
         {
@@ -421,10 +423,14 @@ namespace SimpleInjector
                 // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
                 lock (this.locker)
                 {
+                    this.GetStackTrace(ref this.stackTraceThatLockedTheContainer);
+
                     this.locked = true;
                 }
             }
         }
+
+        partial void GetStackTrace(ref string stackTrace);
 
         private sealed class TypedInstanceInitializer : IInstanceInitializer
         {

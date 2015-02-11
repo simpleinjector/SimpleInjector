@@ -95,7 +95,7 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        internal void RegisterAllClosedGenericCollections(object sender, EventArgs e)
+        internal void TriggerUnregisteredTypeResolutionOnAllClosedCollections(object sender, EventArgs e)
         {
             if (!this.verified)
             {
@@ -104,15 +104,15 @@ namespace SimpleInjector.Advanced
                 foreach (Type closedServiceType in this.GetAllKnownClosedServiceTypes())
                 {
                     // When registering a generic collection, the container keeps track of all open and closed
-                    // elements in the resolver. This resolver allows unregistered type resolution and this allows
-                    // all closed versions of the collection to be resolved. But if we only used unregistered type
-                    // resolution, this could cause these registrations to be hidden from the verification 
-                    // mechanism in case the collections are root types in the application. This could cause the
-                    // container to verify, while still failing at runtime when resolving a collection.
-                    // So besides this unregistered type resolution, we also explicitly register all closed-generic
-                    // collections that we can determine here.
-                    var closedItems = this.GetClosedContainerControlledItemsFor(closedServiceType);
-                    this.Container.RebuildClosedGenericCollection(closedServiceType, closedItems);
+                    // elements in the resolver. This resolver allows unregistered type resolution and this 
+                    // allows all closed versions of the collection to be resolved. But if we only used 
+                    // unregistered type resolution, this could cause these registrations to be hidden from 
+                    // the verification mechanism in case the collections are root types in the application. 
+                    // This could cause the container to verify, while still failing at runtime when resolving 
+                    // a collection. So by explicitly resolving the known closed-generic versions here, we
+                    // ensure that all non-generic registrations (and because of that, most open-generic 
+                    // registrations as well) will be validated.
+                    this.Container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(closedServiceType));
                 }
             }
         }

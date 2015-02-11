@@ -175,7 +175,7 @@ namespace SimpleInjector
 
         internal bool IsExpressionCreated
         {
-            get { return this.expression.IsValueCreated; }
+            get { return this.expression.IsValueCreated && !this.Registration.MustBeVerified; }
         }
 
         internal bool MustBeExplicitlyVerified

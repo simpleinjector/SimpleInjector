@@ -1147,6 +1147,28 @@
                 "Please ensure ILogger is registered in the container",
                 action);
         }
+        
+        [TestMethod]
+        public void Verify_ClosedTypeWithUnregisteredDependencyResolvedBeforeCallingVerift_StillThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterAll(typeof(IEventHandler<>), new[]
+            {
+                typeof(EventHandlerWithDependency<AuditableEvent, ILogger>)
+            });
+
+            container.GetAllInstances<IEventHandler<AuditableEvent>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Please ensure ILogger is registered in the container",
+                action);
+        }
 
         [TestMethod]
         public void GetInstance_TypeDependingOnICollection_InjectsTheRegisteredCollection()
@@ -1554,13 +1576,13 @@
             // Arrange
             var container = new Container();
 
-            Action action = () => container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[]
+            container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[]
             {
                 typeof(AuditableEventEventHandler)
             });
 
             // Act 
-            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+            Action action = () => container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"

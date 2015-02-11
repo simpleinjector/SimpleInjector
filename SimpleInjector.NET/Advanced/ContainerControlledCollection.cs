@@ -47,6 +47,11 @@ namespace SimpleInjector.Advanced
             this.container = container;
         }
 
+        public bool AllProducersVerified
+        {
+            get { return this.producers.All(lazy => lazy.IsValueCreated); }
+        }
+ 
         public int Count
         {
             get { return this.producers.Count; }
@@ -270,5 +275,5 @@ namespace SimpleInjector.Advanced
         {
             return new NotSupportedException();
         }
-    }
+   }
 }
