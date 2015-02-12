@@ -204,6 +204,13 @@ namespace SimpleInjector.Advanced
 
             if (overlappingGroups.Any())
             {
+                if (!serviceType.ContainsGenericParameters &&
+                    overlappingGroups.Any(group => group.ServiceType == serviceType))
+                {
+                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(
+                        typeof(IEnumerable<>).MakeGenericType(serviceType)));
+                }
+
                 throw new InvalidOperationException(
                     StringResources.MixingCallsToRegisterAllIsNotSupported(serviceType));
             }

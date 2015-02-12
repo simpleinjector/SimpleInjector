@@ -922,7 +922,7 @@
                 expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
                 actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
         }
-        
+
         [TestMethod]
         public void RegisterAll_SuppliedWithATypeThatContainsUnresolvableTypeArguments_ThrowsDescriptiveException()
         {
@@ -1045,7 +1045,7 @@
             // Act
             container.RegisterOpenGeneric(
                 typeof(NewConstraintEventHandler<>),
-                typeof(NewConstraintEventHandler<>), 
+                typeof(NewConstraintEventHandler<>),
                 Lifestyle.Singleton);
 
             container.RegisterAll(typeof(IEventHandler<>), new[]
@@ -1147,7 +1147,7 @@
                 "Please ensure ILogger is registered in the container",
                 action);
         }
-        
+
         [TestMethod]
         public void Verify_ClosedTypeWithUnregisteredDependencyResolvedBeforeCallingVerift_StillThrowsException()
         {
@@ -1215,7 +1215,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            ICollection<IPlugin> collection = 
+            ICollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOn<ICollection<IPlugin>>>().Dependency;
 
             // Assert
@@ -1391,7 +1391,7 @@
             // Assert
             Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
         }
-        
+
         [TestMethod]
         public void GetRegistration_RequestingArrayRegistrationUncontainerControlledCollection_HasTheTransientLifestyle()
         {
@@ -1478,7 +1478,7 @@
                 "IEventHandler<CustomerMovedAbroadEvent> (because of the in-keyword) the " +
                 "CustomerMovedEventHandler should have been resolved here.");
         }
-        
+
         [TestMethod]
         public void RegisterAllEnumerableRegistration_NullArgument_ThrowsExpectedException()
         {
@@ -1569,7 +1569,7 @@
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterAll_ForAnOpenGenericCollectionAfterACallOfAClosedGenericVersion_Fails()
         {
@@ -1589,6 +1589,23 @@
                 Mixing calls to RegisterAll for the same open-generic service type is not supported. Consider
                 making one single call to RegisterAll(typeof(IEventHandler<>), types)."
                 .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAll_CalledTwiceOnTheSameClosedGenericType_ThrowsTheExpectedExceptionmessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Act
+            Action action = () => container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered and the container.",
                 action);
         }
 
