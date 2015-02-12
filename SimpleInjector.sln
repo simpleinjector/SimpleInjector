@@ -91,6 +91,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildTools", "BuildTools", 
 		BuildTools\BetterAssemblyInfoTask.dll = BuildTools\BetterAssemblyInfoTask.dll
 		BuildTools\BetterAssemblyInfoTask.pdb = BuildTools\BetterAssemblyInfoTask.pdb
 		build.bat = build.bat
+		publish2nuget.bat = publish2nuget.bat
 		BuildTools\replace.exe = BuildTools\replace.exe
 		BuildTools\zip.vbs = BuildTools\zip.vbs
 	EndProjectSection
