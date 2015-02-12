@@ -14,7 +14,9 @@ Version vNext
 		-[Core] In case the RegisterManyForOpenGeneric overloads that accepted a list of assemblies, registered
 		 a type that implemented the given service type multiple times using the singleton lifestyle, it
 		 became impossible to apply a decorator to this type (work item 21002).
-
+		-[Core] RegisterAll methods behaved inconsistently with the rest of the API where they silently 
+		 appended registrations to a collection when accidentally called multiple times for the same service 
+		 type.
 
 Version 2.7.1 (v2.7.1 RTM) 2015-02-01
 
