@@ -59,7 +59,7 @@ using SimpleInjector.Integration.Wcf;
             var serviceTypes = (
                 from assembly in assemblies
                 where !assembly.IsDynamic
-                from type in assembly.GetExportedTypes()
+                from type in GetExportedTypes(assembly)
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
                 where IsWcfServiceType(type)
@@ -287,6 +287,23 @@ using SimpleInjector.Integration.Wcf;
             return type.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
                 .OfType<ServiceBehaviorAttribute>()
                 .FirstOrDefault();
+        }
+
+        private static Type[] GetExportedTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetExportedTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Return the types that were found before the exception was thrown.
+                return ex.Types;
+            }
+            catch
+            {
+                return new Type[0];
+            }
         }
     }
 }

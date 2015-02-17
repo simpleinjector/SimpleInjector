@@ -128,8 +128,7 @@ namespace SimpleInjector.Extensions
             return !type.IsAbstract && !type.ContainsGenericParameters;
         }
 
-        internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly,
-            bool includeInternals)
+        internal static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly, bool includeInternals)
         {
             try
             {

@@ -159,7 +159,7 @@ namespace SimpleInjector
             return (
                 from assembly in assemblies
                 where !assembly.IsDynamic
-                from type in assembly.GetExportedTypes()
+                from type in GetExportedTypes(assembly)
                 where typeof(IController).IsAssignableFrom(type)
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
@@ -193,6 +193,23 @@ namespace SimpleInjector
                 select provider;
 
             return integratedProviders.Any() || legacyProviders.Any();
+        }
+
+        private static Type[] GetExportedTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetExportedTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Return the types that were found before the exception was thrown.
+                return ex.Types;
+            }
+            catch
+            {
+                return new Type[0];
+            }
         }
     }
 }
