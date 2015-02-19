@@ -49,6 +49,7 @@ namespace SimpleInjector.CodeSamples
     {
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
+        object[] Arguments { get; }
         void Proceed();
         MethodBase GetConcreteMethod();
     }
@@ -258,27 +259,30 @@ namespace SimpleInjector.CodeSamples
             }
 
             private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = new Invocation { Proxy = this, Message = message };
+                var invocation = 
+                    new Invocation { Proxy = this, Message = message, Arguments = message.Args };
 
                 invocation.Proceeding += () => {
                     invocation.ReturnValue = message.MethodBase.Invoke(
-                        this.realInstance, message.Args);
+                        this.realInstance, invocation.Arguments);
                 };
 
                 this.interceptor.Intercept(invocation);
-                return new ReturnMessage(invocation.ReturnValue, null, 0, null, message);
+                return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
+                    invocation.Arguments.Length, null, message);
             }
 
             private IMessage Bypass(IMethodCallMessage message) {
                 object value = message.MethodBase.Invoke(this.realInstance, message.Args);
 
-                return new ReturnMessage(value, null, 0, null, message);
+                return new ReturnMessage(value, message.Args, message.Args.Length, null, message);
             }
 
             private class Invocation : IInvocation
             {
                 public event Action Proceeding;
                 public InterceptorProxy Proxy { get; set; }
+                public object[] Arguments { get; set; }
                 public IMethodCallMessage Message { get; set; }
                 public object ReturnValue { get; set; }
 

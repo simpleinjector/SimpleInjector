@@ -3,10 +3,16 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    public interface IWithOutAndRef
+    {
+        int Operate(ref string refValue, out string outValue);
+    }
+
     [TestClass]
     public class InterceptorExtensionsTests
     {
         private static readonly Func<Type, bool> IsACommandPredicate = type => type.Name.EndsWith("Command");
+        private static readonly Func<Type, bool> IsInterface = type => type.IsInterface;
 
         [TestMethod]
         public void InterceptWithGenericArgAndPredicate_InterceptingInterfacesEndingWithCommand_InterceptsTheInstance()
@@ -443,6 +449,168 @@
             }
         }
 
+        [TestMethod]
+        public void CallingInterceptedMethodWithReturnValue_InterceptedWithPassThroughInterceptor_ReturnsTheExpectedValue()
+        {
+            // Arrange
+            int expectedReturnValue = 3;
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef { ReturnValue = expectedReturnValue };
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+
+            container.InterceptWith<FakeInterceptor>(IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string unused1 = null;
+            string unused2;
+            int actualReturnValue = intercepted.Operate(ref unused1, out unused2);
+
+            // Assert
+            Assert.AreEqual(expectedReturnValue, actualReturnValue);
+        }
+        
+        [TestMethod]
+        public void CallingInterceptedMethodWithRefArgument_InterceptedWithPassThroughInterceptor_PassesTheRefArgumentToTheInterceptee()
+        {
+            // Arrange
+            string expectedRefValue = "ABC";
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef();
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+
+            container.InterceptWith<FakeInterceptor>(IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string refValue = expectedRefValue;
+            string unused;
+            intercepted.Operate(ref refValue, out unused);
+
+            // Assert
+            Assert.AreEqual(expectedRefValue, interceptee.SuppliedRefValue);
+        }
+        
+        [TestMethod]
+        public void CallingInterceptedMethodWithRefArgument_InterceptedWithPassThroughInterceptor_ChangesTheRefValue()
+        {
+            // Arrange
+            string expectedRefValue = "ABC";
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef { OutputRefValue = expectedRefValue };
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+
+            container.InterceptWith<FakeInterceptor>(IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string unused;
+            string actualRefValue = null;
+            intercepted.Operate(ref actualRefValue, out unused);
+
+            // Assert
+            Assert.AreEqual(expectedRefValue, actualRefValue);
+        }
+        
+        [TestMethod]
+        public void CallingInterceptedMethodWithOutArgument_InterceptedWithPassThroughInterceptor_ReturnsTheExpectedOutValue()
+        {
+            // Arrange
+            string expectedOutValue = "DEF";
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef { OutValue = expectedOutValue };
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+
+            container.InterceptWith<FakeInterceptor>(IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string actualOutValue;
+            string unused = null;
+            intercepted.Operate(ref unused, out actualOutValue);
+
+            // Assert
+            Assert.AreEqual(expectedOutValue, actualOutValue);
+        }
+
+        [TestMethod]
+        public void CallingAnInterceptedMethod_InterceptorThatChangesTheInputParameters_GetsForwardedToTheInterceptee()
+        {
+            // Arrange  
+            string expectedValue = "XYZ";
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef();
+
+            var interceptor = new DelegateInterceptor();
+
+            interceptor.Intercepting += invocation =>
+            {
+                invocation.Arguments[0] = expectedValue;
+            };
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+            container.InterceptWith(interceptor, IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string refValue = "Something different";
+            string unused;
+            intercepted.Operate(ref refValue, out unused);
+
+            // Assert
+            Assert.AreEqual(expectedValue, interceptee.SuppliedRefValue);
+        }
+
+        [TestMethod]
+        public void CallingAnInterceptedMethod_InterceptorThatChangesAnOutputParameter_OutputParameterFlowsBackToTheCaller()
+        {
+            // Arrange  
+            string expectedOutValue = "KLM";
+
+            var container = new Container();
+
+            var interceptee = new WithOutAndRef();
+
+            var interceptor = new DelegateInterceptor();
+
+            interceptor.Intercepted += invocation =>
+            {
+                invocation.Arguments[1] = expectedOutValue;
+            };
+
+            container.RegisterSingle<IWithOutAndRef>(interceptee);
+            container.InterceptWith(interceptor, IsInterface);
+
+            var intercepted = container.GetInstance<IWithOutAndRef>();
+
+            // Act
+            string unused = null;
+            string actualOutValue;
+            intercepted.Operate(ref unused, out actualOutValue);
+
+            // Assert
+            Assert.AreEqual(expectedOutValue, actualOutValue);
+        }
+
         // Example interceptor
         private class InterceptorThatLogsBeforeAndAfter : IInterceptor
         {
@@ -488,6 +656,19 @@
             public void Intercept(IInvocation invocation)
             {
                 invocation.Proceed();
+            }
+        }
+        
+        private class DelegateInterceptor : IInterceptor
+        {
+            public event Action<IInvocation> Intercepting = _ => { };
+            public event Action<IInvocation> Intercepted = _ => { };
+
+            public void Intercept(IInvocation invocation)
+            {
+                this.Intercepting(invocation);
+                invocation.Proceed();
+                this.Intercepted(invocation);
             }
         }
 
@@ -564,6 +745,22 @@
                 {
                     this.logger.Log(this.ExecuteLogMessage);
                 }
+            }
+        }
+        
+        private class WithOutAndRef : IWithOutAndRef
+        {
+            public string SuppliedRefValue { get; private set; }
+            public string OutputRefValue { get; set; }
+            public string OutValue { get; set; }
+            public int ReturnValue { get; set; }
+
+            public int Operate(ref string refValue, out string outValue)
+            {
+                this.SuppliedRefValue = refValue;
+                refValue = this.OutputRefValue;
+                outValue = this.OutValue;
+                return this.ReturnValue;
             }
         }
     }
