@@ -662,6 +662,7 @@
         private class DelegateInterceptor : IInterceptor
         {
             public event Action<IInvocation> Intercepting = _ => { };
+
             public event Action<IInvocation> Intercepted = _ => { };
 
             public void Intercept(IInvocation invocation)
@@ -751,8 +752,11 @@
         private class WithOutAndRef : IWithOutAndRef
         {
             public string SuppliedRefValue { get; private set; }
+
             public string OutputRefValue { get; set; }
+
             public string OutValue { get; set; }
+
             public int ReturnValue { get; set; }
 
             public int Operate(ref string refValue, out string outValue)

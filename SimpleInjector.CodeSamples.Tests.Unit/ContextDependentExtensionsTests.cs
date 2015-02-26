@@ -1,10 +1,11 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-using System.Runtime.Remoting.Proxies;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleInjector.Extensions;
-using SimpleInjector.Lifestyles;
+    using System.Linq;
+    using System.Runtime.Remoting.Proxies;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Extensions;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ContextDependentExtensionsTests
@@ -305,6 +306,29 @@ using SimpleInjector.Lifestyles;
             // Assert
             Assert.AreEqual(typeof(IService), decorator.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(ServiceDecoratorWithLoggerDependency), decorator.Logger.Context.ImplementationType);
+        }
+
+        [TestMethod]
+        public void ContextualInstance_Always_ContainsExpectedParameter()
+        {
+            // Arrange
+            var expectedParameter = (
+                from p in typeof(RepositoryThatDependsOnLogger).GetConstructors().Single().GetParameters()
+                where p.ParameterType == typeof(IContextualLogger)
+                select p)
+                .Single();
+
+            var container = ContainerFactory.New();
+
+            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
+
+            container.Register<IRepository, RepositoryThatDependsOnLogger>();
+
+            // Act
+            var logger = container.GetInstance<IRepository>().Logger;
+
+            // Assert
+            Assert.AreSame(expectedParameter, logger.Context.Parameter);
         }
 
         private static void Assert_IsIntercepted(object proxy)
