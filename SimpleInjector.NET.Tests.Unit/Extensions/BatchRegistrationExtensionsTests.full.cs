@@ -22,7 +22,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -96,7 +96,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -114,7 +114,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -146,7 +146,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
         
         [TestMethod]
@@ -161,7 +161,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
 
         [TestMethod]
@@ -177,7 +177,7 @@
             var impl = container.GetInstance<IService<decimal, decimal>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(InternalConcrete4));
+            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
         }
     }
 }

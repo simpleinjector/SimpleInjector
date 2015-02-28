@@ -23,7 +23,7 @@
             // Assert
             var impl = container.GetInstance<IService<int, string>>();
 
-            Assert.IsInstanceOfType(impl, typeof(ServiceImpl<int, string>));
+            AssertThat.IsInstanceOfType(typeof(ServiceImpl<int, string>), impl);
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@
             // Assert
             var impl = container.GetInstance<ServiceImpl<int, string>>();
 
-            Assert.IsInstanceOfType(impl, typeof(ServiceImpl<int, string>));
+            AssertThat.IsInstanceOfType(typeof(ServiceImpl<int, string>), impl);
         }
 
         [TestMethod]
@@ -138,8 +138,8 @@
             var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultStuffDoer<string>));
-            Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
+            AssertThat.IsInstanceOfType(typeof(DefaultStuffDoer<string>), validator);
+            AssertThat.IsInstanceOfType(typeof(ServiceImpl<string, int>), validator.Service);
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@
             // Assert
             var impl = container.GetInstance<IService<int, string>>();
 
-            Assert.IsInstanceOfType(impl, typeof(ServiceImpl<int, string>));
+            AssertThat.IsInstanceOfType(typeof(ServiceImpl<int, string>), impl);
         }
 
         [TestMethod]
@@ -220,8 +220,8 @@
             var validator = container.GetInstance<IDoStuff<string>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(DefaultStuffDoer<string>));
-            Assert.IsInstanceOfType(validator.Service, typeof(ServiceImpl<string, int>));
+            AssertThat.IsInstanceOfType(typeof(DefaultStuffDoer<string>), validator);
+            AssertThat.IsInstanceOfType(typeof(ServiceImpl<string, int>), validator.Service);
         }
 
         [TestMethod]
@@ -267,8 +267,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(AuditableEventEventHandler<AuditableEvent>),
-                "if we resolve IEventHandler<AuditableEvent> then WhereConstraintEventHandler<AuditableEvent> should be activated");
+            AssertThat.IsInstanceOfType(typeof(AuditableEventEventHandler<AuditableEvent>), producer.GetInstance(), "if we resolve IEventHandler<AuditableEvent> then WhereConstraintEventHandler<AuditableEvent> should be activated");
         }
 
         [TestMethod]
@@ -303,8 +302,7 @@
                 "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
                 "should be activated");
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(AuditableEventEventHandler<StructEvent>),
-                "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
+            AssertThat.IsInstanceOfType(typeof(AuditableEventEventHandler<StructEvent>), producer.GetInstance(), "if we resolve IEventHandler<StructEvent> then WhereConstraintEventHandler<StructEvent> " +
                 "should be activated");
         }
 
@@ -322,8 +320,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(NewConstraintEventHandler<DefaultConstructorEvent>),
-                "if we resolve IEventHandler<DefaultConstructorEvent> then NewConstraintEventHandler<DefaultConstructorEvent> should be activated");
+            AssertThat.IsInstanceOfType(typeof(NewConstraintEventHandler<DefaultConstructorEvent>), producer.GetInstance(), "if we resolve IEventHandler<DefaultConstructorEvent> then NewConstraintEventHandler<DefaultConstructorEvent> should be activated");
         }
 
         [TestMethod]
@@ -356,8 +353,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(ClassConstraintEventHandler<ClassEvent>),
-                "if we resolve IEventHandler<ClassEvent> then ClassConstraintEventHandler<ClassEvent> should be activated");
+            AssertThat.IsInstanceOfType(typeof(ClassConstraintEventHandler<ClassEvent>), producer.GetInstance(), "if we resolve IEventHandler<ClassEvent> then ClassConstraintEventHandler<ClassEvent> should be activated");
         }
 
         [TestMethod]
@@ -390,8 +386,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(StructConstraintEventHandler<StructEvent>),
-                "if we resolve IEventHandler<StructEvent> then StructConstraintEventHandler<StructEvent> should be activated");
+            AssertThat.IsInstanceOfType(typeof(StructConstraintEventHandler<StructEvent>), producer.GetInstance(), "if we resolve IEventHandler<StructEvent> then StructConstraintEventHandler<StructEvent> should be activated");
         }
 
         [TestMethod]
@@ -442,8 +437,7 @@
             // Assert
             Assert.IsNotNull(producer);
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(MonoDictionary<int>),
-                "if we resolve IDictionary<int, int> then MonoDictionary<int> should be activated");
+            AssertThat.IsInstanceOfType(typeof(MonoDictionary<int>), producer.GetInstance(), "if we resolve IDictionary<int, int> then MonoDictionary<int> should be activated");
         }
 
         [TestMethod]
@@ -477,8 +471,7 @@
             Assert.IsNotNull(producer,
                 "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
 
-            Assert.IsInstanceOfType(producer.GetInstance(), typeof(NullableProducer<int>),
-                "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
+            AssertThat.IsInstanceOfType(typeof(NullableProducer<int>), producer.GetInstance(), "if we resolve IProducer<int?> then NullableProducer<int> should be activated");
         }
 
         [TestMethod]
@@ -509,7 +502,7 @@
             var impl = container.GetInstance<IService<object, int>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(ServiceImplWithTypesArgsSwapped<int, object>));
+            AssertThat.IsInstanceOfType(typeof(ServiceImplWithTypesArgsSwapped<int, object>), impl);
         }
 
         [TestMethod]
@@ -541,8 +534,8 @@
             var instance2 = container.GetInstance<IQueryHandler<GenericQuery2<string>, string>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance1, typeof(QueryHandlerWithNestedType1<string>));
-            Assert.IsInstanceOfType(instance2, typeof(QueryHandlerWithNestedType2<string>));
+            AssertThat.IsInstanceOfType(typeof(QueryHandlerWithNestedType1<string>), instance1);
+            AssertThat.IsInstanceOfType(typeof(QueryHandlerWithNestedType2<string>), instance2);
         }
 
         [TestMethod]
@@ -563,8 +556,7 @@
             var instance = container.GetInstance<IDictionary<int, int>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(SneakyMonoDictionary<int, object>),
-                "SneakyMonoDictionary implements Dictionary<T, T>, so requesting an IDictionary<int, int> " +
+            AssertThat.IsInstanceOfType(typeof(SneakyMonoDictionary<int, object>), instance, "SneakyMonoDictionary implements Dictionary<T, T>, so requesting an IDictionary<int, int> " +
                 "should succeed because we filled in TUnused with System.Object.");
         }
 
@@ -587,7 +579,7 @@
             var instance = container.GetInstance<IInterface<int, int, double>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(Implementation<int, object, string, double>));
+            AssertThat.IsInstanceOfType(typeof(Implementation<int, object, string, double>), instance);
         }
 
         [TestMethod]
@@ -609,7 +601,7 @@
             var instance = container.GetInstance<IInterface<int, int, object>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(Implementation<int, object, string, object>));
+            AssertThat.IsInstanceOfType(typeof(Implementation<int, object, string, object>), instance);
         }
 
         [TestMethod]
@@ -647,8 +639,7 @@
             var instance = container.GetInstance<IFoo<Baz>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(Foo<Baz, Bar>),
-                "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
+            AssertThat.IsInstanceOfType(typeof(Foo<Baz, Bar>), instance, "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
         }
 
         [TestMethod]
@@ -1085,7 +1076,7 @@
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(OpenGenericWithPredicate1<int>));
+            AssertThat.IsInstanceOfType(typeof(OpenGenericWithPredicate1<int>), result);
         }
 
         [TestMethod]
@@ -1104,7 +1095,7 @@
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(OpenGenericWithPredicate2<long>));
+            AssertThat.IsInstanceOfType(typeof(OpenGenericWithPredicate2<long>), result);
         }
 
         [TestMethod]
@@ -1207,7 +1198,7 @@
             var actualInstance = container.GetInstance<ICommandHandler<UpdateCommand<SpecialEntity>>>();
 
             // Assert
-            Assert.IsInstanceOfType(actualInstance, expectedType);
+            AssertThat.IsInstanceOfType(expectedType, actualInstance);
         }
     }
 

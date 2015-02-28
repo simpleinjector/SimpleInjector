@@ -219,7 +219,7 @@
             var instance = producer.GetInstance();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instance);
         }
 
         [TestMethod]
@@ -235,7 +235,7 @@
             var instance = producer.GetInstance();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instance);
         }
 
         public class ServiceWithProperty<TDependency>

@@ -57,7 +57,7 @@
             }
             catch (ArgumentException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No subtype was expected.");
+                AssertThat.IsInstanceOfType(typeof(ArgumentException), ex, "No subtype was expected.");
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }
@@ -166,7 +166,7 @@
             // Assert
             var instance = container.GetInstance(typeof(SqlUserRepository));
 
-            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), instance);
         }
 
         [TestMethod]

@@ -46,10 +46,9 @@
             var handler = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler);
 
-            Assert.IsInstanceOfType(((RealCommandCommandHandlerDecorator)handler).Decorated,
-                typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), ((RealCommandCommandHandlerDecorator)handler).Decorated);
         }
 
         [TestMethod]
@@ -71,7 +70,7 @@
             var decorator = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
 
             Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler,
                 ((RealCommandCommandHandlerDecorator)decorator).Decorated));
@@ -96,7 +95,7 @@
             var decorator = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
 
             Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler,
                 ((RealCommandCommandHandlerDecorator)decorator).Decorated));
@@ -121,7 +120,7 @@
             var decorator = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
 
             var decoratedInstance = ((RealCommandCommandHandlerDecorator)decorator).Decorated;
 
@@ -211,10 +210,9 @@
             var handler = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler);
 
-            Assert.IsInstanceOfType(((RealCommandCommandHandlerDecorator)handler).Decorated,
-                typeof(TransactionalCommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), ((RealCommandCommandHandlerDecorator)handler).Decorated);
         }
 
         [TestMethod]
@@ -235,7 +233,7 @@
             var handler2 = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(RealCommandCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler1);
 
             Assert.IsFalse(object.ReferenceEquals(handler1, handler2),
                 "Since the decorator is registered as transient, every time the collection is iterated, " +
@@ -264,7 +262,7 @@
             var handler = decorator.DecorateeFactory();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
         }
 
         [TestMethod]
@@ -288,7 +286,7 @@
             var handler = decorator.DecorateeFactory();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
         }
 
         [TestMethod]
@@ -421,11 +419,11 @@
             var decorator = funcDecorator.DecorateeFactory();
 
             // Assert
-            Assert.IsInstanceOfType(decorator, typeof(TransactionalCommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), decorator);
 
             var handler = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator).Decorated;
 
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
         }
 
         [TestMethod]
@@ -452,7 +450,7 @@
             var handler = scopeDecorator.DecorateeFactory();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
         }
 
         [TestMethod]
@@ -475,7 +473,7 @@
             var decorator = (TransactionalCommandHandlerDecorator<RealCommand>)handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator.Decorated, typeof(AsyncCommandHandlerProxy<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(AsyncCommandHandlerProxy<RealCommand>), decorator.Decorated);
         }
 
         [TestMethod]
@@ -497,7 +495,7 @@
             var decorator2 = services.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator1, typeof(NonGenericServiceDecorator));
+            AssertThat.IsInstanceOfType(typeof(NonGenericServiceDecorator), decorator1);
 
             Assert.IsTrue(object.ReferenceEquals(decorator1, decorator2),
                 "Since the decorator is registered as singleton, the enumerable should always return the " +
@@ -525,7 +523,7 @@
             var decorator2 = handlers.Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator1, typeof(AsyncCommandHandlerProxy<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(AsyncCommandHandlerProxy<RealCommand>), decorator1);
 
             Assert.IsTrue(object.ReferenceEquals(decorator1, decorator2),
                 "Since the decorator is registered as singleton, the enumerable should always return the " +
@@ -589,7 +587,7 @@
             var realHandler2 = ((RealCommandCommandHandlerDecorator)handlers.First()).Decorated;
 
             // Assert
-            Assert.IsInstanceOfType(realHandler1, typeof(RealCommandCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), realHandler1);
 
             bool isTransient = !object.ReferenceEquals(realHandler1, realHandler2);
 
@@ -623,7 +621,7 @@
             var nullHandler2 = ((RealCommandCommandHandlerDecorator)handlers2.Last()).Decorated;
 
             // Assert
-            Assert.IsInstanceOfType(nullHandler1, typeof(NullCommandHandler<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), nullHandler1);
 
             Assert.AreSame(nullHandler1, nullHandler2,
                 "The NullCommandHandler is registered as singleton and should be injected as singleton.");
@@ -762,7 +760,7 @@
             var handler = handlers.Last();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(NullCommandHandler<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), handler);
 
             bool nullCommandHandlerIsDecorated =
                 handler.GetType() == typeof(TransactionalCommandHandlerDecorator<RealCommand>);
@@ -838,12 +836,9 @@
             var nullHandler = handlers[2];
 
             // Assert
-            Assert.IsInstanceOfType(realHandler, typeof(RealCommandCommandHandler),
-                "The RealCommandCommandHandler was expected not to be decorated.");
-            Assert.IsInstanceOfType(defaultHandler, typeof(TransactionalCommandHandlerDecorator<RealCommand>),
-                "The DefaultCommandHandler was expected to be decorated.");
-            Assert.IsInstanceOfType(nullHandler, typeof(TransactionalCommandHandlerDecorator<RealCommand>),
-                "The NullCommandHandler was expected to be decorated.");
+            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), realHandler, "The RealCommandCommandHandler was expected not to be decorated.");
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), defaultHandler, "The DefaultCommandHandler was expected to be decorated.");
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), nullHandler, "The NullCommandHandler was expected to be decorated.");
         }
 
         [TestMethod]
@@ -906,11 +901,9 @@
             var nullHandler2 = container.GetAllInstances<ICommandHandler<RealCommand>>().Last();
 
             // Assert
-            Assert.IsInstanceOfType(realHandler1, typeof(TransactionalCommandHandlerDecorator<RealCommand>),
-                "RealCommandCommandHandler hasn't been decorated properly.");
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), realHandler1, "RealCommandCommandHandler hasn't been decorated properly.");
 
-            Assert.IsInstanceOfType(nullHandler1, typeof(AsyncCommandHandlerProxy<RealCommand>),
-                "NullCommandHandler hasn't been decorated properly.");
+            AssertThat.IsInstanceOfType(typeof(AsyncCommandHandlerProxy<RealCommand>), nullHandler1, "NullCommandHandler hasn't been decorated properly.");
 
             Assert.IsFalse(object.ReferenceEquals(realHandler1, realHandler2),
                 "TransactionalCommandHandlerDecorator is registered as transient and should therefore be transient.");
@@ -1018,7 +1011,7 @@
             var decorator = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
 
             // Assert
-            Assert.IsInstanceOfType(decorator, typeof(TransactionalCommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), decorator);
         }
 
         [TestMethod]
@@ -1057,16 +1050,16 @@
 
             DecoratorPredicateContext realContext = predicateContexts[0];
 
-            Assert.AreEqual(typeof(ICommandHandler<RealCommand>), realContext.ServiceType);
-            Assert.AreEqual(typeof(RealCommandCommandHandler), realContext.ImplementationType);
-            Assert.IsInstanceOfType(realContext.Expression, typeof(ConstantExpression));
+            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), realContext.ServiceType);
+            AssertThat.AreEqual(typeof(RealCommandCommandHandler), realContext.ImplementationType);
+            AssertThat.IsInstanceOfType(typeof(ConstantExpression), realContext.Expression);
             Assert.AreEqual(0, realContext.AppliedDecorators.Count);
 
             DecoratorPredicateContext nullContext = predicateContexts[1];
 
             Assert.AreEqual(nullContext.ServiceType, typeof(ICommandHandler<RealCommand>));
             Assert.AreEqual(nullContext.ImplementationType, typeof(NullCommandHandler<RealCommand>));
-            Assert.IsInstanceOfType(nullContext.Expression, typeof(ConstantExpression));
+            AssertThat.IsInstanceOfType(typeof(ConstantExpression), nullContext.Expression);
             Assert.AreEqual(0, nullContext.AppliedDecorators.Count);
         }
 
@@ -1288,8 +1281,7 @@
             var decorator2 = decorator1.Decorated;
 
             // Assert
-            Assert.IsInstanceOfType(decorator2, typeof(TransactionalCommandHandlerDecorator<RealCommand>),
-                "Since the decorator is registered twice, it should wrap the decoratee twice.");
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), decorator2, "Since the decorator is registered twice, it should wrap the decoratee twice.");
 
             var decoratee = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator2).Decorated;
 
@@ -1482,7 +1474,7 @@
             var instance2 = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
 
             // Assert
-            Assert.IsInstanceOfType(instance1, typeof(RealCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), instance1);
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
         }
 
@@ -1628,8 +1620,7 @@
             var decorator = (BaseDecorator)container.GetAllInstances<IBase>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator.Decoratee, typeof(DeriveDecorator),
-                "Since the collection element points back into a container's registration, we would expect " +
+            AssertThat.IsInstanceOfType(typeof(DeriveDecorator), decorator.Decoratee, "Since the collection element points back into a container's registration, we would expect " +
                 "the type to be decorated with that decorator as well.");
         }
 
@@ -1647,8 +1638,7 @@
             var decorator = (BaseDecorator)container.GetAllInstances<IBase>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(decorator.Decoratee, typeof(DeriveImplementation),
-                "Since the collection element points back into a container's registration of the same type, " +
+            AssertThat.IsInstanceOfType(typeof(DeriveImplementation), decorator.Decoratee, "Since the collection element points back into a container's registration of the same type, " +
                 "we'd expect the decorator to be applied just once.");
         }
 
@@ -1669,8 +1659,8 @@
             var plugins = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator<PluginImpl>));
-            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator<PluginImpl2>));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator<PluginImpl>), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator<PluginImpl2>), plugins[1]);
         }
 
         [TestMethod]
@@ -1694,8 +1684,8 @@
             var plugins = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator<IPlugin>));
-            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator<IPlugin>));
+            AssertThat.AreEqual(typeof(PluginDecorator<IPlugin>), plugins[0].GetType());
+            AssertThat.AreEqual(typeof(PluginDecorator<IPlugin>), plugins[1].GetType());
         }
         
         [TestMethod]
@@ -1719,7 +1709,7 @@
             var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), handler);
         }
 
         [TestMethod]
@@ -1744,7 +1734,7 @@
             var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(RealCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), handler);
         }
 
         [TestMethod]
@@ -1804,10 +1794,10 @@
             var service = container.GetAllInstances<INonGenericService>().Single();
 
             // Assert
-            // With uncontrolled collections, the container has no knowlegde about the actual elements of
+            // With uncontrolled collections, the container has no knowledge about the actual elements of
             // the collection (since those elements can change on every iteration), so the ImplementationType
             // will in this case simply be the same as the ServiceType: INonGenericService.
-            Assert.IsInstanceOfType(service, typeof(NonGenericServiceDecorator<INonGenericService>));
+            AssertThat.IsInstanceOfType(typeof(NonGenericServiceDecorator<INonGenericService>), service);
         }
 
         [TestMethod]
@@ -1841,8 +1831,8 @@
             var handler2 = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(SpecialCommandHandlerDecorator<SpecialCommand>));
-            Assert.IsInstanceOfType(handler2, typeof(NullCommandHandler<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(SpecialCommandHandlerDecorator<SpecialCommand>), handler1);
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), handler2);
         }
 
         [TestMethod]
@@ -1871,9 +1861,9 @@
             var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
             // Assert
-            Assert.AreEqual(handler.GetType().ToFriendlyName(),
-                typeof(CommandHandlerDecoratorWithUnresolvableArgument<RealCommand, ICommandHandler<RealCommand>>)
-                .ToFriendlyName());
+            AssertThat.AreEqual(
+                typeof(CommandHandlerDecoratorWithUnresolvableArgument<RealCommand, ICommandHandler<RealCommand>>),
+                actualType: handler.GetType());
         }
 
         [TestMethod]
@@ -1904,7 +1894,7 @@
             var handler = container.GetAllInstances<ICommandHandler<RealCommand>>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(TransactionHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), handler);
         }
 
         [TestMethod]
@@ -1958,8 +1948,8 @@
 
             // NOTE: Since this is an container uncontrolled collection, the container does not know the
             // exact type of the command handler, only its interface type is available.
-            Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ServiceType);
-            Assert.AreSame(typeof(ICommandHandler<RealCommand>), context.ImplementationType);
+            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), context.ServiceType);
+            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), context.ImplementationType);
         }
 
         private static KnownRelationship GetValidRelationship()

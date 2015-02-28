@@ -107,11 +107,9 @@
             container.RegisterAll(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
-            Assert.IsInstanceOfType(container.GetAllInstances<IEventHandler<ClassEvent>>().Single(), 
-                typeof(NonGenericEventHandler));
+            AssertThat.IsInstanceOfType(typeof(NonGenericEventHandler), container.GetAllInstances<IEventHandler<ClassEvent>>().Single());
 
-            Assert.IsInstanceOfType(container.GetAllInstances<IEventHandler<AuditableEvent>>().Single(), 
-                typeof(AuditableEventEventHandler));
+            AssertThat.IsInstanceOfType(typeof(AuditableEventEventHandler), container.GetAllInstances<IEventHandler<AuditableEvent>>().Single());
         }
 
         [TestMethod]
@@ -255,8 +253,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(container.GetInstance<IUserRepository>(), typeof(InMemoryUserRepository),
-                "The registration was not overridden properly.");
+            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), container.GetInstance<IUserRepository>(), "The registration was not overridden properly.");
         }
 
         [TestMethod]
@@ -298,7 +295,7 @@
 
             // Assert
             var instance = container.GetAllInstances<IUserRepository>().Single();
-            Assert.IsInstanceOfType(instance, typeof(InMemoryUserRepository));
+            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
 
         // NOTE: There was a bug in the framework. The container did not selfregister when the overloaded

@@ -30,7 +30,7 @@
             var plugins = container.GetAllInstances<IPlugin>();
 
             // Assert
-            Assert.IsInstanceOfType(plugins, typeof(IList<IPlugin>));
+            AssertThat.IsInstanceOfType(typeof(IList<IPlugin>), plugins);
         }
 
         [TestMethod]
@@ -45,9 +45,9 @@
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(Plugin0));
-            Assert.IsInstanceOfType(plugins[1], typeof(Plugin1));
-            Assert.IsInstanceOfType(plugins[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(Plugin0), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin1), plugins[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), plugins[2]);
         }
 
         [TestMethod]
@@ -247,9 +247,9 @@
             var plugins = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(Plugin0));
-            Assert.IsInstanceOfType(plugins[1], typeof(Plugin1));
-            Assert.IsInstanceOfType(plugins[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(Plugin0), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin1), plugins[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), plugins[2]);
         }
 
         [TestMethod]
@@ -268,9 +268,9 @@
             plugins.CopyTo(pluginCopies, 0);
 
             // Assert
-            Assert.IsInstanceOfType(pluginCopies[0], typeof(Plugin0));
-            Assert.IsInstanceOfType(pluginCopies[1], typeof(Plugin1));
-            Assert.IsInstanceOfType(pluginCopies[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(Plugin0), pluginCopies[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin1), pluginCopies[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), pluginCopies[2]);
         }
 
         [TestMethod]
@@ -285,9 +285,9 @@
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(Plugin0));
-            Assert.IsInstanceOfType(plugins[1], typeof(Plugin1));
-            Assert.IsInstanceOfType(plugins[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(Plugin0), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin1), plugins[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), plugins[2]);
         }
 
         [TestMethod]
@@ -305,9 +305,9 @@
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(plugins[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), plugins[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), plugins[2]);
         }
 
         [TestMethod]
@@ -349,9 +349,9 @@
             }
 
             // Assert
-            Assert.IsInstanceOfType(pluginsCopy[0], typeof(Plugin0));
-            Assert.IsInstanceOfType(pluginsCopy[1], typeof(Plugin1));
-            Assert.IsInstanceOfType(pluginsCopy[2], typeof(Plugin2));
+            AssertThat.IsInstanceOfType(typeof(Plugin0), pluginsCopy[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin1), pluginsCopy[1]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), pluginsCopy[2]);
         }
 
         public class Plugin0 : IPlugin

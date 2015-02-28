@@ -22,8 +22,8 @@
 
             // Assert
             Assert.AreEqual(2, collection.Count);
-            Assert.IsInstanceOfType(collection.First(), typeof(PluginImpl));
-            Assert.IsInstanceOfType(collection.Second(), typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), collection.Second());
         }
 
         [TestMethod]
@@ -42,8 +42,8 @@
 
             // Assert
             Assert.AreEqual(2, collection.Count);
-            Assert.IsInstanceOfType(collection.First(), typeof(PluginDecorator));
-            Assert.IsInstanceOfType(collection.Second(), typeof(PluginDecorator));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.Second());
         }
 
         [TestMethod]
@@ -74,8 +74,8 @@
 
             // Assert
             Assert.AreEqual(2, list.Count);
-            Assert.IsInstanceOfType(list[0], typeof(PluginImpl));
-            Assert.IsInstanceOfType(list[1], typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), list[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), list[1]);
         }
 
         [TestMethod]
@@ -94,8 +94,8 @@
 
             // Assert
             Assert.AreEqual(2, list.Count);
-            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), list[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), list[0]);
         }
 
         [TestMethod]

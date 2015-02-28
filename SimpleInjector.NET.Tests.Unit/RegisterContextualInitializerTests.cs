@@ -214,9 +214,9 @@
             // Assert
             Assert.AreEqual(2, actualContexts.Count, "Two event args were expected.");
 
-            Assert.IsInstanceOfType(actualContexts.First().Instance, typeof(StubCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(StubCommandHandler), actualContexts.First().Instance);
 
-            Assert.IsInstanceOfType(actualContexts.Second().Instance, typeof(RealCommandHandlerDecorator));
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), actualContexts.Second().Instance);
 
             Assert.AreSame(decorator, actualContexts.Second().Instance);
         }
@@ -243,7 +243,7 @@
             // Assert
             Assert.AreEqual(3, actualContexts.Count, "Three event args were expected.");
 
-            Assert.IsInstanceOfType(actualContexts.First().Instance, typeof(StubCommandHandler));
+            AssertThat.IsInstanceOfType(typeof(StubCommandHandler), actualContexts.First().Instance);
 
             Assert.AreSame(decorator1.Decorated, actualContexts.First().Instance);
 

@@ -473,8 +473,7 @@
             scope.Dispose();
 
             // Assert
-            Assert.IsInstanceOfType(disposedObjects.Last(), typeof(DisposablePlugin),
-                "Since the disposable logger is requested during disposal of the scope, it should be " +
+            AssertThat.IsInstanceOfType(typeof(DisposablePlugin), disposedObjects.Last(), "Since the disposable logger is requested during disposal of the scope, it should be " +
                 "disposed after all other already created services have been disposed. " +
                 "In the given case, disposing DisposableLogger before the IDisposable registration becomes " +
                 "a problem when that registration starts using ILogger in its dispose method as well.");

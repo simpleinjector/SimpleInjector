@@ -22,7 +22,7 @@
             // Assert
             var instance = container.GetInstance(validServiceType);
 
-            Assert.IsInstanceOfType(instance, validImplementation);
+            AssertThat.IsInstanceOfType(validImplementation, instance);
         }
 
         [TestMethod]
@@ -126,7 +126,7 @@
             var instance = container.GetInstance<ICovariant<object>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instance);
         }
     }
 }

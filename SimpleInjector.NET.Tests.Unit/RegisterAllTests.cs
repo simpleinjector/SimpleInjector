@@ -330,8 +330,8 @@
 
             // Assert
             Assert.AreEqual(2, repositories.Length);
-            Assert.IsInstanceOfType(repositories[0], typeof(InMemoryUserRepository));
-            Assert.IsInstanceOfType(repositories[1], typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), repositories[0]);
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), repositories[1]);
         }
 
         [TestMethod]
@@ -624,7 +624,7 @@
 
             // Assert
             Assert.AreEqual(1, list.Length);
-            Assert.IsInstanceOfType(list[0], typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), list[0]);
         }
 
         [TestMethod]
@@ -692,7 +692,7 @@
             var repository = container.GetAllInstances<IUserRepository>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(repository, typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), repository);
         }
 
         [TestMethod]
@@ -733,8 +733,8 @@
             var plugins = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(plugins[0], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(plugins[1], typeof(PluginDecorator));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), plugins[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), plugins[1]);
         }
 
         [TestMethod]
@@ -749,7 +749,7 @@
             var instances = container.GetAllInstances<ICovariant<object>>();
 
             // Assert
-            Assert.IsInstanceOfType(instances.Single(), typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instances.Single());
         }
 
         [TestMethod]
@@ -764,7 +764,7 @@
             var instances = container.GetAllInstances<ICovariant<object>>();
 
             // Assert
-            Assert.IsInstanceOfType(instances.Single(), typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instances.Single());
         }
 
         [TestMethod]
@@ -1096,7 +1096,7 @@
             // Assert
             var handler = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();
 
-            Assert.IsInstanceOfType(handler, typeof(ClassConstraintEventHandler<AuditableEvent>));
+            AssertThat.IsInstanceOfType(typeof(ClassConstraintEventHandler<AuditableEvent>), handler);
         }
 
         [TestMethod]
@@ -1184,8 +1184,8 @@
 
             // Assert
             Assert.AreEqual(2, collection.Count);
-            Assert.IsInstanceOfType(collection.First(), typeof(PluginImpl));
-            Assert.IsInstanceOfType(collection.Second(), typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), collection.Second());
         }
 
         [TestMethod]
@@ -1204,8 +1204,8 @@
 
             // Assert
             Assert.AreEqual(2, collection.Count);
-            Assert.IsInstanceOfType(collection.First(), typeof(PluginDecorator));
-            Assert.IsInstanceOfType(collection.Second(), typeof(PluginDecorator));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.Second());
         }
 
         [TestMethod]
@@ -1235,8 +1235,8 @@
 
             // Assert
             Assert.AreEqual(2, list.Count);
-            Assert.IsInstanceOfType(list[0], typeof(PluginImpl));
-            Assert.IsInstanceOfType(list[1], typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), list[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), list[1]);
         }
 
         [TestMethod]
@@ -1255,8 +1255,8 @@
 
             // Assert
             Assert.AreEqual(2, list.Count);
-            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(list[0], typeof(PluginDecorator));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), list[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), list[0]);
         }
 
         [TestMethod]

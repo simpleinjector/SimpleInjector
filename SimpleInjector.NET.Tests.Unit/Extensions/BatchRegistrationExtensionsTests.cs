@@ -122,8 +122,7 @@
             var impl = container.GetInstance<IService<string, object>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(Concrete1),
-                "Concrete1 implements IService<string, object> directly.");
+            AssertThat.IsInstanceOfType(typeof(Concrete1), impl, "Concrete1 implements IService<string, object> directly.");
         }
 
         [TestMethod]
@@ -139,8 +138,7 @@
             var impl = container.GetInstance<IService<int, string>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(Concrete2),
-                "Concrete2 implements OpenGenericBase<int> which implements IService<int, string>.");
+            AssertThat.IsInstanceOfType(typeof(Concrete2), impl, "Concrete2 implements OpenGenericBase<int> which implements IService<int, string>.");
         }
 
         [TestMethod]
@@ -295,8 +293,7 @@
             var impl = container.GetInstance<IService<float, double>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(Concrete3),
-                "Concrete3 implements INonGeneric which implements IService<float, double>.");
+            AssertThat.IsInstanceOfType(typeof(Concrete3), impl, "Concrete3 implements INonGeneric which implements IService<float, double>.");
         }
 
         [TestMethod]
@@ -313,8 +310,7 @@
             var impl = container.GetInstance<IService<Type, Type>>();
 
             // Assert
-            Assert.IsInstanceOfType(impl, typeof(Concrete3),
-                "Concrete3 implements IService<Type, Type>.");
+            AssertThat.IsInstanceOfType(typeof(Concrete3), impl, "Concrete3 implements IService<Type, Type>.");
         }
 
         [TestMethod]
@@ -352,10 +348,8 @@
             var impl = container.GetInstance<IService<string, object>>();
             var imp2 = container.GetInstance<IService<int, string>>();
 
-            Assert.IsInstanceOfType(impl, typeof(Concrete1),
-                "Concrete1 implements IService<string, object>.");
-            Assert.IsInstanceOfType(impl, typeof(Concrete1),
-                "Concrete2 implements IService<int, string>.");
+            AssertThat.IsInstanceOfType(typeof(Concrete1), impl, "Concrete1 implements IService<string, object>.");
+            AssertThat.IsInstanceOfType(typeof(Concrete1), impl, "Concrete2 implements IService<int, string>.");
         }
 
         [TestMethod]
@@ -541,8 +535,8 @@
             var instance2 = container.GetInstance<ICommandHandler<double>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance1, typeof(MultiInterfaceHandler));
-            Assert.IsInstanceOfType(instance2, typeof(MultiInterfaceHandler));
+            AssertThat.IsInstanceOfType(typeof(MultiInterfaceHandler), instance1);
+            AssertThat.IsInstanceOfType(typeof(MultiInterfaceHandler), instance2);
         }
 
         [TestMethod]

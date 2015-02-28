@@ -32,7 +32,7 @@
             var instance = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), instance);
         }
 
         [TestMethod]

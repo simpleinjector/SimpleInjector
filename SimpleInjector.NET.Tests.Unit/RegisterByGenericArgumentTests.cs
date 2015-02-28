@@ -32,7 +32,7 @@
             var instance = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), instance);
         }
 
         [TestMethod]
@@ -122,7 +122,7 @@
             var instance = container.GetInstance<ICovariant<object>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(CovariantImplementation<string>));
+            AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instance);
         }
     }
 }

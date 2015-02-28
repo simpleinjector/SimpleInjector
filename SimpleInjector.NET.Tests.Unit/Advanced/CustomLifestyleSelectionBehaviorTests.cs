@@ -364,7 +364,7 @@
             var decorator2 = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(decorator1, typeof(TransactionHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator1);
             Assert.AreSame(decorator1, decorator2, "Decorator was expected to be a singleton.");
         }
 
@@ -385,7 +385,7 @@
             var decorator2 = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(decorator1, typeof(TransactionHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator1);
             Assert.AreSame(decorator1, decorator2, "Decorator was expected to be a singleton.");
         }
 

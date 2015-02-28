@@ -22,7 +22,7 @@
             }
             catch (TException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(TException), assertMessage);
+                AssertThat.IsInstanceOfType(typeof(TException), ex, assertMessage);
             }
         }
 
@@ -89,7 +89,7 @@
             }
             catch (TArgumentException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(TArgumentException));
+                AssertThat.IsInstanceOfType(typeof(TArgumentException), ex);
 
                 ExceptionContainsParamName(ex, expectedParamName);
             }
@@ -141,6 +141,17 @@
 #else
             Assert.IsTrue(exception.Message.Contains(expectedParamName), assertMessage);
 #endif
+        }
+
+        internal static void IsInstanceOfType(Type expectedType, object actualInstance, string message = null)
+        {
+            Assert.IsNotNull(actualInstance, message);
+
+            if (!expectedType.IsAssignableFrom(actualInstance.GetType()))
+            {
+                Assert.Fail(string.Format("{1} is not an instance of type {0}. {2}",
+                    ToFriendlyName(expectedType), ToFriendlyName(actualInstance.GetType()), message));
+            }
         }
 
         public static void AreEqual(Type expectedType, Type actualType, string message = null)

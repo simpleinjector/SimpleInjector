@@ -58,7 +58,7 @@
             }
             catch (ArgumentException ex)
             {
-                Assert.IsInstanceOfType(ex, typeof(ArgumentException), "No subtype was expected.");
+                AssertThat.IsInstanceOfType(typeof(ArgumentException), ex, "No subtype was expected.");
                 AssertThat.StringContains(expectedMessage, ex.Message);
             }
         }

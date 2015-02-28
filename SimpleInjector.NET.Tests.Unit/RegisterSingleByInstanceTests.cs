@@ -212,7 +212,7 @@
 
             // Assert
             Assert.AreEqual(1, expressionsBuilding.Count);
-            Assert.IsInstanceOfType(expressionsBuilding.Single(), typeof(ConstantExpression));
+            AssertThat.IsInstanceOfType(typeof(ConstantExpression), expressionsBuilding.Single());
         }
 
         [TestMethod]
@@ -235,7 +235,7 @@
 
             // Assert
             Assert.AreEqual(1, expressionsBuilding.Count);
-            Assert.IsInstanceOfType(expressionsBuilding.Single(), typeof(ConstantExpression));
+            AssertThat.IsInstanceOfType(typeof(ConstantExpression), expressionsBuilding.Single());
         }
     }
 }

@@ -185,7 +185,7 @@
 
             container.ExpressionBuilding += (s, e) =>
             {
-                Assert.IsInstanceOfType(e.Expression, typeof(NewExpression));
+                AssertThat.IsInstanceOfType(typeof(NewExpression), e.Expression);
 
                 actualNumberOfCalls++;
             };

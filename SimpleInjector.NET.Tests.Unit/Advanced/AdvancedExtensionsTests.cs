@@ -197,7 +197,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var instance = container.GetAllInstances<IPlugin>().Single();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(PluginImpl));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), instance);
         }
 
         [TestMethod]
@@ -216,8 +216,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var instances = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(instances[0], typeof(PluginImpl));
-            Assert.IsInstanceOfType(instances[1], typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), instances[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), instances[1]);
         }
 
         [TestMethod]
@@ -236,8 +236,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var instances = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(instances[0], typeof(PluginImpl));
-            Assert.IsInstanceOfType(instances[1], typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), instances[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), instances[1]);
         }
 
         [TestMethod]
@@ -257,8 +257,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var instances = container.GetAllInstances<IPlugin>().ToArray();
 
             // Assert
-            Assert.IsInstanceOfType(instances[0], typeof(PluginImpl));
-            Assert.IsInstanceOfType(instances[1], typeof(PluginImpl2));
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), instances[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), instances[1]);
         }
 
         [TestMethod]
@@ -468,7 +468,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var handler2 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(StructConstraintEventHandler<StructEvent>));
+            AssertThat.IsInstanceOfType(typeof(StructConstraintEventHandler<StructEvent>), handler1);
             Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
         }
         
@@ -495,7 +495,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var handler2 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(StructConstraintEventHandler<StructEvent>));
+            AssertThat.IsInstanceOfType(typeof(StructConstraintEventHandler<StructEvent>), handler1);
             Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
         }
 

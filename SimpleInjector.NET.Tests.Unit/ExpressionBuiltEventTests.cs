@@ -55,8 +55,8 @@
             var customerValidator = container.GetInstance<IValidator<Customer>>();
 
             // Assert
-            Assert.IsInstanceOfType(orderValidator, typeof(MonitoringValidator<Order>));
-            Assert.IsInstanceOfType(customerValidator, typeof(MonitoringValidator<Customer>));
+            AssertThat.IsInstanceOfType(typeof(MonitoringValidator<Order>), orderValidator);
+            AssertThat.IsInstanceOfType(typeof(MonitoringValidator<Customer>), customerValidator);
         }
 
         // This test verifies the core difference between ExpressionBuilding and ExpressionBuilt
@@ -83,7 +83,7 @@
 
             // Assert
             Assert.IsNotNull(actualExpression);
-            Assert.IsInstanceOfType(actualExpression, typeof(ConstantExpression));
+            AssertThat.IsInstanceOfType(typeof(ConstantExpression), actualExpression);
         }
 
         [TestMethod]
@@ -135,7 +135,7 @@
             var actual2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsInstanceOfType(actual1, typeof(InMemoryUserRepository));
+            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), actual1);
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
         }
@@ -163,7 +163,7 @@
             var actual2 = container.GetInstance<RealUserService>().Repository;
 
             // Assert
-            Assert.IsInstanceOfType(actual1, typeof(InMemoryUserRepository));
+            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), actual1);
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
         }

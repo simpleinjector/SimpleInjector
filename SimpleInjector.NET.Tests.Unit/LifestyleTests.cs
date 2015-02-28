@@ -82,8 +82,8 @@
             var instance = producer.GetInstance();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
-            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), instance);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), ((PluginDecorator)instance).Decoratee);
         }
 
         [TestMethod]
@@ -101,8 +101,8 @@
             var instance = producer.GetInstance();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
-            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), instance);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), ((PluginDecorator)instance).Decoratee);
         }
 
         [TestMethod]
@@ -120,8 +120,8 @@
             var instance = producer.GetInstance();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(PluginDecorator));
-            Assert.IsInstanceOfType(((PluginDecorator)instance).Decoratee, typeof(PluginImpl));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), instance);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), ((PluginDecorator)instance).Decoratee);
         }
 
         [TestMethod]

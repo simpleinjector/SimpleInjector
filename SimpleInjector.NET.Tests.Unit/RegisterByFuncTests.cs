@@ -204,7 +204,7 @@
             // Assert
             var instance = container.GetInstance(validServiceType);
 
-            Assert.IsInstanceOfType(instance, typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), instance);
         }
 
         [TestMethod]

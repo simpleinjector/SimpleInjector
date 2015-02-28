@@ -17,7 +17,7 @@
             container.RegisterSingle(typeof(IUserRepository), typeof(SqlUserRepository));
 
             // Assert
-            Assert.IsInstanceOfType(container.GetInstance<IUserRepository>(), typeof(SqlUserRepository));
+            AssertThat.IsInstanceOfType(typeof(SqlUserRepository), container.GetInstance<IUserRepository>());
         }
 
         [TestMethod]
