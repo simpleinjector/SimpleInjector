@@ -59,33 +59,18 @@ namespace SimpleInjector.Extensions
 
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
             Justification = "I don't care about the extra casts. This is not a performance critical part.")]
-        internal static Type DetermineImplementationType(Expression expression, Type registeredServiceType)
+        internal static Type DetermineImplementationType(Expression expression, 
+            InstanceProducer registeredProducer)
         {
-            if (expression is ConstantExpression)
-            {
-                var constantExpression = (ConstantExpression)expression;
+            var constantExpression = expression as ConstantExpression;
 
-                object singleton = constantExpression.Value;
-                return singleton == null ? constantExpression.Type : singleton.GetType();
+            // A ConstantExpression with null is supplied in case of a uncontrolled collection.
+            if (constantExpression != null && object.ReferenceEquals(null, constantExpression.Value))
+            {
+                return constantExpression.Type;
             }
 
-            if (expression is NewExpression)
-            {
-                // Transient without initializers.
-                return ((NewExpression)expression).Constructor.DeclaringType;
-            }
-
-            var invocation = expression as InvocationExpression;
-
-            if (invocation != null && invocation.Expression is ConstantExpression &&
-                invocation.Arguments.Count == 1 && invocation.Arguments[0] is NewExpression)
-            {
-                // Transient with initializers.
-                return ((NewExpression)invocation.Arguments[0]).Constructor.DeclaringType;
-            }
-
-            // Implementation type can not be determined.
-            return registeredServiceType;
+            return registeredProducer.Registration.ImplementationType;
         }
 
         internal static bool ContainsGenericParameter(this Type type)

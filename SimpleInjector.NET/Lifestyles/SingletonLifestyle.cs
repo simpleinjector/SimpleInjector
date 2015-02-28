@@ -47,12 +47,12 @@ namespace SimpleInjector.Lifestyles
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
         internal static Registration CreateSingleRegistration(Type serviceType, object instance, 
-            Container container)
+            Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, "instance");
 
-            return new SingletonInstanceLifestyleRegistration(serviceType, instance, Lifestyle.Singleton, 
-                container);
+            return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
+                instance, Lifestyle.Singleton, container);
         }
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
@@ -71,14 +71,16 @@ namespace SimpleInjector.Lifestyles
         {
             private readonly object originalInstance;
             private readonly Type serviceType;
+            private readonly Type implementationType;
             private readonly Lazy<object> initializedInstance;
 
-            internal SingletonInstanceLifestyleRegistration(Type serviceType, object instance, 
-                Lifestyle lifestyle, Container container)
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
+                object instance, Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
             {
                 this.originalInstance = instance;
                 this.serviceType = serviceType;
+                this.implementationType = implementationType;
 
                 // Default lazy behavior ensures that the initializer is guaranteed to be called just once.
                 this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
@@ -86,7 +88,7 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType
             {
-                get { return this.serviceType; }
+                get { return this.implementationType; }
             }
 
             public override Expression BuildExpression()

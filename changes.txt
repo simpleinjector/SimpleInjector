@@ -3,6 +3,12 @@
 
 Version vNext
 
+Version 2.7.3 (v2.7.3 RTM)
+
+	Bug fixes:
+		-[Core] DecoratorPredicateContext.ImplementationType returned service type in case the decoratee was
+		 not transient or singleton (work item 21012).
+
 
 Version 2.7.2 (v2.7.2 RTM) 2015-02-12
 

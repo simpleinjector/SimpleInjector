@@ -625,7 +625,8 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            var registration = SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this);
+            var registration = SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this,
+                instance.GetType());
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -1058,7 +1059,8 @@ namespace SimpleInjector
 
             collection.AppendAll(
                 from instance in singletons
-                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this));
+                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this,
+                    instance.GetType()));
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
         }

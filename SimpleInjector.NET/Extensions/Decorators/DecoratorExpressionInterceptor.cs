@@ -145,7 +145,7 @@ namespace SimpleInjector.Extensions.Decorators
             if (!predicateCache.ContainsKey(registeredProducer))
             {
                 Type implementationType =
-                    ExtensionHelpers.DetermineImplementationType(originalExpression, registeredServiceType);
+                    ExtensionHelpers.DetermineImplementationType(originalExpression, registeredProducer);
 
                 var producer = producerBuilder(implementationType);
 

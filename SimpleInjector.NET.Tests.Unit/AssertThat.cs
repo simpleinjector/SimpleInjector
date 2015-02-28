@@ -143,7 +143,7 @@
 #endif
         }
 
-        internal static void IsInstanceOfType(Type expectedType, object actualInstance, string message = null)
+        public static void IsInstanceOfType(Type expectedType, object actualInstance, string message = null)
         {
             Assert.IsNotNull(actualInstance, message);
 
