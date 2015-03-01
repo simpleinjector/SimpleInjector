@@ -1,7 +1,7 @@
 @ECHO OFF
 
-set version=2.7.0
-set prereleasePostfix=
+set version=2.7.3
+set prereleasePostfix=-alpha1
 set buildNumber=0 
 
 
@@ -96,6 +96,8 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
+%msbuild% "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+
 
 echo BUILD DOCUMENTATION
 
@@ -132,6 +134,8 @@ copy bin\PCL\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
 copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\Portable\SimpleInjector.Diagnostics.dll
 copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\Portable\SimpleInjector.Diagnostics.xml
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.dll
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.xml
 
 mkdir Releases\temp\Portable\CommonServiceLocator
 copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
@@ -266,6 +270,8 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.xml
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.dll"
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%

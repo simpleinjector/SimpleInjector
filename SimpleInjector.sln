@@ -133,6 +133,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.
 		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.PCL", "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj", "{B7AE02F3-D306-4028-8646-4844DBA2CFCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -349,6 +351,16 @@ Global
 		{AE7D36E8-1922-465E-BCB2-6B4940A9206D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AE7D36E8-1922-465E-BCB2-6B4940A9206D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AE7D36E8-1922-465E-BCB2-6B4940A9206D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B7AE02F3-D306-4028-8646-4844DBA2CFCD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
