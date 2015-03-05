@@ -14,12 +14,11 @@
     [TestClass]
     public class VarianceExtensions_AllowToResolveVariantTypesTests
     {
-        // Each test gets its own test class instance and therefore its own new container and logger.
-        private readonly Container container = new Container();
-        
-        public VarianceExtensions_AllowToResolveVariantTypesTests()
+        private static Container CreateContainer()
         {
-            this.container.Options.AllowToResolveVariantTypes();
+            var container = new Container();
+            container.Options.AllowToResolveVariantTypes();
+            return container;
         }
 
         public interface IInvariantInterface<T>
@@ -35,10 +34,12 @@
         public void GetInstance_RequestingAnUnregisteredTypeThatCanBeResolvedUsingContravariance_ReturnsExpectedType()
         {
             // Arrange
-            this.container.Register<IEventHandler<CustomerMovedEvent>, CustomerMovedEventHandler>();
+            var container = CreateContainer();
+
+            container.Register<IEventHandler<CustomerMovedEvent>, CustomerMovedEventHandler>();
 
             // Act
-            var handler = this.container.GetInstance<IEventHandler<CustomerMovedAbroadEvent>>();
+            var handler = container.GetInstance<IEventHandler<CustomerMovedAbroadEvent>>();
 
             // Assert
             Assert.IsInstanceOfType(handler, typeof(CustomerMovedEventHandler));
@@ -49,26 +50,30 @@
         public void GetInstance_RequestingAnInvariantInterface_WillNotReturnTheRegisteredInstance()
         {
             // Arrange
-            this.container.RegisterSingle<IInvariantInterface<CustomerMovedEvent>>(
+            var container = CreateContainer();
+
+            container.RegisterSingle<IInvariantInterface<CustomerMovedEvent>>(
                 new InvariantClass<CustomerMovedEvent>());
 
             // Act
-            this.container.GetInstance(typeof(IInvariantInterface<CustomerMovedAbroadEvent>));
+            container.GetInstance(typeof(IInvariantInterface<CustomerMovedAbroadEvent>));
         }
 
         [TestMethod]
         public void GetInstance_RequesingACovariantType_ReturnsTheExpectedFunc()
         {
             // Arrange
+            var container = CreateContainer();
+
             // Note: Func<out T> contains an out parameter. We are testing covariance here.
             string expectedValue = "Hello covariance.";
 
             Func<string> expectedFunc = () => expectedValue;
 
-            this.container.RegisterSingle<Func<string>>(expectedFunc);
+            container.RegisterSingle<Func<string>>(expectedFunc);
 
             // Act
-            var actualFunc = this.container.GetInstance<Func<object>>();
+            var actualFunc = container.GetInstance<Func<object>>();
 
             object actualValue = actualFunc();
 
@@ -84,10 +89,12 @@
             string expectedValue = "some string";
             object actualValue = null;
 
-            this.container.RegisterSingle<Action<object>>(s => { actualValue = s; });
+            var container = CreateContainer();
+
+            container.RegisterSingle<Action<object>>(s => { actualValue = s; });
 
             // Act
-            var action = this.container.GetInstance<Action<string>>();
+            var action = container.GetInstance<Action<string>>();
 
             action(expectedValue);
 
@@ -99,10 +106,12 @@
         public void GetRegistration_RequestingAnActionOfObjectWhileActionOfStringIsRegistered_ReturnNull()
         {
             // Arrange
-            this.container.RegisterSingle<Action<string>>(s => { });
+            var container = CreateContainer();
+
+            container.RegisterSingle<Action<string>>(s => { });
 
             // Act
-            var registration = this.container.GetRegistration(typeof(Action<object>));
+            var registration = container.GetRegistration(typeof(Action<object>));
 
             // Assert
             Assert.IsNull(registration, "No registration should have been found");
@@ -118,13 +127,15 @@
                 "because there are 2 registrations that are applicable. " +
                 "Ambiguous registrations: ";
 
-            this.container.RegisterSingle<Action<object>>(s => { });
-            this.container.RegisterSingle<Action<Exception>>(s => { });
+            var container = CreateContainer();
+
+            container.RegisterSingle<Action<object>>(s => { });
+            container.RegisterSingle<Action<Exception>>(s => { });
 
             try
             {
                 // Act
-                this.container.GetInstance<Action<ArgumentException>>();
+                container.GetInstance<Action<ArgumentException>>();
 
                 Assert.Fail("Call was expected to fail.");
             }
