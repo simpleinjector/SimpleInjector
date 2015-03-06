@@ -23,11 +23,11 @@
 namespace SimpleInjector.Integration.WebApi
 {
     using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Dependencies;
-using SimpleInjector.Extensions.ExecutionContextScoping;
+    using System.Collections.Generic;
+    using System.Web.Http;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Dependencies;
+    using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>Simple Injector <see cref="IDependencyResolver"/> implementation.</summary>
     /// <example>
