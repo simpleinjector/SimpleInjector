@@ -14,13 +14,6 @@
     [TestClass]
     public class VarianceExtensions_AllowToResolveVariantTypesTests
     {
-        private static Container CreateContainer()
-        {
-            var container = new Container();
-            container.Options.AllowToResolveVariantTypes();
-            return container;
-        }
-
         public interface IInvariantInterface<T>
         {
         }
@@ -146,6 +139,13 @@
                 Assert.IsTrue(ex.Message.Contains(typeof(Action<object>).Name));
                 Assert.IsTrue(ex.Message.Contains(typeof(Action<Exception>).Name));
             }
+        }
+
+        private static Container CreateContainer()
+        {
+            var container = new Container();
+            container.Options.AllowToResolveVariantTypes();
+            return container;
         }
 
         public class InvariantClass<T> : IInvariantInterface<T>

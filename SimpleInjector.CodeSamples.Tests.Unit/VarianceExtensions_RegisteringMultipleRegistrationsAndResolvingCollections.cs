@@ -145,7 +145,7 @@
 
             public void Handle(CustomerMovedEvent e)
             {
-                logger.Log(this.GetType().Name + " handled " + e.GetType().Name);
+                this.logger.Log(this.GetType().Name + " handled " + e.GetType().Name);
             }
         }
 
@@ -160,7 +160,7 @@
 
             public void Handle(CustomerMovedAbroadEvent e)
             {
-                logger.Log(this.GetType().Name + " handled " + e.GetType().Name);
+                this.logger.Log(this.GetType().Name + " handled " + e.GetType().Name);
             }
         }
 
