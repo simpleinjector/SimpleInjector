@@ -289,7 +289,7 @@ namespace SimpleInjector
 
             if (!configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
             {
-                configuration.MessageHandlers.Add(new SimpleInjectorHttpRequestMessageHandler(container));
+                configuration.MessageHandlers.Add(new SimpleInjectorHttpRequestMessageHandler());
             }
 
             httpRequestMessageTrackingEnabled = true;

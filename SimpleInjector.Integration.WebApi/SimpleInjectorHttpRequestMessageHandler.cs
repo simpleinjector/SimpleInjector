@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,28 +22,15 @@
 
 namespace SimpleInjector.Integration.WebApi
 {
-    using System;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
 
     internal sealed class SimpleInjectorHttpRequestMessageHandler : DelegatingHandler
     {
-        private readonly Lazy<InstanceProducer> providerProducer;
-
-        public SimpleInjectorHttpRequestMessageHandler(Container container)
-        {
-            this.providerProducer = new Lazy<InstanceProducer>(
-                () => container.GetRegistration(typeof(SimpleInjectorHttpRequestMessageProvider), true));
-        }
-
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            // Make sure Web API has created an IDependencyScope for the current request. This will begin the
-            // ExecutionContextScope for the current request and allows the next GetInstance call to succeed.
-            request.GetDependencyScope();
-
             SimpleInjectorHttpRequestMessageProvider.CurrentMessage = request;
 
             return base.SendAsync(request, cancellationToken);
