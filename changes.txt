@@ -1,6 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version vNext
+
+	New Features:
+		-[Core] Container.IsVerifying property added to allow checking if the container is currently verifying
+		 its configuration (work item 21014).
+
+
 Version 2.7.3 (v2.7.3 RTM) 2015-03-09
 
 	Bug fixes:

@@ -64,6 +64,9 @@ namespace SimpleInjector
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
 
+        // Flag to signal that the container's configuration is currently being verified.
+        private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
+
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
             new ConditionalHashSet<InstanceProducer>();
@@ -81,9 +84,6 @@ namespace SimpleInjector
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
-
-        // Flag to signal that the container's configuration is currently being verified.
-        private bool verifying;
 
         // Flag to signal that the container's configuration has been verified (at least once).
         private bool succesfullyVerified;
@@ -141,6 +141,17 @@ namespace SimpleInjector
         public ContainerOptions Options { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether the container is currently being verified on the current thread.
+        /// </summary>
+        /// <value>True in case the container is currently being verified on the current thread; otherwise
+        /// false.</value>
+        public bool IsVerifying
+        {
+            get { return this.isVerifying.Value; }
+            private set { this.isVerifying.Value = value; }
+        }
+
+        /// <summary>
         /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is 
         /// returned from the registered container.Options.LifestyleSelectionBehavior.
         /// </summary>
@@ -155,6 +166,11 @@ namespace SimpleInjector
         {
             get
             {
+                if (this.locked)
+                {
+                    return true;
+                }
+
                 // By using a lock, we have the certainty that all threads will see the new value for 'locked'
                 // immediately.
                 lock (this.locker)
@@ -167,27 +183,6 @@ namespace SimpleInjector
         internal bool HasRegistrations
         {
             get { return this.registrations.Count > 1; }
-        }
-
-        internal bool IsVerifying
-        {
-            get
-            {
-                // By using a lock, we have the certainty that all threads will see the new value for 
-                // 'verifying' immediately.
-                lock (this.locker)
-                {
-                    return this.verifying;
-                }
-            }
-
-            private set
-            {
-                lock (this.locker)
-                {
-                    this.verifying = value;
-                }
-            }
         }
 
         internal bool SuccesfullyVerified

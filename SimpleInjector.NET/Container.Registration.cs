@@ -1251,23 +1251,27 @@ namespace SimpleInjector
         /// invalid.</exception>
         public void Verify()
         {
-            this.IsVerifying = true;
-
-            this.VerificationScope = new ContainerVerificationScope();
-
-            try
+            // Prevent multiple threads from starting verification at the same time. This could crash, b
+            lock (this.isVerifying)
             {
-                this.Verifying(this, EventArgs.Empty);
-                this.VerifyThatAllExpressionsCanBeBuilt();
-                this.VerifyThatAllRootObjectsCanBeCreated();
-                this.succesfullyVerified = true;
-            }
-            finally
-            {
-                this.IsVerifying = false;
-                var scopeToDispose = this.VerificationScope;
-                this.VerificationScope = null;
-                scopeToDispose.Dispose();
+                this.IsVerifying = true;
+
+                this.VerificationScope = new ContainerVerificationScope();
+
+                try
+                {
+                    this.Verifying(this, EventArgs.Empty);
+                    this.VerifyThatAllExpressionsCanBeBuilt();
+                    this.VerifyThatAllRootObjectsCanBeCreated();
+                    this.succesfullyVerified = true;
+                }
+                finally
+                {
+                    this.IsVerifying = false;
+                    var scopeToDispose = this.VerificationScope;
+                    this.VerificationScope = null;
+                    scopeToDispose.Dispose();
+                }
             }
         }
 
