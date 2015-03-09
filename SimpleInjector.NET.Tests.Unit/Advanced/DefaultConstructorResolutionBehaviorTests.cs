@@ -60,7 +60,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains("For the container to be able to create " +
-                    "DefaultConstructorResolutionBehaviorTests+TypeWithMultiplePublicConstructors, it should " +
+                    "DefaultConstructorResolutionBehaviorTests.TypeWithMultiplePublicConstructors, it should " +
                     "contain exactly one public constructor, but it has 2.", ex.Message);
             }
         }
@@ -83,7 +83,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains("For the container to be able to create " +
-                    "DefaultConstructorResolutionBehaviorTests+TypeWithSingleInternalConstructor, it should " +
+                    "DefaultConstructorResolutionBehaviorTests.TypeWithSingleInternalConstructor, it should " +
                     "contain exactly one public constructor, but it has 0.", ex.Message);
             }
         }

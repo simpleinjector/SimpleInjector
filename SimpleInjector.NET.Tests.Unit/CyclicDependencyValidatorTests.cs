@@ -31,7 +31,7 @@
         {
             // Arrange
             string expectedExcpetionMessage = @"
-                The configuration is invalid. The type CyclicDependencyValidatorTests+A is directly or
+                The configuration is invalid. The type CyclicDependencyValidatorTests.A is directly or
                 indirectly depending on itself."
                 .TrimInside();
 
@@ -512,7 +512,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The configuration is invalid. The type CyclicDependencyValidatorTests+CompositeService " + 
+                "The configuration is invalid. The type CyclicDependencyValidatorTests.CompositeService " + 
                 "is directly or indirectly depending on itself.",
                 action);
         }

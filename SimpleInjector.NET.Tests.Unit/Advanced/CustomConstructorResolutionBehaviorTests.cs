@@ -27,7 +27,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The CustomConstructorResolutionBehaviorTests+NullReturningConstructorResolutionBehavior that 
+                The CustomConstructorResolutionBehaviorTests.NullReturningConstructorResolutionBehavior that 
                 was registered through Container.Options.ConstructorResolutionBehavior returned a null 
                 reference after its GetConstructor(Type, Type) method was supplied with values 
                 'RealTimeProvider' for serviceType and 'RealTimeProvider' for implementationType. 

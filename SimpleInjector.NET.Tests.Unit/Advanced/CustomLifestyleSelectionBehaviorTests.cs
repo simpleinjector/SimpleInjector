@@ -403,7 +403,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The CustomLifestyleSelectionBehaviorTests+CustomLifestyleSelectionBehavior that was registered 
+                The CustomLifestyleSelectionBehaviorTests.CustomLifestyleSelectionBehavior that was registered 
                 through Container.Options.LifestyleSelectionBehavior returned a null reference after its 
                 SelectLifestyle(Type, Type) method was supplied with values 'RealTimeProvider' for serviceType 
                 and 'RealTimeProvider' for implementationType. ILifestyleSelectionBehavior.SelectLifestyle 

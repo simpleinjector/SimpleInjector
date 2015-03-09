@@ -107,7 +107,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "GetInstanceTests+SomeGenericNastyness<TBla>+ReadOnlyDictionary<TKey, TValue>+KeyCollection", 
+                "GetInstanceTests.SomeGenericNastyness<TBla>.ReadOnlyDictionary<TKey, TValue>.KeyCollection", 
                 action);
         }
 

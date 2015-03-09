@@ -13,7 +13,7 @@
             // Arrange
             string expectedString = @"
                 The constructor of type 
-                DefaultConstructorVerificationBehaviorTests+TypeWithSinglePublicConstructorWithValueTypeParameter 
+                DefaultConstructorVerificationBehaviorTests.TypeWithSinglePublicConstructorWithValueTypeParameter 
                 contains parameter 'intArgument' of type Int32 which can not be used for constructor injection 
                 because it is a value type.
                 ".TrimInside();
@@ -45,7 +45,7 @@
             // Arrange
             string expectedString = @"
                 The constructor of type 
-                DefaultConstructorVerificationBehaviorTests+TypeWithSinglePublicConstructorWithStringTypeParameter 
+                DefaultConstructorVerificationBehaviorTests.TypeWithSinglePublicConstructorWithStringTypeParameter 
                 contains parameter 'stringArgument' of type String which can not be used for constructor 
                 injection."
                 .TrimInside();

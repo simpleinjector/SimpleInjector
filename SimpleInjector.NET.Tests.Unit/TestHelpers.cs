@@ -23,7 +23,7 @@
 
             if (type.IsNested && !type.IsGenericParameter)
             {
-                name = type.DeclaringType.ToFriendlyName() + "+" + type.Name;
+                name = type.DeclaringType.ToFriendlyName() + "." + type.Name;
             }
 
             var genericArguments = GetGenericArguments(type);

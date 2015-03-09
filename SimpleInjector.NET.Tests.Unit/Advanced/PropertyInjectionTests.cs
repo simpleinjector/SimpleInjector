@@ -76,7 +76,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The property named 'Dependency' with type ITimeProvider and declared on type
-                PropertyInjectionTests+ServiceWithReadOnlyPropertyDependency<ITimeProvider>
+                PropertyInjectionTests.ServiceWithReadOnlyPropertyDependency<ITimeProvider>
                 can't be injected, because it has no set method.".TrimInside(),
                 action);
         }

@@ -50,7 +50,7 @@
             catch (ArgumentException ex)
             {
                 AssertThat.StringContains("The constructor of type " +
-                    "ParameterConventionExtensionsTests+TypeWithConnectionStringIntConstructorArgument contains " +
+                    "ParameterConventionExtensionsTests.TypeWithConnectionStringIntConstructorArgument contains " +
                     "parameter 'cs1ConnectionString' of type Int32 which can not be used for constructor " +
                     "injection because it is a value type.", ex.Message);
             }
@@ -73,7 +73,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains("The constructor of type " +
-                    "ParameterConventionExtensionsTests+TypeWithConnectionStringIntConstructorArgument contains " +
+                    "ParameterConventionExtensionsTests.TypeWithConnectionStringIntConstructorArgument contains " +
                     "parameter 'cs1ConnectionString' of type Int32 which can not be used for constructor " +
                     "injection because it is a value type.", ex.Message);
             }
@@ -201,7 +201,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains("The constructor of type " +
-                    "ParameterConventionExtensionsTests+TypeWithAppSettingConstructorArgumentOfReferenceType " +
+                    "ParameterConventionExtensionsTests.TypeWithAppSettingConstructorArgumentOfReferenceType " +
                     "contains the parameter of type IDisposable with name 'as1AppSetting' that is not " +
                     "registered.", ex.Message);
             }

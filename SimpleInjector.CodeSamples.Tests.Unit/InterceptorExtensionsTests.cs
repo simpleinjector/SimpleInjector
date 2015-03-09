@@ -415,7 +415,7 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("For the container to be able to create " + 
-                    "InterceptorExtensionsTests+InterceptorWithInternalConstructor, it should contain " +
+                    "InterceptorExtensionsTests.InterceptorWithInternalConstructor, it should contain " +
                     "exactly one public constructor"),
                     "Actual: " + ex.Message);
             }
@@ -443,7 +443,7 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("The constructor of type " +
-                    "InterceptorExtensionsTests+InterceptorWithDependencyOnLogger contains the parameter " +
+                    "InterceptorExtensionsTests.InterceptorWithDependencyOnLogger contains the parameter " +
                     "of type ILogger with name 'logger' that is not registered."),
                     "Actual: " + ex.Message);
             }

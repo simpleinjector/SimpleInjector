@@ -221,7 +221,7 @@ namespace SimpleInjector
 
             if (type.IsNested && !type.IsGenericParameter)
             {
-                name = type.DeclaringType.ToFriendlyName(argumentsFormatter) + "+" + type.Name;
+                name = type.DeclaringType.ToFriendlyName(argumentsFormatter) + "." + type.Name;
             }
 
             var genericArguments = GetGenericArguments(type);

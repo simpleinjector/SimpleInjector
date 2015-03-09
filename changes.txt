@@ -6,6 +6,8 @@ Version vNext
 	New Features:
 		-[Core] Container.IsVerifying property added to allow checking if the container is currently verifying
 		 its configuration (work item 21014).
+		-[Core] Nested types in exception messages are now displayed with a dot instead of a + sign, as C#
+		 developers are used to. (work item 21011).
 
 
 Version 2.7.3 (v2.7.3 RTM) 2015-03-09

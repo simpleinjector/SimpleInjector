@@ -1968,7 +1968,7 @@
             AssertThat.StringContains(@"
                 impossible for the container to generate a 
                 Func<ICommandHandler<RealCommand>> 
-                for injection into the DecoratorExtensionsCollectionTests+AsyncCommandHandlerProxy<T> decorator"
+                for injection into the DecoratorExtensionsCollectionTests.AsyncCommandHandlerProxy<T> decorator"
                 .TrimInside(),
                 ex.Message);
 
