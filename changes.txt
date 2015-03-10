@@ -12,6 +12,8 @@ Version vNext
 	Improvements/Changes:
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 
 		 context scope in case there is no active scope yet (work item 21015).
+		-[Core/Diagnostics] SimpleInjector.Diagnostics.dll merged with core library (work item 21008).
+
 
 Version 2.7.3 (v2.7.3 RTM) 2015-03-09
 

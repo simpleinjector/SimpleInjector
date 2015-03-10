@@ -147,14 +147,83 @@
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Diagnostics\ContainerDebugViewProxy.cs">
-      <Link>Diagnostics\ContainerDebugViewProxy.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzer.cs">
+      <Link>Diagnostics\Analyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\DisposableTransientComponentAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\DisposableTransientComponentAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\PotentialLifestyleMismatchAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\PotentialLifestyleMismatchAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\ShortCircuitedDependencyAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\ShortCircuitedDependencyAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\SingleResponsibilityViolationsAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\SingleResponsibilityViolationsAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\TornLifestyleContainerAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\TornLifestyleContainerAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\ContainerAnalyzerProvider.cs">
+      <Link>Diagnostics\ContainerAnalyzerProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs">
+      <Link>Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\DebuggerErrorViewItem.cs">
       <Link>Diagnostics\DebuggerErrorViewItem.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Debugger\ContainerDebugView.cs">
+      <Link>Diagnostics\Debugger\ContainerDebugView.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs">
+      <Link>Diagnostics\Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Debugger\DebuggerViewItem.cs">
+      <Link>Diagnostics\Debugger\DebuggerViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticGroup.cs">
+      <Link>Diagnostics\DiagnosticGroup.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticResult.cs">
+      <Link>Diagnostics\DiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticResultGrouper.cs">
+      <Link>Diagnostics\DiagnosticResultGrouper.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticType.enum.cs">
+      <Link>Diagnostics\DiagnosticType.enum.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DisposableTransientComponentDiagnosticResult.cs">
+      <Link>Diagnostics\DisposableTransientComponentDiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\IContainerAnalyzer.cs">
+      <Link>Diagnostics\IContainerAnalyzer.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\KnownRelationshipCollection.cs">
       <Link>Diagnostics\KnownRelationshipCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\LifestyleMismatchChecker.cs">
+      <Link>Diagnostics\LifestyleMismatchChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs">
+      <Link>Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\ShortCircuitedDependencyDiagnosticResult.cs">
+      <Link>Diagnostics\ShortCircuitedDependencyDiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\SingleResponsibilityViolationDiagnosticResult.cs">
+      <Link>Diagnostics\SingleResponsibilityViolationDiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\TornLifestyleDiagnosticResult.cs">
+      <Link>Diagnostics\TornLifestyleDiagnosticResult.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\TypeGeneralizer.cs">
+      <Link>Diagnostics\TypeGeneralizer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\ExpressionBuildingEventArgs.cs">
       <Link>ExpressionBuildingEventArgs.cs</Link>

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -33,6 +33,7 @@ namespace SimpleInjector
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Lifestyles;
     
     /// <summary>
@@ -54,7 +55,7 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
-    [DebuggerTypeProxy(typeof(ContainerDebugViewProxy))]
+    [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container
     {
         private static long counter;

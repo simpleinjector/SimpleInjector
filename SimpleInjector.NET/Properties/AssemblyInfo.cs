@@ -14,7 +14,7 @@ using System.Security;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Simple Injector")]
 [assembly: AssemblyProduct("Simple Injector")]
-[assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
+[assembly: AssemblyCopyright("Copyright © 2013-2015 Simple Injector Contributors")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -45,8 +45,6 @@ using System.Security;
 [assembly: AllowPartiallyTrustedCallers]
 
 #if !PUBLISH
-[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics")]
-[assembly: InternalsVisibleTo("SimpleInjector.Diagnostics.Tests.Unit")]
 [assembly: InternalsVisibleTo("SimpleInjector.Extensions.LifetimeScoping.Tests.Unit")]
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit")]
 #else

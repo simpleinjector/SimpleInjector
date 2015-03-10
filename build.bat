@@ -1,6 +1,6 @@
 @ECHO OFF
 
-set version=2.7.3
+set version=2.8.0
 set prereleasePostfix=-alpha1
 set buildNumber=0 
 
@@ -64,7 +64,7 @@ set numeric_version_Integration_WebApi=%version_Integration_WebApi%.%buildNumber
 set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
 set numeric_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%.%buildNumber%
 
-
+if exist Releases\v%named_version% goto :release_directory_already_exists
 if not exist SimpleInjector.snk goto :strong_name_key_missing
 
 echo BUILDING
@@ -82,9 +82,6 @@ copy "Shared Assemblies\*.*" %targetPathPcl%\*.*
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Mvc%
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" /nologo /p:%net40FullProfile% /p:VersionNumber=%numeric_version_Integration_Wcf%
 
-REM Build a .NET version of the Diagnostics. This is needed for the Documentation project.
-%msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.Net.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%" /p:VersionNumber=%numeric_version_Core%
-
 ren %targetPathNet%\SimpleInjector.dll SimpleInjector_40.dll
 ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 
@@ -94,7 +91,6 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 %msbuild% "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Integration_WebApi%
 
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
-%msbuild% "SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
 
@@ -114,8 +110,6 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\Portable\Documentation\Si
 
 copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\v%named_version%\.NET\SimpleInjector.Diagnostics.xml
 
 echo %named_version% >> Releases\v%named_version%\version.txt 
 
@@ -132,8 +126,6 @@ copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 mkdir Releases\temp\Portable
 copy bin\PCL\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
 copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\Portable\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\Portable\SimpleInjector.Diagnostics.xml
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.xml
 
@@ -146,14 +138,10 @@ copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\Portable\Comm
 mkdir Releases\temp\NET45
 copy bin\NET\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET45\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET45\SimpleInjector.Diagnostics.xml
 
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\NET40\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\NET40\SimpleInjector.Diagnostics.xml
 
 mkdir Releases\temp\NET45\CommonServiceLocator
 copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET45\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
@@ -226,16 +214,10 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net45\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net45\SimpleInjector.Diagnostics.xml
 copy bin\NET\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector.dll
 copy bin\NET\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Diagnostics.dll Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.dll
-copy bin\PCL\SimpleInjector.Diagnostics.xml Releases\temp\lib\net40-client\SimpleInjector.Diagnostics.xml
 copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.dll"
 copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.xml"
-copy bin\PCL\SimpleInjector.Diagnostics.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Diagnostics.dll"
-copy bin\PCL\SimpleInjector.Diagnostics.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Diagnostics.xml"
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
@@ -377,6 +359,9 @@ echo Done!
 
 GOTO :EOF
 
+:release_directory_already_exists
+echo The release directory already exists.
+GOTO :EOF
 
 :strong_name_key_missing
 echo The strong name key SimpleInjector.snk does not exist. You should generate (a fake) one for this build script to work.

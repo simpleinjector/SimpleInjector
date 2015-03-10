@@ -98,7 +98,22 @@
     <Compile Include="ContainerOptionsTests.cs" />
     <Compile Include="Advanced\KnownRelationshipTests.cs" />
     <Compile Include="CuriouslyRecurringTemplatePatternTests.cs" />
-    <Compile Include="Diagnostics\ContainerDebugViewProxyTests.cs" />
+    <Compile Include="Diagnostics\AnalyzerTests.cs" />
+    <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
+    <Compile Include="Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\CustomLifestyleTests.cs" />
+    <Compile Include="Diagnostics\DisposableTransientComponentsTests.cs" />
+    <Compile Include="Diagnostics\ExternalProducerCreationAnalysisTests.cs" />
+    <Compile Include="Diagnostics\Helpers\DebuggerViewItemExtensions.cs" />
+    <Compile Include="Diagnostics\Helpers\DiagnosticGroupExtensions.cs" />
+    <Compile Include="Diagnostics\LifestyleMismatchServicesTests.cs" />
+    <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\TestClasses.cs" />
+    <Compile Include="Diagnostics\TestHelpers.cs" />
+    <Compile Include="Diagnostics\TornLifestyleContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\TypeGeneralizerTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ExpressionBuildingEventTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
@@ -172,9 +187,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Diagnostics\SimpleInjector.Diagnostics.csproj">
-      <Project>{3ecd7954-9c5e-4a62-9401-3f234fe1aeb6}</Project>
-      <Name>SimpleInjector.Diagnostics</Name>
+    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
+      <Project>{d140d43c-b7ab-43b2-a287-394df871eb56}</Project>
+      <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
