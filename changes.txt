@@ -16,6 +16,7 @@ Version vNext
 		 controllers made with the RegisterMvcControllers() extension method (work item 21006).
 		-[WebApi] The Disposable Transient Components diagnostic warning is now suppressed on registration for
 		 controllers made with the RegisterWebApiControllers() extension method  (work item 21006).
+		-[Core/Diagnostics] DisposableTransientComponentDiagnosticResult.Registration was always null.
 
 	Improvements/Changes:
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 

@@ -36,6 +36,7 @@ namespace SimpleInjector.Diagnostics
             string description)
             : base(serviceType, description, DiagnosticType.DisposableTransientComponent, registration)
         {
+            this.Registration = registration;
         }
 
         /// <summary>Gets the object that describes the relationship between the component and its dependency.</summary>
