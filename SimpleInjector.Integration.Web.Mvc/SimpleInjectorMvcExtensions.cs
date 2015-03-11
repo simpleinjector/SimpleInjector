@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Web.Compilation;
     using System.Web.Mvc;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.Web.Mvc;
 
     /// <summary>
@@ -126,9 +127,15 @@ namespace SimpleInjector
                             "grouped together.")]
         public static void RegisterMvcControllers(this Container container, params Assembly[] assemblies)
         {
-            foreach (var controllerType in GetControllerTypesToRegister(container, assemblies))
+            foreach (Type controllerType in GetControllerTypesToRegister(container, assemblies))
             {
-                container.Register(controllerType, controllerType);
+                Registration registration = Lifestyle.Transient.CreateRegistration(controllerType, container);
+
+                // Suppress the Disposable Transient Component warning, because MVC's controller factory
+                // ensures correct disposal of controllers.
+                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
+                container.AddRegistration(controllerType, registration);
             }
         }
 

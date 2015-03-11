@@ -11,6 +11,12 @@ Version vNext
 		-[Core/Diagnostics] Diagnostic warnings can now be suppressed per individual registration, by calling
 		 Registration.SuppressDiagnosticWarning() (work item 21016).
 
+	Bug fixes:
+		-[Mvc] The Disposable Transient Components diagnostic warning is now suppressed on registration for
+		 controllers made with the RegisterMvcControllers() extension method (work item 21006).
+		-[WebApi] The Disposable Transient Components diagnostic warning is now suppressed on registration for
+		 controllers made with the RegisterWebApiControllers() extension method  (work item 21006).
+
 	Improvements/Changes:
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 
 		 context scope in case there is no active scope yet (work item 21015).

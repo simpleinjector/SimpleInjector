@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Filters;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.WebApi;
 
     /// <summary>
@@ -269,7 +270,16 @@ namespace SimpleInjector
 
             var controllerTypes = GetControllerTypesFromConfiguration(configuration, assembliesResolver);
 
-            controllerTypes.ForEach(type => container.Register(type, type));
+            foreach (Type controllerType in controllerTypes)
+            {
+                Registration registration = Lifestyle.Transient.CreateRegistration(controllerType, container);
+
+                // Suppress the Disposable Transient Component warning, because MVC's controller factory
+                // ensures correct disposal of controllers.
+                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
+                container.AddRegistration(controllerType, registration);
+            }
         }
 
         /// <summary>
