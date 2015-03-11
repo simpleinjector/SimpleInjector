@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -61,32 +61,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            var containerRegisteredRegistrations =
-                from producer in producers
-                where producer.IsContainerAutoRegistered
-                select producer;
+            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = 
+                GetRegisteredImplementationTypes(producers);
 
-            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = (
-                from producer in producers
-                where producer.ServiceType != producer.ImplementationType
-                group producer by producer.ImplementationType into registrationGroup
-                select registrationGroup)
-                .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
+            Dictionary<Type, InstanceProducer> autoRegisteredRegistrationsWithLifestyleMismatch =
+                GetAutoRegisteredRegistrationsWithLifestyleMismatch(producers, registeredImplementationTypes);
 
-            Dictionary<Type, InstanceProducer> autoRegisteredRegistrationsWithLifestyleMismatch = (
-                from registration in containerRegisteredRegistrations
-                let registrationIsPossiblyShortCircuited =
-                    registeredImplementationTypes.ContainsKey(registration.ServiceType)
-                where registrationIsPossiblyShortCircuited
-                let registrationsWithThisImplementationType =
-                    registeredImplementationTypes[registration.ServiceType]
-                let hasLifestyleMismatch =
-                    registrationsWithThisImplementationType.Any(r => r.Lifestyle != registration.Lifestyle)
-                where hasLifestyleMismatch
-                select registration)
-                .ToDictionary(producer => producer.ServiceType);
-
-            return (
+            var results =
                 from producer in producers
                 where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.ShortCircuitedDependency)
                 from actualDependency in producer.GetRelationships()
@@ -99,8 +80,44 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     description: BuildDescription(actualDependency, possibleSkippedRegistrations),
                     registration: producer,
                     relationship: actualDependency,
-                    expectedDependencies: possibleSkippedRegistrations))
-                .ToArray();
+                    expectedDependencies: possibleSkippedRegistrations);
+
+            return results.ToArray();
+        }
+
+        private static Dictionary<Type, IEnumerable<InstanceProducer>> GetRegisteredImplementationTypes(
+            IEnumerable<InstanceProducer> producers)
+        {
+            return (
+                from producer in producers
+                where producer.ServiceType != producer.ImplementationType
+                group producer by producer.ImplementationType into registrationGroup
+                select registrationGroup)
+                .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
+        }
+
+        private static Dictionary<Type, InstanceProducer> GetAutoRegisteredRegistrationsWithLifestyleMismatch(
+            IEnumerable<InstanceProducer> producers,
+            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes)
+        {
+            var containerRegisteredRegistrations =
+                from producer in producers
+                where producer.IsContainerAutoRegistered
+                select producer;
+
+            var autoRegisteredRegistrationsWithLifestyleMismatch =
+                from registration in containerRegisteredRegistrations
+                let registrationIsPossiblyShortCircuited =
+                    registeredImplementationTypes.ContainsKey(registration.ServiceType)
+                where registrationIsPossiblyShortCircuited
+                let registrationsWithThisImplementationType =
+                    registeredImplementationTypes[registration.ServiceType]
+                let hasLifestyleMismatch =
+                    registrationsWithThisImplementationType.Any(r => r.Lifestyle != registration.Lifestyle)
+                where hasLifestyleMismatch
+                select registration;
+
+            return autoRegisteredRegistrationsWithLifestyleMismatch.ToDictionary(producer => producer.ServiceType);
         }
 
         private static string BuildDescription(KnownRelationship relationship,
