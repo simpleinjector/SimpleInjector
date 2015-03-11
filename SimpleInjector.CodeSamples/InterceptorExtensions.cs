@@ -66,7 +66,7 @@ namespace SimpleInjector.CodeSamples
             container.Options.ConstructorResolutionBehavior.GetConstructor(
                 typeof(TInterceptor), typeof(TInterceptor));
 
-            var interceptWith = new InterceptionHelper(container) {
+            var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression =
                     e => BuildInterceptorExpression<TInterceptor>(container),
                 Predicate = type => predicate(type)
@@ -81,7 +81,7 @@ namespace SimpleInjector.CodeSamples
             RequiresIsNotNull(interceptorCreator, "interceptorCreator");
             RequiresIsNotNull(predicate, "predicate");
 
-            var interceptWith = new InterceptionHelper(container) {
+            var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression =
                     e => Expression.Invoke(Expression.Constant(interceptorCreator)),
                 Predicate = type => predicate(type)
@@ -97,7 +97,7 @@ namespace SimpleInjector.CodeSamples
             RequiresIsNotNull(interceptorCreator, "interceptorCreator");
             RequiresIsNotNull(predicate, "predicate");
 
-            var interceptWith = new InterceptionHelper(container) {
+            var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Invoke(
                     Expression.Constant(interceptorCreator),
                     Expression.Constant(e)),
@@ -113,7 +113,7 @@ namespace SimpleInjector.CodeSamples
             RequiresIsNotNull(interceptor, "interceptor");
             RequiresIsNotNull(predicate, "predicate");
 
-            var interceptWith = new InterceptionHelper(container) {
+            var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Constant(interceptor),
                 Predicate = predicate
             };
@@ -150,12 +150,6 @@ namespace SimpleInjector.CodeSamples
                 where method.GetParameters().Length == 3
                 select method)
                 .Single();
-
-            public InterceptionHelper(Container container) {
-                this.Container = container;
-            }
-
-            internal Container Container { get; private set; }
 
             internal Func<ExpressionBuiltEventArgs, Expression> BuildInterceptorExpression
             {
