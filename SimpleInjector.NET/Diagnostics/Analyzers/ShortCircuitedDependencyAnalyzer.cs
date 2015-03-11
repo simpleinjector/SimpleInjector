@@ -67,9 +67,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 select producer;
 
             Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = (
-                from registration in producers
-                where registration.ServiceType != registration.ImplementationType
-                group registration by registration.ImplementationType into registrationGroup
+                from producer in producers
+                where producer.ServiceType != producer.ImplementationType
+                group producer by producer.ImplementationType into registrationGroup
                 select registrationGroup)
                 .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
 
@@ -87,16 +87,17 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 .ToDictionary(producer => producer.ServiceType);
 
             return (
-                from registration in producers
-                from actualDependency in registration.GetRelationships()
+                from producer in producers
+                where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.ShortCircuitedDependency)
+                from actualDependency in producer.GetRelationships()
                 where autoRegisteredRegistrationsWithLifestyleMismatch.ContainsKey(
                     actualDependency.Dependency.ServiceType)
                 let possibleSkippedRegistrations =
                     registeredImplementationTypes[actualDependency.Dependency.ServiceType]
                 select new ShortCircuitedDependencyDiagnosticResult(
-                    serviceType: registration.ServiceType,
+                    serviceType: producer.ServiceType,
                     description: BuildDescription(actualDependency, possibleSkippedRegistrations),
-                    registration: registration,
+                    registration: producer,
                     relationship: actualDependency,
                     expectedDependencies: possibleSkippedRegistrations))
                 .ToArray();

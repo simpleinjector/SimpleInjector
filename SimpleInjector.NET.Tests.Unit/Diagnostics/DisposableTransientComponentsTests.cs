@@ -34,6 +34,28 @@
         }
 
         [TestMethod]
+        public void Analyze_TransientRegistrationForDisposableComponentWithSuppressDiagnosticWarning_NoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, DisposablePlugin>();
+
+            Registration registration = container.GetRegistration(typeof(IPlugin)).Registration;
+
+            registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_SingletonRegistrationForDisposableComponent_NoWarning()
         {
             // Arrange

@@ -91,6 +91,26 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
 
         [TestMethod]
+        public void Analyze_OneViolationWithSuppressDiagnosticWarning_NoWarning()
+        {
+            // Arrange
+            Container container = CreateContainerWithRegistrations(typeof(PluginWith8Dependencies));
+
+            container.Verify();
+
+            var registration = container.GetRegistration(typeof(PluginWith8Dependencies)).Registration;
+
+            registration.SuppressDiagnosticWarning(DiagnosticType.SingleResponsibilityViolation);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<SingleResponsibilityViolationDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_WithInvalidConfiguration_ReturnsResultsWithExpectedViolationInformation()
         {
             // Arrange
@@ -328,6 +348,11 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             {
                 Assert.AreEqual(expected.Value, actual.Value, "Values do not match");
             }
+        }
+
+        private static string Actual(SingleResponsibilityViolationDiagnosticResult[] results)
+        {
+            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
         }
     }
 }

@@ -104,6 +104,74 @@
         }
 
         [TestMethod]
+        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnOneRegistration_OneWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
+            container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
+
+            container.Verify();
+
+            var registration = container.GetRegistration(typeof(IFoo)).Registration;
+
+            registration.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnTheOtherRegistration_OneWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
+            container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
+
+            container.Verify();
+
+            var registration = container.GetRegistration(typeof(IBar)).Registration;
+
+            registration.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnBothRegistrations_NoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
+            container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
+
+            container.Verify();
+
+            var registration1 = container.GetRegistration(typeof(IFoo)).Registration;
+            var registration2 = container.GetRegistration(typeof(IBar)).Registration;
+
+            registration1.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
+            registration2.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_TwoDistinctRegistrationsForSameLifestyle_ReturnsWarning()
         {
             // Arrange

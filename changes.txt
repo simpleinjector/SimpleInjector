@@ -8,6 +8,8 @@ Version vNext
 		 its configuration (work item 21014).
 		-[Core] Nested types in exception messages are now displayed with a dot instead of a + sign, as C#
 		 developers are used to. (work item 21011).
+		-[Core/Diagnostics] Diagnostic warnings can now be suppressed per individual registration, by calling
+		 Registration.SuppressDiagnosticWarning() (work item 21016).
 
 	Improvements/Changes:
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 

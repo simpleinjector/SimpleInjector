@@ -31,6 +31,7 @@
 
             container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
 
+            // HomeController depends on MyUnitOfWork.
             container.Register<HomeController>();
 
             container.Verify();
@@ -45,6 +46,31 @@
                 "HomeController might incorrectly depend on unregistered type MyUnitOfWork " +
                 "(Transient) instead of IUnitOfWork (Singleton).",
                 results[0].Description);
+        }
+
+        [TestMethod]
+        public void Analyze_OnConfigurationWithOneShortCircuitedRegistrationWithSuppressDiagnosticWarning_ReturnsNoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            // HomeController depends on MyUnitOfWork.
+            container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
+
+            container.Register<HomeController>();
+
+            container.Verify();
+
+            var registration = container.GetRegistration(typeof(HomeController)).Registration;
+
+            registration.SuppressDiagnosticWarning(DiagnosticType.ShortCircuitedDependency);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<ShortCircuitedDependencyDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
         }
 
         [TestMethod]
@@ -110,6 +136,11 @@
             return results
                 .Single(result => result.Name == "Possible Short Circuited Dependencies")
                 .Value as DebuggerViewItem[];
+        }
+
+        private static string Actual(ShortCircuitedDependencyDiagnosticResult[] results)
+        {
+            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
         }
     }
         

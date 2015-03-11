@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
+using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an
@@ -66,7 +67,8 @@ namespace SimpleInjector
 
         private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
         private readonly ThreadLocal<InstanceProducer> currentProducer = new ThreadLocal<InstanceProducer>();
-        
+
+        private HashSet<DiagnosticType> suppressions;
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
         private Action<object> instanceInitializer;
 
@@ -152,6 +154,25 @@ namespace SimpleInjector
             }
 
             this.instanceInitializer(instance);
+        }
+
+        /// <summary>
+        /// Suppressing the supplied <see cref="DiagnosticType"/> for the given registration.
+        /// </summary>
+        /// <param name="type">The <see cref="DiagnosticType"/>.</param>
+        public void SuppressDiagnosticWarning(DiagnosticType type)
+        {
+            if (this.suppressions == null)
+            {
+                this.suppressions = new HashSet<DiagnosticType>();
+            }
+
+            this.suppressions.Add(type);
+        }
+
+        internal bool ShouldNotBeSuppressed(DiagnosticType type)
+        {
+            return this.suppressions == null || !this.suppressions.Contains(type);
         }
 
         internal Expression BuildExpression(InstanceProducer producer)
