@@ -213,6 +213,9 @@ namespace SimpleInjector
         /// <param name="configuration">The <see cref="HttpConfiguration"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
         /// reference (Nothing in VB).</exception>
+        [Obsolete("SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been deprecated and will " + 
+            "be removed in a future release. Please consult the Web API integration guide on how to inject " +
+            "dependencies into Web API filter attributes. See https://simpleinjector.org/webapi.", error: false)]
         public static void RegisterWebApiFilterProvider(this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, "container");
