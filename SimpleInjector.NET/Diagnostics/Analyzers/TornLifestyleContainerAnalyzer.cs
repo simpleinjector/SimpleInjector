@@ -56,17 +56,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            IEnumerable<InstanceProducer[]> tornRegistrationGroups =
-                from producer in producers
-                where producer.Registration.Lifestyle != Lifestyle.Transient
-                where !producer.Registration.WrapsInstanceCreationDelegate
-                group producer by producer.Registration into registrationGroup
-                let registration = registrationGroup.Key
-                let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }
-                group registrationGroup by key into registrationLifestyleGroup
-                let hasConflict = registrationLifestyleGroup.Count() > 1
-                where hasConflict
-                select registrationLifestyleGroup.SelectMany(p => p).ToArray();
+            IEnumerable<InstanceProducer[]> tornRegistrationGroups = GetTornRegistrationGroups(producers);
 
             var results =
                 from tornProducerGroup in tornRegistrationGroups
@@ -77,6 +67,22 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     affectedProducers: tornProducerGroup);
 
             return results.ToArray();
+        }
+
+        private static IEnumerable<InstanceProducer[]> GetTornRegistrationGroups(
+            IEnumerable<InstanceProducer> producers)
+        {
+            return
+                from producer in producers
+                where producer.Registration.Lifestyle != Lifestyle.Transient
+                where !producer.Registration.WrapsInstanceCreationDelegate
+                group producer by producer.Registration into registrationGroup
+                let registration = registrationGroup.Key
+                let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }
+                group registrationGroup by key into registrationLifestyleGroup
+                let hasConflict = registrationLifestyleGroup.Count() > 1
+                where hasConflict
+                select registrationLifestyleGroup.SelectMany(p => p).ToArray();
         }
 
         private static TornLifestyleDiagnosticResult CreateDiagnosticResult(
