@@ -37,7 +37,7 @@
                 return constructor;
             }
 
-            throw new ActivationException(this.BuildExceptionMessage(implementationType));
+            throw new ActivationException(BuildExceptionMessage(implementationType));
         }
 
         [DebuggerStepThrough]
@@ -77,7 +77,7 @@
         }
 
         [DebuggerStepThrough]
-        private string BuildExceptionMessage(Type type)
+        private static string BuildExceptionMessage(Type type)
         {
             if (!type.GetConstructors().Any())
             {

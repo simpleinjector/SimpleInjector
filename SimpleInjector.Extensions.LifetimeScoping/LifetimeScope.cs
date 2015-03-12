@@ -46,7 +46,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         }
 
         internal LifetimeScope ParentScope { get; private set; }
-        
+
         // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
         internal bool IsCurrentScopeOrAncestor
         {
@@ -93,12 +93,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                         "{0}, but was created on thread with id {1}.", Thread.CurrentThread.ManagedThreadId,
                         this.initialThreadId));
                 }
+            }
 
-                try
-                {
-                    base.Dispose(disposing);
-                }
-                finally
+            try
+            {
+                base.Dispose(disposing);
+            }
+            finally
+            {
+                if (disposing && this.manager != null)
                 {
                     try
                     {

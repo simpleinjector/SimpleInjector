@@ -85,13 +85,13 @@ namespace SimpleInjector
         private static readonly Action[] NoVerifiers = new Action[0];
 
         private readonly object locker = new object();
-        private readonly Lazy<Expression> expression;
+        private readonly Lazy<Expression> lazyExpression;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
-        private ReadOnlyCollection<KnownRelationship> relationships;
+        private ReadOnlyCollection<KnownRelationship> knownRelationships;
         private List<Action> verifiers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
@@ -107,7 +107,7 @@ namespace SimpleInjector
 
             this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
-            this.expression = new Lazy<Expression>(this.BuildExpressionInternal);
+            this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
 
             // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
             // of registration doesn't have to be registered, since it will either always be registered
@@ -175,7 +175,7 @@ namespace SimpleInjector
 
         internal bool IsExpressionCreated
         {
-            get { return this.expression.IsValueCreated && !this.Registration.MustBeVerified; }
+            get { return this.lazyExpression.IsValueCreated && !this.Registration.MustBeVerified; }
         }
 
         internal bool MustBeExplicitlyVerified
@@ -251,7 +251,7 @@ namespace SimpleInjector
 
             try
             {
-                var expression = this.expression.Value;
+                var expression = this.lazyExpression.Value;
 
                 return expression;
             }
@@ -287,9 +287,9 @@ namespace SimpleInjector
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
         {
-            if (this.relationships != null)
+            if (this.knownRelationships != null)
             {
-                return this.relationships.ToArray();
+                return this.knownRelationships.ToArray();
             }
 
             return this.Registration.GetRelationships();
@@ -381,15 +381,18 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                var verifiers = this.verifiers ?? (this.verifiers = new List<Action>());
+                if (this.verifiers == null)
+                {
+                    this.verifiers = new List<Action>();
+                }
 
-                verifiers.Add(action);
+                this.verifiers.Add(action);
             }
         }
 
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
         {
-            this.relationships = new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
+            this.knownRelationships = new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
@@ -426,7 +429,7 @@ namespace SimpleInjector
         private Func<object> BuildInstanceCreator()
         {
             // Don't do recursive checks. The GetInstance() already does that.
-            var expression = this.expression.Value;
+            var expression = this.lazyExpression.Value;
 
             try
             {

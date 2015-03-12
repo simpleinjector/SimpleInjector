@@ -128,7 +128,8 @@ namespace SimpleInjector.Extensions.Decorators
 
                 if (decoratorType != null)
                 {
-                    uncontrolledInterceptor.ApplyDecorator(decoratorType);
+                    uncontrolledInterceptor.SetDecorator(decoratorType);
+                    uncontrolledInterceptor.ApplyDecorator();
                 }
             }
         }

@@ -68,13 +68,13 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && this.manager != null)
+            try
             {
-                try
-                {
-                    base.Dispose(disposing);
-                }
-                finally
+                base.Dispose(disposing);
+            }
+            finally
+            {
+                if (disposing && this.manager != null)
                 {
                     try
                     {

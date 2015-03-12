@@ -56,7 +56,7 @@ namespace SimpleInjector
             object instance;
 
             // Performance optimization: This if check is a duplicate to save a call to GetInstanceForType.
-            if (!this.registrations.TryGetValue(typeof(TService), out instanceProducer))
+            if (!this.producers.TryGetValue(typeof(TService), out instanceProducer))
             {
                 instance = this.GetInstanceForType<TService>();
             }
@@ -86,7 +86,7 @@ namespace SimpleInjector
 
             InstanceProducer instanceProducer;
 
-            if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
+            if (!this.producers.TryGetValue(serviceType, out instanceProducer))
             {
                 return this.GetInstanceForType(serviceType);
             }
@@ -138,7 +138,7 @@ namespace SimpleInjector
 
             InstanceProducer instanceProducer;
 
-            if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
+            if (!this.producers.TryGetValue(serviceType, out instanceProducer))
             {
                 instanceProducer = (InstanceProducer)this.GetRegistration(serviceType);
             }
@@ -334,7 +334,7 @@ namespace SimpleInjector
         {
             InstanceProducer instanceProducer = null;
 
-            if (!this.registrations.TryGetValue(serviceType, out instanceProducer))
+            if (!this.producers.TryGetValue(serviceType, out instanceProducer))
             {
                 var producer = buildInstanceProducer();
 
@@ -729,7 +729,7 @@ namespace SimpleInjector
         // swapping safes us from using locks.
         private void RegisterInstanceProducer(Type serviceType, InstanceProducer instanceProducer)
         {
-            var snapshotCopy = this.registrations.MakeCopy();
+            var snapshotCopy = this.producers.MakeCopy();
 
             // This registration might already exist if it was added made by another thread. That's why we
             // need to use the indexer, instead of Add.
@@ -740,7 +740,7 @@ namespace SimpleInjector
             Thread.MemoryBarrier();
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
-            this.registrations = snapshotCopy;
+            this.producers = snapshotCopy;
 
             if (instanceProducer != null)
             {

@@ -289,6 +289,8 @@ using SimpleInjector.Integration.Wcf;
                 .FirstOrDefault();
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Several types of exceptions can be thrown here.")]
         private static Type[] GetExportedTypes(Assembly assembly)
         {
             try

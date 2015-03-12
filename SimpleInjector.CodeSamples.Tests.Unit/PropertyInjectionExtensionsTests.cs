@@ -163,14 +163,14 @@
             // Arrange
             var container = new Container();
 
-            container.Options.EnablePropertyAutowiring();
+            container.Options.EnablePropertyAutoWiring();
 
             container.Register<ILogger, Logger>();
 
             container.Register<ServiceWithAttributedProperties>();
 
             // Act
-            container.AutowireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
+            container.AutoWireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
 
             // Assert
             var service = container.GetInstance<ServiceWithAttributedProperties>();
@@ -194,7 +194,7 @@
             try
             {
                 // Act
-                container.AutowireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
+                container.AutoWireProperty<ServiceWithAttributedProperties>(s => s.Logger1);
 
                 // Assert
                 Assert.Fail("Expected exception.");
@@ -202,7 +202,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(
-                    ex.Message.Contains("Please call container.Options.EnablePropertyAutowiring() first."));
+                    ex.Message.Contains("Please call container.Options.EnablePropertyAutoWiring() first."));
             }
         }
 

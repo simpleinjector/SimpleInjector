@@ -97,13 +97,13 @@ namespace SimpleInjector.Lifestyles
             }
             else
             {
-                var instanceCreator = this.BuildTransientDelegate<TService, TImplementation>();
+                var transientInstanceCreator = this.BuildTransientDelegate<TService, TImplementation>();
 
                 // WTF! Somehow Func<T> is not contra-variant in PCL :-(
 #if PCL
-                return () => instanceCreator();
+                return () => transientInstanceCreator();
 #else
-                return instanceCreator;
+                return transientInstanceCreator;
 #endif
             }
         }

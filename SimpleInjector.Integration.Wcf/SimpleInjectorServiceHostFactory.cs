@@ -23,6 +23,7 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.ServiceModel;
     using System.ServiceModel.Activation;
 

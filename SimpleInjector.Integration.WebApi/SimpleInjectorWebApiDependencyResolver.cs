@@ -135,7 +135,7 @@ namespace SimpleInjector.Integration.WebApi
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
         /// resources.
         /// </summary>
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             if (this.scope != null)
             {

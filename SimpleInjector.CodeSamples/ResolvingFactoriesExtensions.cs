@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -92,8 +93,6 @@
                 var constructor = container.Options.ConstructorResolutionBehavior
                     .GetConstructor(componentType, componentType);
 
-                var ctorArguments = constructor.GetParameters().Select(p => p.ParameterType).ToArray();
-
                 var parameters = (
                     from factoryArgumentType in factoryArguments
                     select Expression.Parameter(factoryArgumentType))
@@ -130,7 +129,7 @@
 
             if (funcParametersIndex == -1)
             {
-                throw new ActivationException(string.Format(
+                throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
                     "The constructor of type {0} did not contain the sequence of the following " +
                     "constructor parameters: {1}.",
                     constructor.DeclaringType.FullName,

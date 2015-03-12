@@ -43,7 +43,7 @@ namespace SimpleInjector.Advanced
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Not all delegates can be JITted. We fallback to the slower expression.Compile " +
+            Justification = "Not all delegates can be JITted. We fall back to the slower expression.Compile " +
                             "in that case.")]
         private static Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
         {

@@ -1389,7 +1389,7 @@ namespace SimpleInjector
 
             var producer = new InstanceProducer(serviceType, registration);
 
-            this.registrations[serviceType] = producer;
+            this.producers[serviceType] = producer;
 
             this.RemoveExternalProducer(producer);
         }
@@ -1529,7 +1529,7 @@ namespace SimpleInjector
         private void AppendToNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
         {
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-            bool collectionRegistered = this.registrations.ContainsKey(enumerableServiceType);
+            bool collectionRegistered = this.producers.ContainsKey(enumerableServiceType);
 
             if (collectionRegistered)
             {
@@ -1546,7 +1546,7 @@ namespace SimpleInjector
         {
             Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
-            var producer = this.registrations[enumerableServiceType];
+            var producer = this.producers[enumerableServiceType];
 
             IContainerControlledCollection instance =
                 DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
@@ -1650,7 +1650,7 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (this.registrations.ContainsKey(type))
+            if (this.producers.ContainsKey(type))
             {
                 if (!this.Options.AllowOverridingRegistrations)
                 {
@@ -1662,7 +1662,7 @@ namespace SimpleInjector
         private void ThrowWhenCollectionTypeAlreadyRegistered(Type itemType)
         {
             if (!this.Options.AllowOverridingRegistrations &&
-                this.registrations.ContainsKey(typeof(IEnumerable<>).MakeGenericType(itemType)))
+                this.producers.ContainsKey(typeof(IEnumerable<>).MakeGenericType(itemType)))
             {
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(itemType));
@@ -1711,12 +1711,12 @@ namespace SimpleInjector
 
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
         {
-            var producers = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+            var registrations = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
 
             return
-                from producer in producers
-                where producer.MustBeExplicitlyVerified
-                select producer;
+                from registration in registrations
+                where registration.MustBeExplicitlyVerified
+                select registration;
         }
 
         private static void VerifyThatAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)

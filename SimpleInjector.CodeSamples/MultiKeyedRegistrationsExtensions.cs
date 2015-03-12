@@ -7,7 +7,7 @@
     // These extension methods bring two advantages:
     // 1. The TImplementation does not have to be registered explicitly.
     // 2. Any registered initializer on either TService1 or TService2 will not go of twice.
-    public static class MultiKeyedRegistrationsExtensions
+    public static class MultikeyedRegistrationsExtensions
     {
         public static void Register<TService1, TService2, TImplementation>(
             this Container container, Lifestyle lifestyle)

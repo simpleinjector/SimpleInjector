@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,12 +26,12 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using System.Web;
     using System.Web.Compilation;
     using System.Web.UI;
-
     using SimpleInjector.Integration.Web.Forms;
 
     /// <summary>
@@ -193,6 +193,8 @@ namespace SimpleInjector
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Several types of exceptions can be thrown here.")]
         private static Type[] GetExportedTypes(Assembly assembly)
         {
             try

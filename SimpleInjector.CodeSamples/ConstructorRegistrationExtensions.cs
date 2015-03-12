@@ -77,7 +77,7 @@
         public void Register<TConcrete>(IConstructorSelector selector)
             where TConcrete : class
         {
-            this.RegisterExplicitConstructor<TConcrete, TConcrete>(this.container, selector);
+            this.RegisterExplicitConstructor<TConcrete, TConcrete>(selector);
 
             this.container.Register<TConcrete, TConcrete>();
         }
@@ -86,7 +86,7 @@
             where TService : class
             where TImplementation : class, TService
         {
-            this.RegisterExplicitConstructor<TService, TImplementation>(this.container, selector);
+            this.RegisterExplicitConstructor<TService, TImplementation>(selector);
 
             this.container.Register<TService, TImplementation>();
         }
@@ -95,13 +95,12 @@
             where TService : class
             where TImplementation : class, TService
         {
-            this.RegisterExplicitConstructor<TService, TImplementation>(this.container, selector);
+            this.RegisterExplicitConstructor<TService, TImplementation>(selector);
 
             this.container.RegisterSingle<TService, TImplementation>();
         }
 
-        private void RegisterExplicitConstructor<TService, TImplementation>(Container container,
-            IConstructorSelector selector)
+        private void RegisterExplicitConstructor<TService, TImplementation>(IConstructorSelector selector)
         {
             var constructor = selector.GetConstructor(typeof(TImplementation));
 

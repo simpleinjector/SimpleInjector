@@ -60,14 +60,12 @@
 
         private sealed class ContextualDecoratorInjectionBehavior : IConstructorInjectionBehavior
         {
-            private readonly Container container;
             private readonly ContextualPredicateCollection contextualPredicates;
             private readonly IConstructorInjectionBehavior defaultBehavior;
 
             public ContextualDecoratorInjectionBehavior(Container container, 
                 ContextualPredicateCollection contextualPredicates)
             {
-                this.container = container;
                 this.contextualPredicates = contextualPredicates;
                 this.defaultBehavior = container.Options.ConstructorInjectionBehavior;
             }

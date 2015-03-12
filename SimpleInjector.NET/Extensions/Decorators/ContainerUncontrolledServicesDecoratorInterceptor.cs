@@ -75,32 +75,35 @@ namespace SimpleInjector.Extensions.Decorators
             return this.SatisfiesPredicate(this.Context);
         }
 
-        internal void ApplyDecorator(Type decoratorType)
+        internal void SetDecorator(Type decorator)
         {
-            this.decoratorConstructor = 
-                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, decoratorType);
+            this.decoratorConstructor =
+                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, decorator);
 
             if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
             {
-                this.Lifestyle = 
-                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, decoratorType);
+                this.Lifestyle =
+                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, decorator);
             }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.
-            this.decoratorType = this.decoratorConstructor.DeclaringType;
-            
-            var serviceInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer, 
+            this.decoratorType = this.decoratorConstructor.DeclaringType;       
+        }
+
+        internal void ApplyDecorator()
+        {
+            var serviceTypeInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer, 
                 this.registeredServiceType, Lifestyle.Unknown);
-
+            
             Registration decoratorRegistration;
-
+            
             var decoratedExpression = this.BuildDecoratorExpression(out decoratorRegistration);
 
             this.e.Expression = decoratedExpression;
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceInfo.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle, 
+            serviceTypeInfo.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle, 
                 decoratedExpression);
 
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());

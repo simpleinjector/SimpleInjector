@@ -2,19 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public class ParameterConvention : IParameterConvention
+    public sealed class ParameterConvention : IParameterConvention
     {
         private readonly List<ParameterDeclaringTypePair> parameters = new List<ParameterDeclaringTypePair>();
-        private readonly Container container;
-
-        public ParameterConvention(Container container)
-        {
-            this.container = container;
-        }
 
         bool IParameterConvention.CanResolve(ParameterInfo parameter)
         {
@@ -34,20 +29,20 @@
             };
         }
 
-        public Parameter WithParameter<T>(string paramName, T value)
+        public Parameter WithParameter<T>(string parameterName, T value)
         {
             return new Parameter(this, typeof(T))
             {
-                Name = paramName,
+                Name = parameterName,
                 Expression = Expression.Constant(value)
             };
         }
 
-        public Parameter WithParameter<T>(string paramName, Func<T> factory)
+        public Parameter WithParameter<T>(string parameterName, Func<T> factory)
         {
             return new Parameter(this, typeof(T))
             {
-                Name = paramName,
+                Name = parameterName,
                 Expression = Expression.Invoke(Expression.Constant(factory))
             };
         }
@@ -90,8 +85,8 @@
             {
                 var invalidParameter = invalidParameters.First().Parameter;
 
-                throw new ActivationException(string.Format("Parameter with name '{0}' of type {1} is not " +
-                    "a parameter of the constructor of type {2}",
+                throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
+                    "Parameter with name '{0}' of type {1} is not a parameter of the constructor of type {2}",
                     invalidParameter.Name, invalidParameter.Type.Name, parameter.Member.DeclaringType.Name));
             }
 
@@ -112,7 +107,8 @@
                 return suitableParameters[0];
             }
 
-            throw new ActivationException(string.Format("Multiple parameter registrations found for type " +
+            throw new ActivationException(string.Format(CultureInfo.CurrentCulture, 
+                "Multiple parameter registrations found for type " +
                 "{0} that match to parameter with name '{1}' of type {2}.",
                 parameter.Member.DeclaringType.Name, parameter.Name, parameter.ParameterType.Name));
         }

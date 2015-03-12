@@ -25,6 +25,10 @@ Version vNext
 		-pWebApi] SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been made obsolete (work
 		 item 21017).
 
+	Project Changes:
+		-Switched from standalone FxCop to integrated Visual Studio 2013 Static Code Analysis. Created a
+		 custom rule set and fixes some issues that came up (work item 20998).
+
 
 Version 2.7.3 (v2.7.3 RTM) 2015-03-09
 

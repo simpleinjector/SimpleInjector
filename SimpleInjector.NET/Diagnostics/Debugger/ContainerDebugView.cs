@@ -146,7 +146,7 @@ namespace SimpleInjector.Diagnostics.Debugger
             }
             else
             {
-                return this.BuildNonGenericGroup(groupType, producersForGroup);
+                return BuildNonGenericGroup(groupType, producersForGroup);
             }
         }
 
@@ -167,7 +167,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                 value: childGroups);
         }
 
-        private DebuggerViewItem BuildNonGenericGroup(Type closedType,
+        private static DebuggerViewItem BuildNonGenericGroup(Type closedType,
             InstanceProducer[] producersForGroup)
         {
             return new DebuggerViewItem(

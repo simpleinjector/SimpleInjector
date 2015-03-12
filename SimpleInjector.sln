@@ -5,9 +5,11 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
+		empty.ruleset = empty.ruleset
 		Settings.StyleCop = Settings.StyleCop
 		SimpleInjector.FxCop = SimpleInjector.FxCop
 		SimpleInjector.ncover = SimpleInjector.ncover
+		SimpleInjector.ruleset = SimpleInjector.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared Assemblies", "Shared Assemblies", "{C7BE8829-1B19-494C-B719-CFA494053C22}"

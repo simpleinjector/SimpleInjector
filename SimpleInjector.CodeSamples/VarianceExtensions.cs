@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using SimpleInjector;
 
@@ -44,7 +45,7 @@
                     var names = string.Join(", ", 
                         registrations.Select(r => string.Format("{0}", r.ServiceType)));
 
-                    throw new ActivationException(string.Format(
+                    throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
                         "There is an error in the container's configuration. It is impos" + 
                         "sible to resolve type {0}, because there are {1} registrations " + 
                         "that are applicable. Ambiguous registrations: {2}.",

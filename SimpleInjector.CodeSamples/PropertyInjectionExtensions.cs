@@ -13,11 +13,11 @@
         private static readonly object RegistrationsKey = new object();
 
         [DebuggerStepThrough]
-        public static void EnablePropertyAutowiring(this ContainerOptions options)
+        public static void EnablePropertyAutoWiring(this ContainerOptions options)
         {
             if (options.Container.GetItem(RegistrationsKey) != null)
             {
-                throw new InvalidOperationException("EnablePropertyAutowiring should be called just once.");
+                throw new InvalidOperationException("EnablePropertyAutoWiring should be called just once.");
             }
 
             var registrations = new PropertyRegistrations(options.PropertySelectionBehavior);
@@ -28,7 +28,7 @@
         }
 
         [DebuggerStepThrough]
-        public static void AutowireProperty<TImplementation>(this Container container,
+        public static void AutoWireProperty<TImplementation>(this Container container,
             Expression<Func<TImplementation, object>> propertySelector)
         {
             var selectedProperty = (PropertyInfo)((MemberExpression)propertySelector.Body).Member;
@@ -37,7 +37,7 @@
         }
 
         [DebuggerStepThrough]
-        public static void AutowireProperties(this ContainerOptions options,
+        public static void AutoWireProperties(this ContainerOptions options,
             Predicate<PropertyInfo> propertyFilter)
         {
             options.Container.GetPropertyRegistrations().AddPropertySelector(propertyFilter);
@@ -57,7 +57,7 @@
             if (registrations == null)
             {
                 throw new InvalidOperationException(
-                    "Please call container.Options.EnablePropertyAutowiring() first.");
+                    "Please call container.Options.EnablePropertyAutoWiring() first.");
             }
 
             return registrations;

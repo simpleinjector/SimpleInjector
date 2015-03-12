@@ -111,7 +111,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(ParameterInfo parameter)
         {
-            var constr = this.GetConnectionString(parameter);
+            var constr = GetConnectionString(parameter);
 
             return Expression.Constant(constr, typeof(string));
         }
@@ -119,11 +119,11 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(ParameterInfo parameter)
         {
-            this.GetConnectionString(parameter);
+            GetConnectionString(parameter);
         }
 
         [DebuggerStepThrough]
-        private string GetConnectionString(ParameterInfo parameter)
+        private static string GetConnectionString(ParameterInfo parameter)
         {
             string name = parameter.Name.Substring(0,
                 parameter.Name.LastIndexOf(ConnectionStringPostFix));
@@ -168,7 +168,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(ParameterInfo parameter)
         {
-            object valueToInject = this.GetAppSettingValue(parameter);
+            object valueToInject = GetAppSettingValue(parameter);
 
             return Expression.Constant(valueToInject,
                 parameter.ParameterType);
@@ -177,11 +177,11 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(ParameterInfo parameter)
         {
-            this.GetAppSettingValue(parameter);
+            GetAppSettingValue(parameter);
         }
 
         [DebuggerStepThrough]
-        private object GetAppSettingValue(ParameterInfo parameter)
+        private static object GetAppSettingValue(ParameterInfo parameter)
         {
             string key = parameter.Name.Substring(0,
                 parameter.Name.LastIndexOf(AppSettingsPostFix));

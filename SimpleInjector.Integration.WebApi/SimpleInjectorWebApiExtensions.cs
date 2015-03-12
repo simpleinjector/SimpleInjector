@@ -24,6 +24,8 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
@@ -377,7 +379,7 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 // See: https://stackoverflow.com/questions/27927199
-                string message = string.Format(
+                string message = string.Format(CultureInfo.InvariantCulture,
                     "There was an error retrieving the {0}. Are you missing a binding redirect? {1}",
                     typeof(IAssembliesResolver).FullName,
                     ex.Message);
@@ -394,7 +396,7 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                string message = string.Format(
+                string message = string.Format(CultureInfo.InvariantCulture,
                     "There was an error retrieving the {0}. Are you missing a binding redirect? {1}",
                     typeof(IHttpControllerTypeResolver).FullName,
                     ex.Message);

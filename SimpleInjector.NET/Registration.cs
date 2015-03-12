@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
-using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an
@@ -65,7 +65,7 @@ using SimpleInjector.Diagnostics;
     {
         private static readonly Action<object> NoOp = instance => { };
 
-        private readonly HashSet<KnownRelationship> dependencies = new HashSet<KnownRelationship>();
+        private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
         private readonly ThreadLocal<InstanceProducer> currentProducer = new ThreadLocal<InstanceProducer>();
 
         private HashSet<DiagnosticType> suppressions;
@@ -194,21 +194,21 @@ using SimpleInjector.Diagnostics;
 
         internal virtual KnownRelationship[] GetRelationshipsCore()
         {
-            lock (this.dependencies)
+            lock (this.knownRelationships)
             {
-                return this.dependencies.ToArray();
+                return this.knownRelationships.ToArray();
             }
         }
 
-        internal void ReplaceRelationships(IEnumerable<KnownRelationship> dependencies)
+        internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
         {
-            lock (this.dependencies)
+            lock (this.knownRelationships)
             {
-                this.dependencies.Clear();
+                this.knownRelationships.Clear();
 
-                foreach (var dependency in dependencies)
+                foreach (var relationship in relationships)
                 {
-                    this.dependencies.Add(dependency);
+                    this.knownRelationships.Add(relationship);
                 }
             }
         }
@@ -224,16 +224,16 @@ using SimpleInjector.Diagnostics;
         {
             Requires.IsNotNull(relationship, "relationship");
 
-            lock (this.dependencies)
+            lock (this.knownRelationships)
             {
-                this.dependencies.Add(relationship);
+                this.knownRelationships.Add(relationship);
             }
         }
 
         // This method should only be called by the Lifestyle base class and the HybridRegistration.
-        internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)
+        internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> parameters)
         {
-            this.overriddenParameters = overriddenParameters.ToDictionary(p => p.Parameter);
+            this.overriddenParameters = parameters.ToDictionary(p => p.Parameter);
         }
    
         // Wraps the expression with a delegate that injects the properties.
@@ -254,12 +254,12 @@ using SimpleInjector.Diagnostics;
         {
             var context = new InitializationContext(this.GetCurrentProducer(), this);
 
-            Action<object> instanceInitializer = this.Container.GetInitializer(implementationType, context);
+            Action<object> initializer = this.Container.GetInitializer(implementationType, context);
 
-            if (instanceInitializer != null)
+            if (initializer != null)
             {
                 return Expression.Convert(
-                    BuildExpressionWithInstanceInitializer<object>(expression, instanceInitializer),
+                    BuildExpressionWithInstanceInitializer<object>(expression, initializer),
                     serviceType);
             }
 
@@ -523,7 +523,7 @@ using SimpleInjector.Diagnostics;
             var relationships =
                 from dependency in dependencies
                 select new KnownRelationship(implementationType, this.Lifestyle, dependency);
-
+            
             foreach (var relationship in relationships)
             {
                 this.AddRelationship(relationship);
@@ -541,14 +541,14 @@ using SimpleInjector.Diagnostics;
             where TImplementation : class
         {
             var context = new InitializationContext(this.GetCurrentProducer(), this);
+            
+            Action<TImplementation> initializer = this.Container.GetInitializer<TImplementation>(context);
 
-            Action<TImplementation> instanceInitializer = this.Container.GetInitializer<TImplementation>(context);
-
-            if (instanceInitializer != null)
+            if (initializer != null)
             {
                 // It's not possible to return a Expression that is as heavily optimized as the newExpression
                 // simply is, because the instance initializer must be called as well.
-                return BuildExpressionWithInstanceInitializer<TImplementation>(expression, instanceInitializer);
+                return BuildExpressionWithInstanceInitializer<TImplementation>(expression, initializer);
             }
 
             return expression;

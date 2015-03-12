@@ -55,6 +55,10 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
+    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
+        Justification = "Not much we can do about this. Container is the facade where users work with.")]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "This warning is right; we will fix this in v3.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container
     {
@@ -78,7 +82,7 @@ namespace SimpleInjector
         private readonly Dictionary<Type, ContainerControlledCollectionResolver> registerAllResolvers =
             new Dictionary<Type, ContainerControlledCollectionResolver>();
         
-        private Dictionary<Type, InstanceProducer> registrations = 
+        private Dictionary<Type, InstanceProducer> producers = 
             new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
 
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
@@ -183,7 +187,7 @@ namespace SimpleInjector
 
         internal bool HasRegistrations
         {
-            get { return this.registrations.Count > 1; }
+            get { return this.producers.Count > 1; }
         }
 
         internal bool SuccesfullyVerified
@@ -308,22 +312,22 @@ namespace SimpleInjector
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
         {
-            var producers = this.GetCurrentRegistrations(
+            var registrations = this.GetCurrentRegistrations(
                 includeInvalidContainerRegisteredTypes: includeInvalidContainerRegisteredTypes);
 
             var nonRootProducers =
-                from producer in producers
-                from relationship in producer.GetRelationships()
+                from registration in registrations
+                from relationship in registration.GetRelationships()
                 select relationship.Dependency;
 
-            return producers.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
+            return registrations.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
                 .ToArray();
         }
 
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
             bool includeExternalProducers = true)
         {
-            IEnumerable<InstanceProducer> registrations = this.registrations.Values;
+            IEnumerable<InstanceProducer> registrations = this.producers.Values;
 
             if (includeExternalProducers)
             {
@@ -332,10 +336,10 @@ namespace SimpleInjector
 
             // Filter out the invalid registrations (see the IsValid property for more information).
             return (
-                from registration in registrations
-                where registration != null
-                where includeInvalidContainerRegisteredTypes || registration.IsValid
-                select registration)
+                from producer in registrations
+                where producer != null
+                where includeInvalidContainerRegisteredTypes || producer.IsValid
+                select producer)
                 .ToArray();
         }
 
@@ -419,14 +423,14 @@ namespace SimpleInjector
                 // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
                 lock (this.locker)
                 {
-                    this.GetStackTrace(ref this.stackTraceThatLockedTheContainer);
+                    GetStackTrace(ref this.stackTraceThatLockedTheContainer);
 
                     this.locked = true;
                 }
             }
         }
 
-        partial void GetStackTrace(ref string stackTrace);
+        static partial void GetStackTrace(ref string stackTrace);
 
         private sealed class TypedInstanceInitializer : IInstanceInitializer
         {

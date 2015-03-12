@@ -9,7 +9,7 @@
     public static class ImplicitPropertyInjectionExtensions
     {
         [DebuggerStepThrough]
-        public static void AutowirePropertiesImplicitly(this ContainerOptions options)
+        public static void AutoWirePropertiesImplicitly(this ContainerOptions options)
         {
             options.PropertySelectionBehavior = new ImplicitPropertyInjectionBehavior(
                 options.PropertySelectionBehavior, options);
