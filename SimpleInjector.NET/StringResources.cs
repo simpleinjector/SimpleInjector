@@ -111,7 +111,7 @@ namespace SimpleInjector
         internal static string TypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered and the container. If your intention is to resolve " +
+                "Type {0} has already been registered. If your intention is to resolve " +
                 "a collection of {0} implementations, use the RegisterAll overloads. More info: " +
                 "https://simpleinjector.org/coll1" +
                 ". If your intention is to replace the existing registration with this new registration, " +
@@ -123,7 +123,7 @@ namespace SimpleInjector
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Collection of items for type {0} has already been registered and " +
+                "Collection of items for type {0} has already been registered " +
                 "and the container is currently not configured to allow overriding registrations. " +
                 "To allow overriding the current registration, please create the container using the " +
                 "constructor overload that takes a {1} instance and set the " +
@@ -135,7 +135,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The constructor of type {3} contains the parameter of type {0} with name '{1}' that is " +
-                "not registered. Please ensure {0} is registered in the container, or change the " +
+                "not registered. Please ensure {0} is registered, or change the " +
                 "constructor of {2}.",
                 parameter.ParameterType.ToFriendlyName(), parameter.Name, implementationType.ToFriendlyName(),
                 parameter.Member.DeclaringType.ToFriendlyName());

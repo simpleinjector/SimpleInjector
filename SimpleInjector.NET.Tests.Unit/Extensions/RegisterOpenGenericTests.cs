@@ -283,7 +283,7 @@
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
-                "registered  event handler and the container should return null.");
+                "registered event handler and the container should return null.");
         }
 
         [TestMethod]
@@ -336,7 +336,7 @@
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
-                "registered  event handler and the container should return null.");
+                "registered event handler and the container should return null.");
         }
 
         [TestMethod]
@@ -369,7 +369,7 @@
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
-                "registered  event handler and the container should return null.");
+                "registered event handler and the container should return null.");
         }
 
         [TestMethod]
@@ -402,7 +402,7 @@
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
-                "registered  event handler and the container should return null.");
+                "registered event handler and the container should return null.");
         }
 
         [TestMethod]
@@ -420,7 +420,7 @@
 
             // Act
             Assert.IsNull(producer, "The Event type does not satisfy the type constraints on the " +
-                "registered  event handler and the container should return null.");
+                "registered event handler and the container should return null.");
         }
 
         [TestMethod]

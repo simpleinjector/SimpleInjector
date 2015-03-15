@@ -1502,6 +1502,8 @@ namespace SimpleInjector
 
             if (!this.registerAllResolvers.TryGetValue(openGenericServiceType, out resolver))
             {
+                this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(serviceType));
+
                 resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
 
                 this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
@@ -1650,7 +1652,7 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (this.producers.ContainsKey(type))
+            if (this.producers.ContainsKey(type) || this.IsEnumerableTypeRegisteredWithRegisterAll(type))
             {
                 if (!this.Options.AllowOverridingRegistrations)
                 {
@@ -1667,6 +1669,23 @@ namespace SimpleInjector
                 throw new InvalidOperationException(
                     StringResources.CollectionTypeAlreadyRegistered(itemType));
             }
+        }
+
+        private bool IsEnumerableTypeRegisteredWithRegisterAll(Type type)
+        {
+            bool isEnumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+
+            if (isEnumerableType)
+            {
+                Type elementType = type.GetGenericArguments()[0];
+
+                if (elementType.IsGenericType)
+                {
+                    return this.registerAllResolvers.ContainsKey(elementType.GetGenericTypeDefinition());
+                }
+            }
+
+            return false;
         }
 
         private void VerifyThatAllExpressionsCanBeBuilt()

@@ -1117,7 +1117,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered in the container",
+                "Please ensure ILogger is registered",
                 action);
         }
 
@@ -1144,7 +1144,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered in the container",
+                "Please ensure ILogger is registered",
                 action);
         }
 
@@ -1166,7 +1166,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered in the container",
+                "Please ensure ILogger is registered",
                 action);
         }
 
@@ -1605,7 +1605,134 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered and the container.",
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllClosedGeneric_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
+
+            // Act
+            Action action = () => container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllClosedGeneric_CalledAfterRegisterAllUncontrolledForSameType_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var uncontrolledCollection = Enumerable.Empty<IEventHandler<AuditableEvent>>();
+
+            container.RegisterAll<IEventHandler<AuditableEvent>>(uncontrolledCollection);
+
+            // Act
+            Action action = () => container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllClosedGeneric_CalledAfterRegisterSingleOnSameCollectionType_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var collection = new IEventHandler<AuditableEvent>[0];
+
+            container.RegisterSingle<IEnumerable<IEventHandler<AuditableEvent>>>(collection);
+
+            // Act
+            Action action =
+                () => container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterWithGenericCollection_CalledAfterRegisterAllForSameClosedCollection_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+
+            // Act
+            Action action = () => container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterWithGenericCollection_CalledAfterRegisterAllSingletonForSameCollection_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IEventHandler<AuditableEvent>>(new AuditableEventEventHandler());
+
+            // Act
+            Action action = () => container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllSingleton_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
+
+            // Act
+            Action action = () => container.RegisterAll<IEventHandler<AuditableEvent>>(new AuditableEventEventHandler());
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Collection of items for type IEventHandler<AuditableEvent> has already been registered",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllClosed_CalledAfterRegisterAllSingletonForSameCollection_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterAll<IEventHandler<AuditableEvent>>(new AuditableEventEventHandler());
+
+            // Act
+            Action action = () => container.RegisterAll<IEventHandler<AuditableEvent>>(new[]
+            {
+                typeof(AuditableEventEventHandler)
+            });
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
                 action);
         }
 

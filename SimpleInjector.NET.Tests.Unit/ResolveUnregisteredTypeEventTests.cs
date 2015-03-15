@@ -116,7 +116,7 @@
                 No registration for type RealUserService could be found and an implicit registration could not 
                 be made. The constructor of type RealUserService contains the parameter of type 
                 IUserRepository with name 'repository' that is not registered. Please ensure IUserRepository 
-                is registered in the container, or change the constructor of RealUserService."
+                is registered, or change the constructor of RealUserService."
                 .TrimInside();
 
             // We don't register the required IUserRepository dependency.
