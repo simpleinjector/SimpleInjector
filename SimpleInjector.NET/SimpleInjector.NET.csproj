@@ -119,7 +119,6 @@
     <Compile Include="Diagnostics\Analyzers\TornLifestyleContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\ContainerAnalyzerProvider.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs" />
-    <Compile Include="Diagnostics\DebuggerErrorViewItem.cs" />
     <Compile Include="Diagnostics\Debugger\ContainerDebugView.cs" />
     <Compile Include="Diagnostics\Debugger\DebuggerGeneralWarningsContainerAnalyzer.cs" />
     <Compile Include="Diagnostics\Debugger\DebuggerViewItem.cs" />

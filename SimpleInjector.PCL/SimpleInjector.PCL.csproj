@@ -175,9 +175,6 @@
     <Compile Include="..\SimpleInjector.NET\Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs">
       <Link>Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Diagnostics\DebuggerErrorViewItem.cs">
-      <Link>Diagnostics\DebuggerErrorViewItem.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\Debugger\ContainerDebugView.cs">
       <Link>Diagnostics\Debugger\ContainerDebugView.cs</Link>
     </Compile>

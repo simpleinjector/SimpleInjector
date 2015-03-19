@@ -298,7 +298,7 @@
             AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
 
-        // NOTE: There was a bug in the framework. The container did not selfregister when the overloaded
+        // NOTE: There was a bug in the framework. The container did not self-register when the overloaded
         // constructor with the ContainerOptions was used. This test proves this bug.
         [TestMethod]
         public void ContainerWithOptions_ResolvingATypeThatDependsOnTheContainer_ContainerInjectsItself()

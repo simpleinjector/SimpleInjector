@@ -430,23 +430,6 @@ namespace SimpleInjector
                 decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
-        internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
-            IEnumerable<Type> validConstructorArgumentTypes)
-        {
-            var validConstructorArgumentFuncTypes =
-                from type in validConstructorArgumentTypes
-                select typeof(Func<>).MakeGenericType(type);
-
-            var friendlyValidTypes =
-                from type in validConstructorArgumentTypes.Concat(validConstructorArgumentFuncTypes)
-                select type.ToFriendlyName();
-
-            return string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to use {0} as a decorator, its constructor should have an " +
-                "argument of one of the following types: {1}.",
-                decoratorType.ToFriendlyName(), friendlyValidTypes.ToCommaSeparatedText());
-        }
-
         internal static string OpenGenericTypeContainsUnresolvableTypeArguments(Type openGenericImplementation)
         {
             return string.Format(CultureInfo.InvariantCulture,

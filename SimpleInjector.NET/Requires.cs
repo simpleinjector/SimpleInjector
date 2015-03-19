@@ -286,7 +286,6 @@ namespace SimpleInjector
                 container.Options.SelectConstructor(serviceType, decoratorType);
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
-            Requires.DecoratesBaseTypes(serviceType, decoratorConstructor, paramName);
         }
 
         internal static void AreRegistrationsForThisContainer(Container container,
@@ -392,31 +391,7 @@ namespace SimpleInjector
 
             throw new ArgumentException(message, paramName);
         }
-        
-        private static void DecoratesBaseTypes(Type serviceType, ConstructorInfo decoratorConstructor, 
-            string paramName)
-        {
-            bool decoratesBaseTypes = 
-                DecoratorHelpers.DecoratesBaseTypes(serviceType, decoratorConstructor);
-
-            if (!decoratesBaseTypes)
-            {
-                ThrowMustDecorateBaseType(serviceType, decoratorConstructor, paramName);
-            }
-        }
-
-        private static void ThrowMustDecorateBaseType(Type serviceType, ConstructorInfo decoratorConstructor, 
-            string paramName)
-        {
-            var validConstructorArgumentTypes =
-                DecoratorHelpers.GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorConstructor);
-
-            string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                decoratorConstructor.DeclaringType, validConstructorArgumentTypes);
-
-            throw new ArgumentException(message, paramName);
-        }
-
+      
         private static void ThrowArgumentNullException(string paramName)
         {
             throw new ArgumentNullException(paramName);

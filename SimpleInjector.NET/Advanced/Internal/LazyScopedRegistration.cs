@@ -61,9 +61,9 @@ namespace SimpleInjector.Advanced.Internal
             // NOTE: Never pass several scope instances into the GetInstance method of a single
             // LazyScopedRegistration. That would break shit. The scope is passed in here because:
             // -it can't be passed in through the ctor, since that would pre-load the scope which is invalid.
-            // -a LazyScope can't be passed in through the ctor, since LazyScope is is a struct and this means
+            // -a LazyScope can't be passed in through the ctor, since LazyScope is a struct and this means
             //  there will be multiple copies of the LazyScope defeating the purpose of the LazyScope.
-            // -LazyScope can't be a class, since that would force extra preasure on the GC which must be 
+            // -LazyScope can't be a class, since that would force extra pressure on the GC which must be 
             //  prevented.
             if (this.instance == null)
             {

@@ -57,12 +57,6 @@ namespace SimpleInjector.Advanced
         }
 
         internal static void AppendAll(this IContainerControlledCollection collection,
-            IEnumerable<Type> serviceTypes)
-        {
-            collection.AppendAll(serviceTypes.Select(type => new ContainerControlledItem(type)));
-        }
-
-        internal static void AppendAll(this IContainerControlledCollection collection,
             IEnumerable<Registration> registrations)
         {
             collection.AppendAll(registrations.Select(registration => new ContainerControlledItem(registration)));
