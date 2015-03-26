@@ -36,7 +36,8 @@ namespace SimpleInjector.Diagnostics
                 new SingleResponsibilityViolationsAnalyzer(),
                 new ContainerRegisteredServiceAnalyzer(),
                 new TornLifestyleContainerAnalyzer(),
-                new DisposableTransientComponentAnalyzer()
+                new DisposableTransientComponentAnalyzer(),
+                new AmbiguousLifestylesAnalyzer()
             });
     }
 }

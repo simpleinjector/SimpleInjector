@@ -99,6 +99,7 @@
     <Compile Include="Advanced\KnownRelationshipTests.cs" />
     <Compile Include="CuriouslyRecurringTemplatePatternTests.cs" />
     <Compile Include="Diagnostics\AnalyzerTests.cs" />
+    <Compile Include="Diagnostics\AmbiguousLifestylesAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\CustomLifestyleTests.cs" />

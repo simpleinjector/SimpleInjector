@@ -10,6 +10,7 @@ Version vNext
 		 developers are used to. (work item 21011).
 		-[Core/Diagnostics] Diagnostic warnings can now be suppressed per individual registration, by calling
 		 Registration.SuppressDiagnosticWarning() (work item 21016).
+		-[Core/Diagnostics] 'Ambiguous Lifestyles' diagnostic warning added. (work item 20997).
 
 	Bug fixes:
 		-[Mvc] The Disposable Transient Components diagnostic warning is now suppressed on registration for

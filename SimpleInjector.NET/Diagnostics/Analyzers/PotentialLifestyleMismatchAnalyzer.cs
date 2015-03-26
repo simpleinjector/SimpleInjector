@@ -61,7 +61,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             return (
               from producer in producers
-              where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.PotentialLifestyleMismatch)
+              where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
               from relationship in producer.GetRelationships()
               where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(relationship)
               select new PotentialLifestyleMismatchDiagnosticResult(

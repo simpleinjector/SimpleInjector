@@ -111,12 +111,14 @@
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
     <Compile Include="Diagnostics\Analyzer.cs" />
+    <Compile Include="Diagnostics\Analyzers\AmbiguousLifestylesAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\DisposableTransientComponentAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\PotentialLifestyleMismatchAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\ShortCircuitedDependencyAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\SingleResponsibilityViolationsAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\TornLifestyleContainerAnalyzer.cs" />
+    <Compile Include="Diagnostics\AmbiguousLifestylesDiagnosticResult.cs" />
     <Compile Include="Diagnostics\ContainerAnalyzerProvider.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredServiceDiagnosticResult.cs" />
     <Compile Include="Diagnostics\Debugger\ContainerDebugView.cs" />

@@ -69,7 +69,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             var results =
                 from producer in producers
-                where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.ShortCircuitedDependency)
+                where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 from actualDependency in producer.GetRelationships()
                 where autoRegisteredRegistrationsWithLifestyleMismatch.ContainsKey(
                     actualDependency.Dependency.ServiceType)

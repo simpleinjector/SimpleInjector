@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -31,34 +31,42 @@ namespace SimpleInjector.Diagnostics
     /// <summary>
     /// Diagnostic result that warns about when a multiple registrations map to the same implementation type 
     /// and lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
-    /// For more information, see: https://simpleinjector.org/diatl.
+    /// For more information, see: https://simpleinjector.org/diaal.
     /// </summary>
-    public class TornLifestyleDiagnosticResult : DiagnosticResult
+    public class AmbiguousLifestylesDiagnosticResult : DiagnosticResult
     {
-        internal TornLifestyleDiagnosticResult(Type serviceType, string description, Lifestyle lifestyle,
-            Type implementationType, InstanceProducer[] affectedRegistrations)
-            : base(serviceType, description, DiagnosticType.TornLifestyle,
-                CreateDebugValue(implementationType, lifestyle, affectedRegistrations))
+        internal AmbiguousLifestylesDiagnosticResult(Type serviceType, string description, 
+            Lifestyle[] lifestyles, Type implementationType, InstanceProducer diagnosedProducer, 
+            InstanceProducer[] conflictingProducers)
+            : base(serviceType, description, DiagnosticType.AmbiguousLifestyles,
+                CreateDebugValue(implementationType, lifestyles, conflictingProducers))
         {
-            this.Lifestyle = lifestyle;
+            this.Lifestyles = new ReadOnlyCollection<Lifestyle>(lifestyles.ToList());
             this.ImplementationType = implementationType;
-            this.AffectedRegistrations = new ReadOnlyCollection<InstanceProducer>(affectedRegistrations.ToList());
+            this.DiagnosedRegistration = diagnosedProducer;
+            this.ConflictingRegistrations = new ReadOnlyCollection<InstanceProducer>(conflictingProducers.ToList());
         }
 
-        /// <summary>Gets the lifestyle on which instances are torn.</summary>
-        /// <value>A <see cref="Lifestyle"/>.</value>
-        public Lifestyle Lifestyle { get; private set; }
+        /// <summary>Gets the lifestyles that causes the registrations to be conflicting.</summary>
+        /// <value><see cref="Lifestyle"/> instances.</value>
+        public ReadOnlyCollection<Lifestyle> Lifestyles { get; private set; }
         
         /// <summary>Gets the implementation type that the affected registrations map to.</summary>
         /// <value>A <see cref="Type"/>.</value>
         public Type ImplementationType { get; private set; }
 
-        /// <summary>Gets the list of registrations that are affected by this warning.</summary>
-        /// <value>A list of <see cref="InstanceProducer"/> instances.</value>
-        public ReadOnlyCollection<InstanceProducer> AffectedRegistrations { get; private set; }
+        /// <summary>Gets the registration that caused this warning.</summary>
+        /// /// <value>An <see cref="InstanceProducer"/>.</value>
+        public InstanceProducer DiagnosedRegistration { get; private set; }
 
-        private static DebuggerViewItem[] CreateDebugValue(Type implementationType, Lifestyle lifestyle,
-            InstanceProducer[] affectedRegistrations)
+        /// <summary>
+        /// Gets the list of registrations that are in conflict with the <see cref="DiagnosedRegistration"/>.
+        /// </summary>
+        /// <value>A list of <see cref="InstanceProducer"/> instances.</value>
+        public ReadOnlyCollection<InstanceProducer> ConflictingRegistrations { get; private set; }
+
+        private static DebuggerViewItem[] CreateDebugValue(Type implementationType, Lifestyle[] lifestyles,
+            InstanceProducer[] conflictingRegistrations)
         {
             return new[]
             {
@@ -67,14 +75,19 @@ namespace SimpleInjector.Diagnostics
                     description: implementationType.ToFriendlyName(), 
                     value: implementationType),
                 new DebuggerViewItem(
-                    name: "Lifestyle", 
-                    description: lifestyle.Name, 
-                    value: lifestyle),
+                    name: "Lifestyles", 
+                    description: ToCommaSeparatedText(lifestyles), 
+                    value: lifestyles),
                 new DebuggerViewItem(
-                    name: "Affected Registrations", 
-                    description: ToCommaSeparatedText(affectedRegistrations), 
-                    value: affectedRegistrations)
+                    name: "Conflicting Registrations", 
+                    description: ToCommaSeparatedText(conflictingRegistrations), 
+                    value: conflictingRegistrations)
             };
+        }
+
+        private static string ToCommaSeparatedText(IEnumerable<Lifestyle> lifestyles)
+        {
+            return lifestyles.Select(lifestyle => lifestyle.Name).ToCommaSeparatedText();
         }
 
         private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers)

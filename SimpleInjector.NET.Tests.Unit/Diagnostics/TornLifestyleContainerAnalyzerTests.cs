@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics.Analyzers;
@@ -165,10 +166,10 @@
             registration2.SuppressDiagnosticWarning(DiagnosticType.TornLifestyle);
 
             // Act
-            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>();
 
             // Assert
-            Assert.AreEqual(0, results.Length, Actual(results));
+            Assert.IsFalse(results.Any(), Actual(results));
         }
 
         [TestMethod]
@@ -419,9 +420,9 @@
             Assert.IsTrue(matchingResult.Any(), Actual(results));
         }
 
-        private static string Actual(TornLifestyleDiagnosticResult[] results)
+        private static string Actual(IEnumerable<DiagnosticResult> results)
         {
-            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
+            return "Actual: " + string.Join(" - ", results.Select(r => r.Description));
         }
     }
 }

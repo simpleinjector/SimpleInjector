@@ -148,8 +148,14 @@
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\AmbiguousLifestylesDiagnosticResult.cs">
+      <Link>Diagnostics\AmbiguousLifestylesDiagnosticResult.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzer.cs">
       <Link>Diagnostics\Analyzer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\AmbiguousLifestylesAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\AmbiguousLifestylesAnalyzer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs">
       <Link>Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs</Link>

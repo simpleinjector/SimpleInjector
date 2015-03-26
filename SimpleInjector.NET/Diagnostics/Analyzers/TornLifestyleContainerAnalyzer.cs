@@ -98,7 +98,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 affectedProducers);
         }
 
-        private static string BuildDescription(InstanceProducer diagnosedProducer, 
+        private static string BuildDescription(InstanceProducer diagnosedProducer,
              InstanceProducer[] affectedProducers)
         {
             Lifestyle lifestyle = diagnosedProducer.Registration.Lifestyle;

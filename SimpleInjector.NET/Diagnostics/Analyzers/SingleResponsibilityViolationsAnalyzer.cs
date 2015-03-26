@@ -59,7 +59,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             return (
                 from producer in producers
-                where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.SingleResponsibilityViolation)
+                where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 where IsAnalyzable(producer)
                 from relationship in producer.GetRelationships()
                 group relationship by new { relationship.ImplementationType, producer } into g

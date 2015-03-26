@@ -64,7 +64,7 @@ namespace SimpleInjector.Diagnostics
         SingleResponsibilityViolation,
 
         /// <summary>
-        /// Diagnostic type that warns when a multiple registrations map to the same implementation type and
+        /// Diagnostic type that warns when multiple registrations map to the same component and
         /// lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
         /// For more information, see: https://simpleinjector.org/diatl.
         /// </summary>
@@ -76,5 +76,13 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diadt.
         /// </summary>
         DisposableTransientComponent,
+
+        /// <summary>
+        /// Diagnostic type that warns when multiple registrations exist that map to the same component but
+        /// with different lifestyles, which will cause the component to be cached in different -possibly
+        /// incompatible- ways.
+        /// For more information, see: https://simpleinjector.org/diaal.
+        /// </summary>
+        AmbiguousLifestyles
     }
 }
