@@ -95,7 +95,7 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        internal void TriggerUnregisteredTypeResolutionOnAllClosedCollections(object sender, EventArgs e)
+        internal void TriggerUnregisteredTypeResolutionOnAllClosedCollections()
         {
             if (!this.verified)
             {

@@ -11,6 +11,8 @@ Version vNext
 		-[Core/Diagnostics] Diagnostic warnings can now be suppressed per individual registration, by calling
 		 Registration.SuppressDiagnosticWarning() (work item 21016).
 		-[Core/Diagnostics] 'Ambiguous Lifestyles' diagnostic warning added. (work item 20997).
+		-[Core/Diagnostics] An overload to Verify() has been added that allows supplying a VerificationOption
+		 that allows forcing throwing an exception in case of a diagnostic warning.
 
 	Bug fixes:
 		-[Mvc] The Disposable Transient Components diagnostic warning is now suppressed on registration for

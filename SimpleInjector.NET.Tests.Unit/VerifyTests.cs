@@ -507,6 +507,80 @@
             Assert.AreSame(handler, handler2);
         }
 
+        [TestMethod]
+        public void VerifyOnly_WithDiagnosticWarning_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Lifestyle Mismatch
+            container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginImpl>();
+            
+            // Act
+            container.Verify(VerificationOption.VerifyOnly);
+        }
+        
+        [TestMethod]
+        public void VerifyAndDiagnose_WithDiagnosticWarning_ThrowsExpectedException()
+        {
+            // Arrange
+            string expected1 = "The following diagnostic warnings were reported";
+            string expected2 = "ServiceWithDependency<IPlugin> (Singleton) depends on IPlugin (Transient)";
+            string expected3 = "See the Error property for detailed information about the warnings.";
+
+            var container = ContainerFactory.New();
+
+            // Lifestyle Mismatch
+            container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginImpl>();
+
+            // Act
+            Action action = () => container.Verify(VerificationOption.VerifyAndDiagnose);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(expected1, action);
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(expected2, action);
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(expected3, action);
+        }
+
+        [TestMethod]
+        public void VerifyAndDiagnose_WithDiagnosticWarning_ThrowsMessageReferingToTheDocumentation()
+        {
+            // Arrange
+            string expectedMessage =
+                "Please see https://simpleinjector.org/diagnostics how to fix problems and how to " +
+                "suppress individual warnings.";
+
+            var container = ContainerFactory.New();
+
+            // Lifestyle Mismatch
+            container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginImpl>();
+
+            // Act
+            Action action = () => container.Verify(VerificationOption.VerifyAndDiagnose);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void VerifyAndDiagnose_WithDiagnosticMessage_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Container-registered type (PluginImpl)
+            container.Register<ServiceWithDependency<PluginImpl>>(Lifestyle.Transient);
+
+            // Act
+            // This should succeed, because container-registered instances have a low risk of causing errors
+            // and the container will report them quite easily.
+            container.Verify(VerificationOption.VerifyAndDiagnose);
+        }
+
         public class PluginWithBooleanDependency : IPlugin
         {
             public PluginWithBooleanDependency(bool isInUserContext)

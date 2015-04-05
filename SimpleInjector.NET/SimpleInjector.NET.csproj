@@ -107,6 +107,7 @@
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />
+    <Compile Include="Container.Verification.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
     <Compile Include="CyclicDependencyValidatorExtensions.cs" />
@@ -137,6 +138,8 @@
     <Compile Include="Diagnostics\SingleResponsibilityViolationDiagnosticResult.cs" />
     <Compile Include="Diagnostics\TornLifestyleDiagnosticResult.cs" />
     <Compile Include="Diagnostics\TypeGeneralizer.cs" />
+    <Compile Include="DiagnosticVerificationException.cs" />
+    <Compile Include="DiagnosticVerificationException.full.cs" />
     <Compile Include="ExpressionBuildingEventArgs.cs" />
     <Compile Include="ExpressionBuiltEventArgs.cs" />
     <Compile Include="Extensions\ArgumentMapping.cs" />
@@ -185,6 +188,7 @@
     <Compile Include="Requires.cs" />
     <Compile Include="StringResources.cs" />
     <Compile Include="UnregisteredTypeEventArgs.cs" />
+    <Compile Include="VerificationOption.enum.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

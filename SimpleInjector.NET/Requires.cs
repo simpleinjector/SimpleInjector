@@ -24,9 +24,9 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
-
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
@@ -335,6 +335,15 @@ namespace SimpleInjector
                 string message = StringResources.TheCollectionShouldContainAtleastOneElement();
 
                 throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void IsValidEnum<TEnum>(TEnum value, string paramName) where TEnum : struct
+        {
+            if (!Enum.GetValues(typeof(TEnum)).Cast<TEnum>().Contains(value))
+            {
+                throw new ArgumentException(
+                    StringResources.ValueInvalidForEnumType(paramName, value, typeof(TEnum)));
             }
         }
 

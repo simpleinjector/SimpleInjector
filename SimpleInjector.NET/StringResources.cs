@@ -23,13 +23,14 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using SimpleInjector.Advanced;
+using SimpleInjector.Diagnostics;
+using SimpleInjector.Extensions;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -83,6 +84,20 @@ namespace SimpleInjector
                 "all of its type parameters have been substituted with types that are recognized by the " +
                 "compiler.",
                 serviceType.ToFriendlyName());
+        }
+
+        internal static string DiagnosticWarningsReported(IList<DiagnosticResult> errors)
+        {
+            var descriptions =
+                from error in errors
+                select "-" + error.Description;
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "The configuration is invalid. The following diagnostic warnings were reported:\n{0}\n" +
+                "See the Error property for detailed information about the warnings. " +
+                "Please see https://simpleinjector.org/diagnostics how to fix problems and how to suppress " +
+                "individual warnings.",
+                string.Join(Environment.NewLine, descriptions));
         }
 
         internal static string ConfigurationInvalidCreatingInstanceFailed(Type serviceType,
@@ -614,6 +629,15 @@ namespace SimpleInjector
                 "Mixing calls to RegisterAll for the same open-generic service type is not supported. " + 
                 "Consider making one single call to RegisterAll(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
+        }
+
+        internal static string ValueInvalidForEnumType(string paramName, object invalidValue, Type enumClass)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The value of argument '{0}' ({1}) is invalid for Enum type '{2}'.",
+                paramName,
+                invalidValue,
+                enumClass.Name);
         }
     }
 }

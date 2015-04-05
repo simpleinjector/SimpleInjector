@@ -69,9 +69,6 @@ namespace SimpleInjector
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
 
-        // Flag to signal that the container's configuration is currently being verified.
-        private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
-
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
             new ConditionalHashSet<InstanceProducer>();
@@ -89,9 +86,6 @@ namespace SimpleInjector
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
-
-        // Flag to signal that the container's configuration has been verified (at least once).
-        private bool succesfullyVerified;
 
         private string stackTraceThatLockedTheContainer;
 
@@ -189,13 +183,6 @@ namespace SimpleInjector
         {
             get { return this.producers.Count > 1; }
         }
-
-        internal bool SuccesfullyVerified
-        {
-            get { return this.succesfullyVerified; }
-        }
-
-        internal Scope VerificationScope { get; private set; }
 
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered

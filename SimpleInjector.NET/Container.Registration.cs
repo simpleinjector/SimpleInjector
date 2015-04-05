@@ -398,7 +398,7 @@ namespace SimpleInjector
         // Allows getting notified when Verify() is called.
         // This event is currently only used by RegisterAll to make sure that as many registered types can
         // be verified.
-        internal event EventHandler<EventArgs> Verifying = (s, e) => { };
+        internal event Action Verifying = () => { };
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
@@ -1244,38 +1244,6 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Verifies the <b>Container</b>. This method will call all registered delegates, 
-        /// iterate registered collections and throws an exception if there was an error.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
-        /// invalid.</exception>
-        public void Verify()
-        {
-            // Prevent multiple threads from starting verification at the same time. This could crash, b
-            lock (this.isVerifying)
-            {
-                this.IsVerifying = true;
-
-                this.VerificationScope = new ContainerVerificationScope();
-
-                try
-                {
-                    this.Verifying(this, EventArgs.Empty);
-                    this.VerifyThatAllExpressionsCanBeBuilt();
-                    this.VerifyThatAllRootObjectsCanBeCreated();
-                    this.succesfullyVerified = true;
-                }
-                finally
-                {
-                    this.IsVerifying = false;
-                    var scopeToDispose = this.VerificationScope;
-                    this.VerificationScope = null;
-                    scopeToDispose.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
         /// Adds the <paramref name="registration"/> for the supplied <paramref name="serviceType"/>. This
         /// method can be used to apply the same <see cref="Registration"/> to multiple different service
         /// types.
@@ -1688,108 +1656,6 @@ namespace SimpleInjector
             return false;
         }
 
-        private void VerifyThatAllExpressionsCanBeBuilt()
-        {
-            int maximumNumberOfIterations = 10;
-
-            InstanceProducer[] producersToVerify;
-
-            // The process of building expressions can trigger the creation/registration of new instance 
-            // producers. Those new producers need to be checked as well. That's why we have a loop here. But 
-            // since a user could accidentally trigger the creation of new registrations during verify, we 
-            // must set a sensible limit to the number of iterations, to prevent the process from never 
-            // stopping.
-            do
-            {
-                maximumNumberOfIterations--;
-
-                producersToVerify = (
-                    from registration in this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
-                    where !registration.IsExpressionCreated
-                    select registration)
-                    .ToArray();
-
-                VerifyThatAllExpressionsCanBeBuilt(producersToVerify);
-            }
-            while (maximumNumberOfIterations > 0 && producersToVerify.Any());
-        }
-
-        private void VerifyThatAllRootObjectsCanBeCreated()
-        {
-            var rootProducers = this.GetRootRegistrations(includeInvalidContainerRegisteredTypes: true);
-
-            var producersThatMustBeExplicitlyVerified = this.GetProducersThatNeedExplicitVerification();
-
-            var producersToVerify = 
-                from producer in rootProducers.Concat(producersThatMustBeExplicitlyVerified).Distinct()
-                where !producer.InstanceSuccessfullyCreated || !producer.VerifiersAreSuccessfullyCalled
-                select producer;
-
-            VerifyInstanceCreation(producersToVerify.ToArray());
-        }
-
-        private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
-        {
-            var registrations = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
-
-            return
-                from registration in registrations
-                where registration.MustBeExplicitlyVerified
-                select registration;
-        }
-
-        private static void VerifyThatAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)
-        {
-            foreach (var producer in producersToVerify)
-            {
-                var expression = producer.VerifyExpressionBuilding();
-
-                VerifyInstanceProducersOfContainerControlledCollection(expression);
-            }
-        }
-
-        private static void VerifyInstanceProducersOfContainerControlledCollection(Expression expression)
-        {
-            ConstantExpression constant = expression as ConstantExpression;
-
-            if (constant != null && constant.Value is IContainerControlledCollection)
-            {
-                ((IContainerControlledCollection)constant.Value).VerifyCreatingProducers();
-            }
-        }
-
-        private static void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
-        {
-            foreach (var producer in producersToVerify)
-            {
-                if (!producer.InstanceSuccessfullyCreated)
-                {
-                    var instance = producer.VerifyInstanceCreation();
-
-                    VerifyContainerUncontrolledCollection(instance, producer);
-                }
-
-                if (!producer.VerifiersAreSuccessfullyCalled)
-                {
-                    producer.DoExtraVerfication();
-                }
-            }
-        }
-
-        private static void VerifyContainerUncontrolledCollection(object instance, InstanceProducer producer)
-        {
-            bool isContainerUncontrolledCollection =
-                producer.Registration.IsCollection && !(instance is IContainerControlledCollection);
-
-            if (isContainerUncontrolledCollection)
-            {
-                Type collectionType = producer.ServiceType;
-                Type serviceType = collectionType.GetGenericArguments()[0];
-
-                Helpers.VerifyCollection((IEnumerable)instance, serviceType);
-            }
-        }
-
         private Action<T>[] GetInstanceInitializersFor<T>(Type type, InitializationContext context)
         {
             return (
@@ -1813,10 +1679,11 @@ namespace SimpleInjector
 
             if (!constructable)
             {
-                // After some doubt (and even after reading https://bit.ly/1CPDv9) I decided to throw an
-                // ArgumentException when the given generic type argument was invalid. Mainly because a
-                // generic type argument is just an argument, and ArgumentException even allows us to supply 
-                // the name of the argument. No developer will be surprise to see an ArgEx in this case.
+                // After some doubt (and even after reading https://stackoverflow.com/questions/1412598/)
+                // I decided to throw an ArgumentException when the given generic type argument was 
+                // invalid. Mainly because a generic type argument is just an argument, and 
+                // ArgumentException even allows us to supply the name of the argument. No developer 
+                // will be surprise to see an ArgumentException in this case.
                 throw new ArgumentException(message, parameterName);
             }
         }
