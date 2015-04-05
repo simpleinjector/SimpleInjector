@@ -281,7 +281,7 @@ namespace SimpleInjector
         /// <see cref="Container.RegisterInitializer{TService}">RegisterInitializer</see> method are unknown
         /// to the container and are not returned from this method.
         /// Also note that this method will return an empty collection when called before the the
-        /// registered type is requested from the container (or before <see cref="Container.Verify">Verify</see>
+        /// registered type is requested from the container (or before <see cref="Container.Verify()">Verify</see>
         /// is called). 
         /// </summary>
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
@@ -304,7 +304,7 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
-        /// instance, or by calling <see cref="Container.Verify">Verify</see> on the container.</exception>
+        /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.</exception>
         public string VisualizeObjectGraph()
         {
             if (!this.IsExpressionCreated)

@@ -61,7 +61,7 @@ namespace SimpleInjector
         /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point. 
         /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
         /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
-        /// to <see cref="Container.Verify" />.
+        /// to <see cref="Container.Verify()" />.
         /// </remarks>
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference

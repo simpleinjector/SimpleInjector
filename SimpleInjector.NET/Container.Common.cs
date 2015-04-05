@@ -239,7 +239,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
         /// <exception cref="InvalidOperationException">Thrown when this method is called before
-        /// <see cref="Verify"/> has been successfully called.</exception>
+        /// <see cref="Verify()"/> has been successfully called.</exception>
         public InstanceProducer[] GetRootRegistrations()
         {
             if (!this.succesfullyVerified)
