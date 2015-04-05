@@ -21,7 +21,8 @@ namespace $rootnamespace$.App_Start
         /// <summary>Creates and initializes the container.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration? Go to: http://bit.ly/YE8OJj.
+            // Did you know the container can diagnose your configuration?
+            // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
 
             // Override the default behavior and allows properties to be injected into pages, handlers

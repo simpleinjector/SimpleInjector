@@ -12,7 +12,8 @@ namespace $rootnamespace$.App_Start
         /// <summary>Initialize the container and register it for the WCF ServiceHostFactory.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration? Go to: https://bit.ly/YE8OJj.
+            // Did you know the container can diagnose your configuration?
+            // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
 
             container.EnablePerWcfOperationLifestyle();
