@@ -1084,7 +1084,7 @@
     {
     }
 
-    internal class RequestDecorator<TRequest, TResponse> : IHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public class RequestDecorator<TRequest, TResponse> : IHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         public RequestDecorator(IHandler<TRequest, TResponse> decoratee)
         {
