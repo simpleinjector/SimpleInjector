@@ -25,13 +25,13 @@
 namespace SimpleInjector
 {
     using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.ServiceModel;
-using SimpleInjector.Advanced;
-using SimpleInjector.Integration.Wcf;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
+    using System.ServiceModel;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Integration.Wcf;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with WCF services.
@@ -78,13 +78,15 @@ using SimpleInjector.Integration.Wcf;
         }
 
         /// <summary>
-        /// Allows the container to resolve instances with a Per Wcf Operation lifestyle for the given 
+        /// Allows the container to resolve instances with a Per WCF Operation lifestyle for the given 
         /// <paramref name="container"/>. This is 
         /// enabled automatically when services get registered using one of the <b>RegisterPerWcfRequest</b>
         /// overloads or when the container passed onto the 
         /// <see cref="SimpleInjectorServiceHostFactory.SetContainer"/> method. 
         /// </summary>
         /// <param name="container">The container.</param>
+        [Obsolete("The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
+            "This method has therefore become a no-op and the call to this method can be removed safely.")]
         public static void EnablePerWcfOperationLifestyle(this Container container)
         {
             // This method has become a no-op.
