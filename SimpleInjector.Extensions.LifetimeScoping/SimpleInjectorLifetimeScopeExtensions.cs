@@ -1,4 +1,4 @@
-﻿    #region Copyright Simple Injector Contributors
+﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
  * Copyright (c) 2013-2014 Simple Injector Contributors
