@@ -1200,6 +1200,31 @@
             // Assert
             AssertThat.IsInstanceOfType(expectedType, actualInstance);
         }
+        
+        [TestMethod]
+        public void RegisterOpenGeneric_WithPartialOpenGenericServiceType_ThrowsExpectedMessage()
+        {
+            // Arrange
+            string expectedMessage = @"
+                The supplied type 'IService<Int32, TB>' is a partially closed generic type, which is not 
+                supported as value of the openGenericServiceType parameter. 
+                Instead, please supply the open-generic type 'IService<,>' and make the type supplied to 
+                the openGenericImplementation parameter partially closed instead."
+                .TrimInside();            
+
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.RegisterOpenGeneric(
+                typeof(IService<,>).MakePartialOpenGenericType(firstArgument: typeof(int)),
+                typeof(ServiceImpl<,>));
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("openGenericServiceType", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                expectedMessage,
+                action);
+        }
     }
 
     public sealed class DefaultStuffDoer<T> : IDoStuff<T>

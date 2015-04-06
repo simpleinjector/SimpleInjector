@@ -380,6 +380,16 @@ namespace SimpleInjector.Extensions
             Requires.IsNotNull(predicate, "predicate");
 
             Requires.TypeIsOpenGeneric(openGenericServiceType, "openGenericServiceType");
+
+            if (openGenericServiceType.GetGenericTypeDefinition() != openGenericServiceType)
+            {
+                throw new ArgumentException(
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(
+                        openGenericServiceType,
+                        "openGenericServiceType",
+                        "openGenericImplementation"), "openGenericServiceType");
+            }
+
             Requires.TypeIsOpenGeneric(openGenericImplementation, "openGenericImplementation");
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType,
                 openGenericImplementation, "openGenericServiceType");

@@ -639,5 +639,18 @@ using SimpleInjector.Extensions;
                 invalidValue,
                 enumClass.Name);
         }
+
+        internal static string ServiceTypeCannotBeAPartiallyClosedType(Type openGenericServiceType,
+            string serviceTypeParamName, string implementationTypeParamName)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is a partially closed generic type, which is not supported as " +
+                "value of the {1} parameter. Instead, please supply the open-generic type '{2}' and make " +
+                "the type supplied to the {3} parameter partially closed instead.",
+                openGenericServiceType.ToFriendlyName(),
+                serviceTypeParamName,
+                Helpers.ToCSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()),
+                implementationTypeParamName);
+        }
     }
 }
