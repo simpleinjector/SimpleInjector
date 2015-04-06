@@ -68,7 +68,10 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -134,6 +137,9 @@
     <Compile Include="ExpressionBuiltEventTests.cs" />
     <Compile Include="InjectPropertiesTests.full.cs" />
     <Compile Include="InstanceProducerInlineVisualizerTests.cs" />
+    <Compile Include="NUnitToMsTestAdapter\Assert.cs" />
+    <Compile Include="NUnitToMsTestAdapter\TestClassAttribute.cs" />
+    <Compile Include="NUnitToMsTestAdapter\TestMethodAttribute.cs" />
     <Compile Include="RegisterAllTests.full.cs" />
     <Compile Include="RegisterContextualInitializerTests.cs" />
     <Compile Include="InstanceProducerTests.cs" />
@@ -163,6 +169,7 @@
     <Compile Include="VerifyTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>

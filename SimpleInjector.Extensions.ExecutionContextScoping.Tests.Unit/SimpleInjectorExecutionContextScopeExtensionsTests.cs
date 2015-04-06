@@ -10,6 +10,7 @@
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class SimpleInjectorExecutionContextScopeExtensionsTests
@@ -120,14 +121,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetCurrentExecutionContextScope_WithNullContainerArgument_ThrowsExpectedException()
         {
             // Arrange
             Container container = null;
 
             // Act
-            container.GetCurrentExecutionContextScope();
+            Action action = () => container.GetCurrentExecutionContextScope();
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -247,7 +250,7 @@
                 var actualInstance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(actualInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), actualInstance);
             }
         }
 
@@ -639,10 +642,14 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void BeginExecutionContextScope_WithNullArgument_ThrowsExpectedException()
         {
-            SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(null);
+            // Act
+            Action action = () =>
+                SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
         
         [TestMethod]
@@ -707,11 +714,11 @@
                 ICommand instance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(instance, typeof(CommandDecorator));
+                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
 
                 var decorator = (CommandDecorator)instance;
 
-                Assert.IsInstanceOfType(decorator.DecoratedInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
             }
         }
 
@@ -946,7 +953,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
             // Arrange
@@ -955,11 +961,13 @@
             var lifestyle = new ExecutionContextScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(invalidArgument, () => { });
+            Action action = () => lifestyle.WhenScopeEnds(invalidArgument, () => { });
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void WhenScopeEnds_NullActionArgument_ThrowsException()
         {
             // Arrange
@@ -968,7 +976,10 @@
             var lifestyle = new ExecutionContextScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(new Container(), invalidArgument);
+            Action action = () => lifestyle.WhenScopeEnds(new Container(), invalidArgument);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

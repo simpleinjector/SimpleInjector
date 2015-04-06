@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -25,7 +24,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterInitializer_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
@@ -34,7 +32,10 @@
             Action<IUserRepository> invalidInstanceInitializer = null;
 
             // Act
-            container.RegisterInitializer<IUserRepository>(invalidInstanceInitializer);
+            Action action = () => container.RegisterInitializer<IUserRepository>(invalidInstanceInitializer);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -77,7 +78,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterInitializer_CalledOnALockedContainer_ThrowsExceptedException()
         {
             // Arrange
@@ -87,7 +87,10 @@
             container.GetInstance<PluginImpl>();
 
             // Act
-            container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { });
+            Action action = () => container.RegisterInitializer<IUserRepository>(repositoryToInitialize => { });
+            
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]

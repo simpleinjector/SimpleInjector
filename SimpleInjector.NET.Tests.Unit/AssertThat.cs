@@ -13,17 +13,14 @@
             try
             {
                 action();
-
-                Assert.Fail("Action was expected to throw an exception. " + assertMessage);
-            }
-            catch (AssertFailedException)
-            {
-                throw;
             }
             catch (TException ex)
             {
                 AssertThat.IsInstanceOfType(typeof(TException), ex, assertMessage);
+                return;
             }
+
+            Assert.Fail("Action was expected to throw an exception. " + assertMessage);
         }
 
         public static void ThrowsWithExceptionMessageDoesNotContain<TException>(string messageNotToBeExpected,
@@ -36,7 +33,7 @@
                 {
                     action();
                 }
-                catch (Exception ex)
+                catch (TException ex)
                 {
                     ExceptionMessageShouldNotContain(messageNotToBeExpected, ex, assertMessage);
 
@@ -55,7 +52,7 @@
                 {
                     action();
                 }
-                catch (Exception ex)
+                catch (TException ex)
                 {
                     ExceptionMessageContains(expectedMessage, ex, assertMessage);
 
@@ -141,6 +138,17 @@
 #else
             Assert.IsTrue(exception.Message.Contains(expectedParamName), assertMessage);
 #endif
+        }
+
+        public static void IsNotInstanceOfType(Type unexpectedType, object actualInstance, string message = null)
+        {
+            Assert.IsNotNull(actualInstance, message);
+
+            if (unexpectedType.IsAssignableFrom(actualInstance.GetType()))
+            {
+                Assert.Fail(string.Format("{1} is an instance of type {0}. {2}",
+                    ToFriendlyName(unexpectedType), ToFriendlyName(actualInstance.GetType()), message));
+            }
         }
 
         public static void IsInstanceOfType(Type expectedType, object actualInstance, string message = null)

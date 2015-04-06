@@ -1,29 +1,33 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
-    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class AnalyzerTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Analyze_WithNullArgument_ThrowsExpectedException()
         {
-            Analyzer.Analyze(null);
+            // Act
+            Action action = () => Analyzer.Analyze(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Analyze_SuppliedWithUnverifiedContainer_ThrowsExpectedException()
         {
             // Arrange
             var unverfiedContainer = new Container();
 
             // Act
-            Analyzer.Analyze(unverfiedContainer);
+            Action action = () => Analyzer.Analyze(unverfiedContainer);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]

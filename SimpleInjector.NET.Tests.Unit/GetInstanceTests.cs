@@ -8,14 +8,16 @@
     public class GetInstanceTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstanceByType_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
+            Action action = () => container.GetInstance(typeof(ServiceWithUnregisteredDependencies));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
@@ -72,7 +74,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstanceGeneric_CalledOnRegisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
@@ -81,18 +82,23 @@
             container.Register<ServiceWithUnregisteredDependencies>();
 
             // Act
-            container.GetInstance<ServiceWithUnregisteredDependencies>();
+            Action action = () => container.GetInstance<ServiceWithUnregisteredDependencies>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_OnObjectWhileUnregistered_ThrowsActivationException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.GetInstance<object>();
+            Action action = () => container.GetInstance<object>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]

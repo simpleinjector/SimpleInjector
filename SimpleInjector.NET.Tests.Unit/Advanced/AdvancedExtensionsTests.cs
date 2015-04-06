@@ -12,11 +12,13 @@ namespace SimpleInjector.Tests.Unit.Advanced
     public class AdvancedExtensionsTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void IsLocked_WithNullArgument_ThrowsException()
         {
             // Act
-            AdvancedExtensions.IsLocked(null);
+            Action action = () => AdvancedExtensions.IsLocked(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -262,7 +264,6 @@ namespace SimpleInjector.Tests.Unit.Advanced
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void AppendToCollection_CalledAfterTheFirstItemIsRequested_ThrowsExpectedException()
         {
             // Arrange
@@ -276,7 +277,10 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var instances = container.GetAllInstances<IPlugin>().ToArray();
 
             // Act
-            container.AppendToCollection(typeof(IPlugin), registration2);
+            Action action = () => container.AppendToCollection(typeof(IPlugin), registration2);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]

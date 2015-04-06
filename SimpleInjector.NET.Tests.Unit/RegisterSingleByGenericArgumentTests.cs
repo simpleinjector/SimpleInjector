@@ -1,10 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -53,14 +49,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleByGenericArgument_GenericArgumentOfInvalidType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
+            Action action = () => container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -86,7 +84,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingleByGenericArgument_CalledAfterTheContainerWasLocked_ThrowsException()
         {
             // Arrange
@@ -95,7 +92,10 @@
             container.GetInstance<PluginManager>();
 
             // Act
-            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+            Action action = () => container.RegisterSingle<IUserRepository, SqlUserRepository>();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
     }
 }

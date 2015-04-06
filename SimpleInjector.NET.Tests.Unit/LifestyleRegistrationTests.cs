@@ -3,9 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
     using SimpleInjector.Advanced;
 
     [TestClass]

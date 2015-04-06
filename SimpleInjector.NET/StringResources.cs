@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,14 +23,14 @@
 namespace SimpleInjector
 {
     using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using SimpleInjector.Advanced;
-using SimpleInjector.Diagnostics;
-using SimpleInjector.Extensions;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Extensions;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources

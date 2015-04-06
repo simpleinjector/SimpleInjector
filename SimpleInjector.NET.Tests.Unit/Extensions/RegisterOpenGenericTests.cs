@@ -90,38 +90,42 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterOpenGeneric_WithClosedServiceType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+            Action action = () => container.RegisterOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterOpenGeneric_WithClosedImplementation_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+            Action action = () => container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterOpenGeneric_WithNonRelatedTypes_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
-
+                        
             // Act
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+            Action action = () => container.RegisterOpenGeneric(typeof(IService<,>), typeof(Func<,>));
 
-            container.GetInstance<IService<int, string>>();
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -174,36 +178,44 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleOpenGeneric_WithClosedServiceType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterSingleOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+            Action action = () => 
+                container.RegisterSingleOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleOpenGeneric_WithClosedImplementation_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+            Action action = () => 
+                container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleOpenGeneric_WithNonRelatedTypes_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+            Action action = () => container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]

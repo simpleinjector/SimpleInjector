@@ -6,6 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class CustomLifestyleTests

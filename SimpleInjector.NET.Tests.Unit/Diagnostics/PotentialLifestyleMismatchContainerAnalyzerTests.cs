@@ -4,7 +4,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
-    using SimpleInjector.Diagnostics.Tests.Unit.Helpers;
 
     [TestClass]
     public class PotentialLifestyleMismatchContainerAnalyzerTests

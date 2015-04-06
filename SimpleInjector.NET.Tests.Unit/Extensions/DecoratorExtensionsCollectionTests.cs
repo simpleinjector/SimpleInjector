@@ -9,7 +9,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.

@@ -61,7 +61,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
@@ -71,7 +74,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssertThat.cs" />
     <Compile Include="AutomaticFactoryExtensionsTests.cs" />
     <Compile Include="AutomaticParameterizedFactoryExtensionsTests.cs" />
     <Compile Include="ConstructorRegistrationExtensionsTests.cs" />
@@ -101,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +140,10 @@
     <ProjectReference Include="..\SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj">
       <Project>{fb925c19-cda9-44b4-a149-b20e8516a382}</Project>
       <Name>SimpleInjector.Integration.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj">
+      <Project>{1ad3ba5c-662d-41d5-b00f-27af3f84c87c}</Project>
+      <Name>SimpleInjector.NET.Tests.Unit</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}</Project>

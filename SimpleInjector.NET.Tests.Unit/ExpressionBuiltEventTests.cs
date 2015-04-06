@@ -3,9 +3,7 @@
     using System;
     using System.Linq;
     using System.Linq.Expressions;
-    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
 
     [TestClass]
@@ -108,7 +106,7 @@
             container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsNotInstanceOfType(actualBuiltExpression, typeof(NewExpression),
+            AssertThat.IsNotInstanceOfType(typeof(NewExpression), actualBuiltExpression,
                 "The initializer is expected to be applied BEFORE the ExpressionBuilt event ran.");
         }
 
@@ -434,8 +432,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Registration of an event after the container is locked is illegal.")]
         public void AddExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -447,12 +443,14 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ExpressionBuilt += (s, e) => { };
+            Action action = () => container.ExpressionBuilt += (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Registration of an event after the container is locked is illegal.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Removal of an event after the container is locked is illegal.")]
         public void RemoveExpressionBuilt_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -464,7 +462,11 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ResolveUnregisteredType -= (s, e) => { };
+            Action action = () => container.ResolveUnregisteredType -= (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Registration of an event after the container is locked is illegal.");
         }
 
         [TestMethod]
@@ -494,7 +496,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ExpressionBuiltEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
@@ -502,24 +503,29 @@
 
             container.Register<IPlugin, PluginImpl>();
 
+            // Act
             container.ExpressionBuilt += (s, e) =>
             {
-                // Act
                 e.Expression = null;
             };
 
-            try
+            Action action = () =>
             {
-                // Act
-                container.GetInstance<IPlugin>();
+                try
+                {
+                    container.GetInstance<IPlugin>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (Exception ex)
-            {
-                throw ex.GetExceptionChain().Last();
-            }
+                    // Assert
+                    Assert.Fail("Exception expected.");
+                }
+                catch (Exception ex)
+                {
+                    throw ex.GetExceptionChain().Last();
+                }
+            };
+            
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

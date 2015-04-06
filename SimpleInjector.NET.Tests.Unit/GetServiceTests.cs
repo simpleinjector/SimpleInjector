@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -68,7 +67,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetService_RequestingANonregisteredType_WillNotSuppressErrorsThrownFromUnregisteredTypeResolution()
         {
             // Arrange
@@ -84,8 +82,13 @@
                 }
             };
 
+            IServiceProvider serviceProvider = container;
+
             // Act
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
+            Action action = () => serviceProvider.GetService(typeof(IUserRepository));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
@@ -120,7 +123,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetService_RequestedOnRegisteredInvalidType_ReturnsInstance()
         {
             // Arrange
@@ -128,13 +130,13 @@
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
+            IServiceProvider provider = container;
+
             // Act
-            var registration =
-                ((IServiceProvider)container).GetService(typeof(ServiceWithUnregisteredDependencies));
+            Action action = () => provider.GetService(typeof(ServiceWithUnregisteredDependencies));
 
             // Assert
-            Assert.IsNotNull(registration, "The GetService method is expected to return an InstanceProducer " +
-                "since it is explicitly registered by the user.");
+            AssertThat.Throws<ActivationException>(action);
         }
     }
 }

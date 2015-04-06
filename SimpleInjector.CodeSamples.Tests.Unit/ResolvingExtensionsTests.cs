@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ResolvingExtensionsTests
@@ -263,7 +264,7 @@
             container.TryGetInstance(typeof(ICommand), out command);
 
             // Assert
-            Assert.IsInstanceOfType(command, typeof(ConcreteCommand));
+            AssertThat.IsInstanceOfType(typeof(ConcreteCommand), command);
         }
     }
 }

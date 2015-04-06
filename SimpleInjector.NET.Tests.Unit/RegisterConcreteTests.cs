@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -170,7 +169,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterConcrete_NullConcrete_ThrowsException()
         {
             // Arrange
@@ -179,7 +177,10 @@
             Type invalidConcrete = null;
 
             // Act
-            container.Register(invalidConcrete);
+            Action action = () => container.Register(invalidConcrete);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

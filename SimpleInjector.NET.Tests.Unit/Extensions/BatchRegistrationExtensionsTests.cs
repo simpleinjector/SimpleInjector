@@ -7,9 +7,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Extensions;
 
     /// <summary>Normal tests.</summary>
@@ -85,14 +83,17 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterManyForOpenGeneric_WithClosedGenericType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<int, int>), Assembly.GetExecutingAssembly());
+            Action action = () =>
+                container.RegisterManyForOpenGeneric(typeof(IService<int, int>), Assembly.GetExecutingAssembly());
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -378,7 +379,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullAssemblyParamsArgument_ThrowsException()
         {
             // Arrange
@@ -387,11 +387,13 @@
             Assembly[] invalidArgument = null;
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
+            Action action = () => container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullAssemblyIEnumerableArgument_ThrowsException()
         {
             // Arrange
@@ -400,11 +402,13 @@
             IEnumerable<Assembly> invalidArgument = null;
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
+            Action action = () => container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullContainer_ThrowsException()
         {
             // Arrange
@@ -413,11 +417,13 @@
             var validAssembly = Assembly.GetExecutingAssembly();
 
             // Act
-            invalidContainer.RegisterManyForOpenGeneric(validServiceType, validAssembly);
+            Action action = () => invalidContainer.RegisterManyForOpenGeneric(validServiceType, validAssembly);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullTypesToRegister_ThrowsException()
         {
             // Arrange
@@ -427,11 +433,13 @@
             IEnumerable<Type> invalidTypesToRegister = null;
 
             // Act
-            container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+            Action action = () => container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterManyForOpenGeneric_WithNullOpenGenericServiceType_ThrowsException()
         {
             // Arrange
@@ -441,11 +449,13 @@
             IEnumerable<Type> validTypesToRegister = new Type[] { typeof(object) };
 
             // Act
-            container.RegisterManyForOpenGeneric(invalidServiceType, validTypesToRegister);
+            Action action = () => container.RegisterManyForOpenGeneric(invalidServiceType, validTypesToRegister);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterManyForOpenGeneric_WithNullElementInTypesToRegister_ThrowsException()
         {
             // Arrange
@@ -455,7 +465,10 @@
             IEnumerable<Type> invalidTypesToRegister = new Type[] { null };
 
             // Act
-            container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+            Action action = () => container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -819,28 +832,34 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterManyForOpenGeneric_WithInvalidAccessibilityOption_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), (AccessibilityOption)5,
-                Assembly.GetExecutingAssembly());
+            Action action = () => 
+                container.RegisterManyForOpenGeneric(typeof(IService<,>), (AccessibilityOption)5,
+                    Assembly.GetExecutingAssembly());
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterManyForOpenGeneric_ExcludingInternalTypes_DoesNotRegisterInternalTypes()
         {
             // Arrange
             var container = ContainerFactory.New();
+
             container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
                 Assembly.GetExecutingAssembly());
 
             // Act
-            container.GetInstance<IService<decimal, decimal>>();
+            Action action = () => container.GetInstance<IService<decimal, decimal>>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]

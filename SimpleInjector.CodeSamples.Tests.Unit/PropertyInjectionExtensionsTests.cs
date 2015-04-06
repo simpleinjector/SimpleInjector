@@ -2,6 +2,7 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class PropertyInjectionExtensionsTests
@@ -151,7 +152,7 @@
             var service = container.GetInstance<ServiceWithAttributedProperties>();
 
             // Assert
-            Assert.IsInstanceOfType(service.Logger1, typeof(ContextualLogger));
+            AssertThat.IsInstanceOfType(typeof(ContextualLogger), service.Logger1);
             Assert.AreEqual(
                 typeof(ServiceWithAttributedProperties).Name,
                 ((ContextualLogger)service.Logger1).Context.ImplementationType.Name);

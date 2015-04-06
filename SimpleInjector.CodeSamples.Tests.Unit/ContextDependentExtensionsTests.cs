@@ -6,6 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ContextDependentExtensionsTests
@@ -25,7 +26,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterWithContext_CalledForAlreadyRegisteredService_ThrowsExpectedException()
         {
             // Arrange
@@ -34,7 +34,11 @@
             container.Register<IContextualLogger, ContextualLogger>();
 
             // Act
-            container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
+            Action action = () => 
+                container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]

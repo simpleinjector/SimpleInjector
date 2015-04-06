@@ -1,10 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class UnknownLifestyleTests

@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class MethodInjectionExtensionsTests

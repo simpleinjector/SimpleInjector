@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class AutomaticFactoryExtensionsTests
@@ -45,7 +46,7 @@
             var instance = factory.CreateService();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(Service));
+            AssertThat.IsInstanceOfType(typeof(Service), instance);
         }
         
         [TestMethod]

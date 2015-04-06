@@ -4,6 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class RuntimeDecoratorExtensionsTests
@@ -30,8 +31,8 @@
             var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<RealCommand>));
-            Assert.IsInstanceOfType(handler2, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), handler1);
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), handler2);
         }
 
         [TestMethod]
@@ -90,8 +91,8 @@
                 .DecorateeFactory();
 
             // Assert
-            Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<RealCommand>));
-            Assert.IsInstanceOfType(handler2, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), handler1);
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), handler2);
         }
 
         [TestMethod]

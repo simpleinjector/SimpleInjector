@@ -1,12 +1,11 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Diagnostics.Debugger;
+    using SimpleInjector.Tests.Unit;
 
     public interface IUnitOfWork
     {
@@ -125,7 +124,7 @@
             // Assert
             Assert.AreEqual("Controller<T>", results.Name);
             Assert.AreEqual("2 short circuited components.", results.Description);
-            Assert.IsInstanceOfType(results.Value, typeof(DebuggerViewItem[]));
+            AssertThat.IsInstanceOfType(typeof(DebuggerViewItem[]), results.Value);
             Assert.AreEqual(2, ((DebuggerViewItem[])results.Value).Length);
         }
 

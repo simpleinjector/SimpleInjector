@@ -18,7 +18,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllTService_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -27,7 +26,10 @@
             IEnumerable<IPlugin> plugins = null;
 
             // Act
-            container.RegisterAll<IPlugin>(plugins);
+            Action action = () => container.RegisterAll<IPlugin>(plugins);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -81,7 +83,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterSingle_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
             // Arrange
@@ -90,11 +91,13 @@
             container.RegisterAll<IPlugin>(new PluginImpl());
 
             // Act
-            container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
+            Action action = () => container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Register_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
         {
             // Arrange
@@ -103,11 +106,13 @@
             container.RegisterAll<IPlugin>(new PluginImpl());
 
             // Act
-            container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
+            Action action = () => container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_WithEnumerableCalledAfterRegisterSingleWithSameType_Fails()
         {
             // Arrange
@@ -116,11 +121,13 @@
             container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Act
-            container.RegisterAll<IPlugin>(new PluginImpl());
+            Action action = () => container.RegisterAll<IPlugin>(new PluginImpl());
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_WithEnumerableCalledAfterRegisterWithSameType_Fails()
         {
             // Arrange
@@ -129,7 +136,10 @@
             container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
 
             // Act
-            container.RegisterAll<IPlugin>(new PluginImpl());
+            Action action = () => container.RegisterAll<IPlugin>(new PluginImpl());
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
@@ -187,7 +197,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
         public void RegisterAll_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -196,11 +205,14 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.RegisterAll<IUserRepository>(new IUserRepository[0]);
+            Action action = () => container.RegisterAll<IUserRepository>(new IUserRepository[0]);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "The container should get locked after a call to GetInstance.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
         public void RegisterAll_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -209,11 +221,14 @@
             var count = repositories.Count();
 
             // Act
-            container.RegisterAll<IUserRepository>(new IUserRepository[0]);
+            Action action = () => container.RegisterAll<IUserRepository>(new IUserRepository[0]);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "The container should get locked after a call to GetAllInstances.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllParamsT_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -222,11 +237,13 @@
             IUserRepository[] repositories = null;
 
             // Act
-            container.RegisterAll<IUserRepository>(repositories);
+            Action action = () => container.RegisterAll<IUserRepository>(repositories);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllParamsType_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -235,11 +252,13 @@
             Type[] repositoryTypes = null;
 
             // Act
-            container.RegisterAll<IUserRepository>(repositoryTypes);
+            Action action = () => container.RegisterAll<IUserRepository>(repositoryTypes);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllIEnumerableT_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -248,11 +267,13 @@
             IEnumerable<IUserRepository> repositories = null;
 
             // Act
-            container.RegisterAll<IUserRepository>(repositories);
+            Action action = () => container.RegisterAll<IUserRepository>(repositories);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterAllIEnumerableType_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -261,7 +282,10 @@
             IEnumerable<Type> repositoryTypes = null;
 
             // Act
-            container.RegisterAll<IUserRepository>(repositoryTypes);
+            Action action = () => container.RegisterAll<IUserRepository>(repositoryTypes);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -292,7 +316,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterAll_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -301,7 +324,10 @@
             container.RegisterAll<IUserRepository>(repositories);
 
             // Act
-            container.RegisterAll<IUserRepository>(repositories);
+            Action action = () => container.RegisterAll<IUserRepository>(repositories);
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
@@ -490,14 +516,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterAllTService_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
+            Action action = () => container.RegisterAll<IUserRepository>(new IUserRepository[] { null });
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -1747,9 +1775,9 @@
                 return;
             }
 
-            Assert.IsNotInstanceOfType(collection, typeof(T[]), assertMessage);
-            Assert.IsNotInstanceOfType(collection, typeof(IList), assertMessage);
-            Assert.IsNotInstanceOfType(collection, typeof(ICollection<T>), assertMessage);
+            AssertThat.IsNotInstanceOfType(typeof(T[]), collection, assertMessage);
+            AssertThat.IsNotInstanceOfType(typeof(IList), collection, assertMessage);
+            AssertThat.IsNotInstanceOfType(typeof(ICollection<T>), collection, assertMessage);
         }
 
         // Events

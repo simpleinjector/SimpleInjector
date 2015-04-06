@@ -4,6 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class MultiKeyedRegistrationsExtensionsTests
@@ -141,7 +142,7 @@
             var service = container.GetInstance<IService2>();
             
             // Assert
-            Assert.IsInstanceOfType(service, typeof(Service2Decorator));
+            AssertThat.IsInstanceOfType(typeof(Service2Decorator), service);
         }
         
         [TestMethod]

@@ -11,6 +11,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class SimpleInjectorLifetimeScopeExtensionsTests
@@ -122,14 +123,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetCurrentLifetimeScope_WithNullContainerArgument_ThrowsExpectedException()
         {
             // Arrange
             Container container = null;
 
             // Act
-            container.GetCurrentLifetimeScope();
+            Action action = () => container.GetCurrentLifetimeScope();
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -253,7 +256,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                 var actualInstance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(actualInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), actualInstance);
             }
         }
 
@@ -649,38 +652,57 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void BeginLifetimeScope_WithNullArgument_ThrowsExpectedException()
         {
-            SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(null);
+            // Act
+            Action action = () => SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTConcrete_WithNullArgument_ThrowsExpectedException()
         {
+            // Act
+            Action action = () => 
             SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ConcreteCommand>(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceTImplementation_WithNullArgument_ThrowsExpectedException()
         {
-            SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand, ConcreteCommand>(null);
+            // Act
+            Action action = () =>
+                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand, ConcreteCommand>(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceFunc_WithNullContainerArgument_ThrowsExpectedException()
         {
-            SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(null, () => null);
+            // Act
+            Action action = () =>
+                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(null, () => null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()
         {
-            SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(new Container(), null);
+            // Act
+            Action action = () =>
+                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(new Container(), null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
         
         [TestMethod]
@@ -777,11 +799,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                 ICommand instance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(instance, typeof(CommandDecorator));
+                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
 
                 var decorator = (CommandDecorator)instance;
 
-                Assert.IsInstanceOfType(decorator.DecoratedInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
             }
         }
 
@@ -1028,25 +1050,29 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
             // Arrange
             var lifestyle = new LifetimeScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(null, () => { });
+            Action action = () => lifestyle.WhenScopeEnds(null, () => { });
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void WhenScopeEnds_NullActionArgument_ThrowsException()
         {
             // Arrange
             var lifestyle = new LifetimeScopeLifestyle();
 
             // Act
-            lifestyle.WhenScopeEnds(new Container(), null);
+            Action action = () => lifestyle.WhenScopeEnds(new Container(), null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

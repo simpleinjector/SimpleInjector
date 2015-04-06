@@ -1,10 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     
     [TestClass]
@@ -53,14 +49,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterByGenericArgument_GenericArgumentOfInvalidType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
+            Action action = () => container.Register<object, ConcreteTypeWithValueTypeConstructorArgument>();
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
@@ -86,7 +84,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void RegisterByGenericArgument_CalledAfterTheContainerWasLocked_ThrowsException()
         {
             // Arrange
@@ -95,19 +92,25 @@
             container.GetInstance<PluginManager>();
 
             // Act
-            container.Register<IUserRepository, SqlUserRepository>();
+            Action action = () => container.Register<IUserRepository, SqlUserRepository>();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterGenericWithLifestyle_SuppliedAnImplementationWithTwoConstructors_ThrowsAnArgumentException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.Register<ConcreteTypeWithMultiplePublicConstructors, ConcreteTypeWithMultiplePublicConstructors>(
-                Lifestyle.Transient);
+            Action action = () => 
+                container.Register<ConcreteTypeWithMultiplePublicConstructors, ConcreteTypeWithMultiplePublicConstructors>(
+                    Lifestyle.Transient);
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
         
         [TestMethod]

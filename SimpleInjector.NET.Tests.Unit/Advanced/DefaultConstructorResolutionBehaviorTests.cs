@@ -7,25 +7,29 @@
     public class DefaultConstructorResolutionBehaviorTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetConstructor_WithNullArgument1_ThrowsException()
         {
             // Arrange
             var behavior = new ContainerOptions().ConstructorResolutionBehavior;
 
             // Act
-            behavior.GetConstructor(null, typeof(TypeWithSinglePublicDefaultConstructor));
+            Action action = () => behavior.GetConstructor(null, typeof(TypeWithSinglePublicDefaultConstructor));
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetConstructor_WithNullArgument2_ThrowsException()
         {
             // Arrange
             var behavior = new ContainerOptions().ConstructorResolutionBehavior;
 
             // Act
-            behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor), null);
+            Action action = () => behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor), null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

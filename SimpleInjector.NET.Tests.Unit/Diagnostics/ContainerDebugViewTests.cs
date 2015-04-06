@@ -2,11 +2,9 @@
 {
     using System;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ContainerDebugViewTests
@@ -77,7 +75,7 @@
             var registrationsItem = debugView.Items.Single(item => item.Name == "Registrations");
 
             // Assert
-            Assert.IsInstanceOfType(registrationsItem.Value, typeof(InstanceProducer[]));
+            AssertThat.IsInstanceOfType(typeof(InstanceProducer[]), registrationsItem.Value);
         }
 
         [TestMethod]

@@ -2,6 +2,7 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class KeyedFactoryTests
@@ -33,10 +34,10 @@
             IPlugin bar2 = factory["BAR"];
 
             // Assert
-            Assert.IsInstanceOfType(foo1, typeof(Plugin1));
+            AssertThat.IsInstanceOfType(typeof(Plugin1), foo1);
             Assert.IsFalse(object.ReferenceEquals(foo1, foo2), "foo should be transient.");
-            
-            Assert.IsInstanceOfType(bar1, typeof(Plugin2));
+
+            AssertThat.IsInstanceOfType(typeof(Plugin2), bar1);
             Assert.IsTrue(object.ReferenceEquals(bar1, bar2), "bar should be singleton.");
         }
 

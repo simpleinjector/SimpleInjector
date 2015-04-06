@@ -3,6 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class MostParametersConstructorResolutionBehaviorTests
@@ -163,9 +164,9 @@
             var validator = container.GetInstance<IValidator<int>>();
 
             // Assert
-            Assert.IsInstanceOfType(validator, typeof(MultipleCtorsValidatorDecorator<int>));
-            Assert.IsInstanceOfType(((MultipleCtorsValidatorDecorator<int>)validator).WrappedValidator,
-                typeof(NullValidator<int>));
+            AssertThat.IsInstanceOfType(typeof(MultipleCtorsValidatorDecorator<int>), validator);
+            AssertThat.IsInstanceOfType(typeof(NullValidator<int>),
+                ((MultipleCtorsValidatorDecorator<int>)validator).WrappedValidator);
         }
 
         [TestMethod]

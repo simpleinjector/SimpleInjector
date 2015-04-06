@@ -1,7 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class AddRegistrationTests

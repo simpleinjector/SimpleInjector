@@ -2,11 +2,10 @@
 {
     using System;
     using System.Linq.Expressions;
-    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class LifestyleMismatchServicesTests

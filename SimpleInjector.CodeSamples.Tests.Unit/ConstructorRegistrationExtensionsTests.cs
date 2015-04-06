@@ -1,7 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ConstructorRegistrationExtensionsTests
@@ -11,7 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void Register_RegisterConstructorSelectorConvention_CanNotRegisterTypeWithMultipleConstructors()
         {
             // Arrange
@@ -20,7 +20,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
             var convention = container.RegisterConstructorSelectorConvention();
             
             // Act
-            container.Register<ICommand, MultipleConstructorsCommand>();
+            Action action = () => container.Register<ICommand, MultipleConstructorsCommand>();
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]

@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ResolvingFactoriesExtensionsTests
@@ -39,7 +40,7 @@
             var instance = lazy.Value;
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(NullLogger));
+            AssertThat.IsInstanceOfType(typeof(NullLogger), instance);
         }
 
         [TestMethod]
@@ -83,7 +84,7 @@
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "Singleton object was expected.");
         }
-        
+
         [TestMethod]
         public void AllowResolvingFuncFactories_GetInstanceOnUnregisteredFuncDelegate_Succeeds()
         {
@@ -114,7 +115,7 @@
             var instance = factory();
 
             // Assert
-            Assert.IsInstanceOfType(instance, typeof(NullLogger));
+            AssertThat.IsInstanceOfType(typeof(NullLogger), instance);
         }
 
         [TestMethod]
@@ -164,7 +165,7 @@
             var container = new Container();
 
             container.AllowResolvingParameterizedFuncFactories();
-            
+
             // Act
             var tupleFactory = container.GetInstance<Func<int, string, Tuple<int, string>>>();
 
@@ -191,7 +192,7 @@
             var tuple = tupleFactory(0, null);
 
             // Assert
-            Assert.IsInstanceOfType(tuple.Item3, typeof(ILogger));
+            AssertThat.IsInstanceOfType(typeof(ILogger), tuple.Item3);
         }
 
         [TestMethod]
@@ -210,9 +211,9 @@
             var tuple = tupleFactory(0, null);
 
             // Assert
-            Assert.IsInstanceOfType(tuple.Item1, typeof(NullLogger));
+            AssertThat.IsInstanceOfType(typeof(NullLogger), tuple.Item1);
         }
-        
+
         [TestMethod]
         public void AllowResolvingParameterizedFuncFactories_ResolvingTypeWithOneDependencyAtBothSidesOfCtorParameterList_Succeeds()
         {
@@ -230,10 +231,10 @@
             var tuple = tupleFactory(0, null);
 
             // Assert
-            Assert.IsInstanceOfType(tuple.Item1, typeof(NullLogger));
-            Assert.IsInstanceOfType(tuple.Item4, typeof(ConcreteCommand));
+            AssertThat.IsInstanceOfType(typeof(NullLogger), tuple.Item1);
+            AssertThat.IsInstanceOfType(typeof(ConcreteCommand), tuple.Item4);
         }
-        
+
         [TestMethod]
         public void AllowResolvingParameterizedFuncFactories_WithDependencies_PrevervesLifestyles()
         {
@@ -257,7 +258,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void AllowResolvingParameterizedFuncFactories_WithParametersInIncorrectOrder_ThrowExpectedException()
         {
             // Arrange
@@ -269,7 +269,10 @@
             container.Register<ICommand, ConcreteCommand>();
 
             // Act
-            container.GetInstance<Func<int, string, Tuple<ILogger, string, int>>>();
+            Action action = () => container.GetInstance<Func<int, string, Tuple<ILogger, string, int>>>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
     }
 }

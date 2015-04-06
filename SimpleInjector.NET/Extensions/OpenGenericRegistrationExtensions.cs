@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,11 +25,9 @@ namespace SimpleInjector.Extensions
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using SimpleInjector;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.Decorators;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Provides a set of static (Shared in Visual Basic) methods for registration of open generic service

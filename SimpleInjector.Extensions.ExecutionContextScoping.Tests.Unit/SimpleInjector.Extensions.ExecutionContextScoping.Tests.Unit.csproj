@@ -40,6 +40,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
@@ -49,11 +53,7 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="SimpleInjectorExecutionContextScopeExtensionsTests.cs" />
@@ -65,12 +65,17 @@
       <Project>{5b6e8f1a-ae62-4861-bb07-5980b8614a0b}</Project>
       <Name>SimpleInjector.Extensions.ExecutionContextScoping</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj">
+      <Project>{1ad3ba5c-662d-41d5-b00f-27af3f84c87c}</Project>
+      <Name>SimpleInjector.NET.Tests.Unit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>
       <Name>SimpleInjector.NET</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <Choose>

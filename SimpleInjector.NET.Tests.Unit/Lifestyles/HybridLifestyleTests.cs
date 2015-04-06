@@ -1,12 +1,9 @@
 ﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class HybridLifestyleTests

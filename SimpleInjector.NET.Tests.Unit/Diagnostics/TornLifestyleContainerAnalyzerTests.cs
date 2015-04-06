@@ -7,6 +7,7 @@
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class TornLifestyleContainerAnalyzerTests

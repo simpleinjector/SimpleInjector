@@ -7,11 +7,12 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class KeyedRegistrationsTests
     {
-        public interface IPlugin 
+        public interface IPlugin
         {
         }
 
@@ -51,17 +52,17 @@
             var consumer = container.GetInstance<NamedPluginConsumer>();
 
             // Assert
-            Assert.IsInstanceOfType(actualPlugins1[0], typeof(Plugin1));
-            Assert.IsInstanceOfType(actualPlugins1[1], typeof(Plugin2));
-            Assert.IsInstanceOfType(actualPlugins1[2], typeof(PluginDecorator));
-            Assert.IsInstanceOfType(actualPlugins1[3], typeof(Plugin));
-            Assert.IsInstanceOfType(actualPlugins1[4], typeof(Plugin));
+            AssertThat.IsInstanceOfType(typeof(Plugin1), actualPlugins1[0]);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), actualPlugins1[1]);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), actualPlugins1[2]);
+            AssertThat.IsInstanceOfType(typeof(Plugin), actualPlugins1[3]);
+            AssertThat.IsInstanceOfType(typeof(Plugin), actualPlugins1[4]);
 
-            Assert.IsInstanceOfType(factory("1"), typeof(Plugin1));
-            Assert.IsInstanceOfType(factory("2"), typeof(Plugin2));
-            Assert.IsInstanceOfType(factory("3"), typeof(PluginDecorator));
-            Assert.IsInstanceOfType(factory("4"), typeof(Plugin));
-            Assert.IsInstanceOfType(factory("5"), typeof(Plugin));
+            AssertThat.IsInstanceOfType(typeof(Plugin1), factory("1"));
+            AssertThat.IsInstanceOfType(typeof(Plugin2), factory("2"));
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), factory("3"));
+            AssertThat.IsInstanceOfType(typeof(Plugin), factory("4"));
+            AssertThat.IsInstanceOfType(typeof(Plugin), factory("5"));
 
             Assert.AreNotSame(actualPlugins1[0], actualPlugins2[0]);
             Assert.AreNotSame(actualPlugins1[1], actualPlugins2[1]);
@@ -69,38 +70,38 @@
             Assert.AreNotSame(actualPlugins1[3], actualPlugins2[3]);
             Assert.AreSame(actualPlugins1[4], actualPlugins2[4]);
 
-            Assert.IsInstanceOfType(consumer.Plugin1, typeof(Plugin1));
-            Assert.IsInstanceOfType(consumer.Plugin2, typeof(Plugin2));
-            Assert.IsInstanceOfType(consumer.Plugin3, typeof(PluginDecorator));
-            Assert.IsInstanceOfType(consumer.Plugin4, typeof(Plugin));
+            AssertThat.IsInstanceOfType(typeof(Plugin1), consumer.Plugin1);
+            AssertThat.IsInstanceOfType(typeof(Plugin2), consumer.Plugin2);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), consumer.Plugin3);
+            AssertThat.IsInstanceOfType(typeof(Plugin), consumer.Plugin4);
         }
 
-        public class Plugin1 : IPlugin 
+        public class Plugin1 : IPlugin
         {
         }
-        
-        public class Plugin2 : IPlugin 
+
+        public class Plugin2 : IPlugin
         {
         }
-        
-        public class Plugin3 : IPlugin 
+
+        public class Plugin3 : IPlugin
         {
         }
-        
-        public class Plugin : IPlugin 
+
+        public class Plugin : IPlugin
         {
             public Plugin(string a)
             {
             }
         }
-        
+
         public class PluginDecorator : IPlugin
         {
             public PluginDecorator(IPlugin plugin)
             {
             }
         }
-                
+
         [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
         public class NamedAttribute : Attribute
         {

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -20,7 +19,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -28,7 +26,10 @@
             Func<IUserRepository> invalidDelegate = null;
 
             // Act
-            container.RegisterSingle<IUserRepository>(invalidDelegate);
+            Action action = () => container.RegisterSingle<IUserRepository>(invalidDelegate);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -68,7 +69,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
         public void RegisterSingleByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -76,11 +76,13 @@
             container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
 
             // Act
-            container.RegisterSingle<IUserRepository>(() => new InMemoryUserRepository());
+            Action action = () => container.RegisterSingle<IUserRepository>(() => new InMemoryUserRepository());
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
         public void RegisterSingleByFunc_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
@@ -88,11 +90,13 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
-            container.RegisterSingle<UserServiceBase>(() => new FakeUserService(null));
+            Action action = () => container.RegisterSingle<UserServiceBase>(() => new FakeUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
         public void RegisterSingleByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -101,11 +105,13 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
+            Action action = () => container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetInstance.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
         public void RegisterSingleByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -117,7 +123,10 @@
             var count = repositories.Count();
 
             // Act
-            container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
+            Action action = () => container.RegisterSingle<UserServiceBase>(() => new RealUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetAllInstances.");
         }
 
         [TestMethod]
@@ -275,7 +284,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByFuncNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
@@ -285,11 +293,13 @@
             Func<object> validInstanceCreator = () => new SqlUserRepository();
 
             // Act
-            container.RegisterSingle(invalidServiceType, validInstanceCreator);
+            Action action = () => container.RegisterSingle(invalidServiceType, validInstanceCreator);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByFuncNonGeneric_NullInstanceCreator_ThrowsException()
         {
             // Arrange
@@ -299,7 +309,10 @@
             Func<object> invalidInstanceCreator = null;
 
             // Act
-            container.RegisterSingle(validServiceType, invalidInstanceCreator);
+            Action action = () => container.RegisterSingle(validServiceType, invalidInstanceCreator);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
     }
 }

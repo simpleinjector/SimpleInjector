@@ -1,9 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
-    
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
     
     [TestClass]

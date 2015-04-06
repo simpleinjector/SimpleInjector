@@ -3,23 +3,23 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Advanced;
 
     [TestClass]
     public class DefaultConstructorInjectionBehaviorTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void BuildParameterExpression_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
             var behavior = new ContainerOptions().ConstructorInjectionBehavior;
 
             // Act
-            behavior.BuildParameterExpression(null);
+            Action action = () => behavior.BuildParameterExpression(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

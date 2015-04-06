@@ -3,6 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ContextualDecoratorExtensionsTests
@@ -24,7 +25,7 @@
             var instance = container.GetInstance<Consumer<ICommandHandler<RealCommand>>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance.Dependency, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), instance.Dependency);
         }
 
         [TestMethod]
@@ -44,7 +45,7 @@
             var instance = container.GetInstance<Consumer<ICommandHandler<RealCommand>>>();
 
             // Assert
-            Assert.IsInstanceOfType(instance.Dependency, typeof(NullCommandHandler<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), instance.Dependency);
         }
         
         [TestMethod]
@@ -68,8 +69,8 @@
             var cachedConsumer = container.GetInstance<CachedConsumer<ICommandHandler<RealCommand>>>();
 
             // Assert
-            Assert.IsInstanceOfType(consumer.Dependency, typeof(NullCommandHandler<RealCommand>));
-            Assert.IsInstanceOfType(cachedConsumer.Dependency, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), consumer.Dependency);
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), cachedConsumer.Dependency);
         }
 
         [TestMethod]
@@ -96,11 +97,11 @@
             var consumer = container.GetInstance<Consumer<ICommandHandler<RealCommand>>>();
 
             // Assert
-            Assert.IsInstanceOfType(consumer.Dependency, typeof(AnotherCommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(AnotherCommandHandlerDecorator<RealCommand>), consumer.Dependency);
 
             var decorator = consumer.Dependency as AnotherCommandHandlerDecorator<RealCommand>;
 
-            Assert.IsInstanceOfType(decorator.Decoratee, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), decorator.Decoratee);
         }
 
         [TestMethod]
@@ -128,13 +129,13 @@
             var cachedConsumer = container.GetInstance<CachedConsumer<ICommandHandler<RealCommand>>>();
 
             // Assert
-            Assert.IsInstanceOfType(consumer.Dependency, typeof(NullCommandHandler<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), consumer.Dependency);
 
-            Assert.IsInstanceOfType(cachedConsumer.Dependency, typeof(AnotherCommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(AnotherCommandHandlerDecorator<RealCommand>), cachedConsumer.Dependency);
 
             var decorator = cachedConsumer.Dependency as AnotherCommandHandlerDecorator<RealCommand>;
 
-            Assert.IsInstanceOfType(decorator.Decoratee, typeof(CommandHandlerDecorator<RealCommand>));
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), decorator.Decoratee);
         }
 
         [TestMethod]
@@ -246,7 +247,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void EnableContextualDecoratorSupport_RegisteredTwice_Fails()
         {
             // Arrange
@@ -255,7 +255,10 @@
             container.Options.EnableContextualDecoratorSupport();
 
             // Act
-            container.Options.EnableContextualDecoratorSupport();
+            Action action = () => container.Options.EnableContextualDecoratorSupport();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         public sealed class Consumer<TDependency>

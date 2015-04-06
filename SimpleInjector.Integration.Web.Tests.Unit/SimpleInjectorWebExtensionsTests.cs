@@ -60,7 +60,7 @@
                 var actualInstance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(actualInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), actualInstance);
             }
         }
 
@@ -322,31 +322,47 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTConcrete_WithNullArgument_ThrowsExpectedException()
         {
-            SimpleInjectorWebExtensions.RegisterPerWebRequest<ConcreteCommand>(null);
+            // Act
+            Action action = () =>
+                SimpleInjectorWebExtensions.RegisterPerWebRequest<ConcreteCommand>(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceTImplementation_WithNullArgument_ThrowsExpectedException()
         {
-            SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand, ConcreteCommand>(null);
+            // Act
+            Action action = () =>
+                SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand, ConcreteCommand>(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceFunc_WithNullContainerArgument_ThrowsExpectedException()
         {
-            SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand>(null, () => null);
+            // Act
+            Action action = () =>
+                SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand>(null, () => null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterLifetimeScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()
         {
-            SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand>(new Container(), null);
+            // Act
+            Action action = () =>
+                SimpleInjectorWebExtensions.RegisterPerWebRequest<ICommand>(new Container(), null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -411,11 +427,11 @@
                 ICommand instance = container.GetInstance<ICommand>();
 
                 // Assert
-                Assert.IsInstanceOfType(instance, typeof(CommandDecorator));
+                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
 
                 var decorator = (CommandDecorator)instance;
 
-                Assert.IsInstanceOfType(decorator.DecoratedInstance, typeof(ConcreteCommand));
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
             }
         }
 

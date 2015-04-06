@@ -505,8 +505,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Registration of an event after the container is locked is illegal.")]
         public void AddExpressionBuilding_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -518,12 +516,14 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ExpressionBuilding += (s, e) => { };
+            Action action = () => container.ExpressionBuilding += (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Registration of an event after the container is locked is illegal.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Removal of an event after the container is locked is illegal.")]
         public void RemoveExpressionBuilding_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -535,7 +535,11 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ResolveUnregisteredType -= (s, e) => { };
+            Action action = () => container.ResolveUnregisteredType -= (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Registration of an event after the container is locked is illegal.");
         }
 
         [TestMethod]
@@ -565,7 +569,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ExpressionBuildingEventArgsExpressionProperty_SetWithNullReference_ThrowsArgumentNullException()
         {
             // Arrange
@@ -576,7 +579,10 @@
                 Lifestyle.Transient);
 
             // Act
-            eventArgs.Expression = null;
+            Action action = () => eventArgs.Expression = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

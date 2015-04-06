@@ -1,6 +1,5 @@
 ﻿namespace SimpleInjector.Tests.Unit.Advanced
 {
-    using System;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

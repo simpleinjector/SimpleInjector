@@ -3,7 +3,6 @@ namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     
     /// <content>Tests for injecting properties.</content>
@@ -11,7 +10,6 @@ namespace SimpleInjector.Tests.Unit
     public partial class InjectPropertiesTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void InjectProperties_NullInstance_ThrowsExpectedException()
         {
             // Arrange
@@ -20,7 +18,10 @@ namespace SimpleInjector.Tests.Unit
             Service instance = null;
 
             // Act
-            container.InjectProperties(instance);
+            Action action = () => container.InjectProperties(instance);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

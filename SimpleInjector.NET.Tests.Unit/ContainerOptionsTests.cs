@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
@@ -14,14 +13,16 @@
     public class ContainerOptionsTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ContainerConstructor_SuppliedWithNullContainerOptionsArgument_ThrowsException()
         {
             // Arrange
             ContainerOptions invalidOptions = null;
 
             // Act
-            new Container(invalidOptions);
+            Action action = () => new Container(invalidOptions);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -257,7 +258,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringCollections()
         {
             // Arrange
@@ -266,17 +266,13 @@
                 AllowOverridingRegistrations = false
             });
 
-            try
-            {
-                container.RegisterAll<IUserRepository>(new SqlUserRepository());
-            }
-            catch
-            {
-                Assert.Fail("Test setup fail. This call was not expected to fail.");
-            }
+            container.RegisterAll<IUserRepository>(new SqlUserRepository());
 
             // Act
-            container.RegisterAll<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.RegisterAll<IUserRepository>(new InMemoryUserRepository());
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
@@ -337,14 +333,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorResolutionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.ConstructorResolutionBehavior = null;
+            Action action = () => options.ConstructorResolutionBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -423,14 +421,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.ConstructorInjectionBehavior = null;
+            Action action = () => options.ConstructorInjectionBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -480,14 +480,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void PropertyInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.PropertySelectionBehavior = null;
+            Action action = () => options.PropertySelectionBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -719,36 +721,42 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorVerificationBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.ConstructorVerificationBehavior = null;
+            Action action = () => options.ConstructorVerificationBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
         
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void PropertySelectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.PropertySelectionBehavior = null;
+            Action action = () => options.PropertySelectionBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void LifestyleSelectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
             var options = new ContainerOptions();
 
             // Act
-            options.LifestyleSelectionBehavior = null;
+            Action action = () => options.LifestyleSelectionBehavior = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         private static MemberInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)

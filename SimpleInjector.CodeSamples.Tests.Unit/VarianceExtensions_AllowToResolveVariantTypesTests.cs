@@ -5,6 +5,7 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     /// <summary>
     /// Variance Scenario 1: Single registration, single resolve.
@@ -35,11 +36,10 @@
             var handler = container.GetInstance<IEventHandler<CustomerMovedAbroadEvent>>();
 
             // Assert
-            Assert.IsInstanceOfType(handler, typeof(CustomerMovedEventHandler));
+            AssertThat.IsInstanceOfType(typeof(CustomerMovedEventHandler), handler);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_RequestingAnInvariantInterface_WillNotReturnTheRegisteredInstance()
         {
             // Arrange
@@ -49,7 +49,10 @@
                 new InvariantClass<CustomerMovedEvent>());
 
             // Act
-            container.GetInstance(typeof(IInvariantInterface<CustomerMovedAbroadEvent>));
+            Action action = () => container.GetInstance(typeof(IInvariantInterface<CustomerMovedAbroadEvent>));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]

@@ -50,7 +50,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "An exception was expected because the configuration is invalid without registering an IUserRepository.")]
         public void Verify_WithDependantTypeNotRegistered_ThrowsException()
         {
             // Arrange
@@ -60,11 +59,14 @@
             container.RegisterSingle<RealUserService>();
 
             // Act
-            container.Verify();
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "An exception was expected because the configuration is invalid without registering an IUserRepository.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_WithFailingFunc_ThrowsException()
         {
             // Arrange
@@ -75,7 +77,10 @@
             });
 
             // Act
-            container.Verify();
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
@@ -116,7 +121,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_FailingCollection_ThrowsException()
         {
             // Arrange
@@ -130,11 +134,13 @@
             container.RegisterAll<IUserRepository>(repositories);
 
             // Act
-            container.Verify();
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Verify_RegisterCalledWithFuncReturningNullInstances_ThrowsExpectedException()
         {
             // Arrange
@@ -143,7 +149,10 @@
             container.Register<IUserRepository>(() => null);
 
             // Act
-            container.Verify();
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
         }
         
         [TestMethod]

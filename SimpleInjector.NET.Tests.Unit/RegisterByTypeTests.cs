@@ -26,7 +26,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterByType_NullServiceType_ThrowsException()
         {
             // Arrange
@@ -36,11 +35,13 @@
             Type validImplementation = typeof(SqlUserRepository);
 
             // Act
-            container.Register(invalidServiceType, validImplementation);
+            Action action = () => container.Register(invalidServiceType, validImplementation);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterByType_NullImplementation_ThrowsException()
         {
             // Arrange
@@ -50,7 +51,10 @@
             Type invalidImplementation = null;
 
             // Act
-            container.Register(validServiceType, invalidImplementation);
+            Action action = () => container.Register(validServiceType, invalidImplementation);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]

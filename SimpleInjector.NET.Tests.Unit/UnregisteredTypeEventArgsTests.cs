@@ -2,14 +2,12 @@
 {
     using System;
     using System.Linq.Expressions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class UnregisteredTypeEventArgsTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -18,11 +16,13 @@
             Func<object> invalidFunc = null;
             
             // Act
-            e.Register(invalidFunc);
+            Action action = () => e.Register(invalidFunc);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterExpression_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -31,11 +31,13 @@
             Expression invalidExpression = null;
 
             // Act
-            e.Register(invalidExpression);
+            Action action = () => e.Register(invalidExpression);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterExpression_CalledTwice_ThrowsException()
         {
             // Arrange
@@ -44,11 +46,13 @@
             e.Register(Expression.Constant(null));
 
             // Act
-            e.Register(Expression.Constant(null));
+            Action action = () => e.Register(Expression.Constant(null));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterFunc_CalledTwice_ThrowsException()
         {
             // Arrange
@@ -57,11 +61,13 @@
             e.Register(() => null);
 
             // Act
-            e.Register(() => null);
+            Action action = () => e.Register(() => null);
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterExpression_CalledAfterCallingRegisterFun_ThrowsException()
         {
             // Arrange
@@ -70,11 +76,13 @@
             e.Register(() => null);
 
             // Act
-            e.Register(Expression.Constant(null));
+            Action action = () => e.Register(Expression.Constant(null));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void RegisterFunc_CalledAfterCallingRegisterExpression_ThrowsException()
         {
             // Arrange
@@ -83,7 +91,10 @@
             e.Register(Expression.Constant(null));
 
             // Act
-            e.Register(() => null);
+            Action action = () => e.Register(() => null);
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
     }
 }

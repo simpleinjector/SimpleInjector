@@ -21,7 +21,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByTypeNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
@@ -30,11 +29,13 @@
             Type invalidServiceType = null;
 
             // Act
-            container.RegisterSingle(invalidServiceType, typeof(SqlUserRepository));
+            Action action = () => container.RegisterSingle(invalidServiceType, typeof(SqlUserRepository));
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterSingleByTypeNonGeneric_NullImplementationType_ThrowsException()
         {
             // Arrange
@@ -43,7 +44,10 @@
             Type invalidImplementationType = null;
 
             // Act
-            container.RegisterSingle(typeof(IUserRepository), invalidImplementationType);
+            Action action = () => container.RegisterSingle(typeof(IUserRepository), invalidImplementationType);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -65,14 +69,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
         public void RegisterSingleByTypeNonGeneric_InstanceThatDoesNotImplementServiceType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterSingle(typeof(IUserRepository), typeof(object));
+            Action action = () => container.RegisterSingle(typeof(IUserRepository), typeof(object));
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]

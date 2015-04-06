@@ -8,6 +8,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Diagnostics.Tests.Unit.Helpers;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Tests.Unit;
 
     public interface IGenericPlugin<T> 
     {

@@ -1,25 +1,25 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class UnregisteredTypeTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.GetInstance<IUserRepository>();
+            Action action = () => container.GetInstance<IUserRepository>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType2_ThrowsException()
         {
             // Arrange
@@ -29,11 +29,13 @@
             container.GetRegistration(typeof(IUserRepository));
 
             // Act
-            container.GetInstance<IUserRepository>();
+            Action action = () => container.GetInstance<IUserRepository>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredAbstractType3_ThrowsException()
         {
             // Arrange
@@ -42,18 +44,23 @@
             container.GetRegistration(typeof(IUserRepository));
 
             // Act
-            container.GetInstance(typeof(IUserRepository));
+            Action action = () => container.GetInstance(typeof(IUserRepository));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_UnregisteredValueType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            container.GetInstance(typeof(int));
+            Action action = () => container.GetInstance(typeof(int));
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]

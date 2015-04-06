@@ -3,10 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Tests.Unit;
         
     [TestClass]
     public class TypeGeneralizerTests

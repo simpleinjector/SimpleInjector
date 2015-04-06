@@ -4,9 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+ 
     [TestClass]
     public class ResolveUnregisteredTypeEventTests
     {
@@ -164,8 +163,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Registration of an event after the container is locked is illegal.")]
         public void AddResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -177,12 +174,14 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ResolveUnregisteredType += (s, e) => { };
+            Action action = () => container.ResolveUnregisteredType += (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Registration of an event after the container is locked is illegal.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException),
-            "Removal of an event after the container is locked is illegal.")]
         public void RemoveResolveUnregisteredType_AfterContainerHasBeenLocked_ThrowsAnException()
         {
             // Arrange
@@ -194,7 +193,11 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.ResolveUnregisteredType -= (s, e) => { };
+            Action action = () => container.ResolveUnregisteredType -= (s, e) => { };
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Removal of an event after the container is locked is illegal.");
         }
 
         [TestMethod]

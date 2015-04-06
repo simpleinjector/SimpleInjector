@@ -10,7 +10,6 @@
     public class RegisterByFuncTests
     {
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
         public void RegisterByFunc_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
@@ -18,11 +17,13 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
-            container.Register<UserServiceBase>(() => new FakeUserService(null));
+            Action action = () => container.Register<UserServiceBase>(() => new FakeUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "A certain type can only be registered once.")]
         public void RegisterByFunc_CalledAfterRegisterSingleOnSameType_ThrowsException()
         {
             // Arrange
@@ -30,11 +31,13 @@
             container.RegisterSingle<IUserRepository>(new SqlUserRepository());
 
             // Act
-            container.Register<IUserRepository>(() => new InMemoryUserRepository());
+            Action action = () => container.Register<IUserRepository>(() => new InMemoryUserRepository());
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetInstance.")]
         public void RegisterByFunc_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -43,11 +46,13 @@
             container.GetInstance<IUserRepository>();
 
             // Act
-            container.Register<UserServiceBase>(() => new RealUserService(null));
+            Action action = () => container.Register<UserServiceBase>(() => new RealUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetInstance.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The container should get locked after a call to GetAllInstances.")]
         public void RegisterByFunc_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
@@ -59,11 +64,13 @@
             var count = repositories.Count();
 
             // Act
-            container.Register<UserServiceBase>(() => new RealUserService(null));
+            Action action = () => container.Register<UserServiceBase>(() => new RealUserService(null));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetAllInstances.");
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterByFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
@@ -72,11 +79,13 @@
             Func<IUserRepository> invalidInstanceCreator = null;
 
             // Act
-            container.Register<IUserRepository>(invalidInstanceCreator);
+            Action action = () => container.Register<IUserRepository>(invalidInstanceCreator);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void GetInstance_RegisteredWithFuncReturningNull_ThrowsException()
         {
             // Arrange
@@ -84,7 +93,10 @@
             container.Register<IUserRepository>(() => null);
 
             // Act
-            container.GetInstance<IUserRepository>();
+            Action action = () => container.GetInstance<IUserRepository>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
         
         [TestMethod]
@@ -208,7 +220,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RegisterByFunc_NullInstanceCreator_ThrowsException()
         {
             // Arrange
@@ -218,7 +229,10 @@
             Func<object> invalidInstanceCreator = null;
 
             // Act
-            container.Register(validServiceType, invalidInstanceCreator);
+            Action action = () => container.Register(validServiceType, invalidInstanceCreator);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
         }
     }
 }

@@ -4,6 +4,7 @@
     using System.Configuration;
     using System.Data.SqlClient;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ParameterConventionExtensionsTests
@@ -318,7 +319,6 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ActivationException))]
         public void OptionalParameterConvention_TypeWithRequiredDependencyAndDependencyNotRegistered_ThrowsException()
         {
             // Arrange
@@ -328,7 +328,10 @@
                 new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
 
             // Act
-            container.GetInstance<TypeWithRequiredDependency<IDisposable>>();
+            Action action = () => container.GetInstance<TypeWithRequiredDependency<IDisposable>>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
