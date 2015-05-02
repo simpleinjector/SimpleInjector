@@ -430,29 +430,6 @@
         }
 
         [TestMethod]
-        public void Equals_TwoInstanceInitializationContextWithNullRegistrationAndSameInstance_AreConsideredEqual()
-        {
-            // Arrange
-            object instance = new object();
-            var a = new InstanceInitializationData(null, instance);
-            var b = new InstanceInitializationData(null, instance);
-
-            // Assert
-            Assert.AreEqual(a, b);
-        }
-
-        [TestMethod]
-        public void Equals_TwoInstanceInitializationContextWithNullRegistrationDifferentInstances_AreNotConsideredEqual()
-        {
-            // Arrange
-            var a = new InstanceInitializationData(null, new object());
-            var b = new InstanceInitializationData(null, new object());
-
-            // Assert
-            Assert.AreNotEqual(a, b);
-        }
-
-        [TestMethod]
         public void Equals_TwoInstanceInitializationContextWithSameInstanceButDifferentRegistrations_AreNotConsideredEqual()
         {
             // Arrange

@@ -1371,7 +1371,13 @@ namespace SimpleInjector
         {
             this.externalProducers.Remove(producer);
         }
-
+	 
+ 	    internal void RegisterResolveInterceptor(ResolveInterceptor interceptor,
+ 	        Predicate<InitializationContext> predicate)
+ 	    {
+ 	        this.resolveInterceptors.Add(new ContextualResolveInterceptor(interceptor, predicate));
+ 	    }
+ 	  
         internal void ThrowWhenContainerIsLocked()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'

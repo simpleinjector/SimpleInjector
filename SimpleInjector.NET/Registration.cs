@@ -96,6 +96,10 @@ namespace SimpleInjector
         /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
         public Lifestyle Lifestyle { get; private set; }
 
+        /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
+ 	    /// <value>The <see cref="Container"/> instance for this registration.</value>
+ 	    public Container Container { get; private set; } 
+
         internal bool IsCollection { get; set; }
 
         internal virtual bool MustBeVerified
@@ -106,10 +110,6 @@ namespace SimpleInjector
         /// <summary>Gets or sets a value indicating whether this registration object contains a user 
         /// supplied instanceCreator factory delegate.</summary>
         internal bool WrapsInstanceCreationDelegate { get; set; }
-
-        /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
-        /// <value>The <see cref="Container"/> instance for this registration.</value>
-        protected internal Container Container { get; private set; }
 
         /// <summary>
         /// Builds a new <see cref="Expression"/> with the correct caching (according to the specifications of

@@ -29,6 +29,16 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
 
+    /// <summary>
+    /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and 
+    /// <see cref="InstanceProducer.GetInstance"/>.
+    /// </summary>
+    /// <param name="context">Contextual information about the to be created object.</param>
+    /// <param name="instanceProducer">A delegate that produces the actual instance according to its
+    /// lifestyle settings.</param>
+    /// <returns>The instance that is returned from <paramref name="instanceProducer"/> or an intercepted instance.</returns>
+    public delegate object ResolveInterceptor(InitializationContext context, Func<object> instanceProducer);
+    
     /// <summary>Configuration options for the <see cref="Container"/>.</summary>
     /// <example>
     /// The following example shows the typical usage of the <b>ContainerOptions</b> class.
@@ -56,7 +66,7 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
-        
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorVerificationBehavior verificationBehavior;
 
@@ -68,7 +78,7 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ILifestyleSelectionBehavior lifestyleBehavior;
-        
+
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         public ContainerOptions()
         {
@@ -222,7 +232,7 @@ namespace SimpleInjector
         /// <value>The current <see cref="Container"/>.</value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Container Container { get; internal set; }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation. 
         /// By default, this value is <b>true</b> for the first few containers that are created in an app 
@@ -295,7 +305,7 @@ namespace SimpleInjector
                 {
                     descriptions.Add("Custom Lifestyle Selection");
                 }
-                
+
                 if (descriptions.Count == 0)
                 {
                     descriptions.Add("Default Configuration");
@@ -304,6 +314,60 @@ namespace SimpleInjector
                 return string.Join(", ", descriptions);
             }
         }
+
+        /// <summary>
+ 	    /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to
+ 	    /// <see cref="SimpleInjector.Container.GetInstance">GetInstance</see> and 
+ 	    /// <see cref="InstanceProducer.GetInstance()"/>.
+ 	    /// </summary>
+ 	    /// <remarks>
+ 	    /// If multiple registered <see cref="ResolveInterceptor"/> instances must be applied, they will be
+ 	    /// applied/wrapped in the order of registration, i.e. the first registered interceptor will call the 
+ 	    /// original instance producer delegate, the second interceptor will call the first interceptor, etc. 
+ 	    /// The last registered interceptor will become the outermost method in the chain and will be called 
+ 	    /// first.
+ 	    /// </remarks>
+ 	    /// <param name="interceptor">The <see cref="ResolveInterceptor"/> delegate to register.</param>
+ 	    /// <param name="predicate">The predicate that will be used to check whether the given delegate must
+ 	    /// be applied to a registration or not. The given predicate will be called once for each registration
+ 	    /// in the container.</param>
+ 	    /// <exception cref="ArgumentNullException">
+ 	    /// Thrown when either the <paramref name="interceptor"/> or <paramref name="predicate"/> are 
+ 	    /// null references.
+ 	    /// </exception>
+ 	    /// <exception cref="InvalidOperationException">
+ 	    /// Thrown when this container instance is locked and can not be altered.
+ 	    /// </exception>
+ 	    /// <example>
+ 	    /// The following example shows the usage of the <see cref="RegisterResolveInterceptor" /> method:
+ 	    /// <code lang="cs"><![CDATA[
+ 	    /// var container = new Container();
+ 	    /// 
+ 	    /// container.Options.RegisterResolveInterceptor((context, producer) =>
+ 	    ///     {
+ 	    ///         object instance = producer.Invoke();
+ 	    ///         Console.WriteLine(instance.GetType().Name + " resolved for " + context.Producer.ServiceType.Name);
+ 	    ///         return instance;
+ 	    ///     },
+ 	    ///     context => context.Producer.ServiceType.Name.EndsWith("Controller"));
+ 	    ///     
+ 	    /// container.Register<IHomeViewModel, HomeViewModel>();
+ 	    /// container.Register<IUserRepository, SqlUserRepository>();
+ 	    /// 
+ 	    /// // This line will write "HomeViewModel resolved for IHomeViewModel" to the console.
+ 	    /// container.GetInstance<IHomeViewModel>();
+ 	    /// ]]></code>
+ 	    /// </example>
+ 	    public void RegisterResolveInterceptor(ResolveInterceptor interceptor,
+ 	        Predicate<InitializationContext> predicate)
+ 	    {
+ 	        Requires.IsNotNull(interceptor, "interceptor");
+ 	        Requires.IsNotNull(predicate, "predicate");
+ 	 
+ 	        this.Container.ThrowWhenContainerIsLocked();
+ 	 
+ 	        this.Container.RegisterResolveInterceptor(interceptor, predicate);
+ 	    }
 
         internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)
         {

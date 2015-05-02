@@ -35,7 +35,7 @@ namespace SimpleInjector
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Lifestyles;
-    
+
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
     /// </summary>
@@ -66,20 +66,21 @@ namespace SimpleInjector
 
         private readonly object locker = new object();
         private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
+        private readonly List<ContextualResolveInterceptor> resolveInterceptors = new List<ContextualResolveInterceptor>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
-        private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
+        private readonly ConditionalHashSet<InstanceProducer> externalProducers =
             new ConditionalHashSet<InstanceProducer>();
 
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
-        
+
         private readonly Dictionary<Type, ContainerControlledCollectionResolver> registerAllResolvers =
             new Dictionary<Type, ContainerControlledCollectionResolver>();
-        
-        private Dictionary<Type, InstanceProducer> producers = 
+
+        private Dictionary<Type, InstanceProducer> producers =
             new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
 
         private Dictionary<Type, PropertyInjector> propertyInjectorCache = new Dictionary<Type, PropertyInjector>();
@@ -116,7 +117,7 @@ namespace SimpleInjector
                 throw new ArgumentException(StringResources.ContainerOptionsBelongsToAnotherContainer(),
                     "options");
             }
-            
+
             options.Container = this;
             this.Options = options;
 
@@ -357,7 +358,7 @@ namespace SimpleInjector
             }
         }
 
-        internal Expression OnExpressionBuilding(Registration registration, Type serviceType, 
+        internal Expression OnExpressionBuilding(Registration registration, Type serviceType,
             Type implementationType, Expression instanceCreatorExpression)
         {
             if (this.expressionBuilding != null)
@@ -387,7 +388,7 @@ namespace SimpleInjector
         {
             if (this.expressionBuilt != null)
             {
-                var relationships = 
+                var relationships =
                     new KnownRelationshipCollection(instanceProducer.GetRelationships().ToList());
 
                 e.KnownRelationships = relationships;
@@ -417,7 +418,62 @@ namespace SimpleInjector
             }
         }
 
+        internal Func<object> WrapWithResolveInterceptor(InitializationContext context, Func<object> producer)
+        {
+            ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
+
+            foreach (var interceptor in interceptors)
+            {
+                producer = ApplyResolveInterceptor(interceptor, context, producer);
+            }
+
+            return producer;
+        }
+
+        private static Func<object> ApplyResolveInterceptor(ResolveInterceptor interceptor,
+            InitializationContext context, Func<object> wrappedProducer)
+        {
+            return () => ThrowWhenResolveInterceptorReturnsNull(interceptor(context, wrappedProducer));
+        }
+
         static partial void GetStackTrace(ref string stackTrace);
+
+        private static object ThrowWhenResolveInterceptorReturnsNull(object instance)
+        {
+            if (instance == null)
+            {
+                throw new ActivationException(StringResources.ResolveInterceptorDelegateReturnedNull());
+            }
+
+            return instance;
+        }
+
+        private ResolveInterceptor[] GetResolveInterceptorsFor(InitializationContext context)
+        {
+            if (!this.resolveInterceptors.Any())
+            {
+                return new ResolveInterceptor[0];
+            }
+
+            return (
+                from resolveInterceptor in this.resolveInterceptors
+                where resolveInterceptor.Predicate(context)
+                select resolveInterceptor.Interceptor)
+                .ToArray();
+        }
+
+        private sealed class ContextualResolveInterceptor
+        {
+            public readonly ResolveInterceptor Interceptor;
+            public readonly Predicate<InitializationContext> Predicate;
+
+            public ContextualResolveInterceptor(ResolveInterceptor interceptor,
+                Predicate<InitializationContext> predicate)
+            {
+                this.Interceptor = interceptor;
+                this.Predicate = predicate;
+            }
+        }
 
         private sealed class TypedInstanceInitializer : IInstanceInitializer
         {

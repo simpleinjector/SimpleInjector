@@ -10,25 +10,27 @@ Version vNext
 		 developers are used to. (work item 21011).
 		-[Core/Diagnostics] Diagnostic warnings can now be suppressed per individual registration, by calling
 		 Registration.SuppressDiagnosticWarning() (work item 21016).
-		-[Core/Diagnostics] 'Ambiguous Lifestyles' diagnostic warning added. (work item 20997).
+		-[Core/Diagnostics] 'Ambiguous Lifestyles' diagnostic warning added (work item 20997). 
 		-[Core/Diagnostics] An overload to Verify() has been added that allows supplying a VerificationOption
 		 that allows forcing throwing an exception in case of a diagnostic warning (related to work item 20999).
+		-[Core] Options.RegisterResolveInterceptor added to allow intercepting the creation of directly 
+	     resolved types (work item 33). 
 
 	Bug fixes:
+ 	    -[Core/Diagnostics] DisposableTransientComponentDiagnosticResult.Registration was always null.
+ 	    -[Core] Disallowed accidental mixed registrations of collections using different RegisterXXX overloads
+ 	     (work item 21004).
+ 	    -[Core/Diagnostics] Torn lifestyle warning was incorrectly reported in case of decorator (work item 24). 
 		-[Mvc] The Disposable Transient Components diagnostic warning is now suppressed on registration for
 		 controllers made with the RegisterMvcControllers() extension method (work item 21006).
 		-[WebApi] The Disposable Transient Components diagnostic warning is now suppressed on registration for
 		 controllers made with the RegisterWebApiControllers() extension method  (work item 21006).
-		-[Core/Diagnostics] DisposableTransientComponentDiagnosticResult.Registration was always null.
-		-[Core] Disallowed accidental mixed registrations of collections using different RegisterXXX overloads
-		 (work item 21004).
-		-[Core/Diagnostics] Torn lifestyle warning was incorrectly reported in case of decorator (work item 24). 
 
 	Improvements/Changes:
+		-[Core/Diagnostics] SimpleInjector.Diagnostics.dll merged with core library (work item 21008). 
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 
 		 context scope in case there is no active scope yet (work item 21015).
-		-[Core/Diagnostics] SimpleInjector.Diagnostics.dll merged with core library (work item 21008).
-		-pWebApi] SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been made obsolete (work
+		-[WebApi] SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been made obsolete (work
 		 item 21017).
 
 	Project Changes:

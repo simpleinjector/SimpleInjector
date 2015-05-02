@@ -85,6 +85,7 @@ namespace SimpleInjector
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;
+        private readonly InitializationContext initializationContext;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
@@ -108,10 +109,10 @@ namespace SimpleInjector
 
             this.ServiceType = serviceType;
             this.Registration = registration;
-
             this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
             this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
+            this.initializationContext = new InitializationContext(this, registration);
 
             if (registerExternalProducer)
             {
@@ -142,6 +143,11 @@ namespace SimpleInjector
         internal Type ImplementationType
         {
             get { return this.Registration.ImplementationType ?? this.ServiceType; }
+        }
+
+        internal InitializationContext InitializationContext
+        {
+            get { return this.initializationContext; }
         }
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
@@ -249,9 +255,7 @@ namespace SimpleInjector
 
             try
             {
-                var expression = this.lazyExpression.Value;
-
-                return expression;
+                return this.lazyExpression.Value;
             }
             catch (Exception ex)
             {
@@ -431,7 +435,9 @@ namespace SimpleInjector
 
             try
             {
-                return CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression);
+                return this.Registration.Container.WrapWithResolveInterceptor(
+                    this.initializationContext,
+                        CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression));
             }
             catch (Exception ex)
             {

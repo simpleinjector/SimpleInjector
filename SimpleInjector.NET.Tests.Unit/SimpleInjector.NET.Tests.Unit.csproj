@@ -155,6 +155,7 @@
     <Compile Include="RegisterByTypeTests.cs" />
     <Compile Include="RegisterConcreteTests.cs" />
     <Compile Include="RegisterInitializerTests.cs" />
+    <Compile Include="RegisterResolveInterceptorTests.cs" />
     <Compile Include="RegisterSingleByFuncTests.cs" />
     <Compile Include="RegisterSingleByGenericArgumentTests.cs" />
     <Compile Include="RegisterSingleByInstanceTests.cs" />

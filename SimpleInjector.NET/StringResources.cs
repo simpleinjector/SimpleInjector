@@ -56,6 +56,11 @@ namespace SimpleInjector
                 "The registered delegate for type {0} returned null.", serviceType.ToFriendlyName());
         }
 
+        internal static string ResolveInterceptorDelegateReturnedNull()
+	    {
+ 	        return "The delegate that was registered using 'RegisterResolveInterceptor' returned null.";
+	    }
+
         internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType,
             Expression expression, Exception exception)
         {
