@@ -9,6 +9,14 @@
     using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Tests.Unit;
 
+    public static class RegistrationExtensions
+    {
+        public static void SuppressDiagnosticWarning(this Registration registration, DiagnosticType type)
+        {
+            registration.SuppressDiagnosticWarning(type, "Some random justification that we don't care about.");
+        }
+    }
+
     [TestClass]
     public class DisposableTransientComponentsTests
     {
@@ -30,7 +38,7 @@
             Assert.AreEqual(1, results.Length, Actual(results));
             Assert.AreEqual(
                 "DisposablePlugin is registered as transient, but implements IDisposable.",
-                results.Single().Description, 
+                results.Single().Description,
                 Actual(results));
         }
 

@@ -160,8 +160,17 @@ namespace SimpleInjector
         /// Suppressing the supplied <see cref="DiagnosticType"/> for the given registration.
         /// </summary>
         /// <param name="type">The <see cref="DiagnosticType"/>.</param>
-        public void SuppressDiagnosticWarning(DiagnosticType type)
-        {
+ 	    /// <param name="justification">The justification of why the warning must be suppressed.</param>
+ 	    /// <exception cref="ArgumentNullException">Thrown when <paramref name="justication"/> is a null 
+ 	    /// reference.</exception>
+ 	    /// <exception cref="ArgumentException">Thrown when either <paramref name="justification"/> is an
+ 	    /// empty string or when <paramref name="type"/> is not a valid value of <see cref="DiagnosticType"/>.
+ 	    /// </exception>
+ 	    public void SuppressDiagnosticWarning(DiagnosticType type, string justification)
+ 	    {
+ 	        Requires.IsValidEnum(type, "type");
+ 	        Requires.IsNotNullOrEmpty(justification, "justification");
+ 	  
             if (this.suppressions == null)
             {
                 this.suppressions = new HashSet<DiagnosticType>();

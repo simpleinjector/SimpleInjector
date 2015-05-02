@@ -54,7 +54,7 @@ namespace SimpleInjector
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
         [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " +
-            "release. Consider using RegisterMvcIntegratedFilterProvider instead. " + 
+            "release. Consider using RegisterMvcIntegratedFilterProvider instead. " +
             "See https://simpleinjector.org/depr2",
             error: false)]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
@@ -131,9 +131,9 @@ namespace SimpleInjector
             {
                 Registration registration = Lifestyle.Transient.CreateRegistration(controllerType, container);
 
-                // Suppress the Disposable Transient Component warning, because MVC's controller factory
-                // ensures correct disposal of controllers.
-                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent);
+                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
+                    justification:
+                        "MVC's DefaultControllerFactory disposes the controller when the web request ends.");
 
                 container.AddRegistration(controllerType, registration);
             }
