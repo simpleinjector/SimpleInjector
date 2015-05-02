@@ -161,7 +161,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="type">The <see cref="DiagnosticType"/>.</param>
  	    /// <param name="justification">The justification of why the warning must be suppressed.</param>
- 	    /// <exception cref="ArgumentNullException">Thrown when <paramref name="justication"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="justification"/> is a null  
  	    /// reference.</exception>
  	    /// <exception cref="ArgumentException">Thrown when either <paramref name="justification"/> is an
  	    /// empty string or when <paramref name="type"/> is not a valid value of <see cref="DiagnosticType"/>.
