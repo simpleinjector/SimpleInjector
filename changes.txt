@@ -1,7 +1,7 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version 2.8 (v2.8.0 RTM) 
 
 	New Features:
 		-[Core] Container.IsVerifying property added to allow checking if the container is currently verifying
