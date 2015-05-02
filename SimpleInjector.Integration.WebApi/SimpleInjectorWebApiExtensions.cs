@@ -279,12 +279,15 @@ namespace SimpleInjector
             {
                 Registration registration = Lifestyle.Transient.CreateRegistration(controllerType, container);
 
-                // Suppress the Disposable Transient Component warning, because Web API's controller factory
-                // ensures correct disposal of controllers.
-                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
-                    justification:
-                        "Web API registers controllers for disposal when the request ends during the " +
-                        "call to ApiController.ExecuteAsync."); 
+                if (typeof(ApiController).IsAssignableFrom(controllerType))
+                {
+                    // Suppress the Disposable Transient Component warning, because Web API's controller factory
+                    // ensures correct disposal of controllers.
+                    registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
+                        justification:
+                            "Web API registers controllers for disposal when the request ends during the " +
+                            "call to ApiController.ExecuteAsync.");
+                }
 
                 container.AddRegistration(controllerType, registration);
             }
