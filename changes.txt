@@ -22,6 +22,7 @@ Version vNext
 		-[Core/Diagnostics] DisposableTransientComponentDiagnosticResult.Registration was always null.
 		-[Core] Disallowed accidental mixed registrations of collections using different RegisterXXX overloads
 		 (work item 21004).
+		-[Core/Diagnostics] Torn lifestyle warning was incorrectly reported in case of decorator (work item 24). 
 
 	Improvements/Changes:
 		-[WebApi] SimpleInjectorWebApiDependencyResolver.BeginScope will now only create a new execution 

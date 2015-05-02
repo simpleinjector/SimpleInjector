@@ -30,6 +30,7 @@ namespace SimpleInjector.Extensions.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles; 
 
     // This class allows decorating collections of services with elements that are created out of the control
     // of the container. Collections are registered using the following methods:
@@ -69,8 +70,13 @@ namespace SimpleInjector.Extensions.Decorators
             // have defined.
             var expression = Expression.Constant(null, this.registeredServiceType);
 
-            this.Context = this.CreatePredicateContext(this.e.InstanceProducer, this.registeredServiceType, 
-                expression, Lifestyle.Unknown);
+ 	        var registration = new ExpressionRegistration(expression, this.registeredServiceType,
+ 	            Lifestyle.Unknown, this.Container);
+ 	 
+ 	        registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
+ 	 
+ 	        this.Context = this.CreatePredicateContext(this.e.InstanceProducer, registration,
+ 	            this.registeredServiceType, expression); 
 
             return this.SatisfiesPredicate(this.Context);
         }
@@ -92,8 +98,13 @@ namespace SimpleInjector.Extensions.Decorators
 
         internal void ApplyDecorator()
         {
-            var serviceTypeInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer, 
-                this.registeredServiceType, Lifestyle.Unknown);
+ 	        var registration = new ExpressionRegistration(this.e.Expression, this.registeredServiceType, 
+ 	            Lifestyle.Unknown, this.Container);
+ 	 
+ 	        registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
+ 	            
+ 	        var serviceTypeInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer,
+ 	            registration, this.registeredServiceType); 
             
             Registration decoratorRegistration;
             

@@ -324,6 +324,29 @@
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
         }
+        
+ 	    // This was a bug reported here: https://github.com/simpleinjector/SimpleInjector/issues/24
+ 	    [TestMethod]
+ 	    public void Analyze_TwoRegistrationsForTheSameImplementationMadeWithTheSameRegistrationInstanceWrappedBySingletonDecorators_DoesNotReturnsAWarning()
+ 	    {
+ 	        // Arrange
+ 	        var container = new Container();
+ 	 
+ 	        var reg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+ 	 
+ 	        container.AddRegistration(typeof(IFoo), reg);
+ 	        container.AddRegistration(typeof(IBar), reg);
+ 	 
+ 	        container.RegisterDecorator(typeof(IBar), typeof(BarDecorator), Lifestyle.Singleton);
+ 	 
+ 	        container.Verify();
+ 	 
+ 	        // Act
+ 	        var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+ 	 
+ 	        // Assert
+ 	        Assert.AreEqual(0, results.Length, Actual(results));
+ 	    } 	  
 
         [TestMethod]
         public void Analyze_ConfigurationWithViolation_ReturnsTheExpectedDebuggerViewItems()

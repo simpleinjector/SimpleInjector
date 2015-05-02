@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Text;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -98,6 +97,11 @@ namespace SimpleInjector
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
         public InstanceProducer(Type serviceType, Registration registration)
+            : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
+        {
+        }
+
+        internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registration, "registration");
@@ -109,13 +113,7 @@ namespace SimpleInjector
 
             this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
 
-            // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
-            // of registration doesn't have to be registered, since it will either always be registered
-            // in the registrations dictionary anyway, or it is used to build up an InstanceProducer (by
-            // the decorator sub system) that is only used for diagnostics. Allowing the latter producers to
-            // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
-            // producers needlessly.
-            if (!(registration is ExpressionRegistration))
+            if (registerExternalProducer)
             {
                 registration.Container.RegisterExternalProducer(this);
             }
@@ -320,7 +318,7 @@ namespace SimpleInjector
         {
             var visualizedDependencies =
                 from relationship in this.GetRelationships()
-                select Environment.NewLine + 
+                select Environment.NewLine +
                     relationship.Dependency.VisualizeIndentedObjectGraph(indentingDepth + 1);
 
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
@@ -333,7 +331,7 @@ namespace SimpleInjector
         {
             string implementationName = this.ImplementationType.ToFriendlyName();
 
-            var visualizedDependencies = 
+            var visualizedDependencies =
                 this.VisualizeInlinedDependencies(maxLength - implementationName.Length - 2);
 
             return string.Format(CultureInfo.InvariantCulture, "{0}({1})",
@@ -461,10 +459,11 @@ namespace SimpleInjector
 
             e.Lifestyle = this.Lifestyle;
             e.InstanceProducer = this;
+            e.ReplacedRegistration = this.Registration;
 
             this.Registration.Container.OnExpressionBuilt(e, this);
 
-            if (e.ReplacedRegistration != null)
+            if (!object.ReferenceEquals(this.Registration, e.ReplacedRegistration))
             {
                 this.Registration = e.ReplacedRegistration;
             }
@@ -560,6 +559,17 @@ namespace SimpleInjector
             {
                 yield return "...";
             }
+        }
+
+        private static bool ShouldBeRegisteredAsAnExternalProducer(Registration registration)
+        {
+            // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
+            // of registration doesn't have to be registered, since it will either always be registered
+            // in the registrations dictionary anyway, or it is used to build up an InstanceProducer (by
+            // the decorator sub system) that is only used for diagnostics. Allowing the latter producers to
+            // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
+            // producers needlessly.   
+            return !(registration is ExpressionRegistration);
         }
 
         internal sealed class InstanceProducerDebugView

@@ -114,11 +114,13 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
         {
-            return this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.RegisteredServiceType, e.Lifestyle);
+            return this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.ReplacedRegistration,
+                e.RegisteredServiceType);
         }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            InstanceProducer registeredProducer, Type registeredServiceType, Lifestyle lifestyle)
+            InstanceProducer registeredProducer, Registration originalRegistration,
+            Type registeredServiceType)
         {
             // registeredProducer.ServiceType and registeredServiceType are different when called by 
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
@@ -129,12 +131,8 @@ namespace SimpleInjector.Extensions.Decorators
                 // registeredProducer here, since the lifestyle of the original producer can change after
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
-                var registration = 
-                    new ExpressionRegistration(originalExpression, implementationType, lifestyle, this.Container);
-
-                registration.ReplaceRelationships(registeredProducer.GetRelationships());
-
-                return new InstanceProducer(registeredServiceType, registration);
+                return new InstanceProducer(registeredServiceType, originalRegistration,
+                    registerExternalProducer: false); 
             };
 
             return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
@@ -164,7 +162,7 @@ namespace SimpleInjector.Extensions.Decorators
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
             Expression decorateeExpression, InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
         {
-            var overriddenParameters = this.CreateOverriddenParameters(serviceType, decoratorConstructor, 
+            var overriddenParameters = this.CreateOverriddenParameters(serviceType, decoratorConstructor,
                 decorateeExpression, realProducer, info);
 
             return this.Lifestyle.CreateRegistration(serviceType,
@@ -187,14 +185,15 @@ namespace SimpleInjector.Extensions.Decorators
 
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
-            return this.CreatePredicateContext(e.InstanceProducer, e.RegisteredServiceType, e.Expression, 
-                e.Lifestyle);
+            return this.CreatePredicateContext(e.InstanceProducer, e.ReplacedRegistration, 
+                e.RegisteredServiceType, e.Expression); 
         }
 
         protected DecoratorPredicateContext CreatePredicateContext(InstanceProducer registeredProducer,
-            Type registeredServiceType, Expression expression, Lifestyle lifestyle)
+            Registration originalRegistration, Type registeredServiceType, Expression expression) 
         {
-            var info = this.GetServiceTypeInfo(expression, registeredProducer, registeredServiceType, lifestyle);
+            var info = this.GetServiceTypeInfo(expression, registeredProducer, originalRegistration,
+                registeredServiceType); 
 
             // NOTE: registeredServiceType can be different from registeredProducer.ServiceType.
             // This is the case for container uncontrolled collections where producer.ServiceType is the
@@ -210,8 +209,8 @@ namespace SimpleInjector.Extensions.Decorators
                 this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
                 null;
         }
-        
-        protected static ParameterInfo GetDecorateeParameter(Type serviceType, 
+
+        protected static ParameterInfo GetDecorateeParameter(Type serviceType,
             ConstructorInfo decoratorConstructor)
         {
             // Although we partly check for duplicate arguments during registration phase, we must do it here
@@ -228,7 +227,7 @@ namespace SimpleInjector.Extensions.Decorators
                 throw new ActivationException(
                     StringResources.TypeDependsOnItself(decoratorConstructor.DeclaringType));
             }
-            
+
             return parameters.Single();
         }
 
@@ -242,8 +241,8 @@ namespace SimpleInjector.Extensions.Decorators
 
             return new InstanceProducer(parameter.ParameterType, registration);
         }
-        
-        private static void AddVerifierForDecorateeFactoryDependency(Expression decorateeExpression, 
+
+        private static void AddVerifierForDecorateeFactoryDependency(Expression decorateeExpression,
             InstanceProducer producer)
         {
             // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as 
@@ -274,7 +273,7 @@ namespace SimpleInjector.Extensions.Decorators
             var decorateeOverriddenParameter =
                 new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
 
-            IEnumerable<OverriddenParameter> predicateContextOverriddenParameters = 
+            IEnumerable<OverriddenParameter> predicateContextOverriddenParameters =
                 this.CreateOverriddenDecoratorContextParameters(decoratorConstructor, currentProducer);
 
             var overriddenParameters = (new[] { decorateeOverriddenParameter })
@@ -299,7 +298,7 @@ namespace SimpleInjector.Extensions.Decorators
 
             return () => instanceCreator();
         }
-        
+
         // The constructor parameter in which the decorated instance should be injected.
         private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
             Type serviceType, Expression expression)
