@@ -29,6 +29,26 @@ namespace SimpleInjector.Integration.WebApi
     using System.Web.Http.Dependencies;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
+    /// <summary>
+    /// Provides additional options for creating the <see cref="SimpleInjectorWebApiDependencyResolver"/>.
+    /// </summary>
+    public enum DependencyResolverScopeOption
+    {
+        /// <summary>
+        /// When <see cref="IDependencyResolver.BeginScope"/> is called, an ambient 
+        /// <see cref="ExecutionContextScopeLifestyle"/> scope is used, if one already exists. Otherwise, it 
+        /// creates a new <see cref="ExecutionContextScopeLifestyle"/> scope before returning. 
+        /// This is the default value.
+        /// </summary>
+        UseAmbientScope,
+
+        /// <summary>
+        /// A new <see cref="ExecutionContextScopeLifestyle"/> scope  is always created by 
+        /// <see cref="IDependencyResolver.BeginScope"/> before returning.
+        /// </summary>
+        RequiresNew
+    }
+
     /// <summary>Simple Injector <see cref="IDependencyResolver"/> implementation.</summary>
     /// <example>
     /// The following example shows the usage of the <b>SimpleInjectorWebApiDependencyResolver</b> in an
@@ -74,17 +94,45 @@ namespace SimpleInjector.Integration.WebApi
     public sealed class SimpleInjectorWebApiDependencyResolver : IDependencyResolver
     {
         private readonly Container container;
+        private readonly DependencyResolverScopeOption scopeOption;
         private readonly Scope scope;
-        
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class.
+        /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class with
+        /// the default scope option (i.e. to use an ambient <see cref="ExecutionContextScopeLifestyle"/> 
+        /// scope if one already exists).
         /// </summary>
         /// <param name="container">The container.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> parameter is
         /// a null reference (Nothing in VB).</exception>
-        public SimpleInjectorWebApiDependencyResolver(Container container) : this(container, beginScope: false)
+        public SimpleInjectorWebApiDependencyResolver(Container container)
+            : this(container, DependencyResolverScopeOption.UseAmbientScope)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="scopeOption">The scoping option.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> parameter is
+        /// a null reference (Nothing in VB).</exception>
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when the 
+        /// <paramref name="scopeOption"/> contains an invalid value.</exception>
+        public SimpleInjectorWebApiDependencyResolver(Container container,
+            DependencyResolverScopeOption scopeOption)
+            : this(container, beginScope: false)
         {
             Requires.IsNotNull(container, "container");
+
+            if (scopeOption < DependencyResolverScopeOption.UseAmbientScope ||
+                scopeOption > DependencyResolverScopeOption.RequiresNew)
+            {
+                throw new System.ComponentModel.InvalidEnumArgumentException("scopeOption", (int)scopeOption,
+                    typeof(DependencyResolverScopeOption));
+            }
+
+            this.scopeOption = scopeOption;
         }
 
         private SimpleInjectorWebApiDependencyResolver(Container container, bool beginScope)
@@ -101,8 +149,10 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The dependency scope.</returns>
         IDependencyScope IDependencyResolver.BeginScope()
         {
-            return new SimpleInjectorWebApiDependencyResolver(this.container, 
-                beginScope: this.container.GetCurrentExecutionContextScope() == null);
+            bool beginScope = this.scopeOption == DependencyResolverScopeOption.RequiresNew ||
+                this.container.GetCurrentExecutionContextScope() == null;
+
+            return new SimpleInjectorWebApiDependencyResolver(this.container, beginScope);
         }
 
         /// <summary>Retrieves a service from the scope.</summary>
