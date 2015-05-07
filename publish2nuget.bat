@@ -27,18 +27,18 @@ IF NOT EXIST "nuget.exe" (
     GOTO :EOF
 )
 
-nuget.exe push %packageDirectory%\SimpleInjector.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Extensions.ExecutionContextScoping.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Extensions.LifetimeScoping.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.Wcf.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.Wcf.QuickStart.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.Web.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.Web.Mvc.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.MVC3.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.WebApi.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Integration.WebApi.WebHost.QuickStart.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\SimpleInjector.Packaging.%version%.nupkg %superSecretApiKey% %options%
-nuget.exe push %packageDirectory%\CommonServiceLocator.SimpleInjectorAdapter.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Extensions.ExecutionContextScoping.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Extensions.LifetimeScoping.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.Wcf.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.Wcf.QuickStart.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.Web.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.Web.Mvc.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.MVC3.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.WebApi.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Integration.WebApi.WebHost.QuickStart.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\SimpleInjector.Packaging.%version%.nupkg %superSecretApiKey% %options%
+..\nuget.exe push %packageDirectory%\CommonServiceLocator.SimpleInjectorAdapter.%version%.nupkg %superSecretApiKey% %options%
 
 
 echo Done!
