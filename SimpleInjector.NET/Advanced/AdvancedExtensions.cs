@@ -196,7 +196,7 @@ namespace SimpleInjector.Advanced
             container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
-        internal static void Verify(this IConstructorVerificationBehavior behavior, ConstructorInfo constructor)
+        internal static void Verify(this IConstructorInjectionBehavior behavior, ConstructorInfo constructor)
         {
             foreach (var parameter in constructor.GetParameters())
             {

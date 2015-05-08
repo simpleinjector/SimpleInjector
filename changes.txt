@@ -1,6 +1,12 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.0.0 (v3.0 RTM)
+
+	Improvements/Changes:
+		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (work item 2).
+
+
 Version 2.8.1 (v2.8.1 RTM) 2015-05-05
 
 	Improvements/Changes:

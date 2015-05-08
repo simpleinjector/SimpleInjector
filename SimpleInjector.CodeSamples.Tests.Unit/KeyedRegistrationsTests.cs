@@ -159,6 +159,11 @@
 
                 return this.defaultBehavior.BuildParameterExpression(parameter);
             }
+
+            public void Verify(ParameterInfo parameter)
+            {
+                this.defaultBehavior.Verify(parameter);
+            }
         }
     }
 }

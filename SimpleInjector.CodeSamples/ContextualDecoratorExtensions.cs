@@ -94,6 +94,11 @@
                 return expression;
             }
 
+            public void Verify(ParameterInfo parameter)
+            {
+                this.defaultBehavior.Verify(parameter);
+            }
+
             private bool MustApplyContextualDecorator(Type serviceType, out List<PredicatePair> predicatePairs)
             {
                 predicatePairs = (

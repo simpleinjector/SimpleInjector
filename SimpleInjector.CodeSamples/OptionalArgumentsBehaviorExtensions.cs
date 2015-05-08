@@ -9,30 +9,8 @@
     {
         public static void EnableSkippingOptionalConstructorArguments(ContainerOptions options)
         {
-            options.ConstructorVerificationBehavior =
-                new OptionalArgumentsVerificationBehavior(options.ConstructorVerificationBehavior);
-
             options.ConstructorInjectionBehavior =
                 new OptionalArgumentsInjectionBehavior(options.Container, options.ConstructorInjectionBehavior);
-        }
-    }
-
-    public class OptionalArgumentsVerificationBehavior : IConstructorVerificationBehavior
-    {
-        private readonly IConstructorVerificationBehavior original;
-
-        public OptionalArgumentsVerificationBehavior(IConstructorVerificationBehavior original)
-        {
-            this.original = original;
-        }
-
-        [DebuggerStepThrough]
-        public void Verify(ParameterInfo parameter)
-        {
-            if ((parameter.Attributes & ParameterAttributes.Optional) == 0)
-            {
-                this.original.Verify(parameter);
-            }
         }
     }
 
@@ -50,14 +28,26 @@
         [DebuggerStepThrough]
         public Expression BuildParameterExpression(ParameterInfo parameter)
         {
-            bool isOptional = (parameter.Attributes & ParameterAttributes.Optional) != 0;
-
-            if (isOptional && !this.CanBeResolved(parameter))
+            if (IsOptional(parameter) && !this.CanBeResolved(parameter))
             {
                 return Expression.Constant(parameter.DefaultValue, parameter.ParameterType);
             }
 
             return this.original.BuildParameterExpression(parameter);
+        }
+
+        [DebuggerStepThrough]
+        public void Verify(ParameterInfo parameter)
+        {
+            if (!IsOptional(parameter))
+            {
+                this.original.Verify(parameter);
+            }
+        }
+
+        private static bool IsOptional(ParameterInfo parameter)
+        {
+            return (parameter.Attributes & ParameterAttributes.Optional) != 0;
         }
 
         private bool CanBeResolved(ParameterInfo parameter)

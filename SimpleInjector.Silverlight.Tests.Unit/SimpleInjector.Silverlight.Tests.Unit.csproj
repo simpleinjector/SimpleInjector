@@ -108,9 +108,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorResolutionBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorResolutionBehaviorTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorVerificationBehaviorTests.cs">
-      <Link>Advanced\DefaultConstructorVerificationBehaviorTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\IndexableCollectionsTests.cs">
       <Link>Advanced\IndexableCollectionsTests.cs</Link>
     </Compile>

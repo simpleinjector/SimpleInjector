@@ -68,9 +68,6 @@ namespace SimpleInjector
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IConstructorVerificationBehavior verificationBehavior;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorInjectionBehavior injectionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -83,7 +80,6 @@ namespace SimpleInjector
         public ContainerOptions()
         {
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
-            this.verificationBehavior = new DefaultConstructorVerificationBehavior();
             this.injectionBehavior = new DefaultConstructorInjectionBehavior(() => this.Container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new TransientLifestyleSelectionBehavior();
@@ -128,28 +124,15 @@ namespace SimpleInjector
         /// <summary>
         /// Gets or sets the constructor verification behavior. The container's default behavior is to
         /// disallow constructors with value types and strings.
+        /// <b>NOTE:</b> This property has been removed. Please use the <see cref="ConstructorInjectionBehavior"/> 
+        /// property to override Simple Injector's verification behavior.
         /// </summary>
         /// <value>The constructor resolution behavior.</value>
-        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the container already contains registrations.
-        /// </exception>
-        public IConstructorVerificationBehavior ConstructorVerificationBehavior
-        {
-            get
-            {
-                return this.verificationBehavior;
-            }
-
-            set
-            {
-                Requires.IsNotNull(value, "value");
-
-                this.ThrowWhenContainerHasRegistrations("ConstructorVerificationBehavior");
-
-                this.verificationBehavior = value;
-            }
-        }
+        [Obsolete("In v3, the IConstructorVerificationBehavior interface has been merged with the " +
+            "IConstructorInjectionBehavior interface. Please use the ConstructorInjectionBehavior property " +
+            "to override Simple Injector's verification behavior.", error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
 
         /// <summary>Gets or sets the constructor injection behavior.</summary>
         /// <value>The constructor injection behavior.</value>
@@ -284,11 +267,6 @@ namespace SimpleInjector
                 if (!(this.ConstructorResolutionBehavior is DefaultConstructorResolutionBehavior))
                 {
                     descriptions.Add("Custom Constructor Resolution");
-                }
-
-                if (!(this.ConstructorVerificationBehavior is DefaultConstructorVerificationBehavior))
-                {
-                    descriptions.Add("Custom Constructor Verification");
                 }
 
                 if (!(this.ConstructorInjectionBehavior is DefaultConstructorInjectionBehavior))

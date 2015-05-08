@@ -23,7 +23,6 @@
             var behavior = new AutomaticParameterizedFactoriesHelper(options);
 
             options.ConstructorInjectionBehavior = behavior;
-            options.ConstructorVerificationBehavior = behavior;
 
             SetBehavior(options.Container, behavior);
         }
@@ -211,11 +210,10 @@
         }
 
         private sealed class AutomaticParameterizedFactoriesHelper
-            : IConstructorVerificationBehavior, IConstructorInjectionBehavior
+            : IConstructorInjectionBehavior
         {
             private readonly Container container;
-            private readonly IConstructorVerificationBehavior originalVerificationBehavior;
-            private readonly IConstructorInjectionBehavior originalInjectionBehavior;
+            private readonly IConstructorInjectionBehavior originalBehavior;
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> serviceLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
             
@@ -225,15 +223,14 @@
             public AutomaticParameterizedFactoriesHelper(ContainerOptions options)
             {
                 this.container = options.Container;
-                this.originalVerificationBehavior = options.ConstructorVerificationBehavior;
-                this.originalInjectionBehavior = options.ConstructorInjectionBehavior;
+                this.originalBehavior = options.ConstructorInjectionBehavior;
             }
 
-            void IConstructorVerificationBehavior.Verify(ParameterInfo parameter)
+            void IConstructorInjectionBehavior.Verify(ParameterInfo parameter)
             {
                 if (this.FindThreadLocal(parameter) == null)
                 {
-                    this.originalVerificationBehavior.Verify(parameter);
+                    this.originalBehavior.Verify(parameter);
                 }
             }
 
@@ -254,7 +251,7 @@
                         parameter.ParameterType);
                 }
 
-                return this.originalInjectionBehavior.BuildParameterExpression(parameter);
+                return this.originalBehavior.BuildParameterExpression(parameter);
             }
 
             // Called by RegisterFactory<TFactory>

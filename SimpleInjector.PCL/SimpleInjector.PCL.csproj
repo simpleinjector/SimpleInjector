@@ -73,9 +73,6 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
       <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorVerificationBehavior.cs">
-      <Link>Advanced\DefaultConstructorVerificationBehavior.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultPropertySelectionBehavior.cs">
       <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
     </Compile>

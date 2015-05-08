@@ -180,7 +180,7 @@
 
             // Act
             // This type depends on an reference type and since reference types are not handled by the
-            // AppSettingsConvention, it should fallback on the default behavior, and since reference types
+            // AppSettingsConvention, it should fall back on the default behavior, and since reference types
             // can be resolved by the container, the registration is therefore valid.
             container.Register<TypeWithAppSettingConstructorArgumentOfReferenceType>();
         }
@@ -224,8 +224,7 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.StringContains(
-                    "No app setting with key 'doesNotExist' could be found", ex.Message);
+                AssertThat.StringContains("No application setting with key 'doesNotExist' could be found", ex.Message);
             }
         }
 
@@ -245,8 +244,7 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains(
-                    "No app setting with key 'doesNotExist' could be found", ex.Message);
+                AssertThat.StringContains("No application setting with key 'doesNotExist' could be found", ex.Message);
             }
         }
 

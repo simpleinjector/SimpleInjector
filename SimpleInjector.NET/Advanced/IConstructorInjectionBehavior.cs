@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -42,5 +42,14 @@ namespace SimpleInjector.Advanced
         /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
         /// <paramref name="parameter"/>. This method never returns null.</returns>
         Expression BuildParameterExpression(ParameterInfo parameter);
+
+        /// <summary>Verifies the specified <paramref name="parameter"/>.</summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <exception cref="ActivationException">Thrown when the <paramref name="parameter"/> cannot be 
+        /// used for auto wiring.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameter"/> is a
+        /// null reference.</exception>
+        void Verify(ParameterInfo parameter);
     }
 }

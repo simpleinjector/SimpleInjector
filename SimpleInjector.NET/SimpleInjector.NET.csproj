@@ -84,7 +84,6 @@
     <Compile Include="Advanced\ConstantFinderVisitor.cs" />
     <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
-    <Compile Include="Advanced\DefaultConstructorVerificationBehavior.cs" />
     <Compile Include="Advanced\TransientLifestyleSelectionBehavior.cs" />
     <Compile Include="Advanced\DefaultPropertySelectionBehavior.cs" />
     <Compile Include="Advanced\IConstructorInjectionBehavior.cs" />

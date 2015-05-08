@@ -50,6 +50,19 @@ namespace SimpleInjector.Advanced
             return producer.BuildExpression();
         }
 
+        public void Verify(ParameterInfo parameter)
+        {
+            Requires.IsNotNull(parameter, "parameter");
+
+            if (parameter.ParameterType.IsValueType || parameter.ParameterType == typeof(string))
+            {
+                string exceptionMessage = StringResources.ConstructorMustNotContainInvalidParameter(
+                    (ConstructorInfo)parameter.Member, parameter);
+
+                throw new ActivationException(exceptionMessage);
+            }
+        }
+
         private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
         {
             InstanceProducer producer = null;
@@ -66,7 +79,7 @@ namespace SimpleInjector.Advanced
             
             if (producer == null)
             {
-                container.Options.ConstructorVerificationBehavior.Verify(parameter);
+                container.Options.ConstructorInjectionBehavior.Verify(parameter);
 
                 throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
                     parameter.Member.DeclaringType, parameter));

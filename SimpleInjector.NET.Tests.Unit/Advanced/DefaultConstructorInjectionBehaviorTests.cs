@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Advanced
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,6 +56,84 @@
             }
         }
 
+        [TestMethod]
+        public void Verify_TValueTypeParameter_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedString = string.Format(@"
+                The constructor of type {0}.{1} contains parameter 'intArgument' of type Int32 which can not 
+                be used for constructor injection because it is a value type.",
+                this.GetType().Name,
+                typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).Name)
+                .TrimInside();
+
+            var behavior = new ContainerOptions().ConstructorInjectionBehavior;
+
+            var constructor =
+                typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).GetConstructors().Single();
+
+            var invalidParameter = constructor.GetParameters().Single();
+
+            try
+            {
+                // Act
+                behavior.Verify(invalidParameter);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(expectedString, ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public void Verify_StringTypeParameter_ThrowsExpectedException()
+        {
+            // Arrange
+            string expectedString = string.Format(@"
+                The constructor of type {0}.{1} contains parameter 'stringArgument' of type String which can 
+                not be used for constructor injection.",
+                this.GetType().Name,
+                typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).Name)
+                .TrimInside();
+
+            var behavior = new ContainerOptions().ConstructorInjectionBehavior;
+
+            var constructor =
+                typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).GetConstructors().Single();
+
+            var invalidParameter = constructor.GetParameters().Single();
+
+            try
+            {
+                // Act
+                behavior.Verify(invalidParameter);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (ActivationException ex)
+            {
+                AssertThat.StringContains(expectedString, ex.Message);
+            }
+        }
+
+        private class TypeWithSinglePublicConstructorWithValueTypeParameter
+        {
+            public TypeWithSinglePublicConstructorWithValueTypeParameter(int intArgument)
+            {
+            }
+        }
+
+        private class TypeWithSinglePublicConstructorWithStringTypeParameter
+        {
+            public TypeWithSinglePublicConstructorWithStringTypeParameter(string stringArgument)
+            {
+            }
+        }
+
         private sealed class FakeConstructorInjectionBehavior : IConstructorInjectionBehavior
         {
             public Expression ExpressionToReturnFromBuildParameterExpression { get; set; }
@@ -62,6 +141,10 @@
             public Expression BuildParameterExpression(ParameterInfo parameter)
             {
                 return this.ExpressionToReturnFromBuildParameterExpression;
+            }
+            
+            public void Verify(ParameterInfo parameter)
+            {
             }
         }
     }

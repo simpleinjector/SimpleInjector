@@ -634,21 +634,6 @@
         }
 
         [TestMethod]
-        public void DebuggerDisplayDescription_WithOverriddenConstructorVerificationBehavior_ReturnsExpectedMessage()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            options.ConstructorVerificationBehavior = new AlternativeConstructorVerificationBehavior();
-
-            // Act
-            var description = options.DebuggerDisplayDescription;
-
-            // Assert
-            Assert.AreEqual("Custom Constructor Verification", description);
-        }
-
-        [TestMethod]
         public void DebuggerDisplayDescription_WithOverriddenConstructorInjectionBehavior_ReturnsExpectedMessage()
         {
             // Arrange
@@ -701,7 +686,6 @@
 
             options.AllowOverridingRegistrations = true;
             options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
-            options.ConstructorVerificationBehavior = new AlternativeConstructorVerificationBehavior();
             options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
             options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
             options.LifestyleSelectionBehavior = new AlternativeLifestyleSelectionBehavior();
@@ -713,26 +697,12 @@
             Assert.AreEqual(@"
                 Allows Overriding Registrations,
                 Custom Constructor Resolution,
-                Custom Constructor Verification,
                 Custom Constructor Injection,
                 Custom Property Selection,
                 Custom Lifestyle Selection
                 ".TrimInside(), description);
         }
 
-        [TestMethod]
-        public void ConstructorVerificationBehavior_SetWithNullValue_ThrowsException()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            // Act
-            Action action = () => options.ConstructorVerificationBehavior = null;
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-        
         [TestMethod]
         public void PropertySelectionBehavior_SetWithNullValue_ThrowsException()
         {
@@ -790,10 +760,7 @@
             {
                 throw new NotImplementedException();
             }
-        }
 
-        private sealed class AlternativeConstructorVerificationBehavior : IConstructorVerificationBehavior
-        {
             public void Verify(ParameterInfo parameter)
             {
                 throw new NotImplementedException();
