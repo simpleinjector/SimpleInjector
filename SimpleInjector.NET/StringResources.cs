@@ -45,7 +45,7 @@ namespace SimpleInjector
                 return message;
             }
 
-            return message + 
+            return message +
                 " The following stack trace describes the location where the container was locked:" +
                 Environment.NewLine + Environment.NewLine + stackTrace;
         }
@@ -57,9 +57,9 @@ namespace SimpleInjector
         }
 
         internal static string ResolveInterceptorDelegateReturnedNull()
-	    {
- 	        return "The delegate that was registered using 'RegisterResolveInterceptor' returned null.";
-	    }
+        {
+            return "The delegate that was registered using 'RegisterResolveInterceptor' returned null.";
+        }
 
         internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType,
             Expression expression, Exception exception)
@@ -80,7 +80,7 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found.", serviceType.ToFriendlyName());
         }
-        
+
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -264,7 +264,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "You are trying to register {0} as a service type, but registering this type is not " +
-                "allowed to be registered because the type is ambiguous. The registration of such a type " + 
+                "allowed to be registered because the type is ambiguous. The registration of such a type " +
                 "almost always indicates a flaw in the design of the application and is therefore not " +
                 "allowed. Please change any component that depends on a dependency of this type. Ensure " +
                 "that the container does not have to inject any dependencies of this type by injecting a " +
@@ -304,7 +304,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} does not {1} {2}.",
-                implementation.ToFriendlyName(), 
+                implementation.ToFriendlyName(),
                 service.IsInterface ? "implement" : "inherit from",
                 service.ToFriendlyName());
         }
@@ -342,7 +342,7 @@ namespace SimpleInjector
                 "{3}.GetConstructor implementations should never return null, but should throw " +
                 "a {4} with an expressive message instead.",
                 selectionBehavior.GetType().ToFriendlyName(),
-                serviceType.ToFriendlyName(), 
+                serviceType.ToFriendlyName(),
                 implementationType.ToFriendlyName(),
                 typeof(IConstructorResolutionBehavior).Name,
                 typeof(ActivationException).FullName);
@@ -357,7 +357,7 @@ namespace SimpleInjector
                 "supplied with values '{1}' for serviceType and '{2}' for implementationType. " +
                 "{3}.SelectLifestyle implementations should never return null.",
                 selectionBehavior.GetType().ToFriendlyName(),
-                serviceType.ToFriendlyName(), 
+                serviceType.ToFriendlyName(),
                 implementationType.ToFriendlyName(),
                 typeof(ILifestyleSelectionBehavior).Name);
         }
@@ -378,7 +378,7 @@ namespace SimpleInjector
                 "Container instance. Please make sure the ContainerOptions instance is supplied as " +
                 "argument to the constructor of a Container.");
         }
-        
+
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations)
         {
@@ -415,7 +415,7 @@ namespace SimpleInjector
                 "use a decorator that depends on a Func<T> for injecting the decoratee.",
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
         }
-        
+
         internal static string SuppliedTypeIsNotAnOpenGenericType(Type type)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -457,7 +457,7 @@ namespace SimpleInjector
                 "The type would never be resolved and is therefore not suited to be used.",
                 openGenericImplementation.ToFriendlyName());
         }
-        
+
         internal static string DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(Type serviceType,
             Type decoratorType)
         {
@@ -465,7 +465,7 @@ namespace SimpleInjector
                 "The supplied decorator {0} is an open generic type definition, while the supplied " +
                 "service type {1} is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
-        
+
         internal static string ValueIsInvalidForEnumType(int value, Type enumType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -511,8 +511,8 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "Property of type {0} with name '{1}' can't be injected, because no registration for type " +
                 "{2} could be found. {3}",
-                property.PropertyType.ToFriendlyName(), 
-                property.Name, 
+                property.PropertyType.ToFriendlyName(),
+                property.Name,
                 property.PropertyType.ToFriendlyName(),
                 innerException.Message);
         }
@@ -521,7 +521,7 @@ namespace SimpleInjector
             IEnumerable<Type> openGenericTypes)
         {
             var typeNames = openGenericTypes.Select(type => type.ToFriendlyName());
-            
+
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied list of types contains an open generic type, but this overloaded method is " +
                 "unable to handle open generic types because this overload can only register closed " +
@@ -558,7 +558,7 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), exception.Message);
         }
 
-        internal static string UnregisteredTypeEventArgsRegisterDelegateThrewAnException(Type serviceType, 
+        internal static string UnregisteredTypeEventArgsRegisterDelegateThrewAnException(Type serviceType,
             Exception exception)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -567,20 +567,20 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), exception.Message);
         }
 
-        internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType, 
+        internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType,
             ScopedLifestyle lifestyle)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The {0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
                 "context of a {1}.",
-                serviceType.ToFriendlyName(), 
+                serviceType.ToFriendlyName(),
                 lifestyle.Name);
         }
 
         internal static string ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(string lifestyleName)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "This method can only be called within the context of an active {0}.", 
+                "This method can only be called within the context of an active {0}.",
                 lifestyleName);
         }
 
@@ -619,7 +619,7 @@ namespace SimpleInjector
 
         internal static string GetRootRegistrationsCanNotBeCalledBeforeVerify()
         {
-            return 
+            return
                 "Root registrations can't be determined before Verify is called. Please call Verify first.";
         }
 
@@ -631,7 +631,7 @@ namespace SimpleInjector
         internal static string MixingCallsToRegisterAllIsNotSupported(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Mixing calls to RegisterAll for the same open-generic service type is not supported. " + 
+                "Mixing calls to RegisterAll for the same open-generic service type is not supported. " +
                 "Consider making one single call to RegisterAll(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
         }

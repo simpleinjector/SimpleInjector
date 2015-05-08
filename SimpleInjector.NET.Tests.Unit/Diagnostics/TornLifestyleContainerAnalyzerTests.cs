@@ -16,7 +16,7 @@
         public void Analyze_TwoSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
         {
             // Arrange
-            string expectedMessage1 = 
+            string expectedMessage1 =
                 "The registration for IFoo maps to the same implementation and lifestyle as the " +
                 "registration for IBar does. They both map to FooBar (Singleton).";
 
@@ -59,7 +59,7 @@
             string expectedMessage4 =
                 "The registration for IBarExt maps to the same implementation and lifestyle as the " +
                 "registrations for IFoo, IFooExt and IBar do.";
-            
+
             var container = new Container();
 
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
@@ -67,7 +67,7 @@
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
             container.Register<IBarExt, FooBar>(Lifestyle.Singleton);
 
-            container.Verify(); 
+            container.Verify();
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -261,7 +261,7 @@
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
-            
+
             // Assert
             Assert.AreEqual(4, results.Length, Actual(results));
 
@@ -324,29 +324,29 @@
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
         }
-        
- 	    // This was a bug reported here: https://github.com/simpleinjector/SimpleInjector/issues/24
- 	    [TestMethod]
- 	    public void Analyze_TwoRegistrationsForTheSameImplementationMadeWithTheSameRegistrationInstanceWrappedBySingletonDecorators_DoesNotReturnsAWarning()
- 	    {
- 	        // Arrange
- 	        var container = new Container();
- 	 
- 	        var reg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
- 	 
- 	        container.AddRegistration(typeof(IFoo), reg);
- 	        container.AddRegistration(typeof(IBar), reg);
- 	 
- 	        container.RegisterDecorator(typeof(IBar), typeof(BarDecorator), Lifestyle.Singleton);
- 	 
- 	        container.Verify();
- 	 
- 	        // Act
- 	        var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
- 	 
- 	        // Assert
- 	        Assert.AreEqual(0, results.Length, Actual(results));
- 	    } 	  
+
+        // This was a bug reported here: https://github.com/simpleinjector/SimpleInjector/issues/24
+        [TestMethod]
+        public void Analyze_TwoRegistrationsForTheSameImplementationMadeWithTheSameRegistrationInstanceWrappedBySingletonDecorators_DoesNotReturnsAWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            var reg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+
+            container.AddRegistration(typeof(IFoo), reg);
+            container.AddRegistration(typeof(IBar), reg);
+
+            container.RegisterDecorator(typeof(IBar), typeof(BarDecorator), Lifestyle.Singleton);
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
 
         [TestMethod]
         public void Analyze_ConfigurationWithViolation_ReturnsTheExpectedDebuggerViewItems()
@@ -384,7 +384,7 @@
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
-            Assert.AreEqual(0, results.Length, 
+            Assert.AreEqual(0, results.Length,
                 "Since the two registrations both use a delegate, there's no way of knowing what the actual " +
                 "implementation type is, and we should therefore not see a warning in this case. " +
                 Actual(results));

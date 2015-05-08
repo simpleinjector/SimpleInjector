@@ -42,17 +42,17 @@ namespace SimpleInjector.Advanced
         private readonly object instance;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceInitializationData"/> struct.</summary>
-	    /// <param name="context">The <see cref="InitializationContext"/> that contains contextual information
- 	    /// about the created instance.</param>
- 	    /// <param name="instance">The created instance.</param>
- 	    public InstanceInitializationData(InitializationContext context, object instance)
- 	    {
- 	        Requires.IsNotNull(context, "context");
- 	        Requires.IsNotNull(instance, "instance");
- 	 
- 	        this.context = context;
- 	        this.instance = instance;
- 	    } 
+        /// <param name="context">The <see cref="InitializationContext"/> that contains contextual information
+        /// about the created instance.</param>
+        /// <param name="instance">The created instance.</param>
+        public InstanceInitializationData(InitializationContext context, object instance)
+        {
+            Requires.IsNotNull(context, "context");
+            Requires.IsNotNull(instance, "instance");
+
+            this.context = context;
+            this.instance = instance;
+        }
 
         /// <summary>Gets the <see cref="InitializationContext"/> with contextual information about the 
         /// created instance.</summary>

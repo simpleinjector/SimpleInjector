@@ -83,11 +83,11 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(lifestyle, "lifestyle");
             Requires.IsNotNull(container, "container");
-            
+
             this.Lifestyle = lifestyle;
             this.Container = container;
         }
-        
+
         /// <summary>Gets the type that this instance will create.</summary>
         /// <value>The type that this instance will create.</value>
         public abstract Type ImplementationType { get; }
@@ -97,8 +97,8 @@ namespace SimpleInjector
         public Lifestyle Lifestyle { get; private set; }
 
         /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
- 	    /// <value>The <see cref="Container"/> instance for this registration.</value>
- 	    public Container Container { get; private set; } 
+        /// <value>The <see cref="Container"/> instance for this registration.</value>
+        public Container Container { get; private set; }
 
         internal bool IsCollection { get; set; }
 
@@ -117,7 +117,7 @@ namespace SimpleInjector
         /// </summary>
         /// <returns>An <see cref="Expression"/>.</returns>
         public abstract Expression BuildExpression();
- 
+
         /// <summary>
         /// Gets the list of <see cref="KnownRelationship"/> instances. Note that the list is only available
         /// after calling <see cref="BuildExpression()"/>.
@@ -145,7 +145,7 @@ namespace SimpleInjector
         public void InitializeInstance(object instance)
         {
             Requires.IsNotNull(instance, "instance");
-            Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(), 
+            Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(),
                 "instance");
 
             if (this.instanceInitializer == null)
@@ -160,17 +160,17 @@ namespace SimpleInjector
         /// Suppressing the supplied <see cref="DiagnosticType"/> for the given registration.
         /// </summary>
         /// <param name="type">The <see cref="DiagnosticType"/>.</param>
- 	    /// <param name="justification">The justification of why the warning must be suppressed.</param>
+        /// <param name="justification">The justification of why the warning must be suppressed.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="justification"/> is a null  
- 	    /// reference.</exception>
- 	    /// <exception cref="ArgumentException">Thrown when either <paramref name="justification"/> is an
- 	    /// empty string or when <paramref name="type"/> is not a valid value of <see cref="DiagnosticType"/>.
- 	    /// </exception>
- 	    public void SuppressDiagnosticWarning(DiagnosticType type, string justification)
- 	    {
- 	        Requires.IsValidEnum(type, "type");
- 	        Requires.IsNotNullOrEmpty(justification, "justification");
- 	  
+        /// reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when either <paramref name="justification"/> is an
+        /// empty string or when <paramref name="type"/> is not a valid value of <see cref="DiagnosticType"/>.
+        /// </exception>
+        public void SuppressDiagnosticWarning(DiagnosticType type, string justification)
+        {
+            Requires.IsValidEnum(type, "type");
+            Requires.IsNotNullOrEmpty(justification, "justification");
+
             if (this.suppressions == null)
             {
                 this.suppressions = new HashSet<DiagnosticType>();
@@ -225,11 +225,11 @@ namespace SimpleInjector
         internal Expression InterceptInstanceCreation(Type serviceType, Type implementationType,
             Expression instanceCreatorExpression)
         {
-            return this.Container.OnExpressionBuilding(this, serviceType, implementationType, 
+            return this.Container.OnExpressionBuilding(this, serviceType, implementationType,
                 instanceCreatorExpression);
         }
 
-        internal void AddRelationship(KnownRelationship relationship) 
+        internal void AddRelationship(KnownRelationship relationship)
         {
             Requires.IsNotNull(relationship, "relationship");
 
@@ -244,7 +244,7 @@ namespace SimpleInjector
         {
             this.overriddenParameters = parameters.ToDictionary(p => p.Parameter);
         }
-   
+
         // Wraps the expression with a delegate that injects the properties.
         internal Expression WrapWithPropertyInjector(Type serviceType, Type implementationType,
             Expression expressionToWrap)
@@ -345,13 +345,13 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, "instanceCreator");
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
-            
+
             expression = WrapWithNullChecker<TService>(expression);
 
             expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TService), expression);
 
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TService), expression);
-            
+
             expression = this.WrapWithInitializer<TService>(expression);
 
             return expression;
@@ -414,7 +414,7 @@ namespace SimpleInjector
 
         private Expression BuildNewExpression(Type serviceType, Type implementationType)
         {
-            ConstructorInfo constructor = 
+            ConstructorInfo constructor =
                 this.Container.Options.SelectConstructor(serviceType, implementationType);
 
             this.AddConstructorParametersAsKnownRelationship(constructor);
@@ -434,7 +434,7 @@ namespace SimpleInjector
             {
                 var overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
-                var parameterExpression = 
+                var parameterExpression =
                     overriddenExpression ?? this.Container.Options.BuildParameterExpression(parameter);
 
                 parameters.Add(parameterExpression);
@@ -443,7 +443,7 @@ namespace SimpleInjector
             return parameters.ToArray();
         }
 
-        private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType, 
+        private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType,
             Expression expression)
         {
             var properties = this.GetPropertiesToInject(serviceType, implementationType);
@@ -482,8 +482,8 @@ namespace SimpleInjector
                 foreach (var overriddenParameter in this.overriddenParameters.Values)
                 {
                     expression = SubExpressionReplacer.Replace(
-                        expressionToAlter: expression, 
-                        subExpressionToFind: overriddenParameter.PlaceHolder, 
+                        expressionToAlter: expression,
+                        subExpressionToFind: overriddenParameter.PlaceHolder,
                         replacementExpression: overriddenParameter.Expression);
                 }
             }
@@ -504,10 +504,10 @@ namespace SimpleInjector
         private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
         {
             // We have to suppress the overridden parameter since this might result in a wrong relationship.
-            var dependencyTypes = 
+            var dependencyTypes =
                 from parameter in constructor.GetParameters()
                 let overriddenProducer = this.GetOverriddenParameterFor(parameter).Producer
-                let instanceProducer = 
+                let instanceProducer =
                     overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(parameter.ParameterType)
                 where instanceProducer != null
                 select instanceProducer;
@@ -515,10 +515,10 @@ namespace SimpleInjector
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
 
-        private void AddPropertiesAsKnownRelationships(Type implementationType, 
+        private void AddPropertiesAsKnownRelationships(Type implementationType,
             IEnumerable<PropertyInfo> properties)
         {
-            var dependencies = 
+            var dependencies =
                 from dependencyType in properties.Select(p => p.PropertyType)
                 let instanceProducer = this.Container.GetRegistrationEvenIfInvalid(dependencyType)
                 where instanceProducer != null
@@ -532,7 +532,7 @@ namespace SimpleInjector
             var relationships =
                 from dependency in dependencies
                 select new KnownRelationship(implementationType, this.Lifestyle, dependency);
-            
+
             foreach (var relationship in relationships)
             {
                 this.AddRelationship(relationship);
@@ -550,7 +550,7 @@ namespace SimpleInjector
             where TImplementation : class
         {
             var context = new InitializationContext(this.GetCurrentProducer(), this);
-            
+
             Action<TImplementation> initializer = this.Container.GetInitializer<TImplementation>(context);
 
             if (initializer != null)
