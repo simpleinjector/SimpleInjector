@@ -60,7 +60,7 @@ namespace SimpleInjector
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
         Justification = "This warning is right; we will fix this in v3.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public partial class Container
+    public partial class Container : IDisposable
     {
         private static long counter;
 
@@ -69,6 +69,7 @@ namespace SimpleInjector
         private readonly List<ContextualResolveInterceptor> resolveInterceptors = new List<ContextualResolveInterceptor>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
+        private readonly Scope disposableSingletonsScope = new Scope();
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers =
@@ -298,6 +299,13 @@ namespace SimpleInjector
             return base.GetType();
         }
 
+        /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
         {
             var registrations = this.GetCurrentRegistrations(
@@ -428,6 +436,23 @@ namespace SimpleInjector
             }
 
             return producer;
+        }
+
+        internal void RegisterForDisposal(IDisposable disposable)
+        {
+            this.disposableSingletonsScope.RegisterForDisposal(disposable);
+        }
+
+        /// <summary>
+        /// Releases all instances that are cached by the <see cref="Container"/> object.
+        /// </summary>
+        /// <param name="disposing">True for a normal dispose operation; false to finalize the handle.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.disposableSingletonsScope.Dispose();
+            }
         }
 
         private static Func<object> ApplyResolveInterceptor(ResolveInterceptor interceptor,

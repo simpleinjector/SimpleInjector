@@ -204,6 +204,13 @@ namespace SimpleInjector.Lifestyles
 
                 EnsureInstanceIsNotNull(instance);
 
+                IDisposable disposable = instance as IDisposable;
+
+                if (disposable != null)
+                {
+                    this.Container.RegisterForDisposal(disposable);
+                }
+
                 return instance;
             }
 

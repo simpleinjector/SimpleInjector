@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -84,12 +84,18 @@ namespace SimpleInjector
         public static readonly Lifestyle Transient = new TransientLifestyle();
 
         /// <summary>
+        /// <para>
         /// The lifestyle that caches components during the lifetime of the <see cref="Container"/> instance
         /// and guarantees that only a single instance of that component is created for that instance. Since
         /// general use is to create a single <b>Container</b> instance for the lifetime of the application /
         /// AppDomain, this would mean that only a single instance of that component would exist during the
         /// lifetime of the application. In a multi-threaded applications, implementations registered using 
         /// this lifestyle must be thread-safe.
+        /// </para>
+        /// <para>
+        /// In case the type of a cached instance implements <see cref="IDisposable"/>, the container will
+        /// ensure its disposal when the container gets disposed.
+        /// </para>
         /// </summary>
         /// <example>
         /// The following example registers the <c>RealTimeProvider</c> implementation for the

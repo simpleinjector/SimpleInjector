@@ -570,6 +570,8 @@ namespace SimpleInjector
         /// be returned when this instance is requested by type <typeparamref name="TConcrete"/>. 
         /// This <typeparamref name="TConcrete"/> must be thread-safe when working in a multi-threaded 
         /// environment.
+        /// If <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, a created instance will
+        /// get disposed when <see cref="Container.Dispose">Container.Dispose</see> gets called.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
@@ -589,6 +591,8 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> and <typeparamref name="TImplementation"/>  represent the same 
         /// type, the type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe 
         /// when working in a multi-threaded environment.
+        /// If <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, a created instance will
+        /// get disposed when <see cref="Container.Dispose">Container.Dispose</see> gets called.
         /// </summary>
         /// <typeparam name="TService">
         /// The interface or base type that can be used to retrieve the instances.
@@ -611,6 +615,9 @@ namespace SimpleInjector
         /// Registers a single instance that will be returned when an instance of type 
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
+        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
+        /// container, since the instance is assumed to outlive this container instance. If disposing is
+        /// required, use the overload that accepts a <see cref="Func{T}"/> delegate.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
@@ -636,6 +643,9 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of 
         /// the application. The returned instance must be thread-safe when working in a multi-threaded 
         /// environment.
+        /// If the instance returned from <paramref name="instanceCreator"/> implements <see cref="IDisposable"/>, 
+        /// the created instance will get disposed when <see cref="Container.Dispose">Container.Dispose</see> 
+        /// gets called.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating this single
