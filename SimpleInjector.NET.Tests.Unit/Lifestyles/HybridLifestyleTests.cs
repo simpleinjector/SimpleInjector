@@ -477,8 +477,8 @@
             hybrid.WhenScopeEnds(new Container(), () => { });
 
             // Assert
-            Assert.AreEqual(0, trueLifestyle.WhenScopeEndsCallCount, "TrueLifestyle was NOT expected to be called.");
-            Assert.AreEqual(1, falseLifestyle.WhenScopeEndsCallCount, "FalseLifestyle was expected to be called.");
+            Assert.IsFalse(trueLifestyle.ScopeUsed, "TrueLifestyle was NOT expected to be called.");
+            Assert.IsTrue(falseLifestyle.ScopeUsed, "FalseLifestyle was expected to be called.");
         }
 
         [TestMethod]
@@ -494,8 +494,8 @@
             hybrid.WhenScopeEnds(new Container(), () => { });
 
             // Assert
-            Assert.AreEqual(1, trueLifestyle.WhenScopeEndsCallCount, "TrueLifestyle was expected to be called.");
-            Assert.AreEqual(0, falseLifestyle.WhenScopeEndsCallCount, "FalseLifestyle was NOT expected to be called.");
+            Assert.IsTrue(trueLifestyle.ScopeUsed, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseLifestyle.ScopeUsed, "FalseLifestyle was NOT expected to be called.");
         }
 
         [TestMethod]
@@ -511,8 +511,8 @@
             hybrid.RegisterForDisposal(new Container(), new DisposableObject());
 
             // Assert
-            Assert.AreEqual(0, trueLifestyle.RegisterForDisposalCallCount, "TrueLifestyle was NOT expected to be called.");
-            Assert.AreEqual(1, falseLifestyle.RegisterForDisposalCallCount, "FalseLifestyle was expected to be called.");
+            Assert.IsFalse(trueLifestyle.ScopeUsed, "TrueLifestyle was NOT expected to be called.");
+            Assert.IsTrue(falseLifestyle.ScopeUsed, "FalseLifestyle was expected to be called.");
         }
 
         [TestMethod]
@@ -528,8 +528,8 @@
             hybrid.RegisterForDisposal(new Container(), new DisposableObject());
 
             // Assert
-            Assert.AreEqual(1, trueLifestyle.RegisterForDisposalCallCount, "TrueLifestyle was expected to be called.");
-            Assert.AreEqual(0, falseLifestyle.RegisterForDisposalCallCount, "FalseLifestyle was NOT expected to be called.");
+            Assert.IsTrue(trueLifestyle.ScopeUsed, "TrueLifestyle was expected to be called.");
+            Assert.IsFalse(falseLifestyle.ScopeUsed, "FalseLifestyle was NOT expected to be called.");
         }
 
         [TestMethod]
@@ -581,36 +581,31 @@
                 this.Scope = scope;
             }
 
-            public int WhenScopeEndsCallCount { get; private set; }
+            public int GetCurrentScopeCoreCallCount { get; private set; }
+            
+            public int CurrentScopeProviderCallCount { get; private set; }
 
-            public int RegisterForDisposalCallCount { get; private set; }
+            public bool ScopeUsed
+            {
+                get { return this.GetCurrentScopeCoreCallCount + this.CurrentScopeProviderCallCount > 0; }
+            }
 
             public Scope Scope { get; private set; }
 
-            public override void WhenScopeEnds(Container container, Action action)
-            {
-                Assert.IsNotNull(container, "container");
-                Assert.IsNotNull(action, "action");
-
-                this.WhenScopeEndsCallCount++;
-
-                base.WhenScopeEnds(container, action);
-            }
-
-            public override void RegisterForDisposal(Container container, IDisposable disposable)
-            {
-                Assert.IsNotNull(container, "container");
-                Assert.IsNotNull(disposable, "disposable");
-
-                this.RegisterForDisposalCallCount++;
-
-                base.RegisterForDisposal(container, disposable);
-            }
-
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
             {
-                return () => this.Scope ?? new Scope();
-            }            
+                return () =>
+                {
+                    this.CurrentScopeProviderCallCount++;
+                    return this.Scope ?? new Scope();
+                };
+            }
+
+            protected override Scope GetCurrentScopeCore(Container container)
+            {
+                this.GetCurrentScopeCoreCallCount++;
+                return base.GetCurrentScopeCore(container);
+            }
 
             protected override int Length
             {

@@ -9,6 +9,10 @@ Version 3.0.0 (v3.0 RTM)
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (fixes #2).
 		-[Core] Constructor overload 'Container(ContainerOptions)' removed from Container (fixes #40).
+		-[Core] Made ScopedLifestyle.WhenScopeEnds method non-virtual (fixes #11).
+		-[Core] Made ScopedLifestyle.RegisterForDisposal method non-virtual (fixes #11).
+		-[Core] Made ScopedLifestyle.CreateCurrentScopeProvider method abstract (fixes #11).
+		-[Core] Removed ScopedLifestyle.DisposeInstances method (fixes #11).
 
 
 Version 2.8.1 (v2.8.1 RTM) 2015-05-05

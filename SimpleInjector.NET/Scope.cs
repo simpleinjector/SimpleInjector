@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -207,7 +207,7 @@ namespace SimpleInjector
                 // registered actions, but continue disposing all cached instances. This simulates the
                 // behavior of a using statement, where the actions are part of the try-block.
                 bool firstException = !operatingInException;
-                
+
                 if (firstException)
                 {
                     // We must reset the counter here, because even if a recursion was detected in one of the 
@@ -323,7 +323,7 @@ namespace SimpleInjector
 
                 this.disposables = null;
 
-                Helpers.DisposeInstancesInReverseOrder(instances);
+                DisposeInstancesInReverseOrder(instances);
             }
         }
 
@@ -351,6 +351,34 @@ namespace SimpleInjector
         private static void ThrowRecursionException()
         {
             throw new InvalidOperationException(StringResources.RecursiveInstanceRegistrationDetected());
+        }
+
+        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
+        // is called on each element, even if a previous instance threw an exception. 
+        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
+            int startingAsIndex = int.MinValue)
+        {
+            if (startingAsIndex == int.MinValue)
+            {
+                startingAsIndex = disposables.Count - 1;
+            }
+
+            try
+            {
+                while (startingAsIndex >= 0)
+                {
+                    disposables[startingAsIndex].Dispose();
+
+                    startingAsIndex--;
+                }
+            }
+            finally
+            {
+                if (startingAsIndex >= 0)
+                {
+                    DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
+                }
+            }
         }
     }
 }

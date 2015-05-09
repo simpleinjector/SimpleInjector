@@ -42,7 +42,7 @@ namespace SimpleInjector
         {
             return AmbiguousTypes.Contains(type);
         }
-        
+
         internal static Lazy<T> ToLazy<T>(T value)
         {
             return new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
@@ -63,7 +63,7 @@ namespace SimpleInjector
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
         {
-            return genericTypeDefinition.ToFriendlyName(arguments => 
+            return genericTypeDefinition.ToFriendlyName(arguments =>
                 string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
         }
 
@@ -130,7 +130,7 @@ namespace SimpleInjector
         {
             // While array types are in fact concrete, we can not create them and creating them would be
             // pretty useless.
-            return !serviceType.IsAbstract && !serviceType.IsArray && serviceType != typeof(object) && 
+            return !serviceType.IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
                 !typeof(Delegate).IsAssignableFrom(serviceType);
         }
 
@@ -180,34 +180,6 @@ namespace SimpleInjector
             var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
-        }
-        
-        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
-        // is called on each element, even if a previous instance threw an exception. 
-        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
-            int startingAsIndex = int.MinValue)
-        {
-            if (startingAsIndex == int.MinValue)
-            {
-                startingAsIndex = disposables.Count - 1;
-            }
-
-            try
-            {
-                while (startingAsIndex >= 0)
-                {
-                    disposables[startingAsIndex].Dispose();
-
-                    startingAsIndex--;
-                }
-            }
-            finally
-            {
-                if (startingAsIndex >= 0)
-                {
-                    DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
-                }
-            }
         }
 
         private static string ToFriendlyName(this Type type, Func<Type[], string> argumentsFormatter)

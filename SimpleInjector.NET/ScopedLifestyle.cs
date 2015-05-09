@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,10 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -80,9 +76,8 @@ namespace SimpleInjector
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
-        public virtual void WhenScopeEnds(Container container, Action action)
+        public void WhenScopeEnds(Container container, Action action)
         {
-            // NOTE: This method is made virtual for backwards compatibility :-(
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(action, "action");
 
@@ -101,20 +96,14 @@ namespace SimpleInjector
         /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
         /// scope ends.
         /// </summary>
-        /// <remarks>
-        /// Note to implementers: Instances registered for disposal will have to be disposed in the opposite
-        /// order of registration, since disposable components might still need to call disposable dependencies
-        /// in their Dispose() method.
-        /// </remarks>
         /// <param name="container">The <see cref="Container"/> instance.</param>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
-        public virtual void RegisterForDisposal(Container container, IDisposable disposable)
+        public void RegisterForDisposal(Container container, IDisposable disposable)
         {
-            // NOTE: This method is made virtual for backwards compatibility :-(
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(disposable, "disposable");
 
@@ -148,17 +137,18 @@ namespace SimpleInjector
         /// the context of such scope.
         /// </summary>
         /// <param name="container">The container for which the delegate gets created.</param>
-        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected internal virtual Func<Scope> CreateCurrentScopeProvider(Container container)
-        {
-            // NOTE: This method is made virtual instead of abstract for backwards compatibility.
-            throw new NotImplementedException();
-        }
+        /// <returns>A <see cref="Func{T}"/> delegate. This method should never return null.</returns>
+        protected internal abstract Func<Scope> CreateCurrentScopeProvider(Container container);
 
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
+        /// <remarks>
+        /// By default, this method calls the <see cref="CreateCurrentScopeProvider"/> method and invokes the
+        /// returned delegate. This method can be overridden to provide an optimized way for getting the
+        /// current scope.
+        /// </remarks>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
         protected virtual Scope GetCurrentScopeCore(Container container)
@@ -204,24 +194,6 @@ namespace SimpleInjector
             Requires.IsNotNull(container, "container");
 
             return new ScopedRegistration<TService, TImplementation>(this, container, this.disposeInstances);
-        }
-
-        /// <summary>
-        /// Disposes the list of supplied <paramref name="disposables"/>. The list is iterated in reverse 
-        /// order (the first element in the list will be disposed last) and the method ensures that the
-        /// Dispose method of each element is called, regardless of any exceptions raised from any previously
-        /// called Dispose methods. If multiple exceptions are thrown, the last thrown exception will bubble
-        /// up the call stack.
-        /// </summary>
-        /// <param name="disposables">The list of objects to be disposed.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="disposables"/> is a null
-        /// reference.</exception>
-        protected internal static void DisposeInstances(IList<IDisposable> disposables)
-        {
-            // NOTE: This method is included for backwards compatibility :-(. It was added in 2.4.0.
-            Requires.IsNotNull(disposables, "disposables");
-
-            Helpers.DisposeInstancesInReverseOrder(disposables.ToList());
         }
     }
 }
