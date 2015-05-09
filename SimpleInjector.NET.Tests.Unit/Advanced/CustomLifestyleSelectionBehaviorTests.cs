@@ -22,7 +22,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register<RealTimeProvider>();
@@ -38,7 +39,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register<ITimeProvider, RealTimeProvider>();
@@ -54,7 +56,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register<ITimeProvider>(() => new RealTimeProvider());
@@ -70,7 +73,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register(typeof(RealTimeProvider));
@@ -86,7 +90,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register(typeof(ITimeProvider), typeof(RealTimeProvider));
@@ -102,7 +107,8 @@
             // Arrange
             var behavior = new FakeLifestyleSelectionBehavior();
 
-            var container = new Container(new ContainerOptions { LifestyleSelectionBehavior = behavior });
+            var container = new Container();
+            container.Options.LifestyleSelectionBehavior = behavior;
 
             // Act
             container.Register(typeof(ITimeProvider), () => new RealTimeProvider());

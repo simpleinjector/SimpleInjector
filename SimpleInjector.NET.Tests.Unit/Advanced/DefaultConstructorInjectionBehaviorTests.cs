@@ -14,7 +14,7 @@
         public void BuildParameterExpression_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorInjectionBehavior;
+            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
 
             // Act
             Action action = () => behavior.BuildParameterExpression(null);
@@ -67,7 +67,7 @@
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).Name)
                 .TrimInside();
 
-            var behavior = new ContainerOptions().ConstructorInjectionBehavior;
+            var behavior = new Container().Options.ConstructorInjectionBehavior;
 
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).GetConstructors().Single();
@@ -99,7 +99,7 @@
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).Name)
                 .TrimInside();
 
-            var behavior = new ContainerOptions().ConstructorInjectionBehavior;
+            var behavior = new Container().Options.ConstructorInjectionBehavior;
 
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).GetConstructors().Single();
@@ -118,6 +118,11 @@
             {
                 AssertThat.StringContains(expectedString, ex.Message);
             }
+        }
+
+        private static ContainerOptions GetContainerOptions()
+        {
+            return new Container().Options;
         }
 
         private class TypeWithSinglePublicConstructorWithValueTypeParameter

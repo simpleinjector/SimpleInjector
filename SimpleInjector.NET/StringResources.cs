@@ -371,14 +371,6 @@ namespace SimpleInjector
                 lifestyleRegistration.Lifestyle.GetType().ToFriendlyName());
         }
 
-        internal static string CanNotCallBuildParameterExpressionContainerOptionsNotPartOfContainer()
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The ContainerOptions instance for this ConstructorInjectionBehavior is not part of a " +
-                "Container instance. Please make sure the ContainerOptions instance is supplied as " +
-                "argument to the constructor of a Container.");
-        }
-
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations)
         {

@@ -571,7 +571,7 @@ namespace SimpleInjector
         /// This <typeparamref name="TConcrete"/> must be thread-safe when working in a multi-threaded 
         /// environment.
         /// If <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, a created instance will
-        /// get disposed when <see cref="Container.Dispose">Container.Dispose</see> gets called.
+        /// get disposed when <see cref="Container.Dispose()">Container.Dispose</see> gets called.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
@@ -592,7 +592,7 @@ namespace SimpleInjector
         /// type, the type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe 
         /// when working in a multi-threaded environment.
         /// If <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, a created instance will
-        /// get disposed when <see cref="Container.Dispose">Container.Dispose</see> gets called.
+        /// get disposed when <see cref="Container.Dispose()">Container.Dispose</see> gets called.
         /// </summary>
         /// <typeparam name="TService">
         /// The interface or base type that can be used to retrieve the instances.
@@ -644,7 +644,7 @@ namespace SimpleInjector
         /// the application. The returned instance must be thread-safe when working in a multi-threaded 
         /// environment.
         /// If the instance returned from <paramref name="instanceCreator"/> implements <see cref="IDisposable"/>, 
-        /// the created instance will get disposed when <see cref="Container.Dispose">Container.Dispose</see> 
+        /// the created instance will get disposed when <see cref="Container.Dispose()">Container.Dispose</see> 
         /// gets called.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>

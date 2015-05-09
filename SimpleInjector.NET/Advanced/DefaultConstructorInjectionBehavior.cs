@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,7 +22,6 @@
 
 namespace SimpleInjector.Advanced
 {
-    using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -30,14 +29,11 @@ namespace SimpleInjector.Advanced
     [DebuggerDisplay("{GetType().Name,nq}")]
     internal sealed class DefaultConstructorInjectionBehavior : IConstructorInjectionBehavior
     {
-        // By supplying a delegate for the retrieval of the container, the ContainerOptions can create and 
-        // return a DefaultConstructorInjectionBehavior before this ContainerOptions instance has been added
-        // to a container
-        private readonly Func<Container> getContainer;
+        private readonly Container container;
 
-        internal DefaultConstructorInjectionBehavior(Func<Container> getContainer)
+        internal DefaultConstructorInjectionBehavior(Container container)
         {
-            this.getContainer = getContainer;
+            this.container = container;
         }
 
         public Expression BuildParameterExpression(ParameterInfo parameter)
@@ -65,21 +61,11 @@ namespace SimpleInjector.Advanced
 
         private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
         {
-            InstanceProducer producer = null;
-
-            Container container = this.getContainer();
-
-            if (container == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.CanNotCallBuildParameterExpressionContainerOptionsNotPartOfContainer());
-            }
-
-            producer = container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
+            InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
             
             if (producer == null)
             {
-                container.Options.ConstructorInjectionBehavior.Verify(parameter);
+                this.container.Options.ConstructorInjectionBehavior.Verify(parameter);
 
                 throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
                     parameter.Member.DeclaringType, parameter));

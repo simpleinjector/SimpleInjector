@@ -22,6 +22,7 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Linq.Expressions;
     using System.Reflection;
 

@@ -10,7 +10,7 @@
         public void GetConstructor_WithNullArgument1_ThrowsException()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorResolutionBehavior;
+            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
             Action action = () => behavior.GetConstructor(null, typeof(TypeWithSinglePublicDefaultConstructor));
@@ -23,7 +23,7 @@
         public void GetConstructor_WithNullArgument2_ThrowsException()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorResolutionBehavior;
+            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
             Action action = () => behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor), null);
@@ -36,7 +36,7 @@
         public void IsRegistrationPhase_InstancesResolvedFromTheContainer_ReturnsFalse()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorResolutionBehavior;
+            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
             var constructor = behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor),
@@ -50,7 +50,7 @@
         public void GetConstructor_TypeWithMultiplePublicConstructors_ThrowsExpectedException()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorResolutionBehavior;
+            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             try
             {
@@ -73,7 +73,7 @@
         public void GetConstructor_TypeWithSingleInternalConstructor_ThrowsExpectedException()
         {
             // Arrange
-            var behavior = new ContainerOptions().ConstructorResolutionBehavior;
+            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             try
             {
@@ -90,6 +90,11 @@
                     "DefaultConstructorResolutionBehaviorTests.TypeWithSingleInternalConstructor, it should " +
                     "contain exactly one public constructor, but it has 0.", ex.Message);
             }
+        }
+
+        private static ContainerOptions GetContainerOptions()
+        {
+            return new Container().Options;
         }
 
         private class TypeWithSinglePublicDefaultConstructor

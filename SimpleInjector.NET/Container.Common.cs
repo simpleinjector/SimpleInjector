@@ -62,6 +62,10 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
+        // NOTE: This number should be low to prevent memory leaks, since dynamically created assemblies can't
+        // be unloaded.
+        private const int MaximumNumberOfContainersWithDynamicallyCreatedAssemblies = 5;
+
         private static long counter;
 
         private readonly object locker = new object();
@@ -98,8 +102,18 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
-            : this(new ContainerOptions())
         {
+            this.containerId = Interlocked.Increment(ref counter);
+
+            this.RegisterSingle<Container>(this);
+
+            this.Options = new ContainerOptions(this)
+            {
+                EnableDynamicAssemblyCompilation = 
+                    this.containerId < MaximumNumberOfContainersWithDynamicallyCreatedAssemblies
+            };
+            
+            this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
@@ -109,24 +123,14 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when supplied <paramref name="options"/> is an instance
         /// that already is supplied to another <see cref="Container"/> instance. Every container must get
         /// its own <see cref="ContainerOptions"/> instance.</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method is not supported anymore. Please use Container.Options to configure the container.", 
+            error: true)]
         public Container(ContainerOptions options)
         {
-            Requires.IsNotNull(options, "options");
-
-            if (options.Container != null)
-            {
-                throw new ArgumentException(StringResources.ContainerOptionsBelongsToAnotherContainer(),
-                    "options");
-            }
-
-            options.Container = this;
-            this.Options = options;
-
-            this.RegisterSingle<Container>(this);
-
-            this.containerId = Interlocked.Increment(ref counter);
-
-            this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(options);
+            throw new InvalidOperationException(
+                "This method is not supported anymore. Please use Container.Options to configure the container.");
         }
 
         // Wrapper for instance initializer delegates

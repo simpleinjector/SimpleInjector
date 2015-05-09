@@ -13,23 +13,10 @@
     public class ContainerOptionsTests
     {
         [TestMethod]
-        public void ContainerConstructor_SuppliedWithNullContainerOptionsArgument_ThrowsException()
-        {
-            // Arrange
-            ContainerOptions invalidOptions = null;
-
-            // Act
-            Action action = () => new Container(invalidOptions);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
         public void AllowOverridingRegistrations_WhenNotSet_IsFalse()
         {
             // Arrange
-            var options = new ContainerOptions();
+            ContainerOptions options = GetContainerOptions();
 
             // Assert
             Assert.IsFalse(options.AllowOverridingRegistrations,
@@ -40,11 +27,9 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringRegistrations()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
-
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
+            
             container.Register<IUserRepository, SqlUserRepository>();
 
             // Act
@@ -58,10 +43,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverridingRegistrationOfNonGenericCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll(typeof(ILogger), new[] { typeof(NullLogger) });
 
@@ -76,10 +59,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverridingRegistrationOfCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
@@ -97,10 +78,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerAllowsRegistrationOfUnrelatedCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
@@ -117,10 +96,8 @@
         public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsOverridingRegistrationOfCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = true
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
 
             container.RegisterAll(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
@@ -141,10 +118,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowDuplicateRegistrationsForAnOpenGenericType()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
 
@@ -159,10 +134,8 @@
         public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsDuplicateRegistrationsForAnOpenGenericType()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = true
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
 
             container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
@@ -181,10 +154,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerAllowsRegistratingUnrelatedOpenGenericCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
 
@@ -196,10 +167,8 @@
         public void AllowOverridingRegistrations_SetToTrue_ContainerReplacesAppendedRegistrationsAsWell()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = true
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
 
             container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
@@ -220,10 +189,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerThrowsExpectedExceptionMessage()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -243,10 +210,8 @@
         public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringRegistrations()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = true
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
 
             container.Register<IUserRepository, SqlUserRepository>();
 
@@ -261,10 +226,8 @@
         public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverringCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = false
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = false;
 
             container.RegisterAll<IUserRepository>(new SqlUserRepository());
 
@@ -279,10 +242,8 @@
         public void AllowOverridingRegistrations_SetToTrue_ContainerDoesAllowOverringCollections()
         {
             // Arrange
-            var container = new Container(new ContainerOptions
-            {
-                AllowOverridingRegistrations = true
-            });
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
 
             container.RegisterAll<IUserRepository>(new SqlUserRepository());
 
@@ -294,72 +255,19 @@
             AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
 
-        // NOTE: There was a bug in the framework. The container did not self-register when the overloaded
-        // constructor with the ContainerOptions was used. This test proves this bug.
-        [TestMethod]
-        public void ContainerWithOptions_ResolvingATypeThatDependsOnTheContainer_ContainerInjectsItself()
-        {
-            // Arrange
-            var container = new Container(new ContainerOptions());
-
-            // Act
-            var instance = container.GetInstance<ClassWithContainerAsDependency>();
-
-            // Assert
-            Assert.AreEqual(container, instance.Container);
-        }
-
-        [TestMethod]
-        public void ContainerWithOptions_SuppliedWithAnInstanceThatAlreadyBelongsToAnotherContainer_ThrowsExpectedException()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            var container1 = new Container(options);
-
-            try
-            {
-                // Act
-                new Container(options);
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "supplied ContainerOptions instance belongs to another Container instance.", ex);
-            }
-        }
-
-        [TestMethod]
-        public void ConstructorResolutionBehavior_SetWithNullValue_ThrowsException()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            // Act
-            Action action = () => options.ConstructorResolutionBehavior = null;
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
         [TestMethod]
         public void ConstructorResolutionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
             var expectedBehavior = new AlternativeConstructorResolutionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             // Act
-            options.ConstructorResolutionBehavior = expectedBehavior;
+            container.Options.ConstructorResolutionBehavior = expectedBehavior;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.ConstructorResolutionBehavior),
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, container.Options.ConstructorResolutionBehavior),
                 "The set_ConstructorResolutionBehavior did not work.");
         }
 
@@ -367,28 +275,18 @@
         public void ConstructorResolutionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
-            var expectedBehavior = new AlternativeConstructorResolutionBehavior();
-
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             container.RegisterSingle<object>("The first registration.");
 
-            try
-            {
-                // Act
-                options.ConstructorResolutionBehavior = expectedBehavior;
+            // Act
+            Action action = () => container.Options.ConstructorResolutionBehavior = 
+                new AlternativeConstructorResolutionBehavior();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "ConstructorResolutionBehavior property cannot be changed after the first registration",
-                    ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "ConstructorResolutionBehavior property cannot be changed after the first registration",
+                action);
         }
 
         [TestMethod]
@@ -397,34 +295,25 @@
             // Arrange
             var expectedBehavior = new AlternativeConstructorResolutionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             // Request a concrete instance that can be created by the container, even without any registrations.
             container.GetInstance<ClassWithContainerAsDependency>();
 
-            try
-            {
-                // Act
-                options.ConstructorResolutionBehavior = expectedBehavior;
+            // Act
+            Action action = () => container.Options.ConstructorResolutionBehavior = expectedBehavior;
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.StringContains(
-                    "ConstructorResolutionBehavior property cannot be changed after the first registration",
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "ConstructorResolutionBehavior property cannot be changed after the first registration",
+                action);
         }
 
         [TestMethod]
         public void ConstructorInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             // Act
             Action action = () => options.ConstructorInjectionBehavior = null;
@@ -439,15 +328,13 @@
             // Arrange
             var expectedBehavior = new AlternativeConstructorInjectionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             // Act
-            options.ConstructorInjectionBehavior = expectedBehavior;
+            container.Options.ConstructorInjectionBehavior = expectedBehavior;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.ConstructorInjectionBehavior),
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, container.Options.ConstructorInjectionBehavior),
                 "The set_ConstructorInjectionBehavior did not work.");
         }
 
@@ -457,33 +344,24 @@
             // Arrange
             var expectedBehavior = new AlternativeConstructorInjectionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             container.RegisterSingle<object>("The first registration.");
 
-            try
-            {
-                // Act
-                options.ConstructorInjectionBehavior = expectedBehavior;
+            // Act
+            Action action = () => container.Options.ConstructorInjectionBehavior = expectedBehavior;
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "ConstructorInjectionBehavior property cannot be changed after the first registration",
-                    ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "ConstructorInjectionBehavior property cannot be changed after the first registration",
+                action);
         }
 
         [TestMethod]
         public void PropertyInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             // Act
             Action action = () => options.PropertySelectionBehavior = null;
@@ -498,9 +376,7 @@
             // Arrange
             var expectedBehavior = new AlternativePropertySelectionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var options = GetContainerOptions();
 
             // Act
             options.PropertySelectionBehavior = expectedBehavior;
@@ -516,45 +392,16 @@
             // Arrange
             var expectedBehavior = new AlternativePropertySelectionBehavior();
 
-            var options = new ContainerOptions();
-
-            var container = new Container(options);
+            var container = new Container();
 
             container.RegisterSingle<object>("The first registration.");
 
-            try
-            {
-                // Act
-                options.PropertySelectionBehavior = expectedBehavior;
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "PropertySelectionBehavior property cannot be changed after the first registration",
-                    ex);
-            }
-        }
-
-        [TestMethod]
-        public void BuildParameterExpression_CalledOnConstructorInjectionBehaviorWhenOptionsIsNotPartOfAContainer_ThrowsExpectedException()
-        {
-            // Arrange
-            var options = new ContainerOptions();
-
-            var parameter = 
-                typeof(ClassWithContainerAsDependency).GetConstructors().First().GetParameters().First();
-            
             // Act
-            Action action = () => options.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+            Action action = () => container.Options.PropertySelectionBehavior = expectedBehavior;
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                The ContainerOptions instance for this ConstructorInjectionBehavior is not part of a Container
-                instance. Please make sure the ContainerOptions instance is supplied as argument to the 
-                constructor of a Container.".TrimInside(), 
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "PropertySelectionBehavior property cannot be changed after the first registration",
                 action);
         }
 
@@ -594,7 +441,7 @@
         public void DebuggerDisplayDescription_WithDefaultConfiguration_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             // Act
             var description = options.DebuggerDisplayDescription;
@@ -607,7 +454,7 @@
         public void DebuggerDisplayDescription_WithAllowOverridingRegistrations_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.AllowOverridingRegistrations = true;
 
@@ -622,7 +469,7 @@
         public void DebuggerDisplayDescription_WithOverriddenConstructorResolutionBehavior_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
 
@@ -637,7 +484,7 @@
         public void DebuggerDisplayDescription_WithOverriddenConstructorInjectionBehavior_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
 
@@ -652,7 +499,7 @@
         public void DebuggerDisplayDescription_WithOverriddenPropertySelectionBehavior_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
 
@@ -667,7 +514,7 @@
         public void DebuggerDisplayDescription_WithOverriddenLifestyleSelectionBehavior_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.LifestyleSelectionBehavior = new AlternativeLifestyleSelectionBehavior();
 
@@ -682,7 +529,7 @@
         public void DebuggerDisplayDescription_WithAllCustomValues_ReturnsExpectedMessage()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             options.AllowOverridingRegistrations = true;
             options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
@@ -707,7 +554,7 @@
         public void PropertySelectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             // Act
             Action action = () => options.PropertySelectionBehavior = null;
@@ -720,7 +567,7 @@
         public void LifestyleSelectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange
-            var options = new ContainerOptions();
+            var options = GetContainerOptions();
 
             // Act
             Action action = () => options.LifestyleSelectionBehavior = null;
@@ -734,6 +581,11 @@
             var body = (MemberExpression)propertySelector.Body;
 
             return body.Member;
+        }
+
+        private static ContainerOptions GetContainerOptions()
+        {
+            return new Container().Options;
         }
 
         public sealed class ClassWithContainerAsDependency

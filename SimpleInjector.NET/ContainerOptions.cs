@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -39,7 +40,7 @@ namespace SimpleInjector
     /// <returns>The instance that is returned from <paramref name="instanceProducer"/> or an intercepted instance.</returns>
     public delegate object ResolveInterceptor(InitializationContext context, Func<object> instanceProducer);
 
-    /// <summary>Configuration options for the <see cref="Container"/>.</summary>
+    /// <summary>Configuration options for the <see cref="SimpleInjector.Container">Container</see>.</summary>
     /// <example>
     /// The following example shows the typical usage of the <b>ContainerOptions</b> class.
     /// <code lang="cs"><![CDATA[
@@ -57,13 +58,6 @@ namespace SimpleInjector
     [DebuggerDisplay("{DebuggerDisplayDescription,nq}")]
     public class ContainerOptions
     {
-        // NOTE: This number should be low to prevent memory leaks, since dynamically created assemblies can't
-        // be unloaded.
-        private const int MaximumNumberOfContainersWithDynamicallyCreatedAssemblies = 5;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool? enableDynamicAssemblyCompilation;
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
 
@@ -77,10 +71,23 @@ namespace SimpleInjector
         private ILifestyleSelectionBehavior lifestyleBehavior;
 
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method is not supported anymore. Please use Container.Options to configure the container.",
+            error: true)]
         public ContainerOptions()
         {
+            throw new InvalidOperationException(
+                "This method is not supported anymore. Please use Container.Options to configure the container.");
+        }
+
+        internal ContainerOptions(Container container)
+        {
+            Requires.IsNotNull(container, "container");
+
+            this.Container = container;
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
-            this.injectionBehavior = new DefaultConstructorInjectionBehavior(() => this.Container);
+            this.injectionBehavior = new DefaultConstructorInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new TransientLifestyleSelectionBehavior();
         }
@@ -110,10 +117,7 @@ namespace SimpleInjector
 
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
+                Requires.IsNotNull(value, "value");
 
                 this.ThrowWhenContainerHasRegistrations("ConstructorResolutionBehavior");
 
@@ -131,7 +135,7 @@ namespace SimpleInjector
         [Obsolete("In v3, the IConstructorVerificationBehavior interface has been merged with the " +
             "IConstructorInjectionBehavior interface. Please use the ConstructorInjectionBehavior property " +
             "to override Simple Injector's verification behavior.", error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
 
         /// <summary>Gets or sets the constructor injection behavior.</summary>
@@ -209,48 +213,26 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the container to which this <b>ContainerOptions</b> instance belongs to or <b>null</b> when
-        /// this instance hasn't been applied to a <see cref="Container"/> yet.
+        /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
         /// </summary>
-        /// <value>The current <see cref="Container"/>.</value>
+        /// <value>The current <see cref="SimpleInjector.Container">Container</see>.</value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Container Container { get; internal set; }
+        public Container Container { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation. 
-        /// By default, this value is <b>true</b> for the first few containers that are created in an app 
-        /// domain and <b>false</b> for all other containers. You can set this value explicitly to <b>false</b>
+        /// By default, this value is <b>true</b> for the first few containers that are created in an AppDomain 
+        /// and <b>false</b> for all other containers. You can set this value explicitly to <b>false</b>
         /// to prevent the use of dynamic assemblies or you can set this value explicitly to <b>true</b> to
         /// force more container instances to use dynamic assemblies. Note that creating an infinite number
-        /// of <see cref="Container"/> instances (for instance one per web request) with this property set to
-        /// <b>true</b> will result in a memory leak; dynamic assemblies take up memory and will only be
-        /// unloaded when the AppDomain is unloaded.
+        /// of <see cref="SimpleInjector.Container">Container</see> instances (for instance one per web request) 
+        /// with this property set to <b>true</b> will result in a memory leak; dynamic assemblies take up 
+        /// memory and will only be unloaded when the AppDomain is unloaded.
         /// </summary>
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
         /// </value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool EnableDynamicAssemblyCompilation
-        {
-            get
-            {
-                if (this.enableDynamicAssemblyCompilation != null)
-                {
-                    return this.enableDynamicAssemblyCompilation.Value;
-                }
-
-                if (this.Container != null)
-                {
-                    return this.Container.ContainerId < MaximumNumberOfContainersWithDynamicallyCreatedAssemblies;
-                }
-
-                return false;
-            }
-
-            set
-            {
-                this.enableDynamicAssemblyCompilation = value;
-            }
-        }
+        public bool EnableDynamicAssemblyCompilation { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription
@@ -395,7 +377,7 @@ namespace SimpleInjector
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
         {
-            if (this.Container != null && (this.Container.HasRegistrations || this.Container.IsLocked))
+            if (this.Container.HasRegistrations || this.Container.IsLocked)
             {
                 throw new InvalidOperationException(
                     StringResources.PropertyCanNotBeChangedAfterTheFirstRegistration(propertyName));

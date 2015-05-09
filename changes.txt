@@ -4,8 +4,11 @@
 Version 3.0.0 (v3.0 RTM)
 
 	Improvements/Changes:
-		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (work item 2).
-		-[Core] Container now implements IDisposable (work item 5).
+		-[Core] Container now implements IDisposable (fixes #5).
+
+	Breaking Changes:
+		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (fixes #2).
+		-[Core] Constructor overload 'Container(ContainerOptions)' removed from Container (fixes #40).
 
 
 Version 2.8.1 (v2.8.1 RTM) 2015-05-05
