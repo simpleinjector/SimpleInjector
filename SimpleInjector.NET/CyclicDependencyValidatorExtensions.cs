@@ -22,6 +22,8 @@
 
 namespace SimpleInjector
 {
+    using System.Runtime.CompilerServices;
+
     /// <summary>
     /// Extension methods for the RecursiveDependencyValidator class.
     /// </summary>
@@ -29,6 +31,9 @@ namespace SimpleInjector
     {
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal static void CheckForRecursiveCalls(this CyclicDependencyValidator validator)
         {
             if (validator != null)

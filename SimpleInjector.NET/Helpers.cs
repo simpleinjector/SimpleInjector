@@ -294,8 +294,9 @@ namespace SimpleInjector
             }
         }
 
-        internal static class Array<T> {
-            internal readonly static T[] Empty = new T[0];
+        internal static class Array<T> 
+        {
+            internal static readonly T[] Empty = new T[0];
         }
     }
 }

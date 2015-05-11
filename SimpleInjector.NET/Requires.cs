@@ -24,16 +24,17 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
-    using SimpleInjector.Advanced;
+    using System.Runtime.CompilerServices;
     using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
-    using SimpleInjector.Lifestyles;
 
     internal static class Requires
     {
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal static void IsNotNull(object instance, string paramName)
         {
             if (instance == null)

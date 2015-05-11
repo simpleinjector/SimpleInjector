@@ -13,7 +13,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Made ScopedLifestyle.RegisterForDisposal method non-virtual (fixes #11).
 		-[Core] Made ScopedLifestyle.CreateCurrentScopeProvider method abstract (fixes #11).
 		-[Core] Removed ScopedLifestyle.DisposeInstances method (fixes #11).
-		-[Core] Removed Container.InjectProperties method (fixes #12).
+		-[Core] Removed Container.InjectProperties method remove
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
 		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).

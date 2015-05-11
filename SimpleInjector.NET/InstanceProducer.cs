@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -496,6 +497,9 @@ namespace SimpleInjector
         }
 
         // This method will be inlined by the JIT.
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private void RemoveValidator()
         {
             // No recursive calls detected, we can remove the validator to increase performance.
