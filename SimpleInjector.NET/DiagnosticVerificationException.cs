@@ -33,8 +33,8 @@ namespace SimpleInjector
     /// </summary>
     public partial class DiagnosticVerificationException : Exception
     {
-        private static readonly ReadOnlyCollection<DiagnosticResult> Empty = 
-            new ReadOnlyCollection<DiagnosticResult>(new DiagnosticResult[0]);
+        private static readonly ReadOnlyCollection<DiagnosticResult> Empty =
+            new ReadOnlyCollection<DiagnosticResult>(Helpers.Array<DiagnosticResult>.Empty);
 
 #if !PCL
         [NonSerializedAttribute]
@@ -44,17 +44,17 @@ namespace SimpleInjector
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class.
         /// </summary>
-        public DiagnosticVerificationException() 
-        { 
+        public DiagnosticVerificationException()
+        {
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class with a specified error 
         /// message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public DiagnosticVerificationException(string message)
-            : base(message) 
+            : base(message)
         {
         }
 
@@ -63,7 +63,8 @@ namespace SimpleInjector
         /// message.
         /// </summary>
         /// <param name="errors">The list of errors.</param>
-        public DiagnosticVerificationException(IList<DiagnosticResult> errors) : base(BuildMessage(errors)) 
+        public DiagnosticVerificationException(IList<DiagnosticResult> errors)
+            : base(BuildMessage(errors))
         {
             this.errors = new ReadOnlyCollection<DiagnosticResult>(errors.ToArray());
         }
@@ -80,7 +81,7 @@ namespace SimpleInjector
         /// Basic) if no inner exception is specified. 
         /// </param>
         public DiagnosticVerificationException(string message, Exception innerException)
-            : base(message, innerException) 
+            : base(message, innerException)
         {
         }
 
@@ -88,7 +89,7 @@ namespace SimpleInjector
         /// Gets the list of <see cref="DiagnosticResult"/> instances.
         /// </summary>
         /// <value>A list of <see cref="DiagnosticResult"/> instances.</value>
-        public ReadOnlyCollection<DiagnosticResult> Errors 
+        public ReadOnlyCollection<DiagnosticResult> Errors
         {
             get { return this.errors; }
         }

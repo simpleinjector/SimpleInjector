@@ -112,7 +112,7 @@ namespace SimpleInjector
         private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
         {
             Expression<Func<TResult>> lambda =
-                Expression.Lambda<Func<TResult>>(expression, new ParameterExpression[0]);
+                Expression.Lambda<Func<TResult>>(expression, Helpers.Array<ParameterExpression>.Empty);
 
             return CompileDelegateInDynamicAssembly(lambda);
         }

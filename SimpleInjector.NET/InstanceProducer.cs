@@ -81,7 +81,7 @@ namespace SimpleInjector
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class InstanceProducer
     {
-        private static readonly Action[] NoVerifiers = new Action[0];
+        private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;

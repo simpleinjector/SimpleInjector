@@ -54,7 +54,7 @@ namespace SimpleInjector.Extensions
                 return true;
             }
 
-            bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(new Type[0]) != null;
+            bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(Helpers.Array<Type>.Empty) != null;
 
             return typeHasDefaultCtor;
         }

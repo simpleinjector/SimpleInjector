@@ -138,7 +138,7 @@ namespace SimpleInjector
         {
             if (this.disposables == null)
             {
-                return new IDisposable[0];
+                return Helpers.Array<IDisposable>.Empty;
             }
 
             return this.disposables.ToArray();

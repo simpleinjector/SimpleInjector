@@ -479,7 +479,7 @@ namespace SimpleInjector
         {
             if (!this.resolveInterceptors.Any())
             {
-                return new ResolveInterceptor[0];
+                return Helpers.Array<ResolveInterceptor>.Empty;
             }
 
             return (

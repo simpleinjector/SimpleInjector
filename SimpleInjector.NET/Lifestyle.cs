@@ -115,7 +115,7 @@ namespace SimpleInjector
         /// container.RegisterSingle<ITimeProvider, RealTimeProvider>();
         /// ]]></code>
         /// </example>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", 
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "It's not mutable.")]
         public static readonly Lifestyle Singleton = new SingletonLifestyle();
 
@@ -146,19 +146,19 @@ namespace SimpleInjector
 
         /// <summary>Gets the user friendly name of this lifestyle.</summary>
         /// <value>The user friendly name of this lifestyle.</value>
-        public string Name 
-        { 
-            get { return this.name; } 
+        public string Name
+        {
+            get { return this.name; }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal virtual int ComponentLength 
+        internal virtual int ComponentLength
         {
             get { return this.Length; }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal virtual int DependencyLength 
+        internal virtual int DependencyLength
         {
             get { return this.Length; }
         }
@@ -228,7 +228,7 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
-        public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, 
+        public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle,
             Lifestyle falseLifestyle)
         {
             Requires.IsNotNull(lifestyleSelector, "lifestyleSelector");
@@ -283,7 +283,7 @@ namespace SimpleInjector
 
             return new ScopedHybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
         }
-        
+
         /// <summary>
         /// Creates a custom lifestyle using the supplied <paramref name="lifestyleApplierFactory"/> delegate.
         /// </summary>
@@ -394,7 +394,7 @@ namespace SimpleInjector
             return new InstanceProducer(typeof(TService),
                 this.CreateRegistration<TService>(instanceCreator, container));
         }
-        
+
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <paramref name="serviceType"/>
         /// that will create new instances of specified <paramref name="implementationType"/> with the 
@@ -427,7 +427,7 @@ namespace SimpleInjector
             where TConcrete : class
         {
             Requires.IsNotNull(container, "container");
-            
+
             return this.CreateRegistrationCore<TConcrete, TConcrete>(container);
         }
 
@@ -476,7 +476,7 @@ namespace SimpleInjector
 
             return registration;
         }
-                
+
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle.
@@ -518,7 +518,7 @@ namespace SimpleInjector
             Requires.IsReferenceType(serviceType, "serviceType");
             Requires.IsReferenceType(implementationType, "implementationType");
 
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType, 
+            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
                 "implementationType");
 
             var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceTImplementationMethod
@@ -530,11 +530,11 @@ namespace SimpleInjector
             }
             catch (MemberAccessException ex)
             {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(implementationType, ex, 
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(implementationType, ex,
                     "implementationType");
             }
         }
-       
+
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <paramref name="serviceType"/>  using the supplied <paramref name="instanceCreator"/> 
@@ -563,8 +563,8 @@ namespace SimpleInjector
             {
                 // Build the following delegate: () => (ServiceType)instanceCreator();
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
-                
-                return (Registration)closedCreateRegistrationMethod.Invoke(this, 
+
+                return (Registration)closedCreateRegistrationMethod.Invoke(this,
                     new object[] { typeSafeInstanceCreator, container });
             }
             catch (MemberAccessException ex)
@@ -582,7 +582,7 @@ namespace SimpleInjector
 
             return registration;
         }
-        
+
         /// <summary>
         /// When overridden in a derived class, 
         /// creates a new <see cref="Registration"/> instance defining the creation of the
@@ -627,15 +627,13 @@ namespace SimpleInjector
         {
             // Build the following delegate: () => (ServiceType)instanceCreator();
             var invocationExpression =
-                Expression.Invoke(Expression.Constant(instanceCreator), new Expression[0]);
+                Expression.Invoke(Expression.Constant(instanceCreator), Helpers.Array<Expression>.Empty);
 
             var convertExpression = Expression.Convert(invocationExpression, serviceType);
 
-            var parameters = new ParameterExpression[0];
-
             // This might throw an MemberAccessException when serviceType is internal while we're running in
             // a Silverlight sandbox.
-            return Expression.Lambda(convertExpression, parameters).Compile();
+            return Expression.Lambda(convertExpression, Helpers.Array<ParameterExpression>.Empty).Compile();
         }
 
         private static ArgumentException BuildUnableToResolveTypeDueToSecurityConfigException(
@@ -643,7 +641,7 @@ namespace SimpleInjector
         {
             // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
             return new ArgumentException(
-                StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException) + 
+                StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException) +
                 "\nparamName: " + paramName, innerException);
         }
 

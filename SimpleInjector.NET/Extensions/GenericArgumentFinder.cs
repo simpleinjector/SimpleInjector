@@ -199,7 +199,7 @@ namespace SimpleInjector.Extensions
                 // The length of the concrete list and the generic argument list does not match. This normally
                 // means that the generic argument contains a argument that is not generic (so Int32 instead
                 // of T). In that case we can ignore everything, because the type will be unusable.
-                return new ArgumentMapping[0];
+                return Helpers.Array<ArgumentMapping>.Empty;
             }
 
             return (

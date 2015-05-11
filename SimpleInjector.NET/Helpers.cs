@@ -293,5 +293,9 @@ namespace SimpleInjector
                     StringResources.ConfigurationInvalidCollectionContainsNullElements(serviceType));
             }
         }
+
+        internal static class Array<T> {
+            internal readonly static T[] Empty = new T[0];
+        }
     }
 }

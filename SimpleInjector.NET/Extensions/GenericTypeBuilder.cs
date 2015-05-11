@@ -43,9 +43,9 @@ namespace SimpleInjector.Extensions
         private readonly Type partialOpenGenericImplementation;
 
         private readonly bool isPartialOpenGenericImplementation;
-      
+
         public GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
-        {    
+        {
             this.closedGenericBaseType = closedGenericBaseType;
 
             this.openGenericImplementation = openGenericImplementation;
@@ -57,7 +57,7 @@ namespace SimpleInjector.Extensions
                 this.isPartialOpenGenericImplementation = true;
             }
         }
-        
+
         internal bool OpenGenericImplementationCanBeAppliedToServiceType()
         {
             var openGenericBaseType = this.closedGenericBaseType.GetGenericTypeDefinition();
@@ -69,11 +69,11 @@ namespace SimpleInjector.Extensions
                 .Distinct()
                 .ToArray();
 
-            return openGenericBaseTypes.Any(type => 
+            return openGenericBaseTypes.Any(type =>
             {
                 var typeArguments = GetNestedTypeArgumentsForType(type);
 
-                var partialOpenImplementation = 
+                var partialOpenImplementation =
                     this.partialOpenGenericImplementation ?? this.openGenericImplementation;
 
                 var unmappedArguments = partialOpenImplementation.GetGenericArguments().Except(typeArguments);
@@ -131,7 +131,7 @@ namespace SimpleInjector.Extensions
                 catch (ArgumentException)
                 {
                     // This can happen when there is a type constraint that we didn't check. For instance
-                    // the constraint where TIn : TOut is one we cannot check and have to to here (bit ugly).
+                    // the constraint where TIn : TOut is one we cannot check and have to do here (bit ugly).
                     return null;
                 }
             }
@@ -168,14 +168,13 @@ namespace SimpleInjector.Extensions
                     this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
             }
 
-            return new CandicateServiceType(openCandidateServiceType, new Type[0]);
+            return new CandicateServiceType(openCandidateServiceType, Helpers.Array<Type>.Empty);
         }
 
         private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)
         {
             if (this.openGenericImplementation.IsGenericType)
             {
-                // return true;
                 return this.SatisfiesGenericTypeConstraints(openCandidateServiceType);
             }
 
