@@ -52,8 +52,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
             // Act
             using (var scope = container.BeginLifetimeScope())
             {
@@ -141,8 +139,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
             // Act
             var currentScope = container.GetCurrentLifetimeScope();
 
@@ -169,8 +165,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
             using (var scope = container.BeginLifetimeScope())
             {
                 // Act
@@ -187,8 +181,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
-
-            container.EnableLifetimeScoping();
 
             using (var outerScope = container.BeginLifetimeScope())
             {
@@ -353,8 +345,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
@@ -377,8 +367,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
-
-            container.EnableLifetimeScoping();
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
@@ -411,21 +399,13 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
-            // Act
             using (var scope = container.BeginLifetimeScope())
             {
-                try
-                {
-                    scope.RegisterForDisposal(null);
+                // Act
+                Action action = () => scope.RegisterForDisposal(null);
 
-                    Assert.Fail("Exception expected.");
-                }
-                catch (ArgumentNullException)
-                {
-                    // This exception is expected.
-                }
+                // Assert
+                AssertThat.Throws<ArgumentNullException>(action);
             }
         }
 
@@ -752,38 +732,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         }
 
         [TestMethod]
-        public void EnableLifetimeScoping_AllowOverridingRegistrationsIsTrue_AllowOverridingRegistrationsRemainsTrue()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.AllowOverridingRegistrations = true;
-
-            // Act
-            container.EnableLifetimeScoping();
-
-            // Assert
-            Assert.IsTrue(container.Options.AllowOverridingRegistrations);
-        }
-
-        [TestMethod]
-        public void EnableLifetimeScoping_CalledAgainAfterAllowOverridingRegistrationsIsTrue_AllowOverridingRegistrationsRemainsTrue()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.EnableLifetimeScoping();
-
-            container.Options.AllowOverridingRegistrations = true;
-
-            // Act
-            container.EnableLifetimeScoping();
-
-            // Assert
-            Assert.IsTrue(container.Options.AllowOverridingRegistrations);
-        }
-
-        [TestMethod]
         public void GetInstance_OnDecoratedLifetimeScopedInstance_WrapsTheInstanceWithTheDecorator()
         {
             // Arrange
@@ -864,23 +812,25 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.EnableLifetimeScoping();
-
             var scope = container.BeginLifetimeScope();
-            try
-            {
-                // Act
-                Task.Factory.StartNew(() => scope.Dispose()).Wait();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (AggregateException ex)
+            // Act
+            Action action = () =>
             {
-                Assert.IsTrue(ex.InnerException.Message.Contains(
-                    "It is not safe to use a LifetimeScope instance across threads."),
-                    "Actual: ", ex.InnerException.Message);
-            }
+                try
+                {
+                    Task.Factory.StartNew(() => scope.Dispose()).Wait();
+                }
+                catch (AggregateException ex)
+                {
+                    throw ex.InnerException;
+                }
+            };
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "It is not safe to use a LifetimeScope instance across threads.",
+                action);
         }
         
         [TestMethod]
@@ -1028,8 +978,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
-
-            container.EnableLifetimeScoping();
 
             var lifestyle = new LifetimeScopeLifestyle();
 

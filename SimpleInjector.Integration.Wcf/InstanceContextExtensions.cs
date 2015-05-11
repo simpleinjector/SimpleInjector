@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -29,7 +29,7 @@ namespace SimpleInjector.Integration.Wcf
 
     internal static class InstanceContextExtensions
     {
-        internal static WcfOperationScope BeginScope(this InstanceContext instanceContext)
+        internal static Scope BeginScope(this InstanceContext instanceContext)
         {
             var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
 
@@ -46,7 +46,7 @@ namespace SimpleInjector.Integration.Wcf
             return extension.Scope;
         }
 
-        internal static WcfOperationScope GetCurrentScope(this InstanceContext instanceContext)
+        internal static Scope GetCurrentScope(this InstanceContext instanceContext)
         {
             if (instanceContext == null)
             {
@@ -70,7 +70,7 @@ namespace SimpleInjector.Integration.Wcf
 
         private sealed class SimpleInjectorInstanceContextExtension : IExtension<InstanceContext>
         {
-            internal WcfOperationScope Scope { get; set; }
+            internal Scope Scope { get; set; }
 
             public void Attach(InstanceContext owner)
             {

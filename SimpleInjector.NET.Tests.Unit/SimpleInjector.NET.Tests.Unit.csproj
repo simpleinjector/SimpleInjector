@@ -132,9 +132,7 @@
     <Compile Include="GetServiceTests.cs" />
     <Compile Include="CyclicDependencyValidatorTests.cs" />
     <Compile Include="ConsistencyTests.cs" />
-    <Compile Include="InjectPropertiesTests.cs" />
     <Compile Include="ExpressionBuiltEventTests.cs" />
-    <Compile Include="InjectPropertiesTests.full.cs" />
     <Compile Include="InstanceProducerInlineVisualizerTests.cs" />
     <Compile Include="NUnitToMsTestAdapter\Assert.cs" />
     <Compile Include="NUnitToMsTestAdapter\TestClassAttribute.cs" />

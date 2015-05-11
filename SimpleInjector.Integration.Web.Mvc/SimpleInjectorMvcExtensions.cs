@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,7 +25,7 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
@@ -53,28 +53,16 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
-        [Obsolete("RegisterMvcAttributeFilterProvider has been deprecated and will be removed in a future " +
-            "release. Consider using RegisterMvcIntegratedFilterProvider instead. " +
-            "See https://simpleinjector.org/depr2",
-            error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +
+            "Use RegisterMvcIntegratedFilterProvider instead. See https://simpleinjector.org/depr2",
+            error: true)]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException("container");
-            }
-
-            RequiresFilterProviderNotRegistered(container);
-
-            var singletonFilterProvider = new SimpleInjectorLegacyFilterProvider(container);
-
-            container.RegisterSingle<IFilterProvider>(singletonFilterProvider);
-
-            var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToList();
-
-            providers.ForEach(provider => FilterProviders.Providers.Remove(provider));
-
-            FilterProviders.Providers.Add(singletonFilterProvider);
+            throw new InvalidOperationException(
+                "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +
+                "Use RegisterMvcIntegratedFilterProvider instead. See https://simpleinjector.org/depr2");
         }
 
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
@@ -193,13 +181,7 @@ namespace SimpleInjector
                 where differentContainer
                 select provider;
 
-            var legacyProviders =
-                from provider in FilterProviders.Providers.OfType<SimpleInjectorLegacyFilterProvider>()
-                let differentContainer = !object.ReferenceEquals(container, provider.Container)
-                where differentContainer
-                select provider;
-
-            return integratedProviders.Any() || legacyProviders.Any();
+            return integratedProviders.Any();
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",

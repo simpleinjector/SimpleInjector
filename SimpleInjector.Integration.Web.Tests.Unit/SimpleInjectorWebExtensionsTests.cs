@@ -152,52 +152,6 @@
                 "The lifetime scope should not dispose objects that are not explicitly marked as such, since " +
                 "this would allow the scope to accidentally dispose singletons.");
         }
-        
-        [TestMethod]
-        public void RegisterPerWebRequestDispose_TransientInstanceWithRegisterForDisposal_DisposesThatInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Transient
-            container.Register<ICommand, DisposableCommand>();
-
-            container.RegisterInitializer<DisposableCommand>(SimpleInjectorWebExtensions.RegisterForDisposal);
-
-            DisposableCommand command;
-
-            // Act
-            using (new HttpContextScope())
-            {
-                command = container.GetInstance<DisposableCommand>();
-            }
-
-            // Assert
-            Assert.IsTrue(command.HasBeenDisposed,
-                "The transient instance was expected to be disposed, because it was registered for disposal.");
-        }
-
-        [TestMethod]
-        public void RegisterForDisposal_WithNullArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            using (new HttpContextScope())
-            {
-                try
-                {
-                    SimpleInjectorWebExtensions.RegisterForDisposal(null);
-
-                    Assert.Fail("Exception expected.");
-                }
-                catch (ArgumentNullException)
-                {
-                    // This exception is expected.
-                }
-            }
-        }
 
         [TestMethod]
         public void GetInstance_OnPerWebRequesstInstance_WillNotBeDisposedDuringTheRequest()
@@ -484,17 +438,6 @@
                 Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
                     "The decorated instance should be scoped per lifetime. It seems to be transient.");
             }
-        }
-
-        [TestMethod]
-        public void RegisterForDisposal_CalledOutsideTheContextOfAHttpRequest_ThrowsExpectedException()
-        {
-            // Act
-            Action action = () => SimpleInjectorWebExtensions.RegisterForDisposal(new DisposableCommand());
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This method can only be called in the context of a web request", action);
         }
 
         [TestMethod]

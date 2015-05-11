@@ -22,11 +22,7 @@
 
 namespace SimpleInjector.Integration.Wcf
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.ServiceModel;
-    using System.Threading;
 
     /// <summary>
     /// Thread and container specific cache for services that are registered with one of the 
@@ -34,7 +30,7 @@ namespace SimpleInjector.Integration.Wcf
     /// This class is created implicitly and a current instance can be requested by calling
     /// <see cref="SimpleInjectorWcfExtensions.GetCurrentWcfOperationScope">GetCurrentWcfOperationScope</see>.
     /// </summary>
-    public sealed class WcfOperationScope : Scope
+    internal sealed class WcfOperationScope : Scope
     {
         private InstanceContext instanceContext;
 
@@ -43,8 +39,6 @@ namespace SimpleInjector.Integration.Wcf
             this.instanceContext = instanceContext;
         }
 
-        /// <summary>Releases all instances that are cached by the <see cref="WcfOperationScope"/> object.</summary>
-        /// <param name="disposing">False when only unmanaged resources should be released.</param>
         protected override void Dispose(bool disposing)
         {
             try

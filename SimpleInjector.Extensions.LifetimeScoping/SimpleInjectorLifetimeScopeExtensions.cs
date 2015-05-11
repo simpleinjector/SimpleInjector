@@ -26,7 +26,6 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.LifetimeScoping;
     
@@ -37,25 +36,20 @@ namespace SimpleInjector
     {
         private static readonly object ManagerKey = new object();
 
-        /// <summary>
-        /// Enables the lifetime scoping for the given <paramref name="container"/>. Lifetime scoping is
-        /// enabled automatically when services get registered using one of the 
-        /// <see cref="RegisterLifetimeScope{TService, TImplementation}(Container)">RegisterLifetimeScope</see> overloads
-        /// or making registrations using the <see cref="LifetimeScopeLifestyle"/>. When no services are 
-        /// registered using this lifestyle, but lifetime scoping is still needed (for instance when you want 
-        /// instances to be disposed at the end of a lifetime scope), lifetime scoping must be enabled explicitly.
-        /// </summary>
+        /// <summary>This method is obsolete.</summary>
         /// <param name="container">The container.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
-            "Remove the call to this method; it will be removed in a future version.")]
+            "Remove the call to this method; it will be removed in a future version.",
+            error: true)]
         public static void EnableLifetimeScoping(this Container container)
         {
-            // This method has become a no-op.
-            Requires.IsNotNull(container, "container");
+            throw new InvalidOperationException(
+                "LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
+                "Remove the call to this method; it will be removed in a future version.");
         }
 
         /// <summary>
@@ -234,7 +228,7 @@ namespace SimpleInjector
         /// The scope should be disposed explicitly when the scope ends.
         /// </summary>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
@@ -249,7 +243,7 @@ namespace SimpleInjector
         /// }
         /// ]]></code>
         /// </example>
-        public static LifetimeScope BeginLifetimeScope(this Container container)
+        public static Scope BeginLifetimeScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 
@@ -257,13 +251,13 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the <see cref="LifetimeScope"/> that is currently in scope or <b>null</b> when no
-        /// <see cref="LifetimeScope"/> is currently in scope.
+        /// Gets the <see cref="Scope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="Scope"/> is currently in scope.
         /// </summary>
         /// <example>
         /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
         /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="LifetimeScope"/> in which context it is created:
+        /// for disposal in the <see cref="Scope"/> in which context it is created:
         /// <code lang="cs"><![CDATA[
         /// container.Register<IService, ServiceImpl>();
         /// container.RegisterInitializer<ServiceImpl>(instance =>
@@ -273,10 +267,10 @@ namespace SimpleInjector
         /// ]]></code>
         /// </example>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="LifetimeScope"/> instance.</returns>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        public static LifetimeScope GetCurrentLifetimeScope(this Container container)
+        public static Scope GetCurrentLifetimeScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 

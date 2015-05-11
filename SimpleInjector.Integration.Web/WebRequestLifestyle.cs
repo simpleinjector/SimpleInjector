@@ -91,11 +91,6 @@ namespace SimpleInjector.Integration.Web
             return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
         }
 
-        internal static void RegisterForDisposal(IDisposable disposable, HttpContext context)
-        {
-            GetCurrentScope(context).RegisterForDisposal(disposable);
-        }
-
         internal static void CleanUpWebRequest()
         {
             var context = HttpContext.Current;

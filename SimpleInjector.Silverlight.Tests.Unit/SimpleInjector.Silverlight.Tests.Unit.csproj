@@ -174,9 +174,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetServiceTests.cs">
       <Link>GetServiceTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\InjectPropertiesTests.cs">
-      <Link>InjectPropertiesTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\InstanceProducerInlineVisualizerTests.cs">
       <Link>InstanceProducerInlineVisualizerTests.cs</Link>
     </Compile>
@@ -248,7 +245,6 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\OpenGenericRegistrationExtensionsTests.silverlight.cs" />
-    <Compile Include="InjectPropertiesTests.Silverlight.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilverlightSpecificTests.cs" />
   </ItemGroup>

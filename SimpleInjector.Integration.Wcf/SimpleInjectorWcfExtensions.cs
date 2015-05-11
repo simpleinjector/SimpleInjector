@@ -25,6 +25,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -77,20 +78,17 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>
-        /// Allows the container to resolve instances with a Per WCF Operation lifestyle for the given 
-        /// <paramref name="container"/>. This is 
-        /// enabled automatically when services get registered using one of the <b>RegisterPerWcfRequest</b>
-        /// overloads or when the container passed onto the 
-        /// <see cref="SimpleInjectorServiceHostFactory.SetContainer"/> method. 
-        /// </summary>
+        /// <summary>This method is obsolete. Do not call this method.</summary>
         /// <param name="container">The container.</param>
         [Obsolete("The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
-            "This method has therefore become a no-op and the call to this method can be removed safely.")]
+            "This method has therefore become a no-op and the call to this method can be removed safely.",
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void EnablePerWcfOperationLifestyle(this Container container)
         {
-            // This method has become a no-op.
-            Requires.IsNotNull(container, "container");
+            throw new InvalidOperationException(
+                "The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
+                "This method has therefore become a no-op and the call to this method can be removed safely.");
         }
 
         /// <summary>
@@ -201,13 +199,13 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the <see cref="WcfOperationScope"/> for the current WCF request or <b>null</b> when no
-        /// <see cref="WcfOperationScope"/> is currently in scope.
+        /// Gets the <see cref="Scope"/> for the current WCF request or <b>null</b> when no
+        /// <see cref="Scope"/> is currently in scope.
         /// </summary>
         /// <example>
         /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
         /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="WcfOperationScope"/> in which context it is created:
+        /// for disposal in the <see cref="Scope"/> in which context it is created:
         /// <code lang="cs"><![CDATA[
         /// container.Register<IService, ServiceImpl>();
         /// container.RegisterInitializer<ServiceImpl>(instance =>
@@ -217,17 +215,13 @@ namespace SimpleInjector
         /// ]]></code>
         /// </example>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="WcfOperationScope"/> instance.</returns>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
-        /// has both no <b>LifetimeScope</b> registrations <i>and</i> <see cref="EnablePerWcfOperationLifestyle"/> is
-        /// not called. Lifetime scoping must be enabled by calling <see cref="EnablePerWcfOperationLifestyle"/> or
-        /// by registering a service using one of the 
-        /// <see cref="RegisterPerWcfOperation{TService, TImplementation}(Container)">RegisterPerWcfRequest</see>
-        /// overloads.
+        /// has both no <b>LifetimeScope</b> registrations.
         /// </exception>
-        public static WcfOperationScope GetCurrentWcfOperationScope(this Container container)
+        public static Scope GetCurrentWcfOperationScope(this Container container)
         {
             Requires.IsNotNull(container, "container");
 

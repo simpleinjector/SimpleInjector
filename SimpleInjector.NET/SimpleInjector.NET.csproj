@@ -177,7 +177,6 @@
     <Compile Include="Lifestyles\SingletonLifestyle.cs" />
     <Compile Include="Lifestyles\TransientLifestyle.cs" />
     <Compile Include="Lifestyles\UnknownLifestyle.cs" />
-    <Compile Include="PropertyInjector.cs" />
     <Compile Include="Container.Registration.cs" />
     <Compile Include="Container.Resolving.cs" />
     <Compile Include="Container.Common.cs" />

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,17 +23,15 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Runtime.CompilerServices;
     using System.Threading;
 
     /// <summary>
     /// Thread and container specific cache for services that are registered with one of the 
     /// <see cref="SimpleInjectorLifetimeScopeExtensions">RegisterLifetimeScope</see> extension method overloads.
     /// </summary>
-    public sealed class LifetimeScope : Scope
+    internal sealed class LifetimeScope : Scope
     {
         private readonly int initialThreadId;
         private LifetimeScopeManager manager;

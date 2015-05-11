@@ -370,13 +370,6 @@ namespace SimpleInjector
         /// decorated with the supplied <b>MyInjectPropertyAttribute</b>. If decorated properties are found,
         /// the given expression is replaced with an expression that injects decorated properties.
         /// </para>
-        /// <para>
-        /// The example differs from the container's built-in <see cref="InjectProperties"/> method in that
-        /// it will fail when one of the decorated properties can not be injected. The built-in
-        /// <see cref="InjectProperties"/> will look at all properties of a given class and will simply skip
-        /// over any properties that can not be injected, making the use of the <see cref="InjectProperties"/>
-        /// method often verify fragile and error prone.
-        /// </para>
         /// </example>
         public event EventHandler<ExpressionBuildingEventArgs> ExpressionBuilding
         {

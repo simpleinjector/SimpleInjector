@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -207,35 +208,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Injects all public writable properties of the given <paramref name="instance"/> that have a type
-        /// that can be resolved by this container instance.
-        /// <b>NOTE:</b> This method will be removed in a future release. To use property injection,
-        /// implement a custom the <see cref="IPropertySelectionBehavior"/> instead. For more information,
-        /// read the 
-        /// <a href="https://simpleinjector.org/xtppr">extendibility points</a> wiki.
+        /// This method is obsolete.
         /// </summary>
         /// <param name="instance">The instance whose properties will be injected.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="instance"/> is null (Nothing in VB).</exception>
-        /// <exception cref="ActivationException">Throw when injecting properties on the given instance
-        /// failed due to security constraints of the sandbox. This can happen when injecting properties
-        /// on an internal type in a Silverlight sandbox, or when running in partial trust.</exception>
-        [Obsolete("Container.InjectProperties has been deprecated and will be removed in a future release. " +
-            "See https://simpleinjector.org/depr1.", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +
+            "on why and how what to do instead.", 
+            error: true)]
         public void InjectProperties(object instance)
         {
-            Requires.IsNotNull(instance, "instance");
-
-            PropertyInjector propertyInjector;
-
-            if (!this.propertyInjectorCache.TryGetValue(instance.GetType(), out propertyInjector))
-            {
-                propertyInjector = new PropertyInjector(this, instance.GetType());
-
-                this.RegisterPropertyInjector(propertyInjector);
-            }
-
-            propertyInjector.Inject(instance);
+            throw new InvalidOperationException(
+                "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " + 
+                "on why and how what to do instead.");
         }
 
         internal InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure,
@@ -298,20 +283,6 @@ namespace SimpleInjector
                     }
                 };
             }
-        }
-
-        private void RegisterPropertyInjector(PropertyInjector injector)
-        {
-            var copy = this.propertyInjectorCache.MakeCopy();
-
-            copy[injector.Type] = injector;
-
-            // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
-            // producer from being added after the snapshot has been made accessible to other threads.
-            Thread.MemoryBarrier();
-
-            // Replace the original with the new version that includes the serviceType.
-            this.propertyInjectorCache = copy;
         }
 
         private InstanceProducer GetInstanceProducerForType<TService>() where TService : class

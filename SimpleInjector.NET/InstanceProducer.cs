@@ -277,12 +277,10 @@ namespace SimpleInjector
         /// Gets the collection of relationships for this instance that the container knows about.
         /// This includes relationships between the registered type and its dependencies and relationships 
         /// between applied decorators and their dependencies. Note that types that are not newed up by the 
-        /// container, property dependencies that are injected using the (legacy)
-        /// <see cref="Container.InjectProperties">InjectProperties</see> method, and
-        /// properties that are injected inside a custom delegate that is registered using the
+        /// container and properties that are injected inside a custom delegate that is registered using the
         /// <see cref="Container.RegisterInitializer{TService}">RegisterInitializer</see> method are unknown
         /// to the container and are not returned from this method.
-        /// Also note that this method will return an empty collection when called before the the
+        /// Also note that this method will return an empty collection when called before the
         /// registered type is requested from the container (or before <see cref="Container.Verify()">Verify</see>
         /// is called). 
         /// </summary>

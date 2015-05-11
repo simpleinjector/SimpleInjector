@@ -86,7 +86,7 @@ namespace SimpleInjector.Integration.Wcf
             WithDisposal.WhenScopeEnds(container, action);
         }
         
-        internal static WcfOperationScope GetCurrentScopeCore()
+        internal static Scope GetCurrentScopeCore()
         {
             var operationContext = OperationContext.Current;
 

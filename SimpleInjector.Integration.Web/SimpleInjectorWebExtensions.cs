@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,9 +25,9 @@
 namespace SimpleInjector
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Web;
-
     using SimpleInjector.Integration.Web;
 
     /// <summary>
@@ -137,37 +137,18 @@ namespace SimpleInjector
                 WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));
         }
 
-        /// <summary>
-        /// Registers the supplied <paramref name="disposable"/> for disposal when the current web request
-        /// ends.
-        /// </summary>
-        /// <example>
-        /// The following example registers a <b>DisposableServiceImpl</b> type as transient (a new instance 
-        /// will be returned every time) and registers an initializer for that type that will ensure that
-        /// that instance will be disposed when the web request ends:
-        /// <code lang="cs"><![CDATA[
-        /// container.Register<IService, ServiceImpl>();
-        /// container.RegisterInitializer<ServiceImpl>(SimpleInjectorWebExtensions.RegisterForDisposal);
-        /// ]]></code>
-        /// </example>
+        /// <summary>This method is obsolete.</summary>
         /// <param name="disposable">The disposable.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the given <paramref name="disposable"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the <see cref="HttpContext.Current"/>
-        /// returns null.</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +
+            "request's current scope instance.",
+            error: true)]
         public static void RegisterForDisposal(IDisposable disposable)
         {
-            Requires.IsNotNull(disposable, "disposable");
-
-            var context = HttpContext.Current;
-
-            if (context == null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called in the context of a web request.");
-            }
-
-            WebRequestLifestyle.RegisterForDisposal(disposable, context);
+            throw new InvalidOperationException(
+                "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +
+                "request's current scope instance.");
         }
     }
 }

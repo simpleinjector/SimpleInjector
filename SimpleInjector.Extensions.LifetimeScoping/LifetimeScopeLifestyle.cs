@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,16 +23,13 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explicitly defined scope using the
     /// <see cref="SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(Container)">BeginLifetimeScope</see>
     /// method. A scope is thread-specific, each thread should define its own scope. Scopes can be nested and
     /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
-    /// the created scope gets <see cref="LifetimeScope.Dispose">disposed</see>. 
+    /// the created scope gets disposed. 
     /// </summary>
     /// <example>
     /// The following example shows the usage of the <b>LifetimeScopeLifestyle</b> class:
@@ -83,7 +80,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenLifetimeScopeEnds">
         /// Specifies whether the created and cached instance will be disposed when the created 
-        /// <see cref="LifetimeScope"/> instance gets disposed and when the created object implements 
+        /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
         public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds)

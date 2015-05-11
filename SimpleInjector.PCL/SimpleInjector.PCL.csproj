@@ -334,9 +334,6 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\UnknownLifestyle.cs">
       <Link>Lifestyles\UnknownLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\PropertyInjector.cs">
-      <Link>PropertyInjector.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Registration.cs">
       <Link>Registration.cs</Link>
     </Compile>
