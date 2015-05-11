@@ -7,6 +7,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
@@ -382,7 +383,7 @@
             options.PropertySelectionBehavior = expectedBehavior;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, options.PropertySelectionBehavior),
+            Assert.AreSame(expectedBehavior, options.PropertySelectionBehavior,
                 "The set_PropertySelectionBehavior did not work.");
         }
 
@@ -390,18 +391,80 @@
         public void PropertyInjectionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
-            var expectedBehavior = new AlternativePropertySelectionBehavior();
-
             var container = new Container();
 
             container.RegisterSingle<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.PropertySelectionBehavior = expectedBehavior;
+            Action action = 
+                () => container.Options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "PropertySelectionBehavior property cannot be changed after the first registration",
+                action);
+        }
+
+        [TestMethod]
+        public void DefaultScopedLifestyle_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+
+            // Act
+            Action action = () => options.DefaultScopedLifestyle = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void DefaultScopedLifestyle_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var expectedLifestyle = new LifetimeScopeLifestyle();
+
+            var options = GetContainerOptions();
+
+            // Act
+            options.DefaultScopedLifestyle = expectedLifestyle;
+
+            // Assert
+            Assert.AreSame(expectedLifestyle, options.DefaultScopedLifestyle,
+                "The set_DefaultScopedLifestyle did not work.");
+        }
+
+        [TestMethod]
+        public void DefaultScopedLifestyle_ChangedMultipleTimesBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var expectedLifestyle = new LifetimeScopeLifestyle();
+
+            var options = GetContainerOptions();
+
+            // Act
+            options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            options.DefaultScopedLifestyle = expectedLifestyle;
+
+            // Assert
+            Assert.AreSame(expectedLifestyle, options.DefaultScopedLifestyle,
+                "The set_DefaultScopedLifestyle did not work.");
+        }
+
+        [TestMethod]
+        public void DefaultScopedLifestyle_ChangedAfterFirstRegistration_Fails()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingle<object>("The first registration.");
+
+            // Act
+            Action action = () => container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "DefaultScopedLifestyle property cannot be changed after the first registration",
                 action);
         }
 

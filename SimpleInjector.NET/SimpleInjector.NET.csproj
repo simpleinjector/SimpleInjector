@@ -170,6 +170,7 @@
     <Compile Include="Lifestyles\HybridRegistration.cs" />
     <Compile Include="Lifestyles\LifestyleSelectionBehaviorProxyLifestyle.cs" />
     <Compile Include="Lifestyles\ScopedHybridLifestyle.cs" />
+    <Compile Include="Lifestyles\ScopedProxyLifestyle.cs" />
     <Compile Include="Lifestyles\ScopedRegistration.cs" />
     <Compile Include="Scope.cs" />
     <Compile Include="ScopedLifestyle.cs" />

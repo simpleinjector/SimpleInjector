@@ -70,6 +70,9 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ILifestyleSelectionBehavior lifestyleBehavior;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ScopedLifestyle defaultScopedLifestyle;
+
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
@@ -209,6 +212,31 @@ namespace SimpleInjector
                 this.ThrowWhenContainerHasRegistrations("LifestyleSelectionBehavior");
 
                 this.lifestyleBehavior = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the default scoped lifestyle that the container should use when a registration is
+        /// made using <see cref="Lifestyle.Scoped">Lifestyle.Scoped</see>.</summary>
+        /// <value>The default scoped lifestyle.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public ScopedLifestyle DefaultScopedLifestyle
+        {
+            get
+            {
+                return this.defaultScopedLifestyle;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, "value");
+
+                this.ThrowWhenContainerHasRegistrations("DefaultScopedLifestyle");
+
+                this.defaultScopedLifestyle = value;
             }
         }
 

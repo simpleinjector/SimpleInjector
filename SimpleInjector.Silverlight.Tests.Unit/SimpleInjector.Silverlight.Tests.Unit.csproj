@@ -283,6 +283,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj">
+      <Project>{b7ae02f3-d306-4028-8646-4844dba2cfcd}</Project>
+      <Name>SimpleInjector.Extensions.LifetimeScoping.PCL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.PCL\SimpleInjector.PCL.csproj">
       <Project>{7eb69a84-e589-460d-aba2-43d34b12bc27}</Project>
       <Name>SimpleInjector.PCL</Name>

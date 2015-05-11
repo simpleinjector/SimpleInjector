@@ -134,6 +134,7 @@
     <Compile Include="ConsistencyTests.cs" />
     <Compile Include="ExpressionBuiltEventTests.cs" />
     <Compile Include="InstanceProducerInlineVisualizerTests.cs" />
+    <Compile Include="LifestyleScopedTests.cs" />
     <Compile Include="NUnitToMsTestAdapter\Assert.cs" />
     <Compile Include="NUnitToMsTestAdapter\TestClassAttribute.cs" />
     <Compile Include="NUnitToMsTestAdapter\TestMethodAttribute.cs" />

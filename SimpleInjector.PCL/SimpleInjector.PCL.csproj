@@ -322,6 +322,9 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedHybridLifestyle.cs">
       <Link>Lifestyles\ScopedHybridLifestyle.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedProxyLifestyle.cs">
+      <Link>Lifestyles\ScopedProxyLifestyle.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\ScopedRegistration.cs">
       <Link>Lifestyles\ScopedRegistration.cs</Link>
     </Compile>

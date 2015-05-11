@@ -82,6 +82,30 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "It's not mutable.")]
         public static readonly Lifestyle Transient = new TransientLifestyle();
+        
+        /// <summary>
+        /// <para>
+        /// The lifestyle that caches components according to the lifetime of the container's configured
+        /// scoped lifestyle.
+        /// </para>
+        /// <para>
+        /// In case the type of a cached instance implements <see cref="IDisposable"/>, the container will
+        /// ensure its disposal when the active scope gets disposed.
+        /// </para>
+        /// </summary>
+        /// <example>
+        /// The following example registers the <c>RealTimeProvider</c> implementation for the
+        /// <c>ITimeProvider</c> service type using the <b>Scoped</b> lifestyle:
+        /// <code lang="cs"><![CDATA[
+        /// // Create a Container instance, configured with a scoped lifestyle.
+        /// var container = new Container(new WebRequestLifestyle());
+        /// 
+        /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Scoped);
+        /// ]]></code>
+        /// </example>
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
+            Justification = "It's not mutable.")]
+        public static readonly ScopedLifestyle Scoped = new ScopedProxyLifestyle();
 
         /// <summary>
         /// <para>
