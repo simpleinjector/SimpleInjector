@@ -62,7 +62,7 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
         /// reference.</exception>
-        public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
+        public void RegisterCollection<TService>(IEnumerable<TService> collection) where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             Requires.IsNotNull(collection, "collection");
@@ -93,7 +93,7 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when one of the elements of <paramref name="singletons"/>
         /// is a null reference.</exception>
-        public void RegisterAll<TService>(params TService[] singletons) where TService : class
+        public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             Requires.IsNotNull(singletons, "singletons");
@@ -127,9 +127,9 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void RegisterAll<TService>(params Type[] serviceTypes) where TService : class
+        public void RegisterCollection<TService>(params Type[] serviceTypes) where TService : class
         {
-            this.RegisterAll(typeof(TService), serviceTypes);
+            this.RegisterCollection(typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -150,9 +150,9 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void RegisterAll<TService>(IEnumerable<Type> serviceTypes) where TService : class
+        public void RegisterCollection<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
-            this.RegisterAll(typeof(TService), serviceTypes);
+            this.RegisterCollection(typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void RegisterAll(Type serviceType, IEnumerable<Type> serviceTypes)
+        public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(serviceTypes, "serviceTypes");
@@ -210,11 +210,11 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="registrations"/> elements.
         /// </exception>
-        public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
+        public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
             Requires.IsNotNull(registrations, "registrations");
 
-            this.RegisterAll(serviceType, registrations.ToArray());
+            this.RegisterCollection(serviceType, registrations.ToArray());
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="registrations"/> elements.
         /// </exception>
-        public void RegisterAll(Type serviceType, params Registration[] registrations)
+        public void RegisterCollection(Type serviceType, params Registration[] registrations)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registrations, "registrations");
@@ -267,7 +267,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
-        public void RegisterAll(Type serviceType, IEnumerable collection)
+        public void RegisterCollection(Type serviceType, IEnumerable collection)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(collection, "collection");
@@ -300,9 +300,9 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll<TService>(params Assembly[] assemblies) where TService : class
+        public void RegisterCollection<TService>(params Assembly[] assemblies) where TService : class
         {
-            this.RegisterAll(typeof(TService), (IEnumerable<Assembly>)assemblies);
+            this.RegisterCollection(typeof(TService), (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -318,9 +318,9 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll<TService>(IEnumerable<Assembly> assemblies) where TService : class
+        public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
-            this.RegisterAll(typeof(TService), assemblies);
+            this.RegisterCollection(typeof(TService), assemblies);
         }
 
         /// <summary>
@@ -338,10 +338,10 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll<TService>(AccessibilityOption accessibility, params Assembly[] assemblies)
+        public void RegisterCollection<TService>(AccessibilityOption accessibility, params Assembly[] assemblies)
             where TService : class
         {
-            this.RegisterAll(typeof(TService), accessibility, (IEnumerable<Assembly>)assemblies);
+            this.RegisterCollection(typeof(TService), accessibility, (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -359,10 +359,10 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll<TService>(AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
+        public void RegisterCollection<TService>(AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
             where TService : class
         {
-            this.RegisterAll(typeof(TService), accessibility, assemblies);
+            this.RegisterCollection(typeof(TService), accessibility, assemblies);
         }
 
         /// <summary>
@@ -378,9 +378,9 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll(Type serviceType, params Assembly[] assemblies)
+        public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
-            this.RegisterAll(serviceType, (IEnumerable<Assembly>)assemblies);
+            this.RegisterCollection(serviceType, (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -396,11 +396,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll(Type serviceType, IEnumerable<Assembly> assemblies)
+        public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             var types = this.GetTypesToRegisterInternal(serviceType, AccessibilityOption.AllTypes, assemblies);
 
-            this.RegisterAll(serviceType, types);
+            this.RegisterCollection(serviceType, types);
         }
 
         /// <summary>
@@ -418,9 +418,9 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll(Type serviceType, AccessibilityOption accessibility, params Assembly[] assemblies)
+        public void RegisterCollection(Type serviceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
-            this.RegisterAll(serviceType, accessibility, (IEnumerable<Assembly>)assemblies);
+            this.RegisterCollection(serviceType, accessibility, (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -438,11 +438,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        public void RegisterAll(Type serviceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
+        public void RegisterCollection(Type serviceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
             var types = this.GetTypesToRegisterInternal(serviceType, accessibility, assemblies);
 
-            this.RegisterAll(serviceType, types);
+            this.RegisterCollection(serviceType, types);
         }
         
         // This method is internal to prevent the main API of the framework from being 'polluted'. The

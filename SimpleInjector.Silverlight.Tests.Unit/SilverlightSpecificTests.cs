@@ -235,7 +235,7 @@
             try
             {
                 // Act
-                container.RegisterAll(typeof(IInternalService), instances);
+                container.RegisterCollection(typeof(IInternalService), instances);
 
                 Assert.Fail("The call is expected to fail inside a Silverlight sandbox.");
             }

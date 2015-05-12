@@ -1632,7 +1632,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterAll<ICommandHandler<RealCommand>>(
+            container.RegisterCollection<ICommandHandler<RealCommand>>(
                 typeof(NullCommandHandler<RealCommand>),
                 typeof(StubCommandHandler));
 

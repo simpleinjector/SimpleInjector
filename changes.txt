@@ -22,6 +22,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Removed the Container.RegisterSingle<TService>(Func<TService>) method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle(Type, Type) method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle(Type, Func<object>) method (fixes #44).
+		-[Core] Container.RegisterAll methods renamed to Container.RegisterCollection (fixes #42).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).

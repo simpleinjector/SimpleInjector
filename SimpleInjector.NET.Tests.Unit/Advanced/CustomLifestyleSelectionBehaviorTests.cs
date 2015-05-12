@@ -162,7 +162,7 @@
                     type => type == typeof(SqlLogger) ? Lifestyle.Singleton : Lifestyle.Transient);
 
             // Act
-            container.RegisterAll<ILog>(typeof(SqlLogger), typeof(FileLogger));
+            container.RegisterCollection<ILog>(typeof(SqlLogger), typeof(FileLogger));
 
             // Assert
             var loggers = container.GetAllInstances<ILog>();
@@ -181,7 +181,7 @@
                     type => type == typeof(SqlLogger) ? Lifestyle.Singleton : Lifestyle.Transient);
 
             // Act
-            container.RegisterAll(typeof(ILog), new[] { typeof(SqlLogger), typeof(FileLogger) });
+            container.RegisterCollection(typeof(ILog), new[] { typeof(SqlLogger), typeof(FileLogger) });
 
             // Assert
             var loggers = container.GetAllInstances<ILog>();

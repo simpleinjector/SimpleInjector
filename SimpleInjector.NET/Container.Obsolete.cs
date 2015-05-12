@@ -23,11 +23,14 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
 
 #if !PUBLISH
-    /// <summary>Methods for registration.</summary>
+    /// <summary>This is where we putt all obsolete stuff that we can't just remove right now, but will
+    /// in the future.</summary>
 #endif
     public partial class Container
     {
@@ -71,6 +74,7 @@ namespace SimpleInjector
             error: true)]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
             this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, "TConcrete", "TConcrete");
         }
 
@@ -102,6 +106,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
             this.Register<TService, TImplementation>(Lifestyle.Singleton, "TService", "TImplementation");
         }
 
@@ -133,6 +138,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, "instanceCreator");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
             this.Register<TService>(instanceCreator, Lifestyle.Singleton);
         }
 
@@ -161,6 +167,7 @@ namespace SimpleInjector
             error: true)]
         public void RegisterSingle(Type serviceType, Type implementation)
         {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
             this.Register(serviceType, implementation, Lifestyle.Singleton, "serviceType", "implementation");
         }
 
@@ -186,6 +193,7 @@ namespace SimpleInjector
             error: true)]
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
             this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
         }
 
@@ -205,6 +213,139 @@ namespace SimpleInjector
             throw new InvalidOperationException(
                 "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +
                 "on why and how what to do instead.");
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(IEnumerable{TService})"/> instead.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="collection">The collection to register.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection<TService>(IEnumerable<TService>) instead.",
+            error: true)]
+        public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection<TService>(collection);
+        }
+        
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(TService[])"/> instead.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="singletons">The collection to register.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection<TService>(TService[]) instead.",
+            error: true)]
+        public void RegisterAll<TService>(params TService[] singletons) where TService : class
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection<TService>(singletons);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(Type[])"/> instead.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection<TService>(Type[]) instead.",
+            error: true)]
+        public void RegisterAll<TService>(params Type[] serviceTypes) where TService : class
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection<TService>(serviceTypes);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(IEnumerable{Type})"/> instead.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection<TService>(IEnumerable<Type>) instead.",
+            error: true)]
+        public void RegisterAll<TService>(IEnumerable<Type> serviceTypes) where TService : class
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection<TService>(serviceTypes);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection(Type, IEnumerable{Type})"/> instead.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection(Type, IEnumerable<Type>) instead.",
+            error: true)]
+        public void RegisterAll(Type serviceType, IEnumerable<Type> serviceTypes)
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection(serviceType, serviceTypes);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection(Type, IEnumerable{Registration})"/> instead.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection(Type, IEnumerable<Registration>) instead.",
+            error: true)]
+        public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection(serviceType, registrations);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection(Type, Registration[])"/> instead.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection(Type, Registration[]) instead.",
+            error: true)]
+        public void RegisterAll(Type serviceType, params Registration[] registrations)
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection(serviceType, registrations);
+        }
+
+        /// <summary>
+        /// This method is obsolete. Use <see cref="RegisterCollection(Type, IEnumerable)"/> instead.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="collection">The collection of items to register.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been renamed to RegisterCollection. " +
+            "Please call RegisterCollection(Type, IEnumerable) instead.",
+            error: true)]
+        public void RegisterAll(Type serviceType, IEnumerable collection)
+        {
+            // Forward the call. This allows external NuGet packages that depend on this method to keep working.
+            this.RegisterCollection(serviceType, collection);
         }
     }
 }

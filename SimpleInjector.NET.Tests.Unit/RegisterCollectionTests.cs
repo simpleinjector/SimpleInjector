@@ -17,7 +17,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<ILogStuf>(new[] { this.GetType().Assembly });
+            container.RegisterCollection<ILogStuf>(new[] { this.GetType().Assembly });
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -32,7 +32,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<ILogStuf>(Enumerable.Repeat(this.GetType().Assembly, 1));
+            container.RegisterCollection<ILogStuf>(Enumerable.Repeat(this.GetType().Assembly, 1));
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -49,7 +49,7 @@
 
             var assemblies = Enumerable.Repeat(this.GetType().Assembly, 2);
 
-            container.RegisterAll<ILogStuf>(assemblies);
+            container.RegisterCollection<ILogStuf>(assemblies);
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -64,7 +64,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<ILogStuf>(AccessibilityOption.PublicTypesOnly, 
+            container.RegisterCollection<ILogStuf>(AccessibilityOption.PublicTypesOnly, 
                 new[] { this.GetType().Assembly });
 
             // Act
@@ -80,7 +80,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<ILogStuf>(AccessibilityOption.PublicTypesOnly, 
+            container.RegisterCollection<ILogStuf>(AccessibilityOption.PublicTypesOnly, 
                 Enumerable.Repeat(this.GetType().Assembly, 1));
 
             // Act
@@ -96,7 +96,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(ILogStuf), new[] { this.GetType().Assembly });
+            container.RegisterCollection(typeof(ILogStuf), new[] { this.GetType().Assembly });
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -111,7 +111,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(ILogStuf), Enumerable.Repeat(this.GetType().Assembly, 1));
+            container.RegisterCollection(typeof(ILogStuf), Enumerable.Repeat(this.GetType().Assembly, 1));
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -126,7 +126,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(ILogStuf), AccessibilityOption.PublicTypesOnly,
+            container.RegisterCollection(typeof(ILogStuf), AccessibilityOption.PublicTypesOnly,
                 new[] { this.GetType().Assembly });
 
             // Act
@@ -142,7 +142,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(ILogStuf), AccessibilityOption.PublicTypesOnly,
+            container.RegisterCollection(typeof(ILogStuf), AccessibilityOption.PublicTypesOnly,
                 Enumerable.Repeat(this.GetType().Assembly, 1));
 
             // Act

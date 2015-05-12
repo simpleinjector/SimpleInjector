@@ -95,7 +95,7 @@
             // Container configuration.
             var container = new Container();
 
-            container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterAll,
+            container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterCollection,
                 typeof(IEventHandler<>).Assembly);
 
             container.RegisterSingleOpenGeneric(typeof(IEventHandler<>),

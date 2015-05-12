@@ -268,7 +268,7 @@
 
             var container = new Container();
 
-            container.RegisterAll<ICommandHandler<RealCommand>>(typeof(StubCommandHandler));
+            container.RegisterCollection<ICommandHandler<RealCommand>>(typeof(StubCommandHandler));
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 
@@ -300,7 +300,7 @@
                 new StubCommandHandler(),
             };
 
-            container.RegisterAll<ICommandHandler<RealCommand>>(handlers);
+            container.RegisterCollection<ICommandHandler<RealCommand>>(handlers);
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 

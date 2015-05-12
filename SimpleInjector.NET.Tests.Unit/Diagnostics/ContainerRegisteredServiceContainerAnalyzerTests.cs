@@ -147,7 +147,7 @@
             container.Register<Consumer<IReadOnlyCollection<ILogger>>>();
 
             // Since this collection is registered, the previous registration should not yield a warning.
-            container.RegisterAll<ILogger>(typeof(NullLogger));
+            container.RegisterCollection<ILogger>(typeof(NullLogger));
             
             container.Verify();
 
@@ -168,7 +168,7 @@
             container.Register<Consumer<IReadOnlyList<ILogger>>>();
 
             // Since this collection is registered, the previous registration should not yield a warning.
-            container.RegisterAll<ILogger>(typeof(NullLogger));
+            container.RegisterCollection<ILogger>(typeof(NullLogger));
 
             container.Verify();
 

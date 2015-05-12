@@ -88,7 +88,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterAll<IUserRepository>(new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() });
+            container.RegisterCollection<IUserRepository>(new IUserRepository[] { new SqlUserRepository(), new InMemoryUserRepository() });
 
             // Act
             container.Verify();
@@ -102,7 +102,7 @@
 
             IEnumerable<IUserRepository> repositories = new IUserRepository[] { null };
 
-            container.RegisterAll<IUserRepository>(repositories);
+            container.RegisterCollection<IUserRepository>(repositories);
 
             try
             {
@@ -131,7 +131,7 @@
                 where nullRepository.ToString() == "This line fails with an NullReferenceException"
                 select nullRepository;
 
-            container.RegisterAll<IUserRepository>(repositories);
+            container.RegisterCollection<IUserRepository>(repositories);
 
             // Act
             Action action = () => container.Verify();
@@ -270,7 +270,7 @@
 
             var types = new[] { typeof(SqlUserRepository), typeof(IUserRepository) };
 
-            container.RegisterAll<IUserRepository>(types);
+            container.RegisterCollection<IUserRepository>(types);
 
             try
             {
@@ -298,7 +298,7 @@
 
             container.Register<PluginImpl>();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
 
             container.RegisterInitializer<PluginImpl>(plugin => actualNumberOfCreatedPlugins++);
             
@@ -315,7 +315,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
 
             // FailingConstructorDecorator constructor throws an exception.
             container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
@@ -444,7 +444,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginWithBooleanDependency));
+            container.RegisterCollection<IPlugin>(typeof(PluginWithBooleanDependency));
 
             // Act
             Action action = () => container.Verify();
@@ -478,7 +478,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new[]
+            container.RegisterCollection(typeof(IEventHandler<>), new[]
             {
                 typeof(StructEventHandler),
                 typeof(AuditableEventEventHandler),
@@ -497,7 +497,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new Type[]
+            container.RegisterCollection(typeof(IEventHandler<>), new Type[]
             {
                 typeof(StructEventHandler),
             });

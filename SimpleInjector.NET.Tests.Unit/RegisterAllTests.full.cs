@@ -14,7 +14,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
@@ -32,7 +32,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -66,7 +66,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             // Act
             IReadOnlyList<IPlugin> list = 
@@ -84,7 +84,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 

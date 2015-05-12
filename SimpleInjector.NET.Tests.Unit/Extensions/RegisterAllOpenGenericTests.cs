@@ -327,7 +327,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterAll, new Type[]
+            container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterCollection, new Type[]
             {
                 typeof(HandlerWithTwoImplementations)
             });

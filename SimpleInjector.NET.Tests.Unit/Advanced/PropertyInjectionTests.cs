@@ -228,7 +228,7 @@
 
             ServiceWithProperty<ITimeProvider>[] services = new[] { singleton };
 
-            container.RegisterAll<ServiceWithProperty<ITimeProvider>>(services);
+            container.RegisterCollection<ServiceWithProperty<ITimeProvider>>(services);
 
             // Act
             container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
@@ -270,7 +270,7 @@
 
             IService[] services = new[] { singleton };
 
-            container.RegisterAll<IService>(services);
+            container.RegisterCollection<IService>(services);
 
             // Act
             container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();

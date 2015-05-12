@@ -138,7 +138,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
 
             var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
 
@@ -161,7 +161,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var registration1 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
 
-            container.RegisterAll(typeof(IPlugin), new[] { registration1 });
+            container.RegisterCollection(typeof(IPlugin), new[] { registration1 });
 
             container.AppendToCollection(typeof(IPlugin), registration2);
 
@@ -201,7 +201,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             IEnumerable<IPlugin> containerUncontrolledCollection = new[] { new PluginImpl() };
 
-            container.RegisterAll<IPlugin>(containerUncontrolledCollection);
+            container.RegisterCollection<IPlugin>(containerUncontrolledCollection);
 
             var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
 
@@ -228,7 +228,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
@@ -260,7 +260,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), registration);
 
-            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -314,7 +314,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
-            container.RegisterAll(typeof(IEventHandler<StructEvent>), new[] 
+            container.RegisterCollection(typeof(IEventHandler<StructEvent>), new[] 
             { 
                 typeof(AuditableEventEventHandler<StructEvent>) 
             });
@@ -344,7 +344,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
             container.AppendToCollection(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
@@ -365,7 +365,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new[] 
+            container.RegisterCollection(typeof(IEventHandler<>), new[] 
             { 
                 // Here we make a closed registration; this causes an explicit registration for the
                 // IEventHandlerStructEvent> collection.
@@ -392,7 +392,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterAll(typeof(IEventHandler<>), new[] 
+            container.RegisterCollection(typeof(IEventHandler<>), new[] 
             { 
                 typeof(NewConstraintEventHandler<StructEvent>),
             });
