@@ -61,31 +61,22 @@ namespace SimpleInjector.Advanced
             return container.IsVerifying;
         }
 
-        /// <summary>
-        /// Builds up an <see cref="Action{T}"/> delegate wrapping all <see cref="Action{T}"/> delegates that
-        /// are registered using <see cref="Container.RegisterInitializer{T}">RegisterInitializer</see> and
-        /// that apply to the given <typeparamref name="TService"/> (including delegates that are registered
-        /// for interfaces <typeparamref name="TService"/> implements and base types that 
-        /// <typeparamref name="TService"/> inherits from). <b>Null</b> will be returned when no delegates are
-        /// registered that apply to this type.
-        /// </summary>
+        /// <summary>This method has been removed.</summary>
         /// <param name="container">The container.</param>
-        /// <remarks>
-        /// This method has a performance characteristic of O(n). Prevent from calling this in a performance
-        /// critical path of the application.
-        /// </remarks>
         /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
         /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
-            "This method is obsolete and will be removed in a future version. Use Container." + 
-            "GetRegistration().Registration.InitializeInstance instead to initialize an existing instance.")]
+            "This method has been removed. Use Container.GetRegistration().Registration." +
+            "InitializeInstance instead to initialize an existing instance.",
+            error: true)]
         public static Action<TService> GetInitializer<TService>(this Container container)
-        {            
+        {
             Requires.IsNotNull(container, "container");
 
-            InitializationContext dummyContext = null;
-
-            return container.GetInitializer<TService>(dummyContext);
+            throw new InvalidOperationException(
+                "This method has been removed. Use Container.GetRegistration().Registration." +
+                "InitializeInstance instead to initialize an existing instance.");
         }
 
         /// <summary>
