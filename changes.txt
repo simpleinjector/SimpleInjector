@@ -22,6 +22,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Web] Removed the SimpleInjectorWebExtensions.RegisterForDisposal method (fixes #12).
 		-[Mvc] Removed the SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider method (fixes #12).
+		-[WebApi] Removed the SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider method (fixes #12).
 
 
 Version 2.8.1 (v2.8.1 RTM) 2015-05-05

@@ -203,34 +203,22 @@ namespace SimpleInjector
             container.Register<TService>(instanceCreator, GetLifestyle(disposeWhenScopeEnds));
         }
 
-        /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
-        /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
-        /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
-        /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
-        /// attributes. 
-        /// <b>Please note that attributes are cached by Web API, so only dependencies should be injected that
-        /// have the singleton lifestyle.</b>
-        /// </summary>
+        /// <summary>This method has been removed. Please see https://simpleinjector.org/webapi for more
+        /// information.</summary>
         /// <param name="container">The container that should be used.</param>
         /// <param name="configuration">The <see cref="HttpConfiguration"/>.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
-        /// reference (Nothing in VB).</exception>
-        [Obsolete("SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been deprecated and will " + 
-            "be removed in a future release. Please consult the Web API integration guide on how to inject " +
-            "dependencies into Web API filter attributes. See https://simpleinjector.org/webapi.", error: false)]
+        [Obsolete("SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " + 
+            "consult the Web API integration guide on how to inject dependencies into Web API filter " + 
+            "attributes. See https://simpleinjector.org/webapi.", error: true)]
         public static void RegisterWebApiFilterProvider(this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, "container");
             Requires.IsNotNull(configuration, "configuration");
 
-            configuration.Services.RemoveAll(typeof(IFilterProvider), 
-                provider => provider is ActionDescriptorFilterProvider);
-
-            var filterProvider = new SimpleInjectorActionDescriptorFilterProvider(container);
-
-            configuration.Services.Add(typeof(IFilterProvider), filterProvider);
-
-            container.SetItem(typeof(SimpleInjectorActionDescriptorFilterProvider), filterProvider);
+            throw new InvalidOperationException(
+                "SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " +
+                "consult the Web API integration guide on how to inject dependencies into Web API filter " +
+                "attributes. See https://simpleinjector.org/webapi.");
         }
         
         /// <summary>

@@ -33,42 +33,6 @@
         }
 
         [TestMethod]
-        public void GetTypesToRegister1_Always_ReturnsAValue()
-        {
-            // Arrange
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
-                typeof(IService<,>).Assembly);
-
-            // Act
-            result.ToArray();
-        }
-
-        [TestMethod]
-        public void GetTypesToRegister2_Always_ReturnsAValue()
-        {
-            // Arrange
-            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
-
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
-                assemblies);
-
-            // Act
-            result.ToArray();
-        }
-
-        [TestMethod]
-        public void GetTypesToRegister_WithoutContainerArgument_ReturnsDecorators()
-        {
-            // Arrange
-            // Act
-            var types = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
-                typeof(IService<,>), typeof(IService<,>).Assembly);
-
-            // Assert
-            Assert.IsTrue(types.Any(type => type == typeof(ServiceDecorator)), "The decorator was not included.");
-        }
-
-        [TestMethod]
         public void GetTypesToRegister_WithContainerArgument_ReturnsNoDecorators()
         {
             // Arrange
@@ -161,24 +125,6 @@
         }
 
         [TestMethod]
-        public void RegisterManySinglesForOpenGeneric_WithValidTypeDefinitions_ReturnsSingletonInstances()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly, 
-                Assembly.GetExecutingAssembly());
-
-            // Act
-            var impl1 = container.GetInstance<IService<int, string>>();
-            var impl2 = container.GetInstance<IService<int, string>>();
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
-        }
-
-        [TestMethod]
         public void RegisterManyForOpenGeneric_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle3()
         {
             // Arrange
@@ -235,50 +181,6 @@
 
             // Assert
             Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
-        }
-
-        [TestMethod]
-        public void RegisterManySinglesForOpenGeneric_WithValidTypeDefinitions2_ReturnsSingletonInstances()
-        {
-            // Arrange
-            // Concrete1 implements IService<string, object>
-            IEnumerable<Type> typesToRegister = new[] { typeof(Concrete1) };
-
-            var container = ContainerFactory.New();
-
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), typesToRegister);
-
-            // Act
-            var impl1 = container.GetInstance<IService<string, object>>();
-            var impl2 = container.GetInstance<IService<string, object>>();
-
-            // Assert
-            Assert.IsTrue(object.ReferenceEquals(impl1, impl2), "The types should be registered as singleton.");
-        }
-
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericEnumerable_WithValidTypeDefinitions_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-
-            // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly, assemblies);
-        }
-
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericTypeParams_WithValidTypeDefinitions_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            Type[] typesToRegister = new[] { typeof(Concrete1) };
-
-            // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), typesToRegister);
         }
 
         [TestMethod]
@@ -608,38 +510,6 @@
         }
 
         [TestMethod]
-        public void RegisterManySinglesForOpenGenericWithoutCallback1_SuppliedWithOpenGenericType_FailsWithExpectedException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            Type[] types = new[] { typeof(GenericHandler<>) };
-
-            // Act
-            Action action = () => container.RegisterManySinglesForOpenGeneric(typeof(ICommandHandler<>), types);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                @"The supplied list of types contains an open generic type", action);
-        }
-
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericWithoutCallback2_SuppliedWithOpenGenericType_FailsWithExpectedException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<Type> types = new[] { typeof(GenericHandler<>) };
-
-            // Act
-            Action action = () => container.RegisterManySinglesForOpenGeneric(typeof(ICommandHandler<>), types);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                @"The supplied list of types contains an open generic type", action);
-        }
-
-        [TestMethod]
         public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericType_Succeeds()
         {
             // Arrange
@@ -687,29 +557,6 @@
         }
 
         [TestMethod]
-        public void GetTypesToRegister3_Always_ReturnsAValue()
-        {
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
-                AccessibilityOption.AllTypes, typeof(IService<,>).Assembly);
-
-            // Act
-            result.ToArray();
-        }
-
-        [TestMethod]
-        public void GetTypesToRegister4_Always_ReturnsAValue()
-        {
-            // Arrange
-            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
-
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(typeof(IService<,>),
-                AccessibilityOption.AllTypes, assemblies);
-
-            // Act
-            result.ToArray();
-        }
-
-        [TestMethod]
         public void GetTypesToRegisterOverload1_WithoutAccessibilityOption_ReturnsInternalTypes()
         {
             // Arrange
@@ -735,37 +582,6 @@
             IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
             var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
                 container,
-                typeof(IService<,>),
-                assemblies);
-
-            // Assert
-            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
-        }
-
-        [TestMethod]
-        public void GetTypesToRegisterOverload3_WithoutAccessibilityOption_ReturnsInternalTypes()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
-                typeof(IService<,>),
-                typeof(IService<,>).Assembly);
-
-            // Assert
-            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
-        }
-
-        [TestMethod]
-        public void GetTypesToRegisterOverload4_WithoutAccessibilityOption_ReturnsInternalTypes()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
                 typeof(IService<,>),
                 assemblies);
 

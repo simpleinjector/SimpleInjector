@@ -26,32 +26,6 @@
         }
 
         [TestMethod]
-        public void RegisterManySinglesForOpenGenericAccessibilityOptionEnumerable_WithValidTypeDefinitions_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-
-            // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
-                assemblies);
-        }
-        
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericAccessibilityOptionParams_WithValidTypeDefinitions_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            Assembly[] assemblies = new[] { Assembly.GetExecutingAssembly() };
-
-            // Act
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes,
-                assemblies);
-        }
-
-        [TestMethod]
         public void RegisterManyForOpenGenericOverload1_AccessibilityOption_RegistersInternalTypes()
         {
             // Arrange
@@ -88,7 +62,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
                 (s, i) => container.Register(s, i[0]),
                 Assembly.GetExecutingAssembly());
 
@@ -106,7 +80,7 @@
             var container = ContainerFactory.New();
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>),
                 (s, i) => container.Register(s, i[0]),
                 assemblies);
 
@@ -123,7 +97,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient, 
+            container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient,
                 Assembly.GetExecutingAssembly());
 
             // Act
@@ -141,37 +115,6 @@
 
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
             container.RegisterManyForOpenGeneric(typeof(IService<,>), Lifestyle.Transient, assemblies);
-
-            // Act
-            var impl = container.GetInstance<IService<decimal, decimal>>();
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
-        }
-        
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericOverload1_AccessibilityOption_RegistersInternalTypes()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), Assembly.GetExecutingAssembly());
-
-            // Act
-            var impl = container.GetInstance<IService<decimal, decimal>>();
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(InternalConcrete4), impl);
-        }
-
-        [TestMethod]
-        public void RegisterManySinglesForOpenGenericOverload2_AccessibilityOption_RegistersInternalTypes()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-            container.RegisterManySinglesForOpenGeneric(typeof(IService<,>), assemblies);
 
             // Act
             var impl = container.GetInstance<IService<decimal, decimal>>();

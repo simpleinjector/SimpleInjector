@@ -91,7 +91,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requires.cs" />
-    <Compile Include="SimpleInjectorActionDescriptorFilterProvider.cs" />
     <Compile Include="SimpleInjectorHttpRequestMessageHandler.cs" />
     <Compile Include="SimpleInjectorHttpRequestMessageProvider.cs" />
     <Compile Include="SimpleInjectorWebApiExtensions.cs" />

@@ -46,13 +46,13 @@ namespace SimpleInjector
             Justification = "We can't remove the 'container' parameter. That would break the API.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
-            "Remove the call to this method; it will be removed in a future version.",
+            "Remove the call to this method.",
             error: true)]
         public static void EnableLifetimeScoping(this Container container)
         {
             throw new InvalidOperationException(
                 "LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
-                "Remove the call to this method; it will be removed in a future version.");
+                "Remove the call to this method.");
         }
 
         /// <summary>

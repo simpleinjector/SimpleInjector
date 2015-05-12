@@ -67,7 +67,7 @@
                 container.GetInstance<RealTimeProvider>();
             }
         }
-
+ 
         [TestMethod]
         public void InstanceProducerLifestyle_ForAScopedRegistration_HasTheExpectedDefaultScopedLifestyle()
         {
