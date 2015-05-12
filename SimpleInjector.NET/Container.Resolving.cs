@@ -205,26 +205,6 @@ namespace SimpleInjector
             return this.GetRegistration(serviceType, throwOnFailure, autoCreateConcreteTypes: true);
         }
 
-        /// <summary>
-        /// This method is obsolete.
-        /// </summary>
-        /// <param name="instance">The instance whose properties will be injected.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
-            Justification = "Making this method static would break the API.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "instance",
-            Justification = "Removing 'instance' would break the API. We will remove this method later on")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +
-            "on why and how what to do instead.", 
-            error: true)]
-        public void InjectProperties(object instance)
-        {
-            throw new InvalidOperationException(
-                "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " + 
-                "on why and how what to do instead.");
-        }
-
         internal InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure,
             bool autoCreateConcreteTypes)
         {

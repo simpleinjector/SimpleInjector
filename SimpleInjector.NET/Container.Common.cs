@@ -114,25 +114,6 @@ namespace SimpleInjector
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
         }
 
-        /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
-        /// <param name="options">The container options.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="options"/> is a null
-        /// reference.</exception>
-        /// <exception cref="ArgumentException">Thrown when supplied <paramref name="options"/> is an instance
-        /// that already is supplied to another <see cref="Container"/> instance. Every container must get
-        /// its own <see cref="ContainerOptions"/> instance.</exception>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "options",
-            Justification = "We can't remove the 'options' parameter. That would break the API.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method is not supported anymore. Please use Container.Options to configure the container.", 
-            error: true)]
-        public Container(ContainerOptions options)
-        {
-            throw new InvalidOperationException(
-                "This method is not supported anymore. Please use Container.Options to configure the container.");
-        }
-
         // Wrapper for instance initializer delegates
         private interface IInstanceInitializer
         {
