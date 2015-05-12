@@ -13,7 +13,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             try
             {

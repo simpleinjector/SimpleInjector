@@ -601,7 +601,7 @@
             var container = ContainerFactory.New();
 
             // Register the NullCommandHandler<RealCommand> as singleton.
-            container.RegisterSingle<NullCommandHandler<RealCommand>>();
+            container.Register<NullCommandHandler<RealCommand>>(Lifestyle.Singleton);
 
             // Collection that returns both a transient (RealCommandCommandHandler) and singleton.
             container.RegisterAll<ICommandHandler<RealCommand>>(

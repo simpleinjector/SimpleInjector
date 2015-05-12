@@ -81,7 +81,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<DisposableService>();
+            container.Register<DisposableService>(Lifestyle.Singleton);
 
             var instance = container.GetInstance<DisposableService>();
 
@@ -98,7 +98,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IService, DisposableService>();
+            container.Register<IService, DisposableService>(Lifestyle.Singleton);
 
             var instance = container.GetInstance<IService>() as DisposableService;
 
@@ -115,7 +115,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IService>(() => new DisposableService());
+            container.Register<IService>(() => new DisposableService(), Lifestyle.Singleton);
 
             var instance = container.GetInstance<IService>() as DisposableService;
 
@@ -156,7 +156,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<DisposableService>();
+            container.Register<DisposableService>(Lifestyle.Singleton);
 
             var instance = container.GetInstance<DisposableService>();
 
@@ -174,8 +174,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IService, DisposableService>();
-            container.RegisterSingle<DisposableService>();
+            container.Register<IService, DisposableService>(Lifestyle.Singleton);
+            container.Register<DisposableService>(Lifestyle.Singleton);
 
             var instance1 = container.GetInstance<DisposableService>();
             var instance2 = container.GetInstance<IService>() as DisposableService;
@@ -196,8 +196,8 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IService, DisposableService>();
-            container.RegisterSingle<DisposableService>();
+            container.Register<IService, DisposableService>(Lifestyle.Singleton);
+            container.Register<DisposableService>(Lifestyle.Singleton);
 
             var instance1 = container.GetInstance<DisposableService>();
             var instance2 = container.GetInstance<IService>() as DisposableService;

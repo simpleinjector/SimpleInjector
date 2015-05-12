@@ -17,7 +17,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // RealUserService depends on IUserRepository
-            container.RegisterSingle<RealUserService>();
+            container.Register<RealUserService>(Lifestyle.Singleton);
 
             container.Verify();
 
@@ -37,7 +37,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // RealUserService depends on IUserRepository
-            container.RegisterSingle<RealUserService>();
+            container.Register<RealUserService>(Lifestyle.Singleton);
 
             container.Verify();
 
@@ -57,10 +57,10 @@
             container.Register<IUserRepository, InMemoryUserRepository>();
 
             // RealUserService depends on IUserRepository
-            container.RegisterSingle<RealUserService>();
+            container.Register<RealUserService>(Lifestyle.Singleton);
 
             // FakeUserService depends on IUserRepository
-            container.RegisterSingle<FakeUserService>();
+            container.Register<FakeUserService>(Lifestyle.Singleton);
 
             container.Verify();
 

@@ -81,7 +81,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<InternalType>();
+            container.Register<InternalType>(Lifestyle.Singleton);
 
             // Act
             container.GetInstance<InternalOuterTypeDependingOnConcrete>();
@@ -98,7 +98,7 @@
             try
             {
                 // Act
-                container.RegisterSingle(typeof(IPublicService), typeof(InternalImplOfPublicService));
+                container.Register(typeof(IPublicService), typeof(InternalImplOfPublicService), Lifestyle.Singleton);
 
                 Assert.Fail("The call is expected to fail inside a Silverlight sandbox.");
             }
@@ -122,7 +122,7 @@
             try
             {
                 // Act
-                container.RegisterSingle(typeof(IInternalService), creator);
+                container.Register(typeof(IInternalService), creator, Lifestyle.Singleton);
 
                 Assert.Fail("The call is expected to fail inside a Silverlight sandbox.");
             }

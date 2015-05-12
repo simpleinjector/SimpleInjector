@@ -274,7 +274,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ILogger, FakeLogger>();
+            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
             container.RegisterAllOpenGeneric(typeof(IEventHandler<>), typeof(EventHandlerWithLoggerDependency<>));
 

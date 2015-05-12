@@ -63,8 +63,8 @@
 
             var convention = container.RegisterConstructorSelectorConvention();
 
-            container.RegisterSingle<ILogger, NullLogger>();
-            container.RegisterSingle<ISomeDependency, SomeDependency>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
+            container.Register<ISomeDependency, SomeDependency>(Lifestyle.Singleton);
 
             convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
 
@@ -83,8 +83,8 @@
 
             var convention = container.RegisterConstructorSelectorConvention();
 
-            container.RegisterSingle<ILogger, NullLogger>();
-            container.RegisterSingle<ISomeDependency, SomeDependency>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
+            container.Register<ISomeDependency, SomeDependency>(Lifestyle.Singleton);
 
             convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
             convention.Register<MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);

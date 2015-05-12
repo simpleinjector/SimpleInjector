@@ -131,7 +131,7 @@
             // Ensure properties of type ITimeProvider will be injected.
             container.Options.PropertySelectionBehavior = new InjectPropertyOfType<ITimeProvider>();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // MyPlugin contains a TimeProvider property of type ITimeProvider.
             container.Register<PluginWithPropertyDependencyOfType<ITimeProvider>>(() => null);

@@ -207,20 +207,8 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterInitializerTests.cs">
       <Link>RegisterInitializerTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByFuncTests.cs">
-      <Link>RegisterSingleByFuncTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByGenericArgumentTests.cs">
-      <Link>RegisterSingleByGenericArgumentTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByInstanceTests.cs">
       <Link>RegisterSingleByInstanceTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByTypeNonGenericTests.cs">
-      <Link>RegisterSingleByTypeNonGenericTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleConcreteTests.cs">
-      <Link>RegisterSingleConcreteTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ResolveUnregisteredTypeEventTests.cs">
       <Link>ResolveUnregisteredTypeEventTests.cs</Link>

@@ -233,7 +233,7 @@
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 
-            container.RegisterSingle<ICommandHandler<RealCommand>, StubCommandHandler>();
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act

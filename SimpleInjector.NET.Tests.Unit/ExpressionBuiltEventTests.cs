@@ -26,7 +26,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ILogger, ConsoleLogger>();
+            container.Register<ILogger, ConsoleLogger>(Lifestyle.Singleton);
             container.Register<IValidator<Order>, OrderValidator>();
             container.Register<IValidator<Customer>, CustomerValidator>();
 
@@ -64,7 +64,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
 
             Expression actualExpression = null;
 
@@ -302,7 +302,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository, SqlUserRepository>();
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
 
             container.ExpressionBuilt += (sender, e) =>
             {
@@ -331,7 +331,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository>(() => new SqlUserRepository());
+            container.Register<IUserRepository>(() => new SqlUserRepository(), Lifestyle.Singleton);
 
             container.ExpressionBuilt += (sender, e) =>
             {

@@ -135,7 +135,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             var registrations = container.GetCurrentRegistrations()
@@ -151,7 +151,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<RealTimeProvider>();
+            container.Register<RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             var registrations = container.GetCurrentRegistrations()
@@ -167,7 +167,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ITimeProvider>(() => new RealTimeProvider());
+            container.Register<ITimeProvider>(() => new RealTimeProvider(), Lifestyle.Singleton);
 
             // Act
             var registrations = container.GetCurrentRegistrations()

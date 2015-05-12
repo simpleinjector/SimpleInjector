@@ -9,17 +9,23 @@ Version 3.0.0 (v3.0 RTM)
 		 the supplied assemblies and register all found types in the collection (fixes #6).
 
 	Breaking Changes:
-		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (fixes #2).
+		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).
 		-[Core] Constructor overload 'Container(ContainerOptions)' removed from Container (fixes #40).
 		-[Core] Made ScopedLifestyle.WhenScopeEnds method non-virtual (fixes #11).
 		-[Core] Made ScopedLifestyle.RegisterForDisposal method non-virtual (fixes #11).
 		-[Core] Made ScopedLifestyle.CreateCurrentScopeProvider method abstract (fixes #11).
 		-[Core] Removed ScopedLifestyle.DisposeInstances method (fixes #11).
 		-[Core] Removed Container.InjectProperties method remove
-		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
-		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).
+		-[Core] Removed the Container.RegisterSingle<TConcrete>() method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle<TService, TImplementation>() method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle<TService>(TService) method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle<TService>(Func<TService>) method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle(Type, Type) method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle(Type, Func<object>) method (fixes #44).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
+		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
+		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).
 		-[Web] Removed the SimpleInjectorWebExtensions.RegisterForDisposal method (fixes #12).
 		-[Mvc] Removed the SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider method (fixes #12).
 		-[WebApi] Removed the SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider method (fixes #12).

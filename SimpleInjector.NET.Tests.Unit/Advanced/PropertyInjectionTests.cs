@@ -21,7 +21,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             var service = container.GetInstance<ServiceWithProperty<ITimeProvider>>();
@@ -36,7 +36,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             var service = container.GetInstance<SubClassServiceWithProperty<ITimeProvider>>();
@@ -68,7 +68,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             Action action = () => container.GetInstance<ServiceWithReadOnlyPropertyDependency<ITimeProvider>>();
@@ -87,7 +87,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             // Quite bizarre, but this even succeeds in the Silverlight sandbox. I don't know why.
@@ -103,7 +103,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             Action action = () => container.GetInstance<ServiceWithStaticPropertyDependency<ITimeProvider>>();
@@ -175,7 +175,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             container.Register<ServiceWithProperty<ITimeProvider>>();
 
@@ -205,7 +205,7 @@
 
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             container.RegisterSingle<ServiceWithProperty<ITimeProvider>>(singleton);
 
@@ -224,7 +224,7 @@
 
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             ServiceWithProperty<ITimeProvider>[] services = new[] { singleton };
 
@@ -247,7 +247,7 @@
 
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             container.RegisterSingle<IService>(singleton);
 
@@ -266,7 +266,7 @@
 
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             IService[] services = new[] { singleton };
 

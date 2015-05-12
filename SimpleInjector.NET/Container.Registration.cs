@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,12 +25,9 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
 
@@ -573,6 +570,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been removed. Please call Register<TConcrete>(Lifestyle.Singleton) instead.",
+            error: true)]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
             this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, "TConcrete", "TConcrete");
@@ -597,6 +598,11 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been removed. " +
+            "Please call Register<TService, TImplementation>(Lifestyle.Singleton) instead.",
+            error: true)]
         public void RegisterSingle<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -649,6 +655,11 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a 
         /// null reference.</exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been removed. " +
+            "Please call Register<TService>(instanceCreator, Lifestyle.Singleton) instead.",
+            error: true)]
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
             Requires.IsNotNull(instanceCreator, "instanceCreator");
@@ -675,6 +686,11 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been removed. " +
+            "Please call Register(serviceType, implementation, Lifestyle.Singleton) instead.",
+            error: true)]
         public void RegisterSingle(Type serviceType, Type implementation)
         {
             this.Register(serviceType, implementation, Lifestyle.Singleton, "serviceType", "implementation");
@@ -695,6 +711,11 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "This method has been removed. " +
+            "Please call Register(serviceType, instanceCreator, Lifestyle.Singleton) instead.",
+            error: true)]
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
             this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
@@ -912,8 +933,7 @@ namespace SimpleInjector
         /// Registered initializers will only be applied to instances that are created by the container self
         /// (using constructor injection). Types that are newed up manually by supplying a 
         /// <see cref="Func{T}"/> delegate to the container (using the 
-        /// <see cref="Register{TService}(Func{TService})"/> and 
-        /// <see cref="RegisterSingle{TService}(Func{TService})"/> methods) or registered as single instance
+        /// <see cref="Register{TService}(Func{TService})"/> method) or registered as single instance
         /// (using <see cref="RegisterSingle{TService}(TService)"/>) will not trigger initialization.
         /// When initialization of these instances is needed, this must be done manually, as can be seen in 
         /// the following example:

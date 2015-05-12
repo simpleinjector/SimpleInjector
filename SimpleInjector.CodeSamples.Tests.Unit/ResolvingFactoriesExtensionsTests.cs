@@ -72,7 +72,7 @@
 
             container.AllowResolvingLazyFactories();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
 
             var lazy1 = container.GetInstance<Lazy<ILogger>>();
             var lazy2 = container.GetInstance<Lazy<ILogger>>();
@@ -146,7 +146,7 @@
 
             container.AllowResolvingFuncFactories();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
 
             var factory = container.GetInstance<Func<ILogger>>();
 
@@ -243,7 +243,7 @@
 
             container.AllowResolvingParameterizedFuncFactories();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
             container.Register<ICommand, ConcreteCommand>();
 
             // Act
@@ -265,7 +265,7 @@
 
             container.AllowResolvingParameterizedFuncFactories();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
             container.Register<ICommand, ConcreteCommand>();
 
             // Act

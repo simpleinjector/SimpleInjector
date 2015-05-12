@@ -150,7 +150,7 @@
                 commandToInitialize.Clock = container.GetInstance<ITimeProvider>();
             });
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             // ConcreteCommand inherits from CommandBase and implements ICommand.
@@ -167,7 +167,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ConcreteCommand>();
+            container.Register<ConcreteCommand>(Lifestyle.Singleton);
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -208,7 +208,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ConcreteCommand>();
+            container.Register<ConcreteCommand>(Lifestyle.Singleton);
 
             container.RegisterInitializer<ICommand>(commandToInitialize =>
             {
@@ -285,7 +285,7 @@
 
             container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
-            container.RegisterSingle<ICommand>(() => new ConcreteCommand());
+            container.Register<ICommand>(() => new ConcreteCommand(), Lifestyle.Singleton);
 
             // Act
             container.GetInstance<ICommand>();

@@ -1443,7 +1443,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ConcreteCommand>();
+            container.Register<ConcreteCommand>(Lifestyle.Singleton);
 
             container.RegisterAll<ICommand>(typeof(ConcreteCommand));
 

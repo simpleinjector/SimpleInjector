@@ -97,7 +97,7 @@
         {
             this.RegisterExplicitConstructor<TService, TImplementation>(selector);
 
-            this.container.RegisterSingle<TService, TImplementation>();
+            this.container.Register<TService, TImplementation>(Lifestyle.Singleton);
         }
 
         private void RegisterExplicitConstructor<TService, TImplementation>(IConstructorSelector selector)

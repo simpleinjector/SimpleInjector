@@ -63,7 +63,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<INonGenericService, RealNonGenericService>();
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Singleton);
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
 
             // Act
@@ -83,7 +83,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<INonGenericService, RealNonGenericService>();
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Singleton);
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
 
             // Act
@@ -1390,7 +1390,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ILogger, FakeLogger>();
+            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
             // StubCommandHandler has no dependencies.
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
@@ -1430,10 +1430,10 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ILogger, FakeLogger>();
+            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
             // StubCommandHandler has no dependencies.
-            container.RegisterSingle<ICommandHandler<RealCommand>, StubCommandHandler>();
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
 
             // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));

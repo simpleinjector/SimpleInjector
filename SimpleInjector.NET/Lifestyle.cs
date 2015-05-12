@@ -129,15 +129,6 @@ namespace SimpleInjector
         /// 
         /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
         /// ]]></code>
-        /// Note that using the 
-        /// <see cref="Container.RegisterSingle{TService, TImplementation}">RegisterSingle</see> method has 
-        /// the same effect:
-        /// <code lang="cs"><![CDATA[
-        /// var container = new Container();
-        /// 
-        /// // Singleton registration.
-        /// container.RegisterSingle<ITimeProvider, RealTimeProvider>();
-        /// ]]></code>
         /// </example>
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "It's not mutable.")]

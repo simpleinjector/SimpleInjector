@@ -128,10 +128,6 @@
 
             Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
-
-            //// Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ServiceType);
-            //// Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ImplementationType);           
-            //// Assert.IsNull(logger.Context.Parent.Parent);
         }
 
         [TestMethod]
@@ -142,9 +138,9 @@
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
-            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
 
-            container.RegisterSingle<IService, ServiceThatDependsOnRepository>();
+            container.Register<IService, ServiceThatDependsOnRepository>(Lifestyle.Singleton);
 
             // Act
             var service = container.GetInstance<IService>() as ServiceThatDependsOnRepository;
@@ -154,10 +150,6 @@
 
             Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
-
-            //// Assert.AreEqual(typeof(IService), logger.Context.Parent.ServiceType);
-            //// Assert.AreEqual(typeof(ServiceThatDependsOnRepository), logger.Context.Parent.ImplementationType);
-            //// Assert.IsNull(logger.Context.Parent.Parent);
         }
 
         [TestMethod]
@@ -189,7 +181,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
 
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
@@ -210,7 +202,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IRepository, RepositoryThatDependsOnLogger>();
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
 
             // Since InterceptWith alters the Expression of ILogger, this would make it harder for 
             // the Expression visitor of RegisterWithContext to find and alter this expression. So this is

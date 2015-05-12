@@ -77,7 +77,7 @@
 
             container.Register<ICommand, FakeCommand>();
 
-            container.RegisterSingle<FakeInterceptor>();
+            container.Register<FakeInterceptor>(Lifestyle.Singleton);
 
             container.InterceptWith<FakeInterceptor>(IsACommandPredicate);
 
@@ -96,7 +96,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommand, FakeCommand>();
+            container.Register<ICommand, FakeCommand>(Lifestyle.Singleton);
 
             container.InterceptWith<FakeInterceptor>(IsACommandPredicate);
 
@@ -116,9 +116,9 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ICommand, FakeCommand>();
+            container.Register<ICommand, FakeCommand>(Lifestyle.Singleton);
 
-            container.RegisterSingle<FakeInterceptor>();
+            container.Register<FakeInterceptor>(Lifestyle.Singleton);
 
             container.InterceptWith<FakeInterceptor>(IsACommandPredicate);
 
@@ -254,7 +254,7 @@
 
             var interceptor = new FakeInterceptor();
 
-            container.RegisterSingle<ICommand, FakeCommand>();
+            container.Register<ICommand, FakeCommand>(Lifestyle.Singleton);
 
             container.InterceptWith(interceptor, IsACommandPredicate);
 
@@ -363,7 +363,7 @@
 
             var interceptor = new FakeInterceptor();
 
-            container.RegisterSingle<ICommand, FakeCommand>();
+            container.Register<ICommand, FakeCommand>(Lifestyle.Singleton);
 
             container.InterceptWith(() => interceptor, IsACommandPredicate);
 
@@ -383,8 +383,8 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<ICommand, FakeCommand>();
-            container.RegisterSingle<ILogger, FakeLogger>();
+            container.Register<ICommand, FakeCommand>(Lifestyle.Singleton);
+            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
             container.InterceptWith(e => new BuiltInfoInterceptor(e), type => type.IsInterface);
 

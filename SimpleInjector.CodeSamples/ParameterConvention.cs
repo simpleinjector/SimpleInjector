@@ -162,7 +162,7 @@
             where TConcrete : class
         {
             AddParameters(typeof(TConcrete), parameters);
-            container.RegisterSingle<TConcrete>();
+            container.Register<TConcrete>(Lifestyle.Singleton);
         }
 
         public static void RegisterSingle<TService, TImplementation>(this Container container,
@@ -171,7 +171,7 @@
             where TService : class
         {
             AddParameters(typeof(TImplementation), parameters);
-            container.RegisterSingle<TService, TImplementation>();
+            container.Register<TService, TImplementation>(Lifestyle.Singleton);
         }
 
         private static void AddParameters(Type concreteType, ParameterConvention.Parameter[] parameters)

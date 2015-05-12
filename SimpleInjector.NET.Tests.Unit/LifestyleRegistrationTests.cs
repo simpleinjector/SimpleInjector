@@ -99,7 +99,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             var registration = container.GetRegistration(typeof(ITimeProvider)).Registration;
 
@@ -120,7 +120,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             var registration = container.GetRegistration(typeof(ITimeProvider)).Registration;
 

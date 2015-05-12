@@ -128,7 +128,7 @@
             var container = new Container();
 
             // Forces a lifestyle mismatch
-            container.RegisterSingle<ILogger, FakeLogger>();
+            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
             container.Verify();
 

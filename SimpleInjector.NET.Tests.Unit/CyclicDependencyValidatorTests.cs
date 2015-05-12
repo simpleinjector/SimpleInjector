@@ -108,7 +108,7 @@
             var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
-            container.RegisterSingle<B>();
+            container.Register<B>(Lifestyle.Singleton);
 
             try
             {
@@ -130,7 +130,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<A>();
+            container.Register<A>(Lifestyle.Singleton);
 
             try
             {
@@ -154,8 +154,8 @@
             var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
-            container.RegisterSingle<A>();
-            container.RegisterSingle<B>();
+            container.Register<A>(Lifestyle.Singleton);
+            container.Register<B>(Lifestyle.Singleton);
 
             try
             {
@@ -202,8 +202,8 @@
             var container = ContainerFactory.New();
 
             // One depends on ITwo and Two depends on IOne.
-            container.RegisterSingle<IOne, One>();
-            container.RegisterSingle<ITwo, Two>();
+            container.Register<IOne, One>(Lifestyle.Singleton);
+            container.Register<ITwo, Two>(Lifestyle.Singleton);
 
             try
             {
@@ -478,7 +478,7 @@
             var container = ContainerFactory.New();
 
             // This registration will use a FuncSingletonInstanceProducer under the covers.
-            container.RegisterSingle<ITimeProvider>(() => { throw new NullReferenceException(); });
+            container.Register<ITimeProvider>(() => { throw new NullReferenceException(); }, Lifestyle.Singleton);
 
             Action arrangeAction = () => container.GetInstance<ITimeProvider>();
 
@@ -502,7 +502,7 @@
 
             var container = new Container();
 
-            container.RegisterSingle<IService, CompositeService>();
+            container.Register<IService, CompositeService>(Lifestyle.Singleton);
 
             // CompositeService is also part of the collection making it indirectly depending on itself.
             container.RegisterAll<IService>(typeof(Service), typeof(CompositeService));

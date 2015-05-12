@@ -18,7 +18,7 @@
 
             container.Options.EnableMethodInjectionWith<InjectAttribute>();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
             container.Register<ICommand, ConcreteCommand>();
 
             // Act
@@ -37,7 +37,7 @@
 
             container.Options.EnableMethodInjectionWith<InjectAttribute>();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
 
             try
             {
@@ -85,7 +85,7 @@
 
             container.Options.EnableMethodInjectionWith<InjectAttribute>();
 
-            container.RegisterSingle<ILogger, NullLogger>();
+            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
 
             try
             {

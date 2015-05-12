@@ -56,7 +56,7 @@
             var container = ContainerFactory.New();
 
             // RealUserService has a constructor that takes an IUserRepository.
-            container.RegisterSingle<RealUserService>();
+            container.Register<RealUserService>(Lifestyle.Singleton);
 
             // Act
             Action action = () => container.Verify();
@@ -183,7 +183,7 @@
             try
             {
                 // Act
-                container.RegisterSingle<IUserRepository, SqlUserRepository>();
+                container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -408,7 +408,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<IPlugin>(() => container.GetInstance<PluginWithCreationCounter>());
+            container.Register<IPlugin>(() => container.GetInstance<PluginWithCreationCounter>(), Lifestyle.Singleton);
 
             // Act
             container.Verify();

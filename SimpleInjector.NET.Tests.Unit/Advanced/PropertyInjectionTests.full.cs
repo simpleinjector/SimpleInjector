@@ -11,7 +11,7 @@
             // Arrange
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingle<ITimeProvider, RealTimeProvider>();
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
             // Act
             var service = container.GetInstance<PrivateServiceWithPrivateSetPropertyDependency<ITimeProvider>>();

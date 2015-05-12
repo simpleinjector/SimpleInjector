@@ -177,7 +177,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<DisposableCommand>();
+            container.Register<DisposableCommand>(Lifestyle.Singleton);
 
             container.RegisterPerWebRequest<IDisposable, DisposableCommand>();
 
