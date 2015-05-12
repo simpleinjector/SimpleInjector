@@ -80,6 +80,8 @@ namespace SimpleInjector
 
         /// <summary>This method is obsolete. Do not call this method.</summary>
         /// <param name="container">The container.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "We can't remove the 'container' parameter. That would break the API.")]
         [Obsolete("The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
             "This method has therefore become a no-op and the call to this method can be removed safely.",
             error: true)]

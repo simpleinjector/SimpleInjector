@@ -53,6 +53,8 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
                             "grouped together.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "We can't remove the 'container' parameter. That would break the API.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +

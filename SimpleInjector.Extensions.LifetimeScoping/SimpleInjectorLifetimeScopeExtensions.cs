@@ -26,6 +26,7 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions.LifetimeScoping;
     
@@ -41,6 +42,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
+            Justification = "We can't remove the 'container' parameter. That would break the API.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
             "Remove the call to this method; it will be removed in a future version.",

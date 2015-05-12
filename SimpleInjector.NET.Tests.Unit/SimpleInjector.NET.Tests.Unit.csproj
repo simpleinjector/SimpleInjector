@@ -139,6 +139,7 @@
     <Compile Include="NUnitToMsTestAdapter\TestClassAttribute.cs" />
     <Compile Include="NUnitToMsTestAdapter\TestMethodAttribute.cs" />
     <Compile Include="RegisterAllTests.full.cs" />
+    <Compile Include="RegisterCollectionTests.cs" />
     <Compile Include="RegisterContextualInitializerTests.cs" />
     <Compile Include="InstanceProducerTests.cs" />
     <Compile Include="Lifestyles\CustomLifestyleTests.cs" />

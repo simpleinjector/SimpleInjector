@@ -130,6 +130,9 @@
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Container.Registration.Collections.cs">
+      <Link>Container.Registration.Collections.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Registration.cs">
       <Link>Container.Registration.cs</Link>
     </Compile>

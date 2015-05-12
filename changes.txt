@@ -5,6 +5,8 @@ Version 3.0.0 (v3.0 RTM)
 
 	Improvements/Changes:
 		-[Core] Container now implements IDisposable (fixes #5).
+		-[Core] Added RegisterAll overloads that take in an assembly to allow simple inject to search through
+		 the supplied assemblies and register all found types in the collection (fixes #6).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior  (fixes #2).

@@ -1086,7 +1086,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void RegisterAll<TService>(params Type[] serviceTypes)
+        public void RegisterAll<TService>(params Type[] serviceTypes) where TService : class
         {
             this.RegisterAll(typeof(TService), serviceTypes);
         }
@@ -1109,7 +1109,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void RegisterAll<TService>(IEnumerable<Type> serviceTypes)
+        public void RegisterAll<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             this.RegisterAll(typeof(TService), serviceTypes);
         }

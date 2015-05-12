@@ -10,7 +10,7 @@ namespace System.Threading
     // NOTE: Silverlight lacks a ThreadLocal<T>.
     // Source: http://ayende.com/blog/4825 (but fixed to actually work in Silverlight)
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal sealed class ThreadLocal<T>
+    internal sealed class ThreadLocal<T> : IDisposable
     {
         [ThreadStatic]
         private static ConditionalWeakTable<object, ThreadLocalValue> threadStaticWeakTable;
@@ -56,6 +56,11 @@ namespace System.Threading
 
                 weakTable.GetOrCreateValue(this).Value = value;
             }
+        }
+
+        public void Dispose()
+        {
+            // This method is added for compatibility with the 'real' ThreadLocal<T>.
         }
     }
 }

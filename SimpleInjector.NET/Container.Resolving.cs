@@ -209,6 +209,10 @@ namespace SimpleInjector
         /// This method is obsolete.
         /// </summary>
         /// <param name="instance">The instance whose properties will be injected.</param>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
+            Justification = "Making this method static would break the API.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "instance",
+            Justification = "Removing 'instance' would break the API. We will remove this method later on")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +

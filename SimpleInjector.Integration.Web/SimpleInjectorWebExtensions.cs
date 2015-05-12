@@ -139,6 +139,8 @@ namespace SimpleInjector
 
         /// <summary>This method is obsolete.</summary>
         /// <param name="disposable">The disposable.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposable",
+            Justification = "We can't remove the 'disposable' parameter. That would break the API.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +

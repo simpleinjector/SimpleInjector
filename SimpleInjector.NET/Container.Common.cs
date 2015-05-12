@@ -121,6 +121,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when supplied <paramref name="options"/> is an instance
         /// that already is supplied to another <see cref="Container"/> instance. Every container must get
         /// its own <see cref="ContainerOptions"/> instance.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "options",
+            Justification = "We can't remove the 'options' parameter. That would break the API.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method is not supported anymore. Please use Container.Options to configure the container.", 
@@ -454,6 +456,7 @@ namespace SimpleInjector
             if (disposing)
             {
                 this.disposableSingletonsScope.Dispose();
+                this.isVerifying.Dispose();
             }
         }
 

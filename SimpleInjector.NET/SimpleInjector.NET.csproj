@@ -103,6 +103,7 @@
     <Compile Include="Advanced\SubExpressionReplacer.cs" />
     <Compile Include="Advanced\ContainerControlledItem.cs" />
     <Compile Include="Advanced\ContainerControlledCollectionResolver.cs" />
+    <Compile Include="Container.Registration.Collections.cs" />
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />
