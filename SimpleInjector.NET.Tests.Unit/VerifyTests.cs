@@ -393,7 +393,7 @@
 
             container.Register<IPlugin, FailingConstructorPlugin<Exception>>();
 
-            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginProxy));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginProxy), Lifestyle.Singleton);
 
             // Act
             Action action = () => container.Verify();
@@ -424,7 +424,7 @@
             var container = new Container();
 
             container.Register<IPlugin, FailingPlugin>();
-            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginProxy));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginProxy), Lifestyle.Singleton);
 
             // This call will succeed, because it resolves: "new PluginProxy(() => new FailingPlugin())" and
             // that will not call the FailingPlugin constructor.

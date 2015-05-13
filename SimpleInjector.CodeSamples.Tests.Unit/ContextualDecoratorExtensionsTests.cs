@@ -152,7 +152,7 @@
                 parameter => false);
 
             // Wrap the conditional decorator in a non-transient decorator.
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
 
             try
             {
@@ -186,7 +186,7 @@
                 parameter => parameter.Name.StartsWith("cached"));
 
             // Wrap the conditional decorator in a non-transient decorator.
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerProxy<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerProxy<>), Lifestyle.Singleton);
 
             // And wrap with a second contextual decorator.
             container.RegisterContextualDecorator(

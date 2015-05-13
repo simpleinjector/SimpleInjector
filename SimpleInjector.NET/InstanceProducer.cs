@@ -48,9 +48,8 @@ namespace SimpleInjector
     /// delegate and allows the actual instance to be created. A <b>Registration</b> itself can't create any
     /// instance. The <b>InsanceProducer</b> allows intercepting created instances by hooking onto the
     /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
-    /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type)">RegisterDecorator</see>
-    /// extension methods for instance work by hooking onto the <b>ExpressionBuilt</b> event and allow
-    /// wrapping the returned instance with a decorator.
+    /// <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for instance work 
+    /// by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance with a decorator.
     /// </remarks>
     /// <example>
     /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap
@@ -125,7 +124,7 @@ namespace SimpleInjector
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
         /// is changed by an <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> registration or
-        /// gets <see cref="SimpleInjector.Extensions.DecoratorExtensions">decorated</see>.
+        /// gets decorated.
         /// </summary>
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
         public Lifestyle Lifestyle

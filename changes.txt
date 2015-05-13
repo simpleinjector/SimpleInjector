@@ -7,6 +7,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Container now implements IDisposable (fixes #5).
 		-[Core] Added RegisterAll overloads that take in an assembly to allow simple inject to search through
 		 the supplied assemblies and register all found types in the collection (fixes #6).
+		-[Core] Added RegisterDecorator<TService, TDecorator>() methods (fixes #7).
+		-[Core] Added RegisterDecorator() overloads as instance methods on the Container (fixes #7).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).
@@ -15,7 +17,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Made ScopedLifestyle.RegisterForDisposal method non-virtual (fixes #11).
 		-[Core] Made ScopedLifestyle.CreateCurrentScopeProvider method abstract (fixes #11).
 		-[Core] Removed ScopedLifestyle.DisposeInstances method (fixes #11).
-		-[Core] Removed Container.InjectProperties method remove
+		-[Core] Removed Container.InjectProperties method (fixes #12).
 		-[Core] Removed the Container.RegisterSingle<TConcrete>() method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle<TService, TImplementation>() method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle<TService>(TService) method (fixes #44).
@@ -23,6 +25,9 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Removed the Container.RegisterSingle(Type, Type) method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle(Type, Func<object>) method (fixes #44).
 		-[Core] Container.RegisterAll methods renamed to Container.RegisterCollection (fixes #42).
+		-[Core] Moved DecoratorPredicateContext class to the SimpleInjector root namespace (fixes #7).
+		-[Core] Moved DecoratorContext to the SimpleInjector root namespace (fixes #7).
+		-[Core] Removed RegisterSingleDecorator extension methods (fixed #7).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).

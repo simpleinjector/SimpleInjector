@@ -76,7 +76,7 @@
             container.RegisterRuntimeDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 c => decorateHandler);
 
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerProxy<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerProxy<>), Lifestyle.Singleton);
 
             // Act
             var handler1 = 

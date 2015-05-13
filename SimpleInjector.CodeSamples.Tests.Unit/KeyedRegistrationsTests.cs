@@ -38,7 +38,7 @@
 
             container.RegisterCollection<IPlugin>(plugins);
 
-            container.RegisterSingleDecorator(typeof(IPlugin), typeof(PluginDecorator),
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator), Lifestyle.Singleton,
                 context => context.ImplementationType == typeof(Plugin3));
 
             container.RegisterSingle<Func<string, IPlugin>>(key => plugins.GetInstance(key));

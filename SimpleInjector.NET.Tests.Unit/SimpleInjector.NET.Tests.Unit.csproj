@@ -121,11 +121,10 @@
     <Compile Include="ExpressionBuildingEventTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.cs" />
     <Compile Include="Extensions\BatchRegistrationExtensionsTests.full.cs" />
-    <Compile Include="Extensions\DecoratorExtensionsCollectionTests.cs" />
-    <Compile Include="Extensions\DecoratorExtensionsTests.cs" />
+    <Compile Include="DecoratorCollectionTests.cs" />
+    <Compile Include="DecoratorTests.cs" />
     <Compile Include="Extensions\RegisterOpenGenericTests.cs" />
     <Compile Include="Extensions\RegisterAllOpenGenericTests.cs" />
-    <Compile Include="Extensions\TestClasses.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
     <Compile Include="GetInstanceTests.cs" />
     <Compile Include="GetRegistrationTests.cs" />

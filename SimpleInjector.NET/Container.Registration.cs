@@ -255,7 +255,7 @@ namespace SimpleInjector
         /// Please note that given example is just an uhhmm... example. In the case of the example the
         /// <b>MonitoringValidator&lt;T&gt;</b> is a decorator and instead of manually writing this code that
         /// many limitations, you can use one of the built-in 
-        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions.RegisterDecorator(Container, Type, Type, Lifestyle)">RegisterDecorator</see> extension methods instead.
+        /// <see cref="Container.RegisterDecorator(Type, Type, Lifestyle)">RegisterDecorator</see> methods instead.
         /// These extension methods take care of any given generic type constraint, allow to register decorators
         /// conditionally and allow the decorator to be integrated into the container's pipeline, which allows
         /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
@@ -933,9 +933,8 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// The most practical example of this is the use of decorators using one of the 
-        /// <see cref="SimpleInjector.Extensions.DecoratorExtensions">RegisterDecorator</see> overloads 
-        /// (decorator registration use the
-        /// <b>ExpressionBuilt</b> event under the covers). Take a look at the following example:
+        /// <see cref="RegisterDecorator(Type, Type)">RegisterDecorator</see> overloads (decorator registration 
+        /// use the <b>ExpressionBuilt</b> event under the covers). Take a look at the following example:
         /// </para>
         /// <code lang="cs"><![CDATA[
         /// public interface IFoo { }

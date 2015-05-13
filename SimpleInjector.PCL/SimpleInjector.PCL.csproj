@@ -130,11 +130,17 @@
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Container.Obsolete.cs">
+      <Link>Container.Obsolete.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Registration.Collections.cs">
       <Link>Container.Registration.Collections.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Registration.cs">
       <Link>Container.Registration.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Container.Registration.Decorators.cs">
+      <Link>Container.Registration.Decorators.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Resolving.cs">
       <Link>Container.Resolving.cs</Link>
@@ -150,6 +156,12 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
       <Link>CyclicDependencyValidatorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\DecoratorContext.cs">
+      <Link>DecoratorContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\DecoratorPredicateContext.cs">
+      <Link>DecoratorPredicateContext.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\AmbiguousLifestylesDiagnosticResult.cs">
       <Link>Diagnostics\AmbiguousLifestylesDiagnosticResult.cs</Link>
@@ -244,14 +256,8 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\ArgumentMapping.cs">
       <Link>Extensions\ArgumentMapping.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorContext.cs">
-      <Link>Extensions\DecoratorContext.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
       <Link>Extensions\DecoratorExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorPredicateContext.cs">
-      <Link>Extensions\DecoratorPredicateContext.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
       <Link>Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>

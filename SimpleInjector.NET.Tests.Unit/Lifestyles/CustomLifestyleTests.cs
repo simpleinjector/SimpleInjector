@@ -52,7 +52,8 @@
 
             container.Register<ICommandHandler<ConcreteCommand>, ConcreteCommandHandler>(CustomLifestyle);
 
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>),
+                Lifestyle.Singleton, c =>
             {
                 actualImplementationType = c.ImplementationType;
                 return true;
@@ -76,9 +77,9 @@
 
             container.Register<ICommandHandler<ConcreteCommand>, ConcreteCommandHandler>(CustomLifestyle);
 
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
 
-            container.RegisterSingleDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), c =>
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton, c =>
             {
                 actualImplementationType = c.ImplementationType;
                 return true;

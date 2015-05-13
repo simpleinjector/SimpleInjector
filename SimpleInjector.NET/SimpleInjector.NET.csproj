@@ -108,6 +108,7 @@
     <Compile Include="CompilationHelpers.cs" />
     <Compile Include="CompilationHelpers.full.cs" />
     <Compile Include="Container.Common.full.cs" />
+    <Compile Include="Container.Registration.Decorators.cs" />
     <Compile Include="Container.Verification.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="CyclicDependencyValidator.cs" />
@@ -144,9 +145,9 @@
     <Compile Include="ExpressionBuildingEventArgs.cs" />
     <Compile Include="ExpressionBuiltEventArgs.cs" />
     <Compile Include="Extensions\ArgumentMapping.cs" />
-    <Compile Include="Extensions\DecoratorContext.cs" />
+    <Compile Include="DecoratorContext.cs" />
     <Compile Include="Extensions\DecoratorExtensions.cs" />
-    <Compile Include="Extensions\DecoratorPredicateContext.cs" />
+    <Compile Include="DecoratorPredicateContext.cs" />
     <Compile Include="Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
     <Compile Include="Advanced\ContainerControlledCollection.cs" />
     <Compile Include="Extensions\Decorators\DecoratorExpressionInterceptor.cs" />

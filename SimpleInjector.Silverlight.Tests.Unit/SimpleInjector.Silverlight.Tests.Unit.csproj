@@ -135,6 +135,12 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\CyclicDependencyValidatorTests.cs">
       <Link>CyclicDependencyValidatorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\DecoratorCollectionTests.cs">
+      <Link>DecoratorCollectionTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\DecoratorTests.cs">
+      <Link>DecoratorTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\EnumerableExtensions.cs">
       <Link>EnumerableExtensions.cs</Link>
     </Compile>
@@ -147,20 +153,11 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\BatchRegistrationExtensionsTests.cs">
       <Link>Extensions\BatchRegistrationExtensionsTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\DecoratorExtensionsCollectionTests.cs">
-      <Link>Extensions\DecoratorExtensionsCollectionTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\DecoratorExtensionsTests.cs">
-      <Link>Extensions\DecoratorExtensionsTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterAllOpenGenericTests.cs">
       <Link>Extensions\RegisterAllOpenGenericTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterOpenGenericTests.cs">
       <Link>Extensions\RegisterOpenGenericTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\TestClasses.cs">
-      <Link>Extensions\TestClasses.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
