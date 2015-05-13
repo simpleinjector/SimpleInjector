@@ -260,6 +260,18 @@ namespace SimpleInjector
                 "been made to the container.";
         }
 
+        internal static string RegisterCollectionCalledWithTypeAsTService(IEnumerable<Type> types)
+        {
+            return TypeIsAmbiguous(typeof(Type)) + " " + string.Format(CultureInfo.InvariantCulture,
+                "The most likely cause of this happening is because the C# overload resolution picked " +
+                "a different method for you than you expected to call. The method C# selected for you is: " + 
+                "RegisterCollection<Type>(new[] {{ {0} }}). Instead, you probably intended to call: " + 
+                "RegisterCollection(typeof({1}), new[] {{ {2} }}).",
+                ToTypeOCfSharpFriendlyList(types),
+                Helpers.ToCSharpFriendlyName(types.First()),
+                ToTypeOCfSharpFriendlyList(types.Skip(1)));
+        }
+        
         internal static string TypeIsAmbiguous(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -648,6 +660,13 @@ namespace SimpleInjector
                 serviceTypeParamName,
                 Helpers.ToCSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()),
                 implementationTypeParamName);
+        }
+
+        private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types)
+        {
+            return string.Join(", ",
+                from type in types
+                select string.Format(CultureInfo.InvariantCulture, "typeof({0})", Helpers.ToCSharpFriendlyName(type)));
         }
     }
 }

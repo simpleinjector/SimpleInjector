@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Advanced;
@@ -93,12 +94,22 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when one of the elements of <paramref name="singletons"/>
         /// is a null reference.</exception>
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
+            Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
             Requires.IsNotNull(singletons, "singletons");
             Requires.DoesNotContainNullValues(singletons, "singletons");
 
+            if (typeof(TService) == typeof(Type) && singletons.Any())
+            {
+                throw new ArgumentException(
+                    StringResources.RegisterCollectionCalledWithTypeAsTService(singletons.Cast<Type>()),
+                    "TService");
+            }
+
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            
             var collection = DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this);
 
             collection.AppendAll(

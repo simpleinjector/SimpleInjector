@@ -7,6 +7,14 @@
     [TestClass]
     public class CuriouslyRecurringTemplatePatternTests
     {
+        private interface IEntity<T> where T : IEntity<T>
+        {
+        }
+
+        private interface IRepo<T> where T : class, IEntity<T>
+        {
+        }
+
         // These methods don't seem to really do anything but were used to 
         // identify and fix a StackOverflowException and so have been left 
         // in to capture the problem if it is erroneously reintroduced
@@ -18,10 +26,10 @@
         }
 
         [TestMethod]
-        public void RegisterAllOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
+        public void RegisterCollection_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(RepoA<>), typeof(RepoB<>));
+            container.RegisterCollection(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
         }
 
         [TestMethod]
@@ -36,20 +44,12 @@
         public void GetAllInstances_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterAllOpenGeneric(typeof(IRepo<>), typeof(RepoA<>), typeof(RepoB<>));
+            container.RegisterCollection(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
             var repo = container.GetAllInstances<IRepo<Entity>>();
             AssertThat.Equals(repo.Count(), 2);
         }
 
-        private interface IEntity<T> where T : IEntity<T>
-        {
-        }
-
         private class Entity : IEntity<Entity>
-        {
-        }
-
-        private interface IRepo<T> where T : class, IEntity<T>
         {
         }
 

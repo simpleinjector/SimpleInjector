@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Collections;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -150,6 +151,25 @@
 
             // Assert
             Assert_ContainsAllPublicLoggers(loggers);
+        }
+
+        [TestMethod]
+        public void RegisterCollection_UnexpectedCSharpOverloadResolution_ThrowsDescriptiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            // Here the user might think he calls RegisterCollection(Type, params Type[]), but instead
+            // RegisterCollection<Type>(new[] { typeof(ILogger), typeof(NullLogger) }) is called. 
+            Action action = () => container.RegisterCollection(typeof(ILogger), typeof(NullLogger));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The most likely cause of this happening is because the C# overload resolution picked " +
+                "a different method for you than you expected to call. The method C# selected for you is: " +
+                "RegisterCollection<Type>",
+                action);
         }
 
         private static void Assert_ContainsAllLoggers(IEnumerable loggers)

@@ -28,6 +28,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Moved DecoratorPredicateContext class to the SimpleInjector root namespace (fixes #7).
 		-[Core] Moved DecoratorContext to the SimpleInjector root namespace (fixes #7).
 		-[Core] Removed RegisterSingleDecorator extension methods (fixed #7).
+		-[Core] Removed RegisterAllOpenGeneric extension methods (fixes #7).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).

@@ -365,7 +365,7 @@
             var container = ContainerFactory.New();
 
             // Service<T> depends on IEnumerable<T>
-            container.RegisterAllOpenGeneric(typeof(Service<>), typeof(Service<>));
+            container.RegisterCollection(typeof(Service<>), new[] { typeof(Service<>) });
 
             container.Register<Service<Service<Service<Service<IDisposable>>>>>();
 
