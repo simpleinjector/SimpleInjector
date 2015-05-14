@@ -111,6 +111,12 @@ namespace SimpleInjector.Integration.Web
 
             if (scope != null)
             {
+                // NOTE: We explicitly don't remove the scope from the items dictionary, because if anything
+                // is resolved from the container after this point during the request, that would cause the
+                // creation of a new Scope, while will never be disposed. This would make it seem like the
+                // application is working, while instead we are failing silently. By not removing the scope,
+                // this will cause the Scope to throw an ObjectDisposedException once it is accessed after
+                // this point; effectively making the application to fail fast.
                 scope.Dispose();
             }
         }
