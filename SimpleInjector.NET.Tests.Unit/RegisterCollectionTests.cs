@@ -172,6 +172,24 @@
                 action);
         }
 
+        [TestMethod]
+        public void RegisterCollection_WithOpenGenericTypeThatIsRegisteredAsSingleton_RespectsTheRegisteredLifestyle()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(InternalEventHandler<>), typeof(InternalEventHandler<>), Lifestyle.Singleton);
+
+            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(InternalEventHandler<>) });
+
+            // Act
+            var handler1 = container.GetAllInstances<IEventHandler<int>>().Single();
+            var handler2 = container.GetAllInstances<IEventHandler<int>>().Single();
+
+            // Assert
+            Assert.AreSame(handler1, handler2, "Singleton was expected.");
+        }
+
         private static void Assert_ContainsAllLoggers(IEnumerable loggers)
         {
             var instances = loggers.Cast<ILogStuf>().ToArray();

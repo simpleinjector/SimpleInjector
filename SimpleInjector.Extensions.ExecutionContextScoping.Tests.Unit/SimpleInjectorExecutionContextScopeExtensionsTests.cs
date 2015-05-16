@@ -96,7 +96,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), new ExecutionContextScopeLifestyle());
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), new ExecutionContextScopeLifestyle());
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
@@ -112,7 +112,7 @@
 
             var hybrid = Lifestyle.CreateHybrid(() => false, new ExecutionContextScopeLifestyle(), new ExecutionContextScopeLifestyle());
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), hybrid);
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 

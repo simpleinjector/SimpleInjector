@@ -127,11 +127,11 @@ namespace SimpleInjector
         /// <para>
         /// Please note that given example is just an uhhmm... example. In the case of the example the
         /// <b>EmptyValidator&lt;T&gt;</b> can be better registered using of the built-in 
-        /// <see cref="SimpleInjector.Extensions.OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container, Type, Type, Lifestyle)">RegisterOpenGeneric</see> 
-        /// extension methods instead. These extension methods take care of any given generic type constraint
-        /// and allow the implementation to be integrated into the container's pipeline, which allows
-        /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered
-        /// <see cref="RegisterInitializer{TService}">initializers</see> to be applied.
+        /// <see cref="Register(Type, Type, Lifestyle)">Register</see> methods instead. These methods take 
+        /// care of any given generic type constraint and allow the implementation to be integrated into the 
+        /// container's pipeline, which allows it to be intercepted using the <see cref="ExpressionBuilding"/> 
+        /// event and allow any registered <see cref="RegisterInitializer{TService}">initializers</see> to be 
+        /// applied.
         /// </para>
         /// </example>
         public event EventHandler<UnregisteredTypeEventArgs> ResolveUnregisteredType
@@ -511,13 +511,12 @@ namespace SimpleInjector
         /// the exact lifestyle for the specified type. By default this will be 
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
-        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
         /// <param name="implementation">The actual type that will be returned when requested.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
         /// <paramref name="implementation"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
-        /// no sub type from <paramref name="serviceType"/> (or the same type), or one of them represents an 
-        /// open generic type.
+        /// no sub type from <paramref name="serviceType"/> (or the same type).
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 
@@ -527,6 +526,77 @@ namespace SimpleInjector
         {
             this.Register(serviceType, implementation, this.SelectionBasedLifestyle,
                 "serviceType", "implementation");
+        }
+
+        /// <summary>
+        /// Registers that a closed-generic instance of the open-generic type 
+        /// <paramref name="implementationType"/> will be returned when an instance of a closed-generic 
+        /// version of the open-generic type <paramref name="serviceType"/> is requested in case the supplied
+        /// <paramref name="predicate"/> returns <b>true</b>. The returned instance is cached according to 
+        /// the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="serviceType">The definition of the open generic service type that can be 
+        /// used to retrieve instances.</param>
+        /// <param name="implementationType">The definition of the open-generic implementation type
+        /// that will be returned when a <paramref name="serviceType"/> is requested.</param>
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
+        /// <param name="predicate">The predicate that determines whether the 
+        /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
+        /// can be used to build a fall back mechanism where multiple registrations for the same service type
+        /// are made.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
+        /// <paramref name="implementationType"/> are not a generic type or when <paramref name="serviceType"/>
+        /// is a partially-closed generic type.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.
+        /// </exception>
+        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle,
+            Predicate<OpenGenericPredicateContext> predicate)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(predicate, "predicate");
+
+            if (!serviceType.ContainsGenericParameters)
+            {
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(serviceType), 
+                    "serviceType");
+            }
+
+            if (!implementationType.ContainsGenericParameters)
+            {
+                throw new ArgumentException(
+                    StringResources.SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(implementationType),
+                    "implementationType");
+            }
+
+            if (serviceType.GetGenericTypeDefinition() != serviceType)
+            {
+                throw new ArgumentException(
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(serviceType, "serviceType", 
+                        "implementationType"),
+                    "serviceType");
+            }
+
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, "serviceType");
+            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, "implementationType");
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, "implementationType");
+
+            var resolver = new UnregisteredOpenGenericResolver
+            {
+                Container = this,
+                OpenGenericServiceType = serviceType,
+                OpenGenericImplementation = implementationType,
+                Lifestyle = lifestyle,
+                Predicate = predicate
+            };
+
+            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
         }
 
         /// <summary>
@@ -1077,16 +1147,22 @@ namespace SimpleInjector
 
             Requires.IsReferenceType(serviceType, serviceTypeParamName);
             Requires.IsReferenceType(implementationType, implementationTypeParamName);
-            Requires.IsNotOpenGenericType(serviceType, serviceTypeParamName);
-            Requires.IsNotOpenGenericType(implementationType, implementationTypeParamName);
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
-                implementationTypeParamName);
-
+            
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
-            var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+            if (serviceType.ContainsGenericParameters)
+            {
+                this.Register(serviceType, implementationType, lifestyle, c => true);
+            }
+            else
+            {
+                Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
+                    implementationTypeParamName);
 
-            this.AddRegistration(serviceType, registration);
+                var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+
+                this.AddRegistration(serviceType, registration);
+            }
         }
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)

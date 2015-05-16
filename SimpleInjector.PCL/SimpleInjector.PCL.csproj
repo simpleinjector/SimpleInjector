@@ -124,6 +124,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\TransientLifestyleSelectionBehavior.cs">
       <Link>Advanced\TransientLifestyleSelectionBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\UnregisteredOpenGenericResolver.cs">
+      <Link>Advanced\UnregisteredOpenGenericResolver.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\CompilationHelpers.cs">
       <Link>CompilationHelpers.cs</Link>
     </Compile>
@@ -295,9 +298,6 @@
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericBatchRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericBatchRegistrationExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericPredicateContext.cs">
-      <Link>Extensions\OpenGenericPredicateContext.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
@@ -345,6 +345,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyles\UnknownLifestyle.cs">
       <Link>Lifestyles\UnknownLifestyle.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\OpenGenericPredicateContext.cs">
+      <Link>OpenGenericPredicateContext.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Registration.cs">
       <Link>Registration.cs</Link>

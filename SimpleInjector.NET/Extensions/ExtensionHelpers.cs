@@ -134,12 +134,6 @@ namespace SimpleInjector.Extensions
             }
         }
 
-        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition,
-            Type typeToCheck)
-        {
-            return typeToCheck.IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
-        }
-
         internal static bool IsGenericArgument(this Type type)
         {
             return type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());

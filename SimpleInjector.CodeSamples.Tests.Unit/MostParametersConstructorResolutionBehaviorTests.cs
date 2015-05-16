@@ -103,7 +103,7 @@
             Container container = CreateContainerWithMostParametersConstructorResolutionBehavior();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IValidator<>), typeof(MultipleCtorNullValidator<>));
+            container.Register(typeof(IValidator<>), typeof(MultipleCtorNullValidator<>));
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@
             // Arrange
             Container container = CreateContainerWithMostParametersConstructorResolutionBehavior();
 
-            container.RegisterOpenGeneric(typeof(IValidator<>), typeof(MultipleCtorNullValidator<>));
+            container.Register(typeof(IValidator<>), typeof(MultipleCtorNullValidator<>));
 
             container.Register<ILogger, NullLogger>();
             container.Register<ICommand, ConcreteCommand>();

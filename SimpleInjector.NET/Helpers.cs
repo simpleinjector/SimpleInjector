@@ -38,6 +38,11 @@ namespace SimpleInjector
     {
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
 
+        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck)
+        {
+            return typeToCheck.IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
+        }
+
         internal static bool IsAmbiguousType(Type type)
         {
             return AmbiguousTypes.Contains(type);

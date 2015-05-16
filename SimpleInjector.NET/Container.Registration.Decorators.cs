@@ -51,9 +51,7 @@ namespace SimpleInjector
         /// The <b>RegisterDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
         /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
-        /// decoration of types that are resolved using unregistered type resolution. The
-        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
-        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>.
+        /// decoration of types that are resolved using unregistered type resolution.
         /// </para>
         /// <para>
         /// Multiple decorators can be applied to the same service type. The order in which they are registered
@@ -170,9 +168,7 @@ namespace SimpleInjector
         /// The <b>RegisterDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
         /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
-        /// decoration of types that are resolved using unregistered type resolution. The
-        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
-        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>.
+        /// decoration of types that are resolved using unregistered type resolution.
         /// </para>
         /// <para>
         /// Multiple decorators can be applied to the same service type. The order in which they are registered
@@ -359,9 +355,7 @@ namespace SimpleInjector
         /// The <b>RegisterDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
         /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
-        /// decoration of types that are resolved using unregistered type resolution. The
-        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
-        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>.
+        /// decoration of types that are resolved using unregistered type resolution.
         /// </para>
         /// <para>
         /// Multiple decorators can be applied to the same service type. The order in which they are registered
@@ -420,9 +414,7 @@ namespace SimpleInjector
         /// The <b>RegisterDecorator</b> method works by hooking onto the container's
         /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event. This event fires after the
         /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event, which allows
-        /// decoration of types that are resolved using unregistered type resolution. The
-        /// <see cref="OpenGenericRegistrationExtensions.RegisterOpenGeneric(Container,Type,Type,Lifestyle)">RegisterOpenGeneric</see>
-        /// extension method, for instance, hooks onto the <b>ResolveUnregisteredType</b>.
+        /// decoration of types that are resolved using unregistered type resolution.
         /// </para>
         /// <para>
         /// Multiple decorators can be applied to the same service type. The order in which they are registered

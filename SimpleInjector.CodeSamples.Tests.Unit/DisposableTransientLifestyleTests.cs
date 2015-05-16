@@ -108,7 +108,7 @@
             // NOTE: Open-generic types are special, because they are resolved through unregistered type
             // resolution. This test will fail if the DisposableTransientLifestyle registers the initializer
             // lazily.
-            container.RegisterOpenGeneric(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
+            container.Register(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
 
             var scope = container.BeginLifetimeScope();
 
@@ -184,7 +184,7 @@
 
             var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
 
-            container.RegisterOpenGeneric(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
+            container.Register(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
 
             try
             {

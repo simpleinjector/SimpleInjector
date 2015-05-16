@@ -570,7 +570,7 @@
 
             // Register the NullCommandHandler<RealCommand> as singleton.
             // We do this using the RegisterSingleOpenGeneric, but this is not important for this test.
-            container.RegisterSingleOpenGeneric(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>), Lifestyle.Singleton);
 
             // Collection that returns both a transient (RealCommandCommandHandler) and singleton.
             container.RegisterCollection<ICommandHandler<RealCommand>>(

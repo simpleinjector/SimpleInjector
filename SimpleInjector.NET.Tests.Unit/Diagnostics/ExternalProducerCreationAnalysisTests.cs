@@ -84,7 +84,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             container.RegisterCollection<IPlugin>(typeof(PluginWith8Dependencies));
 

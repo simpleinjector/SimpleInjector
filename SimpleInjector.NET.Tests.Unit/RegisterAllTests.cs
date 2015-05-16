@@ -995,7 +995,7 @@
 
             // RegisterAll will not throw an exception, because registration is forwarded back into the
             // container, and it could be possible that someone does a registration like:
-            // container.RegisterOpeNGeneric(typeof(EventHandlerWithConstructorContainingPrimitive<>), typeof(X))
+            // container.Register(typeof(EventHandlerWithConstructorContainingPrimitive<>), typeof(X))
             // where X is a type with one constructor.
             container.RegisterCollection(typeof(IEventHandler<>), registeredTypes);
 
@@ -1050,7 +1050,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterOpenGeneric(typeof(NewConstraintEventHandler<>),
+            container.Register(typeof(NewConstraintEventHandler<>),
                 typeof(NewConstraintEventHandler<>), Lifestyle.Singleton);
 
             container.RegisterCollection(typeof(IEventHandler<>), new[]
@@ -1071,7 +1071,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterOpenGeneric(
+            container.Register(
                 typeof(NewConstraintEventHandler<>),
                 typeof(NewConstraintEventHandler<>),
                 Lifestyle.Singleton);

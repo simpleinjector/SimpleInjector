@@ -387,7 +387,7 @@
 
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
+            container.Register(typeof(IValidate<>), typeof(NullValidator<>));
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 

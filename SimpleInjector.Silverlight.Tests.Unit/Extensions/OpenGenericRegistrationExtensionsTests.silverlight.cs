@@ -3,7 +3,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
-    /// <summary>Tests for RegisterOpenGeneric under Silverlight.</summary>
+    /// <summary>Tests for registering open generic types under Silverlight.</summary>
     public partial class OpenGenericRegistrationExtensionsTests
     {
         [TestMethod]
@@ -12,7 +12,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(InternalEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(InternalEventHandler<>));
 
             try
             {

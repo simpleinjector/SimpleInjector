@@ -22,7 +22,7 @@
         public void RegisterOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(RepoA<>));
+            container.Register(typeof(IRepo<>), typeof(RepoA<>));
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@
         public void GetInstance_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterOpenGeneric(typeof(IRepo<>), typeof(RepoA<>));
+            container.Register(typeof(IRepo<>), typeof(RepoA<>));
             var repo = container.GetInstance<IRepo<Entity>>();
         }
 

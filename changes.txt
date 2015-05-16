@@ -9,6 +9,7 @@ Version 3.0.0 (v3.0 RTM)
 		 the supplied assemblies and register all found types in the collection (fixes #6).
 		-[Core] Added RegisterDecorator<TService, TDecorator>() methods (fixes #7).
 		-[Core] Added RegisterDecorator() overloads as instance methods on the Container (fixes #7).
+		-[Core] Register(Type, Type) overloads now accept open-generic types as well (fixes #7).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).
@@ -29,6 +30,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Moved DecoratorContext to the SimpleInjector root namespace (fixes #7).
 		-[Core] Removed RegisterSingleDecorator extension methods (fixed #7).
 		-[Core] Removed RegisterAllOpenGeneric extension methods (fixes #7).
+		-[Core] Removed RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods (fixes #7).
+		-[Core] Moved OpenGenericPredicateContext to the SimpleInjector root namespace (fixes #7).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).

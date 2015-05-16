@@ -267,7 +267,7 @@
         {
             RegisterWithoutLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IValidate<object>),
-                container => container.RegisterOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>)));
+                container => container.Register(typeof(IValidate<>), typeof(NullValidator<>)));
         }
 
         [TestMethod]
@@ -349,7 +349,7 @@
         {
             RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IValidate<object>),
-                (container, lifestyle) => container.RegisterOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>), lifestyle));
+                (container, lifestyle) => container.Register(typeof(IValidate<>), typeof(NullValidator<>), lifestyle));
         }
 
         [TestMethod]

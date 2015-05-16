@@ -98,8 +98,7 @@
             container.RegisterManyForOpenGeneric(typeof(IEventHandler<>), container.RegisterCollection,
                 typeof(IEventHandler<>).Assembly);
 
-            container.RegisterSingleOpenGeneric(typeof(IEventHandler<>),
-                typeof(MultipleDispatchEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(MultipleDispatchEventHandler<>), Lifestyle.Singleton);
 
             // The ILogger is used by the unit tests to test the configuration.
             container.RegisterSingle<ILogger>(logger ?? new ListLogger());

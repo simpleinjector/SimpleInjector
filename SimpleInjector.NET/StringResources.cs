@@ -295,13 +295,8 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} is an open generic type. This type cannot be used for registration " +
-                "using this method. You can use one of the {1}.RegisterOpenGeneric extension method " +
-                "overloads for mapping an generic abstraction to an generic implementation, or use one of " +
-                "the {2}.RegisterManyForOpenGeneric extension method overloads for registering a set of " +
-                "implementations for a generic abstraction.",
-                type.ToFriendlyName(),
-                typeof(OpenGenericRegistrationExtensions).FullName,
-                typeof(OpenGenericBatchRegistrationExtensions).FullName);
+                "using this method. Please use the RegisterCollection(Type, Type[]) method instead.",
+                type.ToFriendlyName());
         }
 
         internal static string SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(Type type)
@@ -418,6 +413,11 @@ namespace SimpleInjector
                 "generate a Func<T>. Either switch to one of the other RegisterAll overloads, or don't " +
                 "use a decorator that depends on a Func<T> for injecting the decoratee.",
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
+        }
+
+        internal static string SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(Type type)
+        {
+            return SuppliedTypeIsNotAnOpenGenericType(type) + " This method overload only handles generic types.";
         }
 
         internal static string SuppliedTypeIsNotAnOpenGenericType(Type type)

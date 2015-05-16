@@ -58,7 +58,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             container.Register<Consumer<IGenericPlugin<IDisposable>>>();
 
             // Register open generic type with 6 dependencies.
-            container.RegisterOpenGeneric(typeof(IGenericPlugin<>), typeof(GenericPluginWith6Dependencies<>));
+            container.Register(typeof(IGenericPlugin<>), typeof(GenericPluginWith6Dependencies<>));
 
             container.Verify();
 
@@ -316,7 +316,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         {
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             foreach (var type in implementationTypes)
             {
@@ -332,7 +332,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         {
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(GenericType<>));
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             container.Register<TService, TImplementation>();
 

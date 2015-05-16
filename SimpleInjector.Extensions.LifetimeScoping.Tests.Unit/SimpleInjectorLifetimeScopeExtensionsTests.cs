@@ -75,7 +75,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), new LifetimeScopeLifestyle());
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), new LifetimeScopeLifestyle());
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
@@ -91,7 +91,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             var hybrid = Lifestyle.CreateHybrid(() => false, new LifetimeScopeLifestyle(), new LifetimeScopeLifestyle());
 
-            container.RegisterOpenGeneric(typeof(IGeneric<>), typeof(Generic<>), hybrid);
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 

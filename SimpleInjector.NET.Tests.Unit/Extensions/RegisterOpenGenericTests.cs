@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
     
-    /// <summary>Tests for testing RegisterOpenGeneric.</summary>
+    /// <summary>Tests for testing registering open generic types.</summary>
     [TestClass]
     public partial class RegisterOpenGenericTests
     {
@@ -18,7 +18,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Assert
             var impl = container.GetInstance<IService<int, string>>();
@@ -33,7 +33,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterOpenGeneric(typeof(ServiceImpl<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(ServiceImpl<,>), typeof(ServiceImpl<,>));
 
             // Assert
             var impl = container.GetInstance<ServiceImpl<int, string>>();
@@ -47,7 +47,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
             var instance1 = container.GetInstance<IService<int, string>>();
@@ -63,7 +63,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Transient);
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Transient);
 
             // Act
             var instance1 = container.GetInstance<IService<int, string>>();
@@ -79,7 +79,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
             // Act
             var instance1 = container.GetInstance<IService<int, string>>();
@@ -96,7 +96,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+            Action action = () => container.Register(typeof(IService<int, string>), typeof(ServiceImpl<,>));
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -109,7 +109,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+            Action action = () => container.Register(typeof(IService<,>), typeof(ServiceImpl<int, int>));
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -122,7 +122,7 @@
             var container = ContainerFactory.New();
                         
             // Act
-            Action action = () => container.RegisterOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+            Action action = () => container.Register(typeof(IService<,>), typeof(Func<,>));
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -135,8 +135,8 @@
             var container = ContainerFactory.New();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
             var validator = container.GetInstance<IDoStuff<string>>();
@@ -153,7 +153,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
             // Assert
             var impl = container.GetInstance<IService<int, string>>();
@@ -167,7 +167,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
             // Act
             var instance1 = container.GetInstance<IService<int, string>>();
@@ -184,8 +184,8 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => 
-                container.RegisterSingleOpenGeneric(typeof(IService<int, string>), typeof(ServiceImpl<,>));
+            Action action = () =>
+                container.Register(typeof(IService<int, string>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -198,8 +198,8 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => 
-                container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+            Action action = () =>
+                container.Register(typeof(IService<,>), typeof(ServiceImpl<int, int>), Lifestyle.Singleton);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -212,7 +212,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(Func<,>));
+            Action action = () => container.Register(typeof(IService<,>), typeof(Func<,>), Lifestyle.Singleton);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -225,8 +225,8 @@
             var container = ContainerFactory.New();
 
             // The DefaultValidator<T> contains an IService<T, int> as constructor argument.
-            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
-            container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>), Lifestyle.Singleton);
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
 
             // Act
             var validator = container.GetInstance<IDoStuff<string>>();
@@ -242,7 +242,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleOpenGeneric(typeof(IValidate<>), typeof(NullValidator<>));
+            container.Register(typeof(IValidate<>), typeof(NullValidator<>), Lifestyle.Singleton);
 
             // Act
             container.GetInstance<IValidate<int>>();
@@ -255,10 +255,10 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // RegisterOpenGeneric registers the ResolveUnregisteredType and this event will get raised before
+            // Register registers the ResolveUnregisteredType and this event will get raised before
             // trying to resolve an unregistered concrete type. Therefore it is important to check whether
             // the registered delegate will not fail when it is called with an non-generic type.
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImpl<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<,>));
 
             // Act
             // Resolve an unregistered concrete non-generic type.
@@ -271,7 +271,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<AuditableEvent>));
@@ -288,7 +288,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<DefaultConstructorEvent>));
@@ -304,7 +304,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
@@ -324,7 +324,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<DefaultConstructorEvent>));
@@ -341,7 +341,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<NoDefaultConstructorEvent>));
@@ -357,7 +357,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<ClassEvent>));
@@ -374,7 +374,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
@@ -390,7 +390,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<StructEvent>));
@@ -407,7 +407,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IEventHandler<ClassEvent>));
@@ -423,7 +423,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Register(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
             // Act
             // Although Nullable<T> is a value type, the actual C# 'struct' constraint is the CLR 
@@ -441,7 +441,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
+            container.Register(typeof(IDictionary<,>), typeof(MonoDictionary<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IDictionary<int, int>));
@@ -458,7 +458,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(MonoDictionary<>));
+            container.Register(typeof(IDictionary<,>), typeof(MonoDictionary<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IDictionary<int, double>));
@@ -474,7 +474,7 @@
             var container = ContainerFactory.New();
 
             // NullableProducer<T> : IProducer<Nullable<T>>, IProducer<IValidate<T>>, IProducer<double> where T : struct
-            container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
+            container.Register(typeof(IProducer<>), typeof(NullableProducer<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IProducer<int?>));
@@ -492,7 +492,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IProducer<>), typeof(NullableProducer<>));
+            container.Register(typeof(IProducer<>), typeof(NullableProducer<>));
 
             // Act
             var producer = container.GetRegistration(typeof(IProducer<int>));
@@ -508,7 +508,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithTypesArgsSwapped<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceImplWithTypesArgsSwapped<,>));
 
             // Act
             var impl = container.GetInstance<IService<object, int>>();
@@ -524,7 +524,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterOpenGeneric(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
+            Action action = () => container.Register(typeof(IDictionary<,>), typeof(SneakyMonoDictionary<,>));
             
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -538,8 +538,8 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterOpenGeneric(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType1<>));
-            container.RegisterOpenGeneric(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType2<>));
+            container.Register(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType1<>));
+            container.Register(typeof(IQueryHandler<,>), typeof(QueryHandlerWithNestedType2<>));
 
             // Act
             var instance1 = container.GetInstance<IQueryHandler<GenericQuery1<string>, string>>();
@@ -560,8 +560,8 @@
             var implementationType = typeof(SneakyMonoDictionary<,>).MakeGenericType(
                 typeof(SneakyMonoDictionary<,>).GetGenericArguments().First(),
                 typeof(object));
-            
-            container.RegisterOpenGeneric(typeof(IDictionary<,>), implementationType);
+
+            container.Register(typeof(IDictionary<,>), implementationType);
 
             // Act
             // SneakyMonoDictionary implements Dictionary<T, T>, so requesting this should succeed.
@@ -585,7 +585,7 @@
             var parialOpenImplementationType =
                 openImplementationType.MakeGenericType(arguments[0], typeof(object), typeof(string), arguments[3]);
 
-            container.RegisterOpenGeneric(typeof(IInterface<,,>), parialOpenImplementationType);
+            container.Register(typeof(IInterface<,,>), parialOpenImplementationType);
 
             // Act
             var instance = container.GetInstance<IInterface<int, int, double>>();
@@ -607,7 +607,7 @@
             var parialOpenImplementationType =
                 openImplementationType.MakeGenericType(arguments[0], typeof(object), typeof(string), typeof(object));
 
-            container.RegisterOpenGeneric(typeof(IInterface<,,>), parialOpenImplementationType);
+            container.Register(typeof(IInterface<,,>), parialOpenImplementationType);
 
             // Act
             var instance = container.GetInstance<IInterface<int, int, object>>();
@@ -625,8 +625,8 @@
             var implementationType = typeof(SneakyMonoDictionary<,>).MakeGenericType(
                 typeof(SneakyMonoDictionary<,>).GetGenericArguments().First(),
                 typeof(object));
-            
-            container.RegisterOpenGeneric(typeof(IDictionary<,>), implementationType);
+
+            container.Register(typeof(IDictionary<,>), implementationType);
 
             // Act
             var producer = container.GetRegistration(typeof(IDictionary<int, object>));
@@ -645,13 +645,14 @@
 
             // class Baz : IBar<Bar>
             // class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
-            container.RegisterOpenGeneric(typeof(IFoo<>), typeof(Foo<,>));
+            container.Register(typeof(IFoo<>), typeof(Foo<,>));
 
             // Act
             var instance = container.GetInstance<IFoo<Baz>>();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(Foo<Baz, Bar>), instance, "The RegisterOpenGeneric should be able to see that 'T2' is of type 'Bar'.");
+            AssertThat.IsInstanceOfType(typeof(Foo<Baz, Bar>), instance, 
+                "Register should be able to see that 'T2' is of type 'Bar'.");
         }
 
         [TestMethod]
@@ -663,7 +664,7 @@
             try
             {
                 // Act
-                container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
+                container.Register(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -686,7 +687,7 @@
             try
             {
                 // Act
-                container.RegisterSingleOpenGeneric(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
+                container.Register(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>), Lifestyle.Singleton);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -707,7 +708,7 @@
             var container = ContainerFactory.New();
 
             // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
-            container.RegisterOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
+            container.Register(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
 
             try
             {
@@ -739,7 +740,7 @@
             var container = ContainerFactory.New();
 
             // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
-            container.RegisterSingleOpenGeneric(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
+            container.Register(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>), Lifestyle.Singleton);
 
             try
             {
@@ -772,7 +773,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
 
             // Act
             // Since TIn : TOut and IDisposable : object, GetInstance should succeed.
@@ -786,7 +787,7 @@
             var container = new Container();
 
             // Act
-            container.RegisterOpenGeneric(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
+            container.Register(typeof(IService<,>), typeof(ServiceWhereTInIsTOut<,>));
 
             // Act
             var registration = container.GetRegistration(typeof(IService<object, IDisposable>));
@@ -803,9 +804,10 @@
             var container = new Container();
 
             // Service type is the same as implementation
-            container.RegisterSingleOpenGeneric(
+            container.Register(
+                typeof(NewConstraintEventHandler<>),
                 typeof(NewConstraintEventHandler<>), 
-                typeof(NewConstraintEventHandler<>));
+                Lifestyle.Singleton);
 
             // Act
             var t1 = container.GetInstance<NewConstraintEventHandler<int>>();
@@ -823,7 +825,7 @@
 
             var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(typeof(List<>));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             container.GetInstance<IEventHandler<List<int>>>();
@@ -841,7 +843,7 @@
                     typeof(int),
                     typeof(List<>)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int, List<double>>>));
@@ -858,7 +860,7 @@
 
             var partialOpenGenericType = typeof(ClassConstraintEventHandler<>).MakeGenericType(typeof(List<>));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Collection<int>>));
@@ -879,7 +881,7 @@
                     typeof(int),
                     typeof(List<>)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<double, List<int>>>));
@@ -900,7 +902,7 @@
                     typeof(int),
                     typeof(List<>)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<double, object>>));
@@ -921,7 +923,7 @@
                     typeof(Nullable<>),
                     typeof(object)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, List<int>>>));
@@ -942,7 +944,7 @@
                     typeof(Nullable<>),
                     typeof(List<int>)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, Collection<int>>>));
@@ -963,7 +965,7 @@
                     typeof(Nullable<>),
                     typeof(List<int>)));
 
-            container.RegisterOpenGeneric(typeof(IEventHandler<>), partialOpenGenericType);
+            container.Register(typeof(IEventHandler<>), partialOpenGenericType);
 
             // Act
             var registration = container.GetRegistration(typeof(IEventHandler<Tuple<int?, string>>));
@@ -980,7 +982,7 @@
 
             // Act
             // ValidatorWithUnusedTypeArgument<T, TUnused>
-            Action action = () => container.RegisterOpenGeneric(
+            Action action = () => container.Register(
                 typeof(IValidate<>), 
                 typeof(ValidatorWithUnusedTypeArgument<,>));
 
@@ -996,10 +998,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>), 
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>), 
                 Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(int));
-            
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(long));
 
             // Act
@@ -1027,7 +1029,7 @@
 
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
                     {
                         if (c.ServiceType.ContainsGenericParameter())
@@ -1053,7 +1055,7 @@
 
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
                     {
                         if (c.ImplementationType.ContainsGenericParameter())
@@ -1077,10 +1079,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
 
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
 
             // Act
@@ -1096,10 +1098,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
 
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
 
             // Act
@@ -1115,10 +1117,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().FullName.StartsWith("System"));
 
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
 
             // Act
@@ -1138,10 +1140,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
 
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
 
             // Act
@@ -1164,7 +1166,7 @@
 
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
                 {
                     if (c.Handled)
@@ -1175,7 +1177,7 @@
                     return c.ImplementationType.GetGenericArguments().Single() == typeof(int);
                 });
 
-            container.RegisterOpenGeneric(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
+            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
                 Lifestyle.Transient, c =>
                 {
                     // this is the test - we are checking that c.handled changed between
@@ -1204,7 +1206,7 @@
 
             // UpdateCommandHandler<TEntity, TCommand> has generic type constraints, allowing the TEntity to 
             // be deduced by the IComandHandler<T> interface.
-            container.RegisterOpenGeneric(typeof(ICommandHandler<>), typeof(UpdateCommandHandler<,>));
+            container.Register(typeof(ICommandHandler<>), typeof(UpdateCommandHandler<,>));
 
             // Act
             var actualInstance = container.GetInstance<ICommandHandler<UpdateCommand<SpecialEntity>>>();
@@ -1219,20 +1221,20 @@
             // Arrange
             string expectedMessage = @"
                 The supplied type 'IService<Int32, TB>' is a partially closed generic type, which is not 
-                supported as value of the openGenericServiceType parameter. 
-                Instead, please supply the open-generic type 'IService<,>' and make the type supplied to 
-                the openGenericImplementation parameter partially closed instead."
+                supported as value of the serviceType parameter. Instead, please supply the open-generic type 
+                'IService<,>' and make the type supplied to the implementationType parameter partially closed 
+                instead."
                 .TrimInside();            
 
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.RegisterOpenGeneric(
+            Action action = () => container.Register(
                 typeof(IService<,>).MakePartialOpenGenericType(firstArgument: typeof(int)),
                 typeof(ServiceImpl<,>));
 
             // Assert
-            AssertThat.ThrowsWithParamName<ArgumentException>("openGenericServiceType", action);
+            AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 expectedMessage,
                 action);
