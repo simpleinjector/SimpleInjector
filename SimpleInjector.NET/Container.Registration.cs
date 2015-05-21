@@ -456,6 +456,27 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Registers that an instance of <typeparamref name="TImplementation"/> will be returned when an
+        /// instance of type <typeparamref name="TService"/> is requested. The instance is cached according to 
+        /// the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// type is not a type that can be created by the container.
+        /// </exception>
+        public void Register<TService, TImplementation>(Lifestyle lifestyle)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            this.Register<TService, TImplementation>(lifestyle, "TService", "TImplementation");
+        }
+
+        /// <summary>
         /// Registers the specified delegate that allows returning transient instances of 
         /// <typeparamref name="TService"/>. The delegate is expected to always return a new instance on
         /// each call.
@@ -476,6 +497,33 @@ namespace SimpleInjector
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
             this.Register<TService>(instanceCreator, this.SelectionBasedLifestyle);
+        }
+
+        /// <summary>
+        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
+        /// type <typeparamref name="TService"/> and will be returned when an instance of type 
+        /// <typeparamref name="TService"/> is requested. The delegate is expected to produce new instances on
+        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
+        public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
+            where TService : class
+        {
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+
+            var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
+
+            this.AddRegistration(typeof(TService), registration);
         }
 
         /// <summary>
@@ -529,6 +577,85 @@ namespace SimpleInjector
         {
             this.Register(serviceType, implementationType, this.SelectionBasedLifestyle,
                 "serviceType", "implementationType");
+        }
+
+        /// <summary>
+        /// Registers that an instance of type <paramref name="implementationType"/> will be returned when an
+        /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to 
+        /// the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
+        /// <param name="implementationType">The concrete type that will be registered.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <paramref name="serviceType"/> has already been registered.</exception>
+        /// <exception cref="ArgumentException">Thrown when the given <paramref name="implementationType"/>
+        /// type is not a type that can be created by the container, when either <paramref name="serviceType"/>
+        /// or <paramref name="implementationType"/> are open generic types, or when 
+        /// <paramref name="serviceType"/> is not assignable from the <paramref name="implementationType"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
+        {
+            this.Register(serviceType, implementationType, lifestyle, "serviceType", "implementationType");
+        }
+
+        /// <summary>
+        /// Registers the specified delegate that allows returning instances of <paramref name="serviceType"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses the container's 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
+        /// the exact lifestyle for the specified type. By default this will be 
+        /// <see cref="Lifestyle.Transient">Transient</see>.
+        /// </remarks>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
+        /// open generic type.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
+        public void Register(Type serviceType, Func<object> instanceCreator)
+        {
+            this.Register(serviceType, instanceCreator, this.SelectionBasedLifestyle);
+        }
+
+        /// <summary>
+        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
+        /// type <paramref name="serviceType"/> and will be returned when an instance of type 
+        /// <paramref name="serviceType"/> is requested. The delegate is expected to produce new instances on 
+        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve instances.</param>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <paramref name="serviceType"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
+        public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(lifestyle, "lifestyle");
+
+            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+
+            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+
+            var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
+
+            this.AddRegistration(serviceType, registration);
         }
 
         /// <summary>
@@ -603,30 +730,6 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning instances of <paramref name="serviceType"/>.
-        /// </summary>
-        /// <remarks>
-        /// This method uses the container's 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
-        /// <see cref="Lifestyle.Transient">Transient</see>.
-        /// </remarks>
-        /// <param name="serviceType">The base type or interface to register.</param>
-        /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
-        /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
-        /// open generic type.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
-        /// the <paramref name="serviceType"/> has already been registered.
-        /// </exception>
-        public void Register(Type serviceType, Func<object> instanceCreator)
-        {
-            this.Register(serviceType, instanceCreator, this.SelectionBasedLifestyle);
-        }
-
-        /// <summary>
         /// Registers a single instance that will be returned when an instance of type 
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
@@ -677,109 +780,6 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
             var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, instance, this);
-
-            this.AddRegistration(serviceType, registration);
-        }
-
-        /// <summary>
-        /// Registers that an instance of <typeparamref name="TImplementation"/> will be returned when an
-        /// instance of type <typeparamref name="TService"/> is requested. The instance is cached according to 
-        /// the supplied <paramref name="lifestyle"/>.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
-        /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
-        /// type is not a type that can be created by the container.
-        /// </exception>
-        public void Register<TService, TImplementation>(Lifestyle lifestyle)
-            where TImplementation : class, TService
-            where TService : class
-        {
-            this.Register<TService, TImplementation>(lifestyle, "TService", "TImplementation");
-        }
-
-        /// <summary>
-        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
-        /// type <typeparamref name="TService"/> and will be returned when an instance of type 
-        /// <typeparamref name="TService"/> is requested. The delegate is expected to produce new instances on
-        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
-        /// <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
-        public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
-            where TService : class
-        {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-
-            var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
-
-            this.AddRegistration(typeof(TService), registration);
-        }
-
-        /// <summary>
-        /// Registers that an instance of type <paramref name="implementationType"/> will be returned when an
-        /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to 
-        /// the supplied <paramref name="lifestyle"/>.
-        /// </summary>
-        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
-        /// <param name="implementationType">The concrete type that will be registered.</param>
-        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
-        /// <paramref name="serviceType"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <paramref name="implementationType"/>
-        /// type is not a type that can be created by the container, when either <paramref name="serviceType"/>
-        /// or <paramref name="implementationType"/> are open generic types, or when 
-        /// <paramref name="serviceType"/> is not assignable from the <paramref name="implementationType"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
-        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
-        {
-            this.Register(serviceType, implementationType, lifestyle, "serviceType", "implementationType");
-        }
-
-        /// <summary>
-        /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
-        /// type <paramref name="serviceType"/> and will be returned when an instance of type 
-        /// <paramref name="serviceType"/> is requested. The delegate is expected to produce new instances on 
-        /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
-        /// </summary>
-        /// <param name="serviceType">The interface or base type that can be used to retrieve instances.</param>
-        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
-        /// <paramref name="serviceType"/> has already been registered.</exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
-        public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
-        {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
-
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
-
-            var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
             this.AddRegistration(serviceType, registration);
         }
