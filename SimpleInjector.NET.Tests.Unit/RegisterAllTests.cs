@@ -57,7 +57,7 @@
             IPlugin[] plugins = new IPlugin[] { new PluginImpl(), new PluginImpl(), new PluginImpl() };
 
             // RegisterSingle<IEnumerable<T>> should have the same effect as RegisterAll<T>
-            container.RegisterSingle<IEnumerable<IPlugin>>(plugins);
+            container.RegisterInstance<IEnumerable<IPlugin>>(plugins);
 
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
@@ -91,7 +91,7 @@
             container.RegisterCollection<IPlugin>(new PluginImpl());
 
             // Act
-            Action action = () => container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
+            Action action = () => container.RegisterInstance<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -118,7 +118,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IEnumerable<IPlugin>>(new IPlugin[0]);
+            container.RegisterInstance<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Act
             Action action = () => container.RegisterCollection<IPlugin>(new PluginImpl());
@@ -201,7 +201,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act
@@ -1592,8 +1592,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterAll for the same open-generic service type is not supported. Consider
-                making one single call to RegisterAll(typeof(IEventHandler<>), types)."
+                Mixing calls to RegisterCollection for the same open-generic service type is not supported. Consider
+                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }
@@ -1614,8 +1614,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterAll for the same open-generic service type is not supported. Consider
-                making one single call to RegisterAll(typeof(IEventHandler<>), types)."
+                Mixing calls to RegisterCollection for the same open-generic service type is not supported. Consider
+                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }
@@ -1681,7 +1681,7 @@
 
             var collection = new IEventHandler<AuditableEvent>[0];
 
-            container.RegisterSingle<IEnumerable<IEventHandler<AuditableEvent>>>(collection);
+            container.RegisterInstance<IEnumerable<IEventHandler<AuditableEvent>>>(collection);
 
             // Act
             Action action =

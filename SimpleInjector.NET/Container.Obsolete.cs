@@ -198,6 +198,28 @@ namespace SimpleInjector
         }
 
         /// <summary>This method has been removed.</summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
+        /// <param name="instance">The instance to register.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method has been removed. Please call RegisterInstance<TService>(TService) instead.", error: true)]
+        public void RegisterSingle<TService>(TService instance) where TService : class
+        {
+            this.RegisterInstance<TService>(instance);
+        }
+
+        /// <summary>This method has been removed.</summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method has been removed. Please call RegisterInstance(Type, object) instead.", error: true)]
+        public void RegisterSingle(Type serviceType, object instance)
+        {
+            this.RegisterInstance(serviceType, instance);
+        }
+
+        /// <summary>This method has been removed.</summary>
         /// <param name="instance">The instance whose properties will be injected.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
             Justification = "Making this method static would break the API.")]

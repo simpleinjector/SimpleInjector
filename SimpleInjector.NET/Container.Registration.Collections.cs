@@ -293,7 +293,7 @@ namespace SimpleInjector
 
             Type openGenericServiceType = itemType.GetGenericTypeDefinition();
 
-            if (!this.registerAllResolvers.TryGetValue(openGenericServiceType, out resolver))
+            if (!this.collectionResolvers.TryGetValue(openGenericServiceType, out resolver))
             {
                 this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(itemType));
 
@@ -302,7 +302,7 @@ namespace SimpleInjector
                 this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
                 this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
 
-                this.registerAllResolvers.Add(openGenericServiceType, resolver);
+                this.collectionResolvers.Add(openGenericServiceType, resolver);
             }
 
             return resolver;

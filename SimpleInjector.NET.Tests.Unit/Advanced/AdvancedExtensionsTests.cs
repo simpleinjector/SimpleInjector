@@ -211,7 +211,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 appending registrations to these collections is not supported. Please register the collection
-                with one of the other RegisterAll overloads is appending is required."
+                with one of the other RegisterCollection overloads if appending is required."
                 .TrimInside(),
                 action);
         }

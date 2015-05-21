@@ -83,7 +83,7 @@ namespace SimpleInjector
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
 
-        private readonly Dictionary<Type, ContainerControlledCollectionResolver> registerAllResolvers =
+        private readonly Dictionary<Type, ContainerControlledCollectionResolver> collectionResolvers =
             new Dictionary<Type, ContainerControlledCollectionResolver>();
 
         private Dictionary<Type, InstanceProducer> producers =
@@ -104,7 +104,7 @@ namespace SimpleInjector
         {
             this.containerId = Interlocked.Increment(ref counter);
 
-            this.RegisterSingle<Container>(this);
+            this.RegisterInstance<Container>(this);
 
             this.Options = new ContainerOptions(this)
             {

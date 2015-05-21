@@ -14,7 +14,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             var instance1 = container.GetInstance<IUserRepository>();
@@ -33,7 +33,7 @@
             IUserRepository invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterSingle<IUserRepository>(invalidInstance);
+            Action action = () => container.RegisterInstance<IUserRepository>(invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -44,10 +44,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
-            Action action = () => container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
@@ -61,7 +61,7 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
-            Action action = () => container.RegisterSingle<UserServiceBase>(new FakeUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new FakeUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
@@ -72,11 +72,11 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingle<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act
-            Action action = () => container.RegisterSingle<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetInstance.");
@@ -94,7 +94,7 @@
             var count = repositories.Count();
 
             // Act
-            Action action = () => container.RegisterSingle<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetAllInstances.");
@@ -108,7 +108,7 @@
 
             // This registration will make the DelegateBuilder call the 
             // SingletonInstanceProducer.BuildExpression method.
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.GetInstance<RealUserService>();
@@ -123,7 +123,7 @@
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterSingle(typeof(IUserRepository), impl);
+            container.RegisterInstance(typeof(IUserRepository), impl);
 
             // Assert
             Assert.AreEqual(impl, container.GetInstance<IUserRepository>(),
@@ -139,7 +139,7 @@
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterSingle(typeof(IUserRepository), impl);
+            container.RegisterInstance(typeof(IUserRepository), impl);
 
             var instance1 = container.GetInstance<IUserRepository>();
             var instance2 = container.GetInstance<IUserRepository>();
@@ -157,7 +157,7 @@
             object impl = new List<int>();
 
             // Act
-            Action action = () => container.RegisterSingle(typeof(IUserRepository), impl);
+            Action action = () => container.RegisterInstance(typeof(IUserRepository), impl);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -172,7 +172,7 @@
             object impl = new List<int>();
 
             // Act
-            container.RegisterSingle(impl.GetType(), impl);
+            container.RegisterInstance(impl.GetType(), impl);
         }
 
         [TestMethod]
@@ -185,7 +185,7 @@
             object validInstance = new SqlUserRepository();
 
             // Act
-            Action action = () => container.RegisterSingle(invalidServiceType, validInstance);
+            Action action = () => container.RegisterInstance(invalidServiceType, validInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -201,7 +201,7 @@
             object invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterSingle(validServiceType, invalidInstance);
+            Action action = () => container.RegisterInstance(validServiceType, invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -215,7 +215,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {
@@ -238,7 +238,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle(typeof(IUserRepository), new SqlUserRepository());
+            container.RegisterInstance(typeof(IUserRepository), new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {

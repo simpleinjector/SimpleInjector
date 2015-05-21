@@ -13,6 +13,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Added Container.Register(Type, IEnumerable<Assembly>) and 
 		 Container.RegisterCollection(Type, IEnumerable<Assembly>) overloads for batch registration. (fixes #7)
 	    -[Core] Added Container.GetTypesToRegister method for batch registration. (fixes #7)
+		-[Core] Added Container.RegisterInstance overloads as replacement for RegisterSingle overloads that
+		 take in an instance (fixes #44).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).
@@ -28,6 +30,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Removed the Container.RegisterSingle<TService>(Func<TService>) method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle(Type, Type) method (fixes #44).
 		-[Core] Removed the Container.RegisterSingle(Type, Func<object>) method (fixes #44).
+		-[Core] Removed the Container.RegisterSingle(Type, object) method (fixes #44).
 		-[Core] Container.RegisterAll methods renamed to Container.RegisterCollection (fixes #42).
 		-[Core] Moved DecoratorPredicateContext class to the SimpleInjector root namespace (fixes #7).
 		-[Core] Moved DecoratorContext to the SimpleInjector root namespace (fixes #7).

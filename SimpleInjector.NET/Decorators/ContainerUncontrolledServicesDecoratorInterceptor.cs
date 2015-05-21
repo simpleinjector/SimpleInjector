@@ -34,9 +34,9 @@ namespace SimpleInjector.Decorators
 
     // This class allows decorating collections of services with elements that are created out of the control
     // of the container. Collections are registered using the following methods:
-    // -RegisterAll<TService>(IEnumerable<TService> collection)
+    // -RegisterCollection<TService>(IEnumerable<TService> uncontrolledCollection)
     // -Register<TService>(TService) (where TService is a IEnumerable<T>)
-    // -RegisterAll(this Container container, Type serviceType, IEnumerable collection).
+    // -RegisterCollection(Type serviceType, IEnumerable uncontrolledCollection).
     internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
         private static readonly object ContainerItemsKeyAndLock = new object();

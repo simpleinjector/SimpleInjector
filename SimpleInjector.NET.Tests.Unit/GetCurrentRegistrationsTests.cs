@@ -183,7 +183,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<ITimeProvider>(new RealTimeProvider());
+            container.RegisterInstance<ITimeProvider>(new RealTimeProvider());
 
             // Act
             var registrations = container.GetCurrentRegistrations()

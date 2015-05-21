@@ -132,7 +132,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Type {0} has already been registered. If your intention is to resolve " +
-                "a collection of {0} implementations, use the RegisterAll overloads. More info: " +
+                "a collection of {0} implementations, use the RegisterCollection overloads. More info: " +
                 "https://simpleinjector.org/coll1" +
                 ". If your intention is to replace the existing registration with this new registration, " +
                 "you can allow overriding the current registration by setting Container.Options." +
@@ -420,11 +420,11 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
                 "decorator, that will be wrapped around instances of the collection of {0} instances, " +
-                "because the registration hasn't been made using one of the RegisterAll overloads that " +
-                "take a list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is " +
+                "because the registration hasn't been made using one of the RegisterCollection overloads " +
+                "that take a list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is " +
                 "impossible for the container to determine its lifestyle, which makes it impossible to " +
-                "generate a Func<T>. Either switch to one of the other RegisterAll overloads, or don't " +
-                "use a decorator that depends on a Func<T> for injecting the decoratee.",
+                "generate a Func<T>. Either switch to one of the other RegisterCollection overloads, or " +
+                "don't use a decorator that depends on a Func<T> for injecting the decoratee.",
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
         }
 
@@ -503,7 +503,7 @@ namespace SimpleInjector
                 "type {2}, but the registered collection is not controlled by the container. Since the " +
                 "number of returned items might change on each call, the decorator with this lifestyle " +
                 "cannot be applied to the collection. Instead, register the decorator with the Transient " +
-                "lifestyle, or use one of the RegisterAll overloads that takes a collection of " +
+                "lifestyle, or use one of the RegisterCollection overloads that takes a collection of " +
                 "System.Type types.",
                 decoratorType.ToFriendlyName(), lifestyle.Name, serviceType.ToFriendlyName());
         }
@@ -569,10 +569,10 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "You are trying to append a registration to the registered collection of {0} instances, " +
-                "which is either registered using RegisterAll<TService>(IEnumerable<TService>) or " +
-                "RegistereAll(Type, IEnumerable). Since the number of returned items might change on each " +
-                "call, appending registrations to these collections is not supported. Please register the " +
-                "collection with one of the other RegisterAll overloads is appending is required.",
+                "which is either registered using RegisterCollection<TService>(IEnumerable<TService>) or " +
+                "RegisterCollection(Type, IEnumerable). Since the number of returned items might change on " +
+                "each call, appending registrations to these collections is not supported. Please register " +
+                "the collection with one of the other RegisterCollection overloads if appending is required.",
                 serviceType.ToFriendlyName());
         }
 
@@ -656,11 +656,11 @@ namespace SimpleInjector
             return "This method can only be called after GetInstance() or BuildExpression() have been called.";
         }
 
-        internal static string MixingCallsToRegisterAllIsNotSupported(Type serviceType)
+        internal static string MixingCallsToRegisterCollectionIsNotSupported(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Mixing calls to RegisterAll for the same open-generic service type is not supported. " +
-                "Consider making one single call to RegisterAll(typeof({0}), types).",
+                "Mixing calls to RegisterCollection for the same open-generic service type is not " +
+                "supported. Consider making one single call to RegisterCollection(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
         }
 

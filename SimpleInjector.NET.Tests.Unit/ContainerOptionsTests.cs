@@ -278,7 +278,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.ConstructorResolutionBehavior = 
@@ -347,7 +347,7 @@
 
             var container = new Container();
 
-            container.RegisterSingle<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.ConstructorInjectionBehavior = expectedBehavior;
@@ -393,7 +393,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = 
@@ -457,7 +457,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingle<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();

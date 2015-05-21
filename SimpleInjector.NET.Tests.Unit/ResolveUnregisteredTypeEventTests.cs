@@ -94,7 +94,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             container.ResolveUnregisteredType += (s, e) => { eventCalled = true; };
 
@@ -168,7 +168,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -187,7 +187,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -215,7 +215,7 @@
 
             container.ResolveUnregisteredType += handler;
 
-            container.RegisterSingle<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.ResolveUnregisteredType -= handler;

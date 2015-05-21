@@ -30,7 +30,7 @@ namespace SimpleInjector.Internals
     using SimpleInjector.Decorators;
 
     // This class is similar to the OpenGenericRegistrationExtensions.UnregisteredAllOpenGenericResolver class
-    // (which is used by RegisterAllOpenGeneric), but this class (used by RegisterAll) behaves differently. 
+    // (which is used by RegisterAllOpenGeneric), but this class (used by RegisterCollection) behaves differently. 
     // This implementation forwards requests for types back to the container (using the 
     // ContainerControlledCollection<T>) to allow lifestyles of individual registrations to be overridden and 
     // this allows abstractions to be used as types. This isn't supported by RegisterAllOpenGeneric and 
@@ -212,7 +212,7 @@ namespace SimpleInjector.Internals
                 }
 
                 throw new InvalidOperationException(
-                    StringResources.MixingCallsToRegisterAllIsNotSupported(serviceType));
+                    StringResources.MixingCallsToRegisterCollectionIsNotSupported(serviceType));
             }
         }
 

@@ -143,7 +143,7 @@
 
             IInternalService expectedSingleton = new InternalServiceImpl(null);
 
-            container.RegisterSingle(typeof(IInternalService), expectedSingleton);
+            container.RegisterInstance(typeof(IInternalService), expectedSingleton);
 
             try
             {
@@ -170,7 +170,7 @@
 
             IPublicService expectedSingleton = new InternalImplOfPublicService(null);
 
-            container.RegisterSingle(typeof(IPublicService), expectedSingleton);
+            container.RegisterInstance(typeof(IPublicService), expectedSingleton);
 
             // Act
             container.GetInstance(typeof(IPublicService));

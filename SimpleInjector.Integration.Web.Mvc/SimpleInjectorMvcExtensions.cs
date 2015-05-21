@@ -95,7 +95,7 @@ namespace SimpleInjector
 
             var singletonFilterProvider = new SimpleInjectorFilterAttributeFilterProvider(container);
 
-            container.RegisterSingle<IFilterProvider>(singletonFilterProvider);
+            container.RegisterInstance<IFilterProvider>(singletonFilterProvider);
 
             var providers = FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().ToList();
 

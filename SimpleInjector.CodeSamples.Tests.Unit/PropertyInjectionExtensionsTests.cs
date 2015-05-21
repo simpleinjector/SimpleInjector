@@ -50,7 +50,7 @@
 
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
-            container.RegisterSingle<ILogger>(expectedDependency);
+            container.RegisterInstance<ILogger>(expectedDependency);
 
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperty>();
@@ -69,7 +69,7 @@
 
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
-            container.RegisterSingle<ILogger>(expectedDependency);
+            container.RegisterInstance<ILogger>(expectedDependency);
             
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperties>();
@@ -91,7 +91,7 @@
 
             container.Options.AutoWirePropertiesWithAttribute<Inject2Attribute>();
 
-            container.RegisterSingle<ILogger>(expectedDependency);
+            container.RegisterInstance<ILogger>(expectedDependency);
 
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperties>();

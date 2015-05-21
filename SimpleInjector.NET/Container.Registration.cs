@@ -214,7 +214,7 @@ namespace SimpleInjector
         ///     // Arrange
         ///     var container = new Container();
         ///
-        ///     container.RegisterSingle<ILogger, ConsoleLogger>();
+        ///     container.Register<ILogger, ConsoleLogger>(Lifestyle.Singleton);
         ///     container.Register<IValidator<Order>, OrderValidator>();
         ///     container.Register<IValidator<Customer>, CustomerValidator>();
         ///
@@ -303,7 +303,7 @@ namespace SimpleInjector
         /// will result in an <see cref="NewExpression"/>, while registrations that take a delegate (such as
         /// <see cref="Register{TService}(Func{TService})">Register&lt;TService&gt;(Func&lt;TService&gt;)</see>)
         /// will result in an <see cref="InvocationExpression"/>. Singletons that are passed in using their
-        /// value (<see cref="RegisterSingle{TService}(TService)">RegisterSingle&lt;TService&gt;(TService)</see>)
+        /// value (<see cref="RegisterInstance{TService}(TService)">RegisterInstance&lt;TService&gt;(TService)</see>)
         /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
         /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> 
         /// property and might have supplied an <see cref="Expression"/> of a different type. The order in
@@ -387,8 +387,8 @@ namespace SimpleInjector
         }
 
         // Allows getting notified when Verify() is called.
-        // This event is currently only used by RegisterAll to make sure that as many registered types can
-        // be verified.
+        // This event is currently only used by RegisterCollection to make sure that as many registered types
+        // can be verified.
         internal event Action Verifying = () => { };
 
         /// <summary>
@@ -642,7 +642,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
-        public void RegisterSingle<TService>(TService instance) where TService : class
+        public void RegisterInstance<TService>(TService instance) where TService : class
         {
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
@@ -668,7 +668,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void RegisterSingle(Type serviceType, object instance)
+        public void RegisterInstance(Type serviceType, object instance)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(instance, "instance");
@@ -866,7 +866,7 @@ namespace SimpleInjector
         /// (using constructor injection). Types that are newed up manually by supplying a 
         /// <see cref="Func{T}"/> delegate to the container (using the 
         /// <see cref="Register{TService}(Func{TService})"/> method) or registered as single instance
-        /// (using <see cref="RegisterSingle{TService}(TService)"/>) will not trigger initialization.
+        /// (using <see cref="RegisterInstance{TService}(TService)"/>) will not trigger initialization.
         /// When initialization of these instances is needed, this must be done manually, as can be seen in 
         /// the following example:
         /// <code lang="cs"><![CDATA[
@@ -1138,7 +1138,7 @@ namespace SimpleInjector
 
         private void ThrowWhenTypeAlreadyRegistered(Type type)
         {
-            if (this.producers.ContainsKey(type) || this.IsEnumerableTypeRegisteredWithRegisterAll(type))
+            if (this.producers.ContainsKey(type) || this.IsEnumerableTypeRegisteredWithRegisterCollection(type))
             {
                 if (!this.Options.AllowOverridingRegistrations)
                 {
@@ -1147,7 +1147,7 @@ namespace SimpleInjector
             }
         }
 
-        private bool IsEnumerableTypeRegisteredWithRegisterAll(Type type)
+        private bool IsEnumerableTypeRegisteredWithRegisterCollection(Type type)
         {
             bool isEnumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
@@ -1157,7 +1157,7 @@ namespace SimpleInjector
 
                 if (elementType.IsGenericType)
                 {
-                    return this.registerAllResolvers.ContainsKey(elementType.GetGenericTypeDefinition());
+                    return this.collectionResolvers.ContainsKey(elementType.GetGenericTypeDefinition());
                 }
             }
 
