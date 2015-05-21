@@ -32,6 +32,7 @@ namespace SimpleInjector
     using System.Threading.Tasks;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Internals;
 
 #if !PUBLISH
     /// <summary>Methods for verifying the container.</summary>

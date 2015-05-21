@@ -27,7 +27,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
     
 #if !PUBLISH
     /// <summary>Methods for batch registration.</summary>
@@ -245,14 +245,28 @@ namespace SimpleInjector
             var types =
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
-                from type in ExtensionHelpers.GetTypesFromAssembly(assembly, includeInternals: true)
+                from type in GetTypesFromAssembly(assembly)
                 where Helpers.IsConcreteType(type)
                 where !type.IsGenericType
-                where ExtensionHelpers.ServiceIsAssignableFromImplementation(serviceType, type)
+                where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
                 where !DecoratorHelpers.IsDecorator(this, serviceType, type)
                 select type;
 
             return types.ToArray();
+        }
+
+        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (NotSupportedException)
+            {
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // Assembly and it would be safe to skip this exception.
+                return Enumerable.Empty<Type>();
+            }
         }
 
         private sealed class BatchMapping

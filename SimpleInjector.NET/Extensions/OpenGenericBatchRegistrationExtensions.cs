@@ -26,7 +26,6 @@ namespace SimpleInjector.Extensions
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using SimpleInjector.Extensions.Decorators;
 
     /// <summary>
     /// Represents the method that will called to register one or multiple concrete non-generic

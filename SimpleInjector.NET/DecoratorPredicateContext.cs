@@ -29,7 +29,7 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>

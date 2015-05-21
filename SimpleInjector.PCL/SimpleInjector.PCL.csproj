@@ -55,18 +55,6 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
       <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ConditionalHashSet.cs">
-      <Link>Advanced\ConditionalHashSet.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollection.cs">
-      <Link>Advanced\ContainerControlledCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledCollectionResolver.cs">
-      <Link>Advanced\ContainerControlledCollectionResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ContainerControlledItem.cs">
-      <Link>Advanced\ContainerControlledItem.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
       <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
@@ -84,9 +72,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\IContainerControlledCollection.cs">
-      <Link>Advanced\IContainerControlledCollection.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\ILifestyleSelectionBehavior.cs">
       <Link>Advanced\ILifestyleSelectionBehavior.cs</Link>
@@ -109,26 +94,11 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\KnownRelationship.cs">
       <Link>Advanced\KnownRelationship.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\OverriddenParameter.cs">
-      <Link>Advanced\OverriddenParameter.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
       <Link>Advanced\PropertyInjectionHelper.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\ReferenceEqualityComparer.cs">
-      <Link>Advanced\ReferenceEqualityComparer.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\SubExpressionReplacer.cs">
-      <Link>Advanced\SubExpressionReplacer.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\TransientLifestyleSelectionBehavior.cs">
       <Link>Advanced\TransientLifestyleSelectionBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\UnregisteredOpenGenericResolver.cs">
-      <Link>Advanced\UnregisteredOpenGenericResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\CompilationHelpers.cs">
-      <Link>CompilationHelpers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
@@ -157,17 +127,41 @@
     <Compile Include="..\SimpleInjector.NET\ContainerOptions.cs">
       <Link>ContainerOptions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidator.cs">
-      <Link>CyclicDependencyValidator.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\CyclicDependencyValidatorExtensions.cs">
-      <Link>CyclicDependencyValidatorExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\DecoratorContext.cs">
       <Link>DecoratorContext.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\DecoratorPredicateContext.cs">
       <Link>DecoratorPredicateContext.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
+      <Link>Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorExpressionInterceptor.cs">
+      <Link>Decorators\DecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorExpressionInterceptorData.cs">
+      <Link>Decorators\DecoratorExpressionInterceptorData.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorExtensions.cs">
+      <Link>Decorators\DecoratorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorHelpers.cs">
+      <Link>Decorators\DecoratorHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorInfo.cs">
+      <Link>Decorators\DecoratorInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorInterceptor.cs">
+      <Link>Decorators\DecoratorInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\IDecoratableSingletonCollection.cs">
+      <Link>Decorators\IDecoratableSingletonCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\ServiceDecoratorExpressionInterceptor.cs">
+      <Link>Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Decorators\ServiceTypeDecoratorInfo.cs">
+      <Link>Decorators\ServiceTypeDecoratorInfo.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\AmbiguousLifestylesDiagnosticResult.cs">
       <Link>Diagnostics\AmbiguousLifestylesDiagnosticResult.cs</Link>
@@ -259,59 +253,74 @@
     <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
       <Link>ExpressionBuiltEventArgs.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\ArgumentMapping.cs">
-      <Link>Extensions\ArgumentMapping.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
-      <Link>Extensions\DecoratorExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs">
-      <Link>Extensions\Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorExpressionInterceptor.cs">
-      <Link>Extensions\Decorators\DecoratorExpressionInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorExpressionInterceptorData.cs">
-      <Link>Extensions\Decorators\DecoratorExpressionInterceptorData.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorHelpers.cs">
-      <Link>Extensions\Decorators\DecoratorHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInfo.cs">
-      <Link>Extensions\Decorators\DecoratorInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\DecoratorInterceptor.cs">
-      <Link>Extensions\Decorators\DecoratorInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs">
-      <Link>Extensions\Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\Decorators\ServiceTypeDecoratorInfo.cs">
-      <Link>Extensions\Decorators\ServiceTypeDecoratorInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\ExtensionHelpers.cs">
-      <Link>Extensions\ExtensionHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\GenericArgumentFinder.cs">
-      <Link>Extensions\GenericArgumentFinder.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\GenericTypeBuilder.cs">
-      <Link>Extensions\GenericTypeBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericBatchRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericBatchRegistrationExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\TypeConstraintValidator.cs">
-      <Link>Extensions\TypeConstraintValidator.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\InstanceProducer.cs">
       <Link>InstanceProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ArgumentMapping.cs">
+      <Link>Internals\ArgumentMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\CompilationHelpers.cs">
+      <Link>Internals\CompilationHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ConditionalHashSet.cs">
+      <Link>Internals\ConditionalHashSet.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ConstantArrayIndexizerVisitor.cs">
+      <Link>Internals\ConstantArrayIndexizerVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ConstantFinderVisitor.cs">
+      <Link>Internals\ConstantFinderVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollection.cs">
+      <Link>Internals\ContainerControlledCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollectionResolver.cs">
+      <Link>Internals\ContainerControlledCollectionResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledItem.cs">
+      <Link>Internals\ContainerControlledItem.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\CyclicDependencyValidator.cs">
+      <Link>Internals\CyclicDependencyValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\CyclicDependencyValidatorExtensions.cs">
+      <Link>Internals\CyclicDependencyValidatorExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\GenericArgumentFinder.cs">
+      <Link>Internals\GenericArgumentFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\GenericTypeBuilder.cs">
+      <Link>Internals\GenericTypeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\IContainerControlledCollection.cs">
+      <Link>Internals\IContainerControlledCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\InternalsFinderVisitor.cs">
+      <Link>Internals\InternalsFinderVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\OverriddenParameter.cs">
+      <Link>Internals\OverriddenParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ReferenceEqualityComparer.cs">
+      <Link>Internals\ReferenceEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\SubExpressionReplacer.cs">
+      <Link>Internals\SubExpressionReplacer.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\TypeConstraintValidator.cs">
+      <Link>Internals\TypeConstraintValidator.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\UnregisteredOpenGenericResolver.cs">
+      <Link>Internals\UnregisteredOpenGenericResolver.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyle.cs">
       <Link>Lifestyle.cs</Link>

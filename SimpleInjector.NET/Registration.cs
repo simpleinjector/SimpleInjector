@@ -31,6 +31,7 @@ namespace SimpleInjector
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// A <b>Registration</b> implements lifestyle based caching for a single service and allows building an

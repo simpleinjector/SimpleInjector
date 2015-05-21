@@ -28,6 +28,7 @@ namespace SimpleInjector.Diagnostics
     using System.Diagnostics;
     using System.Linq;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// Entry point for doing diagnostic analysis on <see cref="Container"/> instances.

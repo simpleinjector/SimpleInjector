@@ -27,8 +27,10 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
+    using SimpleInjector.Internals;
 
     internal static class Requires
     {
@@ -139,7 +141,7 @@ namespace SimpleInjector
             Type implementation, string paramName)
         {
             if (service != implementation &&
-                !ExtensionHelpers.ServiceIsAssignableFromImplementation(service, implementation))
+                !Helpers.ServiceIsAssignableFromImplementation(service, implementation))
             {
                 throw new ArgumentException(
                     StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
@@ -152,7 +154,7 @@ namespace SimpleInjector
         {
             var invalidType = (
                 from type in typesToRegister
-                where !ExtensionHelpers.ServiceIsAssignableFromImplementation(serviceType, type)
+                where !Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
                 where !typeCanBeServiceType || type != serviceType
                 select type)
                 .FirstOrDefault();

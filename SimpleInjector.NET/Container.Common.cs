@@ -34,6 +34,7 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>

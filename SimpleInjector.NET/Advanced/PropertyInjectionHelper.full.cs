@@ -26,6 +26,7 @@ namespace SimpleInjector.Advanced
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Threading;
+    using SimpleInjector.Internals;
 
     internal sealed partial class PropertyInjectionHelper
     {

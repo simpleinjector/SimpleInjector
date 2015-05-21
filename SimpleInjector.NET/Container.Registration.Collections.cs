@@ -28,7 +28,8 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH

@@ -24,7 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
 
 #if !PUBLISH
     /// <summary>Methods for registration of decorators.</summary>

@@ -29,6 +29,7 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH

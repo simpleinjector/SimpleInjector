@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>Implements a cache for <see cref="ScopedLifestyle"/> implementations.</summary>

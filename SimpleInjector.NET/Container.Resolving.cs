@@ -30,7 +30,8 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Threading;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions.Decorators;
+    using SimpleInjector.Decorators;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH

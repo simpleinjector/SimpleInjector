@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// Helper methods for the container.
@@ -37,6 +38,17 @@ namespace SimpleInjector
     internal static partial class Helpers
     {
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
+
+        internal static bool ContainsGenericParameter(this Type type)
+        {
+            return type.IsGenericParameter ||
+                (type.IsGenericType && type.GetGenericArguments().Any(ContainsGenericParameter));
+        }
+
+        internal static bool IsGenericArgument(this Type type)
+        {
+            return type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
+        }
 
         internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck)
         {
@@ -192,6 +204,105 @@ namespace SimpleInjector
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
 
+
+
+
+        internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
+        {
+            bool serviceIsGenericTypeDefinitionOfImplementation =
+                implementation.IsGenericType && implementation.GetGenericTypeDefinition() == service;
+
+            return serviceIsGenericTypeDefinitionOfImplementation ||
+                implementation.GetBaseTypesAndInterfacesFor(service).Any();
+        }
+
+        // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
+        // return typeof(IComparable<int>) and typeof(IComparable<double>) when serviceType is
+        // typeof(IComparable<>).
+        internal static IEnumerable<Type> GetBaseTypesAndInterfacesFor(this Type type, Type serviceType)
+        {
+            return GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
+        }
+
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType)
+        {
+            return GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
+        }
+
+        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
+        {
+            return type.GetInterfaces().Concat(type.GetBaseTypes());
+        }
+
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
+        {
+            var thisType = new[] { type };
+            return thisType.Concat(type.GetBaseTypesAndInterfaces());
+        }
+
+        internal static Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType,
+            IEnumerable<Type> openGenericImplementations, bool includeVariantTypes = true)
+        {
+            var openItems =
+                from openGenericImplementation in openGenericImplementations
+                select new ContainerControlledItem(openGenericImplementation);
+
+            var closedItems = GetClosedGenericImplementationsFor(closedGenericServiceType, openItems,
+                includeVariantTypes);
+
+            return closedItems.Select(item => item.ImplementationType).ToArray();
+        }
+
+        internal static ContainerControlledItem[] GetClosedGenericImplementationsFor(
+            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems,
+            bool includeVariantTypes = true)
+        {
+            return (
+                from item in containerControlledItems
+                let openGenericImplementation = item.ImplementationType
+                let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
+                let result = builder.BuildClosedGenericImplementation()
+                where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
+                    includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
+                let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
+                    ? result.ClosedGenericImplementation
+                    : openGenericImplementation
+                select item.Registration != null ? item : new ContainerControlledItem(closedImplementation))
+                .ToArray();
+        }
+
+        private static IEnumerable<Type> GetBaseTypes(this Type type)
+        {
+            Type baseType = type.BaseType ?? (type != typeof(object) ? typeof(object) : null);
+
+            while (baseType != null)
+            {
+                yield return baseType;
+
+                baseType = baseType.BaseType;
+            }
+        }
+
+        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType)
+        {
+            return
+                from type in types
+                where type == serviceType || serviceType.IsVariantVersionOf(type) ||
+                    (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
+                select type;
+        }
+
+        private static bool IsVariantVersionOf(this Type type, Type otherType)
+        {
+            return
+                type.IsGenericType &&
+                otherType.IsGenericType &&
+                type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() &&
+                type.IsAssignableFrom(otherType);
+        }
+
+
+
         private static string ToFriendlyName(this Type type, Func<Type[], string> argumentsFormatter)
         {
             if (type.IsArray)
@@ -218,17 +329,17 @@ namespace SimpleInjector
             return name + "<" + argumentsFormatter(genericArguments.ToArray()) + ">";
         }
 
-        private static IEnumerable<Type> GetBaseTypes(Type type)
-        {
-            Type baseType = type.BaseType;
+        //private static IEnumerable<Type> GetBaseTypes(Type type)
+        //{
+        //    Type baseType = type.BaseType;
 
-            while (baseType != null)
-            {
-                yield return baseType;
+        //    while (baseType != null)
+        //    {
+        //        yield return baseType;
 
-                baseType = baseType.BaseType;
-            }
-        }
+        //        baseType = baseType.BaseType;
+        //    }
+        //}
 
         private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection)
         {

@@ -28,6 +28,7 @@ namespace SimpleInjector.Lifestyles
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     internal sealed class HybridRegistration : Registration
     {
