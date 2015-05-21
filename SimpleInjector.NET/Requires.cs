@@ -27,8 +27,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
 

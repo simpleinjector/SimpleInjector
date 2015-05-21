@@ -154,9 +154,6 @@
     <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorInterceptor.cs">
       <Link>Decorators\DecoratorInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Decorators\IDecoratableSingletonCollection.cs">
-      <Link>Decorators\IDecoratableSingletonCollection.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Decorators\ServiceDecoratorExpressionInterceptor.cs">
       <Link>Decorators\ServiceDecoratorExpressionInterceptor.cs</Link>
     </Compile>

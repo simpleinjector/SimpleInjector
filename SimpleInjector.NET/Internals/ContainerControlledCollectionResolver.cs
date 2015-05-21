@@ -26,7 +26,6 @@ namespace SimpleInjector.Internals
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Decorators;
 
     // This class is similar to the OpenGenericRegistrationExtensions.UnregisteredAllOpenGenericResolver class

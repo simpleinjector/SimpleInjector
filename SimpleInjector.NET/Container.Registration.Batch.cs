@@ -26,7 +26,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Decorators;
     
 #if !PUBLISH

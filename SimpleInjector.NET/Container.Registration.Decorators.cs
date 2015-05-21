@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Decorators;
 
 #if !PUBLISH
