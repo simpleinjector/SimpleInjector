@@ -128,8 +128,7 @@
             Container container = CreateContainerWithMostParametersConstructorResolutionBehavior();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-                new Type[] { typeof(MultipleCtorIntValidator) });
+            container.Register(typeof(IValidator<>), new[] { typeof(MultipleCtorIntValidator) });
         }
 
         [TestMethod]
@@ -138,8 +137,7 @@
             // Arrange
             Container container = CreateContainerWithMostParametersConstructorResolutionBehavior();
 
-            container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-                new Type[] { typeof(MultipleCtorIntValidator) });
+            container.Register(typeof(IValidator<>), new[] { typeof(MultipleCtorIntValidator) });
 
             container.Register<ILogger, NullLogger>();
             container.Register<ICommand, ConcreteCommand>();

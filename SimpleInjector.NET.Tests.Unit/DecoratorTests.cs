@@ -163,7 +163,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+            container.Register(typeof(ICommandHandler<RealCommand>), typeof(RealCommandHandler));
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
@@ -320,7 +320,7 @@
 
             container.RegisterSingle<ILogger>(logger);
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(LoggingRealCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, LoggingRealCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
 
@@ -339,7 +339,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(RealCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LogExceptionCommandHandlerDecorator<>));
@@ -361,7 +361,7 @@
 
             container.RegisterSingle<ILogger>(logger);
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(LoggingRealCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, LoggingRealCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator2<>));
@@ -392,7 +392,7 @@
                 decorator.Item2 = expectedItem2Value;
             });
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>),
                 typeof(HandlerDecoratorWithProperties<>));
@@ -412,7 +412,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             // Decorator1Handler depends on ILogger, but ILogger is not registered.
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
@@ -430,7 +430,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c => false);
 
@@ -447,7 +447,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>),
                 c => true);
@@ -468,7 +468,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
@@ -492,7 +492,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
@@ -516,7 +516,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterInitializer<StubCommandHandler>(handlerToInitialize => { });
 
@@ -616,7 +616,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
@@ -643,7 +643,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
@@ -667,7 +667,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
@@ -698,7 +698,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -723,7 +723,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
@@ -750,7 +750,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>));
 
@@ -781,7 +781,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>),
                 typeof(ClassConstraintHandlerDecorator<>));
@@ -799,7 +799,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
+            container.Register<ICommandHandler<StructCommand>, StructCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ClassConstraintHandlerDecorator<>));
 
@@ -910,7 +910,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StubCommandHandler));
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
@@ -944,7 +944,7 @@
             var container = ContainerFactory.New();
 
             // StructCommandHandler implements ICommandHandler<StructCommand>
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), typeof(StructCommandHandler));
+            container.Register<ICommandHandler<StructCommand>, StructCommandHandler>();
 
             // ConcreteCommandHandlerDecorator implements ICommandHandler<RealCommand>
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -1638,9 +1638,11 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(
+            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
+            {
                 typeof(NullCommandHandler<RealCommand>),
-                typeof(StubCommandHandler));
+                typeof(StubCommandHandler)
+            });
 
             // EnumerableDecorator<T> decorated IEnumerable<T>
             container.RegisterDecorator(

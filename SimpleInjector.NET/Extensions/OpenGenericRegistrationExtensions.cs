@@ -144,7 +144,7 @@ namespace SimpleInjector.Extensions
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
             "This extension method has been removed. " +
-            "Please use Container.RegisterCollection(Type, Type[]) instead.",
+            "Please use Container.RegisterCollection(Type, IEnumerable<Type>) instead.",
             error: true)]
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, params Type[] openGenericImplementations)

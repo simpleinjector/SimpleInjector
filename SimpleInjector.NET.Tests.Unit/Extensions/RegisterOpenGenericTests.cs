@@ -1220,7 +1220,7 @@
         {
             // Arrange
             string expectedMessage = @"
-                The supplied type 'IService<Int32, TB>' is a partially closed generic type, which is not 
+                The supplied type 'IService<Int32, TB>' is a partially-closed generic type, which is not 
                 supported as value of the serviceType parameter. Instead, please supply the open-generic type 
                 'IService<,>' and make the type supplied to the implementationType parameter partially closed 
                 instead."

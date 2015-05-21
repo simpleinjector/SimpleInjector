@@ -88,14 +88,15 @@ namespace SimpleInjector
             }
         }
 
-        internal static void TypeIsOpenGeneric(Type type, string paramName)
+        internal static void IsOpenGenericType(Type type, string paramName, string guidance = null)
         {
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
             // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
             // implementation of the GenericArgumentFinder. That's not an easy thing to fix :-(
             if (!type.ContainsGenericParameters)
             {
-                string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type);
+                string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type) +
+                    guidance == null ? string.Empty : (" " + guidance);
 
                 throw new ArgumentException(message, paramName);
             }
@@ -312,6 +313,22 @@ namespace SimpleInjector
         internal static void CollectionDoesNotContainOpenGenericTypes(IEnumerable<Type> typesToRegister,
             string paramName)
         {
+            var openGenericTypes =
+                from type in typesToRegister
+                where type.ContainsGenericParameters
+                select type;
+
+            if (openGenericTypes.Any())
+            {
+                string message = StringResources.ThisOverloadDoesNotAllowOpenGenerics(openGenericTypes);
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void CollectionDoesNotContainOpenGenericTypesForRegisterMany(IEnumerable<Type> typesToRegister,
+            string paramName)
+        {
             if (typesToRegister != null)
             {
                 var openGenericTypes =
@@ -345,6 +362,16 @@ namespace SimpleInjector
             {
                 throw new ArgumentException(
                     StringResources.ValueInvalidForEnumType(paramName, value, typeof(TEnum)));
+            }
+        }
+
+        internal static void IsNotPartiallyClosed(Type openGenericServiceType, string paramName)
+        {
+            if (openGenericServiceType.IsPartiallyClosed())
+            {
+                throw new ArgumentException(
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(openGenericServiceType),
+                    paramName);
             }
         }
 

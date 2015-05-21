@@ -162,7 +162,7 @@
                     type => type == typeof(SqlLogger) ? Lifestyle.Singleton : Lifestyle.Transient);
 
             // Act
-            container.RegisterCollection<ILog>(typeof(SqlLogger), typeof(FileLogger));
+            container.RegisterCollection<ILog>(new[] { typeof(SqlLogger), typeof(FileLogger) });
 
             // Assert
             var loggers = container.GetAllInstances<ILog>();
@@ -243,10 +243,7 @@
         {
             RegisterWithoutLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                container => container.RegisterManyForOpenGeneric(
-                    typeof(IService<,>),
-                    AccessibilityOption.PublicTypesOnly,
-                    Assembly.GetExecutingAssembly()));
+                container => container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }));
         }
 
         [TestMethod]
@@ -254,12 +251,7 @@
         {
             RegisterWithoutLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                container => container.RegisterManyForOpenGeneric(
-                    typeof(IService<,>),
-                    new[] 
-                    { 
-                        typeof(ServiceForLifestyleSelectionBehaviorTests) 
-                    }));
+                container => container.Register<IService<double, decimal>, ServiceForLifestyleSelectionBehaviorTests>());
         }
 
         [TestMethod]
@@ -323,11 +315,7 @@
         {
             RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                (container, lifestyle) => container.RegisterManyForOpenGeneric(
-                    typeof(IService<,>),
-                    AccessibilityOption.PublicTypesOnly,
-                    lifestyle,
-                    Assembly.GetExecutingAssembly()));
+                (container, lifestyle) => container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, lifestyle));
         }
 
         [TestMethod]
@@ -335,13 +323,9 @@
         {
             RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                (container, lifestyle) => container.RegisterManyForOpenGeneric(
-                    typeof(IService<,>),
-                    lifestyle,
-                    new[] 
-                    {
-                        typeof(ServiceForLifestyleSelectionBehaviorTests) 
-                    }));
+                (container, lifestyle) =>
+                    container.Register<IService<double, decimal>, ServiceForLifestyleSelectionBehaviorTests>(
+                        lifestyle));
         }
 
         [TestMethod]

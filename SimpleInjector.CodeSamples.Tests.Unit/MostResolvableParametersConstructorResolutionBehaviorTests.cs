@@ -161,8 +161,7 @@
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-                new Type[] { typeof(MultipleCtorIntValidator) });
+            container.Register(typeof(IValidator<>), new[] { typeof(MultipleCtorIntValidator) });
         }
 
         [TestMethod]
@@ -171,8 +170,7 @@
             // Arrange
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
-            container.RegisterManyForOpenGeneric(typeof(IValidator<>),
-                new Type[] { typeof(MultipleCtorIntValidator) });
+            container.Register(typeof(IValidator<>), new[] { typeof(MultipleCtorIntValidator) });
 
             container.Register<ILogger, NullLogger>();
             container.Register<ICommand, ConcreteCommand>();

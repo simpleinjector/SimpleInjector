@@ -65,6 +65,11 @@ namespace SimpleInjector
             return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
         }
 
+        internal static bool IsPartiallyClosed(this Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() != type;
+        }
+
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
         {
@@ -181,7 +186,7 @@ namespace SimpleInjector
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
-            // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterAll<T> method.
+            // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterCollection<T> method.
             var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
@@ -227,13 +232,13 @@ namespace SimpleInjector
 
         private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection)
         {
-            return RegisterAllEnumerable(collection);
+            return RegisterCollectionEnumerable(collection);
         }
 
         // This method name does not describe what it does, but since the C# compiler will create a iterator
         // type named after this method, it allows us to return a type that has a nice name that will show up
         // during debugging.
-        private static IEnumerable<T> RegisterAllEnumerable<T>(IEnumerable<T> collection)
+        private static IEnumerable<T> RegisterCollectionEnumerable<T>(IEnumerable<T> collection)
         {
             foreach (var item in collection)
             {

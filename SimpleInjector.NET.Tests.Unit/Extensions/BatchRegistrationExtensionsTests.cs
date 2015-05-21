@@ -39,8 +39,8 @@
             var container = new Container();
 
             // Act
-            var types = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(container,
-                typeof(IService<,>), typeof(IService<,>).Assembly);
+            var types = 
+                container.GetTypesToRegister(typeof(IService<,>), new[] { typeof(IService<,>).Assembly });
 
             // Assert
             Assert.IsFalse(types.Any(type => type == typeof(ServiceDecorator)), "The decorator was included.");
@@ -52,9 +52,10 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            var assemblies = new[] { Assembly.GetExecutingAssembly() };
+
             // Act
-            Action action = () =>
-                container.RegisterManyForOpenGeneric(typeof(IService<int, int>), Assembly.GetExecutingAssembly());
+            Action action = () => container.Register(typeof(IService<int, int>), assemblies);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -67,9 +68,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
         }
 
         [TestMethod]
@@ -79,9 +78,7 @@
             var container = ContainerFactory.New();
 
             // We've got these concrete public implementations: Concrete1, Concrete2, Concrete3
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var impl = container.GetInstance<IService<string, object>>();
@@ -95,9 +92,8 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>),
-                AccessibilityOption.PublicTypesOnly, 
-                Assembly.GetExecutingAssembly());
+
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var impl = container.GetInstance<IService<int, string>>();
@@ -112,9 +108,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -130,10 +124,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>),
-                AccessibilityOption.PublicTypesOnly,
-                Lifestyle.Transient,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Transient);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -149,10 +140,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly, 
-                Lifestyle.Singleton,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -170,10 +158,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>),
-                AccessibilityOption.PublicTypesOnly, 
-                Lifestyle.Singleton, 
-                assemblies);
+            container.Register(typeof(IService<,>), assemblies, Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -188,9 +173,8 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var impl = container.GetInstance<IService<float, double>>();
@@ -205,9 +189,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var impl = container.GetInstance<IService<Type, Type>>();
@@ -222,20 +204,16 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // This call should fail, because both Invalid1 and Invalid2 implement the same closed generic
-                // interface IInvalid<int, double>
-                container.RegisterManyForOpenGeneric(typeof(IInvalid<,>), Assembly.GetExecutingAssembly());
+            // Act
+            // This call should fail, because both Invalid1 and Invalid2 implement the same closed generic
+            // interface IInvalid<int, double>
+            Action action = () => container.Register(typeof(IInvalid<,>), new[] { Assembly.GetExecutingAssembly() });
 
-                Assert.Fail("RegisterManyForOpenGeneric is expected to fail.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("There are 2 types that represent the closed generic type"),
-                    "Actual message: " + ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "There are 2 types in the supplied list of types or assemblies that represent the same " + 
+                "closed generic type",
+                action);
         }
 
         [TestMethod]
@@ -245,7 +223,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), typeof(Concrete1), typeof(Concrete2));
+            container.Register(typeof(IService<,>), new[] { typeof(Concrete1), typeof(Concrete2) });
 
             // Assert
             var impl = container.GetInstance<IService<string, object>>();
@@ -265,19 +243,12 @@
             var validType = typeof(ServiceImpl<object, string>);
             var invalidType = typeof(List<int>);
 
-            try
-            {
-                // Act
-                container.RegisterManyForOpenGeneric(serviceType, validType, invalidType);
+            // Act
+            Action action = () => container.Register(serviceType, new[] { validType, invalidType });
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (Exception ex)
-            {
-                AssertThat.StringContains("List<Int32>", ex.Message);
-                AssertThat.StringContains("IService<TA, TB>", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>("List<Int32>", action);
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>("IService<TA, TB>", action);
         }
 
         [TestMethod]
@@ -289,7 +260,7 @@
             Assembly[] invalidArgument = null;
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
+            Action action = () => container.Register(typeof(IService<,>), invalidArgument);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -304,22 +275,7 @@
             IEnumerable<Assembly> invalidArgument = null;
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(typeof(IService<,>), invalidArgument);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGeneric_WithNullContainer_ThrowsException()
-        {
-            // Arrange
-            Container invalidContainer = null;
-            var validServiceType = typeof(IService<,>);
-            var validAssembly = Assembly.GetExecutingAssembly();
-
-            // Act
-            Action action = () => invalidContainer.RegisterManyForOpenGeneric(validServiceType, validAssembly);
+            Action action = () => container.Register(typeof(IService<,>), invalidArgument);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -335,7 +291,7 @@
             IEnumerable<Type> invalidTypesToRegister = null;
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+            Action action = () => container.Register(validServiceType, invalidTypesToRegister);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -351,7 +307,7 @@
             IEnumerable<Type> validTypesToRegister = new Type[] { typeof(object) };
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(invalidServiceType, validTypesToRegister);
+            Action action = () => container.Register(invalidServiceType, validTypesToRegister);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -367,31 +323,10 @@
             IEnumerable<Type> invalidTypesToRegister = new Type[] { null };
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(validServiceType, invalidTypesToRegister);
+            Action action = () => container.Register(validServiceType, invalidTypesToRegister);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGenericAssemblyParams_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
-            {
-                // Do nothing.
-            };
-
-            // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, Assembly.GetExecutingAssembly());
-
-            // Assert
-            var registration = container.GetRegistration(typeof(IService<string, object>));
-
-            Assert.IsNull(registration, "GetRegistration should result in null, because by supplying a delegate, the " +
-                "extension method does not do any registration itself.");
         }
 
         [TestMethod]
@@ -405,35 +340,21 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), 
-                AccessibilityOption.PublicTypesOnly,
-                assemblies);
+            container.Register(typeof(IService<,>), assemblies);
         }
 
         [TestMethod]
         public void RegisterManyForOpenGeneric_WithCallback_IsCalledTheExpectedAmountOfTimes()
         {
             // Arrange
-            List<Type> expectedClosedServiceTypes = new List<Type>
-            {
-                typeof(IService<float, double>), 
-                typeof(IService<Type, Type>) 
-            };
-
-            List<Type> actualClosedServiceTypes = new List<Type>();
-
             var container = ContainerFactory.New();
 
-            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
-            {
-                actualClosedServiceTypes.Add(closedServiceType);
-            };
+            // class Concrete3 : IService<float, double>, IService<Type, Type>
+            container.RegisterCollection(typeof(IService<,>), new[] { typeof(Concrete3) });
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), callback, new[] { typeof(Concrete3) });
-
-            // Assert
-            Assert_AreEqual(expectedClosedServiceTypes, actualClosedServiceTypes);
+            container.GetAllInstances<IService<float, double>>().Single();
+            container.GetAllInstances<IService<Type, Type>>().Single();
         }
 
         [TestMethod]
@@ -443,7 +364,7 @@
             var container = ContainerFactory.New();
 
             // MultiInterfaceHandler implements two interfaces.
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), Assembly.GetExecutingAssembly());
+            container.Register(typeof(ICommandHandler<>), new[] { Assembly.GetExecutingAssembly() });
 
             // Act
             var instance1 = container.GetInstance<ICommandHandler<int>>();
@@ -460,9 +381,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // MultiInterfaceHandler implements two interfaces.
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), Lifestyle.Singleton,
-                Assembly.GetExecutingAssembly());
+            // MultiInterfaceHandler implements ICommandHandler<int> and ICommandHandler<double>.
+            container.Register(typeof(ICommandHandler<>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
 
             // Act
             var instance1 = container.GetInstance<ICommandHandler<int>>();
@@ -481,15 +401,15 @@
             Type[] types = new[] { typeof(GenericHandler<>) };
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+            Action action = () => container.Register(typeof(ICommandHandler<>), types);
 
             // Assert
-            AssertThat.ThrowsWithParamName("typesToRegister", action);
+            AssertThat.ThrowsWithParamName("implementationTypes", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied list of types contains an open generic type, but this overloaded method is unable
-                to handle open generic types because this overload can only register closed generic services 
-                types that have a single implementation. Please use the overload that takes in the 
-                BatchRegistrationCallback instead.".TrimInside(),
+                The supplied list of types contains one or multiple open generic types, but this method 
+                is unable to handle open generic types because it can only map closed-generic service 
+                types to a single implementation. Try using RegisterCollection instead."
+                .TrimInside(),
                 action);
         }
 
@@ -502,11 +422,11 @@
             IEnumerable<Type> types = new[] { typeof(GenericHandler<>) };
 
             // Act
-            Action action = () => container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), types);
+            Action action = () => container.Register(typeof(ICommandHandler<>), types);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                @"The supplied list of types contains an open generic type", action);
+                "The supplied list of types contains one or multiple open generic types", action);
         }
 
         [TestMethod]
@@ -517,76 +437,73 @@
 
             var types = new[] { typeof(GenericHandler<>) };
 
+            container.RegisterCollection(typeof(ICommandHandler<>), types);
+
             // Act
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>), 
-                (service, implementations) => { },
-                types);
+            var handler = container.GetAllInstances<ICommandHandler<int>>().Single();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(GenericHandler<int>), handler);
         }
 
         [TestMethod]
         public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericType_ReturnsTheExpectedClosedGenericVersion()
         {
             // Arrange
-            var types = new[] { typeof(DecimalHandler), typeof(GenericHandler<>) };
+            var registeredTypes = new[] { typeof(DecimalHandler), typeof(GenericHandler<>) };
+
             var expected = new[] { typeof(DecimalHandler), typeof(GenericHandler<decimal>) };
+                        
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
+
+            // Act
+            var handlers = container.GetAllInstances<ICommandHandler<decimal>>();
 
             // Assert
-            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
+            var actual = handlers.Select(handler => handler.GetType()).ToArray();
+            Assert.AreEqual(expected.ToFriendlyNamesText(), actual.ToFriendlyNamesText());
         }
 
         [TestMethod]
         public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericTypeWithCompatibleTypeConstraint_ReturnsThatGenericType()
         {
             // Arrange
-            var types = new[] { typeof(FloatHandler), typeof(GenericStructHandler<>) };
+            var registeredTypes = new[] { typeof(FloatHandler), typeof(GenericStructHandler<>) };
+
             var expected = new[] { typeof(FloatHandler), typeof(GenericStructHandler<float>) };
 
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
+
             // Assert
-            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
+            var handlers = container.GetAllInstances<ICommandHandler<float>>();
+
+            // Assert
+            var actual = handlers.Select(handler => handler.GetType()).ToArray();
+            Assert.AreEqual(expected.ToFriendlyNamesText(), actual.ToFriendlyNamesText());
         }
 
         [TestMethod]
         public void RegisterManyForOpenGenericWithCallback_SuppliedWithOpenGenericTypeWithIncompatibleTypeConstraint_DoesNotReturnThatGenericType()
         {
             // Arrange
-            var types = new[] { typeof(ObjectHandler), typeof(GenericStructHandler<>) };
+            var registeredTypes = new[] { typeof(ObjectHandler), typeof(GenericStructHandler<>) };
+
             var expected = new[] { typeof(ObjectHandler) };
+            
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
 
             // Assert
-            Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(types, expected);
-        }
-
-        [TestMethod]
-        public void GetTypesToRegisterOverload1_WithoutAccessibilityOption_ReturnsInternalTypes()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
-                container, 
-                typeof(IService<,>), 
-                typeof(IService<,>).Assembly);
+            var handlers = container.GetAllInstances<ICommandHandler<object>>();
 
             // Assert
-            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
-        }
-
-        [TestMethod]
-        public void GetTypesToRegisterOverload2_WithoutAccessibilityOption_ReturnsInternalTypes()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            IEnumerable<Assembly> assemblies = new[] { typeof(IService<,>).Assembly };
-            var result = OpenGenericBatchRegistrationExtensions.GetTypesToRegister(
-                container,
-                typeof(IService<,>),
-                assemblies);
-
-            // Assert
-            Assert.IsTrue(result.Contains(typeof(InternalConcrete4)));
+            var actual = handlers.Select(handler => handler.GetType()).ToArray();
+            Assert.AreEqual(expected.ToFriendlyNamesText(), actual.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -596,8 +513,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
         }
 
         [TestMethod]
@@ -609,8 +525,7 @@
             IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
-                assemblies);
+            container.Register(typeof(IService<,>), assemblies);
         }
 
         [TestMethod]
@@ -618,9 +533,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>),
-                AccessibilityOption.PublicTypesOnly, Lifestyle.Transient,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Transient);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -635,9 +548,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterManyForOpenGeneric(typeof(IService<,>),
-                AccessibilityOption.PublicTypesOnly, Lifestyle.Singleton,
-                Assembly.GetExecutingAssembly());
+            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -645,76 +556,6 @@
 
             // Assert
             Assert.AreEqual(impl1, impl2, "The type should be returned as singleton.");
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGeneric_WithInvalidAccessibilityOption_ThrowsExpectedException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Act
-            Action action = () => 
-                container.RegisterManyForOpenGeneric(typeof(IService<,>), (AccessibilityOption)5,
-                    Assembly.GetExecutingAssembly());
-
-            // Assert
-            AssertThat.Throws<ArgumentException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGeneric_ExcludingInternalTypes_DoesNotRegisterInternalTypes()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
-                Assembly.GetExecutingAssembly());
-
-            // Act
-            Action action = () => container.GetInstance<IService<decimal, decimal>>();
-
-            // Assert
-            AssertThat.Throws<ActivationException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGenericAssemblyIEnumerable_WithCallbackThatDoesNothing_DoesNotRegisterAnything()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            BatchRegistrationCallback callback = (closedServiceType, implementations) =>
-            {
-                // Do nothing.
-            };
-
-            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-
-            // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.PublicTypesOnly,
-                callback, assemblies);
-
-            // Assert
-            var registration = container.GetRegistration(typeof(IService<string, object>));
-
-            Assert.IsNull(registration, "GetRegistration should result in null, because by supplying a delegate, the " +
-                "extension method does not do any registration itself.");
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGenericAccessibilityOptionCallbackEnum_WithValidArguments_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            BatchRegistrationCallback callback = (closedServiceType, implementations) => { };
-
-            var assemblies = new[] { Assembly.GetExecutingAssembly() };
-
-            // Act
-            container.RegisterManyForOpenGeneric(typeof(IService<,>), AccessibilityOption.AllTypes, callback,
-                assemblies);
         }
 
         // This is a regression test for work item 21002
@@ -725,8 +566,7 @@
             var container = new Container();
 
             // Just registers RequestGroup in three groups.
-            container.RegisterManyForOpenGeneric(typeof(IHandler<,>), Lifestyle.Singleton,
-                typeof(RequestGroup).Assembly);
+            container.Register(typeof(IHandler<,>), new[] { typeof(RequestGroup).Assembly }, Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(IHandler<,>), typeof(RequestDecorator<,>));
 
@@ -749,10 +589,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterManyForOpenGeneric(typeof(IHandler<,>), Lifestyle.Singleton, new Type[]
-            {
-                typeof(RequestGroup)
-            });
+            container.Register(typeof(IHandler<,>), new Type[] { typeof(RequestGroup) }, Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(IHandler<,>), typeof(RequestDecorator<,>));
 
@@ -767,32 +604,12 @@
             Assert.AreSame(decorator2.Decoratee, decorator3.Decoratee);
         }
 
-        private static void Assert_RegisterManyForOpenGenericWithCallback_ReturnsExpectedImplementations(
-            Type[] inputTypes, Type[] expectedTypes)
-        {
-            // Arrange
-            var actualTypes = new List<Type>();
-
-            var container = ContainerFactory.New();
-
-            // Act
-            container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
-                (service, implementations) => actualTypes.AddRange(implementations),
-                inputTypes);
-
-            // Assert
-            bool collectionsContainTheSameElements = !Enumerable.Except(expectedTypes, actualTypes).Any();
-
-            Assert.IsTrue(collectionsContainTheSameElements,
-                "Actual list: " + actualTypes.ToFriendlyNamesText());
-        }
-
         private static void Assert_AreEqual<T>(List<T> expectedList, List<T> actualList)
         {
             Assert.IsNotNull(actualList);
 
             Assert.AreEqual(expectedList.Count, actualList.Count);
-
+            
             for (int i = 0; i < expectedList.Count; i++)
             {
                 T expected = expectedList[i];
@@ -881,11 +698,6 @@
             public ServiceDecorator(IService<int, object> decorated)
             {
             }
-        }
-
-        // Internal type.
-        private class InternalConcrete4 : IService<decimal, decimal>
-        {
         }
 
         #endregion

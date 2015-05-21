@@ -268,7 +268,7 @@
 
             var container = new Container();
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(typeof(StubCommandHandler));
+            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { typeof(StubCommandHandler) });
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 

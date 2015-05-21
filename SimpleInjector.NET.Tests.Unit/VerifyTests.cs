@@ -298,7 +298,7 @@
 
             container.Register<PluginImpl>();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
 
             container.RegisterInitializer<PluginImpl>(plugin => actualNumberOfCreatedPlugins++);
             
@@ -315,7 +315,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
 
             // FailingConstructorDecorator constructor throws an exception.
             container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
@@ -444,7 +444,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginWithBooleanDependency));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginWithBooleanDependency) });
 
             // Act
             Action action = () => container.Verify();

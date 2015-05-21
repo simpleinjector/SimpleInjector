@@ -26,7 +26,9 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH
@@ -501,9 +503,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that a new instance of <paramref name="implementation"/> will be returned every time a
+        /// Registers that a new instance of <paramref name="implementationType"/> will be returned every time a
         /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and 
-        /// <paramref name="implementation"/> represent the same type, the type is registered by itself.
+        /// <paramref name="implementationType"/> represent the same type, the type is registered by itself.
         /// </summary>
         /// <remarks>
         /// This method uses the container's 
@@ -512,20 +514,20 @@ namespace SimpleInjector
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
-        /// <param name="implementation">The actual type that will be returned when requested.</param>
+        /// <param name="implementationType">The actual type that will be returned when requested.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
-        /// <paramref name="implementation"/> are null references (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="implementation"/> is
+        /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
         /// no sub type from <paramref name="serviceType"/> (or the same type).
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void Register(Type serviceType, Type implementation)
+        public void Register(Type serviceType, Type implementationType)
         {
-            this.Register(serviceType, implementation, this.SelectionBasedLifestyle,
-                "serviceType", "implementation");
+            this.Register(serviceType, implementationType, this.SelectionBasedLifestyle,
+                "serviceType", "implementationType");
         }
 
         /// <summary>
@@ -564,23 +566,23 @@ namespace SimpleInjector
             if (!serviceType.ContainsGenericParameters)
             {
                 throw new ArgumentException(
-                    StringResources.SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(serviceType), 
+                    StringResources.SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(serviceType), 
+                    "serviceType");
+            }
+
+            if (serviceType.IsPartiallyClosed())
+            {
+                throw new ArgumentException(
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(serviceType, "serviceType",
+                        "implementationType"),
                     "serviceType");
             }
 
             if (!implementationType.ContainsGenericParameters)
             {
                 throw new ArgumentException(
-                    StringResources.SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(implementationType),
+                    StringResources.SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(implementationType),
                     "implementationType");
-            }
-
-            if (serviceType.GetGenericTypeDefinition() != serviceType)
-            {
-                throw new ArgumentException(
-                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(serviceType, "serviceType", 
-                        "implementationType"),
-                    "serviceType");
             }
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, "serviceType");
@@ -644,7 +646,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, "instance");
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
 
-            var registration = SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this,
+            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this,
                 instance.GetType());
 
             this.AddRegistration(typeof(TService), registration);
@@ -673,7 +675,7 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
-            var registration = SingletonLifestyle.CreateSingleRegistration(serviceType, instance, this);
+            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, instance, this);
 
             this.AddRegistration(serviceType, registration);
         }
@@ -1089,38 +1091,6 @@ namespace SimpleInjector
             this.resolveInterceptors.Add(new ContextualResolveInterceptor(interceptor, predicate));
         }
 
-        internal void ThrowWhenContainerIsLocked()
-        {
-            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-            // immediately.
-            lock (this.locker)
-            {
-                if (this.locked)
-                {
-                    throw new InvalidOperationException(StringResources.ContainerCanNotBeChangedAfterUse(
-                        this.stackTraceThatLockedTheContainer));
-                }
-            }
-        }
-
-        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
-        {
-            errorMessage = null;
-
-            try
-            {
-                var constructor = this.Options.SelectConstructor(serviceType, implementationType);
-
-                this.Options.ConstructorInjectionBehavior.Verify(constructor);
-            }
-            catch (ActivationException ex)
-            {
-                errorMessage = ex.Message;
-            }
-
-            return errorMessage == null;
-        }
-
         private void Register<TService, TImplementation>(Lifestyle lifestyle, string serviceTypeParamName,
             string implementationTypeParamName)
             where TImplementation : class, TService
@@ -1176,16 +1146,6 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowWhenCollectionTypeAlreadyRegistered(Type itemType)
-        {
-            if (!this.Options.AllowOverridingRegistrations &&
-                this.producers.ContainsKey(typeof(IEnumerable<>).MakeGenericType(itemType)))
-            {
-                throw new InvalidOperationException(
-                    StringResources.CollectionTypeAlreadyRegistered(itemType));
-            }
-        }
-
         private bool IsEnumerableTypeRegisteredWithRegisterAll(Type type)
         {
             bool isEnumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
@@ -1201,15 +1161,6 @@ namespace SimpleInjector
             }
 
             return false;
-        }
-
-        private Action<T>[] GetInstanceInitializersFor<T>(Type type, InitializationContext context)
-        {
-            return (
-                from instanceInitializer in this.instanceInitializers
-                where instanceInitializer.AppliesTo(type, context)
-                select instanceInitializer.CreateAction<T>(context))
-                .ToArray();
         }
 
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type concreteType, string parameterName)

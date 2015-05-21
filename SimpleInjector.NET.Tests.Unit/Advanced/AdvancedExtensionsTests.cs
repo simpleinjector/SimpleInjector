@@ -138,7 +138,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
 
             var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
 

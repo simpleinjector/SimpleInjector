@@ -27,21 +27,9 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Reflection;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Extensions.Decorators;
     using SimpleInjector.Lifestyles;
-
-    /// <summary>Defines the accessibility of the types to search.</summary>
-    public enum AccessibilityOption
-    {
-        /// <summary>Load both public as internal types from the given assemblies.</summary>
-        AllTypes = 0,
-
-        /// <summary>Only load publicly exposed types from the given assemblies.</summary>
-        PublicTypesOnly = 1,
-    }
 
 #if !PUBLISH
     /// <summary>Methods for registration of collections.</summary>
@@ -51,34 +39,25 @@ namespace SimpleInjector
         /// <summary>
         /// Registers a dynamic (container uncontrolled) collection of elements of type 
         /// <typeparamref name="TService"/>. A call to <see cref="GetAllInstances{T}"/> will return the 
-        /// <paramref name="collection"/> itself, and updates to the collection will be reflected in the 
-        /// result. If updates are allowed, make sure the collection can be iterated safely if you're running 
-        /// a multi-threaded application.
+        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be 
+        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely 
+        /// if you're running a multi-threaded application.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="collection">The collection to register.</param>
+        /// <param name="containerUncontrolledCollection">The container-uncontrolled collection to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="collection"/>
+        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="containerUncontrolledCollection"/>
         /// for <typeparamref name="TService"/> has already been registered.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="collection"/> is a null
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="containerUncontrolledCollection"/> is a null
         /// reference.</exception>
-        public void RegisterCollection<TService>(IEnumerable<TService> collection) where TService : class
+        public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection) 
+            where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-            Requires.IsNotNull(collection, "collection");
+            Requires.IsNotNull(containerUncontrolledCollection, "containerUncontrolledCollection");
 
-            this.ThrowWhenCollectionTypeAlreadyRegistered(typeof(TService));
-
-            var readOnlyCollection = collection.MakeReadOnly();
-
-            var registration = Lifestyle.Singleton.CreateRegistration(
-                typeof(IEnumerable<TService>), () => readOnlyCollection, this);
-
-            registration.IsCollection = true;
-
-            // This is a container uncontrolled collection
-            this.AddRegistration(typeof(IEnumerable<TService>), registration);
+            this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
         }
 
         /// <summary>
@@ -114,33 +93,10 @@ namespace SimpleInjector
 
             collection.AppendAll(
                 from instance in singletons
-                select SingletonLifestyle.CreateSingleRegistration(typeof(TService), instance, this,
+                select SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this,
                     instance.GetType()));
 
             this.RegisterContainerControlledCollection(typeof(TService), collection);
-        }
-
-        /// <summary>
-        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
-        /// </summary>
-        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
-        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
-        /// reference (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
-        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
-        /// </exception>
-        public void RegisterCollection<TService>(params Type[] serviceTypes) where TService : class
-        {
-            this.RegisterCollection(typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -190,16 +146,16 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceTypes, "serviceTypes");
 
             // Make a copy for correctness and performance.
-            Type[] serviceTypesCopy = serviceTypes.ToArray();
+            serviceTypes = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(serviceTypesCopy, "serviceTypes");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypesCopy, "serviceTypes",
+            Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
+            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes",
                 typeCanBeServiceType: true);
-            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypesCopy,
+            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypes,
                 "serviceTypes");
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypesCopy, "serviceTypes");
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypes, "serviceTypes");
 
-            this.RegisterCollectionInternal(serviceType, serviceTypesCopy);
+            this.RegisterCollectionInternal(serviceType, serviceTypes);
         }
 
         /// <summary>
@@ -223,43 +179,16 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
-            Requires.IsNotNull(registrations, "registrations");
-
-            this.RegisterCollection(serviceType, registrations.ToArray());
-        }
-
-        /// <summary>
-        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
-        /// </summary>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
-        /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
-        /// reference (Nothing in VB).
-        /// </exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
-        /// <paramref name="serviceType"/> is
-        /// not assignable from one of the given <paramref name="registrations"/> elements.
-        /// </exception>
-        public void RegisterCollection(Type serviceType, params Registration[] registrations)
-        {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registrations, "registrations");
             Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
-            // Make a copy for correctness.
+            // Make a copy for performance and correctness.
             registrations = registrations.ToArray();
 
             Requires.DoesNotContainNullValues(registrations, "registrations");
             Requires.AreRegistrationsForThisContainer(this, registrations, "registrations");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, "registrations",
-                typeCanBeServiceType: true);
+            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, "registrations", typeCanBeServiceType: true);
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, "registrations");
 
             this.RegisterCollectionInternal(serviceType, registrations);
@@ -268,26 +197,27 @@ namespace SimpleInjector
         /// <summary>
         /// Registers a dynamic (container uncontrolled) collection of elements of type 
         /// <paramref name="serviceType"/>. A call to <see cref="GetAllInstances{T}"/> will return the 
-        /// <paramref name="collection"/> itself, and updates to the collection will be reflected in the 
-        /// result. If updates are allowed, make sure the collection can be iterated safely if you're running 
-        /// a multi-threaded application.
+        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be 
+        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely 
+        /// if you're running a multi-threaded application.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
-        /// <param name="collection">The collection of items to register.</param>
+        /// <param name="containerUncontrolledCollection">The collection of items to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
-        public void RegisterCollection(Type serviceType, IEnumerable collection)
+        public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
             Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(collection, "collection");
+            Requires.IsNotNull(containerUncontrolledCollection, "containerUncontrolledCollection");
             Requires.IsNotOpenGenericType(serviceType, "serviceType");
             Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
 
             try
             {
-                this.RegisterAllInternal(serviceType, collection);
+                this.RegisterContainerUncontrolledCollection(serviceType, 
+                    containerUncontrolledCollection.Cast<object>());
             }
             catch (MemberAccessException ex)
             {
@@ -298,231 +228,73 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>
-        /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
-        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection<TService>(params Assembly[] assemblies) where TService : class
-        {
-            this.RegisterCollection(typeof(TService), (IEnumerable<Assembly>)assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
-        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
-        {
-            this.RegisterCollection(typeof(TService), assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types that match the given <paramref name="accessibility"/> 
-        /// that are defined in the given set of <paramref name="assemblies"/> and that implement the given 
-        /// <typeparamref name="TService"/> with a default lifestyle and register them as a collection of 
-        /// <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
-        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection<TService>(AccessibilityOption accessibility, params Assembly[] assemblies)
-            where TService : class
-        {
-            this.RegisterCollection(typeof(TService), accessibility, (IEnumerable<Assembly>)assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types that match the given <paramref name="accessibility"/> 
-        /// that are defined in the given set of <paramref name="assemblies"/> and that implement the given 
-        /// <typeparamref name="TService"/> with a default lifestyle and register them as a collection of 
-        /// <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
-        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection<TService>(AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
-            where TService : class
-        {
-            this.RegisterCollection(typeof(TService), accessibility, assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
-        /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <param name="serviceType">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
-        {
-            this.RegisterCollection(serviceType, (IEnumerable<Assembly>)assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
-        /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <param name="serviceType">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
-        {
-            var types = this.GetTypesToRegisterInternal(serviceType, AccessibilityOption.AllTypes, assemblies);
-
-            this.RegisterCollection(serviceType, types);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types that match the given <paramref name="accessibility"/> 
-        /// that are defined in the given set of <paramref name="assemblies"/> and that implement the given 
-        /// <paramref name="serviceType"/> with a default lifestyle and register them as a collection of 
-        /// <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <param name="serviceType">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</param>
-        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection(Type serviceType, AccessibilityOption accessibility, params Assembly[] assemblies)
-        {
-            this.RegisterCollection(serviceType, accessibility, (IEnumerable<Assembly>)assemblies);
-        }
-
-        /// <summary>
-        /// Registers all concrete, non-generic types that match the given <paramref name="accessibility"/> 
-        /// that are defined in the given set of <paramref name="assemblies"/> and that implement the given 
-        /// <paramref name="serviceType"/> with a default lifestyle and register them as a collection of 
-        /// <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
-        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
-        /// </summary>
-        /// <param name="serviceType">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</param>
-        /// <param name="accessibility">Defines which types should be used from the given assemblies.</param>
-        /// <param name="assemblies">A list of assemblies that will be searched.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
-        public void RegisterCollection(Type serviceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
-        {
-            var types = this.GetTypesToRegisterInternal(serviceType, accessibility, assemblies);
-
-            this.RegisterCollection(serviceType, types);
-        }
-        
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
         // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
         // exposure.
-        internal void AppendToCollectionInternal(Type serviceType, Registration registration)
+        internal void AppendToCollectionInternal(Type itemType, Registration registration)
         {
-            this.RegisterCollectionInternal(serviceType,
+            this.RegisterCollectionInternal(itemType,
                 new[] { new ContainerControlledItem(registration) },
                 appending: true);
         }
 
-        internal void AppendToCollectionInternal(Type serviceType, Type implementationType)
+        internal void AppendToCollectionInternal(Type itemType, Type implementationType)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
-            this.RegisterCollectionInternal(serviceType,
+            this.RegisterCollectionInternal(itemType,
                 new[] { new ContainerControlledItem(implementationType) },
                 appending: true);
         }
 
-        private void RegisterCollectionInternal(Type serviceType, Registration[] registrations)
+        private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
         {
-            this.RegisterCollectionInternal(serviceType,
+            this.RegisterCollectionInternal(itemType,
                 registrations.Select(r => new ContainerControlledItem(r)).ToArray());
         }
 
-        private void RegisterCollectionInternal(Type serviceType, Type[] serviceTypes)
+        private void RegisterCollectionInternal(Type itemType, IEnumerable<Type> serviceTypes)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
-            this.RegisterCollectionInternal(serviceType,
+            this.RegisterCollectionInternal(itemType,
                 serviceTypes.Select(type => new ContainerControlledItem(type)).ToArray());
         }
 
-        private void RegisterCollectionInternal(Type serviceType, ContainerControlledItem[] registrations,
+        private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] registrations,
             bool appending = false)
         {
             this.ThrowWhenContainerIsLocked();
 
-            if (serviceType.IsGenericType)
+            if (itemType.IsGenericType)
             {
-                this.RegisterGenericCollection(serviceType, registrations, appending);
+                this.RegisterGenericCollection(itemType, registrations, appending);
             }
             else
             {
-                this.RegisterNonGenericCollection(serviceType, registrations, appending);
+                this.RegisterNonGenericCollection(itemType, registrations, appending);
             }
         }
 
-        private void RegisterGenericCollection(Type serviceType, ContainerControlledItem[] registrations,
+        private void RegisterGenericCollection(Type itemType, ContainerControlledItem[] registrations,
             bool appending)
         {
-            ContainerControlledCollectionResolver resolver = this.GetUnregisteredAllResolver(serviceType);
+            ContainerControlledCollectionResolver resolver = this.GetControlledCollectionResolver(itemType);
 
-            resolver.AddRegistrations(serviceType, registrations,
+            resolver.AddRegistrations(itemType, registrations,
                 append: appending,
                 allowOverridingRegistrations: this.Options.AllowOverridingRegistrations);
         }
 
-        private ContainerControlledCollectionResolver GetUnregisteredAllResolver(Type serviceType)
+        private ContainerControlledCollectionResolver GetControlledCollectionResolver(Type itemType)
         {
             ContainerControlledCollectionResolver resolver;
 
-            Type openGenericServiceType = serviceType.GetGenericTypeDefinition();
+            Type openGenericServiceType = itemType.GetGenericTypeDefinition();
 
             if (!this.registerAllResolvers.TryGetValue(openGenericServiceType, out resolver))
             {
-                this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(serviceType));
+                this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(itemType));
 
                 resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
 
@@ -535,60 +307,49 @@ namespace SimpleInjector
             return resolver;
         }
 
-        private void RegisterNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations,
+        private void RegisterNonGenericCollection(Type itemType, ContainerControlledItem[] registrations,
             bool appending)
         {
             if (appending)
             {
-                this.AppendToNonGenericCollection(serviceType, registrations);
+                this.AppendToNonGenericCollection(itemType, registrations);
             }
             else
             {
-                this.RegisterContainerControlledCollection(serviceType, registrations);
+                this.RegisterContainerControlledCollection(itemType, registrations);
             }
         }
 
-        private void AppendToNonGenericCollection(Type serviceType, ContainerControlledItem[] registrations)
+        private void AppendToNonGenericCollection(Type itemType, ContainerControlledItem[] registrations)
         {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(itemType);
             bool collectionRegistered = this.producers.ContainsKey(enumerableServiceType);
 
             if (collectionRegistered)
             {
-                this.AppendToExistingNonGenericCollection(serviceType, registrations);
+                this.AppendToExistingNonGenericCollection(itemType, registrations);
             }
             else
             {
-                this.RegisterContainerControlledCollection(serviceType, registrations);
+                this.RegisterContainerControlledCollection(itemType, registrations);
             }
         }
 
-        private void AppendToExistingNonGenericCollection(Type serviceType,
-            ContainerControlledItem[] registrations)
+        private void AppendToExistingNonGenericCollection(Type itemType, ContainerControlledItem[] registrations)
         {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
-            var producer = this.producers[enumerableServiceType];
+            var producer = this.producers[enumerableType];
 
             IContainerControlledCollection instance =
                 DecoratorHelpers.ExtractContainerControlledCollectionFromRegistration(producer.Registration);
 
             if (instance == null)
             {
-                ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(serviceType);
+                ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(itemType);
             }
 
             instance.AppendAll(registrations);
-        }
-
-        private static void ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
-            Type serviceType)
-        {
-            string exceptionMessage =
-                StringResources.AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
-                    serviceType);
-
-            throw new NotSupportedException(exceptionMessage);
         }
 
         private void RegisterContainerControlledCollection(Type serviceType,
@@ -602,53 +363,55 @@ namespace SimpleInjector
             this.RegisterContainerControlledCollection(serviceType, collection);
         }
         
-        private void RegisterContainerControlledCollection(Type serviceType,
+        private void RegisterContainerControlledCollection(Type itemType, 
             IContainerControlledCollection collection)
         {
-            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
+            this.ThrowWhenCollectionTypeAlreadyRegistered(itemType);
 
-            var registration = DecoratorHelpers.CreateRegistrationForContainerControlledCollection(serviceType,
-                collection, this);
+            Registration registration = 
+                DecoratorHelpers.CreateRegistrationForContainerControlledCollection(itemType, collection, this);
 
-            this.AddRegistration(typeof(IEnumerable<>).MakeGenericType(serviceType), registration);
+            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
+
+            this.AddRegistration(enumerableType, registration);
         }
 
-        private void RegisterAllInternal(Type serviceType, IEnumerable collection)
+        private void RegisterContainerUncontrolledCollection<T>(Type itemType, 
+            IEnumerable<T> containerUncontrolledCollection)
         {
-            IEnumerable readOnlyCollection = collection.Cast<object>().MakeReadOnly();
+            this.ThrowWhenCollectionTypeAlreadyRegistered(itemType);
 
-            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, serviceType);
+            IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
+            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
 
-            this.ThrowWhenCollectionTypeAlreadyRegistered(serviceType);
+            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            var registration =
-                SingletonLifestyle.CreateSingleRegistration(enumerableServiceType, castedCollection, this);
+            var registration = 
+                SingletonLifestyle.CreateSingleInstanceRegistration(enumerableType, castedCollection, this);
 
             registration.IsCollection = true;
 
-            // This is a container-uncontrolled collection
-            this.AddRegistration(enumerableServiceType, registration);
+            this.AddRegistration(enumerableType, registration);
         }
-        
-        private IEnumerable<Type> GetTypesToRegisterInternal(Type serviceType, AccessibilityOption accessibility, 
-            IEnumerable<Assembly> assemblies)
+
+        private void ThrowWhenCollectionTypeAlreadyRegistered(Type itemType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsValidEnum(accessibility, "accessibility");
-            Requires.IsNotNull(assemblies, "assemblies");
+            if (!this.Options.AllowOverridingRegistrations &&
+                this.producers.ContainsKey(typeof(IEnumerable<>).MakeGenericType(itemType)))
+            {
+                throw new InvalidOperationException(
+                    StringResources.CollectionTypeAlreadyRegistered(itemType));
+            }
+        }
 
-            bool includeInternals = accessibility == AccessibilityOption.AllTypes;
+        private static void ThrowAppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+            Type serviceType)
+        {
+            string exceptionMessage =
+                StringResources.AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
+                    serviceType);
 
-            return
-                from assembly in assemblies.Distinct()
-                where !assembly.IsDynamic
-                from type in ExtensionHelpers.GetTypesFromAssembly(assembly, includeInternals)
-                where ExtensionHelpers.IsConcreteType(type)
-                where ExtensionHelpers.ServiceIsAssignableFromImplementation(serviceType, type)
-                where !DecoratorHelpers.IsDecorator(this, serviceType, type)
-                select type;
+            throw new NotSupportedException(exceptionMessage);
         }
     }
 }

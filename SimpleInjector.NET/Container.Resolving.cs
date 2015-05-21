@@ -551,7 +551,7 @@ namespace SimpleInjector
 
                 if (collection != null)
                 {
-                    var registration = SingletonLifestyle.CreateSingleRegistration(serviceType, collection, this);
+                    var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, collection, this);
 
                     var producer = new InstanceProducer(serviceType, registration);
 

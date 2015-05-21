@@ -428,6 +428,38 @@ namespace SimpleInjector
             this.disposableSingletonsScope.RegisterForDisposal(disposable);
         }
 
+        internal void ThrowWhenContainerIsLocked()
+        {
+            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+            // immediately.
+            lock (this.locker)
+            {
+                if (this.locked)
+                {
+                    throw new InvalidOperationException(StringResources.ContainerCanNotBeChangedAfterUse(
+                        this.stackTraceThatLockedTheContainer));
+                }
+            }
+        }
+
+        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
+        {
+            errorMessage = null;
+
+            try
+            {
+                var constructor = this.Options.SelectConstructor(serviceType, implementationType);
+
+                this.Options.ConstructorInjectionBehavior.Verify(constructor);
+            }
+            catch (ActivationException ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            return errorMessage == null;
+        }
+
         /// <summary>
         /// Releases all instances that are cached by the <see cref="Container"/> object.
         /// </summary>
@@ -470,6 +502,15 @@ namespace SimpleInjector
                 from resolveInterceptor in this.resolveInterceptors
                 where resolveInterceptor.Predicate(context)
                 select resolveInterceptor.Interceptor)
+                .ToArray();
+        }
+
+        private Action<T>[] GetInstanceInitializersFor<T>(Type type, InitializationContext context)
+        {
+            return (
+                from instanceInitializer in this.instanceInitializers
+                where instanceInitializer.AppliesTo(type, context)
+                select instanceInitializer.CreateAction<T>(context))
                 .ToArray();
         }
 

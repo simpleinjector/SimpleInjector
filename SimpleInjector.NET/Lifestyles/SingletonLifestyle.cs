@@ -46,7 +46,7 @@ namespace SimpleInjector.Lifestyles
         // (and the extra SingletonInstanceLifestyleRegistration class), we can ensure that the
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
-        internal static Registration CreateSingleRegistration(Type serviceType, object instance, 
+        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance, 
             Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, "instance");

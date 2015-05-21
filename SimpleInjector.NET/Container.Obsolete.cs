@@ -248,7 +248,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(Type[])"/> instead.
+        /// This method is obsolete. Use <see cref="RegisterCollection{TService}(IEnumerable{Type})"/> instead.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -256,7 +256,7 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been renamed to RegisterCollection. " +
-            "Please call RegisterCollection<TService>(Type[]) instead.",
+            "Please call RegisterCollection<TService>(IEnumerable<Type>) instead.",
             error: true)]
         public void RegisterAll<TService>(params Type[] serviceTypes) where TService : class
         {
@@ -316,7 +316,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// This method is obsolete. Use <see cref="RegisterCollection(Type, Registration[])"/> instead.
+        /// This method is obsolete. Use <see cref="RegisterCollection(Type, IEnumerable{Registration})"/> instead.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
@@ -324,7 +324,7 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been renamed to RegisterCollection. " +
-            "Please call RegisterCollection(Type, Registration[]) instead.",
+            "Please call RegisterCollection(Type, IEnumerable<Registration>) instead.",
             error: true)]
         public void RegisterAll(Type serviceType, params Registration[] registrations)
         {

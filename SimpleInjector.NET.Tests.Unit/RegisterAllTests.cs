@@ -690,7 +690,7 @@
 
             // Act
             // Registers a type that references the registration above.
-            container.RegisterCollection<IUserRepository>(typeof(SqlUserRepository), typeof(IUserRepository));
+            container.RegisterCollection<IUserRepository>(new[] { typeof(SqlUserRepository), typeof(IUserRepository) });
         }
 
         [TestMethod]
@@ -771,7 +771,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<ICovariant<object>>(typeof(CovariantImplementation<string>));
+            container.RegisterCollection<ICovariant<object>>(new[] { typeof(CovariantImplementation<string>) });
 
             // Act
             var instances = container.GetAllInstances<ICovariant<object>>();
@@ -1204,7 +1204,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             // Act
             ICollection<IPlugin> collection =
@@ -1222,7 +1222,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -1256,7 +1256,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             // Act
             IList<IPlugin> list = container.GetInstance<ClassDependingOn<IList<IPlugin>>>().Dependency;
@@ -1273,7 +1273,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(typeof(PluginImpl), typeof(PluginImpl2));
+            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -1342,7 +1342,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<ICommand>(typeof(ConcreteCommand));
+            container.RegisterCollection<ICommand>(new[] { typeof(ConcreteCommand) });
 
             // Act
             var composite = container.GetInstance<CompositeCommand>();
@@ -1411,7 +1411,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<ICommand>(typeof(ConcreteCommand));
+            container.RegisterCollection<ICommand>(new[] { typeof(ConcreteCommand) });
 
             // Act
             var registration = container.GetRegistration(typeof(ICommand[]));
@@ -1445,7 +1445,7 @@
 
             container.Register<ConcreteCommand>(Lifestyle.Singleton);
 
-            container.RegisterCollection<ICommand>(typeof(ConcreteCommand));
+            container.RegisterCollection<ICommand>(new[] { typeof(ConcreteCommand) });
 
             // Act
             var registration = container.GetRegistration(typeof(ICommand[]));
@@ -1567,7 +1567,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection<ITimeProvider>(typeof(RealTimeProvider));
+            container.RegisterCollection<ITimeProvider>(new[] { typeof(RealTimeProvider) });
 
             container.Verify();
 
@@ -1626,10 +1626,10 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+            container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
@@ -1646,7 +1646,7 @@
             container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
 
             // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
@@ -1665,7 +1665,7 @@
             container.RegisterCollection<IEventHandler<AuditableEvent>>(uncontrolledCollection);
 
             // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
@@ -1685,7 +1685,7 @@
 
             // Act
             Action action =
-                () => container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+                () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
@@ -1699,7 +1699,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection<IEventHandler<AuditableEvent>>(typeof(AuditableEventEventHandler));
+            container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Act
             Action action = () => container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);

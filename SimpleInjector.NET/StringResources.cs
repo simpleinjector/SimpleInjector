@@ -377,8 +377,21 @@ namespace SimpleInjector
                 lifestyleRegistration.GetType().ToFriendlyName(),
                 lifestyleRegistration.Lifestyle.GetType().ToFriendlyName());
         }
-
+        
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
+            Type[] implementations)
+        {
+            var friendlyNames = implementations.Select(type => type.ToFriendlyName());
+
+            return string.Format(CultureInfo.InvariantCulture,
+                    "There are {0} types in the supplied list of types or assemblies that represent the " + 
+                    "same closed generic type {1}. Conflicting types: {2}.",
+                    implementations.Length, 
+                    closedServiceType.ToFriendlyName(),
+                    friendlyNames.ToCommaSeparatedText());
+        }
+
+        internal static string MultipleTypesThatRepresentClosedGenericTypeForRegisterMany(Type closedServiceType,
             Type[] implementations)
         {
             var friendlyNames = implementations.Select(type => type.ToFriendlyName());
@@ -415,7 +428,7 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
         }
 
-        internal static string SuppliedTypeIsNotAGenericTypeThisOverloadOnlySupportsGenerics(Type type)
+        internal static string SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(Type type)
         {
             return SuppliedTypeIsNotAnOpenGenericType(type) + " This method overload only handles generic types.";
         }
@@ -519,6 +532,17 @@ namespace SimpleInjector
                 property.Name,
                 property.PropertyType.ToFriendlyName(),
                 innerException.Message);
+        }
+
+        internal static string ThisOverloadDoesNotAllowOpenGenerics(IEnumerable<Type> openGenericTypes)
+        {
+            var typeNames = openGenericTypes.Select(type => type.ToFriendlyName());
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied list of types contains one or multiple open generic types, but this method is " +
+                "unable to handle open generic types because it can only map closed-generic service types " +
+                "to a single implementation. Try using RegisterCollection instead. Invalid types: {0}.",
+                typeNames.ToCommaSeparatedText());
         }
 
         internal static string ThisRegisterManyForOpenGenericOverloadDoesNotAllowOpenGenerics(
@@ -649,11 +673,20 @@ namespace SimpleInjector
                 enumClass.Name);
         }
 
+        internal static string ServiceTypeCannotBeAPartiallyClosedType(Type openGenericServiceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type '{0}' is a partially-closed generic type, which is not supported by " +
+                "this method. Please supply the open-generic type '{1}' instead.",
+                openGenericServiceType.ToFriendlyName(),
+                Helpers.ToCSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()));
+        }
+
         internal static string ServiceTypeCannotBeAPartiallyClosedType(Type openGenericServiceType,
             string serviceTypeParamName, string implementationTypeParamName)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The supplied type '{0}' is a partially closed generic type, which is not supported as " +
+                "The supplied type '{0}' is a partially-closed generic type, which is not supported as " +
                 "value of the {1} parameter. Instead, please supply the open-generic type '{2}' and make " +
                 "the type supplied to the {3} parameter partially closed instead.",
                 openGenericServiceType.ToFriendlyName(),

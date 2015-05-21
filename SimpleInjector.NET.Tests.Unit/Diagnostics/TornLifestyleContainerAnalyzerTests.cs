@@ -376,7 +376,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new ChocolateBar(), container);
 
-            container.RegisterCollection(typeof(IFoo), reg1, reg2);
+            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -399,7 +399,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBarSub(), container);
 
-            container.RegisterCollection(typeof(IFoo), reg1, reg2);
+            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -422,7 +422,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
 
-            container.RegisterCollection(typeof(IFoo), reg1, reg2);
+            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
