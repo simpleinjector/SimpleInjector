@@ -248,7 +248,7 @@ namespace SimpleInjector
                 where Helpers.IsConcreteType(type)
                 where !type.IsGenericType
                 where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
-                where !DecoratorHelpers.IsDecorator(this, serviceType, type)
+                where this.Options.BatchRegistrationBehavior.ShouldRegisterType(serviceType, type)
                 select type;
 
             return types.ToArray();

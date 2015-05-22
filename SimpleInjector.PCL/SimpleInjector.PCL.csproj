@@ -55,6 +55,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\AdvancedExtensions.cs">
       <Link>Advanced\AdvancedExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultBatchRegistrationBehavior.cs">
+      <Link>Advanced\DefaultBatchRegistrationBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
       <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
     </Compile>
@@ -63,6 +66,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultPropertySelectionBehavior.cs">
       <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IBatchRegistrationBehavior.cs">
+      <Link>Advanced\IBatchRegistrationBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorInjectionBehavior.cs">
       <Link>Advanced\IConstructorInjectionBehavior.cs</Link>
