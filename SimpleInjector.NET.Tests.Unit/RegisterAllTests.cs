@@ -6,8 +6,6 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Tests.Unit.Extensions;
 
     /// <summary>Tests for RegisterAll.</summary>
     [TestClass]
@@ -1592,7 +1590,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open-generic service type is not supported. Consider
+                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
                 making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
@@ -1614,7 +1612,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open-generic service type is not supported. Consider
+                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
                 making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);

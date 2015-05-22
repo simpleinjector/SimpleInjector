@@ -255,6 +255,18 @@
             StringContains(expectedMessage, actualMessage, null);
         }
 
+        public static void SequenceEquals(IEnumerable<Type> expectedTypes, IEnumerable<Type> actualTypes)
+        {
+            Assert.IsNotNull(actualTypes);
+
+            if (!expectedTypes.SequenceEqual(actualTypes))
+            {
+                Assert.Fail("The sequences did not match.\nExpected list: {0}.\nActual list: {1}",
+                    expectedTypes.ToFriendlyNamesText(),
+                    actualTypes.ToFriendlyNamesText());
+            }
+        }
+
         public static void WriteToConsole(this Exception exception)
         {
             while (exception != null)

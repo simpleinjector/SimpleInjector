@@ -1,14 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Text;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class CustomLifestyleTests

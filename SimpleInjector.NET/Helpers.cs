@@ -79,7 +79,7 @@ namespace SimpleInjector
 
         internal static bool IsPartiallyClosed(this Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() != type;
+            return type.IsGenericType && type.ContainsGenericParameters && type.GetGenericTypeDefinition() != type;
         }
 
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>

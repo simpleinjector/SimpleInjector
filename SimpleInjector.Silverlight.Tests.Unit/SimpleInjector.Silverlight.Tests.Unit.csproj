@@ -150,15 +150,6 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ExpressionBuiltEventTests.cs">
       <Link>ExpressionBuiltEventTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\BatchRegistrationExtensionsTests.cs">
-      <Link>Extensions\BatchRegistrationExtensionsTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterAllOpenGenericTests.cs">
-      <Link>Extensions\RegisterAllOpenGenericTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Extensions\RegisterOpenGenericTests.cs">
-      <Link>Extensions\RegisterOpenGenericTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\GetCurrentRegistrationsTests.cs">
       <Link>GetCurrentRegistrationsTests.cs</Link>
     </Compile>
@@ -204,14 +195,29 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterInitializerTests.cs">
       <Link>RegisterInitializerTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterOpenGenericTests.cs">
+      <Link>RegisterOpenGenericTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByInstanceTests.cs">
       <Link>RegisterSingleByInstanceTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ResolveUnregisteredTypeEventTests.cs">
       <Link>ResolveUnregisteredTypeEventTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.CommandHandlers.cs">
+      <Link>TestClasses.CommandHandlers.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.cs">
       <Link>TestClasses.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.EventHandlers.cs">
+      <Link>TestClasses.EventHandlers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.Handlers.cs">
+      <Link>TestClasses.Handlers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.QueryHandlers.cs">
+      <Link>TestClasses.QueryHandlers.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestHelpers.cs">
       <Link>TestHelpers.cs</Link>

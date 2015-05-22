@@ -88,7 +88,18 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsOpenGenericType(Type type, string paramName, string guidance = null)
+        internal static void IsGenericType(Type type, string paramName, Func<Type, string> guidance = null)
+        {
+            if (!type.IsGenericType)
+            {
+                string message = StringResources.SuppliedTypeIsNotAGenericType(type) +
+                    (guidance == null ? string.Empty : (" " + guidance(type)));
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
+        internal static void IsOpenGenericType(Type type, string paramName, Func<Type, string> guidance = null)
         {
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
             // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
@@ -96,7 +107,7 @@ namespace SimpleInjector
             if (!type.ContainsGenericParameters)
             {
                 string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type) +
-                    guidance == null ? string.Empty : (" " + guidance);
+                    (guidance == null ? string.Empty : (" " + guidance(type)));
 
                 throw new ArgumentException(message, paramName);
             }

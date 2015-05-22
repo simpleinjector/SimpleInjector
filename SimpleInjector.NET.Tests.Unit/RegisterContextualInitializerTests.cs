@@ -6,9 +6,7 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
-    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class RegisterContextualInitializerTests

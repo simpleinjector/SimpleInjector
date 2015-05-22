@@ -72,11 +72,11 @@ namespace SimpleInjector
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(lifestyle, "lifestyle");
             Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsGenericType(openGenericServiceType, "openGenericServiceType",
+                guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithAssemblies);
             Requires.IsNotPartiallyClosed(openGenericServiceType, "openGenericServiceType");
             Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType", 
-                guidance: 
-                    "You can use the RegisterCollection(Type, IEnumerable<Assembly>) overload to " +
-                    "register a collection of instances.");
+                guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
             var implementationTypes = this.GetTypesToRegister(openGenericServiceType, assemblies);
 
@@ -124,11 +124,11 @@ namespace SimpleInjector
             Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
             Requires.IsNotNull(lifestyle, "lifestyle");
             Requires.IsNotNull(implementationTypes, "implementationTypes");
+            Requires.IsGenericType(openGenericServiceType, "openGenericServiceType",
+                guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithTypes);
             Requires.IsNotPartiallyClosed(openGenericServiceType, "openGenericServiceType");
             Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType",
-                guidance: 
-                    "You can use the RegisterCollection(Type, IEnumerable<Type>) overload to " +
-                    "register a collection of instances.");
+                guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithTypes);
 
             implementationTypes = implementationTypes.Distinct().ToArray();
 

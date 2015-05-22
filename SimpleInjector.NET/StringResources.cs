@@ -433,6 +433,12 @@ namespace SimpleInjector
             return SuppliedTypeIsNotAnOpenGenericType(type) + " This method overload only handles generic types.";
         }
 
+        internal static string SuppliedTypeIsNotAGenericType(Type type)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The supplied type {0} is not a generic type.", type.ToFriendlyName());
+        }
+
         internal static string SuppliedTypeIsNotAnOpenGenericType(Type type)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -540,7 +546,7 @@ namespace SimpleInjector
 
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied list of types contains one or multiple open generic types, but this method is " +
-                "unable to handle open generic types because it can only map closed-generic service types " +
+                "unable to handle open generic types because it can only map closed generic service types " +
                 "to a single implementation. Try using RegisterCollection instead. Invalid types: {0}.",
                 typeNames.ToCommaSeparatedText());
         }
@@ -624,7 +630,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The registered decorator type factory returned open generic type {0} while the registered " +
-                "service type {1} is not generic, making it impossible for a closed-generic decorator type " +
+                "service type {1} is not generic, making it impossible for a closed generic decorator type " +
                 "to be constructed.",
                 decoratorType.ToFriendlyName(),
                 serviceType.ToFriendlyName());
@@ -659,7 +665,7 @@ namespace SimpleInjector
         internal static string MixingCallsToRegisterCollectionIsNotSupported(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Mixing calls to RegisterCollection for the same open-generic service type is not " +
+                "Mixing calls to RegisterCollection for the same open generic service type is not " +
                 "supported. Consider making one single call to RegisterCollection(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
         }
@@ -677,7 +683,7 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied type '{0}' is a partially-closed generic type, which is not supported by " +
-                "this method. Please supply the open-generic type '{1}' instead.",
+                "this method. Please supply the open generic type '{1}' instead.",
                 openGenericServiceType.ToFriendlyName(),
                 Helpers.ToCSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()));
         }
@@ -687,12 +693,32 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The supplied type '{0}' is a partially-closed generic type, which is not supported as " +
-                "value of the {1} parameter. Instead, please supply the open-generic type '{2}' and make " +
-                "the type supplied to the {3} parameter partially closed instead.",
+                "value of the {1} parameter. Instead, please supply the open generic type '{2}' and make " +
+                "the type supplied to the {3} parameter partially-closed instead.",
                 openGenericServiceType.ToFriendlyName(),
                 serviceTypeParamName,
                 Helpers.ToCSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()),
                 implementationTypeParamName);
+        }
+
+        internal static string SuppliedTypeIsNotGenericExplainingAlternativesWithAssemblies(Type type)
+        {
+            return SuppliedTypeIsNotGenericExplainingAlternatives(type, typeof(Assembly).Name);
+        }
+
+        internal static string SuppliedTypeIsNotGenericExplainingAlternativesWithTypes(Type type)
+        {
+            return SuppliedTypeIsNotGenericExplainingAlternatives(type, typeof(Type).Name);
+        }
+
+        internal static string SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies(Type type)
+        {
+            return SuppliedTypeIsNotOpenGenericExplainingAlternatives(type, typeof(Assembly).Name);
+        }
+
+        internal static string SuppliedTypeIsNotOpenGenericExplainingAlternativesWithTypes(Type type)
+        {
+            return SuppliedTypeIsNotOpenGenericExplainingAlternatives(type, typeof(Type).Name);
         }
 
         private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types)
@@ -700,6 +726,27 @@ namespace SimpleInjector
             return string.Join(", ",
                 from type in types
                 select string.Format(CultureInfo.InvariantCulture, "typeof({0})", Helpers.ToCSharpFriendlyName(type)));
+        }
+
+        private static string SuppliedTypeIsNotGenericExplainingAlternatives(Type type, string registeringElement)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "This method only supports open generic types. " +
+                "If you meant to register all available implementations of {0}, call " +
+                "RegisterCollection(typeof({0}), IEnumerable<{1}>) instead.",
+                type.ToFriendlyName(),
+                registeringElement);
+        }
+
+        private static string SuppliedTypeIsNotOpenGenericExplainingAlternatives(Type type, string registeringElement)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Supply this method with the open generic type {0} to register all available " + 
+                "implementations of this type, or call RegisterCollection(Type, IEnumerable<{1}>) either " + 
+                "with the open or closed version of that type to register a collection of instances based " + 
+                "on that type.",
+                Helpers.ToCSharpFriendlyName(type.GetGenericTypeDefinition()),
+                registeringElement);
         }
     }
 }

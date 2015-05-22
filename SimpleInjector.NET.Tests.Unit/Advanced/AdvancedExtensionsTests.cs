@@ -6,7 +6,6 @@ namespace SimpleInjector.Tests.Unit.Advanced
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Tests.Unit.Extensions;
 
     [TestClass]
     public class AdvancedExtensionsTests
