@@ -43,7 +43,7 @@ namespace SimpleInjector.Advanced
 
         private bool IsDecorator(Type serviceType, Type implementationType)
         {
-            return !DecoratorHelpers.IsDecorator(this.container, serviceType, implementationType);
+            return DecoratorHelpers.IsDecorator(this.container, serviceType, implementationType);
         }
     }
 }
