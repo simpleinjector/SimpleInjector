@@ -15,6 +15,9 @@ Version 3.0.0 (v3.0 RTM)
 	    -[Core] Added Container.GetTypesToRegister method for batch registration. (fixes #7)
 		-[Core] Added Container.RegisterInstance overloads as replacement for RegisterSingle overloads that
 		 take in an instance (fixes #44).
+		-[Core] InstanceProducer<TService> added that inherits from InstanceProducer and adds a
+		 "TService GetInstance()" method. The generic Lifestyle.CreateProducer methods return an
+		 InstanceProducer<TService> (fixes #39).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).

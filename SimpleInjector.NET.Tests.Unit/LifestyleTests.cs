@@ -79,7 +79,7 @@
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
             // Act
-            var instance = producer.GetInstance();
+            IPlugin instance = producer.GetInstance();
 
             // Assert
             AssertThat.IsInstanceOfType(typeof(PluginDecorator), instance);
@@ -144,7 +144,7 @@
             };
 
             // Act
-            var instance = producer.GetInstance();
+            IPlugin instance = producer.GetInstance();
 
             // Assert
             Assert.AreEqual(expectedRegisteredServiceType, actualRegisteredServiceType,

@@ -214,7 +214,7 @@
                     container);
 
             // Act
-            var instance = producer.GetInstance();
+            ICovariant<object> instance = producer.GetInstance();
 
             // Assert
             AssertThat.IsInstanceOfType(typeof(CovariantImplementation<string>), instance);

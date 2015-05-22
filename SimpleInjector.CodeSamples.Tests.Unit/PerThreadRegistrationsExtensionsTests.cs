@@ -37,8 +37,8 @@
             var producer2 = threadLifestyle.CreateProducer<ICommand, ConcreteCommand>(container);
 
             // Act
-            var instance1 = producer1.GetInstance();
-            var instance2 = producer2.GetInstance();
+            ICommand instance1 = producer1.GetInstance();
+            ICommand instance2 = producer2.GetInstance();
 
             // Assert
             Assert.AreNotSame(instance1, instance2, "Each instance producer should get its own cache.");

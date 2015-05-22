@@ -262,6 +262,9 @@
     <Compile Include="..\SimpleInjector.NET\InstanceProducer.cs">
       <Link>InstanceProducer.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\InstanceProducerOfT.cs">
+      <Link>InstanceProducerOfT.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\ArgumentMapping.cs">
       <Link>Internals\ArgumentMapping.cs</Link>
     </Compile>
