@@ -80,7 +80,7 @@ namespace SimpleInjector
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public sealed class InstanceProducer
+    public class InstanceProducer
     {
         private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
 

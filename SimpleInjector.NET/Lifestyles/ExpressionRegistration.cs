@@ -73,17 +73,14 @@ namespace SimpleInjector.Lifestyles
             Justification = "I don't care. This is not a performance critical path.")]
         private static Type GetImplementationTypeFor(Expression expression)
         {
-            if (expression is ConstantExpression)
+            var newExpression = expression as NewExpression;
+
+            if (newExpression != null)
             {
-                return ((ConstantExpression)expression).Type;
+                return newExpression.Constructor.DeclaringType;
             }
 
-            if (expression is NewExpression)
-            {
-                return ((NewExpression)expression).Constructor.DeclaringType;
-            }
-
-            return null;
+            return expression.Type;
         }
     }
 }
