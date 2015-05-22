@@ -50,6 +50,9 @@ Version 3.0.0 (v3.0 RTM)
 		-[Mvc] Removed the SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider method (fixes #12).
 		-[WebApi] Removed the SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider method (fixes #12).
 
+	Project Changes:
+		-Removed Common Service Locator adapter (fixes #26).
+
 
 Version 2.8.1 (v2.8.1 RTM) 2015-05-05
 

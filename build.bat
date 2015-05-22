@@ -1,6 +1,6 @@
 @ECHO OFF
 
-set version=2.8.0
+set version=3.0.0
 set prereleasePostfix=-alpha1
 set buildNumber=0 
 
@@ -91,7 +91,6 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 %msbuild% "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" /nologo /p:%net45Profile% /p:VersionNumber=%numeric_version_Integration_WebApi%
 
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
-%msbuild% "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
 
 
@@ -129,12 +128,6 @@ copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.dll
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.xml
 
-mkdir Releases\temp\Portable\CommonServiceLocator
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\Portable\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
-copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\Portable\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
-
 mkdir Releases\temp\NET45
 copy bin\NET\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
@@ -142,18 +135,6 @@ copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
-
-mkdir Releases\temp\NET45\CommonServiceLocator
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET45\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\NET45\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET45\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
-copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET45\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
-
-mkdir Releases\temp\NET40\CommonServiceLocator
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll Releases\temp\NET40\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.dll
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml Releases\temp\NET40\CommonServiceLocator\CommonServiceLocator.SimpleInjectorAdapter.xml
-copy bin\PCL\Microsoft.Practices.ServiceLocation.dll Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.dll
-copy bin\PCL\Microsoft.Practices.ServiceLocation.xml Releases\temp\NET40\CommonServiceLocator\Microsoft.Practices.ServiceLocation.xml
 
 mkdir Releases\temp\NET45\Extensions
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
@@ -221,17 +202,6 @@ copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wp
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\CommonServiceLocator.SimpleInjectorAdapter Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-del Releases\temp\.gitignore /s /q
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\CommonServiceLocator.SimpleInjectorAdapter.dll"
-copy bin\PCL\CommonServiceLocator.SimpleInjectorAdapter.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\CommonServiceLocator.SimpleInjectorAdapter.xml"
-%replace% /source:Releases\temp\CommonServiceLocator.SimpleInjectorAdapter.nuspec {version} %named_version_Core%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\1fea7be7f6324eb68593116ecd0864e4.psmdcp {version} %named_version_Core%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\CommonServiceLocator.SimpleInjectorAdapter.%named_version_Core%.zip"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
