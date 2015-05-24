@@ -18,6 +18,9 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] InstanceProducer<TService> added that inherits from InstanceProducer and adds a
 		 "TService GetInstance()" method. The generic Lifestyle.CreateProducer methods return an
 		 InstanceProducer<TService> (fixes #39).
+		-[Core] Batch registration using the Register and RegisterCollection overloads that accept a list
+		 of Assembly instances and the Container.GetTypesToRegister method filter out Code Contract classes
+		 (classes that are marked with a ContractClassForAttribute) (fixes #19).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).

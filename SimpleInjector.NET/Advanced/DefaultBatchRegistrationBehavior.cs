@@ -24,6 +24,8 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
     using SimpleInjector.Decorators;
 
     [DebuggerDisplay("{GetType().Name,nq}")]
@@ -38,12 +40,26 @@ namespace SimpleInjector.Advanced
 
         public bool ShouldRegisterType(Type serviceType, Type implementationType)
         {
-            return !this.IsDecorator(serviceType, implementationType);
+            return
+                !this.IsDecorator(serviceType, implementationType) &&
+                !IsContractClass(serviceType, implementationType);
         }
 
         private bool IsDecorator(Type serviceType, Type implementationType)
         {
             return DecoratorHelpers.IsDecorator(this.container, serviceType, implementationType);
+        }
+
+        private static bool IsContractClass(Type serviceType, Type implementationType)
+        {
+            var attributes = implementationType.GetCustomAttributes(typeof(ContractClassForAttribute), true);
+
+            var contractAttributesForServiceType =
+                from ContractClassForAttribute attribute in attributes
+                where attribute.TypeContractsAreFor == serviceType
+                select attribute;
+
+            return contractAttributesForServiceType.Any();
         }
     }
 }
