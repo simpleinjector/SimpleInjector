@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
- 
+
     [TestClass]
     public class ResolveUnregisteredTypeEventTests
     {

@@ -61,6 +61,10 @@ Version 3.0.0 (v3.0 RTM)
 		-[Mvc] Removed the SimpleInjectorMvcExtensions.RegisterMvcAttributeFilterProvider method (fixes #12).
 		-[WebApi] Removed the SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider method (fixes #12).
 
+	Bug fixes:
+		-[Core] Registering a Func<object> using UnregisteredTypeEventArgs.Register(Func<object>) caused the
+		 Diagnostic system to throw a NullRefernceException (fixes #49).
+
 	Project Changes:
 		-Removed Common Service Locator adapter (fixes #26).
 

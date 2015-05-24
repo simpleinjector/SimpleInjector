@@ -91,12 +91,16 @@ namespace SimpleInjector
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
         {
+            Requires.IsNotNull(genericTypeDefinition, "genericTypeDefinition");
+
             return genericTypeDefinition.ToFriendlyName(arguments =>
                 string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
         }
 
         internal static string ToFriendlyName(this Type type)
         {
+            Requires.IsNotNull(type, "type");
+
             return type.ToFriendlyName(arguments =>
                 string.Join(", ", arguments.Select(argument => argument.ToFriendlyName()).ToArray()));
         }

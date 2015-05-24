@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -40,6 +40,9 @@ namespace SimpleInjector.Lifestyles
             Container container)
             : base(lifestyle, container)
         {
+            Requires.IsNotNull(expression, "expression");
+            Requires.IsNotNull(implementationType, "implementationType");
+
             this.expression = expression;
             this.implementationType = implementationType;
         }
@@ -69,8 +72,6 @@ namespace SimpleInjector.Lifestyles
             return Lifestyle.Unknown;
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "I don't care. This is not a performance critical path.")]
         private static Type GetImplementationTypeFor(Expression expression)
         {
             var newExpression = expression as NewExpression;
