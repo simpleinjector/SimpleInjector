@@ -129,6 +129,8 @@
 
         private static DebuggerViewItem[] VerifyAndGetDebuggerViewItems(Container container)
         {
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
             container.Verify();
 
             return new ContainerDebugView(container).Items;

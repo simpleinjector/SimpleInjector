@@ -126,6 +126,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             // Forces a lifestyle mismatch
             container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);

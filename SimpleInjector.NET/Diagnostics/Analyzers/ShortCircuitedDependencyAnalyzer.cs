@@ -30,6 +30,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ShortCircuitedDependencyAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new ShortCircuitedDependencyAnalyzer();
+
+        private ShortCircuitedDependencyAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.ShortCircuitedDependency; }

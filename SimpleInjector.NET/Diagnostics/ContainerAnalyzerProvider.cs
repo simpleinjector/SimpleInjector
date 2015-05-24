@@ -31,13 +31,13 @@ namespace SimpleInjector.Diagnostics
         internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = 
             new ReadOnlyCollection<IContainerAnalyzer>(new List<IContainerAnalyzer>
             {
-                new PotentialLifestyleMismatchAnalyzer(),
-                new ShortCircuitedDependencyAnalyzer(),
-                new SingleResponsibilityViolationsAnalyzer(),
-                new ContainerRegisteredServiceAnalyzer(),
-                new TornLifestyleContainerAnalyzer(),
-                new DisposableTransientComponentAnalyzer(),
-                new AmbiguousLifestylesAnalyzer()
+                PotentialLifestyleMismatchAnalyzer.Instance,
+                ShortCircuitedDependencyAnalyzer.Instance,
+                SingleResponsibilityViolationsAnalyzer.Instance,
+                ContainerRegisteredServiceAnalyzer.Instance,
+                TornLifestyleContainerAnalyzer.Instance,
+                DisposableTransientComponentAnalyzer.Instance,
+                AmbiguousLifestylesAnalyzer.Instance
             });
     }
 }

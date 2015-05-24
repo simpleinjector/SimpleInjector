@@ -29,6 +29,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal class DisposableTransientComponentAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new DisposableTransientComponentAnalyzer();
+
+        private DisposableTransientComponentAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.DisposableTransientComponent; }

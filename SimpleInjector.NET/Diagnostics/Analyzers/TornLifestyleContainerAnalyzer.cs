@@ -26,10 +26,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using SimpleInjector.Advanced;
 
     internal sealed class TornLifestyleContainerAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new TornLifestyleContainerAnalyzer();
+
+        private TornLifestyleContainerAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.TornLifestyle; }

@@ -13,6 +13,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -33,6 +34,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -53,6 +55,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -73,6 +76,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<IUserRepository, InMemoryUserRepository>();
 
@@ -104,9 +108,13 @@
 
             container.AddRegistration(typeof(UserServiceBase), registration);
 
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
             container.Verify();
 
             registration.SuppressDiagnosticWarning(DiagnosticType.PotentialLifestyleMismatch);
+
+            container.Options.SuppressLifestyleMismatchVerification = false;
 
             container.Verify();
 

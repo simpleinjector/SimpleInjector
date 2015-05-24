@@ -85,6 +85,12 @@ namespace SimpleInjector
         {
         }
 
+        internal DiagnosticVerificationException(string message, DiagnosticResult error)
+            : base(message)
+        {
+            this.errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
+        }
+
         /// <summary>
         /// Gets the list of <see cref="DiagnosticResult"/> instances.
         /// </summary>

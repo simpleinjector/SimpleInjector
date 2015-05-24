@@ -27,10 +27,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
-    using SimpleInjector.Advanced;
 
     internal sealed class AmbiguousLifestylesAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new AmbiguousLifestylesAnalyzer();
+
+        private AmbiguousLifestylesAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.AmbiguousLifestyles; }
@@ -87,12 +92,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 let r = registrationWithProducers.registration
                 let componentLifestylePair = new { r.ImplementationType, Lifestyle = r.Lifestyle.GetType() }
                 group registrationWithProducers by componentLifestylePair into g
-                select new 
+                select new
                 {
-                    g.Key.ImplementationType, 
+                    g.Key.ImplementationType,
                     Producers = g.SelectMany(registration => registration.Producers)
                 };
-            
+
             var components =
                 from componentLifestylePair in componentLifestylePairs
                 group componentLifestylePair by componentLifestylePair.ImplementationType into g

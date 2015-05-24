@@ -123,7 +123,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => 
+            Action action = () =>
                 container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator<>));
 
             // Assert
@@ -300,12 +300,12 @@
             Type nonGenericDecorator = typeof(RealCommandHandlerDecorator);
 
             // Act
-            Action action = 
+            Action action =
                 () => container.RegisterDecorator(nonMathcingClosedGenericServiceType, nonGenericDecorator);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type RealCommandHandlerDecorator does not implement ICommandHandler<Int32>", 
+                "The supplied type RealCommandHandlerDecorator does not implement ICommandHandler<Int32>",
                 action);
         }
 
@@ -887,7 +887,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = 
+            Action action =
                 () => container.RegisterDecorator(typeof(ICommandHandler<>), typeof(KeyValuePair<,>));
 
             // Assert
@@ -1097,10 +1097,9 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<INonGenericService, RealNonGenericService>();
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Singleton);
 
-            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator),
-                Lifestyle.Singleton);
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>(Lifestyle.Singleton);
 
             // Act
             var decorator1 = container.GetInstance<INonGenericService>();
@@ -1109,7 +1108,7 @@
             // Assert
             AssertThat.IsInstanceOfType(typeof(NonGenericServiceDecorator), decorator1);
 
-            Assert.IsTrue(object.ReferenceEquals(decorator1, decorator2),
+            Assert.AreSame(decorator1, decorator2,
                 "Since the decorator is registered as singleton, GetInstance should always return the same " +
                 "instance.");
         }
@@ -1120,7 +1119,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<INonGenericService, RealNonGenericService>();
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator),
                 Lifestyle.Singleton,
@@ -1347,6 +1346,7 @@
             };
 
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             // StubCommandHandler has no dependencies.
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(
@@ -1437,6 +1437,7 @@
             };
 
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
@@ -1527,6 +1528,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
 
@@ -2250,7 +2252,7 @@
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ContextualHandlerDecorator<>));
 
             // Act
-            var decorator = 
+            var decorator =
                 (ContextualHandlerDecorator<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>();
 
             DecoratorContext context = decorator.Context;

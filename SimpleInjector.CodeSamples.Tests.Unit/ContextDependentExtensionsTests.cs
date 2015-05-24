@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Runtime.Remoting.Proxies;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
     using SimpleInjector.Tests.Unit;
@@ -142,6 +143,12 @@
 
             container.Register<IService, ServiceThatDependsOnRepository>(Lifestyle.Singleton);
 
+            container.GetRegistration(typeof(IRepository)).Registration.SuppressDiagnosticWarning(
+                DiagnosticType.PotentialLifestyleMismatch, "Depending on ContextualLogger is fine.");
+
+            container.GetRegistration(typeof(IService)).Registration.SuppressDiagnosticWarning(
+                DiagnosticType.PotentialLifestyleMismatch, "Depending on ContextualLogger is fine.");
+
             // Act
             var service = container.GetInstance<IService>() as ServiceThatDependsOnRepository;
 
@@ -181,7 +188,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Transient);
 
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IRepository));
 
@@ -202,7 +209,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Transient);
 
             // Since InterceptWith alters the Expression of ILogger, this would make it harder for 
             // the Expression visitor of RegisterWithContext to find and alter this expression. So this is
@@ -227,6 +234,7 @@
             var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
@@ -247,6 +255,7 @@
             var hybrid = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 

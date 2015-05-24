@@ -27,10 +27,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Text;
     using System.Threading;
-    using System.Threading.Tasks;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
 
@@ -77,26 +74,35 @@ namespace SimpleInjector
         {
             Requires.IsValidEnum(option, "option");
 
-            this.VerifyInternal();
+            bool diagnose = option == VerificationOption.VerifyAndDiagnose;
 
-            if (option == VerificationOption.VerifyAndDiagnose)
+            this.VerifyInternal(suppressLifestyleMismatchVerification: diagnose);
+
+            if (diagnose)
             {
-                this.DiagnoseInternal();
+                this.ThrowOnDiagnosticWarnings();
             }
         }
 
-        private void VerifyInternal()
+        private void VerifyInternal(bool suppressLifestyleMismatchVerification)
         {
             // Prevent multiple threads from starting verification at the same time. This could crash, because
             // the first thread could dispose the verification scope, while the other thread is still using it.
             lock (this.isVerifying)
             {
+                bool original = this.Options.SuppressLifestyleMismatchVerification;
                 this.IsVerifying = true;
-
                 this.VerificationScope = new ContainerVerificationScope();
 
                 try
                 {
+                    // Temporarily suppress lifestyle mismatch verification, because that would cause a single
+                    // diagnostic warning to be displayed instead of the complete list of found warnings.
+                    if (suppressLifestyleMismatchVerification)
+                    {
+                        this.Options.SuppressLifestyleMismatchVerification = true;
+                    }
+
                     this.Verifying();
                     this.VerifyThatAllExpressionsCanBeBuilt();
                     this.VerifyThatAllRootObjectsCanBeCreated();
@@ -104,6 +110,7 @@ namespace SimpleInjector
                 }
                 finally
                 {
+                    this.Options.SuppressLifestyleMismatchVerification = original;
                     this.IsVerifying = false;
                     var scopeToDispose = this.VerificationScope;
                     this.VerificationScope = null;
@@ -112,25 +119,17 @@ namespace SimpleInjector
             }
         }
 
-        private void DiagnoseInternal()
+        private void ThrowOnDiagnosticWarnings()
         {
-            DiagnosticType[] typesToDiagnose = new[]
-            {
-                DiagnosticType.AmbiguousLifestyles,
-                DiagnosticType.DisposableTransientComponent,
-                DiagnosticType.PotentialLifestyleMismatch,
-                DiagnosticType.ShortCircuitedDependency,
-                DiagnosticType.TornLifestyle,
-            };
-
-            var errors =
+            var errors = (
                 from result in Analyzer.Analyze(this)
-                where typesToDiagnose.Contains(result.DiagnosticType)
-                select result;
+                where result.Severity > DiagnosticSeverity.Information
+                select result)
+                .ToArray();
 
             if (errors.Any())
             {
-                throw new DiagnosticVerificationException(errors.ToArray());
+                throw new DiagnosticVerificationException(errors);
             }
         }
 

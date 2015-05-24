@@ -107,6 +107,15 @@ namespace SimpleInjector
         public bool AllowOverridingRegistrations { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the container should suppress checking for lifestyle
+        /// mismatches (see: https://simpleinjector.org/dialm) when a component is resolved. The default
+        /// is false.
+        /// </summary>
+        /// <value>The value indicating whether the container should suppress checking for lifestyle
+        /// mismatches.</value>
+        public bool SuppressLifestyleMismatchVerification { get; set; }
+
+        /// <summary>
         /// Gets or sets the constructor resolution behavior. By default, the container only supports types
         /// that have a single public constructor.
         /// </summary>

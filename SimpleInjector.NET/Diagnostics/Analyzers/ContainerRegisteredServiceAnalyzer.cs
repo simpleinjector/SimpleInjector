@@ -29,6 +29,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ContainerRegisteredServiceAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new ContainerRegisteredServiceAnalyzer();
+
+        private ContainerRegisteredServiceAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.ContainerRegisteredComponent; }

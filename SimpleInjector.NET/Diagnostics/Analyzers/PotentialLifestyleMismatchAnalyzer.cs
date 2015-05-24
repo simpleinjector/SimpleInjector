@@ -22,7 +22,6 @@
 
 namespace SimpleInjector.Diagnostics.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -30,6 +29,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class PotentialLifestyleMismatchAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new PotentialLifestyleMismatchAnalyzer();
+
+        private PotentialLifestyleMismatchAnalyzer()
+        {
+        }
+
         public DiagnosticType DiagnosticType
         {
             get { return DiagnosticType.PotentialLifestyleMismatch; }

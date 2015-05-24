@@ -29,7 +29,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
+        internal static readonly IContainerAnalyzer Instance = new SingleResponsibilityViolationsAnalyzer();
+
         private const int MaximumValidNumberOfDependencies = 7;
+
+        private SingleResponsibilityViolationsAnalyzer()
+        {
+        }
 
         public DiagnosticType DiagnosticType
         {
@@ -71,9 +77,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
                     implementationType: g.Key.ImplementationType,
                     dependencies: dependencies))
-                .ToArray();           
+                .ToArray();
         }
-        
+
         private static bool IsAnalyzable(InstanceProducer producer)
         {
             // We can't analyze collections, because this would lead to false positives when decorators are

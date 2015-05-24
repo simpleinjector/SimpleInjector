@@ -91,6 +91,15 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
+        internal static string LifestyleMismatchesReported(PotentialLifestyleMismatchDiagnosticResult error)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "A lifestyle mismatch is encountered. {0} Lifestyle mismatches can cause concurrency " + 
+                "bugs in your application. Please see https://simpleinjector.org/dialm to understand this " +
+                "problem and how to solve it.",
+                error.Description);
+        }
+
         internal static string DiagnosticWarningsReported(IList<DiagnosticResult> errors)
         {
             var descriptions =

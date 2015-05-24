@@ -520,6 +520,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             // Lifestyle Mismatch
             container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);

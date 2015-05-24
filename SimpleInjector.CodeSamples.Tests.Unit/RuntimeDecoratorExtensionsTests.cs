@@ -3,6 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
@@ -43,24 +44,22 @@
 
             bool decorateHandler = false;
 
-            container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>(Lifestyle.Singleton);
 
             container.RegisterRuntimeDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 Lifestyle.Singleton, c => decorateHandler);
 
             // Act
             var handler1 = container.GetInstance<ICommandHandler<RealCommand>>();
-            var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Runtime switch
             decorateHandler = true;
 
-            var handler3 = container.GetInstance<ICommandHandler<RealCommand>>();
-            var handler4 = container.GetInstance<ICommandHandler<RealCommand>>();
+            var handler2 = container.GetInstance<ICommandHandler<RealCommand>>();
 
             // Assert
-            Assert.AreNotSame(handler1, handler2);
-            Assert.AreSame(handler3, handler4);
+            AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), handler1);
+            AssertThat.IsInstanceOfType(typeof(CommandHandlerDecorator<RealCommand>), handler2);
         }
 
         [TestMethod]

@@ -105,6 +105,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
 
@@ -119,9 +120,9 @@
 
             // Assert
             Assert.AreEqual(1, results.Length,
-                "Even though RealUserService isn't registered registered in the container directly, " +
-                "when creating a Registration or InstanceProducer, such instance should still be verified " +
-                "by the container. Warnings: " +
+                "Even though RealUserService isn't registered in the container directly, when creating a " +
+                "Registration or InstanceProducer, such instance should still be verified by the container. " +
+                "Warnings: " +
                 string.Join(" ", results.Select(result => result.Description)) +
                 (results.Any() ? string.Empty : "[No warnings]"));
         }

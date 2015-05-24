@@ -32,6 +32,8 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -432,9 +434,11 @@ namespace SimpleInjector
             // Don't do recursive checks. The GetInstance() already does that.
             var expression = this.lazyExpression.Value;
 
+            Func<object> instanceCreator;
+
             try
             {
-                return this.Registration.Container.WrapWithResolveInterceptor(
+                instanceCreator = this.Registration.Container.WrapWithResolveInterceptor(
                     this.initializationContext,
                         CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression));
             }
@@ -444,6 +448,26 @@ namespace SimpleInjector
                     StringResources.ErrorWhileBuildingDelegateFromExpression(this.ServiceType, expression, ex);
 
                 throw new ActivationException(message, ex);
+            }
+
+            this.Analyze();
+
+            return instanceCreator;
+        }
+
+        private void Analyze()
+        {
+            if (!this.Registration.Container.Options.SuppressLifestyleMismatchVerification)
+            {
+                var error = PotentialLifestyleMismatchAnalyzer.Instance.Analyze(new[] { this })
+                    .Cast<PotentialLifestyleMismatchDiagnosticResult>()
+                    .FirstOrDefault();
+
+                if (error != null)
+                {
+                    throw new DiagnosticVerificationException(
+                        StringResources.LifestyleMismatchesReported(error), error);
+                }
             }
         }
 

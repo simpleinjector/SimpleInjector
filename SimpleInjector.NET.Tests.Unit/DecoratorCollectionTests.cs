@@ -481,10 +481,12 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-
+            
             // Register transient service
             // This is not good practice, since we register a singleton decorator, but just for testing.
             container.RegisterCollection<INonGenericService>(new[] { typeof(RealNonGenericService) });
+
+            container.Register<RealNonGenericService>(Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator), Lifestyle.Singleton);
 
@@ -1496,7 +1498,9 @@
 
             var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(typesToRegister);
+            container.RegisterCollection(typeof(ICommandHandler<RealCommand>),
+                from type in typesToRegister
+                select Lifestyle.Singleton.CreateRegistration(type, container));
 
             var hybridLifestyle = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
 

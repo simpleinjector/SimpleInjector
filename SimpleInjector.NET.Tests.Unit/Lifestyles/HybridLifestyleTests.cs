@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Extensions.LifetimeScoping;
 
     [TestClass]
     public class HybridLifestyleTests
@@ -293,12 +294,11 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<IUserRepository, SqlUserRepository>();
+            var hybridLifestyle = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
-            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
-
-            // RealUserService depends on IUserRepository
-            container.Register<UserServiceBase, RealUserService>(hybrid);
+            // class RealUserService(IUserRepository)
+            container.Register<UserServiceBase, RealUserService>(hybridLifestyle);
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
 
             var serviceRegistration = container.GetRegistration(typeof(UserServiceBase));
 
@@ -309,9 +309,9 @@
             var repositoryRelationship = serviceRegistration.GetRelationships().Single();
 
             // Assert
-            Assert.AreEqual(hybrid, repositoryRelationship.Lifestyle,
+            Assert.AreEqual(hybridLifestyle, repositoryRelationship.Lifestyle,
                 "Even though the transient and singleton lifestyles build the list, the hybrid lifestyle" +
-                "must merge the two lists two one and use it's own lifestyle since the the real lifestyle " +
+                "must merge the two lists two one and use it's own lifestyle since the real lifestyle " +
                 "is not singleton or transient, but hybrid");
         }
 
