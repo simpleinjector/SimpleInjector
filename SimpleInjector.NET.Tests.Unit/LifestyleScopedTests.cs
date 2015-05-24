@@ -107,6 +107,22 @@
             container.GetInstance<RealTimeProvider>();
         }
 
+        [TestMethod]
+        public void Verify_RegistrationWithHybridLifestyleContainingScoped_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            var hybridLifestyle = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Scoped);
+
+            // class RealUserService(IUserRepository)
+            container.Register<UserServiceBase, RealUserService>(hybridLifestyle);
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
+
+            // Act
+            container.Verify();
+        }
+
         private sealed class CustomScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;

@@ -40,16 +40,6 @@ namespace SimpleInjector.Lifestyles
             this.falseLifestyle = falseLifestyle;
         }
 
-        internal override int ComponentLength
-        {
-            get { return Math.Max(this.trueLifestyle.ComponentLength, this.falseLifestyle.ComponentLength); }
-        }
-
-        internal override int DependencyLength
-        {
-            get { return Math.Min(this.trueLifestyle.DependencyLength, this.falseLifestyle.DependencyLength); }
-        }
-
         protected override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
@@ -58,6 +48,20 @@ namespace SimpleInjector.Lifestyles
         private ScopedLifestyle CurrentLifestyle
         {
             get { return this.lifestyleSelector() ? this.trueLifestyle : this.falseLifestyle; }
+        }
+
+        internal override int ComponentLength(Container container)
+        {
+            return Math.Max(
+                this.trueLifestyle.ComponentLength(container), 
+                this.falseLifestyle.ComponentLength(container));
+        }
+
+        internal override int DependencyLength(Container container)
+        {
+            return Math.Min(
+                this.trueLifestyle.DependencyLength(container), 
+                this.falseLifestyle.DependencyLength(container));
         }
 
         internal string GetHybridName()

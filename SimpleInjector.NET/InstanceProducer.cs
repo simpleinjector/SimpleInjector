@@ -434,11 +434,11 @@ namespace SimpleInjector
             // Don't do recursive checks. The GetInstance() already does that.
             var expression = this.lazyExpression.Value;
 
-            Func<object> instanceCreator;
+            Func<object> creator;
 
             try
             {
-                instanceCreator = this.Registration.Container.WrapWithResolveInterceptor(
+                creator = this.Registration.Container.WrapWithResolveInterceptor(
                     this.initializationContext,
                         CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression));
             }
@@ -452,7 +452,7 @@ namespace SimpleInjector
 
             this.Analyze();
 
-            return instanceCreator;
+            return creator;
         }
 
         private void Analyze()

@@ -36,23 +36,23 @@ namespace SimpleInjector.Lifestyles
             this.lifestyleApplierFactory = lifestyleApplierFactory;
         }
 
-        // Ensure that this lifestyle can only be safely used with singleton dependencies.
-        internal override int ComponentLength
-        {
-            get { return Lifestyle.Singleton.ComponentLength; }
-        }
-
-        // Ensure that this lifestyle can only be safely used with transient components/consumers.
-        internal override int DependencyLength
-        {
-            get { return Lifestyle.Transient.DependencyLength; }
-        }
-
         protected override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
         
+        // Ensure that this lifestyle can only be safely used with singleton dependencies.
+        internal override int ComponentLength(Container container)
+        {
+            return Lifestyle.Singleton.ComponentLength(container);
+        }
+
+        // Ensure that this lifestyle can only be safely used with transient components/consumers.
+        internal override int DependencyLength(Container container)
+        {
+            return Lifestyle.Transient.DependencyLength(container);
+        }
+
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
             return new CustomRegistration<TService, TImplementation>(this.lifestyleApplierFactory, this, container);

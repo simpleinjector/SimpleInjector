@@ -27,13 +27,13 @@
         [TestMethod]
         public void ComponentLength_Always_ReturnsTheSameLengthAsTheSingletonLifestyle()
         {
-            Assert.AreEqual(Lifestyle.Singleton.ComponentLength, Lifestyle.Unknown.ComponentLength);
+            Assert.AreEqual(Lifestyle.Singleton.ComponentLength(null), Lifestyle.Unknown.ComponentLength(null));
         }
 
         [TestMethod]
         public void DependencyLength_Always_ReturnsTheSameLengthAsTheTransientLifestyle()
         {
-            Assert.AreEqual(Lifestyle.Transient.ComponentLength, Lifestyle.Unknown.DependencyLength);
+            Assert.AreEqual(Lifestyle.Transient.ComponentLength(null), Lifestyle.Unknown.DependencyLength(null));
         }
 
         [TestMethod]

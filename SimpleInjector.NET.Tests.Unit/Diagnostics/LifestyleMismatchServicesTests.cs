@@ -17,7 +17,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyle.Singleton);
             
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
@@ -30,7 +30,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result);
@@ -43,7 +43,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyle.Singleton);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
@@ -56,7 +56,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result);
@@ -69,7 +69,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyles.LifetimeScope);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result);
@@ -82,7 +82,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyles.WcfOperation);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result);
@@ -95,7 +95,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyles.WebRequest);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result);
@@ -108,7 +108,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Singleton);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
@@ -121,7 +121,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Singleton);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
@@ -134,7 +134,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.WebRequest, child: Lifestyle.Singleton);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
@@ -147,7 +147,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
@@ -160,7 +160,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
@@ -173,7 +173,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.WebRequest, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
@@ -186,7 +186,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyle.Unknown);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "A transient service can safely depend on any other dependency.");
@@ -199,7 +199,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "An unknown lifestyle will always be bigger than transient.");
@@ -212,7 +212,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyle.Unknown);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "The unknown lifestyle will likely be shorter than singleton.");
@@ -225,7 +225,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyle.Singleton);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Every dependency can always safely depend on a singleton.");
@@ -238,7 +238,7 @@
             var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Unknown);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "A lifestyle longer than transient can not safely depend on an unknown " +
@@ -252,7 +252,7 @@
             var dependency = CreateRelationship(parent: Lifestyle.Unknown, child: Lifestyles.LifetimeScope);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "An unknown lifestyle can not safely depend on a lifestyle that is " +
@@ -268,7 +268,7 @@
             var dependency = CreateRelationship(parent: hybrid, child: hybrid);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Since the both the parent and child have exactly the same lifestyle, " +
@@ -285,7 +285,7 @@
             var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsFalse(result, "Both lifestyles of the parent are shorter than those of the child.");
@@ -301,7 +301,7 @@
             var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Both lifestyles of the parent are longer than those of the child.");
@@ -320,7 +320,7 @@
             var dependency = CreateRelationship(parent: parentHybrid, child: childHybrid);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Both lifestyles of the parent are longer than those of the child.");
@@ -348,7 +348,7 @@
                 CreateRelationship(parent: hybridWithDeeplyNestedSingleton, child: Lifestyle.Transient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Since the hybrid lifestyle contains a singleton lifestyle, this " +
@@ -377,7 +377,7 @@
                 CreateRelationship(parent: Lifestyle.Singleton, child: hybridWithDeeplyNestedTransient);
 
             // Act
-            bool result = LifestyleMismatchChecker.HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency);
 
             // Assert
             Assert.IsTrue(result, "Since the hybrid lifestyle contains a transient lifestyle, this " +
@@ -386,12 +386,15 @@
 
         private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child)
         {
-            var container = new Container();
-
             return new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
                 lifestyle: parent,
                 dependency: new InstanceProducer(typeof(IDisposable), new DummyRegistration(child)));
+        }
+
+        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency)
+        {
+            return LifestyleMismatchChecker.HasPossibleLifestyleMismatch(new Container(), dependency);
         }
 
         private class DummyRegistration : Registration
@@ -445,7 +448,7 @@
 
             protected override int Length
             {
-                get { return this.realLifestyle.ComponentLength; }
+                get { return this.realLifestyle.ComponentLength(null); }
             }
 
             protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)

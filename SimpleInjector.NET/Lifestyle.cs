@@ -167,18 +167,6 @@ namespace SimpleInjector
             get { return this.name; }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal virtual int ComponentLength
-        {
-            get { return this.Length; }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal virtual int DependencyLength
-        {
-            get { return this.Length; }
-        }
-
         /// <summary>
         /// Gets the length of the lifestyle. Implementers must implement this property. The diagnostic
         /// services use this value to compare lifestyles with each other to determine lifestyle 
@@ -585,6 +573,16 @@ namespace SimpleInjector
             {
                 throw BuildUnableToResolveTypeDueToSecurityConfigException(serviceType, ex, "serviceType");
             }
+        }
+
+        internal virtual int ComponentLength(Container container)
+        {
+            return this.Length;
+        }
+
+        internal virtual int DependencyLength(Container container)
+        {
+            return this.Length;
         }
 
         internal Registration CreateRegistration(Type serviceType, Type implementationType,

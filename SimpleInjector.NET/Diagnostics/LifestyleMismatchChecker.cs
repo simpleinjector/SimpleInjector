@@ -26,7 +26,7 @@ namespace SimpleInjector.Diagnostics
 
     internal static class LifestyleMismatchChecker
     {
-        internal static bool HasPossibleLifestyleMismatch(KnownRelationship relationship)
+        internal static bool HasPossibleLifestyleMismatch(Container container, KnownRelationship relationship)
         {
             Lifestyle componentLifestyle = relationship.Lifestyle;
             Lifestyle dependencyLifestyle = relationship.Dependency.Lifestyle;
@@ -40,7 +40,7 @@ namespace SimpleInjector.Diagnostics
                 return false;
             }
 
-            return componentLifestyle.ComponentLength > dependencyLifestyle.DependencyLength;
+            return componentLifestyle.ComponentLength(container) > dependencyLifestyle.DependencyLength(container);
         }
     }
 }

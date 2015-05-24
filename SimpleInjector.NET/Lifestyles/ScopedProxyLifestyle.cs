@@ -35,6 +35,16 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotImplementedException(); }
         }
 
+        internal override int ComponentLength(Container container)
+        {
+            return GetDefaultScopedLifestyle(container).ComponentLength(container);
+        }
+
+        internal override int DependencyLength(Container container)
+        {
+            return GetDefaultScopedLifestyle(container).DependencyLength(container);
+        }
+
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
             ScopedLifestyle lifestyle = GetDefaultScopedLifestyle(container);

@@ -68,7 +68,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
               from producer in producers
               where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
               from relationship in producer.GetRelationships()
-              where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(relationship)
+              let container = producer.Registration.Container
+              where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(container, relationship)
               select new PotentialLifestyleMismatchDiagnosticResult(
                   serviceType: producer.ServiceType,
                   description: BuildRelationshipDescription(relationship),
