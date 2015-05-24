@@ -28,7 +28,7 @@
 
             container.Register<IPlugin, DisposablePlugin>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
@@ -50,7 +50,7 @@
 
             container.Register<IPlugin, DisposablePlugin>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var result = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>().First();

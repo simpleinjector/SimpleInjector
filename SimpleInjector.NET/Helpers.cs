@@ -65,6 +65,12 @@ namespace SimpleInjector
             return new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
         }
 
+        internal static T AddReturn<T>(this HashSet<T> set, T value)
+        {
+            set.Add(value);
+            return value;
+        }
+
         internal static string ToCommaSeparatedText(this IEnumerable<string> values)
         {
             var names = values.ToArray();

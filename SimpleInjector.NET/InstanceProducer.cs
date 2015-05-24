@@ -319,17 +319,31 @@ namespace SimpleInjector
             return this.VisualizeIndentedObjectGraph(indentingDepth: 0);
         }
 
-        internal string VisualizeIndentedObjectGraph(int indentingDepth)
+        internal string VisualizeIndentedObjectGraph(int indentingDepth, HashSet<InstanceProducer> set = null)
         {
+            set = set ?? new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
+
             var visualizedDependencies =
                 from relationship in this.GetRelationships()
-                select Environment.NewLine +
-                    relationship.Dependency.VisualizeIndentedObjectGraph(indentingDepth + 1);
+                let dependency = relationship.Dependency
+                let isCyclicGraph = set.Contains(dependency)
+                let visualizeSubGraph = isCyclicGraph
+                    ? dependency.VisualizeCyclicProducerWithoutDependencies(indentingDepth + 1)
+                    : set.AddReturn(dependency).VisualizeIndentedObjectGraph(indentingDepth + 1, set)
+                select Environment.NewLine + visualizeSubGraph;
 
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
                 new string(' ', indentingDepth * 4),
                 this.ImplementationType.ToFriendlyName(),
                 string.Join(",", visualizedDependencies));
+        }
+
+        internal string VisualizeCyclicProducerWithoutDependencies(int indentingDepth)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
+                new string(' ', indentingDepth * 4),
+                this.ImplementationType.ToFriendlyName(),
+                "/* cyclic dependency graph detected */");
         }
 
         internal string VisualizeInlinedAndTruncatedObjectGraph(int maxLength)

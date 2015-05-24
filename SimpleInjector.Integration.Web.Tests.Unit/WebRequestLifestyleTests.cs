@@ -85,7 +85,7 @@
             });
 
             // Act
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Arrange
             Assert.IsTrue(initializerCalled);
@@ -179,7 +179,7 @@
             });
 
             // Act
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Arrange
             Assert.IsTrue(initializerCalled);

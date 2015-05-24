@@ -1364,7 +1364,7 @@
                 typeof(RealCommandHandlerDecorator),
                 Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var actualRelationships = container.GetRegistration(typeof(ICommandHandler<RealCommand>))
@@ -1406,7 +1406,7 @@
             // LoggingHandlerDecorator1 takes a dependency on ILogger.
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LoggingHandlerDecorator1<>));
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var relationships =
@@ -1451,7 +1451,7 @@
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>),
                 Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var relationships =
@@ -1687,7 +1687,7 @@
                 }
             };
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var relationships =

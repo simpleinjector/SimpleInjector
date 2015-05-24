@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
@@ -14,6 +15,14 @@
         }
 
         public interface ITwo
+        {
+        }
+
+        public interface INode
+        {
+        }
+
+        public interface INodeFactory
         {
         }
 
@@ -147,6 +156,35 @@
                 "enough information to visualize the object graph. Instead of returning an incorrect result " +
                 "we expect the library to throw an exception here.");
         }
+        
+        [TestMethod]
+        public void VisualizeObjectGraph_DelayedCyclicReference_VisualizesTheExpectedObjectGraph()
+        {
+            // Arrange
+            string expectedGraph = @"InstanceProducerTests.NodeFactory(
+    IEnumerable<InstanceProducerTests.INode>(
+        InstanceProducerTests.NodeFactory(
+            IEnumerable<InstanceProducerTests.INode>(/* cyclic dependency graph detected */))))";
+
+            var container = new Container();
+
+            // class NodeOne(INodeFactory factory)
+            container.RegisterCollection<INode>(new[] { typeof(NodeOne) });
+
+            // class NodeFactory(IEnumerable<INode>)
+            container.Register<INodeFactory, NodeFactory>();
+
+            container.Verify();
+
+            var registration = container.GetRegistration(typeof(INodeFactory));
+
+            // Act
+            // Since the dependency is delayed,
+            string actualGraph = registration.VisualizeObjectGraph();
+
+            // Assert
+            Assert.AreEqual(expectedGraph, actualGraph);
+        }
 
         public class OneAndTwo : IOne, ITwo 
         {
@@ -155,6 +193,20 @@
         public class OneDecorator : IOne
         {
             public OneDecorator(IOne one)
+            {
+            }
+        }
+
+        public class NodeOne : INode
+        {
+            public NodeOne(INodeFactory nodeFactory)
+            {
+            }
+        }
+
+        public class NodeFactory : INodeFactory
+        {
+            public NodeFactory(IEnumerable<INode> nodes)
             {
             }
         }

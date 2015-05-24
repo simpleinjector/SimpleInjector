@@ -31,7 +31,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Transient);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container);
@@ -52,7 +52,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Transient);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var result = Analyzer.Analyze(container).OfType<AmbiguousLifestylesDiagnosticResult>().First();
@@ -70,7 +70,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Transient);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var fooRegistration = container.GetRegistration(typeof(IFoo));
             var barRegistration = container.GetRegistration(typeof(IBar));
@@ -117,7 +117,7 @@
             container.AddRegistration(typeof(IFooExt), singletonFooBar);
             container.AddRegistration(typeof(IBarExt), singletonFooBar);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results =
@@ -145,7 +145,7 @@
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IFooExt, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results =
@@ -171,7 +171,7 @@
             container.AddRegistration(typeof(IFooExt), scopedFooBar2);
             container.AddRegistration(typeof(IBarExt), scopedFooBar2);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results =
@@ -193,7 +193,7 @@
             container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<AmbiguousLifestylesDiagnosticResult>();
@@ -211,7 +211,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Transient);
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration = container.GetRegistration(typeof(IFoo)).Registration;
 
@@ -233,7 +233,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Transient);
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration1 = container.GetRegistration(typeof(IFoo)).Registration;
             var registration2 = container.GetRegistration(typeof(IBar)).Registration;
@@ -257,7 +257,7 @@
             var a = Lifestyle.Transient.CreateProducer<IFoo, FooBar>(container);
             var b = Lifestyle.Singleton.CreateProducer<IFoo, FooBar>(container);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container);

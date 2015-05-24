@@ -33,7 +33,7 @@
             // HomeController depends on MyUnitOfWork.
             container.Register<HomeController>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container));
@@ -58,7 +58,7 @@
             // HomeController depends on MyUnitOfWork.
             container.Register<HomeController>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var result = Analyzer.Analyze(container).OfType<ShortCircuitedDependencyDiagnosticResult>().First();
@@ -78,7 +78,7 @@
 
             container.Register<HomeController>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration = container.GetRegistration(typeof(HomeController)).Registration;
 
@@ -106,7 +106,7 @@
 
             container.Register<Controller<int>>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container));
@@ -136,7 +136,7 @@
             container.Register<Controller<int>>();
             container.Register<Controller<float>>();
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container)).Single();

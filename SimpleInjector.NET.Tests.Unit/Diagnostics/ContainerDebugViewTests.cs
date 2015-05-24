@@ -131,7 +131,7 @@
             // Forces a lifestyle mismatch
             container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var debugView = new ContainerDebugView(container);

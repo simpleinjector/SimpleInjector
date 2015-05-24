@@ -20,7 +20,7 @@
             // RealUserService depends on IUserRepository
             container.Register<RealUserService>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var item = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
@@ -41,7 +41,7 @@
             // RealUserService depends on IUserRepository
             container.Register<RealUserService>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var result = Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>().First();
@@ -62,7 +62,7 @@
             // RealUserService depends on IUserRepository
             container.Register<RealUserService>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var item = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
@@ -86,7 +86,7 @@
             // FakeUserService depends on IUserRepository
             container.Register<FakeUserService>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var item = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container);
@@ -110,13 +110,13 @@
 
             container.Options.SuppressLifestyleMismatchVerification = true;
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             registration.SuppressDiagnosticWarning(DiagnosticType.PotentialLifestyleMismatch);
 
             container.Options.SuppressLifestyleMismatchVerification = false;
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>()

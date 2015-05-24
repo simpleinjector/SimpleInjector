@@ -29,7 +29,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -49,7 +49,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var result = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().First();
@@ -85,7 +85,7 @@
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
             container.Register<IBarExt, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -112,7 +112,7 @@
             container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -132,7 +132,7 @@
             container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration = container.GetRegistration(typeof(IFoo)).Registration;
 
@@ -154,7 +154,7 @@
             container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration = container.GetRegistration(typeof(IBar)).Registration;
 
@@ -176,7 +176,7 @@
             container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             var registration1 = container.GetRegistration(typeof(IFoo)).Registration;
             var registration2 = container.GetRegistration(typeof(IBar)).Registration;
@@ -203,7 +203,7 @@
             container.AddRegistration(typeof(IFoo), fooReg);
             container.AddRegistration(typeof(IBar), barReg);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -223,7 +223,7 @@
 
             container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator), Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -244,7 +244,7 @@
             container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator));
             container.RegisterDecorator(typeof(IBar), typeof(BarDecorator));
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -275,7 +275,7 @@
             container.AddRegistration(typeof(IBar), barReg);
             container.AddRegistration(typeof(IBarExt), barReg);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -314,7 +314,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
@@ -375,7 +375,7 @@
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(Lifestyle.Singleton);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = DebuggerGeneralWarningsContainerAnalyzer.Analyze(container).Value as DebuggerViewItem[];
@@ -442,7 +442,7 @@
 
             container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();

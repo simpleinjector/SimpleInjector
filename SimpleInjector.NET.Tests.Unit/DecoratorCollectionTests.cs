@@ -1579,7 +1579,7 @@
                 }
             };
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var commandHandlerCollectionRegistration =
@@ -1617,7 +1617,7 @@
                 }
             };
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var commandHandlerCollectionRegistration =

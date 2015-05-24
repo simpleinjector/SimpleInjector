@@ -50,14 +50,14 @@ namespace SimpleInjector
         internal Scope VerificationScope { get; private set; }
 
         /// <summary>
-        /// Verifies the <b>Container</b>. This method will call all registered delegates, 
-        /// iterate registered collections and throws an exception if there was an error.
+        /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered 
+        /// delegates, iterate registered collections and throws an exception if there was an error.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
         /// invalid.</exception>
         public void Verify()
         {
-            this.Verify(VerificationOption.VerifyOnly);
+            this.Verify(VerificationOption.VerifyAndDiagnose);
         }
 
         /// <summary>

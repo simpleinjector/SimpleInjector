@@ -112,7 +112,7 @@
             // RealUserService (Singleton) depends on InMemoryUserRepository (Transient).
             createLifestyleMismatch(container);
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             // Act
             var results =

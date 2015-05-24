@@ -131,7 +131,7 @@
         {
             container.Options.SuppressLifestyleMismatchVerification = true;
 
-            container.Verify();
+            container.Verify(VerificationOption.VerifyOnly);
 
             return new ContainerDebugView(container).Items;
         }

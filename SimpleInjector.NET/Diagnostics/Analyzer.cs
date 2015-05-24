@@ -89,19 +89,28 @@ namespace SimpleInjector.Diagnostics
                 .ToArray();
         }
 
-        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer)
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
+            HashSet<InstanceProducer> set = null)
         {
+            set = set ?? new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
+
+            // Prevent stack overflow exception in case the graph is cyclic.
+            if (set.Contains(producer))
+            {
+                yield break;
+            }
+
             // Return self
-            yield return producer;
+            yield return set.AddReturn(producer);
 
             // Return dependent producers
             foreach (var relationship in producer.GetRelationships())
             {
-                yield return relationship.Dependency;
+                yield return set.AddReturn(relationship.Dependency);
 
-                foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency))
+                foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency, set))
                 {
-                    yield return dependentProducer;
+                    yield return set.AddReturn(dependentProducer);
                 }
             }
         }
