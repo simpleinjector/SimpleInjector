@@ -33,6 +33,21 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
 
         [TestMethod]
+        public void Analyze_OnConfigurationWithOneViolation_ReturnsSeverityWarning()
+        {
+            // Arrange
+            Container container = CreateContainerWithRegistrations(typeof(PluginWith8Dependencies));
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<SingleResponsibilityViolationDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Information, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_OnValidConfiguration_ReturnsNull()
         {
             // Arrange

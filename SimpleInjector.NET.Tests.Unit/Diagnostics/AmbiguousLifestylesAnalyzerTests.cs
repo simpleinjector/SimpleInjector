@@ -44,6 +44,24 @@
         }
 
         [TestMethod]
+        public void Analyze_TwoRegistrationsWithDifferentLifestylesForTheSameImplementation_ReturnsSeverityWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
+            container.Register<IBar, FooBar>(Lifestyle.Transient);
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<AmbiguousLifestylesDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_TwoRegistrationsWithDifferentLifestylesForTheSameImplementation_ReturnsExpectedDiagnosticResult()
         {
             // Arrange

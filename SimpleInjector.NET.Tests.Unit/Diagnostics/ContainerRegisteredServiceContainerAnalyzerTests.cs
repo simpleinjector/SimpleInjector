@@ -30,6 +30,23 @@
         }
 
         [TestMethod]
+        public void Analyze_ComponentDependingOnUnregisteredConcreteType_ReturnsSeverityInformation()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<Consumer<ConcreteShizzle>>();
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<ContainerRegisteredServiceDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Information, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_ComponentDependingOnUnregisteredEnumerable_ReturnsWarning()
         {
             // Arrange

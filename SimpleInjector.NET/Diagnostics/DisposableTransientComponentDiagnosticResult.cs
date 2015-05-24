@@ -34,7 +34,8 @@ namespace SimpleInjector.Diagnostics
     {
         internal DisposableTransientComponentDiagnosticResult(Type serviceType, InstanceProducer registration, 
             string description)
-            : base(serviceType, description, DiagnosticType.DisposableTransientComponent, registration)
+            : base(serviceType, description, DiagnosticType.DisposableTransientComponent,
+                DiagnosticSeverity.Warning, registration)
         {
             this.Registration = registration;
         }

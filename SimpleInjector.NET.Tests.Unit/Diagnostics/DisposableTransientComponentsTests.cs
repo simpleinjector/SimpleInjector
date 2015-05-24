@@ -43,6 +43,23 @@
         }
 
         [TestMethod]
+        public void Analyze_TransientRegistrationForDisposableComponent_ReturnsSeverityWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, DisposablePlugin>();
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_TransientRegistrationForDisposableComponentWithSuppressDiagnosticWarning_NoWarning()
         {
             // Arrange

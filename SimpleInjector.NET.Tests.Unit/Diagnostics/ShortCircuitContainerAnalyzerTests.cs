@@ -48,6 +48,26 @@
         }
 
         [TestMethod]
+        public void Analyze_OnConfigurationWithOneShortCircuitedRegistration_ReturnsSeverityWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
+
+            // HomeController depends on MyUnitOfWork.
+            container.Register<HomeController>();
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<ShortCircuitedDependencyDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_OnConfigurationWithOneShortCircuitedRegistrationWithSuppressDiagnosticWarning_ReturnsNoWarning()
         {
             // Arrange

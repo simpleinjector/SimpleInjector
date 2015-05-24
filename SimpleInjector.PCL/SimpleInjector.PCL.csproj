@@ -217,6 +217,9 @@
     <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticResultGrouper.cs">
       <Link>Diagnostics\DiagnosticResultGrouper.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticSeverity.enum.cs">
+      <Link>Diagnostics\DiagnosticSeverity.enum.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\DiagnosticType.enum.cs">
       <Link>Diagnostics\DiagnosticType.enum.cs</Link>
     </Compile>

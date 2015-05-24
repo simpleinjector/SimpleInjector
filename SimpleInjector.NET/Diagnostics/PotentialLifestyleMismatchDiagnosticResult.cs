@@ -34,7 +34,8 @@ namespace SimpleInjector.Diagnostics
     {
         internal PotentialLifestyleMismatchDiagnosticResult(Type serviceType, string description,
             KnownRelationship relationship)
-            : base(serviceType, description, DiagnosticType.PotentialLifestyleMismatch, relationship)
+            : base(serviceType, description, DiagnosticType.PotentialLifestyleMismatch,
+                DiagnosticSeverity.Warning, relationship)
         {
             this.Relationship = relationship;
         }

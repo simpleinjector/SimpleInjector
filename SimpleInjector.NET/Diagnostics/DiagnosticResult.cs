@@ -32,13 +32,19 @@ namespace SimpleInjector.Diagnostics
     [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
     public abstract class DiagnosticResult
     {
-        internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType, object value)
+        internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType,
+            DiagnosticSeverity severity, object value)
         {
             this.ServiceType = serviceType;
             this.Description = description;
             this.DiagnosticType = diagnosticType;
+            this.Severity = severity;
             this.Value = value;
         }
+
+        /// <summary>Gets the severity of this result.</summary>
+        /// <value>The <see cref="DiagnosticSeverity"/>.</value>
+        public DiagnosticSeverity Severity { get; private set; }
 
         /// <summary>Gets the diagnostic type of this result.</summary>
         /// <value>The <see cref="DiagnosticType"/>.</value>

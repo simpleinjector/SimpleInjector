@@ -21,6 +21,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Batch registration using the Register and RegisterCollection overloads that accept a list
 		 of Assembly instances and the Container.GetTypesToRegister method filter out Code Contract classes
 		 (classes that are marked with a ContractClassForAttribute) (fixes #19).
+		-[Core] DiagnosticResult.Severity property added to allow differentiating between warnings and
+		 information messages (fixes #9).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).

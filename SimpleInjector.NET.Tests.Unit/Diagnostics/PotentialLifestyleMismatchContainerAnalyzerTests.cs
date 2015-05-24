@@ -29,6 +29,26 @@
         }
 
         [TestMethod]
+        public void Analyze_ContainerWithOneMismatch_ReturnsSeverityWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, InMemoryUserRepository>();
+
+            // RealUserService depends on IUserRepository
+            container.Register<RealUserService>(Lifestyle.Singleton);
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_ContainerWithOneMismatch_ReturnsItemWithExpectedDescription()
         {
             // Arrange

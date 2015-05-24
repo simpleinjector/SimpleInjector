@@ -41,6 +41,24 @@
         }
 
         [TestMethod]
+        public void Analyze_TwoSingletonRegistrationsForTheSameImplementation_ReturnsSeverityWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
+            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+
+            container.Verify();
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().First();
+
+            // Assert
+            Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
+        }
+
+        [TestMethod]
         public void Analyze_FourSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
         {
             // Arrange

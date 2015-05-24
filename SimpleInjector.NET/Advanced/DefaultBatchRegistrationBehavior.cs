@@ -52,6 +52,10 @@ namespace SimpleInjector.Advanced
 
         private static bool IsContractClass(Type serviceType, Type implementationType)
         {
+            // NOTE: The ContractClassForAttribute is marked with [Conditional("CONTRACTS_FULL")].
+            // This means that without the CONTRACTS_FULL compiler directive, a class marked with this
+            // attribute will just become a regular class and will end up as a normal class, and it will be
+            // included.
             var attributes = implementationType.GetCustomAttributes(typeof(ContractClassForAttribute), true);
 
             var contractAttributesForServiceType =

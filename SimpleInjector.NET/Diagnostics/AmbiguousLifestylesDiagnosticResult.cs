@@ -38,7 +38,7 @@ namespace SimpleInjector.Diagnostics
         internal AmbiguousLifestylesDiagnosticResult(Type serviceType, string description, 
             Lifestyle[] lifestyles, Type implementationType, InstanceProducer diagnosedProducer, 
             InstanceProducer[] conflictingProducers)
-            : base(serviceType, description, DiagnosticType.AmbiguousLifestyles,
+            : base(serviceType, description, DiagnosticType.AmbiguousLifestyles, DiagnosticSeverity.Warning,
                 CreateDebugValue(implementationType, lifestyles, conflictingProducers))
         {
             this.Lifestyles = new ReadOnlyCollection<Lifestyle>(lifestyles.ToList());

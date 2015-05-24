@@ -81,6 +81,7 @@
     <Compile Include="Advanced\AdvancedExtensions.cs" />
     <Compile Include="Advanced\DefaultBatchRegistrationBehavior.cs" />
     <Compile Include="Advanced\IBatchRegistrationBehavior.cs" />
+    <Compile Include="Diagnostics\DiagnosticSeverity.enum.cs" />
     <Compile Include="InstanceProducerOfT.cs" />
     <Compile Include="Internals\ConditionalHashSet.cs" />
     <Compile Include="Internals\ConstantArrayIndexizerVisitor.cs" />

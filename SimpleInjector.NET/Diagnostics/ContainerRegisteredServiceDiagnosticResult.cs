@@ -38,8 +38,8 @@ namespace SimpleInjector.Diagnostics
     {
         internal ContainerRegisteredServiceDiagnosticResult(Type serviceType, string description,
             IEnumerable<KnownRelationship> relationships)
-            : base(serviceType, description, DiagnosticType.ContainerRegisteredComponent, 
-                relationships.ToArray())
+            : base(serviceType, description, DiagnosticType.ContainerRegisteredComponent,
+                DiagnosticSeverity.Information, relationships.ToArray())
         {
             this.Relationships = new ReadOnlyCollection<KnownRelationship>(relationships.ToList());
         }

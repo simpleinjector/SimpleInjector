@@ -37,7 +37,7 @@ namespace SimpleInjector.Diagnostics
     {
         internal TornLifestyleDiagnosticResult(Type serviceType, string description, Lifestyle lifestyle,
             Type implementationType, InstanceProducer[] affectedRegistrations)
-            : base(serviceType, description, DiagnosticType.TornLifestyle,
+            : base(serviceType, description, DiagnosticType.TornLifestyle, DiagnosticSeverity.Warning,
                 CreateDebugValue(implementationType, lifestyle, affectedRegistrations))
         {
             this.Lifestyle = lifestyle;

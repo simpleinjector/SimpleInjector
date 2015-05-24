@@ -41,7 +41,8 @@ namespace SimpleInjector.Diagnostics
         internal ShortCircuitedDependencyDiagnosticResult(Type serviceType, string description,
             InstanceProducer registration, KnownRelationship relationship,
             IEnumerable<InstanceProducer> expectedDependencies)
-            : base(serviceType, description, DiagnosticType.ShortCircuitedDependency,
+            : base(serviceType, description, DiagnosticType.ShortCircuitedDependency, 
+                DiagnosticSeverity.Warning, 
                 CreateDebugValue(registration, relationship, expectedDependencies.ToArray()))
         {
             this.Relationship = relationship;
