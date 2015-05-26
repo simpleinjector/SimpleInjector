@@ -1762,6 +1762,38 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetAllInstances_CollectionRegisteredForOpenGenericTypeMadeUsingRegistrationInstances_ReturnsTheExpectedTypes()
+        {
+            // Arrange
+            var expectedTypes = new Type[] 
+            { 
+                typeof(AuditableEventEventHandler),
+                typeof(EventHandlerImplementationTwoInterface)
+            };
+
+            var registeredTypes = new Type[] 
+            { 
+                typeof(AuditableEventEventHandler), // IEventHandler<AuditableEvent>
+                typeof(EventHandlerImplementationTwoInterface), // IEventHandler<AuditableEvent>, IEventHandler<ClassEvent>
+                typeof(StructEventHandler), // IEventHandler<StructEvent>
+            };
+            
+            var container = ContainerFactory.New();
+
+            var registrations =
+                from type in registeredTypes
+                select Lifestyle.Transient.CreateRegistration(type, container);
+
+            container.RegisterCollection(typeof(IEventHandler<>), registrations);
+
+            // Act
+            var auditableHandlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(expectedTypes, auditableHandlers.Select(h => h.GetType()));
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +

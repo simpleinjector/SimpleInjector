@@ -47,6 +47,10 @@
     {
     }
 
+    public class EventHandlerImplementationTwoInterface : IEventHandler<AuditableEvent>, IEventHandler<ClassEvent>
+    {
+    }
+
     public class AuditableEventEventHandler<TAuditableEvent> : IEventHandler<TAuditableEvent>
         where TAuditableEvent : IAuditableEvent
     {

@@ -23,6 +23,8 @@ Version 3.0.0 (v3.0 RTM)
 		 (classes that are marked with a ContractClassForAttribute) (fixes #19).
 		-[Core] DiagnosticResult.Severity property added to allow differentiating between warnings and
 		 information messages (fixes #9).
+		-[Core] RegisterCollection(Type, IEnumerable<Registration>) now accepts open generic types as well
+		 (fixes #22).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).

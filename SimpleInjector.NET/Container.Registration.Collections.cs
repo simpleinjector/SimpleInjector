@@ -167,22 +167,21 @@ namespace SimpleInjector
         /// The order in which the types appear in the collection is the exact same order that the items were 
         /// registered, i.e the resolved collection is deterministic.   
         /// </summary>
-        /// <param name="serviceType">The base type or interface for elements in the collection.</param>
+        /// <param name="serviceType">The base type or interface for elements in the collection. This can be
+        /// an a non-generic type, closed generic type or generic type definition.</param>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element, the <paramref name="serviceType"/> is a generic type definition, or when 
-        /// <paramref name="serviceType"/> is
-        /// not assignable from one of the given <paramref name="registrations"/> elements.
+        /// (Nothing in VB) element or when <paramref name="serviceType"/> is not assignable from any of the
+        /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
             Requires.IsNotNull(serviceType, "serviceType");
             Requires.IsNotNull(registrations, "registrations");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
 
             // Make a copy for performance and correctness.
             registrations = registrations.ToArray();
