@@ -106,6 +106,7 @@ namespace SimpleInjector
         /// <returns>A sequence of instances of the requested TService.</returns>
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<TService> GetAllInstances<TService>()
+            where TService : class
         {
             return this.GetInstance<IEnumerable<TService>>();
         }
