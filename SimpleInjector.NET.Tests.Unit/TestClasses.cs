@@ -64,10 +64,6 @@
         DateTime Now { get; }
     }
 
-    public interface IPlugin
-    {
-    }
-
     public interface IGeneric<T>
     {
     }
@@ -167,66 +163,6 @@
         }
     }
 
-    public class PluginImpl : IPlugin
-    {
-    }
-
-    public class PluginImpl2 : IPlugin
-    {
-    }
-
-    public class PluginDecorator : IPlugin
-    {
-        public PluginDecorator(IPlugin decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public IPlugin Decoratee { get; private set; }
-    }
-
-    public class PluginDecorator<T> : IPlugin
-    {
-        public PluginDecorator(IPlugin decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public IPlugin Decoratee { get; private set; }
-    }
-
-    public class PluginDecoratorWithDependencyOfType<TDependency> : IPlugin
-    {
-        public PluginDecoratorWithDependencyOfType(TDependency dependency, IPlugin decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public IPlugin Decoratee { get; private set; }
-    }
-
-    public class PluginWithPropertyDependencyOfType<TDependency> : IPlugin
-    {
-        public TDependency Dependency { get; set; }
-    }
-
-    public class PluginWithDependencyOfType<TDependency> : IPlugin
-    {
-        public PluginWithDependencyOfType(TDependency dependency)
-        {
-        }
-    }
-
-    public class PluginManager
-    {
-        public PluginManager(IEnumerable<IPlugin> plugins)
-        {
-            this.Plugins = plugins.ToArray();
-        }
-
-        public IPlugin[] Plugins { get; private set; }
-    }
-
     public class ConcreteTypeWithValueTypeConstructorArgument
     {
         public ConcreteTypeWithValueTypeConstructorArgument(int intParam)
@@ -307,33 +243,6 @@
         }
     }
 
-    public sealed class ValidatorWithUnusedTypeArgument<T, TUnused> : IValidate<T>
-    {
-        public void Validate(T instance)
-        {
-            // Do nothing.
-        }
-    }
-
-    public struct StructCommand
-    {
-    }
-    
-    public class MonoDictionary<T> : Dictionary<T, T>
-    {
-    }
-
-    public class SneakyMonoDictionary<T, TUnused> : Dictionary<T, T>
-    {
-    }
-
-    // Note: This class deliberately implements a second IProducer. This will verify whether the code can
-    // handle types with multiple versions of the same interface.
-    public class NullableProducer<T> : IProducer<T?>, IProducer<IValidate<T>>, IProducer<double>
-        where T : struct
-    {
-    }
-
     public sealed class ServiceImpl<TA, TB> : IService<TA, TB>
     {
     }
@@ -356,30 +265,6 @@
         }
     }
 
-    // The type constraint will prevent the type from being created when the arguments are ordered
-    // incorrectly.
-    public sealed class ServiceImplWithTypesArgsSwapped<B, A> : IService<A, B>
-        where B : struct
-        where A : class
-    {
-    }
-
-    public class Bar
-    {
-    }
-
-    public class Baz : IBar<Bar>
-    {
-    }
-
-    public class Foo<T1, T2> : IFoo<T1> where T1 : IBar<T2>
-    {
-    }
-
-    public class ServiceWhereTInIsTOut<TA, TB> : IService<TA, TB> where TA : TB
-    {
-    }
-
     public class ServiceWithDependency<TDependency>
     {
         public ServiceWithDependency(TDependency dependency)
@@ -388,22 +273,6 @@
         }
 
         public TDependency Dependency { get; private set; }
-    }
-
-    public class Implementation<X, TUnused1, TUnused2, Y> : IInterface<X, X, Y>
-    {
-    }
-
-    public interface IOpenGenericWithPredicate<T>
-    {
-    }
-
-    public class OpenGenericWithPredicate1<T> : IOpenGenericWithPredicate<T>
-    {
-    }
-
-    public class OpenGenericWithPredicate2<T> : IOpenGenericWithPredicate<T>
-    {
     }
 
     public class ServiceDecorator : IService<int, object>

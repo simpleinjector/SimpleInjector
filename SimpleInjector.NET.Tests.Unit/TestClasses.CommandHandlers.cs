@@ -17,6 +17,10 @@
         ICommandHandler<TCommand> Decorated { get; }
     }
 
+    public struct StructCommand
+    {
+    }
+    
     public static class CommandHandlerExtensions
     {
         public static IEnumerable<Type> GetDecoratorTypeChain<T>(this ICommandHandler<T> handler)

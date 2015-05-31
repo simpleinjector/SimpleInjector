@@ -234,7 +234,7 @@ namespace SimpleInjector
         internal void AppendToCollectionInternal(Type itemType, Registration registration)
         {
             this.RegisterCollectionInternal(itemType,
-                new[] { new ContainerControlledItem(registration) },
+                new[] { ContainerControlledItem.CreateFromRegistration(registration) },
                 appending: true);
         }
 
@@ -243,22 +243,22 @@ namespace SimpleInjector
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
             this.RegisterCollectionInternal(itemType,
-                new[] { new ContainerControlledItem(implementationType) },
+                new[] { ContainerControlledItem.CreateFromType(implementationType) },
                 appending: true);
         }
 
         private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
         {
             this.RegisterCollectionInternal(itemType,
-                registrations.Select(r => new ContainerControlledItem(r)).ToArray());
+                registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray());
         }
 
         private void RegisterCollectionInternal(Type itemType, IEnumerable<Type> serviceTypes)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
-            this.RegisterCollectionInternal(itemType,
-                serviceTypes.Select(type => new ContainerControlledItem(type)).ToArray());
+            var items = serviceTypes.Select(ContainerControlledItem.CreateFromType).ToArray();
+            this.RegisterCollectionInternal(itemType, items);
         }
 
         private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] registrations,

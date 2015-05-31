@@ -216,6 +216,12 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.Handlers.cs">
       <Link>TestClasses.Handlers.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.OpenGenerics.cs">
+      <Link>TestClasses.OpenGenerics.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.Plugins.cs">
+      <Link>TestClasses.Plugins.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\TestClasses.QueryHandlers.cs">
       <Link>TestClasses.QueryHandlers.cs</Link>
     </Compile>

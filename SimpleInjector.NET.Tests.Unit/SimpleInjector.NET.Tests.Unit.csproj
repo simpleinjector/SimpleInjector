@@ -160,6 +160,8 @@
     <Compile Include="ScopedLifestyleTests.cs" />
     <Compile Include="TestClasses.CommandHandlers.cs" />
     <Compile Include="TestClasses.EventHandlers.cs" />
+    <Compile Include="TestClasses.OpenGenerics.cs" />
+    <Compile Include="TestClasses.Plugins.cs" />
     <Compile Include="TestClasses.QueryHandlers.cs" />
     <Compile Include="TestClasses.cs" />
     <Compile Include="TestClasses.Handlers.cs" />

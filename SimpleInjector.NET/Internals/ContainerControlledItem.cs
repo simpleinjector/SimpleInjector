@@ -36,17 +36,27 @@ namespace SimpleInjector.Internals
         /// <summary>Can be null.</summary>
         public readonly Registration Registration;
 
-        public ContainerControlledItem(Registration registration)
+        private ContainerControlledItem(Registration registration)
         {
             Requires.IsNotNull(registration, "registration");
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
         }
 
-        public ContainerControlledItem(Type serviceType)
+        private ContainerControlledItem(Type implementationType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            this.ImplementationType = serviceType;
+            Requires.IsNotNull(implementationType, "implementationType");
+            this.ImplementationType = implementationType;
+        }
+        
+        public static ContainerControlledItem CreateFromRegistration(Registration registration)
+        {
+            return new ContainerControlledItem(registration);
+        }
+
+        public static ContainerControlledItem CreateFromType(Type implementationType)
+        {
+            return new ContainerControlledItem(implementationType);
         }
     }
 }
