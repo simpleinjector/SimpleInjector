@@ -189,6 +189,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterByTypeTests.cs">
       <Link>RegisterByTypeTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterCollectionDuplicateRegistrationTests.cs">
+      <Link>RegisterCollectionDuplicateRegistrationTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterConcreteTests.cs">
       <Link>RegisterConcreteTests.cs</Link>
     </Compile>

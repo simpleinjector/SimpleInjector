@@ -193,26 +193,31 @@ namespace SimpleInjector.Internals
 
         private void CheckForOverlappingRegistrations(Type serviceType)
         {
-            var overlappingGroups =
-                from registrationGroup in this.registrationGroups
-                where !registrationGroup.Appended
-                where registrationGroup.ServiceType == serviceType 
-                    || serviceType.ContainsGenericParameters
-                    || registrationGroup.ServiceType.ContainsGenericParameters
-                select registrationGroup;
+            var overlappingGroups = this.GetOverlappingGroupsFor(serviceType);
 
             if (overlappingGroups.Any())
             {
                 if (!serviceType.ContainsGenericParameters &&
                     overlappingGroups.Any(group => group.ServiceType == serviceType))
                 {
-                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(
-                        typeof(IEnumerable<>).MakeGenericType(serviceType)));
+                    throw new InvalidOperationException(
+                        StringResources.CollectionTypeAlreadyRegistered(serviceType));
                 }
 
                 throw new InvalidOperationException(
                     StringResources.MixingCallsToRegisterCollectionIsNotSupported(serviceType));
             }
+        }
+
+        private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType)
+        {
+            return
+                from registrationGroup in this.registrationGroups
+                where !registrationGroup.Appended
+                where registrationGroup.ServiceType == serviceType
+                    || serviceType.ContainsGenericParameters
+                    || registrationGroup.ServiceType.ContainsGenericParameters
+                select registrationGroup;
         }
 
         private class RegistrationGroup

@@ -60,6 +60,10 @@
     {
     }
 
+    public class GenericEventHandler<TEvent> : IEventHandler<TEvent>
+    {
+    }
+
     public class NewConstraintEventHandler<TEvent> : IEventHandler<TEvent> where TEvent : new()
     {
     }

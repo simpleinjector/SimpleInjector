@@ -1575,67 +1575,6 @@
         }
 
         [TestMethod]
-        public void RegisterAll_ForClosedGenericCollectionAfterACallOfThatOpenGenericVersion_Fails()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
-
-            // Act
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<AuditableEvent>), new[]
-            {
-                typeof(AuditableEventEventHandler)
-            });
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
-                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
-                .TrimInside(),
-                action);
-        }
-
-        [TestMethod]
-        public void RegisterAll_ForAnOpenGenericCollectionAfterACallOfAClosedGenericVersion_Fails()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterCollection(typeof(IEventHandler<AuditableEvent>), new[]
-            {
-                typeof(AuditableEventEventHandler)
-            });
-
-            // Act 
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
-                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
-                .TrimInside(),
-                action);
-        }
-
-        [TestMethod]
-        public void RegisterAll_CalledTwiceOnTheSameClosedGenericType_ThrowsTheExpectedExceptionmessage()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
-
-            // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
-                action);
-        }
-
-        [TestMethod]
         public void RegisterAllClosedGeneric_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange

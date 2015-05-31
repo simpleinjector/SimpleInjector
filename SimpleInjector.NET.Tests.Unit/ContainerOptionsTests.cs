@@ -56,25 +56,6 @@
         }
 
         [TestMethod]
-        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowOverridingRegistrationOfCollections()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.AllowOverridingRegistrations = false;
-
-            container.RegisterCollection(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
-
-            // Act
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<ClassEvent>), new[] 
-            {
-                typeof(ClassConstraintEventHandler<ClassEvent>) 
-            });
-
-            // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
-        }
-
-        [TestMethod]
         public void AllowOverridingRegistrations_SetToFalse_ContainerAllowsRegistrationOfUnrelatedCollections()
         {
             // Arrange
@@ -112,22 +93,6 @@
             // Assert
             Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(ClassConstraintEventHandler<ClassEvent>),
                 "Actual: " + handlers.ToFriendlyNamesText());
-        }
-
-        [TestMethod]
-        public void AllowOverridingRegistrations_SetToFalse_ContainerDoesNotAllowDuplicateRegistrationsForAnOpenGenericType()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.AllowOverridingRegistrations = false;
-
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
-
-            // Act
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
-
-            // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         [TestMethod]
