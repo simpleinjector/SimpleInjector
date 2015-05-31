@@ -331,6 +331,7 @@
 
         private static void Assert_RegisterCollectionWithAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
+            where TService : class
         {
             // Arrange
             var container = ContainerFactory.New();

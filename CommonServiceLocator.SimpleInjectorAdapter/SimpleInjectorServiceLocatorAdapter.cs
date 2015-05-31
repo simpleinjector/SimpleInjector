@@ -24,6 +24,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -64,7 +65,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
         {
             try
             {
-                return this.container.GetAllInstances<TService>();
+                return this.container.GetAllInstances(typeof(TService)).Cast<TService>();
             }
             catch (SimpleInjector.ActivationException ex)
             {
