@@ -95,7 +95,7 @@ namespace SimpleInjector
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
             this.injectionBehavior = new DefaultConstructorInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
-            this.lifestyleBehavior = new TransientLifestyleSelectionBehavior();
+            this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(Lifestyle.Transient);
             this.batchRegistrationBehavior = new DefaultBatchRegistrationBehavior(container);
         }
 
@@ -328,7 +328,7 @@ namespace SimpleInjector
                     descriptions.Add("Custom Property Selection");
                 }
 
-                if (!(this.LifestyleSelectionBehavior is TransientLifestyleSelectionBehavior))
+                if (!(this.LifestyleSelectionBehavior is DefaultLifestyleSelectionBehavior))
                 {
                     descriptions.Add("Custom Lifestyle Selection");
                 }

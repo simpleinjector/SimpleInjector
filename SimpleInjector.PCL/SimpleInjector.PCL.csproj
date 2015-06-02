@@ -64,6 +64,9 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
       <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultLifestyleSelectionBehavior.cs">
+      <Link>Advanced\DefaultLifestyleSelectionBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultPropertySelectionBehavior.cs">
       <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
     </Compile>
@@ -102,9 +105,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\PropertyInjectionHelper.cs">
       <Link>Advanced\PropertyInjectionHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\TransientLifestyleSelectionBehavior.cs">
-      <Link>Advanced\TransientLifestyleSelectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Common.cs">
       <Link>Container.Common.cs</Link>
