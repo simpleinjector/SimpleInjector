@@ -122,6 +122,30 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
+        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// service types supplied by the given <paramref name="registrations"/> instances.
+        /// </exception>
+        public void RegisterCollection<TService>(IEnumerable<Registration> registrations)
+            where TService : class
+        {
+            this.RegisterCollection(typeof(TService), registrations);
+        }
+
+        /// <summary>
         /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
         /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
         /// The underlying collection is a stream that will return individual instances based on their 
