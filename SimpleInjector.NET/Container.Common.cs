@@ -30,6 +30,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
@@ -397,18 +398,16 @@ namespace SimpleInjector
         }
 
         /// <summary>Prevents any new registrations to be made to the container.</summary>
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal void LockContainer()
         {
             if (!this.locked)
             {
-                // By using a lock, we have the certainty that all threads will see the new value for 'locked'
-                // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
-                lock (this.locker)
-                {
-                    GetStackTrace(ref this.stackTraceThatLockedTheContainer);
-
-                    this.locked = true;
-                }
+                // Performance optimization: The real locking is moved to another method to allow this method
+                // to be in-lined.
+                this.FlagContainerAsLocked();
             }
         }
 
@@ -478,6 +477,18 @@ namespace SimpleInjector
             InitializationContext context, Func<object> wrappedProducer)
         {
             return () => ThrowWhenResolveInterceptorReturnsNull(interceptor(context, wrappedProducer));
+        }
+
+        private void FlagContainerAsLocked()
+        {
+            // By using a lock, we have the certainty that all threads will see the new value for 'locked'
+            // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
+            lock (this.locker)
+            {
+                GetStackTrace(ref this.stackTraceThatLockedTheContainer);
+
+                this.locked = true;
+            }
         }
 
         static partial void GetStackTrace(ref string stackTrace);

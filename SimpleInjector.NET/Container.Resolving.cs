@@ -45,11 +45,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public TService GetInstance<TService>() where TService : class
         {
-            // Performance optimization: This if check is a duplicate to save a call to LockContainer.
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             InstanceProducer instanceProducer;
 
@@ -79,10 +75,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public object GetInstance(Type serviceType)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             InstanceProducer instanceProducer;
 
@@ -132,10 +125,7 @@ namespace SimpleInjector
             Justification = "Users are not expected to inherit from this class and override this implementation.")]
         object IServiceProvider.GetService(Type serviceType)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             InstanceProducer instanceProducer;
 
@@ -210,10 +200,7 @@ namespace SimpleInjector
         internal InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure,
             bool autoCreateConcreteTypes)
         {
-            if (!this.locked)
-            {
-                this.LockContainer();
-            }
+            this.LockContainer();
 
             var producer = this.GetRegistrationEvenIfInvalid(serviceType, autoCreateConcreteTypes);
 
