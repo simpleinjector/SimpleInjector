@@ -1592,7 +1592,7 @@
         }
 
         [TestMethod]
-        public void RegisterAllClosedGeneric_CalledAfterRegisterAllUncontrolledForSameType_ThrowsAlreadyRegisteredException()
+        public void RegisterAllClosedGenericControlled_CalledAfterRegisterAllUncontrolledForSameType_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1602,11 +1602,41 @@
             container.RegisterCollection<IEventHandler<AuditableEvent>>(uncontrolledCollection);
 
             // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] 
+                {
+                    typeof(AuditableEventEventHandler) 
+                });
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                You already made a registration for the IEventHandler<TEvent> type using one of the 
+                RegisterCollection overloads that registers container-uncontrolled collections, while this 
+                method registers container-controlled collections. Mixing calls for the same open generic 
+                service type is not supported."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterAllClosedGenericUncontrolled_CalledAfterRegisterAllControlledForSameType_ThrowsAlreadyRegisteredException()
+        {
+            // Arrange
+            var container = new Container();
+
+            var uncontrolledCollection = Enumerable.Empty<IEventHandler<AuditableEvent>>();
+                        
+            container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
+
+            // Act
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(uncontrolledCollection);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                You already made a registration for the IEventHandler<TEvent> type using one of the 
+                RegisterCollection overloads that registers container-controlled collections, while this 
+                method registers container-uncontrolled collections. Mixing calls for the same open generic 
+                service type is not supported."
+                .TrimInside(),
                 action);
         }
 
@@ -1677,7 +1707,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Collection of items for type IEventHandler<AuditableEvent> has already been registered",
+                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered.",
                 action);
         }
 
@@ -1697,7 +1727,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+                "Collection of items for type IEventHandler<AuditableEvent> has already been registered",
                 action);
         }
 

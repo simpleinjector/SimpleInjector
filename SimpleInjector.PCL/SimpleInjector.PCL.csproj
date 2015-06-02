@@ -277,6 +277,9 @@
     <Compile Include="..\SimpleInjector.NET\Internals\ArgumentMapping.cs">
       <Link>Internals\ArgumentMapping.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\CollectionResolver.cs">
+      <Link>Internals\CollectionResolver.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\CompilationHelpers.cs">
       <Link>Internals\CompilationHelpers.cs</Link>
     </Compile>
@@ -291,9 +294,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollection.cs">
       <Link>Internals\ContainerControlledCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollectionResolver.cs">
-      <Link>Internals\ContainerControlledCollectionResolver.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledItem.cs">
       <Link>Internals\ContainerControlledItem.cs</Link>

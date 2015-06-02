@@ -23,6 +23,8 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Threading;
     using SimpleInjector.Advanced;
@@ -54,6 +56,19 @@ namespace SimpleInjector.Lifestyles
 
             return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
                 instance, Lifestyle.Singleton, container);
+        }
+
+        internal static Registration CreateUncontrolledCollectionRegistration(Type itemType, 
+            IEnumerable collection, Container container)
+        {
+            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
+
+            var registration =
+                SingletonLifestyle.CreateSingleInstanceRegistration(enumerableType, collection, container);
+
+            registration.IsCollection = true;
+
+            return registration;
         }
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(

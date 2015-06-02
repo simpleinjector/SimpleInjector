@@ -1407,11 +1407,12 @@
             // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
+            // Verify() ensures that all Relationships are built.
             container.Verify();
 
             // Act
-            var relationships =
-                container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>)).GetRelationships();
+            var registration = container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
+            var relationships = registration.GetRelationships();
 
             // Assert
             Assert.AreEqual(1, relationships.Length);

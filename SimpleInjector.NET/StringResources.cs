@@ -678,7 +678,20 @@ namespace SimpleInjector
                 "supported. Consider making one single call to RegisterCollection(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
         }
-
+        
+        internal static string MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(Type serviceType,
+            bool controlled)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "You already made a registration for the {0} type using one of the RegisterCollection " +
+                "overloads that registers container-{1} collections, while this method registers container-" +
+                "{2} collections. Mixing calls for the same open generic service type is not supported. " +
+                "Consider making both call either using uncontrolled overloads or the controlled overloads.",
+                serviceType.GetGenericTypeDefinition().ToFriendlyName(),
+                controlled ? "uncontrolled" : "controlled",
+                controlled ? "controlled" : "uncontrolled");
+        }
+        
         internal static string ValueInvalidForEnumType(string paramName, object invalidValue, Type enumClass)
         {
             return string.Format(CultureInfo.InvariantCulture,

@@ -89,15 +89,13 @@ namespace SimpleInjector
             }
 
             Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-            
-            var collection = DecoratorHelpers.CreateContainerControlledCollection(typeof(TService), this);
 
-            collection.AppendAll(
-                from instance in singletons
-                select SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this,
-                    instance.GetType()));
+            var registrations =
+                from singleton in singletons
+                select SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), singleton, this,
+                    singleton.GetType());
 
-            this.RegisterContainerControlledCollection(typeof(TService), collection);
+            this.RegisterCollection(typeof(TService), registrations);
         }
 
         /// <summary>
@@ -257,8 +255,8 @@ namespace SimpleInjector
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
-            var items = serviceTypes.Select(ContainerControlledItem.CreateFromType).ToArray();
-            this.RegisterCollectionInternal(itemType, items);
+            var controlledItems = serviceTypes.Select(ContainerControlledItem.CreateFromType).ToArray();
+            this.RegisterCollectionInternal(itemType, controlledItems);
         }
 
         private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] registrations,
@@ -268,7 +266,7 @@ namespace SimpleInjector
 
             if (itemType.IsGenericType)
             {
-                this.RegisterGenericCollection(itemType, registrations, appending);
+                this.RegisterGenericContainerControlledCollection(itemType, registrations, appending);
             }
             else
             {
@@ -276,35 +274,14 @@ namespace SimpleInjector
             }
         }
 
-        private void RegisterGenericCollection(Type itemType, ContainerControlledItem[] registrations,
-            bool appending)
+        private void RegisterGenericContainerControlledCollection(Type itemType, 
+            ContainerControlledItem[] registrations, bool appending)
         {
-            ContainerControlledCollectionResolver resolver = this.GetControlledCollectionResolver(itemType);
+            CollectionResolver resolver = this.GetContainerControlledResolver(itemType);
 
-            resolver.AddRegistrations(itemType, registrations,
+            resolver.AddControlledRegistrations(itemType, registrations,
                 append: appending,
                 allowOverridingRegistrations: this.Options.AllowOverridingRegistrations);
-        }
-
-        private ContainerControlledCollectionResolver GetControlledCollectionResolver(Type itemType)
-        {
-            ContainerControlledCollectionResolver resolver;
-
-            Type openGenericServiceType = itemType.GetGenericTypeDefinition();
-
-            if (!this.collectionResolvers.TryGetValue(openGenericServiceType, out resolver))
-            {
-                this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(itemType));
-
-                resolver = new ContainerControlledCollectionResolver(this, openGenericServiceType);
-
-                this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
-                this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
-
-                this.collectionResolvers.Add(openGenericServiceType, resolver);
-            }
-
-            return resolver;
         }
 
         private void RegisterNonGenericCollection(Type itemType, ContainerControlledItem[] registrations,
@@ -352,6 +329,14 @@ namespace SimpleInjector
             instance.AppendAll(registrations);
         }
 
+        private void RegisterGenericContainerUncontrolledCollection(Type itemType, IEnumerable collection)
+        {
+            var resolver = this.GetContainerUncontrolledResolver(itemType);
+
+            resolver.RegisterUncontrolledCollection(itemType, collection, 
+                allowOverridingRegistrations: this.Options.AllowOverridingRegistrations);
+        }
+
         private void RegisterContainerControlledCollection(Type serviceType,
             ContainerControlledItem[] registrations)
         {
@@ -384,14 +369,50 @@ namespace SimpleInjector
             IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
 
-            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
+            if (itemType.IsGenericType)
+            {
+                this.RegisterGenericContainerUncontrolledCollection(itemType, containerUncontrolledCollection);
+            }
+            else
+            {
+                var registration =
+                    SingletonLifestyle.CreateUncontrolledCollectionRegistration(itemType, castedCollection, this);
 
-            var registration = 
-                SingletonLifestyle.CreateSingleInstanceRegistration(enumerableType, castedCollection, this);
+                Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
-            registration.IsCollection = true;
+                this.AddRegistration(enumerableType, registration);
+            }
+        }
 
-            this.AddRegistration(enumerableType, registration);
+        private CollectionResolver GetContainerControlledResolver(Type itemType)
+        {
+            return this.GetCollectionResolver(itemType, containerControlled: true);
+        }
+
+        private CollectionResolver GetContainerUncontrolledResolver(Type itemType)
+        {
+            return this.GetCollectionResolver(itemType, containerControlled: false);
+        }
+
+        private CollectionResolver GetCollectionResolver(Type itemType, bool containerControlled)
+        {
+            CollectionResolver resolver;
+
+            Type openGenericServiceType = itemType.GetGenericTypeDefinition();
+
+            if (!this.collectionResolvers.TryGetValue(openGenericServiceType, out resolver))
+            {
+                this.ThrowWhenTypeAlreadyRegistered(typeof(IEnumerable<>).MakeGenericType(itemType));
+
+                resolver = CollectionResolver.Create(this, openGenericServiceType, containerControlled);
+
+                this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+                this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
+
+                this.collectionResolvers.Add(openGenericServiceType, resolver);
+            }
+
+            return resolver;
         }
 
         private void ThrowWhenCollectionTypeAlreadyRegistered(Type itemType)

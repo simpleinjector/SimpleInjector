@@ -189,8 +189,14 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterByTypeTests.cs">
       <Link>RegisterByTypeTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterCollectionBatchTests.cs">
+      <Link>RegisterCollectionBatchTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterCollectionDuplicateRegistrationTests.cs">
       <Link>RegisterCollectionDuplicateRegistrationTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterCollectionTests.cs">
+      <Link>RegisterCollectionTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterConcreteTests.cs">
       <Link>RegisterConcreteTests.cs</Link>

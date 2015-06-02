@@ -7,7 +7,8 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
-    /// This set of tests control whether the container correctly prevents duplicate registrations of collections.
+    /// This set of tests control whether the container correctly prevents duplicate registrations of 
+    /// collections and correctly replaces a collection in case overriding registrations is allowed.
     /// </summary>
     [TestClass]
     public class RegisterCollectionDuplicateRegistrationTests

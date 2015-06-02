@@ -383,13 +383,9 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType,
             bool autoCreateConcreteTypes = true)
         {
-            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType = () => null;
-
-            if (autoCreateConcreteTypes)
-            {
-                tryBuildInstanceProducerForConcreteType =
-                    () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType);
-            }
+            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType = autoCreateConcreteTypes
+                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
+                : (Func<InstanceProducer>)(() => null);
 
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcreteType);
         }

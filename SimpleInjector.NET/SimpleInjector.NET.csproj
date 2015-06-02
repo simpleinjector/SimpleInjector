@@ -106,7 +106,7 @@
     <Compile Include="Internals\ReferenceEqualityComparer.cs" />
     <Compile Include="Internals\SubExpressionReplacer.cs" />
     <Compile Include="Internals\ContainerControlledItem.cs" />
-    <Compile Include="Internals\ContainerControlledCollectionResolver.cs" />
+    <Compile Include="Internals\CollectionResolver.cs" />
     <Compile Include="Internals\UnregisteredOpenGenericResolver.cs" />
     <Compile Include="Container.Obsolete.cs" />
     <Compile Include="Container.Registration.Batch.cs" />

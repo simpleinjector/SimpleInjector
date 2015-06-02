@@ -205,6 +205,27 @@ namespace SimpleInjector
             return instanceInitializer.Compile();
         }
 
+        internal static IEnumerable ConcatCollections(Type resultType, IEnumerable<IEnumerable> collections)
+        {           
+            collections = collections.ToArray();
+
+            IEnumerable concattedCollection = collections.First();
+
+            foreach (IEnumerable collection in collections.Skip(1))
+            {
+                concattedCollection = ConcatCollection(resultType, concattedCollection, collection);
+            }
+
+            return concattedCollection;
+        }
+
+        internal static IEnumerable ConcatCollection(Type resultType, IEnumerable first, IEnumerable second)
+        {
+            var concatMethod = typeof(Enumerable).GetMethod("Concat").MakeGenericMethod(resultType);
+
+            return (IEnumerable)concatMethod.Invoke(null, new[] { first, second });
+        }
+
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 

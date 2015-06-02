@@ -83,8 +83,8 @@ namespace SimpleInjector
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
 
-        private readonly Dictionary<Type, ContainerControlledCollectionResolver> collectionResolvers =
-            new Dictionary<Type, ContainerControlledCollectionResolver>();
+        private readonly Dictionary<Type, CollectionResolver> collectionResolvers =
+            new Dictionary<Type, CollectionResolver>();
 
         private Dictionary<Type, InstanceProducer> producers =
             new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);

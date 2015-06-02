@@ -11,7 +11,7 @@
     public class RegisterCollectionTests
     {
         public interface ILogStuf
-        { 
+        {
         }
 
         [TestMethod]
@@ -101,9 +101,9 @@
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(InternalEventHandler<>), typeof(InternalEventHandler<>), Lifestyle.Singleton);
+            container.Register(typeof(GenericEventHandler<>), typeof(GenericEventHandler<>), Lifestyle.Singleton);
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(InternalEventHandler<>) });
+            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(GenericEventHandler<>) });
 
             // Act
             var handler1 = container.GetAllInstances<IEventHandler<int>>().Single();
@@ -329,6 +329,57 @@
             Assert.AreEqual(1, doubleHandlers.Length, doubleHandlers.Select(h => h.GetType()).ToFriendlyNamesText());
         }
 
+        [TestMethod]
+        public void GetAllInstances_TwoUncontrolledVariantCollectionsRegisteredWithTService_ResolvesInstancesThroughBaseType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection<ITypeConverter<DerivedA>>(Enumerable.Repeat(new DerivedAConverter(), 1));
+            container.RegisterCollection<ITypeConverter<DerivedB>>(Enumerable.Repeat(new DerivedBConverter(), 1));
+
+            // Act
+            var baseConverters = container.GetAllInstances<ITypeConverter<BaseClass>>();
+            var types = baseConverters.Select(b => b.GetType()).ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(new[] { typeof(DerivedAConverter), typeof(DerivedBConverter) }, types);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_TwoUncontrolledVariantCollections_ResolvesInstancesThroughBaseType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(ITypeConverter<DerivedA>), new[] { new DerivedAConverter() });
+            container.RegisterCollection(typeof(ITypeConverter<DerivedB>), new[] { new DerivedBConverter() });
+
+            // Act
+            var baseConverters = container.GetAllInstances<ITypeConverter<BaseClass>>();
+            var types = baseConverters.Select(b => b.GetType()).ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(new[] { typeof(DerivedAConverter), typeof(DerivedBConverter) }, types);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_TwoUncontrolledVariantCollections2_ResolvesInstancesThroughBaseType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection<ITypeConverter<DerivedA>>(new[] { new DerivedAConverter() });
+            container.RegisterCollection<ITypeConverter<DerivedB>>(new[] { new DerivedBConverter() });
+
+            // Act
+            var baseConverters = container.GetAllInstances<ITypeConverter<BaseClass>>();
+            var types = baseConverters.Select(b => b.GetType()).ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(new[] { typeof(DerivedAConverter), typeof(DerivedBConverter) }, types);
+        }
+
         private static void Assert_RegisterCollectionWithAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
             where TService : class
@@ -374,7 +425,32 @@
         {
         }
 
-        internal class LogStuff3 : ILogStuf
+        public class LogStuff3 : ILogStuf
+        {
+        }
+
+        public interface ITypeConverter<out TBase>
+        {
+            // TBase ConvertFromString(string value);
+        }
+
+        public class BaseClass
+        {
+        }
+
+        public class DerivedA : BaseClass
+        {
+        }
+
+        public class DerivedB : BaseClass
+        {
+        }
+
+        public class DerivedAConverter : ITypeConverter<DerivedA>
+        {
+        }
+
+        public class DerivedBConverter : ITypeConverter<DerivedB>
         {
         }
     }
