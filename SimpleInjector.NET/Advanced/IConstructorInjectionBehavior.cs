@@ -51,16 +51,12 @@ namespace SimpleInjector.Advanced
         Expression BuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter);
 
         /// <summary>Verifies the specified <paramref name="parameter"/>.</summary>
-        /// <param name="serviceType">The service type of the consuming type that contains the given
-        /// <paramref name="parameter"/>.</param>
-        /// <param name="implementationType">The implementation type of the consuming type that contains the 
-        /// given <paramref name="parameter"/>.</param>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ActivationException">Thrown when the <paramref name="parameter"/> cannot be 
         /// used for auto wiring.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
         /// reference.</exception>
-        void Verify(Type serviceType, Type implementationType, ParameterInfo parameter);
+        void Verify(ParameterInfo parameter);
     }
 }

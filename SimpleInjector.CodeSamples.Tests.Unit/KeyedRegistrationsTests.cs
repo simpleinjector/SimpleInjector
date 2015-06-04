@@ -161,9 +161,9 @@
                 return this.defaultBehavior.BuildParameterExpression(serviceType, implementationType, parameter);
             }
 
-            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+            public void Verify(ParameterInfo parameter)
             {
-                this.defaultBehavior.Verify(serviceType, implementationType, parameter);
+                this.defaultBehavior.Verify(parameter);
             }
         }
     }

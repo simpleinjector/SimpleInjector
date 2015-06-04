@@ -103,7 +103,7 @@
             try
             {
                 // Act
-                behavior.Verify(constructor.DeclaringType, constructor.DeclaringType, invalidParameter);
+                behavior.Verify(invalidParameter);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -135,7 +135,7 @@
             try
             {
                 // Act
-                behavior.Verify(constructor.DeclaringType, constructor.DeclaringType, invalidParameter);
+                behavior.Verify(invalidParameter);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -175,7 +175,7 @@
                 return this.ExpressionToReturnFromBuildParameterExpression;
             }
 
-            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+            public void Verify(ParameterInfo parameter)
             {
             }
         }

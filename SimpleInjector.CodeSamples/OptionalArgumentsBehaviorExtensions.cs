@@ -39,11 +39,11 @@
         }
 
         [DebuggerStepThrough]
-        public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+        public void Verify(ParameterInfo parameter)
         {
             if (!IsOptional(parameter))
             {
-                this.original.Verify(serviceType, implementationType, parameter);
+                this.original.Verify(parameter);
             }
         }
 

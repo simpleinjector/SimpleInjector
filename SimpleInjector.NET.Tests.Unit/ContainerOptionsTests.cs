@@ -641,7 +641,7 @@
                 throw new NotImplementedException();
             }
 
-            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+            public void Verify(ParameterInfo parameter)
             {
                 throw new NotImplementedException();
             }

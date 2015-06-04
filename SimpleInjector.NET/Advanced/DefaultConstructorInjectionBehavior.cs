@@ -43,16 +43,14 @@ namespace SimpleInjector.Advanced
             Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
-            InstanceProducer producer = this.GetInstanceProducerFor(serviceType, implementationType, parameter);
+            InstanceProducer producer = this.GetInstanceProducerFor(parameter);
             
             // When the instance producer is invalid, this call will fail with an expressive exception.
             return producer.BuildExpression();
         }
 
-        public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+        public void Verify(ParameterInfo parameter)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
             if (parameter.ParameterType.IsValueType || parameter.ParameterType == typeof(string))
@@ -64,15 +62,13 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private InstanceProducer GetInstanceProducerFor(Type serviceType, Type implementationType, 
-            ParameterInfo parameter)
+        private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
         {
             InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
             
             if (producer == null)
             {
-                this.container.Options.ConstructorInjectionBehavior.Verify(serviceType, implementationType, 
-                    parameter);
+                this.container.Options.ConstructorInjectionBehavior.Verify(parameter);
 
                 throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
                     parameter.Member.DeclaringType, parameter));

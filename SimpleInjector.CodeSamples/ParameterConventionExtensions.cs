@@ -51,11 +51,11 @@
             }
             
             [DebuggerStepThrough]
-            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
+            public void Verify(ParameterInfo parameter)
             {
                 if (!this.convention.CanResolve(parameter))
                 {
-                    this.decorated.Verify(serviceType, implementationType, parameter);
+                    this.decorated.Verify(parameter);
                 }
             }
         }

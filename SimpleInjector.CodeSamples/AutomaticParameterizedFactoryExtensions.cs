@@ -226,12 +226,11 @@
                 this.originalBehavior = options.ConstructorInjectionBehavior;
             }
 
-            void IConstructorInjectionBehavior.Verify(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            void IConstructorInjectionBehavior.Verify(ParameterInfo parameter)
             {
                 if (this.FindThreadLocal(parameter) == null)
                 {
-                    this.originalBehavior.Verify(serviceType, implementationType, parameter);
+                    this.originalBehavior.Verify(parameter);
                 }
             }
 
