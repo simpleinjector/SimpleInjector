@@ -635,12 +635,13 @@
 
         private sealed class AlternativeConstructorInjectionBehavior : IConstructorInjectionBehavior
         {
-            public Expression BuildParameterExpression(ParameterInfo parameter)
+            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
                 throw new NotImplementedException();
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
             {
                 throw new NotImplementedException();
             }

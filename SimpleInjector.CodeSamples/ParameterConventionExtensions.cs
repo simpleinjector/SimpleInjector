@@ -14,7 +14,7 @@
     {
         bool CanResolve(ParameterInfo parameter);
 
-        Expression BuildExpression(ParameterInfo parameter);
+        Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter);
     }
 
     public static class ParameterConventionExtensions
@@ -39,22 +39,23 @@
             }
 
             [DebuggerStepThrough]
-            public Expression BuildParameterExpression(ParameterInfo parameter)
+            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
                 if (!this.convention.CanResolve(parameter))
                 {
-                    return this.decorated.BuildParameterExpression(parameter);
+                    return this.decorated.BuildParameterExpression(serviceType, implementationType, parameter);
                 }
 
-                return this.convention.BuildExpression(parameter);
+                return this.convention.BuildExpression(serviceType, implementationType, parameter);
             }
             
             [DebuggerStepThrough]
-            public void Verify(ParameterInfo parameter)
+            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
             {
                 if (!this.convention.CanResolve(parameter))
                 {
-                    this.decorated.Verify(parameter);
+                    this.decorated.Verify(serviceType, implementationType, parameter);
                 }
             }
         }
@@ -81,7 +82,7 @@
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(ParameterInfo parameter)
+        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             string connectionString = GetConnectionString(parameter);
 
@@ -136,7 +137,7 @@
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(ParameterInfo parameter)
+        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             object valueToInject = GetAppSettingValue(parameter);
 
@@ -189,11 +190,12 @@
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(ParameterInfo parameter)
+        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             try
             {
-                return this.injectionBehavior.BuildParameterExpression(parameter);
+                return this.injectionBehavior.BuildParameterExpression(serviceType, implementationType,
+                    parameter);
             }
             catch (ActivationException)
             {

@@ -60,6 +60,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Class constraint "where TService : class" added to GetAllInstances<TService>() method.
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
+		-[Core] Extra parameters added to IConstructorInjectionBehavior methods BuildParameterExpression and
+		 Verify.
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
 		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).
 		-[Web] Removed the SimpleInjectorWebExtensions.RegisterForDisposal method (fixes #12).

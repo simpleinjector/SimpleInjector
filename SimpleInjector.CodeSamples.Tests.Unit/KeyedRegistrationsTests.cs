@@ -148,7 +148,8 @@
                 this.keyedProducerRetriever = keyedProducerRetriever;
             }
 
-            public Expression BuildParameterExpression(ParameterInfo parameter)
+            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
                 var attribute = parameter.GetCustomAttribute<NamedAttribute>();
 
@@ -157,12 +158,12 @@
                     return this.keyedProducerRetriever(parameter.ParameterType, attribute.Name).BuildExpression();
                 }
 
-                return this.defaultBehavior.BuildParameterExpression(parameter);
+                return this.defaultBehavior.BuildParameterExpression(serviceType, implementationType, parameter);
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
             {
-                this.defaultBehavior.Verify(parameter);
+                this.defaultBehavior.Verify(serviceType, implementationType, parameter);
             }
         }
     }

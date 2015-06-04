@@ -226,15 +226,17 @@
                 this.originalBehavior = options.ConstructorInjectionBehavior;
             }
 
-            void IConstructorInjectionBehavior.Verify(ParameterInfo parameter)
+            void IConstructorInjectionBehavior.Verify(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
                 if (this.FindThreadLocal(parameter) == null)
                 {
-                    this.originalBehavior.Verify(parameter);
+                    this.originalBehavior.Verify(serviceType, implementationType, parameter);
                 }
             }
 
-            Expression IConstructorInjectionBehavior.BuildParameterExpression(ParameterInfo parameter)
+            Expression IConstructorInjectionBehavior.BuildParameterExpression(Type serviceType,
+                Type implementationType, ParameterInfo parameter)
             {
                 var local = this.FindThreadLocal(parameter);
 
@@ -251,7 +253,7 @@
                         parameter.ParameterType);
                 }
 
-                return this.originalBehavior.BuildParameterExpression(parameter);
+                return this.originalBehavior.BuildParameterExpression(serviceType, implementationType, parameter);
             }
 
             // Called by RegisterFactory<TFactory>

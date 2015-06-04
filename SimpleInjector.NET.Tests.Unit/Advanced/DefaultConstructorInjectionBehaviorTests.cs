@@ -11,16 +11,42 @@
     public class DefaultConstructorInjectionBehaviorTests
     {
         [TestMethod]
-        public void BuildParameterExpression_WithNullArgument_ThrowsExpectedException()
+        public void BuildParameterExpression_WithNullParameterArgument_ThrowsExpectedException()
         {
             // Arrange
             var behavior = GetContainerOptions().ConstructorInjectionBehavior;
 
             // Act
-            Action action = () => behavior.BuildParameterExpression(null);
+            Action action = () => behavior.BuildParameterExpression(typeof(object), typeof(object), null);
 
             // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("parameter", action);
+        }
+        
+        [TestMethod]
+        public void BuildParameterExpression_WithNullImplementationTypeArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
+
+            // Act
+            Action action = () => behavior.BuildParameterExpression(typeof(object), null, null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("implementationType", action);
+        }
+
+        [TestMethod]
+        public void BuildParameterExpression_WithNullServiceTypeArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
+
+            // Act
+            Action action = () => behavior.BuildParameterExpression(null, null, null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceType", action);
         }
 
         [TestMethod]
@@ -77,7 +103,7 @@
             try
             {
                 // Act
-                behavior.Verify(invalidParameter);
+                behavior.Verify(constructor.DeclaringType, constructor.DeclaringType, invalidParameter);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -109,7 +135,7 @@
             try
             {
                 // Act
-                behavior.Verify(invalidParameter);
+                behavior.Verify(constructor.DeclaringType, constructor.DeclaringType, invalidParameter);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -143,12 +169,13 @@
         {
             public Expression ExpressionToReturnFromBuildParameterExpression { get; set; }
 
-            public Expression BuildParameterExpression(ParameterInfo parameter)
+            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
                 return this.ExpressionToReturnFromBuildParameterExpression;
             }
-            
-            public void Verify(ParameterInfo parameter)
+
+            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
             {
             }
         }

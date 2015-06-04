@@ -420,10 +420,12 @@ namespace SimpleInjector
 
             this.AddConstructorParametersAsKnownRelationship(constructor);
 
-            return Expression.New(constructor, this.BuildConstructorParameters(constructor));
+            return Expression.New(constructor, 
+                this.BuildConstructorParameters(serviceType, implementationType, constructor));
         }
 
-        private Expression[] BuildConstructorParameters(ConstructorInfo constructor)
+        private Expression[] BuildConstructorParameters(Type serviceType, Type implementationType,
+            ConstructorInfo constructor)
         {
             // NOTE: We used to use a LINQ query here (which is cleaner code), but we reverted back to using
             // a foreach statement to clean up the stack trace, since this is a very common code path to
@@ -435,8 +437,8 @@ namespace SimpleInjector
             {
                 var overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
-                var parameterExpression =
-                    overriddenExpression ?? this.Container.Options.BuildParameterExpression(parameter);
+                var parameterExpression = overriddenExpression ?? 
+                    this.Container.Options.BuildParameterExpression(serviceType, implementationType, parameter);
 
                 parameters.Add(parameterExpression);
             }

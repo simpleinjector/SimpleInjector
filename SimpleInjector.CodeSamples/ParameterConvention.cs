@@ -16,7 +16,7 @@
             return this.GetParameter(parameter) != null;
         }
 
-        Expression IParameterConvention.BuildExpression(ParameterInfo parameter)
+        Expression IParameterConvention.BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             return this.GetParameter(parameter).Expression;
         }

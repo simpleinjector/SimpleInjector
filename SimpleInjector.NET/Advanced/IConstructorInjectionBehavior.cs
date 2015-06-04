@@ -39,18 +39,28 @@ namespace SimpleInjector.Advanced
         /// Builds an <see cref="Expression"/> for the supplied <paramref name="parameter"/>, based on the
         /// container's configuration.
         /// </summary>
+        /// <param name="serviceType">The service type of the consuming type that contains the given
+        /// <paramref name="parameter"/>.</param>
+        /// <param name="implementationType">The implementation type of the consuming type that contains the 
+        /// given <paramref name="parameter"/>.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
         /// <paramref name="parameter"/>. This method never returns null.</returns>
-        Expression BuildParameterExpression(ParameterInfo parameter);
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference.</exception>
+        Expression BuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter);
 
         /// <summary>Verifies the specified <paramref name="parameter"/>.</summary>
+        /// <param name="serviceType">The service type of the consuming type that contains the given
+        /// <paramref name="parameter"/>.</param>
+        /// <param name="implementationType">The implementation type of the consuming type that contains the 
+        /// given <paramref name="parameter"/>.</param>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ActivationException">Thrown when the <paramref name="parameter"/> cannot be 
         /// used for auto wiring.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameter"/> is a
-        /// null reference.</exception>
-        void Verify(ParameterInfo parameter);
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// reference.</exception>
+        void Verify(Type serviceType, Type implementationType, ParameterInfo parameter);
     }
 }

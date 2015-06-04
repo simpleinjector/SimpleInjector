@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
+    using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -26,22 +27,23 @@
         }
 
         [DebuggerStepThrough]
-        public Expression BuildParameterExpression(ParameterInfo parameter)
+        public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+            ParameterInfo parameter)
         {
             if (IsOptional(parameter) && !this.CanBeResolved(parameter))
             {
                 return Expression.Constant(parameter.DefaultValue, parameter.ParameterType);
             }
 
-            return this.original.BuildParameterExpression(parameter);
+            return this.original.BuildParameterExpression(serviceType, implementationType, parameter);
         }
 
         [DebuggerStepThrough]
-        public void Verify(ParameterInfo parameter)
+        public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             if (!IsOptional(parameter))
             {
-                this.original.Verify(parameter);
+                this.original.Verify(serviceType, implementationType, parameter);
             }
         }
 

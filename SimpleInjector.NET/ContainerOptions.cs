@@ -416,9 +416,11 @@ namespace SimpleInjector
             return constructor;
         }
 
-        internal Expression BuildParameterExpression(ParameterInfo parameter)
+        internal Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+            ParameterInfo parameter)
         {
-            Expression expression = this.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+            Expression expression = this.ConstructorInjectionBehavior.BuildParameterExpression(
+                serviceType, implementationType, parameter);
 
             if (expression == null)
             {

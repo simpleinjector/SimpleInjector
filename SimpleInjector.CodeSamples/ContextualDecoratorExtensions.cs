@@ -70,9 +70,11 @@
                 this.defaultBehavior = container.Options.ConstructorInjectionBehavior;
             }
 
-            public Expression BuildParameterExpression(ParameterInfo parameter)
+            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+                ParameterInfo parameter)
             {
-                var expression = this.defaultBehavior.BuildParameterExpression(parameter);
+                var expression = this.defaultBehavior.BuildParameterExpression(serviceType, implementationType,
+                    parameter);
 
                 List<PredicatePair> predicatePairs;
 
@@ -94,9 +96,9 @@
                 return expression;
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
             {
-                this.defaultBehavior.Verify(parameter);
+                this.defaultBehavior.Verify(serviceType, implementationType, parameter);
             }
 
             private bool MustApplyContextualDecorator(Type serviceType, out List<PredicatePair> predicatePairs)

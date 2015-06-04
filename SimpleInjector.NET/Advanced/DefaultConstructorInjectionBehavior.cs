@@ -22,6 +22,7 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -36,18 +37,22 @@ namespace SimpleInjector.Advanced
             this.container = container;
         }
 
-        public Expression BuildParameterExpression(ParameterInfo parameter)
+        public Expression BuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
-            InstanceProducer producer = this.GetInstanceProducerFor(parameter);
+            InstanceProducer producer = this.GetInstanceProducerFor(serviceType, implementationType, parameter);
             
             // When the instance producer is invalid, this call will fail with an expressive exception.
             return producer.BuildExpression();
         }
 
-        public void Verify(ParameterInfo parameter)
+        public void Verify(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
             if (parameter.ParameterType.IsValueType || parameter.ParameterType == typeof(string))
@@ -59,13 +64,15 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
+        private InstanceProducer GetInstanceProducerFor(Type serviceType, Type implementationType, 
+            ParameterInfo parameter)
         {
             InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
             
             if (producer == null)
             {
-                this.container.Options.ConstructorInjectionBehavior.Verify(parameter);
+                this.container.Options.ConstructorInjectionBehavior.Verify(serviceType, implementationType, 
+                    parameter);
 
                 throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
                     parameter.Member.DeclaringType, parameter));

@@ -30,7 +30,7 @@
         [DebuggerStepThrough]
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
-            var constructor = this.GetConstructorOrNull(implementationType);
+            var constructor = this.GetConstructorOrNull(serviceType, implementationType);
 
             if (constructor != null)
             {
@@ -41,33 +41,36 @@
         }
 
         [DebuggerStepThrough]
-        private ConstructorInfo GetConstructorOrNull(Type type)
+        private ConstructorInfo GetConstructorOrNull(Type serviceType, Type implementationType)
         {
             // We prevent calling GetRegistration during the registration phase, because at this point not
             // all dependencies might be registered, and calling GetRegistration would lock the container,
             // making it impossible to do other registrations.
             return (
-                from ctor in type.GetConstructors()
+                from ctor in implementationType.GetConstructors()
                 let parameters = ctor.GetParameters()
                 orderby parameters.Length descending
-                where this.IsCalledDuringRegistrationPhase || parameters.All(this.CanBeResolved)
+                where this.IsCalledDuringRegistrationPhase || 
+                    parameters.All(parameter => this.CanBeResolved(serviceType, implementationType, parameter))
                 select ctor)
                 .FirstOrDefault();
         }
 
         [DebuggerStepThrough]
-        private bool CanBeResolved(ParameterInfo parameter)
+        private bool CanBeResolved(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             return this.container.GetRegistration(parameter.ParameterType) != null ||
-                this.CanBuildParameterExpression(parameter);
+                this.CanBuildParameterExpression(serviceType, implementationType, parameter);
         }
 
         [DebuggerStepThrough]
-        private bool CanBuildParameterExpression(ParameterInfo parameter)
+        private bool CanBuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             try
             {
-                this.container.Options.ConstructorInjectionBehavior.BuildParameterExpression(parameter);
+                this.container.Options.ConstructorInjectionBehavior.BuildParameterExpression(
+                    serviceType, implementationType, parameter);
+
                 return true;
             }
             catch (ActivationException)
