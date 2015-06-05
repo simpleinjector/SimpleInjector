@@ -148,11 +148,6 @@ namespace SimpleInjector
             get { return this.Registration.ImplementationType ?? this.ServiceType; }
         }
 
-        internal InitializationContext InitializationContext
-        {
-            get { return this.initializationContext; }
-        }
-
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
         internal bool IsContainerAutoRegistered { get; set; }
