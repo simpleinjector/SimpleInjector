@@ -11,6 +11,21 @@
     [TestClass]
     public class ScopedLifestyleTests
     {
+        private static readonly string CannotAccessADisposedObjectMessage;
+
+        [DebuggerStepThrough]
+        static ScopedLifestyleTests()
+	    {
+            try
+            {
+                throw new ObjectDisposedException("Foo");
+            }
+            catch (ObjectDisposedException ex)
+            {
+                CannotAccessADisposedObjectMessage = ex.Message.Substring(0, ex.Message.IndexOf('.'));
+            }             
+	    }
+
         [TestMethod]
         public void Dispose_ListWithOneItem_DisposesItem()
         {
@@ -604,7 +619,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Cannot access a disposed object.",
+                CannotAccessADisposedObjectMessage,
                 action);
         }
 
