@@ -27,6 +27,8 @@ Version 3.0.0 (v3.0 RTM)
 		 (fixes #22).
 		-[Core] Resolving variant collections is now supported for container-uncontrolled collections as well
 		 (fixes #25).
+		-[Core] RegisterConditional methods added to make conditional registrations for both non-generic and
+		 closed-generic and open-generic types (fixes #4).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).

@@ -1801,6 +1801,32 @@
             AssertThat.SequenceEquals(expectedTypes, auditableHandlers.Select(h => h.GetType()));
         }
 
+        [TestMethod]
+        public void RegisterAllClosed_CalledAfterRegisterAllSingletonWithAllowOverridingRegistrations_CompletelyReplacesPrevious()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[] { typeof(AuditableEventEventHandler) };
+
+            var container = new Container();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.RegisterCollection<IEventHandler<AuditableEvent>>(new AuditableEventEventHandler<AuditableEvent>());
+
+            // Act
+            // Should Completely override the previous registration
+            container.RegisterCollection<IEventHandler<AuditableEvent>>(expectedHandlerTypes);
+
+            // Assert
+            var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>();
+
+            Type[] actualHandlerTypes = handlers.Select(handler => handler.GetType()).ToArray();
+
+            Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
+                "The original registration was expected to be replaced completely. Actual: " +
+                actualHandlerTypes.ToFriendlyNamesText());
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
