@@ -58,6 +58,14 @@ namespace SimpleInjector.Lifestyles
                 instance, Lifestyle.Singleton, container);
         }
 
+        internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType, 
+            IEnumerable collection, Container container)
+        {
+            return new InstanceProducer(
+                typeof(IEnumerable<>).MakeGenericType(itemType),
+                CreateUncontrolledCollectionRegistration(itemType, collection, container));
+        }
+
         internal static Registration CreateUncontrolledCollectionRegistration(Type itemType, 
             IEnumerable collection, Container container)
         {

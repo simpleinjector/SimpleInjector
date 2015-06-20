@@ -444,7 +444,7 @@
             {
                 Assert.IsTrue(ex.Message.Contains("The constructor of type " +
                     "InterceptorExtensionsTests.InterceptorWithDependencyOnLogger contains the parameter " +
-                    "of type ILogger with name 'logger' that is not registered."),
+                    "with name 'logger' and type ILogger that is not registered."),
                     "Actual: " + ex.Message);
             }
         }

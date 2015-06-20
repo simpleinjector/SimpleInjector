@@ -33,8 +33,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithUnregisteredDependencies contains the parameter 
-                    of type IDisposable with name 'a' that is not registered."
+                The constructor of type ServiceWithUnregisteredDependencies contains the parameter with name
+                'a' and type IDisposable that is not registered."
                 .TrimInside(),
                 action);
         }
@@ -51,7 +51,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithUnregisteredDependencies contains the parameter 
-                of type IDisposable with name 'a' that is not registered."
+                with name 'a' and type IDisposable that is not registered."
                 .TrimInside(),
                 action);
         }
@@ -68,7 +68,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithUnregisteredDependencies contains the parameter 
-                of type IDisposable with name 'a' that is not registered."
+                with name 'a' and type IDisposable that is not registered."
                 .TrimInside(),
                 action);
         }

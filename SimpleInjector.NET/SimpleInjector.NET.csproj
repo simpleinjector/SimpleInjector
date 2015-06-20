@@ -81,7 +81,10 @@
     <Compile Include="Advanced\AdvancedExtensions.cs" />
     <Compile Include="Advanced\DefaultBatchRegistrationBehavior.cs" />
     <Compile Include="Advanced\IBatchRegistrationBehavior.cs" />
+    <Compile Include="Container.Registration.Conditional.cs" />
     <Compile Include="Diagnostics\DiagnosticSeverity.enum.cs" />
+    <Compile Include="InjectionConsumerInfo.cs" />
+    <Compile Include="InjectionTargetInfo.cs" />
     <Compile Include="InstanceProducerOfT.cs" />
     <Compile Include="Internals\ConditionalHashSet.cs" />
     <Compile Include="Internals\ConstantArrayIndexizerVisitor.cs" />
@@ -96,6 +99,8 @@
     <Compile Include="Advanced\ILifestyleSelectionBehavior.cs" />
     <Compile Include="Advanced\InitializationContext.cs" />
     <Compile Include="Advanced\InstanceInitializationData.cs" />
+    <Compile Include="Internals\ContainerControlledCollectionResolver.cs" />
+    <Compile Include="Internals\ContainerUncontrolledCollectionResolver.cs" />
     <Compile Include="Internals\InternalsFinderVisitor.cs" />
     <Compile Include="Advanced\Internal\LazyScope.cs" />
     <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />
@@ -104,10 +109,10 @@
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.full.cs" />
     <Compile Include="Internals\ReferenceEqualityComparer.cs" />
+    <Compile Include="Internals\RegistrationEntry.cs" />
     <Compile Include="Internals\SubExpressionReplacer.cs" />
     <Compile Include="Internals\ContainerControlledItem.cs" />
     <Compile Include="Internals\CollectionResolver.cs" />
-    <Compile Include="Internals\UnregisteredOpenGenericResolver.cs" />
     <Compile Include="Container.Obsolete.cs" />
     <Compile Include="Container.Registration.Batch.cs" />
     <Compile Include="Container.Registration.Collections.cs" />
@@ -167,7 +172,7 @@
     <Compile Include="Internals\GenericArgumentFinder.cs" />
     <Compile Include="Internals\GenericTypeBuilder.cs" />
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
-    <Compile Include="OpenGenericPredicateContext.cs" />
+    <Compile Include="PredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Internals\TypeConstraintValidator.cs" />
     <Compile Include="Lifestyles\CustomLifestyle.cs" />

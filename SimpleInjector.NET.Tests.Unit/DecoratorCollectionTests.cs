@@ -1410,6 +1410,8 @@
             // Verify() ensures that all Relationships are built.
             container.Verify();
 
+            var r = container.GetCurrentRegistrations();
+
             // Act
             var registration = container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
             var relationships = registration.GetRelationships();

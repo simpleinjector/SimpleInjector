@@ -122,6 +122,7 @@
     <Compile Include="DecoratorCollectionTests.cs" />
     <Compile Include="DecoratorTests.cs" />
     <Compile Include="RegisterCollectionDuplicateRegistrationTests.cs" />
+    <Compile Include="RegisterConditionalTests.cs" />
     <Compile Include="RegisterOpenGenericTests.cs" />
     <Compile Include="GetCurrentRegistrationsTests.cs" />
     <Compile Include="GetInstanceTests.cs" />

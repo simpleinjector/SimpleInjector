@@ -1,8 +1,50 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Collections.Generic;
 
+    public interface IGeneric<T>
+    {
+    }
+
+    public interface IConstraintedGeneric<T> where T : class
+    {
+    }
+    
     public interface IOpenGenericWithPredicate<T>
+    {
+    }
+
+    public class ConstraintedGeneric<T> : IConstraintedGeneric<T> where T : class
+    {
+    }
+
+    public class ConstraintedGeneric2<T> : IConstraintedGeneric<T> where T : class
+    {
+    }
+
+    public class IntGenericType : IGeneric<int>
+    {
+    }
+
+    public class GenericType<T> : IGeneric<T>
+    {
+    }
+
+    public class DefaultGenericType<T> : IGeneric<T>
+    {
+    }
+
+    public class GenericClassType<TClass> : IGeneric<TClass> where TClass : class
+    {
+    }
+
+    public class GenericDisposableClassType<TDisposableClass> : IGeneric<TDisposableClass>
+        where TDisposableClass : class, IDisposable
+    {
+    }
+
+    public class GenericStructType<TStruct> : IGeneric<TStruct> where TStruct : struct
     {
     }
 

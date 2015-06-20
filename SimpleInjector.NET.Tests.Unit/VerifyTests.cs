@@ -355,27 +355,27 @@
             // All these collection are resolved through unregistered type resolution.
             var expectedTypes = new[]
             {
-                typeof(IEnumerable<Service<Service<Service<IDisposable>>>>),
-                typeof(IEnumerable<Service<Service<IDisposable>>>),
-                typeof(IEnumerable<Service<IDisposable>>),
+                typeof(IEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>>),
+                typeof(IEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>),
+                typeof(IEnumerable<ServiceWithEnumerable<IDisposable>>),
                 typeof(IEnumerable<IDisposable>),
             };
 
             var container = ContainerFactory.New();
 
             // Service<T> depends on IEnumerable<T>
-            container.RegisterCollection(typeof(Service<>), new[] { typeof(Service<>) });
+            container.RegisterCollection(typeof(ServiceWithEnumerable<>), new[] { typeof(ServiceWithEnumerable<>) });
 
-            container.Register<Service<Service<Service<Service<IDisposable>>>>>();
+            container.Register<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>>>();
 
             container.Verify();
 
             // Act
-            var registrations = container.GetCurrentRegistrations();
-            var actualTypes = registrations.Select(p => p.ServiceType).ToList();
+            InstanceProducer[] registrations = container.GetCurrentRegistrations();
+            var actualTypes = registrations.Select(p => p.ServiceType);
 
             // Assert
-            var missingTypes = expectedTypes.Where(registration => !actualTypes.Contains(registration));
+            var missingTypes = expectedTypes.Except(actualTypes);
 
             // When the missingTypes list is empty, this means that the container kept looking for new 
             // registrations at the end of the verification process.
@@ -529,7 +529,47 @@
             // Act
             container.Verify(VerificationOption.VerifyOnly);
         }
-        
+
+        [TestMethod]
+        public void VerifyOnly_WithLifestyleMismathcDiagnosticWarning_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = false;
+
+            // Lifestyle Mismatch
+            container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginImpl>();
+
+            // Act
+            Action action = () => container.Verify(VerificationOption.VerifyOnly);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "A lifestyle mismatch is encountered",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_WithLifestyleMismathcDiagnosticWarning_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.SuppressLifestyleMismatchVerification = false;
+
+            // Lifestyle Mismatch
+            container.Register<ServiceWithDependency<IPlugin>>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginImpl>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithDependency<IPlugin>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "A lifestyle mismatch is encountered",
+                action);
+        }
+
         [TestMethod]
         public void VerifyAndDiagnose_WithDiagnosticWarning_ThrowsExpectedException()
         {
@@ -593,13 +633,6 @@
         public class PluginWithBooleanDependency : IPlugin
         {
             public PluginWithBooleanDependency(bool isInUserContext)
-            {
-            }
-        }
-
-        public class Service<T>
-        {
-            public Service(IEnumerable<T> collection)
             {
             }
         }

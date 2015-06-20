@@ -62,6 +62,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Core] Extra parameters added to IConstructorInjectionBehavior methods BuildParameterExpression and
 		 Verify.
+		-[Core] UnregisteredTypeEventArgs constructor made internal.
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
 		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).
 		-[Web] Removed the SimpleInjectorWebExtensions.RegisterForDisposal method (fixes #12).

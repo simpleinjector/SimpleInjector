@@ -102,16 +102,15 @@
         }
 
         [TestMethod]
-        public void RegisterOpenGeneric_WithClosedImplementation_ThrowsException()
+        public void RegisterOpenGeneric_OpenServiceTypeClosedImplementation_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            // Act
-            Action action = () => container.Register(typeof(IService<,>), typeof(ServiceImpl<int, int>));
+            container.Register(typeof(IService<,>), typeof(ServiceImpl<int, int>));
 
-            // Assert
-            AssertThat.Throws<ArgumentException>(action);
+            // Act
+            container.GetInstance<IService<int, int>>();
         }
 
         [TestMethod]
@@ -185,20 +184,6 @@
             // Act
             Action action = () =>
                 container.Register(typeof(IService<int, string>), typeof(ServiceImpl<,>), Lifestyle.Singleton);
-
-            // Assert
-            AssertThat.Throws<ArgumentException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterSingleOpenGeneric_WithClosedImplementation_ThrowsException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Act
-            Action action = () =>
-                container.Register(typeof(IService<,>), typeof(ServiceImpl<int, int>), Lifestyle.Singleton);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -660,21 +645,15 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.Register(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
+            // Act
+            Action action = () => container.Register(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
-                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
-                    it should contain exactly one public constructor, but it has 2.".TrimInside(),
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
+                it should contain exactly one public constructor, but it has 2."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -709,27 +688,15 @@
             // DefaultStuffDoer depends on IService<T, int> but this isn't registered.
             container.Register(typeof(IDoStuff<>), typeof(DefaultStuffDoer<>));
 
-            try
-            {
-                // Act
-                container.GetInstance<IDoStuff<bool>>();
+            // Act
+            Action action = () => container.GetInstance<IDoStuff<bool>>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(@"
-                    There was an error in the registration of open generic type IDoStuff<T>. 
-                    Failed to build a registration for type DefaultStuffDoer<Boolean>.".TrimInside(),
-                    ex);
-
-                AssertThat.ExceptionMessageContains(@"                                                                     
-                    The constructor of type DefaultStuffDoer<Boolean> 
-                    contains the parameter of type IService<Boolean, Int32> with name 'service' that 
-                    is not registered.".TrimInside(),
-                    ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The constructor of type DefaultStuffDoer<Boolean> contains the parameter with name 'service'
+                and type IService<Boolean, Int32> that is not registered."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
@@ -751,15 +718,9 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains(@"
-                    There was an error in the registration of open generic type IDoStuff<T>. 
-                    Failed to build a registration for type DefaultStuffDoer<Boolean>."
-                    .TrimInside(),
-                    ex.Message);
-
                 AssertThat.StringContains(@"                                                                     
                     The constructor of type DefaultStuffDoer<Boolean> contains the parameter 
-                    of type IService<Boolean, Int32>  with name 'service' that is not registered."
+                    with name 'service' and type IService<Boolean, Int32> that is not registered."
                     .TrimInside(),
                     ex.Message);
             }
@@ -993,23 +954,6 @@
         }
 
         [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterface_Verifies()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(int));
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c => c.ServiceType.GetGenericArguments().Single().GetType() == typeof(long));
-
-            // Act
-            container.Verify();
-
-            // Assert
-        }
-
-        [TestMethod]
         public void ExtensionHelper_ContainsGenericParameter_WorksAsExpected()
         {
             // Arrange
@@ -1019,178 +963,6 @@
             // Assert
             Assert.IsTrue(open.ContainsGenericParameter());
             Assert.IsFalse(closed.ContainsGenericParameter());
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_PredicateContext_ServiceTypeIsClosedImplentation()
-        {
-            bool called = false;
-
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c =>
-                    {
-                        if (c.ServiceType.ContainsGenericParameter())
-                        {
-                            throw new InvalidOperationException("ServiceType should be a closed type");
-                        }
-
-                        called = true;
-                        return true;
-                    });
-
-            // Act
-            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
-
-            // Assert
-            Assert.IsTrue(called, "Predicate was not called");
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_PredicateContext_ImplementationTypeIsClosedImplentation()
-        {
-            bool called = false;
-
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c =>
-                    {
-                        if (c.ImplementationType.ContainsGenericParameter())
-                        {
-                            throw new InvalidOperationException("ImplementationType should be a closed type");
-                        }
-
-                        called = true;
-                        return true;
-                    });
-
-            // Act
-            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
-
-            // Assert
-            Assert.IsTrue(called, "Predicate was not called");
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate1()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
-
-            // Act
-            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
-
-            // Assert
-            Assert.IsNotNull(result);
-            AssertThat.IsInstanceOfType(typeof(OpenGenericWithPredicate1<int>), result);
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate2()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(long));
-
-            // Act
-            var result = container.GetInstance<IOpenGenericWithPredicate<long>>();
-
-            // Assert
-            Assert.IsNotNull(result);
-            AssertThat.IsInstanceOfType(typeof(OpenGenericWithPredicate2<long>), result);
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException1()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().FullName.StartsWith("System"));
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
-
-            // Act
-            Action action = () =>
-                container.GetInstance<IOpenGenericWithPredicate<long>>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple observers of the ResolveUnregisteredType event",
-                action,
-                "GetInstance should fail because the framework should detect that more than one " +
-                "implemention of the requested service.");
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException2()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
-
-            // Act
-            var result1 = container.GetInstance<IOpenGenericWithPredicate<long>>();
-            Action action = () =>
-                container.GetInstance<IOpenGenericWithPredicate<int>>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple observers of the ResolveUnregisteredType event",
-                action,
-                "GetInstance should fail because the framework should detect that more than one " +
-                "implementation of the requested service.");
-        }
-
-        [TestMethod]
-        public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
-        {
-            bool handled = false;
-
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
-                Lifestyle.Transient, c =>
-                {
-                    if (c.Handled)
-                    {
-                        throw new InvalidOperationException("The test assumes handled is false at this time.");
-                    }
-
-                    return c.ImplementationType.GetGenericArguments().Single() == typeof(int);
-                });
-
-            container.Register(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate2<>),
-                Lifestyle.Transient, c =>
-                {
-                    // this is the test - we are checking that c.handled changed between
-                    // the registered Predicates for OpenGenericWithPredicate1<> and OpenGenericWithPredicate2<>
-                    handled = c.Handled;
-                    return c.ImplementationType.GetGenericArguments().Single() == typeof(long);
-                });
-
-            // Act
-            handled = false;
-            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
-
-            // Assert
-            Assert.IsTrue(handled);
         }
 
         // This is a regression test. This test fails on .NET 4.0 and 4.5 builds (but not on PCL).
@@ -1218,13 +990,6 @@
         public void RegisterOpenGeneric_WithPartialOpenGenericServiceType_ThrowsExpectedMessage()
         {
             // Arrange
-            string expectedMessage = @"
-                The supplied type 'IService<Int32, TB>' is a partially-closed generic type, which is not 
-                supported as value of the serviceType parameter. Instead, please supply the open generic type 
-                'IService<,>' and make the type supplied to the implementationType parameter partially-closed 
-                instead."
-                .TrimInside();
-
             var container = ContainerFactory.New();
 
             // Act
@@ -1234,8 +999,226 @@
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                expectedMessage,
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied type 'IService<Int32, TB>' is a partially-closed generic type, which is not 
+                supported by this method. Please supply the open generic type 'IService<,>' instead."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationThatOverlapsWithPreviousNonGenericRegistration_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "that overlaps with the registration for GenericType<T>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterConditional_ImplementationThatOverlapsWithPreviousNonGenericRegistration_StillSucceeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            // It's impossible to check at this stage whether there is overlap, so we need to do this at the
+            // time we build the object graph.
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), c => true);
+        }
+
+        [TestMethod]
+        public void RegisterClosedGeneric_ImplementationThatOverlapsWithPreviousOpenGenericRegistration_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Act
+            Action action = () => container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already an open generic registration for IGeneric<T> (with implementation 
+                GenericType<T>) that overlaps with the registration of IGeneric<Int32> that you are trying to 
+                make. If your intention is to use GenericType<T> as fall back registration, please instead
+                call: RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterClosedGeneric_ImplementationThatOverlapsWithPreviousPartialOpenGenericRegistrationW_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>).MakeGenericType(typeof(List<>)));
+
+            // Act
+            Action action = () => container.Register<IGeneric<List<int>>, GenericType<List<int>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already an open generic registration for IGeneric<T> (with implementation 
+                GenericType<List<T>>) that overlaps with the registration of IGeneric<List<Int32>> that you 
+                are trying to make. If your intention is to use GenericType<List<T>> as fall back 
+                registration, please instead call: 
+                RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterNonGeneric_ImplementationThatOverlapsWithPreviousOpenGenericRegistration_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Act
+            Action action = () => container.Register<IGeneric<int>, IntGenericType>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "overlaps with the registration of IGeneric<Int32>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationThatDoesntOverlapsWithPreviousNonGenericRegistrationBecauseOfTypeConstraint_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Act
+            container.GetInstance<IGeneric<int>>();
+            container.GetInstance<IGeneric<string>>();
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationWithTypeConstraintThatOverlapsWithPreviousNonGenericRegistration_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<string>, GenericType<string>>();
+
+            // It would be lovely if we would be able to detect that these two registrations overlapped, but
+            // this too complex to do. So we check during resolve.
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Act
+            Action action = () => container.GetInstance<IGeneric<string>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Multiple applicable registrations found for IGeneric<String>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationWithTypeConstraintThatOverlapsWithPreviousOpenGenericRegistration_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "overlaps with the registration",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationThatOverlapsWithPreviousOpenGenericRegistrationWithTypeConstraint_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "overlaps with the registration for GenericType<T>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_ImplementationThatOverlapsWithPreviousOpenGenericRegistrationForSameType_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "overlaps with the registration for GenericClassType<TClass>",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_MultipleImplementationsWithNonOverlappingTypeConstraints_Succeed()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+            container.Register(typeof(IGeneric<>), typeof(GenericStructType<>));
+
+            // Act
+            container.GetInstance<IGeneric<int>>();
+            container.GetInstance<IGeneric<string>>();
+        }
+
+        [TestMethod]
+        public void RegisterOpenGeneric_MultipleRegistrationsWithOverlappingGenericTypeConstraints_ThrowsExceptionWhenResolved()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericDisposableClassType<>));
+
+            // These two registrations will technically overlap and in this case resolving a IGeneric<T> where
+            // the T implements IDisposable will never work, because the next registration will get applied
+            // as well. Still, we allow this scenario, because it is really hard to check these conditions.
+            // So instead we check this when the object graph is built.
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
+
+            // Act
+            Action action = () => container.GetInstance<IGeneric<IDisposable>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Multiple applicable registrations found for IGeneric<IDisposable>.",
                 action);
         }
     }

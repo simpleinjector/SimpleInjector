@@ -15,7 +15,7 @@
 
         [DebuggerStepThrough]
         static ScopedLifestyleTests()
-	    {
+        {
             try
             {
                 throw new ObjectDisposedException("Foo");
@@ -23,8 +23,8 @@
             catch (ObjectDisposedException ex)
             {
                 CannotAccessADisposedObjectMessage = ex.Message.Substring(0, ex.Message.IndexOf('.'));
-            }             
-	    }
+            }
+        }
 
         [TestMethod]
         public void Dispose_ListWithOneItem_DisposesItem()
@@ -39,14 +39,14 @@
             var disposables = new List<IDisposable> { disposable };
 
             scope.RegisterForDisposal(disposable);
-            
+
             // Act
             scope.Dispose();
 
             // Assert
             Assert.IsTrue(disposable.IsDisposedOnce);
         }
-        
+
         [TestMethod]
         public void Dispose_MultipleItems_DisposesAllItems()
         {
@@ -168,13 +168,13 @@
             int disposeCount = 0;
 
             var scope = new Scope();
-            
+
             scope.RegisterForDisposal(new DisposableObject(_ =>
             {
                 Assert.AreEqual(2, actionCount);
                 disposeCount++;
-            })); 
-            
+            }));
+
             scope.WhenScopeEnds(() =>
             {
                 Assert.AreEqual(0, disposeCount);
@@ -186,13 +186,13 @@
                 Assert.AreEqual(0, disposeCount);
                 actionCount++;
             });
-            
+
             scope.RegisterForDisposal(new DisposableObject(_ =>
             {
                 Assert.AreEqual(2, actionCount);
                 disposeCount++;
-            })); 
-            
+            }));
+
             // Act
             scope.Dispose();
 
@@ -421,7 +421,7 @@
             var container = new Container();
 
             container.Register<IPlugin>(
-                () => new DisposablePlugin(disposing: _ => newlyResolvedInstanceDisposed = true), 
+                () => new DisposablePlugin(disposing: _ => newlyResolvedInstanceDisposed = true),
                 scopedLifestyle);
 
             container.Register<DisposableObject>(() => new DisposableObject(disposing: _ =>
@@ -552,10 +552,10 @@
                 The registered delegate for type IPlugin threw an exception. A recursive registration of 
                 Action or IDisposable instances was detected during disposal of the scope. 
                 This is possibly caused by a component that is directly or indirectly depending on itself"
-                .TrimInside(), 
+                .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void Dispose_RecursiveResolveTriggeredDuringEndScopeAction_StillDisposesRegisteredDisposables()
         {
@@ -724,8 +724,8 @@
             container.Verify();
 
             // Assert
-            Assert.IsFalse(actionCalled, 
-                "Any registered action delegates should not be called during verification " + 
+            Assert.IsFalse(actionCalled,
+                "Any registered action delegates should not be called during verification " +
                 "(but registration should succeed). Users are allowed to do any ");
         }
 
@@ -769,9 +769,9 @@
 
             public int DisposeCount { get; private set; }
 
-            public bool IsDisposedOnce 
+            public bool IsDisposedOnce
             {
-                get { return this.DisposeCount == 1; } 
+                get { return this.DisposeCount == 1; }
             }
 
             public void Dispose()
@@ -789,7 +789,7 @@
                 }
             }
         }
-        
+
         private sealed class FakeScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;

@@ -203,7 +203,7 @@
             {
                 AssertThat.StringContains("The constructor of type " +
                     "ParameterConventionExtensionsTests.TypeWithAppSettingConstructorArgumentOfReferenceType " +
-                    "contains the parameter of type IDisposable with name 'as1AppSetting' that is not " +
+                    "contains the parameter with name 'as1AppSetting' and type IDisposable that is not " +
                     "registered.", ex.Message);
             }
         }

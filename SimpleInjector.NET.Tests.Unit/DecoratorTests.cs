@@ -105,7 +105,7 @@
 
             // Register as transient
             container.Register<INonGenericService, RealNonGenericService>();
-            container.RegisterDecorator(typeof(INonGenericService), typeof(NonGenericServiceDecorator));
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>();
 
             // Act
             var decorator1 = (NonGenericServiceDecorator)container.GetInstance<INonGenericService>();
@@ -1154,7 +1154,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 The constructor of type LoggingHandlerDecorator1<RealCommand> 
-                contains the parameter of type ILogger with name 'logger' that is 
+                contains the parameter with name 'logger' and type ILogger that is 
                 not registered.".TrimInside(),
                 action);
         }

@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -171,7 +172,8 @@
 
             // Act
             var registrations = container.GetCurrentRegistrations()
-                .Where(r => r.ServiceType == typeof(ITimeProvider));
+                .Where(r => r.ServiceType == typeof(ITimeProvider))
+                .ToArray();
 
             // Assert
             Assert.AreEqual(1, registrations.Count());

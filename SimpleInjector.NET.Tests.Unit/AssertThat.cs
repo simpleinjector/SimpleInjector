@@ -212,8 +212,8 @@
             Assert.IsTrue(actualMessage != null && actualMessage.Contains(expectedMessage),
                 assertMessage +
                 " The string did not contain the expected value. " +
-                "Actual string: \"" + actualMessage + "\". " +
-                "Expected value to be in the string: \"" + expectedMessage + "\"." + Environment.NewLine +
+                "Actual string:\n\n" + actualMessage + "\n\n\n" +
+                "Expected value to be in the string:\n\n" + expectedMessage + "\n\n" + Environment.NewLine +
                 stackTrace);
         }
         

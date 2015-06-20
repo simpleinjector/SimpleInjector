@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
@@ -138,6 +139,16 @@ namespace SimpleInjector
             return copy;
         }
 
+        [DebuggerStepThrough]
+        internal static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
+        {
+            TValue value;
+
+            source.TryGetValue(key, out value);
+
+            return value;
+        }
+
         internal static void VerifyCollection(IEnumerable collection, Type serviceType)
         {
             // This construct looks a bit weird, but prevents the collection from being iterated twice.
@@ -205,27 +216,6 @@ namespace SimpleInjector
             return instanceInitializer.Compile();
         }
 
-        internal static IEnumerable ConcatCollections(Type resultType, IEnumerable<IEnumerable> collections)
-        {           
-            collections = collections.ToArray();
-
-            IEnumerable concattedCollection = collections.First();
-
-            foreach (IEnumerable collection in collections.Skip(1))
-            {
-                concattedCollection = ConcatCollection(resultType, concattedCollection, collection);
-            }
-
-            return concattedCollection;
-        }
-
-        internal static IEnumerable ConcatCollection(Type resultType, IEnumerable first, IEnumerable second)
-        {
-            var concatMethod = typeof(Enumerable).GetMethod("Concat").MakeGenericMethod(resultType);
-
-            return (IEnumerable)concatMethod.Invoke(null, new[] { first, second });
-        }
-
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
@@ -266,17 +256,6 @@ namespace SimpleInjector
         {
             var thisType = new[] { type };
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
-        }
-
-        internal static Type[] GetClosedGenericImplementationsFor(Type closedGenericServiceType,
-            IEnumerable<Type> openGenericImplementations, bool includeVariantTypes = true)
-        {
-            var openItems = openGenericImplementations.Select(ContainerControlledItem.CreateFromType);
-
-            var closedItems = GetClosedGenericImplementationsFor(closedGenericServiceType, openItems,
-                includeVariantTypes);
-
-            return closedItems.Select(item => item.ImplementationType).ToArray();
         }
 
         internal static ContainerControlledItem[] GetClosedGenericImplementationsFor(

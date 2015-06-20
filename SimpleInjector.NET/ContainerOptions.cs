@@ -304,42 +304,7 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription
         {
-            get
-            {
-                var descriptions = new List<string>();
-
-                if (this.AllowOverridingRegistrations)
-                {
-                    descriptions.Add("Allows Overriding Registrations");
-                }
-
-                if (!(this.ConstructorResolutionBehavior is DefaultConstructorResolutionBehavior))
-                {
-                    descriptions.Add("Custom Constructor Resolution");
-                }
-
-                if (!(this.ConstructorInjectionBehavior is DefaultConstructorInjectionBehavior))
-                {
-                    descriptions.Add("Custom Constructor Injection");
-                }
-
-                if (!(this.PropertySelectionBehavior is DefaultPropertySelectionBehavior))
-                {
-                    descriptions.Add("Custom Property Selection");
-                }
-
-                if (!(this.LifestyleSelectionBehavior is DefaultLifestyleSelectionBehavior))
-                {
-                    descriptions.Add("Custom Lifestyle Selection");
-                }
-
-                if (descriptions.Count == 0)
-                {
-                    descriptions.Add("Default Configuration");
-                }
-
-                return string.Join(", ", descriptions);
-            }
+            get { return this.ToString(); }
         }
 
         /// <summary>
@@ -400,7 +365,39 @@ namespace SimpleInjector
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            return this.DebuggerDisplayDescription;
+            var descriptions = new List<string>();
+
+            if (this.AllowOverridingRegistrations)
+            {
+                descriptions.Add("Allows Overriding Registrations");
+            }
+
+            if (!(this.ConstructorResolutionBehavior is DefaultConstructorResolutionBehavior))
+            {
+                descriptions.Add("Custom Constructor Resolution");
+            }
+
+            if (!(this.ConstructorInjectionBehavior is DefaultConstructorInjectionBehavior))
+            {
+                descriptions.Add("Custom Constructor Injection");
+            }
+
+            if (!(this.PropertySelectionBehavior is DefaultPropertySelectionBehavior))
+            {
+                descriptions.Add("Custom Property Selection");
+            }
+
+            if (!(this.LifestyleSelectionBehavior is DefaultLifestyleSelectionBehavior))
+            {
+                descriptions.Add("Custom Lifestyle Selection");
+            }
+
+            if (descriptions.Count == 0)
+            {
+                descriptions.Add("Default Configuration");
+            }
+
+            return string.Join(", ", descriptions);
         }
 
         internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)

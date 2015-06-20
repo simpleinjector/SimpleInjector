@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
 
     public interface ILogger
     {
@@ -62,10 +60,6 @@
     public interface ITimeProvider
     {
         DateTime Now { get; }
-    }
-
-    public interface IGeneric<T>
-    {
     }
 
     public interface IUserRepository
@@ -152,13 +146,6 @@
         }
 
         public ConcreteTypeWithMultiplePublicConstructors(IUserRepository userRepository)
-        {
-        }
-    }
-
-    public class GenericType<T> : IGeneric<T>
-    {
-        public GenericType()
         {
         }
     }
@@ -283,9 +270,26 @@
         public TDependency Dependency { get; private set; }
     }
 
+    public class AnotherServiceWithDependency<TDependency>
+    {
+        public AnotherServiceWithDependency(TDependency dependency)
+        {
+            this.Dependency = dependency;
+        }
+
+        public TDependency Dependency { get; private set; }
+    }
+
     public class ServiceDecorator : IService<int, object>
     {
         public ServiceDecorator(IService<int, object> decorated)
+        {
+        }
+    }
+
+    public class ServiceWithEnumerable<T>
+    {
+        public ServiceWithEnumerable(IEnumerable<T> collection)
         {
         }
     }

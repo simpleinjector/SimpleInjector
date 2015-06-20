@@ -659,77 +659,6 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that a closed-generic instance of the open-generic type 
-        /// <paramref name="implementationType"/> will be returned when an instance of a closed-generic 
-        /// version of the open-generic type <paramref name="serviceType"/> is requested in case the supplied
-        /// <paramref name="predicate"/> returns <b>true</b>. The returned instance is cached according to 
-        /// the supplied <paramref name="lifestyle"/>.
-        /// </summary>
-        /// <param name="serviceType">The definition of the open generic service type that can be 
-        /// used to retrieve instances.</param>
-        /// <param name="implementationType">The definition of the open-generic implementation type
-        /// that will be returned when a <paramref name="serviceType"/> is requested.</param>
-        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
-        /// <param name="predicate">The predicate that determines whether the 
-        /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
-        /// can be used to build a fall back mechanism where multiple registrations for the same service type
-        /// are made.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
-        /// <paramref name="implementationType"/> are not a generic type or when <paramref name="serviceType"/>
-        /// is a partially-closed generic type.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered.
-        /// </exception>
-        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle,
-            Predicate<OpenGenericPredicateContext> predicate)
-        {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(predicate, "predicate");
-
-            if (!serviceType.ContainsGenericParameters)
-            {
-                throw new ArgumentException(
-                    StringResources.SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(serviceType), 
-                    "serviceType");
-            }
-
-            if (serviceType.IsPartiallyClosed())
-            {
-                throw new ArgumentException(
-                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(serviceType, "serviceType",
-                        "implementationType"),
-                    "serviceType");
-            }
-
-            if (!implementationType.ContainsGenericParameters)
-            {
-                throw new ArgumentException(
-                    StringResources.SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(implementationType),
-                    "implementationType");
-            }
-
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, "serviceType");
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, "implementationType");
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, "implementationType");
-
-            var resolver = new UnregisteredOpenGenericResolver
-            {
-                Container = this,
-                OpenGenericServiceType = serviceType,
-                OpenGenericImplementation = implementationType,
-                Lifestyle = lifestyle,
-                Predicate = predicate
-            };
-
-            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
-        }
-
-        /// <summary>
         /// Registers a single instance that will be returned when an instance of type 
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
@@ -1067,23 +996,26 @@ namespace SimpleInjector
             Requires.IsRegistrationForThisContainer(this, registration, "registration");
 
             this.ThrowWhenContainerIsLocked();
-            this.ThrowWhenTypeAlreadyRegistered(serviceType);
 
             var producer = new InstanceProducer(serviceType, registration);
 
-            this.producers[serviceType] = producer;
-
-            this.RemoveExternalProducer(producer);
+            this.AddInstanceProducer(producer);
         }
 
         internal void RegisterExternalProducer(InstanceProducer producer)
         {
-            this.externalProducers.Add(producer);
+            lock (this.externalProducers)
+            {
+                this.externalProducers.Add(producer);
+            }
         }
 
         internal void RemoveExternalProducer(InstanceProducer producer)
         {
-            this.externalProducers.Remove(producer);
+            lock (this.externalProducers)
+            {
+                this.externalProducers.Remove(producer);
+            }
         }
 
         internal void RegisterResolveInterceptor(ResolveInterceptor interceptor,
@@ -1121,9 +1053,12 @@ namespace SimpleInjector
             
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(serviceType, implementationType,
+                implementationTypeParamName);
+
             if (serviceType.ContainsGenericParameters)
             {
-                this.Register(serviceType, implementationType, lifestyle, c => true);
+                this.RegisterOpenGeneric(serviceType, implementationType, lifestyle);
             }
             else
             {
@@ -1134,34 +1069,6 @@ namespace SimpleInjector
 
                 this.AddRegistration(serviceType, registration);
             }
-        }
-
-        private void ThrowWhenTypeAlreadyRegistered(Type type)
-        {
-            if (this.producers.ContainsKey(type) || this.IsEnumerableTypeRegisteredWithRegisterCollection(type))
-            {
-                if (!this.Options.AllowOverridingRegistrations)
-                {
-                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(type));
-                }
-            }
-        }
-
-        private bool IsEnumerableTypeRegisteredWithRegisterCollection(Type type)
-        {
-            bool isEnumerableType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-
-            if (isEnumerableType)
-            {
-                Type elementType = type.GetGenericArguments()[0];
-
-                if (elementType.IsGenericType)
-                {
-                    return this.collectionResolvers.ContainsKey(elementType.GetGenericTypeDefinition());
-                }
-            }
-
-            return false;
         }
 
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type concreteType, string parameterName)

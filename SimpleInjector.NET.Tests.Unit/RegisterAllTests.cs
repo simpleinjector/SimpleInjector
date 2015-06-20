@@ -92,7 +92,7 @@
             Action action = () => container.RegisterInstance<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
+            AssertThat.Throws<NotSupportedException>(action);
         }
 
         [TestMethod]
@@ -107,7 +107,9 @@
             Action action = () => container.Register<IEnumerable<IPlugin>>(() => new IPlugin[0]);
 
             // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
+                action);
         }
 
         [TestMethod]
@@ -122,7 +124,9 @@
             Action action = () => container.RegisterCollection<IPlugin>(new PluginImpl());
 
             // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
+                action);
         }
 
         [TestMethod]
@@ -137,7 +141,9 @@
             Action action = () => container.RegisterCollection<IPlugin>(new PluginImpl());
 
             // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
+                action);
         }
 
         [TestMethod]
@@ -442,7 +448,11 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IUserRepository>(new Collection<IUserRepository> { new SqlUserRepository(), new InMemoryUserRepository() });
+            container.RegisterCollection<IUserRepository>(new Collection<IUserRepository> 
+            {
+                new SqlUserRepository(), 
+                new InMemoryUserRepository() 
+            });
 
             // Act
             var collection = container.GetAllInstances<IUserRepository>();
@@ -1185,6 +1195,8 @@
                 typeof(EventHandlerWithDependency<AuditableEvent, ILogger>)
             });
 
+            // There was a bug in the library that caused collections to be unverified if the collection
+            // was resolved before Verify was called.
             container.GetAllInstances<IEventHandler<AuditableEvent>>();
 
             // Act
@@ -1193,6 +1205,31 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "Please ensure ILogger is registered",
+                action);
+        }
+
+        [TestMethod]
+        public void Verify_NonGenericTypeWithUnregisteredDependencyResolvedBeforeCallingVerift_StillThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(UserServiceBase), new[]
+            {
+                // Depends on unregistered type IUserRepository
+                typeof(RealUserService)
+            });
+
+            // There was a bug in the library that caused collections to be unverified if the collection
+            // was resolved before Verify was called.
+            container.GetAllInstances<IEventHandler<UserServiceBase>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "Please ensure IUserRepository is registered",
                 action);
         }
 
@@ -1514,7 +1551,7 @@
             IEnumerable<Registration> registrations = null;
 
             // Act
-            Action action = () => container.RegisterCollection(typeof(IPlugin), registrations);
+            Action action = () => container.RegisterCollection<IPlugin>(registrations);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("registrations", action);
@@ -1583,11 +1620,14 @@
             container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
 
             // Act
-            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
+            Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] 
+            {
+                typeof(AuditableEventEventHandler) 
+            });
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
                 action);
         }
 
@@ -1608,11 +1648,10 @@
                 });
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 You already made a registration for the IEventHandler<TEvent> type using one of the 
                 RegisterCollection overloads that registers container-uncontrolled collections, while this 
-                method registers container-controlled collections. Mixing calls for the same open generic 
-                service type is not supported."
+                method registers container-controlled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);
         }
@@ -1631,11 +1670,10 @@
             Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(uncontrolledCollection);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 You already made a registration for the IEventHandler<TEvent> type using one of the 
                 RegisterCollection overloads that registers container-controlled collections, while this 
-                method registers container-uncontrolled collections. Mixing calls for the same open generic 
-                service type is not supported."
+                method registers container-uncontrolled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);
         }
@@ -1655,8 +1693,8 @@
                 () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
                 action);
         }
 
@@ -1672,8 +1710,8 @@
             Action action = () => container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
                 action);
         }
 
@@ -1689,8 +1727,8 @@
             Action action = () => container.Register<IEnumerable<IEventHandler<AuditableEvent>>>(() => null);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
                 action);
         }
 
@@ -1706,8 +1744,8 @@
             Action action = () => container.RegisterCollection<IEventHandler<AuditableEvent>>(new AuditableEventEventHandler());
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Type IEnumerable<IEventHandler<AuditableEvent>> has already been registered.",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "Mixing calls is not supported.",
                 action);
         }
 

@@ -32,48 +32,52 @@ namespace SimpleInjector.Internals
 
     internal abstract class CollectionResolver
     {
-        private readonly List<RegistrationGroup> registrationGroups;
-        private readonly Dictionary<Type, Registration> lifestyleRegistrationCache =
-            new Dictionary<Type, Registration>();
+        private readonly List<RegistrationGroup> registrationGroups = new List<RegistrationGroup>();
+        private readonly Dictionary<Type, InstanceProducer> producerCache =
+            new Dictionary<Type, InstanceProducer>();
 
         private bool verified;
 
-        protected CollectionResolver(Container container, Type openGenericServiceType)
+        protected CollectionResolver(Container container, Type serviceType)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
+            Requires.IsNotPartiallyClosed(serviceType, "serviceType");
 
             this.Container = container;
-            this.OpenGenericServiceType = openGenericServiceType;
-            this.registrationGroups = new List<RegistrationGroup>();
+            this.ServiceType = serviceType;
         }
 
-        protected Type OpenGenericServiceType { get; private set; }
+        internal IEnumerable<InstanceProducer> Producers
+        {
+            get
+            {
+                // We must lock this, because producers can be added to the cache, while the user calls
+                // GetCurrentInstances on a different thread.
+                lock (this.producerCache)
+                {
+                    return this.producerCache.Values.ToArray();
+                }
+            }
+        }
+
+        protected IEnumerable<RegistrationGroup> RegistrationGroups
+        {
+            get { return this.registrationGroups; }
+        }
+
+        protected Type ServiceType { get; private set; }
 
         protected Container Container { get; private set; }
 
-        internal static CollectionResolver Create(Container container, Type openGenericServiceType,
-            bool containerControlled)
-        {
-            return containerControlled
-                ? (CollectionResolver)new ContainerControlledCollectionResolver(container, openGenericServiceType)
-                : (CollectionResolver)new ContainerUncontrolledCollectionResolver(container, openGenericServiceType);
-        }
+        internal abstract void AddControlledRegistrations(Type serviceType, 
+            ContainerControlledItem[] registrations, bool append);
 
-        internal virtual void AddControlledRegistrations(Type serviceType,
-            ContainerControlledItem[] registrations, bool append, bool allowOverridingRegistrations)
+        internal abstract void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer);
+        
+        internal InstanceProducer TryGetInstanceProducer(Type elementType)
         {
-            throw new InvalidOperationException(
-                StringResources.MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(serviceType,
-                    controlled: true));
-        }
-
-        internal virtual void RegisterUncontrolledCollection(Type serviceType, IEnumerable collection,
-            bool allowOverridingRegistrations)
-        {
-            throw new InvalidOperationException(
-                StringResources.MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(serviceType,
-                    controlled: false));
+            return this.ServiceType == elementType || this.ServiceType.IsGenericTypeDefinitionOf(elementType) 
+                ? this.GetInstanceProducerFromCache(elementType)
+                : null;
         }
 
         internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
@@ -82,13 +86,13 @@ namespace SimpleInjector.Internals
             {
                 Type closedServiceType = e.UnregisteredServiceType.GetGenericArguments().Single();
 
-                if (this.OpenGenericServiceType.IsGenericTypeDefinitionOf(closedServiceType))
+                if (this.ServiceType.IsGenericTypeDefinitionOf(closedServiceType))
                 {
-                    Registration registration;
+                    var producer = this.GetInstanceProducerFromCache(closedServiceType);
 
-                    if (this.TryGetContainerControlledRegistrationFromCache(closedServiceType, out registration))
+                    if (producer != null)
                     {
-                        e.Register(registration);
+                        e.Register(producer.Registration);
                     }
                 }
             }
@@ -118,13 +122,13 @@ namespace SimpleInjector.Internals
 
         protected abstract Type[] GetAllKnownClosedServiceTypes();
 
-        protected abstract Registration BuildCollectionRegistration(Type closedServiceType);
+        protected abstract InstanceProducer BuildCollectionProducer(Type closedServiceType);
 
-        protected void AddRegistrationGroup(bool allowOverridingRegistrations, RegistrationGroup group)
+        protected void AddRegistrationGroup(RegistrationGroup group)
         {
             if (!group.Appended)
             {
-                if (allowOverridingRegistrations)
+                if (this.Container.Options.AllowOverridingRegistrations)
                 {
                     this.RemoveRegistrationsToOverride(group.ServiceType);
                 }
@@ -135,23 +139,19 @@ namespace SimpleInjector.Internals
             this.registrationGroups.Add(group);
         }
 
-        private bool TryGetContainerControlledRegistrationFromCache(Type closedServiceType,
-            out Registration registration)
+        private InstanceProducer GetInstanceProducerFromCache(Type closedServiceType)
         {
-            lock (this.lifestyleRegistrationCache)
+            lock (this.producerCache)
             {
-                if (!this.lifestyleRegistrationCache.TryGetValue(closedServiceType, out registration))
-                {
-                    registration = this.BuildCollectionRegistration(closedServiceType);
+                InstanceProducer producer;
 
-                    if (registration != null)
-                    {
-                        this.lifestyleRegistrationCache[closedServiceType] = registration;
-                    }
+                if (!this.producerCache.TryGetValue(closedServiceType, out producer))
+                {
+                    this.producerCache[closedServiceType] =
+                        producer = this.BuildCollectionProducer(closedServiceType);
                 }
 
-                // If there are no implementations, no registration need to be made.
-                return registration != null;
+                return producer;
             }
         }
 
@@ -181,7 +181,7 @@ namespace SimpleInjector.Internals
         private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType)
         {
             return
-                from registrationGroup in this.registrationGroups
+                from registrationGroup in this.RegistrationGroups
                 where !registrationGroup.Appended
                 where registrationGroup.ServiceType == serviceType
                     || serviceType.ContainsGenericParameters
@@ -191,128 +191,33 @@ namespace SimpleInjector.Internals
 
         protected sealed class RegistrationGroup
         {
-            internal Type ServiceType { get; set; }
+            internal Type ServiceType { get; private set; }
 
-            internal ContainerControlledItem[] ControlledItems { get; set; }
+            internal IEnumerable<ContainerControlledItem> ControlledItems { get; private set; }
 
-            internal IEnumerable UncontrolledCollection { get; set; }
+            internal InstanceProducer UncontrolledProducer { get; private set; }
 
-            internal bool Appended { get; set; }
-        }
+            internal bool Appended { get; private set; }
 
-        // This class is similar to the OpenGenericRegistrationExtensions.UnregisteredAllOpenGenericResolver class
-        // (which is used by RegisterAllOpenGeneric), but this class (used by RegisterCollection) behaves differently. 
-        // This implementation forwards requests for types back to the container (using the 
-        // ContainerControlledCollection<T>) to allow lifestyles of individual registrations to be overridden and 
-        // this allows abstractions to be used as types. This isn't supported by RegisterAllOpenGeneric and 
-        // changing this would be a breaking change. That's why we need both of them.
-        private sealed class ContainerControlledCollectionResolver : CollectionResolver
-        {
-            internal ContainerControlledCollectionResolver(Container container, Type openGenericServiceType)
-                : base(container, openGenericServiceType)
+            internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType, 
+                InstanceProducer producer)
             {
+                return new RegistrationGroup
+                {
+                    ServiceType = serviceType,
+                    UncontrolledProducer = producer
+                };
             }
 
-            internal override void AddControlledRegistrations(Type serviceType,
-                ContainerControlledItem[] registrations, bool append, bool allowOverridingRegistrations)
+            internal static RegistrationGroup CreateForControlledItems(Type serviceType, 
+                ContainerControlledItem[] registrations, bool appended)
             {
-                this.AddRegistrationGroup(allowOverridingRegistrations, new RegistrationGroup
+                return new RegistrationGroup
                 {
                     ServiceType = serviceType,
                     ControlledItems = registrations,
-                    Appended = append
-                });
-            }
-
-            protected override Registration BuildCollectionRegistration(Type closedServiceType)
-            {
-                ContainerControlledItem[] closedGenericImplementations =
-                    this.GetClosedContainerControlledItemsFor(closedServiceType);
-
-                IContainerControlledCollection collection = DecoratorHelpers.CreateContainerControlledCollection(
-                    closedServiceType, this.Container);
-
-                collection.AppendAll(closedGenericImplementations);
-
-                return DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
-                    collection, this.Container);
-            }
-
-            protected override Type[] GetAllKnownClosedServiceTypes()
-            {
-                var closedServiceTypes =
-                    from registrationGroup in this.registrationGroups
-                    from item in registrationGroup.ControlledItems
-                    let implementation = item.ImplementationType
-                    where !implementation.ContainsGenericParameters
-                    from service in implementation.GetBaseTypesAndInterfacesFor(this.OpenGenericServiceType)
-                    select service;
-
-                return closedServiceTypes.Distinct().ToArray();
-            }
-
-            private ContainerControlledItem[] GetClosedContainerControlledItemsFor(Type closedGenericServiceType)
-            {
-                return Helpers.GetClosedGenericImplementationsFor(closedGenericServiceType,
-                    this.GetItemsFor(closedGenericServiceType));
-            }
-
-            private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType)
-            {
-                return
-                    from registrationGroup in this.registrationGroups
-                    where registrationGroup.ServiceType.ContainsGenericParameters ||
-                        closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
-                    from item in registrationGroup.ControlledItems
-                    select item;
-            }
-        }
-
-        // This resolver allows multiple registrations for the same generic type to be combined in case the generic
-        // type is variant.
-        private sealed class ContainerUncontrolledCollectionResolver : CollectionResolver
-        {
-            internal ContainerUncontrolledCollectionResolver(Container container, Type openGenericServiceType)
-                : base(container, openGenericServiceType)
-            {
-            }
-
-            internal override void RegisterUncontrolledCollection(Type serviceType, IEnumerable collection,
-                bool allowOverridingRegistrations)
-            {
-                this.AddRegistrationGroup(allowOverridingRegistrations, new RegistrationGroup
-                {
-                    ServiceType = serviceType,
-                    UncontrolledCollection = collection,
-                });
-            }
-
-            protected override Registration BuildCollectionRegistration(Type closedServiceType)
-            {
-                var collections = (
-                    from registrationGroup in this.registrationGroups
-                    where closedServiceType.IsAssignableFrom(registrationGroup.ServiceType)
-                    select registrationGroup.UncontrolledCollection)
-                    .ToArray();
-
-                if (!collections.Any())
-                {
-                    return null;
-                }
-
-                IEnumerable collection = Helpers.ConcatCollections(closedServiceType, collections);
-
-                return SingletonLifestyle.CreateUncontrolledCollectionRegistration(closedServiceType,
-                    collection, this.Container);
-            }
-
-            protected override Type[] GetAllKnownClosedServiceTypes()
-            {
-                var closedServiceTypes =
-                    from registrationGroup in this.registrationGroups
-                    select registrationGroup.ServiceType;
-
-                return closedServiceTypes.Distinct().ToArray();
+                    Appended = appended
+                };
             }
         }
     }

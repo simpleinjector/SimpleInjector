@@ -23,17 +23,20 @@
 namespace SimpleInjector.Internals
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
 
     internal sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
     {
         internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
 
+        [DebuggerStepThrough]
         public bool Equals(T x, T y)
         {
             return object.ReferenceEquals(x, y);
         }
 
+        [DebuggerStepThrough]
         public int GetHashCode(T obj)
         {
             return RuntimeHelpers.GetHashCode(obj);

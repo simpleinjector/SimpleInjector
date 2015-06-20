@@ -57,25 +57,29 @@ namespace SimpleInjector.Advanced
             });
 
         private readonly Container container;
+        private readonly Type serviceType;
         private readonly Type implementationType;
 
-        internal PropertyInjectionHelper(Container container, Type implementationType)
+        internal PropertyInjectionHelper(Container container, Type serviceType,
+            Type implementationType)
         {
             this.container = container;
+            this.serviceType = serviceType;
             this.implementationType = implementationType;
         }
 
         internal static Expression BuildPropertyInjectionExpression(Container container,
-            Type implementationType, PropertyInfo[] properties, Expression expressionToWrap)
+            Type serviceType, Type implementationType, PropertyInfo[] properties, 
+            Expression expressionToWrap)
         {
-            var helper = new PropertyInjectionHelper(container, implementationType);
+            var helper = new PropertyInjectionHelper(container, serviceType, implementationType);
 
             return helper.BuildPropertyInjectionExpression(expressionToWrap, properties);
         }
 
         internal static PropertyInfo[] GetCandidateInjectionPropertiesFor(Type implementationType)
         {
-            var all = BindingFlags.FlattenHierarchy | 
+            var all = BindingFlags.FlattenHierarchy |
                 BindingFlags.Instance | BindingFlags.Static |
                 BindingFlags.NonPublic | BindingFlags.Public;
 
@@ -89,7 +93,7 @@ namespace SimpleInjector.Advanced
                 VerifyProperty(property);
             }
         }
-        
+
         private Delegate BuildPropertyInjectionDelegate(PropertyInfo[] properties)
         {
             try
@@ -130,8 +134,8 @@ namespace SimpleInjector.Advanced
             return this.CompilePropertyInjectorLambda(lambda);
         }
 
-        private List<Expression> BuildPropertyInjectionExpressions(ParameterExpression targetParameter, 
-            PropertyInfo[] properties, 
+        private List<Expression> BuildPropertyInjectionExpressions(ParameterExpression targetParameter,
+            PropertyInfo[] properties,
             ParameterExpression[] dependencyParameters)
         {
             var blockExpressions = (
@@ -144,7 +148,7 @@ namespace SimpleInjector.Advanced
 
             blockExpressions.Add(Expression.Return(returnTarget, targetParameter, this.implementationType));
             blockExpressions.Add(Expression.Label(returnTarget, Expression.Constant(null, this.implementationType)));
-            
+
             return blockExpressions;
         }
 
@@ -202,7 +206,10 @@ namespace SimpleInjector.Advanced
 
             try
             {
-                registration = this.container.GetRegistration(property.PropertyType, throwOnFailure: true);
+                var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
+
+                registration = 
+                    this.container.GetRegistration(property.PropertyType, consumer, throwOnFailure: true);
             }
             catch (Exception ex)
             {
@@ -230,7 +237,7 @@ namespace SimpleInjector.Advanced
 
             return openGenericFuncType.MakeGenericType(genericTypeArguments.ToArray());
         }
-        
+
         private Delegate CompilePropertyInjectorLambda(LambdaExpression expression)
         {
             Delegate compiledDelegate = null;

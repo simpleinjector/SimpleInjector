@@ -43,7 +43,9 @@ namespace SimpleInjector.Advanced
             Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
-            InstanceProducer producer = this.GetInstanceProducerFor(parameter);
+            var context = new InjectionConsumerInfo(serviceType, implementationType, parameter);
+
+            InstanceProducer producer = this.GetInstanceProducerFor(context);
             
             // When the instance producer is invalid, this call will fail with an expressive exception.
             return producer.BuildExpression();
@@ -62,16 +64,18 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private InstanceProducer GetInstanceProducerFor(ParameterInfo parameter)
+        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo context)
         {
-            InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(parameter.ParameterType);
+            InstanceProducer producer = 
+                this.container.GetRegistrationEvenIfInvalid(context.Target.TargetType, context);
             
             if (producer == null)
             {
+                // Currently, the target is always a parameter, but this will change in the future.
+                ParameterInfo parameter = context.Target.Parameter;
                 this.container.Options.ConstructorInjectionBehavior.Verify(parameter);
 
-                throw new ActivationException(StringResources.ParameterTypeMustBeRegistered(
-                    parameter.Member.DeclaringType, parameter));
+                this.container.ThrowParameterTypeMustBeRegistered(context.Target);
             }
 
             return producer;

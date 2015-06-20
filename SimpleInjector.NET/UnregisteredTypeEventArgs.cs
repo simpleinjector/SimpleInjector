@@ -37,11 +37,10 @@ namespace SimpleInjector
     /// </summary>
     public class UnregisteredTypeEventArgs : EventArgs
     {
-        /// <summary>Initializes a new instance of the UnregisteredTypeEventArgs class.</summary>
-        /// <param name="unregisteredServiceType">The unregistered service type.</param>
-        public UnregisteredTypeEventArgs(Type unregisteredServiceType)
+        internal UnregisteredTypeEventArgs(Type unregisteredServiceType, InjectionConsumerInfo context)
         {
             this.UnregisteredServiceType = unregisteredServiceType;
+            this.Context = context;
         }
 
         /// <summary>Gets the unregistered service type that is currently requested.</summary>
@@ -62,6 +61,8 @@ namespace SimpleInjector
         internal Expression Expression { get; private set; }
 
         internal Registration Registration { get; private set; }
+
+        internal InjectionConsumerInfo Context { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type

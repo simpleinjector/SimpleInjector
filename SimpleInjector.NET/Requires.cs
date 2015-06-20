@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
@@ -35,6 +36,7 @@ namespace SimpleInjector
 #if NET45
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
+        [DebuggerStepThrough]
         internal static void IsNotNull(object instance, string paramName)
         {
             if (instance == null)
@@ -43,6 +45,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void IsNotNullOrEmpty(string instance, string paramName)
         {
             IsNotNull(instance, paramName);
@@ -53,6 +56,16 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
+        internal static void IsTrue(bool predicate, string paramName, string message = null)
+        {
+            if (!predicate)
+            {
+                throw new ArgumentException(message ?? string.Empty, paramName);
+            }
+        }
+
+        [DebuggerStepThrough]
         internal static void IsReferenceType(Type type, string paramName)
         {
             if (!type.IsClass && !type.IsInterface)
@@ -61,6 +74,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void IsNotOpenGenericType(Type type, string paramName)
         {
             // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
@@ -71,6 +85,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
             string paramName)
         {
@@ -80,6 +95,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void IsNotAnAmbiguousType(Type type, string paramName)
         {
             if (Helpers.IsAmbiguousType(type))
@@ -88,6 +104,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void IsGenericType(Type type, string paramName, Func<Type, string> guidance = null)
         {
             if (!type.IsGenericType)
@@ -99,6 +116,7 @@ namespace SimpleInjector
             }
         }
 
+        [DebuggerStepThrough]
         internal static void IsOpenGenericType(Type type, string paramName, Func<Type, string> guidance = null)
         {
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
@@ -134,7 +152,7 @@ namespace SimpleInjector
                     paramName);
             }
         }
-        
+
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
             bool implementationIsOpen = implementation.IsGenericType && implementation.ContainsGenericParameters;
@@ -146,7 +164,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static void ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(Type service, 
+        internal static void ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(Type service,
             Type implementation, string paramName)
         {
             if (service != implementation &&
@@ -282,7 +300,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(Type decoratorType, 
+        internal static void DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(Type decoratorType,
             Type serviceType)
         {
             if (!serviceType.IsAssignableFrom(decoratorType))
@@ -295,7 +313,7 @@ namespace SimpleInjector
         internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
             string paramName)
         {
-            ConstructorInfo decoratorConstructor = 
+            ConstructorInfo decoratorConstructor =
                 container.Options.SelectConstructor(serviceType, decoratorType);
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
@@ -337,36 +355,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static void CollectionDoesNotContainOpenGenericTypesForRegisterMany(IEnumerable<Type> typesToRegister,
-            string paramName)
-        {
-            if (typesToRegister != null)
-            {
-                var openGenericTypes =
-                    from type in typesToRegister
-                    where type != null && type.ContainsGenericParameters
-                    select type;
-
-                if (openGenericTypes.Any())
-                {
-                    string message = StringResources
-                        .ThisRegisterManyForOpenGenericOverloadDoesNotAllowOpenGenerics(openGenericTypes);
-
-                    throw new ArgumentException(message, paramName);
-                }
-            }
-        }
-
-        internal static void CollectionIsNotEmpty(IEnumerable<Type> collection, string paramName)
-        {
-            if (!collection.Any())
-            {
-                string message = StringResources.TheCollectionShouldContainAtleastOneElement();
-
-                throw new ArgumentException(message, paramName);
-            }
-        }
-
+        [DebuggerStepThrough]
         internal static void IsValidEnum<TEnum>(TEnum value, string paramName) where TEnum : struct
         {
             if (!Enum.GetValues(typeof(TEnum)).Cast<TEnum>().Contains(value))
@@ -386,7 +375,19 @@ namespace SimpleInjector
             }
         }
 
-        private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor, 
+        internal static void IsNotPartiallyClosed(Type openGenericServiceType, string paramName,
+            string implementationTypeParamName)
+        {
+            if (openGenericServiceType.IsPartiallyClosed())
+            {
+                throw new ArgumentException(
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(openGenericServiceType, paramName,
+                        implementationTypeParamName),
+                    paramName);
+            }
+        }
+
+        private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor,
             string paramName)
         {
             bool decoratesServiceType = DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
@@ -397,7 +398,7 @@ namespace SimpleInjector
             }
         }
 
-        private static void ThrowMustDecorateServiceType(Type serviceType, 
+        private static void ThrowMustDecorateServiceType(Type serviceType,
             ConstructorInfo decoratorConstructor, string paramName)
         {
             int numberOfServiceTypeDependencies =
@@ -413,7 +414,7 @@ namespace SimpleInjector
                     decoratorConstructor.DeclaringType)
                     .First();
 
-                ThrowMustContainTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);           
+                ThrowMustContainTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);
             }
             else
             {
@@ -433,13 +434,13 @@ namespace SimpleInjector
         private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(Type serviceType,
             ConstructorInfo decoratorConstructor, string paramName)
         {
-            string message = 
+            string message =
                 StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
                     decoratorConstructor.DeclaringType, serviceType);
 
             throw new ArgumentException(message, paramName);
         }
-      
+
         private static void ThrowArgumentNullException(string paramName)
         {
             throw new ArgumentNullException(paramName);

@@ -33,6 +33,8 @@ namespace SimpleInjector.Extensions
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static class OpenGenericRegistrationExtensions
     {
+        private static readonly Predicate<PredicateContext> Fallback = c => !c.Handled;
+
         /// <summary>
         /// Registers that a new instance of <paramref name="openGenericImplementation"/> will be returned 
         /// every time a <paramref name="openGenericServiceType"/> is requested.
@@ -49,12 +51,15 @@ namespace SimpleInjector.Extensions
         /// that will be returned when a <paramref name="openGenericServiceType"/> is requested.</param>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
-            "This extension method has been removed. Please use Container.Register(Type, Type) instead.",
+            "This extension method has been removed. " +
+            "Please use Container.Register(Type, Type) to register a generic type. In case this " +
+            "registration acts as fallback registration (in case an explicit registration is missing), " +
+            "please use Container.RegisterConditional(Type, Type, c => !c.Handled) instead.",
             error: true)]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
-            container.Register(openGenericServiceType, openGenericImplementation);
+            container.RegisterConditional(openGenericServiceType, openGenericImplementation, Fallback);
         }
 
         /// <summary>
@@ -74,12 +79,16 @@ namespace SimpleInjector.Extensions
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
             "This extension method has been removed. " +
-            "Please use Container.Register(Type, Type, Lifestyle.Singleton) instead.",
+            "Please use Container.Register(Type, Type, Lifestyle.Singleton) to register a generic type. In " +
+            "case this registration acts as fallback registration (in case an explicit registration is " +
+            "missing), please use Container.RegisterConditional(Type, Type, Lifestyle.Singleton, c => !c.Handled) " +
+            "instead.",
             error: true)]
         public static void RegisterSingleOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
-            container.Register(openGenericServiceType, openGenericImplementation, Lifestyle.Singleton);
+            container.RegisterConditional(openGenericServiceType, openGenericImplementation,
+                Lifestyle.Singleton, Fallback);
         }
 
         /// <summary>
@@ -97,12 +106,15 @@ namespace SimpleInjector.Extensions
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
             "This extension method has been removed. " +
-            "Please use Container.Register(Type, Type, Lifestyle) instead.",
+            "Please use Container.Register(Type, Type, Lifestyle) to register a generic type. In case this " +
+            "registration acts as fallback registration (in case an explicit registration is missing), " +
+            "please use Container.RegisterConditional(Type, Type, Lifestyle, c => !c.Handled) " +
+            "instead.",
             error: true)]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
         {
-            container.Register(openGenericServiceType, openGenericImplementation, lifestyle);
+            container.RegisterConditional(openGenericServiceType, openGenericImplementation, lifestyle, Fallback);
         }
 
         /// <summary>
@@ -125,13 +137,17 @@ namespace SimpleInjector.Extensions
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(
             "This extension method has been removed. " +
-            "Please use Container.Register(Type, Type, Lifestyle, Predicate<OpenGenericPredicateContext>) instead.",
+            "Please use Container.RegisterConditional(Type, Type, Lifestyle, Predicate<PredicateContext>) " + 
+            "to make conditional registrations. In case this registration acts as fallback registration, " +
+            "add the !c.Handled check to the supplied predicate. For instance: " +
+            "Container.RegisterConditional(Type, Type, Lifestyle, c => !c.Handled && yourOriginalPredicate).",
             error: true)]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementationType, Lifestyle lifestyle,
-            Predicate<OpenGenericPredicateContext> predicate)
+            Predicate<PredicateContext> predicate)
         {
-            container.Register(openGenericServiceType, openGenericImplementationType, lifestyle, predicate);
+            container.RegisterConditional(openGenericServiceType, openGenericImplementationType, lifestyle, 
+                c => Fallback(c) && predicate(c));
         }
 
         /// <summary>This method has been removed.</summary>

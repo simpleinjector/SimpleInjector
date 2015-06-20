@@ -148,10 +148,12 @@ namespace SimpleInjector
             {
                 maximumNumberOfIterations--;
 
+                producersToVerify = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+
                 producersToVerify = (
-                    from registration in this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
-                    where !registration.IsExpressionCreated
-                    select registration)
+                    from producer in producersToVerify
+                    where !producer.IsExpressionCreated
+                    select producer)
                     .ToArray();
 
                 VerifyThatAllExpressionsCanBeBuilt(producersToVerify);
@@ -175,10 +177,10 @@ namespace SimpleInjector
 
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
         {
-            var registrations = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
+            var currentRegistrations = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
 
             return
-                from registration in registrations
+                from registration in currentRegistrations
                 where registration.MustBeExplicitlyVerified
                 select registration;
         }

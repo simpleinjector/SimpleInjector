@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions.LifetimeScoping;
 
@@ -123,6 +124,60 @@
             container.Verify();
         }
 
+        [TestMethod]
+        public void CustomBuiltDelegate_NestedDepenencyWithScopedLifestyle_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            // class RealUserService(IUserRepository)
+            container.Register<UserServiceBase, RealUserService>(Lifestyle.Transient);
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
+
+            var expression = container.GetRegistration(typeof(UserServiceBase)).BuildExpression();
+
+            // By building this expression we circumvent the container's scope optimizations and we force
+            // a different path through the code causing Scope.GetScopelessInstance to be called.
+            var userServiceFactory = Expression.Lambda<Func<UserServiceBase>>(expression).Compile();
+
+            // Act
+            Action action = () => userServiceFactory();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "the instance is requested outside the context of a Lifetime Scope",
+                action);
+        }
+
+        [TestMethod]
+        public void Verify_NestedDepenencyWithScopedLifestyleWithCustomBuiltExpression_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            // class RealUserService(IUserRepository)
+            container.Register<UserServiceBase, RealUserService>(Lifestyle.Transient);
+            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
+
+            container.Register<object>(() =>
+            {
+                var expression = container.GetRegistration(typeof(UserServiceBase)).BuildExpression();
+
+                // By building this expression we circumvent the container's scope optimizations and we force
+                // a different path through the code causing Scope.GetScopelessInstance to be called.
+                var userServiceFactory = Expression.Lambda<Func<UserServiceBase>>(expression).Compile();
+
+                return userServiceFactory();
+            }, Lifestyle.Singleton);
+
+            // Act
+            container.Verify();
+        }
+        
         private sealed class CustomScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;

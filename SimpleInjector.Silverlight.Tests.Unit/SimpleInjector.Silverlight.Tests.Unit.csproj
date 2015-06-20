@@ -201,6 +201,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterConcreteTests.cs">
       <Link>RegisterConcreteTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterConditionalTests.cs">
+      <Link>RegisterConditionalTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterInitializerTests.cs">
       <Link>RegisterInitializerTests.cs</Link>
     </Compile>

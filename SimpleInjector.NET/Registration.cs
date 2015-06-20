@@ -418,7 +418,7 @@ namespace SimpleInjector
             ConstructorInfo constructor =
                 this.Container.Options.SelectConstructor(serviceType, implementationType);
 
-            this.AddConstructorParametersAsKnownRelationship(constructor);
+            this.AddConstructorParametersAsKnownRelationship(serviceType, implementationType, constructor);
 
             return Expression.New(constructor, 
                 this.BuildConstructorParameters(serviceType, implementationType, constructor));
@@ -455,10 +455,10 @@ namespace SimpleInjector
             {
                 PropertyInjectionHelper.VerifyProperties(properties);
 
-                expression = PropertyInjectionHelper.BuildPropertyInjectionExpression(this.Container,
-                    this.ImplementationType, properties, expression);
+                expression = PropertyInjectionHelper.BuildPropertyInjectionExpression(
+                    this.Container, serviceType, implementationType, properties, expression);
 
-                this.AddPropertiesAsKnownRelationships(implementationType, properties);
+                this.AddPropertiesAsKnownRelationships(serviceType, implementationType, properties);
             }
 
             return expression;
@@ -504,26 +504,31 @@ namespace SimpleInjector
             return new OverriddenParameter();
         }
 
-        private void AddConstructorParametersAsKnownRelationship(ConstructorInfo constructor)
+        private void AddConstructorParametersAsKnownRelationship(Type serviceType, Type implementationType,
+            ConstructorInfo constructor)
         {
             // We have to suppress the overridden parameter since this might result in a wrong relationship.
             var dependencyTypes =
                 from parameter in constructor.GetParameters()
+                let type = parameter.ParameterType
                 let overriddenProducer = this.GetOverriddenParameterFor(parameter).Producer
-                let instanceProducer =
-                    overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(parameter.ParameterType)
+                let context = new InjectionConsumerInfo(serviceType, implementationType, parameter)
+                let instanceProducer = 
+                    overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(type, context)
                 where instanceProducer != null
                 select instanceProducer;
 
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
 
-        private void AddPropertiesAsKnownRelationships(Type implementationType,
+        private void AddPropertiesAsKnownRelationships(Type serviceType, Type implementationType, 
             IEnumerable<PropertyInfo> properties)
         {
             var dependencies =
-                from dependencyType in properties.Select(p => p.PropertyType)
-                let instanceProducer = this.Container.GetRegistrationEvenIfInvalid(dependencyType)
+                from property in properties
+                let dependencyType = property.PropertyType
+                let context = new InjectionConsumerInfo(serviceType, implementationType, property)
+                let instanceProducer = this.Container.GetRegistrationEvenIfInvalid(dependencyType, context)
                 where instanceProducer != null
                 select instanceProducer;
 

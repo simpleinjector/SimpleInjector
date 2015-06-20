@@ -15,6 +15,13 @@
     {
     }
 
+    public class PluginWithDependency<TDependency> : IPlugin
+    {
+        public PluginWithDependency(TDependency dependency)
+        {
+        }
+    }
+
     public class PluginDecorator : IPlugin
     {
         public PluginDecorator(IPlugin decoratee)

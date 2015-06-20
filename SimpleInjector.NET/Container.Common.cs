@@ -77,6 +77,14 @@ namespace SimpleInjector
         private readonly long containerId;
         private readonly Scope disposableSingletonsScope = new Scope();
 
+        // Collection of (both conditional and unconditional) instance producers that are explicitly 
+        // registered by the user and implicitly registered through unregistered type resolution.
+        private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations =
+            new Dictionary<Type, IRegistrationEntry>(64);
+
+        private readonly Dictionary<Type, CollectionResolver> collectionResolvers =
+            new Dictionary<Type, CollectionResolver>();
+
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers =
             new ConditionalHashSet<InstanceProducer>();
@@ -84,11 +92,11 @@ namespace SimpleInjector
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
 
-        private readonly Dictionary<Type, CollectionResolver> collectionResolvers =
-            new Dictionary<Type, CollectionResolver>();
-
-        private Dictionary<Type, InstanceProducer> producers =
-            new Dictionary<Type, InstanceProducer>(40, ReferenceEqualityComparer<Type>.Instance);
+        // Cache for producers that are resolved as root type
+        // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
+        // PERF: This collection is updated by replacing the complete collection.
+        private Dictionary<Type, InstanceProducer> rootProducerCache =
+            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
@@ -109,10 +117,10 @@ namespace SimpleInjector
 
             this.Options = new ContainerOptions(this)
             {
-                EnableDynamicAssemblyCompilation = 
+                EnableDynamicAssemblyCompilation =
                     this.containerId < MaximumNumberOfContainersWithDynamicallyCreatedAssemblies
             };
-            
+
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
         }
 
@@ -170,7 +178,7 @@ namespace SimpleInjector
 
         internal bool HasRegistrations
         {
-            get { return this.producers.Count > 1; }
+            get { return this.explicitRegistrations.Count > 1; }
         }
 
         /// <summary>
@@ -295,31 +303,36 @@ namespace SimpleInjector
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
         {
-            var registrations = this.GetCurrentRegistrations(
+            var currentRegistrations = this.GetCurrentRegistrations(
                 includeInvalidContainerRegisteredTypes: includeInvalidContainerRegisteredTypes);
 
             var nonRootProducers =
-                from registration in registrations
+                from registration in currentRegistrations
                 from relationship in registration.GetRelationships()
                 select relationship.Dependency;
 
-            return registrations.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
+            return currentRegistrations.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
                 .ToArray();
         }
 
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
             bool includeExternalProducers = true)
         {
-            IEnumerable<InstanceProducer> registrations = this.producers.Values;
+            IEnumerable<InstanceProducer> producers =
+                from entry in this.explicitRegistrations.Values
+                from producer in entry.Producers
+                select producer;
 
             if (includeExternalProducers)
             {
-                registrations = registrations.Concat(this.externalProducers.Keys);
+                producers = producers.Concat(this.externalProducers.Keys);
             }
+
+            producers = producers.Concat(this.rootProducerCache.Values).Distinct();
 
             // Filter out the invalid registrations (see the IsValid property for more information).
             return (
-                from producer in registrations
+                from producer in producers
                 where producer != null
                 where includeInvalidContainerRegisteredTypes || producer.IsValid
                 select producer)
@@ -442,6 +455,14 @@ namespace SimpleInjector
             }
         }
 
+        internal void ThrowParameterTypeMustBeRegistered(InjectionTargetInfo target)
+        {
+            throw new ActivationException(
+                StringResources.ParameterTypeMustBeRegistered(
+                    target,
+                    this.GetNumberOfConditionalRegistrationsFor(target.TargetType)));
+        }
+
         internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
         {
             errorMessage = null;
@@ -524,6 +545,115 @@ namespace SimpleInjector
                 where instanceInitializer.AppliesTo(type, context)
                 select instanceInitializer.CreateAction<T>(context))
                 .ToArray();
+        }
+        
+        private void RegisterOpenGeneric(Type openGenericServiceType, Type implementationType, 
+            Lifestyle lifestyle, Predicate<PredicateContext> predicate = null)
+        {
+            Requires.IsGenericType(openGenericServiceType, "serviceType");
+            Requires.IsNotPartiallyClosed(openGenericServiceType, "serviceType");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType,
+                implementationType, "serviceType");
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(openGenericServiceType,
+                implementationType, "implementationType");
+
+            IRegistrationEntry entry;
+
+            if (!this.explicitRegistrations.TryGetValue(openGenericServiceType, out entry))
+            {
+                this.explicitRegistrations[openGenericServiceType] =
+                    entry = RegistrationEntry.CreateGeneric(openGenericServiceType, this);
+            }
+
+            entry.AddGeneric(openGenericServiceType, implementationType, lifestyle, predicate);
+        }
+
+        private void AddInstanceProducer(InstanceProducer producer)
+        {
+            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType))
+            {
+                this.AddCollectionInstanceProducer(producer);
+                return;
+            }
+
+            IRegistrationEntry entry = this.GetRegistrationalEntryOrNull(producer.ServiceType);
+
+            if (entry == null)
+            {
+                this.explicitRegistrations[GetRegistrationKey(producer.ServiceType)] = RegistrationEntry.Create(producer);
+            }
+            else
+            {
+                entry.Add(producer);
+            }
+
+            this.RemoveExternalProducer(producer);
+        }
+
+        private void AddCollectionInstanceProducer(InstanceProducer producer)
+        {
+            Type itemType = producer.ServiceType.GetGenericArguments()[0];
+
+            var resolver = this.GetContainerUncontrolledResolver(itemType);
+
+            resolver.RegisterUncontrolledCollection(itemType, producer);
+        }
+
+        private int GetNumberOfConditionalRegistrationsFor(Type serviceType)
+        {
+            var entry = this.GetRegistrationalEntryOrNull(serviceType);
+
+            return entry == null ? 0 : entry.GetNumberOfConditionalRegistrationsFor(serviceType);
+        }
+
+        // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
+        // container to be thread-safe, without using locks.
+        private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo consumer,
+            Func<InjectionConsumerInfo, InstanceProducer> buildInstanceProducer)
+        {
+            return 
+                this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
+                ?? this.GetInstanceProducerForRegisteredCollection(serviceType)
+                ?? buildInstanceProducer(consumer);
+        }
+
+        private InstanceProducer GetExplicitlyRegisteredInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
+        {
+            var entry = this.GetRegistrationalEntryOrNull(serviceType);
+
+            return entry != null
+                ? entry.TryGetInstanceProducer(serviceType, consumer)
+                : null;
+        }
+
+        private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType)
+        {
+            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType))
+            {
+                Type elementType = serviceType.GetGenericArguments()[0];
+
+                Type key = GetRegistrationKey(elementType);
+
+                var resolver = this.collectionResolvers.GetValueOrDefault(key);
+
+                return resolver != null 
+                    ? resolver.TryGetInstanceProducer(elementType) 
+                    : null;
+            }
+
+            return null;
+        }
+
+        private IRegistrationEntry GetRegistrationalEntryOrNull(Type serviceType)
+        {
+            return this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
+        }
+
+        private static Type GetRegistrationKey(Type serviceType)
+        {
+            return serviceType.IsGenericType
+                ? serviceType.GetGenericTypeDefinition()
+                : serviceType;
         }
 
         private sealed class ContextualResolveInterceptor

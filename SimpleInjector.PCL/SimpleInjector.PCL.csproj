@@ -118,6 +118,9 @@
     <Compile Include="..\SimpleInjector.NET\Container.Registration.Collections.cs">
       <Link>Container.Registration.Collections.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Container.Registration.Conditional.cs">
+      <Link>Container.Registration.Conditional.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Container.Registration.cs">
       <Link>Container.Registration.cs</Link>
     </Compile>
@@ -268,6 +271,12 @@
     <Compile Include="..\SimpleInjector.NET\Helpers.cs">
       <Link>Helpers.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\InjectionConsumerInfo.cs">
+      <Link>InjectionConsumerInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\InjectionTargetInfo.cs">
+      <Link>InjectionTargetInfo.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\InstanceProducer.cs">
       <Link>InstanceProducer.cs</Link>
     </Compile>
@@ -295,8 +304,14 @@
     <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollection.cs">
       <Link>Internals\ContainerControlledCollection.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledCollectionResolver.cs">
+      <Link>Internals\ContainerControlledCollectionResolver.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\ContainerControlledItem.cs">
       <Link>Internals\ContainerControlledItem.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\ContainerUncontrolledCollectionResolver.cs">
+      <Link>Internals\ContainerUncontrolledCollectionResolver.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\CyclicDependencyValidator.cs">
       <Link>Internals\CyclicDependencyValidator.cs</Link>
@@ -322,14 +337,14 @@
     <Compile Include="..\SimpleInjector.NET\Internals\ReferenceEqualityComparer.cs">
       <Link>Internals\ReferenceEqualityComparer.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\RegistrationEntry.cs">
+      <Link>Internals\RegistrationEntry.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\SubExpressionReplacer.cs">
       <Link>Internals\SubExpressionReplacer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\TypeConstraintValidator.cs">
       <Link>Internals\TypeConstraintValidator.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Internals\UnregisteredOpenGenericResolver.cs">
-      <Link>Internals\UnregisteredOpenGenericResolver.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Lifestyle.cs">
       <Link>Lifestyle.cs</Link>
@@ -367,8 +382,8 @@
     <Compile Include="..\SimpleInjector.NET\Lifestyles\UnknownLifestyle.cs">
       <Link>Lifestyles\UnknownLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\OpenGenericPredicateContext.cs">
-      <Link>OpenGenericPredicateContext.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\PredicateContext.cs">
+      <Link>PredicateContext.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Registration.cs">
       <Link>Registration.cs</Link>

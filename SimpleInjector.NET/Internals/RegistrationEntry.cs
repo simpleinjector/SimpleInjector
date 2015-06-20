@@ -1,0 +1,550 @@
+﻿#region Copyright Simple Injector Contributors
+/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
+ * 
+ * Copyright (c) 2015 Simple Injector Contributors
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial 
+ * portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+ * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+#endregion
+
+namespace SimpleInjector.Internals
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    internal interface IRegistrationEntry
+    {
+        IEnumerable<InstanceProducer> Producers { get; }
+
+        void Add(InstanceProducer producer);
+
+        void AddGeneric(Type serviceType, Type implementationType, Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate = null);
+
+        InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer);
+
+        int GetNumberOfConditionalRegistrationsFor(Type serviceType);
+    }
+
+    internal static class RegistrationEntry
+    {
+        internal static IRegistrationEntry Create(InstanceProducer producer)
+        {
+            if (producer.ServiceType.IsGenericType)
+            {
+                var entry = new GenericRegistrationEntry(
+                    producer.ServiceType.GetGenericTypeDefinition(),
+                    producer.Registration.Container);
+
+                entry.Add(producer);
+
+                return entry;
+            }
+            else
+            {
+                return new NonGenericRegistrationEntry(producer);
+            }
+        }
+
+        internal static IRegistrationEntry CreateGeneric(Type openGenericServiceType, Container container)
+        {
+            return new GenericRegistrationEntry(openGenericServiceType, container);
+        }
+
+        private sealed class NonGenericRegistrationEntry : IRegistrationEntry
+        {
+            private readonly List<InstanceProducer> producers = new List<InstanceProducer>();
+
+            public NonGenericRegistrationEntry(InstanceProducer producer)
+            {
+                this.producers.Add(producer);
+            }
+
+            public IEnumerable<InstanceProducer> Producers
+            {
+                get { return this.producers; }
+            }
+
+            private IEnumerable<InstanceProducer> ConditionalProducers
+            {
+                get { return this.producers.Where(p => p.IsConditional); }
+            }
+
+            private IEnumerable<InstanceProducer> UnconditionalProducers
+            {
+                get { return this.producers.Where(p => !p.IsConditional); }
+            }
+
+            private Container Container
+            {
+                get { return this.producers[0].Registration.Container; }
+            }
+
+            private Type ServiceType
+            {
+                get { return this.producers[0].ServiceType; }
+            }
+
+            public void Add(InstanceProducer producer)
+            {
+                Requires.IsTrue(producer.ServiceType == this.ServiceType, "producer");
+                this.Container.ThrowWhenContainerIsLocked();
+                this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
+
+                if (producer.IsUnconditional && this.producers.Any())
+                {
+                    if (!this.Container.Options.AllowOverridingRegistrations)
+                    {
+                        throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.ServiceType));
+                    }
+
+                    this.producers.Clear();
+                }
+
+                this.producers.Add(producer);
+            }
+
+            public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo context)
+            {
+                Requires.IsTrue(serviceType == this.ServiceType, "serviceType");
+
+                var instanceProducers = this.GetInstanceProducers(context).ToArray();
+
+                if (instanceProducers.Length <= 1)
+                {
+                    return instanceProducers.FirstOrDefault();
+                }
+
+                var producersInfo =
+                    from producer in instanceProducers
+                    select Tuple.Create(this.ServiceType, producer.Registration.ImplementationType, producer);
+
+                throw new ActivationException(
+                    StringResources.MultipleApplicationRegistrationsFound(
+                        this.ServiceType, producersInfo.ToArray()));
+            }
+
+            public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
+            {
+                Requires.IsTrue(serviceType == this.ServiceType, "serviceType");
+
+                return this.producers.Count(p => p.IsConditional);
+            }
+
+            public void AddGeneric(Type serviceType, Type implementationType,
+                Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+            {
+                throw new NotSupportedException();
+            }
+
+            private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
+            {
+                if (producer.IsConditional && this.UnconditionalProducers.Any())
+                {
+                    throw new InvalidOperationException(
+                        StringResources.NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(
+                            producer.ServiceType));
+                }
+
+                if (producer.IsUnconditional && this.ConditionalProducers.Any())
+                {
+                    throw new InvalidOperationException(
+                        StringResources.NonGenericTypeAlreadyRegisteredAsConditionalRegistration(
+                            producer.ServiceType));
+                }
+            }
+
+            private IEnumerable<InstanceProducer> GetInstanceProducers(InjectionConsumerInfo consumer)
+            {
+                bool handled = false;
+
+                foreach (var producer in this.producers)
+                {
+                    var context = new PredicateContext(producer, consumer, handled);
+                    if (!producer.IsConditional || producer.Predicate(context))
+                    {
+                        yield return producer;
+                        handled = true;
+                    }
+                }
+            }
+        }
+
+        private sealed class GenericRegistrationEntry : IRegistrationEntry
+        {
+            private readonly List<IProducerProvider> providers = new List<IProducerProvider>();
+            private readonly Container container;
+
+            internal GenericRegistrationEntry(Type serviceType, Container container)
+            {
+                Requires.IsTrue(serviceType.IsGenericTypeDefinition, "serviceType");
+                this.container = container;
+            }
+
+            private interface IProducerProvider
+            {
+                bool IsConditional { get; }
+
+                bool AppliesToAllClosedServiceTypes { get; }
+
+                Type ServiceType { get; }
+
+                Type ImplementationType { get; }
+
+                IEnumerable<InstanceProducer> GetCurrentProducers();
+
+                bool OverlapsWith(Type closedServiceType);
+
+                InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
+                    bool handled = false, bool unconditionally = false);
+            }
+
+            public IEnumerable<InstanceProducer> Producers
+            {
+                get
+                {
+                    return
+                        from provider in this.providers
+                        from producer in provider.GetCurrentProducers()
+                        select producer;
+                }
+            }
+
+            public void Add(InstanceProducer producer)
+            {
+                this.container.ThrowWhenContainerIsLocked();
+
+                if (!this.container.Options.AllowOverridingRegistrations)
+                {
+                    var overlappingProviders =
+                        from provider in this.providers
+                        where provider.OverlapsWith(producer.ServiceType)
+                        select provider;
+
+                    if (overlappingProviders.Any())
+                    {
+                        var overlappingProvider = overlappingProviders.First();
+
+                        if (overlappingProvider.ServiceType.IsGenericTypeDefinition)
+                        {
+                            throw new InvalidOperationException(
+                                StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
+                                    producer.ServiceType,
+                                    overlappingProvider.ImplementationType));
+                        }
+
+                        throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(producer.ServiceType));
+                    }
+                }
+
+                this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
+
+                this.providers.Add(new ClosedToInstanceProducerProvider(producer));
+            }
+
+            public void AddGeneric(Type serviceType, Type implementationType,
+                Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+            {
+                this.container.ThrowWhenContainerIsLocked();
+                this.ThrowWhenConditionalIsRegisteredInOverridingMode(predicate);
+
+                var provider = new OpenGenericToInstanceProducerProvider(
+                    serviceType, implementationType, lifestyle, predicate, this.container);
+
+                this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
+
+                this.providers.Add(provider);
+            }
+
+            public InstanceProducer TryGetInstanceProducer(Type closedGenericServiceType,
+                InjectionConsumerInfo context)
+            {
+                var producers = this.GetInstanceProducers(closedGenericServiceType, context).ToArray();
+
+                if (producers.Length <= 1)
+                {
+                    return producers.Select(p => p.Item3).FirstOrDefault();
+                }
+
+                throw new ActivationException(
+                    StringResources.MultipleApplicationRegistrationsFound(closedGenericServiceType, producers));
+            }
+
+            public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
+            {
+                var conditionalProducersForServiceType =
+                    from provider in this.providers
+                    let producer =
+                        provider.TryGetProducer(serviceType, InjectionConsumerInfo.Root, unconditionally: true)
+                    where producer != null
+                    select producer;
+
+                return conditionalProducersForServiceType.Count();
+            }
+
+            private void ThrowWhenConditionalIsRegisteredInOverridingMode(Predicate<PredicateContext> predicate)
+            {
+                if (predicate != null && this.container.Options.AllowOverridingRegistrations)
+                {
+                    throw new NotSupportedException(
+                        StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+                }
+            }
+
+            private void ThrowWhenProviderToRegisterOverlapsWithExistingProvider(
+                OpenGenericToInstanceProducerProvider providerToRegister)
+            {
+                // A provider is a superset of the providerToRegister when it can be applied to ALL generic
+                // types that the providerToRegister can be applied to as well.
+                var supersetProviders =
+                    from provider in this.providers
+                    where provider.AppliesToAllClosedServiceTypes
+                        || provider.ImplementationType == providerToRegister.ImplementationType
+                    select provider;
+
+                bool providerToRegisterIsSuperset =
+                    providerToRegister.AppliesToAllClosedServiceTypes && this.providers.Any();
+
+                if (providerToRegisterIsSuperset || supersetProviders.Any())
+                {
+                    var overlappingProvider = supersetProviders.FirstOrDefault() ?? this.providers.First();
+
+                    throw new InvalidOperationException(
+                        StringResources.AnOverlappingGenericRegistrationExists(
+                            providerToRegister.ServiceType,
+                            overlappingProvider.ImplementationType,
+                            overlappingProvider.IsConditional,
+                            providerToRegister.ImplementationType,
+                            providerToRegister.Predicate != null));
+                }
+            }
+
+            private IEnumerable<Tuple<Type, Type, InstanceProducer>> GetInstanceProducers(
+                Type closedGenericServiceType, InjectionConsumerInfo consumer)
+            {
+                bool handled = false;
+
+                foreach (var provider in this.providers)
+                {
+                    var producer =
+                        provider.TryGetProducer(closedGenericServiceType, consumer, handled: handled);
+
+                    if (producer != null)
+                    {
+                        yield return Tuple.Create(provider.ServiceType, provider.ImplementationType, producer);
+                        handled = true;
+                    }
+                }
+            }
+
+            private sealed class ClosedToInstanceProducerProvider : IProducerProvider
+            {
+                private readonly InstanceProducer producer;
+
+                public ClosedToInstanceProducerProvider(InstanceProducer producer)
+                {
+                    this.producer = producer;
+                }
+
+                public bool IsConditional
+                {
+                    get { return this.producer.IsConditional; }
+                }
+
+                public bool AppliesToAllClosedServiceTypes
+                {
+                    get { return false; }
+                }
+
+                public Type ServiceType
+                {
+                    get { return this.producer.ServiceType; }
+                }
+
+                public Type ImplementationType
+                {
+                    get { return this.producer.Registration.ImplementationType; }
+                }
+
+                public IEnumerable<InstanceProducer> GetCurrentProducers()
+                {
+                    return Enumerable.Repeat(this.producer, 1);
+                }
+
+                public bool OverlapsWith(Type closedServiceType)
+                {
+                    return !this.producer.IsConditional && this.producer.ServiceType == closedServiceType;
+                }
+
+                public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
+                    bool handled, bool unconditionally)
+                {
+                    bool match = this.MatchesServiceType(serviceType);
+
+                    return match && (unconditionally || this.MatchesPredicate(consumer, handled))
+                        ? this.producer
+                        : null;
+                }
+
+                private bool MatchesServiceType(Type serviceType)
+                {
+                    return serviceType == this.producer.ServiceType;
+                }
+
+                private bool MatchesPredicate(InjectionConsumerInfo consumer, bool handled)
+                {
+                    if (this.producer.IsConditional)
+                    {
+                        var context = new PredicateContext(this.producer, consumer, handled);
+
+                        return this.producer.Predicate(context);
+                    }
+
+                    return true;
+                }
+            }
+
+            private sealed class OpenGenericToInstanceProducerProvider : IProducerProvider
+            {
+                internal readonly Predicate<PredicateContext> Predicate;
+
+                private readonly Lifestyle lifestyle;
+                private readonly Container container;
+
+                private readonly Dictionary<Type, InstanceProducer> cache = new Dictionary<Type, InstanceProducer>();
+
+                internal OpenGenericToInstanceProducerProvider(Type serviceType, Type implementationType,
+                    Lifestyle lifestyle, Predicate<PredicateContext> predicate, Container container)
+                {
+                    this.ServiceType = serviceType;
+                    this.ImplementationType = implementationType;
+                    this.lifestyle = lifestyle;
+                    this.Predicate = predicate;
+                    this.container = container;
+
+                    // We cache the result of this method, because this is a really heavy operation.
+                    // Not caching it can dramatically influence the performance of the registration process.
+                    this.AppliesToAllClosedServiceTypes = this.RegistrationAppliesToAllClosedServiceTypes();
+                }
+
+                public bool IsConditional
+                {
+                    get { return this.Predicate != null; }
+                }
+
+                public bool AppliesToAllClosedServiceTypes { get; private set; }
+
+                public Type ServiceType { get; private set; }
+
+                public Type ImplementationType { get; private set; }
+
+                public IEnumerable<InstanceProducer> GetCurrentProducers()
+                {
+                    return this.cache.Values;
+                }
+
+                public bool OverlapsWith(Type serviceType)
+                {
+                    if (this.Predicate != null)
+                    {
+                        // Conditionals never overlap compile time.
+                        return false;
+                    }
+
+                    return GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(serviceType,
+                        this.ImplementationType);
+                }
+
+                public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
+                    bool handled, bool unconditionally)
+                {
+                    InstanceProducer producer = this.GetOrBuildProducerFromCache(serviceType);
+
+                    if (producer != null)
+                    {
+                        var context = new PredicateContext(producer, consumer, handled);
+
+                        return unconditionally || this.MatchesPredicate(context)
+                            ? producer
+                            : null;
+                    }
+
+                    return null;
+                }
+
+                private InstanceProducer GetOrBuildProducerFromCache(Type serviceType)
+                {
+                    InstanceProducer producer;
+
+                    lock (this.cache)
+                    {
+                        if (this.cache.TryGetValue(serviceType, out producer))
+                        {
+                            return producer;
+                        }
+
+                        Type closedImplementation =
+                            GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType);
+
+                        if (closedImplementation != null)
+                        {
+                            producer = this.CreateNewProducerFor(serviceType, closedImplementation);
+                        }
+
+                        this.cache[serviceType] = producer;
+                    }
+
+                    return producer;
+                }
+
+                private InstanceProducer CreateNewProducerFor(Type serviceType, Type closedImplementation)
+                {
+                    return new InstanceProducer(
+                        serviceType,
+                        this.lifestyle.CreateRegistration(serviceType, closedImplementation, this.container),
+                        this.Predicate);
+                }
+
+                private bool MatchesPredicate(PredicateContext context)
+                {
+                    return this.Predicate != null ? this.Predicate(context) : true;
+                }
+
+                private bool RegistrationAppliesToAllClosedServiceTypes()
+                {
+                    // This is nice, if we pass the open generic service type to the GenericTypeBuilder, it
+                    // can check for us whether the implementation adds extra type constraints that the service
+                    // type doesn't have. This works, because if it doesn't add any type constraints, it will be
+                    // able to construct a new open service type, based on the generic type arguments of the
+                    // implementation. If it can't, it means that the implementionType applies to a subset.
+                    return
+                        this.Predicate == null
+                        && this.ImplementationType.IsGenericType
+                        && !this.ImplementationType.IsPartiallyClosed()
+                        && this.IsImplementationApplicableToEveryGenericType();
+                }
+
+                private bool IsImplementationApplicableToEveryGenericType()
+                {
+                    return GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(
+                        this.ServiceType,
+                        this.ImplementationType);
+                }
+            }
+        }
+    }
+}

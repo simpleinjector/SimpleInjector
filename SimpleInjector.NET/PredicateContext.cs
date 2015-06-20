@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,27 +26,35 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Reflection;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
     /// delegate that is that is supplied to the 
-    /// <see cref="Container.Register(Type,Type,Lifestyle,Predicate{OpenGenericPredicateContext})">Register</see>
+    /// <see cref="Container.RegisterConditional(Type,Type,Lifestyle,Predicate{PredicateContext})">Register</see>
     /// overload that takes this delegate. This type contains information about the open generic service that 
     /// is about to be created and it allows the user to examine the given instance to decide whether this 
     /// implementation should be created or not.
     /// </summary>
     /// <remarks>
     /// Please see the 
-    /// <see cref="Container.Register(Type,Type,Lifestyle,Predicate{OpenGenericPredicateContext})">Register</see>
+    /// <see cref="Container.RegisterConditional(Type,Type,Lifestyle,Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("OpenGenericPredicateContext ({DebuggerDisplay,nq})")]
-    public sealed class OpenGenericPredicateContext
+    [DebuggerDisplay("PredicateContext ({DebuggerDisplay,nq})")]
+    public sealed class PredicateContext
     {
-        internal OpenGenericPredicateContext(Type serviceType, Type implementationType, bool handled)
+        internal PredicateContext(InstanceProducer producer, InjectionConsumerInfo consumer, bool handled)
+            : this(producer.ServiceType, producer.Registration.ImplementationType, consumer, handled)
+        {
+        }
+
+        internal PredicateContext(Type serviceType, Type implementationType, InjectionConsumerInfo consumer,
+            bool handled)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
+            this.Consumer = consumer;
             this.Handled = handled;
         }
 
@@ -63,18 +71,26 @@ namespace SimpleInjector
         /// <value>The indication whether the event has been handled.</value>
         public bool Handled { get; private set; }
 
+        /// <summary>
+        /// Gets the contextual information of the consuming component that directly depends on the resolved
+        /// service. This property will return null in case the service is resolved directly from the container.
+        /// </summary>
+        /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
+        public InjectionConsumerInfo Consumer { get; private set; }
+
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
+        internal string DebuggerDisplay
         {
             get
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType: {0}, ImplementationType: {1}, Handled: {2}",
+                    "ServiceType: {0}, ImplementationType: {1}, Handled: {2}, Consumer: {3}",
                     this.ServiceType.ToFriendlyName(),
                     this.ImplementationType.ToFriendlyName(),
-                    this.Handled);
+                    this.Handled,
+                    this.Consumer);
             }
         }
     }

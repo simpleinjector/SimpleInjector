@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,7 +12,7 @@
         public void RegisterFunc_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             Func<object> invalidFunc = null;
             
@@ -26,7 +27,7 @@
         public void RegisterExpression_WithNullArgument_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             Expression invalidExpression = null;
 
@@ -41,7 +42,7 @@
         public void RegisterExpression_CalledTwice_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             e.Register(Expression.Constant(null));
 
@@ -56,7 +57,7 @@
         public void RegisterFunc_CalledTwice_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             e.Register(() => null);
 
@@ -71,7 +72,7 @@
         public void RegisterExpression_CalledAfterCallingRegisterFun_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             e.Register(() => null);
 
@@ -86,7 +87,7 @@
         public void RegisterFunc_CalledAfterCallingRegisterExpression_ThrowsException()
         {
             // Arrange
-            var e = new UnregisteredTypeEventArgs(typeof(IUserRepository));
+            var e = CreateValidUnregisteredTypeEventArgs();
 
             e.Register(Expression.Constant(null));
 
@@ -95,6 +96,16 @@
 
             // Assert
             AssertThat.Throws<ActivationException>(action);
+        }
+
+        private static UnregisteredTypeEventArgs CreateValidUnregisteredTypeEventArgs()
+        {
+            return new UnregisteredTypeEventArgs(
+                typeof(IUserRepository),
+                new InjectionConsumerInfo(
+                    typeof(IUserRepository),
+                    typeof(InMemoryUserRepository),
+                    typeof(RealUserService).GetConstructors().Single().GetParameters().First()));
         }
     }
 }

@@ -309,6 +309,37 @@
                 string.Join(", ", expectedOrderOfCreation.Select(type => type.ToFriendlyName())),
                 string.Join(", ", actualOrderOfCreation.Select(type => type.ToFriendlyName())));
         }
+        
+        [TestMethod]
+        public void GetInstance_InjectingPropertyWithConditionalRegistration_UsesTheExpectedPredicateContext()
+        {
+            // Arrange
+            PredicateContext context = null;
+
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.RegisterConditional<ITimeProvider, RealTimeProvider>(c =>
+            {
+                context = c;
+
+                Assert.AreSame(c.ServiceType, typeof(ITimeProvider));
+                Assert.AreSame(c.ImplementationType, typeof(RealTimeProvider));
+                Assert.IsNotNull(c.Consumer, "c.Consumer is null");
+                Assert.AreSame(context.Consumer.ImplementationType, typeof(ServiceWithProperty<ITimeProvider>));
+                Assert.AreEqual(context.Consumer.Target.Name, "Dependency");
+                Assert.AreSame(context.Consumer.Target.TargetType, typeof(ITimeProvider));
+
+                return true;
+            });
+
+            container.Register<ServiceWithProperty<ITimeProvider>>();
+
+            // Act
+            var service = container.GetInstance<ServiceWithProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency);
+        }
 
         private static Container CreateContainerThatInjectsAllProperties()
         {

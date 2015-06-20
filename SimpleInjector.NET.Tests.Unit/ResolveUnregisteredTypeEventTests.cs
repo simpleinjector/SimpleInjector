@@ -113,28 +113,21 @@
             // Arrange
             string expectedMessage = @"
                 No registration for type RealUserService could be found and an implicit registration could not 
-                be made. The constructor of type RealUserService contains the parameter of type 
-                IUserRepository with name 'repository' that is not registered. Please ensure IUserRepository 
+                be made. The constructor of type RealUserService contains the parameter with name 'repository'
+                and type IUserRepository that is not registered. Please ensure IUserRepository 
                 is registered, or change the constructor of RealUserService."
                 .TrimInside();
 
             // We don't register the required IUserRepository dependency.
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // RealUserService is a concrete class with a constructor with a single argument of type 
-                // IUserRepository.
-                container.GetInstance<RealUserService>();
+            // Act
+            // RealUserService is a concrete class with a constructor with a single argument of type 
+            // IUserRepository.
+            Action action = () => container.GetInstance<RealUserService>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (Exception ex)
-            {
-                AssertThat.ExceptionMessageContains(expectedMessage, ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>(expectedMessage, action);
         }
 
         [TestMethod]

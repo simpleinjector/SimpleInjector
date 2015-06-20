@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Extensions;
 
@@ -153,6 +154,8 @@
         public void Add_OnContainerControlledCollection_ThrowsNotSupported()
         {
             // Arrange
+            var c = Thread.CurrentThread.CurrentCulture;
+
             var container = ContainerFactory.New();
 
             container.RegisterCollection<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });

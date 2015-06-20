@@ -44,7 +44,7 @@ namespace SimpleInjector.Internals
 
         private readonly bool isPartialOpenGenericImplementation;
 
-        public GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
+        internal GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
         {
             this.closedGenericBaseType = closedGenericBaseType;
 
@@ -56,6 +56,29 @@ namespace SimpleInjector.Internals
                 this.partialOpenGenericImplementation = openGenericImplementation;
                 this.isPartialOpenGenericImplementation = true;
             }
+        }
+
+        internal static bool IsImplementationApplicableToEveryGenericType(Type openAbstraction,
+            Type openImplementation)
+        {
+            try
+            {
+                return MakeClosedImplementation(openAbstraction, openImplementation) != null;
+            }
+            catch (InvalidOperationException)
+            {
+                // This can happen in case there are some weird as type constraints, as with the curiously
+                // recurring template pattern. In that case we know that the implementation can't be applied
+                // to every generic type
+                return false;
+            }
+        }
+
+        internal static Type MakeClosedImplementation(Type closedAbstraction, Type openImplementation)
+        {
+            var builder = new GenericTypeBuilder(closedAbstraction, openImplementation);
+            var results = builder.BuildClosedGenericImplementation();
+            return results.ClosedGenericImplementation;
         }
 
         internal bool OpenGenericImplementationCanBeAppliedToServiceType()
@@ -298,6 +321,7 @@ namespace SimpleInjector.Internals
                 this.Arguments = arguments;
             }
 
+#if DEBUG
             public override string ToString()
             {
                 // This is for our own debugging purposes. We don't use the DebuggerDisplayAttribute, since
@@ -306,6 +330,7 @@ namespace SimpleInjector.Internals
                     this.ServiceType.ToFriendlyName(),
                     this.Arguments.Select(type => type.ToFriendlyName()).ToCommaSeparatedText());
             }
+#endif
         }
     }
 }

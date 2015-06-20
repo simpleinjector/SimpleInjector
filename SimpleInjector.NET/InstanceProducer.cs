@@ -105,6 +105,12 @@ namespace SimpleInjector
         {
         }
 
+        internal InstanceProducer(Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
+            : this(serviceType, registration)
+        {
+            this.Predicate = predicate;
+        }
+
         internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
         {
             Requires.IsNotNull(serviceType, "serviceType");
@@ -174,6 +180,18 @@ namespace SimpleInjector
         // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
         // when the producer is valid.
         internal Exception Exception { get; private set; }
+
+        internal Predicate<PredicateContext> Predicate { get; private set; }
+
+        internal bool IsConditional
+        {
+            get { return this.Predicate != null; }
+        }
+
+        internal bool IsUnconditional
+        {
+            get { return !this.IsConditional; }
+        }
 
         internal bool IsExpressionCreated
         {

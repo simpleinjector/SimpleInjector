@@ -94,7 +94,7 @@ namespace SimpleInjector
         internal static string LifestyleMismatchesReported(PotentialLifestyleMismatchDiagnosticResult error)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "A lifestyle mismatch is encountered. {0} Lifestyle mismatches can cause concurrency " + 
+                "A lifestyle mismatch is encountered. {0} Lifestyle mismatches can cause concurrency " +
                 "bugs in your application. Please see https://simpleinjector.org/dialm to understand this " +
                 "problem and how to solve it.",
                 error.Description);
@@ -149,6 +149,24 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
+        internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported()
+        {
+            return
+                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
+                "is set, because it is impossible for the container to detect whether the registration " +
+                "should replace a different registration or not.";
+        }
+
+        internal static string NonGenericTypeAlreadyRegisteredAsConditionalRegistration(Type serviceType)
+        {
+            return NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
+        }
+
+        internal static string NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(Type serviceType)
+        {
+            return NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: false);
+        }
+
         internal static string CollectionTypeAlreadyRegistered(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -160,14 +178,28 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
         }
 
-        internal static string ParameterTypeMustBeRegistered(Type implementationType, ParameterInfo parameter)
+        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int count)
         {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The constructor of type {3} contains the parameter of type {0} with name '{1}' that is " +
-                "not registered. Please ensure {0} is registered, or change the " +
-                "constructor of {2}.",
-                parameter.ParameterType.ToFriendlyName(), parameter.Name, implementationType.ToFriendlyName(),
-                parameter.Member.DeclaringType.ToFriendlyName());
+            if (target.Parameter != null)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
+                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}",
+                    target.Member.DeclaringType.ToFriendlyName(),
+                    target.Name,
+                    target.TargetType.ToFriendlyName(),
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, count));
+            }
+            else
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
+                    "Please ensure {2} is registered, or change {0}.{3}",
+                    target.Member.DeclaringType.ToFriendlyName(),
+                    target.Name,
+                    target.TargetType.ToFriendlyName(),
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, count));
+            }
         }
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType)
@@ -255,13 +287,6 @@ namespace SimpleInjector
                 injectee.ToFriendlyName(), innerException.Message);
         }
 
-        internal static string ContainerOptionsBelongsToAnotherContainer()
-        {
-            return
-                "The supplied ContainerOptions instance belongs to another Container instance. Create a " +
-                "new ContainerOptions per Container instance.";
-        }
-
         internal static string PropertyCanNotBeChangedAfterTheFirstRegistration(string propertyName)
         {
             return
@@ -273,14 +298,14 @@ namespace SimpleInjector
         {
             return TypeIsAmbiguous(typeof(Type)) + " " + string.Format(CultureInfo.InvariantCulture,
                 "The most likely cause of this happening is because the C# overload resolution picked " +
-                "a different method for you than you expected to call. The method C# selected for you is: " + 
-                "RegisterCollection<Type>(new[] {{ {0} }}). Instead, you probably intended to call: " + 
+                "a different method for you than you expected to call. The method C# selected for you is: " +
+                "RegisterCollection<Type>(new[] {{ {0} }}). Instead, you probably intended to call: " +
                 "RegisterCollection(typeof({1}), new[] {{ {2} }}).",
                 ToTypeOCfSharpFriendlyList(types),
                 Helpers.ToCSharpFriendlyName(types.First()),
                 ToTypeOCfSharpFriendlyList(types.Skip(1)));
         }
-        
+
         internal static string TypeIsAmbiguous(Type serviceType)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -386,42 +411,18 @@ namespace SimpleInjector
                 lifestyleRegistration.GetType().ToFriendlyName(),
                 lifestyleRegistration.Lifestyle.GetType().ToFriendlyName());
         }
-        
+
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations)
         {
             var friendlyNames = implementations.Select(type => type.ToFriendlyName());
 
             return string.Format(CultureInfo.InvariantCulture,
-                    "There are {0} types in the supplied list of types or assemblies that represent the " + 
+                    "There are {0} types in the supplied list of types or assemblies that represent the " +
                     "same closed generic type {1}. Conflicting types: {2}.",
-                    implementations.Length, 
+                    implementations.Length,
                     closedServiceType.ToFriendlyName(),
                     friendlyNames.ToCommaSeparatedText());
-        }
-
-        internal static string MultipleTypesThatRepresentClosedGenericTypeForRegisterMany(Type closedServiceType,
-            Type[] implementations)
-        {
-            var friendlyNames = implementations.Select(type => type.ToFriendlyName());
-
-            return string.Format(CultureInfo.InvariantCulture,
-                    "There are {0} types that represent the closed generic type {1}. Types: {2}. " +
-                    "Either remove one of the types or use an overload that takes an {3} delegate, " +
-                    "which allows you to define the way these types should be registered.",
-                    implementations.Length, closedServiceType.ToFriendlyName(),
-                    friendlyNames.ToCommaSeparatedText(),
-                    typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name);
-        }
-
-        internal static string ErrorInRegisterOpenGenericRegistration(Type openGenericServiceType,
-            Type closedGenericImplementation, string message)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "There was an error in the registration of open generic type {0}. " +
-                "Failed to build a registration for type {1}. {2}",
-                openGenericServiceType.ToFriendlyName(), closedGenericImplementation.ToFriendlyName(),
-                message);
         }
 
         internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType)
@@ -435,11 +436,6 @@ namespace SimpleInjector
                 "generate a Func<T>. Either switch to one of the other RegisterCollection overloads, or " +
                 "don't use a decorator that depends on a Func<T> for injecting the decoratee.",
                 serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
-        }
-
-        internal static string SuppliedTypeIsNotAnOpenGenericTypeThisOverloadOnlySupportsGenerics(Type type)
-        {
-            return SuppliedTypeIsNotAnOpenGenericType(type) + " This method overload only handles generic types.";
         }
 
         internal static string SuppliedTypeIsNotAGenericType(Type type)
@@ -498,13 +494,6 @@ namespace SimpleInjector
                 "service type {1} is not.", decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
-        internal static string ValueIsInvalidForEnumType(int value, Type enumType)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "The value {0} is invalid for Enum-type {1}.",
-                value, enumType.ToFriendlyName());
-        }
-
         internal static string TheSuppliedRegistrationBelongsToADifferentContainer()
         {
             return "The supplied Registration belongs to a different container.";
@@ -558,25 +547,6 @@ namespace SimpleInjector
                 "unable to handle open generic types because it can only map closed generic service types " +
                 "to a single implementation. Try using RegisterCollection instead. Invalid types: {0}.",
                 typeNames.ToCommaSeparatedText());
-        }
-
-        internal static string ThisRegisterManyForOpenGenericOverloadDoesNotAllowOpenGenerics(
-            IEnumerable<Type> openGenericTypes)
-        {
-            var typeNames = openGenericTypes.Select(type => type.ToFriendlyName());
-
-            return string.Format(CultureInfo.InvariantCulture,
-                "The supplied list of types contains an open generic type, but this overloaded method is " +
-                "unable to handle open generic types because this overload can only register closed " +
-                "generic services types that have a single implementation. Please use the overload that " +
-                "takes in the {0} instead. Invalid types: {1}.",
-                typeof(SimpleInjector.Extensions.BatchRegistrationCallback).Name,
-                typeNames.ToCommaSeparatedText());
-        }
-
-        internal static string TheCollectionShouldContainAtleastOneElement()
-        {
-            return "The supplied collection should contain at least one element.";
         }
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
@@ -678,20 +648,20 @@ namespace SimpleInjector
                 "supported. Consider making one single call to RegisterCollection(typeof({0}), types).",
                 Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
         }
-        
+
         internal static string MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(Type serviceType,
             bool controlled)
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "You already made a registration for the {0} type using one of the RegisterCollection " +
                 "overloads that registers container-{1} collections, while this method registers container-" +
-                "{2} collections. Mixing calls for the same open generic service type is not supported. " +
-                "Consider making both call either using uncontrolled overloads or the controlled overloads.",
-                serviceType.GetGenericTypeDefinition().ToFriendlyName(),
+                "{2} collections. Mixing calls is not supported. Consider merging those calls or make both " +
+                "calls either as controlled or uncontrolled registration.",
+                (serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType).ToFriendlyName(),
                 controlled ? "uncontrolled" : "controlled",
                 controlled ? "controlled" : "uncontrolled");
         }
-        
+
         internal static string ValueInvalidForEnumType(string paramName, object invalidValue, Type enumClass)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -743,6 +713,133 @@ namespace SimpleInjector
             return SuppliedTypeIsNotOpenGenericExplainingAlternatives(type, typeof(Type).Name);
         }
 
+        internal static string RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
+            Type closedServiceType, Type overlappingGenericImplementationType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "There is already an open generic registration for {0} (with implementation {1}) that " +
+                "overlaps with the registration of {2} that you are trying to make. If your intention is " +
+                "to use {1} as fall back registration, please instead call: " +
+                "RegisterConditional(typeof({3}), typeof({4}), c => !c.Handled).",
+                closedServiceType.GetGenericTypeDefinition().ToFriendlyName(),
+                overlappingGenericImplementationType.ToFriendlyName(),
+                closedServiceType.ToFriendlyName(),
+                Helpers.ToCSharpFriendlyName(closedServiceType.GetGenericTypeDefinition()),
+                Helpers.ToCSharpFriendlyName(overlappingGenericImplementationType));
+        }
+
+        internal static string AnOverlappingGenericRegistrationExists(Type openGenericServiceType,
+            Type overlappingImplementationType, bool isExistingRegistrationConditional,
+            Type implementationTypeOfNewRegistration, bool isNewRegistrationConditional)
+        {
+            string solution = "Either remove one of the registrations or make them both conditional.";
+
+            if (isExistingRegistrationConditional && isNewRegistrationConditional &&
+                overlappingImplementationType == implementationTypeOfNewRegistration)
+            {
+                solution =
+                    "You can merge both registrations into a single conditional registration and combine " +
+                    "both predicates into one single predicate.";
+            }
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "There is already a {0}registration for {1} (with implementation {2}) that " +
+                "overlaps with the registration for {3} that you are trying to make. This new " +
+                "registration would cause ambiguity, because both registrations would be used for the " +
+                "same closed service types. {4}",
+                isExistingRegistrationConditional ? "conditional " : string.Empty,
+                openGenericServiceType.ToFriendlyName(),
+                overlappingImplementationType.ToFriendlyName(),
+                implementationTypeOfNewRegistration.ToFriendlyName(),
+                solution);
+        }
+
+        internal static string MultipleApplicationRegistrationsFound(Type serviceType, 
+            Tuple<Type, Type, InstanceProducer>[] overlappingRegistrations)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Multiple applicable registrations found for {0}. The applicable registrations are {1}. " +
+                "If your goal is to make one registration a fall back in case another registration is not " +
+                "applicable, make the fall back registration last and check the Handled property in the " +
+                "predicate.",
+                serviceType.ToFriendlyName(),
+                overlappingRegistrations.Select(BuildRegistrationName).ToCommaSeparatedText());
+        }
+
+        private static string BuildRegistrationName(Tuple<Type, Type, InstanceProducer> registration, int index)
+        {
+            Type serviceType = registration.Item1;
+            Type implementationType = registration.Item2;
+            InstanceProducer producer = registration.Item3;
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "({0}) the {1} {2}registration for {3} using {4}",
+                index + 1,
+                producer.IsConditional ? "conditional" : "unconditional",
+                serviceType.IsGenericTypeDefinition 
+                    ? "open generic " 
+                    : serviceType.IsGenericType ? "closed generic " : string.Empty,
+                serviceType.ToFriendlyName(),
+                implementationType.ToFriendlyName());
+        }
+
+        private static string NonGenericTypeAlreadyRegistered(Type serviceType,
+            bool existingRegistrationIsConditional)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Type {0} has already been registered as {1} registration. For non-generic types, " +
+                "conditional and unconditional registrations can't be mixed.",
+                serviceType.ToFriendlyName(),
+                existingRegistrationIsConditional ? "conditional" : "unconditional");
+        }
+
+        private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
+            InjectionTargetInfo target, int count)
+        {
+            string serviceTypeName = target.TargetType.ToFriendlyName();
+
+            bool isGenericType = target.TargetType.IsGenericType;
+
+            string openServiceTypeName = isGenericType
+                ? target.TargetType.GetGenericTypeDefinition().ToFriendlyName()
+                : target.TargetType.ToFriendlyName();
+
+            if (count > 1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    " {0} conditional registrations for {1} exist{2}, but none of the supplied predicates " +
+                    "returned true when provided with the contextual information for {3}.",
+                    count,
+                    openServiceTypeName,
+                    isGenericType ? (" that are applicable to " + serviceTypeName) : string.Empty,
+                    target.Member.DeclaringType.ToFriendlyName());
+            }
+            else if (count == 1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    " 1 conditional registration for {0} exists{1}, but its supplied predicate didn't " +
+                    "return true when provided with the contextual information for {2}.",
+                    openServiceTypeName,
+                    isGenericType ? (" that is applicable to " + serviceTypeName) : string.Empty,
+                    target.Member.DeclaringType.ToFriendlyName());
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string SuppliedTypeIsNotOpenGenericExplainingAlternatives(Type type, string registeringElement)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "Supply this method with the open generic type {0} to register all available " +
+                "implementations of this type, or call RegisterCollection(Type, IEnumerable<{1}>) either " +
+                "with the open or closed version of that type to register a collection of instances based " +
+                "on that type.",
+                Helpers.ToCSharpFriendlyName(type.GetGenericTypeDefinition()),
+                registeringElement);
+        }
+
         private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types)
         {
             return string.Join(", ",
@@ -757,17 +854,6 @@ namespace SimpleInjector
                 "If you meant to register all available implementations of {0}, call " +
                 "RegisterCollection(typeof({0}), IEnumerable<{1}>) instead.",
                 type.ToFriendlyName(),
-                registeringElement);
-        }
-
-        private static string SuppliedTypeIsNotOpenGenericExplainingAlternatives(Type type, string registeringElement)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Supply this method with the open generic type {0} to register all available " + 
-                "implementations of this type, or call RegisterCollection(Type, IEnumerable<{1}>) either " + 
-                "with the open or closed version of that type to register a collection of instances based " + 
-                "on that type.",
-                Helpers.ToCSharpFriendlyName(type.GetGenericTypeDefinition()),
                 registeringElement);
         }
     }
