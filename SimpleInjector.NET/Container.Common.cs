@@ -318,25 +318,26 @@ namespace SimpleInjector
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
             bool includeExternalProducers = true)
         {
-            IEnumerable<InstanceProducer> producers =
+            var producers =
                 from entry in this.explicitRegistrations.Values
                 from producer in entry.Producers
                 select producer;
+
+            producers = producers.Concat(this.rootProducerCache.Values);
 
             if (includeExternalProducers)
             {
                 producers = producers.Concat(this.externalProducers.Keys);
             }
 
-            producers = producers.Concat(this.rootProducerCache.Values).Distinct();
-
             // Filter out the invalid registrations (see the IsValid property for more information).
-            return (
-                from producer in producers
+            producers =
+                from producer in producers.Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
                 where producer != null
                 where includeInvalidContainerRegisteredTypes || producer.IsValid
-                select producer)
-                .ToArray();
+                select producer;
+
+            return producers.ToArray();
         }
 
         internal object GetItem(object key)
@@ -704,13 +705,6 @@ namespace SimpleInjector
 
             public bool AppliesTo(Type implementationType, InitializationContext context)
             {
-                if (context == null)
-                {
-                    // LEGACY: AdvancedExtensions.GetInitializer passes in a null context. We have to support
-                    // that.
-                    return false;
-                }
-
                 return this.predicate(context);
             }
 

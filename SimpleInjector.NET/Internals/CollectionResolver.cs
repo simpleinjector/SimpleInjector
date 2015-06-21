@@ -46,19 +46,6 @@ namespace SimpleInjector.Internals
             this.ServiceType = serviceType;
         }
 
-        internal IEnumerable<InstanceProducer> Producers
-        {
-            get
-            {
-                // We must lock this, because producers can be added to the cache, while the user calls
-                // GetCurrentInstances on a different thread.
-                lock (this.producerCache)
-                {
-                    return this.producerCache.Values.ToArray();
-                }
-            }
-        }
-
         protected IEnumerable<RegistrationGroup> RegistrationGroups
         {
             get { return this.registrationGroups; }
