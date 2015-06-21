@@ -157,7 +157,7 @@
     <Compile Include="ExpressionBuiltEventArgs.cs" />
     <Compile Include="Internals\ArgumentMapping.cs" />
     <Compile Include="DecoratorContext.cs" />
-    <Compile Include="Decorators\DecoratorExtensions.cs" />
+    <Compile Include="Extensions\DecoratorExtensions.cs" />
     <Compile Include="DecoratorPredicateContext.cs" />
     <Compile Include="Decorators\ContainerUncontrolledServicesDecoratorInterceptor.cs" />
     <Compile Include="Internals\ContainerControlledCollection.cs" />

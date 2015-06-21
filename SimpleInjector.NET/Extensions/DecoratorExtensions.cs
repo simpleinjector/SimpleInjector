@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Decorators
+namespace SimpleInjector.Extensions
 {
     using System;
 

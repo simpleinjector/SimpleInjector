@@ -151,9 +151,6 @@
     <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorExpressionInterceptorData.cs">
       <Link>Decorators\DecoratorExpressionInterceptorData.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorExtensions.cs">
-      <Link>Decorators\DecoratorExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Decorators\DecoratorHelpers.cs">
       <Link>Decorators\DecoratorHelpers.cs</Link>
     </Compile>
@@ -261,6 +258,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\ExpressionBuiltEventArgs.cs">
       <Link>ExpressionBuiltEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
+      <Link>Extensions\DecoratorExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericBatchRegistrationExtensions.cs">
       <Link>Extensions\OpenGenericBatchRegistrationExtensions.cs</Link>
