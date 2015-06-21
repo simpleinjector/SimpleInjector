@@ -91,13 +91,13 @@
             this.container.Register<TService, TImplementation>();
         }
 
-        public void RegisterSingle<TService, TImplementation>(IConstructorSelector selector)
+        public void Register<TService, TImplementation>(IConstructorSelector selector, Lifestyle lifestyle)
             where TService : class
             where TImplementation : class, TService
         {
             this.RegisterExplicitConstructor<TService, TImplementation>(selector);
 
-            this.container.Register<TService, TImplementation>(Lifestyle.Singleton);
+            this.container.Register<TService, TImplementation>(lifestyle);
         }
 
         private void RegisterExplicitConstructor<TService, TImplementation>(IConstructorSelector selector)

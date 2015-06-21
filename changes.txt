@@ -5,26 +5,27 @@ Version 3.0.0 (v3.0 RTM)
 
 	Improvements/Changes:
 		-[Core] Container now implements IDisposable (fixes #5).
-		-[Core] Added RegisterAll overloads that take in an assembly to allow simple inject to search through
-		 the supplied assemblies and register all found types in the collection (fixes #6).
 		-[Core] Added RegisterDecorator<TService, TDecorator>() methods (fixes #7).
-		-[Core] Added RegisterDecorator() overloads as instance methods on the Container (fixes #7).
+		-[Core] Added RegisterDecorator() as instance methods on the Container (fixes #7).
 		-[Core] Register(Type, Type) overloads now accept open-generic types as well (fixes #7).
-		-[Core] Added Container.Register(Type, IEnumerable<Assembly>) and 
-		 Container.RegisterCollection(Type, IEnumerable<Assembly>) overloads for batch registration. (fixes #7)
 	    -[Core] Added Container.GetTypesToRegister method for batch registration. (fixes #7)
-		-[Core] Added Container.RegisterInstance overloads as replacement for RegisterSingle overloads that
+		-[Core] Added Container.RegisterSingleton methods as replacement for RegisterSingle overloads that
 		 take in an instance (fixes #44).
+		-[Core] Added Container.RegisterCollection methods as replacement for RegisterAll (fixes #42).
 		-[Core] InstanceProducer<TService> added that inherits from InstanceProducer and adds a
 		 "TService GetInstance()" method. The generic Lifestyle.CreateProducer methods return an
 		 InstanceProducer<TService> (fixes #39).
-		-[Core] Batch registration using the Register and RegisterCollection overloads that accept a list
-		 of Assembly instances and the Container.GetTypesToRegister method filter out Code Contract classes
-		 (classes that are marked with a ContractClassForAttribute) (fixes #19).
 		-[Core] DiagnosticResult.Severity property added to allow differentiating between warnings and
 		 information messages (fixes #9).
 		-[Core] RegisterCollection(Type, IEnumerable<Registration>) now accepts open generic types as well
 		 (fixes #22).
+		-[Core] Added Container.Register(Type, IEnumerable<Assembly>) and 
+		 Container.RegisterCollection(Type, IEnumerable<Assembly>) overloads for batch registration. (fixes #7)
+		-[Core] Added RegisterCollection overloads that take in an assembly to allow simple inject to search 
+		 through the supplied assemblies and register all found types in the collection (fixes #6).
+		-[Core] Batch registration using the Register and RegisterCollection overloads that accept a list
+		 of Assembly instances and the Container.GetTypesToRegister method filter out Code Contract classes
+		 (classes that are marked with a ContractClassForAttribute) (fixes #19).
 		-[Core] Resolving variant collections is now supported for container-uncontrolled collections as well
 		 (fixes #25).
 		-[Core] RegisterConditional methods added to make conditional registrations for both non-generic and
@@ -38,21 +39,15 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Made ScopedLifestyle.CreateCurrentScopeProvider method abstract (fixes #11).
 		-[Core] Removed ScopedLifestyle.DisposeInstances method (fixes #11).
 		-[Core] Removed Container.InjectProperties method (fixes #12).
-		-[Core] Removed the Container.RegisterSingle<TConcrete>() method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle<TService, TImplementation>() method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle<TService>(TService) method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle<TService>(Func<TService>) method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle(Type, Type) method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle(Type, Func<object>) method (fixes #44).
-		-[Core] Removed the Container.RegisterSingle(Type, object) method (fixes #44).
-		-[Core] Container.RegisterAll methods renamed to Container.RegisterCollection (fixes #42).
+		-[Core] Removed the Container.RegisterSingle method overloads (fixes #44).
+		-[Core] Removed the Container.RegisterAll method overloads (fixes #42).
 		-[Core] Moved DecoratorPredicateContext class to the SimpleInjector root namespace (fixes #7).
 		-[Core] Moved DecoratorContext to the SimpleInjector root namespace (fixes #7).
 		-[Core] Removed RegisterSingleDecorator extension methods (fixed #7).
 		-[Core] Removed RegisterAllOpenGeneric extension methods (fixes #7).
 		-[Core] Removed RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods (fixes #7).
 		-[Core] Moved OpenGenericPredicateContext to the SimpleInjector root namespace (fixes #7).
-		-[Core] second argument of Container.Register(Type, Type) renamed from "implementation" to
+		-[Core] Second argument of Container.Register(Type, Type) renamed from "implementation" to
 		 "implementationType".
 		-[Core] Removed RegisterManyForOpenGeneric extension methods (fixes #7).
 		-[Core] Removed GetTypesToRegister extension methods (fixes #7).
@@ -74,6 +69,7 @@ Version 3.0.0 (v3.0 RTM)
 	Bug fixes:
 		-[Core] Registering a Func<object> using UnregisteredTypeEventArgs.Register(Func<object>) caused the
 		 Diagnostic system to throw a NullRefernceException (fixes #49).
+		-[Core] Prevented incorrectly mixing registrations for several types of collections (fixes #8).
 
 	Project Changes:
 		-Removed Common Service Locator adapter (fixes #26).

@@ -113,7 +113,7 @@ namespace SimpleInjector
         {
             this.containerId = Interlocked.Increment(ref counter);
 
-            this.RegisterInstance<Container>(this);
+            this.RegisterSingleton<Container>(this);
 
             this.Options = new ContainerOptions(this)
             {

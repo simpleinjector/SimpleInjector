@@ -136,7 +136,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IService>(instance);
+            container.RegisterSingleton<IService>(instance);
 
             container.GetInstance<IService>();
 

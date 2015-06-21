@@ -235,7 +235,7 @@
 
             container.RegisterInitializer<ICommand>(c => { actualNumberOfCalls++; });
 
-            container.RegisterInstance<ICommand>(new ConcreteCommand());
+            container.RegisterSingleton<ICommand>(new ConcreteCommand());
 
             // Act
             // Request the instance 4 times
@@ -251,7 +251,7 @@
             // Assert
             Assert.AreEqual(1, actualNumberOfCalls,
                 "The container will even call the initializer on instances that are passed in from the " +
-                "outside, but in the case of RegisterSingle, the initializer should only be called once.");
+                "outside, but in the case of RegisterSingleton, the initializer should only be called once.");
         }
 
         [TestMethod]
@@ -307,7 +307,7 @@
 
             container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
-            container.RegisterInstance<ICommand>(new ConcreteCommand());
+            container.RegisterSingleton<ICommand>(new ConcreteCommand());
 
             // Act
             container.GetInstance<ICommand>();

@@ -27,7 +27,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             container.Verify();
 
@@ -41,7 +41,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             container.GetInstance<IUserRepository>();
 

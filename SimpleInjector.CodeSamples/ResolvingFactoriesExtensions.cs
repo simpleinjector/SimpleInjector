@@ -10,7 +10,7 @@
     public static class ResolvingFactoriesExtensions
     {
         // This extension method is equivalent to the following registration, for each and every T:
-        // container.RegisterSingle<Func<T>>(() => container.GetInstance<T>());
+        // container.RegisterSingleton<Func<T>>(() => container.GetInstance<T>());
         // This is useful for consumers that need to create multiple instances of a dependency.
         // This mimics the behavior of Autofac. In Autofac this behavior is default.
         public static void AllowResolvingFuncFactories(this Container container)

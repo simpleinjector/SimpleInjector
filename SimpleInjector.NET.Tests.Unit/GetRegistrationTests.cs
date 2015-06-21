@@ -200,7 +200,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<ITimeProvider>(new RealTimeProvider());
+            container.RegisterSingleton<ITimeProvider>(new RealTimeProvider());
 
             // Act
             var provider = container.GetRegistration(typeof(ITimeProvider));

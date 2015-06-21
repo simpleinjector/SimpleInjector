@@ -109,7 +109,7 @@
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
             // Use the RegisterSingle<IEnumerable<T>> method.
-            container.RegisterInstance<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
+            container.RegisterSingleton<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
 
@@ -325,7 +325,7 @@
             var expectedSingletonHandler = new RealCommandCommandHandler();
 
             // Use the RegisterSingle<IEnumerable<T>> method
-            container.RegisterInstance<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
+            container.RegisterSingleton<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
 

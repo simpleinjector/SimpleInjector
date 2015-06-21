@@ -307,7 +307,7 @@
             AddConventions(container,
                 new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
 
-            container.RegisterInstance<IDisposable>(dependency);
+            container.RegisterSingleton<IDisposable>(dependency);
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();

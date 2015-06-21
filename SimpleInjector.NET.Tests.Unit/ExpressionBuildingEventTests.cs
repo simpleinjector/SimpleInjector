@@ -510,7 +510,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -529,7 +529,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -557,7 +557,7 @@
 
             container.ExpressionBuilding += handler;
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.ExpressionBuilding -= handler;

@@ -68,7 +68,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             // RealUserService is concrete with a constructor with a single argument of type IUserRepository.
@@ -83,7 +83,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             object instance1 = container.GetInstance<RealUserService>();
@@ -98,7 +98,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             // Get the concrete class with a constructor with the argument of concrete type RealUserService.

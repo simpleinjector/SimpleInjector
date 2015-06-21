@@ -201,10 +201,10 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method has been removed. Please call RegisterInstance<TService>(TService) instead.", error: true)]
+        [Obsolete("This method has been removed. Please call RegisterSingleton<TService>(TService) instead.", error: true)]
         public void RegisterSingle<TService>(TService instance) where TService : class
         {
-            this.RegisterInstance<TService>(instance);
+            this.RegisterSingleton<TService>(instance);
         }
 
         /// <summary>This method has been removed.</summary>
@@ -213,10 +213,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
         /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method has been removed. Please call RegisterInstance(Type, object) instead.", error: true)]
+        [Obsolete("This method has been removed. Please call RegisterSingleton(Type, object) instead.", error: true)]
         public void RegisterSingle(Type serviceType, object instance)
         {
-            this.RegisterInstance(serviceType, instance);
+            this.RegisterSingleton(serviceType, instance);
         }
 
         /// <summary>This method has been removed.</summary>

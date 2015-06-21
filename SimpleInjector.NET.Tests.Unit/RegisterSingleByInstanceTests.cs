@@ -14,7 +14,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             var instance1 = container.GetInstance<IUserRepository>();
@@ -33,7 +33,7 @@
             IUserRepository invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterInstance<IUserRepository>(invalidInstance);
+            Action action = () => container.RegisterSingleton<IUserRepository>(invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -44,10 +44,10 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
-            Action action = () => container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
@@ -61,7 +61,7 @@
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
-            Action action = () => container.RegisterInstance<UserServiceBase>(new FakeUserService(null));
+            Action action = () => container.RegisterSingleton<UserServiceBase>(new FakeUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
@@ -72,11 +72,11 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act
-            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterSingleton<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetInstance.");
@@ -94,7 +94,7 @@
             var count = repositories.Count();
 
             // Act
-            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterSingleton<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetAllInstances.");
@@ -108,7 +108,7 @@
 
             // This registration will make the DelegateBuilder call the 
             // SingletonInstanceProducer.BuildExpression method.
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.GetInstance<RealUserService>();
@@ -123,11 +123,11 @@
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterInstance(typeof(IUserRepository), impl);
+            container.RegisterSingleton(typeof(IUserRepository), impl);
 
             // Assert
             Assert.AreEqual(impl, container.GetInstance<IUserRepository>(),
-                "GetInstance should return the instance registered using RegisterSingle.");
+                "GetInstance should return the instance registered using RegisterSingleton.");
         }
 
         [TestMethod]
@@ -139,13 +139,13 @@
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterInstance(typeof(IUserRepository), impl);
+            container.RegisterSingleton(typeof(IUserRepository), impl);
 
             var instance1 = container.GetInstance<IUserRepository>();
             var instance2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.AreEqual(instance1, instance2, "RegisterSingle should register singleton.");
+            Assert.AreEqual(instance1, instance2, "RegisterSingleton should register singleton.");
         }
 
         [TestMethod]
@@ -157,7 +157,7 @@
             object impl = new List<int>();
 
             // Act
-            Action action = () => container.RegisterInstance(typeof(IUserRepository), impl);
+            Action action = () => container.RegisterSingleton(typeof(IUserRepository), impl);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
@@ -172,7 +172,7 @@
             object impl = new List<int>();
 
             // Act
-            container.RegisterInstance(impl.GetType(), impl);
+            container.RegisterSingleton(impl.GetType(), impl);
         }
 
         [TestMethod]
@@ -185,7 +185,7 @@
             object validInstance = new SqlUserRepository();
 
             // Act
-            Action action = () => container.RegisterInstance(invalidServiceType, validInstance);
+            Action action = () => container.RegisterSingleton(invalidServiceType, validInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -201,7 +201,7 @@
             object invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterInstance(validServiceType, invalidInstance);
+            Action action = () => container.RegisterSingleton(validServiceType, invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -215,7 +215,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {
@@ -238,7 +238,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterInstance(typeof(IUserRepository), new SqlUserRepository());
+            container.RegisterSingleton(typeof(IUserRepository), new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {

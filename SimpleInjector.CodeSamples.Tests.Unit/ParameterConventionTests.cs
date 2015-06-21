@@ -67,7 +67,7 @@
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
-            container.RegisterSingle<ClassWithOnlyPrimitiveConstructorParams>(
+            container.RegisterSingleton<ClassWithOnlyPrimitiveConstructorParams>(
                 convention.WithParameter("someValue", "foo"),
                 convention.WithParameter(() => DateTime.MinValue),
                 convention.WithParameter("name", () => "bar"));
@@ -87,7 +87,7 @@
 
             // Act
             // ctor: ClassWithPrimiveConstructorParams(string someValue, DateTime now, string name)
-            container.RegisterSingle<IService, ClassWithOnlyPrimitiveConstructorParams>(
+            container.RegisterSingleton<IService, ClassWithOnlyPrimitiveConstructorParams>(
                 convention.WithParameter("someValue", "foo"),
                 convention.WithParameter(() => DateTime.MinValue),
                 convention.WithParameter("name", () => "bar"));
@@ -134,11 +134,11 @@
 
             container.Options.RegisterParameterConvention(convention);
 
-            container.RegisterInstance<IDependency>(new Dependency());
+            container.RegisterSingleton<IDependency>(new Dependency());
 
             // Act
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
-            container.RegisterSingle<ClassWithAPrimitiveConstructorParam>(
+            container.RegisterSingleton<ClassWithAPrimitiveConstructorParam>(
                 convention.WithParameter("someDecimal", decimal.MinValue));
         }
 
@@ -152,10 +152,10 @@
             var container = new Container();
             var convention = new ParameterConvention();
             container.Options.RegisterParameterConvention(convention);
-            container.RegisterInstance<IDependency>(expectedDependency);
+            container.RegisterSingleton<IDependency>(expectedDependency);
 
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
-            container.RegisterSingle<ClassWithAPrimitiveConstructorParam>(
+            container.RegisterSingleton<ClassWithAPrimitiveConstructorParam>(
                 convention.WithParameter("someDecimal", expectedDecimal));
 
             // Act

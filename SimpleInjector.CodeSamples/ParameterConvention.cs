@@ -157,7 +157,7 @@
             container.Register<TService, TImplementation>();
         }
 
-        public static void RegisterSingle<TConcrete>(this Container container,
+        public static void RegisterSingleton<TConcrete>(this Container container,
             params ParameterConvention.Parameter[] parameters)
             where TConcrete : class
         {
@@ -165,7 +165,7 @@
             container.Register<TConcrete>(Lifestyle.Singleton);
         }
 
-        public static void RegisterSingle<TService, TImplementation>(this Container container,
+        public static void RegisterSingleton<TService, TImplementation>(this Container container,
             params ParameterConvention.Parameter[] parameters)
             where TImplementation : class, TService
             where TService : class

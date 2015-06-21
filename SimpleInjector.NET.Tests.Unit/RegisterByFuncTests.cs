@@ -28,7 +28,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
+            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 
             // Act
             Action action = () => container.Register<IUserRepository>(() => new InMemoryUserRepository());
@@ -42,7 +42,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act

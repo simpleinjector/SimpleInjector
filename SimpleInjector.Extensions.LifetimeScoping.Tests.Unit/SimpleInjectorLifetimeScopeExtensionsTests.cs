@@ -1066,7 +1066,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
-            container.RegisterInstance<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
+            container.RegisterSingleton<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
 
             // Outer depends on Middle that depends on Inner. 
             // Registration is deliberately made in a different order to prevent that the order of
@@ -1119,7 +1119,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             // PropertyDependency, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
-            container.RegisterInstance<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
+            container.RegisterSingleton<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
 
             // Middle depends on Inner that depends on property PropertyDependency. 
             // Registration is deliberately made in a different order to prevent that the order of

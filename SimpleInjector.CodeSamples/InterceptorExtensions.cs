@@ -17,7 +17,7 @@ namespace SimpleInjector.CodeSamples
     container.InterceptWith<MonitoringInterceptor>(type => type.Name.EndsWith("CommandHandler"));
 
     // Reuse the same interceptor instance.
-    container.RegisterSingle<MonitoringInterceptor>();
+    container.RegisterSingleton<MonitoringInterceptor>();
     container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
     
     // Manually: returns a SqlUserRepository decorated by a MonitoringInterceptor.
