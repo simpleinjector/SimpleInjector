@@ -32,7 +32,8 @@ Version 3.0.0 (v3.0 RTM)
 		 closed-generic and open-generic types (fixes #4).
 
 	Breaking Changes:
-		-[Core] IConstructorVerificationBehavior merged with IConstructorVerificationBehavior (fixes #2).
+		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and
+		 replaced with a new IDependencyInjectionBehavior abstraction that combines the two (fixes #2).
 		-[Core] Constructor overload 'Container(ContainerOptions)' removed from Container (fixes #40).
 		-[Core] Made ScopedLifestyle.WhenScopeEnds method non-virtual (fixes #11).
 		-[Core] Made ScopedLifestyle.RegisterForDisposal method non-virtual (fixes #11).
@@ -57,8 +58,6 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Class constraint "where TService : class" added to GetAllInstances<TService>() method.
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
-		-[Core] Extra parameters added to IConstructorInjectionBehavior methods BuildParameterExpression and
-		 Verify.
 		-[Core] UnregisteredTypeEventArgs constructor made internal.
 		-[Wcf] Made the WcfOperationScope class internal (fixes #12).
 		-[Wcf] Removed the SimpleInjectorWcfExtensions.EnablePerWcfOperationLifestyle method (fixes #12).

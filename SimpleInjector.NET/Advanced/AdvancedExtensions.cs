@@ -187,11 +187,12 @@ namespace SimpleInjector.Advanced
             container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
-        internal static void Verify(this IConstructorInjectionBehavior behavior, ConstructorInfo constructor)
+        internal static void Verify(this IDependencyInjectionBehavior behavior, Type serviceType, 
+            ConstructorInfo constructor)
         {
             foreach (var parameter in constructor.GetParameters())
             {
-                behavior.Verify(parameter);
+                behavior.Verify(new InjectionConsumerInfo(serviceType, constructor.DeclaringType, parameter));
             }
         }
     }

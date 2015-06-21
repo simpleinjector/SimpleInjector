@@ -8,78 +8,42 @@
     using SimpleInjector.Advanced;
 
     [TestClass]
-    public class DefaultConstructorInjectionBehaviorTests
+    public class DefaultDependencyInjectionBehaviorTests
     {
         [TestMethod]
         public void BuildParameterExpression_WithNullParameterArgument_ThrowsExpectedException()
         {
             // Arrange
-            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
+            var behavior = GetContainerOptions().DependencyInjectionBehavior;
 
             // Act
-            Action action = () => behavior.BuildParameterExpression(typeof(object), typeof(object), null);
+            Action action = () => behavior.BuildParameterExpression(null);
 
             // Assert
-            AssertThat.ThrowsWithParamName<ArgumentNullException>("parameter", action);
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("consumer", action);
         }
         
         [TestMethod]
-        public void BuildParameterExpression_WithNullImplementationTypeArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
-
-            // Act
-            Action action = () => behavior.BuildParameterExpression(typeof(object), null, null);
-
-            // Assert
-            AssertThat.ThrowsWithParamName<ArgumentNullException>("implementationType", action);
-        }
-
-        [TestMethod]
-        public void BuildParameterExpression_WithNullServiceTypeArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            var behavior = GetContainerOptions().ConstructorInjectionBehavior;
-
-            // Act
-            Action action = () => behavior.BuildParameterExpression(null, null, null);
-
-            // Assert
-            AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceType", action);
-        }
-
-        [TestMethod]
-        public void ConstructorInjectionBehavior_CustomBehaviorThatReturnsNull_ThrowsExpressiveException()
+        public void DependencyInjectionBehavior_CustomBehaviorThatReturnsNull_ThrowsExpressiveException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.ConstructorInjectionBehavior = new FakeConstructorInjectionBehavior
+            container.Options.DependencyInjectionBehavior = new FakeDependencyInjectionBehavior
             {
                 ExpressionToReturnFromBuildParameterExpression = null
             };
 
             container.Register<IUserRepository, SqlUserRepository>();
 
-            try
-            {
-                // Act
-                // RealUserService depends on IUserRepository
-                container.GetInstance<RealUserService>();
+            // Act
+            // RealUserService depends on IUserRepository
+            Action action = () => container.GetInstance<RealUserService>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "FakeConstructorInjectionBehavior that was registered through " + 
-                    "Container.Options.ConstructorInjectionBehavior returned a null reference", ex);
-                AssertThat.ExceptionMessageContains(
-                    "argument of type IUserRepository with name 'repository' from the constructor of type " + 
-                    "RealUserService", ex);
-            }
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "FakeDependencyInjectionBehavior that was registered through " + 
+                "the Container.Options.DependencyInjectionBehavior property, returned a null reference",
+                action);
         }
 
         [TestMethod]
@@ -93,17 +57,20 @@
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).Name)
                 .TrimInside();
 
-            var behavior = new Container().Options.ConstructorInjectionBehavior;
+            var behavior = new Container().Options.DependencyInjectionBehavior;
 
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).GetConstructors().Single();
 
-            var invalidParameter = constructor.GetParameters().Single();
+            var consumer = new InjectionConsumerInfo(
+                constructor.DeclaringType,
+                constructor.DeclaringType,
+                constructor.GetParameters().Single());
 
             try
             {
                 // Act
-                behavior.Verify(invalidParameter);
+                behavior.Verify(consumer);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -125,17 +92,20 @@
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).Name)
                 .TrimInside();
 
-            var behavior = new Container().Options.ConstructorInjectionBehavior;
+            var behavior = new Container().Options.DependencyInjectionBehavior;
 
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).GetConstructors().Single();
 
-            var invalidParameter = constructor.GetParameters().Single();
+            var consumer = new InjectionConsumerInfo(
+                constructor.DeclaringType,
+                constructor.DeclaringType,
+                constructor.GetParameters().Single());
 
             try
             {
                 // Act
-                behavior.Verify(invalidParameter);
+                behavior.Verify(consumer);
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -165,17 +135,16 @@
             }
         }
 
-        private sealed class FakeConstructorInjectionBehavior : IConstructorInjectionBehavior
+        private sealed class FakeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
             public Expression ExpressionToReturnFromBuildParameterExpression { get; set; }
 
-            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
             {
                 return this.ExpressionToReturnFromBuildParameterExpression;
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(InjectionConsumerInfo consumer)
             {
             }
         }

@@ -11,14 +11,14 @@
     {
         private readonly List<ParameterDeclaringTypePair> parameters = new List<ParameterDeclaringTypePair>();
 
-        bool IParameterConvention.CanResolve(ParameterInfo parameter)
+        bool IParameterConvention.CanResolve(InjectionTargetInfo target)
         {
-            return this.GetParameter(parameter) != null;
+            return target.Parameter != null && this.GetParameter(target.Parameter) != null;
         }
 
-        Expression IParameterConvention.BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        Expression IParameterConvention.BuildExpression(InjectionConsumerInfo consumer)
         {
-            return this.GetParameter(parameter).Expression;
+            return this.GetParameter(consumer.Target.Parameter).Expression;
         }
 
         public Parameter WithParameter<T>(T value)

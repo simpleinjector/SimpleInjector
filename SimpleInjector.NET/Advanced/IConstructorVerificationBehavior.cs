@@ -32,9 +32,10 @@ namespace SimpleInjector.Advanced
     /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
     /// of the container.
     /// </summary>
-    [Obsolete("In v3, the IConstructorVerificationBehavior interface has been merged with the " +
-        "IConstructorInjectionBehavior interface. Please use the IConstructorInjectionBehavior interface " +
-        "to override Simple Injector's verification behavior.", error: true)]
+    [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " + 
+        "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
+        "IDependencyInjectionBehavior interface to override Simple Injector's verification behavior.", 
+        error: true)]
     public interface IConstructorVerificationBehavior
     {
         /// <summary>Verifies the specified <paramref name="parameter"/>.</summary>

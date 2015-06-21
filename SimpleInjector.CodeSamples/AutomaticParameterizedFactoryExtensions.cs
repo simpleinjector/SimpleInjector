@@ -22,7 +22,7 @@
 
             var behavior = new AutomaticParameterizedFactoriesHelper(options);
 
-            options.ConstructorInjectionBehavior = behavior;
+            options.DependencyInjectionBehavior = behavior;
 
             SetBehavior(options.Container, behavior);
         }
@@ -209,11 +209,10 @@
             internal object OldValue { get; set; }
         }
 
-        private sealed class AutomaticParameterizedFactoriesHelper
-            : IConstructorInjectionBehavior
+        private sealed class AutomaticParameterizedFactoriesHelper : IDependencyInjectionBehavior
         {
             private readonly Container container;
-            private readonly IConstructorInjectionBehavior originalBehavior;
+            private readonly IDependencyInjectionBehavior originalBehavior;
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> serviceLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
             
@@ -223,25 +222,24 @@
             public AutomaticParameterizedFactoriesHelper(ContainerOptions options)
             {
                 this.container = options.Container;
-                this.originalBehavior = options.ConstructorInjectionBehavior;
+                this.originalBehavior = options.DependencyInjectionBehavior;
             }
 
-            void IConstructorInjectionBehavior.Verify(ParameterInfo parameter)
+            void IDependencyInjectionBehavior.Verify(InjectionConsumerInfo consumer)
             {
-                if (this.FindThreadLocal(parameter) == null)
+                if (this.FindThreadLocal(consumer.Target) == null)
                 {
-                    this.originalBehavior.Verify(parameter);
+                    this.originalBehavior.Verify(consumer);
                 }
             }
 
-            Expression IConstructorInjectionBehavior.BuildParameterExpression(Type serviceType,
-                Type implementationType, ParameterInfo parameter)
+            Expression IDependencyInjectionBehavior.BuildParameterExpression(InjectionConsumerInfo consumer)
             {
-                var local = this.FindThreadLocal(parameter);
+                var local = this.FindThreadLocal(consumer.Target);
 
                 if (local != null)
                 {
-                    if (parameter.ParameterType.IsValueType && this.container.IsVerifying())
+                    if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying())
                     {
                         throw new InvalidOperationException(
                             "You can't use Verify() is the factory product contains value types.");
@@ -249,10 +247,10 @@
 
                     return Expression.Convert(
                         Expression.Property(Expression.Constant(local), "Value"),
-                        parameter.ParameterType);
+                        consumer.Target.TargetType);
                 }
 
-                return this.originalBehavior.BuildParameterExpression(serviceType, implementationType, parameter);
+                return this.originalBehavior.BuildParameterExpression(consumer);
             }
 
             // Called by RegisterFactory<TFactory>
@@ -284,15 +282,15 @@
                 return this.serviceLocals[serviceType][parameterType];
             }
 
-            private ThreadLocal<object> FindThreadLocal(ParameterInfo parameter)
+            private ThreadLocal<object> FindThreadLocal(InjectionTargetInfo target)
             {
                 Dictionary<Type, ThreadLocal<object>> parameterLocals;
 
-                if (this.implementationLocals.TryGetValue(parameter.Member.DeclaringType, out parameterLocals))
+                if (this.implementationLocals.TryGetValue(target.Member.DeclaringType, out parameterLocals))
                 {
                     ThreadLocal<object> local;
 
-                    if (parameterLocals.TryGetValue(parameter.ParameterType, out local))
+                    if (parameterLocals.TryGetValue(target.TargetType, out local))
                     {
                         return local;
                     }

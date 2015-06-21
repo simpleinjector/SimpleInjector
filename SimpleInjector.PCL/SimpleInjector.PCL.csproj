@@ -58,11 +58,11 @@
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultBatchRegistrationBehavior.cs">
       <Link>Advanced\DefaultBatchRegistrationBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorInjectionBehavior.cs">
-      <Link>Advanced\DefaultConstructorInjectionBehavior.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultConstructorResolutionBehavior.cs">
       <Link>Advanced\DefaultConstructorResolutionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\DefaultDependencyInjectionBehavior.cs">
+      <Link>Advanced\DefaultDependencyInjectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\DefaultLifestyleSelectionBehavior.cs">
       <Link>Advanced\DefaultLifestyleSelectionBehavior.cs</Link>
@@ -81,6 +81,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\IConstructorVerificationBehavior.cs">
       <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Advanced\IDependencyInjectionBehavior.cs">
+      <Link>Advanced\IDependencyInjectionBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Advanced\ILifestyleSelectionBehavior.cs">
       <Link>Advanced\ILifestyleSelectionBehavior.cs</Link>

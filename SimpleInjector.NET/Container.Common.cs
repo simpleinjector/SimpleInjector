@@ -472,7 +472,7 @@ namespace SimpleInjector
             {
                 var constructor = this.Options.SelectConstructor(serviceType, implementationType);
 
-                this.Options.ConstructorInjectionBehavior.Verify(constructor);
+                this.Options.DependencyInjectionBehavior.Verify(serviceType, constructor);
             }
             catch (ActivationException ex)
             {

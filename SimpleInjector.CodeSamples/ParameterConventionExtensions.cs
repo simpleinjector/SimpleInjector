@@ -12,9 +12,9 @@
 
     public interface IParameterConvention
     {
-        bool CanResolve(ParameterInfo parameter);
+        bool CanResolve(InjectionTargetInfo target);
 
-        Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter);
+        Expression BuildExpression(InjectionConsumerInfo consumer);
     }
 
     public static class ParameterConventionExtensions
@@ -22,40 +22,39 @@
         public static void RegisterParameterConvention(this ContainerOptions options,
             IParameterConvention convention)
         {
-            options.ConstructorInjectionBehavior = new ConventionConstructorInjectionBehavior(
-                options.ConstructorInjectionBehavior, convention);
+            options.DependencyInjectionBehavior = new ConventionDependencyInjectionBehavior(
+                options.DependencyInjectionBehavior, convention);
         }
 
-        private class ConventionConstructorInjectionBehavior : IConstructorInjectionBehavior
+        private class ConventionDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            private IConstructorInjectionBehavior decorated;
+            private IDependencyInjectionBehavior decorated;
             private IParameterConvention convention;
 
-            public ConventionConstructorInjectionBehavior(
-                IConstructorInjectionBehavior decorated, IParameterConvention convention)
+            public ConventionDependencyInjectionBehavior(
+                IDependencyInjectionBehavior decorated, IParameterConvention convention)
             {
                 this.decorated = decorated;
                 this.convention = convention;
             }
 
             [DebuggerStepThrough]
-            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
             {
-                if (!this.convention.CanResolve(parameter))
+                if (!this.convention.CanResolve(consumer.Target))
                 {
-                    return this.decorated.BuildParameterExpression(serviceType, implementationType, parameter);
+                    return this.decorated.BuildParameterExpression(consumer);
                 }
 
-                return this.convention.BuildExpression(serviceType, implementationType, parameter);
+                return this.convention.BuildExpression(consumer);
             }
             
             [DebuggerStepThrough]
-            public void Verify(ParameterInfo parameter)
+            public void Verify(InjectionConsumerInfo consumer)
             {
-                if (!this.convention.CanResolve(parameter))
+                if (!this.convention.CanResolve(consumer.Target))
                 {
-                    this.decorated.Verify(parameter);
+                    this.decorated.Verify(consumer);
                 }
             }
         }
@@ -66,40 +65,40 @@
         private const string ConnectionStringPostFix = "ConnectionString";
 
         [DebuggerStepThrough]
-        public bool CanResolve(ParameterInfo parameter)
+        public bool CanResolve(InjectionTargetInfo target)
         {
             bool resolvable =
-                parameter.ParameterType == typeof(string) &&
-                parameter.Name.EndsWith(ConnectionStringPostFix) &&
-                parameter.Name.LastIndexOf(ConnectionStringPostFix) > 0;
+                target.TargetType == typeof(string) &&
+                target.Name.EndsWith(ConnectionStringPostFix) &&
+                target.Name.LastIndexOf(ConnectionStringPostFix) > 0;
 
             if (resolvable)
             {
-                this.VerifyConfigurationFile(parameter);
+                this.VerifyConfigurationFile(target);
             }
 
             return resolvable;
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            string connectionString = GetConnectionString(parameter);
+            string connectionString = GetConnectionString(consumer.Target);
 
             return Expression.Constant(connectionString, typeof(string));
         }
 
         [DebuggerStepThrough]
-        private void VerifyConfigurationFile(ParameterInfo parameter)
+        private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetConnectionString(parameter);
+            GetConnectionString(target);
         }
 
         [DebuggerStepThrough]
-        private static string GetConnectionString(ParameterInfo parameter)
+        private static string GetConnectionString(InjectionTargetInfo target)
         {
-            string name = parameter.Name.Substring(0,
-                parameter.Name.LastIndexOf(ConnectionStringPostFix));
+            string name = target.Name.Substring(0,
+                target.Name.LastIndexOf(ConnectionStringPostFix));
 
             var settings = ConfigurationManager.ConnectionStrings[name];
 
@@ -119,56 +118,56 @@
         private const string AppSettingsPostFix = "AppSetting";
 
         [DebuggerStepThrough]
-        public bool CanResolve(ParameterInfo parameter)
+        public bool CanResolve(InjectionTargetInfo target)
         {
-            Type type = parameter.ParameterType;
+            Type type = target.TargetType;
 
             bool resolvable =
                 (type.IsValueType || type == typeof(string)) &&
-                parameter.Name.EndsWith(AppSettingsPostFix) &&
-                parameter.Name.LastIndexOf(AppSettingsPostFix) > 0;
+                target.Name.EndsWith(AppSettingsPostFix) &&
+                target.Name.LastIndexOf(AppSettingsPostFix) > 0;
 
             if (resolvable)
             {
-                this.VerifyConfigurationFile(parameter);
+                this.VerifyConfigurationFile(target);
             }
 
             return resolvable;
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            object valueToInject = GetAppSettingValue(parameter);
+            object valueToInject = GetAppSettingValue(consumer.Target);
 
-            return Expression.Constant(valueToInject, parameter.ParameterType);
+            return Expression.Constant(valueToInject, consumer.Target.TargetType);
         }
 
         [DebuggerStepThrough]
-        private void VerifyConfigurationFile(ParameterInfo parameter)
+        private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetAppSettingValue(parameter);
+            GetAppSettingValue(target);
         }
 
         [DebuggerStepThrough]
-        private static object GetAppSettingValue(ParameterInfo parameter)
+        private static object GetAppSettingValue(InjectionTargetInfo target)
         {
-            string key = parameter.Name.Substring(0,
-                parameter.Name.LastIndexOf(AppSettingsPostFix));
+            string key = target.Name.Substring(0,
+                target.Name.LastIndexOf(AppSettingsPostFix));
 
             string configurationValue = ConfigurationManager.AppSettings[key];
 
-            if (configurationValue == null)
+            if (configurationValue != null)
             {
-                throw new ActivationException(
-                    "No application setting with key '" + key + "' could be found in the " +
-                    "application's configuration file.");
+                TypeConverter converter = TypeDescriptor.GetConverter(target.TargetType);
+
+                return converter.ConvertFromString(null,
+                    CultureInfo.InvariantCulture, configurationValue);
             }
 
-            TypeConverter converter = TypeDescriptor.GetConverter(parameter.ParameterType);
-
-            return converter.ConvertFromString(null,
-                CultureInfo.InvariantCulture, configurationValue);
+            throw new ActivationException(
+                "No application setting with key '" + key + "' could be found in the " +
+                "application's configuration file.");
         }
     }
 
@@ -176,29 +175,30 @@
     // This code is merely an example.
     public class OptionalParameterConvention : IParameterConvention
     {
-        private readonly IConstructorInjectionBehavior injectionBehavior;
+        private readonly IDependencyInjectionBehavior injectionBehavior;
 
-        public OptionalParameterConvention(IConstructorInjectionBehavior injectionBehavior)
+        public OptionalParameterConvention(IDependencyInjectionBehavior injectionBehavior)
         {
             this.injectionBehavior = injectionBehavior;
         }
 
         [DebuggerStepThrough]
-        public bool CanResolve(ParameterInfo parameter)
+        public bool CanResolve(InjectionTargetInfo target)
         {
-            return parameter.GetCustomAttributes(typeof(OptionalAttribute), true).Length > 0;
+            return target.Parameter != null &&
+                target.GetCustomAttributes(typeof(OptionalAttribute), true).Length > 0;
         }
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
             try
             {
-                return this.injectionBehavior.BuildParameterExpression(serviceType, implementationType,
-                    parameter);
+                return this.injectionBehavior.BuildParameterExpression(consumer);
             }
             catch (ActivationException)
             {
+                var parameter = consumer.Target.Parameter;
                 return Expression.Constant(parameter.RawDefaultValue, parameter.ParameterType);
             }
         }

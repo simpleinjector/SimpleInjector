@@ -68,8 +68,8 @@
         {
             try
             {
-                this.container.Options.ConstructorInjectionBehavior.BuildParameterExpression(
-                    serviceType, implementationType, parameter);
+                this.container.Options.DependencyInjectionBehavior.BuildParameterExpression(
+                    new InjectionConsumerInfo(serviceType, implementationType, parameter));
 
                 return true;
             }

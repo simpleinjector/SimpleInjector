@@ -210,21 +210,35 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), serviceType.GetConstructors().Length);
         }
 
-        internal static string ConstructorMustNotContainInvalidParameter(ConstructorInfo constructor,
-            ParameterInfo invalidParameter)
+        internal static string TypeMustNotContainInvalidInjectionTarget(InjectionTargetInfo invalidTarget)
         {
             string reason = string.Empty;
 
-            if (invalidParameter.ParameterType.IsValueType)
+            if (invalidTarget.TargetType.IsValueType)
             {
                 reason = " because it is a value type";
             }
 
-            return string.Format(CultureInfo.InvariantCulture,
-                "The constructor of type {0} contains parameter '{1}' of type {2} which can not be used " +
-                "for constructor injection{3}.",
-                constructor.DeclaringType.ToFriendlyName(), invalidParameter.Name,
-                invalidParameter.ParameterType.ToFriendlyName(), reason);
+            if (invalidTarget.Parameter != null)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "The constructor of type {0} contains parameter '{1}' of type {2} which can not be used " +
+                    "for constructor injection{3}.",
+                    invalidTarget.Member.DeclaringType.ToFriendlyName(), 
+                    invalidTarget.Name,
+                    invalidTarget.TargetType.ToFriendlyName(), 
+                    reason);
+            }
+            else
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "The type {0} contains property '{1}' of type {2} which can not be used for property " +
+                    "injection{3}.",
+                    invalidTarget.Member.DeclaringType.ToFriendlyName(),
+                    invalidTarget.Name,
+                    invalidTarget.TargetType.ToFriendlyName(), 
+                    reason);
+            }
         }
 
         internal static string TypeShouldBeConcreteToBeUsedOnThisMethod(Type serviceType)
@@ -357,19 +371,15 @@ namespace SimpleInjector
                 type.ToFriendlyName(), innerException.Message);
         }
 
-        internal static string ConstructorInjectionBehaviorReturnedNull(
-            IConstructorInjectionBehavior injectionBehavior, ParameterInfo parameter)
+        internal static string DependencyInjectionBehaviorReturnedNull(IDependencyInjectionBehavior behavior)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through Container.Options.ConstructorInjectionBehavior " +
-                "returned a null reference after its BuildParameterExpression(ParameterInfo) method was " +
-                "supplied with the argument of type {1} with name '{2}' from the constructor of type {3}. " +
-                "{4}.BuildParameterExpression implementations should never return null, but should throw " +
-                "a {5} with an expressive message instead.",
-                injectionBehavior.GetType().ToFriendlyName(),
-                parameter.ParameterType.ToFriendlyName(), parameter.Name,
-                parameter.Member.DeclaringType.ToFriendlyName(),
-                typeof(IConstructorInjectionBehavior).Name,
+                "The {0} that was registered through the Container.Options.DependencyInjectionBehavior " +
+                "property, returned a null reference after its BuildParameterExpression() method. " +
+                "{1}.BuildParameterExpression implementations should never return null, but should throw " +
+                "a {2} with an expressive message instead.",
+                behavior.GetType().ToFriendlyName(),
+                typeof(IDependencyInjectionBehavior).Name,
                 typeof(ActivationException).FullName);
         }
 

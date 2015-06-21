@@ -33,10 +33,16 @@ namespace SimpleInjector
     public class InjectionConsumerInfo
     {
         internal static readonly InjectionConsumerInfo Root = null;
-
-        internal InjectionConsumerInfo(Type serviceType, Type implementationType, ParameterInfo parameter)
+        
+        /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
+        /// <param name="serviceType">The service type of the consumer of the component that should be created.</param>
+        /// <param name="implementationType">The implementation type of the consumer of the component that should be created.</param>
+        /// <param name="parameter">The constructor parameter for the created component.</param>
+        public InjectionConsumerInfo(Type serviceType, Type implementationType, ParameterInfo parameter)
             : this(serviceType, implementationType)
         {
+            Requires.IsNotNull(serviceType, "serviceType");
+            Requires.IsNotNull(implementationType, "implementationType");
             Requires.IsNotNull(parameter, "parameter");
 
             this.Target = new InjectionTargetInfo(parameter);

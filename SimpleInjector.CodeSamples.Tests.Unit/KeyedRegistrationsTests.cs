@@ -26,8 +26,8 @@
 
             var plugins = new KeyedRegistrations<string, IPlugin>(container);
 
-            container.Options.ConstructorInjectionBehavior = new NamedConstructorInjectionBehavior(
-                container.Options.ConstructorInjectionBehavior,
+            container.Options.DependencyInjectionBehavior = new NamedDependencyInjectionBehavior(
+                container.Options.DependencyInjectionBehavior,
                 (serviceType, name) => plugins.GetRegistration(name));
 
             plugins.Register(typeof(Plugin1), "1");
@@ -136,34 +136,34 @@
             public IPlugin Plugin4 { get; private set; }
         }
 
-        public class NamedConstructorInjectionBehavior : IConstructorInjectionBehavior
+        public class NamedDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            private readonly IConstructorInjectionBehavior defaultBehavior;
+            private readonly IDependencyInjectionBehavior defaultBehavior;
             private readonly Func<Type, string, InstanceProducer> keyedProducerRetriever;
 
-            public NamedConstructorInjectionBehavior(IConstructorInjectionBehavior defaultBehavior,
+            public NamedDependencyInjectionBehavior(IDependencyInjectionBehavior defaultBehavior,
                 Func<Type, string, InstanceProducer> keyedProducerRetriever)
             {
                 this.defaultBehavior = defaultBehavior;
                 this.keyedProducerRetriever = keyedProducerRetriever;
             }
 
-            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
             {
-                var attribute = parameter.GetCustomAttribute<NamedAttribute>();
+                var attribute = consumer.Target.GetCustomAttribute<NamedAttribute>();
 
                 if (attribute != null)
                 {
-                    return this.keyedProducerRetriever(parameter.ParameterType, attribute.Name).BuildExpression();
+                    return this.keyedProducerRetriever(consumer.Target.TargetType, attribute.Name)
+                        .BuildExpression();
                 }
 
-                return this.defaultBehavior.BuildParameterExpression(serviceType, implementationType, parameter);
+                return this.defaultBehavior.BuildParameterExpression(consumer);
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(InjectionConsumerInfo consumer)
             {
-                this.defaultBehavior.Verify(parameter);
+                this.defaultBehavior.Verify(consumer);
             }
         }
     }

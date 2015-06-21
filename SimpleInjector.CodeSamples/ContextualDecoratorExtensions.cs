@@ -21,14 +21,14 @@
                 throw new InvalidOperationException("EnableContextualDecoratorSupport can't be called twice.");
             }
 
-            options.ConstructorInjectionBehavior =
+            options.DependencyInjectionBehavior =
                 new ContextualDecoratorInjectionBehavior(options.Container, predicates);
 
             options.Container.SetItem(PredicateCollectionKey, predicates);
         }
 
         public static void RegisterContextualDecorator(this Container container, Type serviceType, 
-            Type decoratorType, Predicate<ParameterInfo> contextualPredicate)
+            Type decoratorType, Predicate<InjectionTargetInfo> contextualPredicate)
         {
             var predicates = GetContextualPredicates(container);
 
@@ -58,29 +58,32 @@
             return (ContextualPredicateCollection)container.GetItem(PredicateCollectionKey);
         }
 
-        private sealed class ContextualDecoratorInjectionBehavior : IConstructorInjectionBehavior
+        private sealed class ContextualDecoratorInjectionBehavior : IDependencyInjectionBehavior
         {
             private readonly ContextualPredicateCollection contextualPredicates;
-            private readonly IConstructorInjectionBehavior defaultBehavior;
+            private readonly IDependencyInjectionBehavior defaultBehavior;
 
             public ContextualDecoratorInjectionBehavior(Container container, 
                 ContextualPredicateCollection contextualPredicates)
             {
                 this.contextualPredicates = contextualPredicates;
-                this.defaultBehavior = container.Options.ConstructorInjectionBehavior;
+                this.defaultBehavior = container.Options.DependencyInjectionBehavior;
             }
 
-            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            public void Verify(InjectionConsumerInfo consumer)
             {
-                var expression = this.defaultBehavior.BuildParameterExpression(serviceType, implementationType,
-                    parameter);
+                this.defaultBehavior.Verify(consumer);
+            }
+
+            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+            {
+                var expression = this.defaultBehavior.BuildParameterExpression(consumer);
 
                 List<PredicatePair> predicatePairs;
 
-                if (this.MustApplyContextualDecorator(parameter.ParameterType, out predicatePairs))
+                if (this.MustApplyContextualDecorator(consumer.Target.TargetType, out predicatePairs))
                 {
-                    var visitor = new ContextualDecoratorExpressionVisitor(parameter, predicatePairs);
+                    var visitor = new ContextualDecoratorExpressionVisitor(consumer.Target, predicatePairs);
 
                     expression = visitor.Visit(expression);
 
@@ -89,16 +92,11 @@
                         throw new InvalidOperationException("Couldn't apply the contextual decorator " + 
                             visitor.UnappliedDecorators.Last().FullName + ". Make sure that all registered " +
                             "decorators that wrap this decorator are transient and don't depend on " +
-                            "Func<" + parameter.ParameterType.FullName + ">.");
+                            "Func<" + consumer.Target.TargetType.FullName + ">.");
                     }
                 }
 
                 return expression;
-            }
-
-            public void Verify(ParameterInfo parameter)
-            {
-                this.defaultBehavior.Verify(parameter);
             }
 
             private bool MustApplyContextualDecorator(Type serviceType, out List<PredicatePair> predicatePairs)
@@ -117,13 +115,14 @@
 
         private sealed class ContextualDecoratorExpressionVisitor : ExpressionVisitor
         {
-            private readonly ParameterInfo parameter;
+            private readonly InjectionTargetInfo target;
             private readonly List<PredicatePair> predicatePairs;
             private readonly List<PredicatePair> appliedPairs = new List<PredicatePair>();
 
-            public ContextualDecoratorExpressionVisitor(ParameterInfo parameter, List<PredicatePair> predicatePairs)
+            public ContextualDecoratorExpressionVisitor(InjectionTargetInfo target, 
+                List<PredicatePair> predicatePairs)
             {
-                this.parameter = parameter;
+                this.target = target;
                 this.predicatePairs = predicatePairs;
             }
 
@@ -145,7 +144,7 @@
                 {
                     this.appliedPairs.Add(predicatePair);
 
-                    return this.Visit(predicatePair.ContextualPredicate(this.parameter) ? node.IfTrue : node.IfFalse);
+                    return this.Visit(predicatePair.ContextualPredicate(this.target) ? node.IfTrue : node.IfFalse);
                 }
 
                 return base.VisitConditional(node);
@@ -210,10 +209,10 @@
         {
             internal readonly Type DecoratorType;
             internal readonly Predicate<DecoratorPredicateContext> PredicateToReplace;
-            internal readonly Predicate<ParameterInfo> ContextualPredicate;
+            internal readonly Predicate<InjectionTargetInfo> ContextualPredicate;
 
-            public PredicatePair(Type decoratorType, Predicate<DecoratorPredicateContext> predicateToReplace, 
-                Predicate<ParameterInfo> contextualPredicate)
+            public PredicatePair(Type decoratorType, Predicate<DecoratorPredicateContext> predicateToReplace,
+                Predicate<InjectionTargetInfo> contextualPredicate)
             {
                 this.DecoratorType = decoratorType;
                 this.PredicateToReplace = predicateToReplace;

@@ -62,7 +62,7 @@ namespace SimpleInjector
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IConstructorInjectionBehavior injectionBehavior;
+        private IDependencyInjectionBehavior injectionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IPropertySelectionBehavior propertyBehavior;
@@ -93,7 +93,7 @@ namespace SimpleInjector
 
             this.Container = container;
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
-            this.injectionBehavior = new DefaultConstructorInjectionBehavior(container);
+            this.injectionBehavior = new DefaultDependencyInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(Lifestyle.Transient);
             this.batchRegistrationBehavior = new DefaultBatchRegistrationBehavior(container);
@@ -148,9 +148,10 @@ namespace SimpleInjector
         /// property to override Simple Injector's verification behavior.
         /// </summary>
         /// <value>The constructor resolution behavior.</value>
-        [Obsolete("In v3, the IConstructorVerificationBehavior interface has been merged with the " +
-            "IConstructorInjectionBehavior interface. Please use the ConstructorInjectionBehavior property " +
-            "to override Simple Injector's verification behavior.", error: true)]
+        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
+            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
+            "DependencyInjectionBehavior property to override Simple Injector's verification behavior.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
 
@@ -160,7 +161,19 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when the container already contains registrations.
         /// </exception>
-        public IConstructorInjectionBehavior ConstructorInjectionBehavior
+        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
+            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
+            "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",
+            error: true)]
+        public IConstructorInjectionBehavior ConstructorInjectionBehavior { get; set; }
+
+        /// <summary>Gets or sets the dependency injection behavior.</summary>
+        /// <value>The constructor injection behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public IDependencyInjectionBehavior DependencyInjectionBehavior
         {
             get
             {
@@ -171,12 +184,12 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, "value");
 
-                this.ThrowWhenContainerHasRegistrations("ConstructorInjectionBehavior");
+                this.ThrowWhenContainerHasRegistrations("DependencyInjectionBehavior");
 
                 this.injectionBehavior = value;
             }
         }
-
+        
         /// <summary>
         /// Gets or sets the property selection behavior. The container's default behavior is to do no
         /// property injection.
@@ -377,9 +390,9 @@ namespace SimpleInjector
                 descriptions.Add("Custom Constructor Resolution");
             }
 
-            if (!(this.ConstructorInjectionBehavior is DefaultConstructorInjectionBehavior))
+            if (!(this.DependencyInjectionBehavior is DefaultDependencyInjectionBehavior))
             {
-                descriptions.Add("Custom Constructor Injection");
+                descriptions.Add("Custom Dependency Injection");
             }
 
             if (!(this.PropertySelectionBehavior is DefaultPropertySelectionBehavior))
@@ -416,13 +429,16 @@ namespace SimpleInjector
         internal Expression BuildParameterExpression(Type serviceType, Type implementationType, 
             ParameterInfo parameter)
         {
-            Expression expression = this.ConstructorInjectionBehavior.BuildParameterExpression(
-                serviceType, implementationType, parameter);
+            var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
 
+            Expression expression = this.DependencyInjectionBehavior.BuildParameterExpression(consumer);
+
+            // Expression will only be null if a user created a custom IConstructorInjectionBehavior that
+            // returned null.
             if (expression == null)
             {
-                throw new ActivationException(StringResources.ConstructorInjectionBehaviorReturnedNull(
-                    this.ConstructorInjectionBehavior, parameter));
+                throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
+                    this.DependencyInjectionBehavior));
             }
 
             return expression;

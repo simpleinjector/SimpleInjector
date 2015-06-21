@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -33,30 +33,19 @@ namespace SimpleInjector.Advanced
     /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
     /// of the container.
     /// </summary>
+    [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
+        "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
+        "IDependencyInjectionBehavior interface to override Simple Injector's constructor injection behavior.",
+        error: true)]
     public interface IConstructorInjectionBehavior
     {
         /// <summary>
         /// Builds an <see cref="Expression"/> for the supplied <paramref name="parameter"/>, based on the
         /// container's configuration.
         /// </summary>
-        /// <param name="serviceType">The service type of the consuming type that contains the given
-        /// <paramref name="parameter"/>.</param>
-        /// <param name="implementationType">The implementation type of the consuming type that contains the 
-        /// given <paramref name="parameter"/>.</param>
         /// <param name="parameter">The parameter.</param>
         /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
         /// <paramref name="parameter"/>. This method never returns null.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
-        /// reference.</exception>
-        Expression BuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter);
-
-        /// <summary>Verifies the specified <paramref name="parameter"/>.</summary>
-        /// <param name="parameter">The parameter.</param>
-        /// <exception cref="ActivationException">Thrown when the <paramref name="parameter"/> cannot be 
-        /// used for auto wiring.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
-        /// reference.</exception>
-        void Verify(ParameterInfo parameter);
+        Expression BuildParameterExpression(ParameterInfo parameter);
     }
 }

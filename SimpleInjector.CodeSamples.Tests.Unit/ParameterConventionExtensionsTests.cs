@@ -286,8 +286,8 @@
             // Arrange
             var container = new Container();
 
-            AddConventions(container,
-                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+            AddConventions(container, 
+                new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();
@@ -305,7 +305,7 @@
             var container = new Container();
 
             AddConventions(container,
-                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+                new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             container.RegisterSingleton<IDisposable>(dependency);
 
@@ -323,7 +323,7 @@
             var container = new Container();
 
             AddConventions(container,
-                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+                new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             // Act
             Action action = () => container.GetInstance<TypeWithRequiredDependency<IDisposable>>();
@@ -339,7 +339,7 @@
             var container = new Container();
 
             AddConventions(container,
-                new OptionalParameterConvention(container.Options.ConstructorInjectionBehavior));
+                new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalIntDependencyWithDefaultValueOfFive>();

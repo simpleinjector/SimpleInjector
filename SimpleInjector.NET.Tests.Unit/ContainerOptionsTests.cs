@@ -281,7 +281,7 @@
             var options = GetContainerOptions();
 
             // Act
-            Action action = () => options.ConstructorInjectionBehavior = null;
+            Action action = () => options.DependencyInjectionBehavior = null;
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -291,15 +291,15 @@
         public void ConstructorInjectionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
-            var expectedBehavior = new AlternativeConstructorInjectionBehavior();
+            var expectedBehavior = new AlternativeDependencyInjectionBehavior();
 
             var container = new Container();
 
             // Act
-            container.Options.ConstructorInjectionBehavior = expectedBehavior;
+            container.Options.DependencyInjectionBehavior = expectedBehavior;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, container.Options.ConstructorInjectionBehavior),
+            Assert.IsTrue(object.ReferenceEquals(expectedBehavior, container.Options.DependencyInjectionBehavior),
                 "The set_ConstructorInjectionBehavior did not work.");
         }
 
@@ -307,18 +307,18 @@
         public void ConstructorInjectionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
-            var expectedBehavior = new AlternativeConstructorInjectionBehavior();
+            var expectedBehavior = new AlternativeDependencyInjectionBehavior();
 
             var container = new Container();
 
             container.RegisterSingleton<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.ConstructorInjectionBehavior = expectedBehavior;
+            Action action = () => container.Options.DependencyInjectionBehavior = expectedBehavior;
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "ConstructorInjectionBehavior property cannot be changed after the first registration",
+                "DependencyInjectionBehavior property cannot be changed after the first registration",
                 action);
         }
 
@@ -513,13 +513,13 @@
             // Arrange
             var options = GetContainerOptions();
 
-            options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
+            options.DependencyInjectionBehavior = new AlternativeDependencyInjectionBehavior();
 
             // Act
             var description = options.DebuggerDisplayDescription;
 
             // Assert
-            Assert.AreEqual("Custom Constructor Injection", description);
+            Assert.AreEqual("Custom Dependency Injection", description);
         }
 
         [TestMethod]
@@ -560,7 +560,7 @@
 
             options.AllowOverridingRegistrations = true;
             options.ConstructorResolutionBehavior = new AlternativeConstructorResolutionBehavior();
-            options.ConstructorInjectionBehavior = new AlternativeConstructorInjectionBehavior();
+            options.DependencyInjectionBehavior = new AlternativeDependencyInjectionBehavior();
             options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
             options.LifestyleSelectionBehavior = new AlternativeLifestyleSelectionBehavior();
 
@@ -571,10 +571,11 @@
             Assert.AreEqual(@"
                 Allows Overriding Registrations,
                 Custom Constructor Resolution,
-                Custom Constructor Injection,
+                Custom Dependency Injection,
                 Custom Property Selection,
                 Custom Lifestyle Selection
-                ".TrimInside(), description);
+                ".TrimInside(), 
+                description);
         }
 
         [TestMethod]
@@ -633,15 +634,14 @@
             }
         }
 
-        private sealed class AlternativeConstructorInjectionBehavior : IConstructorInjectionBehavior
+        private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-                ParameterInfo parameter)
+            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
             {
                 throw new NotImplementedException();
             }
 
-            public void Verify(ParameterInfo parameter)
+            public void Verify(InjectionConsumerInfo consumer)
             {
                 throw new NotImplementedException();
             }

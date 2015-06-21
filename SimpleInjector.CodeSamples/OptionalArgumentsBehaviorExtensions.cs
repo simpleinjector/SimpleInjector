@@ -1,6 +1,5 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -10,41 +9,44 @@
     {
         public static void EnableSkippingOptionalConstructorArguments(ContainerOptions options)
         {
-            options.ConstructorInjectionBehavior =
-                new OptionalArgumentsInjectionBehavior(options.Container, options.ConstructorInjectionBehavior);
+            options.DependencyInjectionBehavior =
+                new OptionalArgumentsInjectionBehavior(options.Container, options.DependencyInjectionBehavior);
         }
     }
 
-    public class OptionalArgumentsInjectionBehavior : IConstructorInjectionBehavior
+    public class OptionalArgumentsInjectionBehavior : IDependencyInjectionBehavior
     {
         private readonly Container container;
-        private readonly IConstructorInjectionBehavior original;
+        private readonly IDependencyInjectionBehavior original;
 
-        public OptionalArgumentsInjectionBehavior(Container container, IConstructorInjectionBehavior original)
+        public OptionalArgumentsInjectionBehavior(Container container, IDependencyInjectionBehavior original)
         {
             this.container = container;
             this.original = original;
         }
 
         [DebuggerStepThrough]
-        public Expression BuildParameterExpression(Type serviceType, Type implementationType, 
-            ParameterInfo parameter)
+        public void Verify(InjectionConsumerInfo consumer)
         {
-            if (IsOptional(parameter) && !this.CanBeResolved(parameter))
+            var parameter = consumer.Target.Parameter;
+
+            if (parameter != null && !IsOptional(parameter))
+            {
+                this.original.Verify(consumer);
+            }
+        }
+
+        [DebuggerStepThrough]
+        public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+        {
+            var parameter = consumer.Target.Parameter;
+
+            if (parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter))
             {
                 return Expression.Constant(parameter.DefaultValue, parameter.ParameterType);
             }
 
-            return this.original.BuildParameterExpression(serviceType, implementationType, parameter);
-        }
-
-        [DebuggerStepThrough]
-        public void Verify(ParameterInfo parameter)
-        {
-            if (!IsOptional(parameter))
-            {
-                this.original.Verify(parameter);
-            }
+            return this.original.BuildParameterExpression(consumer);
         }
 
         private static bool IsOptional(ParameterInfo parameter)

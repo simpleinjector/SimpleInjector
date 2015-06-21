@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.Reflection;
@@ -39,11 +40,13 @@ namespace SimpleInjector
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
+            Requires.IsNotNull(parameter, "parameter");
             this.Parameter = parameter;
         }
 
         internal InjectionTargetInfo(PropertyInfo property)
         {
+            Requires.IsNotNull(property, "property");
             this.Property = property;
         }
 
@@ -75,7 +78,7 @@ namespace SimpleInjector
         /// <summary>Gets the member of the target. This is either the constructor of the parameter, or in
         /// case the target is a property, the property itself will be returned.</summary>
         /// <value>A <see cref="TargetType"/> containing the type of the target.</value>
-        internal MemberInfo Member
+        public MemberInfo Member
         {
             get { return this.Parameter != null ? this.Parameter.Member : this.Property; }
         }
@@ -139,6 +142,80 @@ namespace SimpleInjector
             return this.Parameter != null
                 ? this.Parameter.IsDefined(attributeType, inherit)
                 : this.Property.IsDefined(attributeType, inherit);
+        }
+
+        /// <summary>
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
+        /// </summary>
+        /// <typeparam name="T">The parameter to inspect.</typeparam>
+        /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
+        public T GetCustomAttribute<T>() where T : Attribute
+        {
+            return this.GetCustomAttribute<T>(inherit: true);
+        }
+
+        /// <summary>
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and 
+        /// optionally inspects the ancestors of that parameter.
+        /// </summary>
+        /// <typeparam name="T">The parameter to inspect.The parameter to inspect.</typeparam>
+        /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
+        /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
+        public T GetCustomAttribute<T>(bool inherit) where T : Attribute
+        {
+            return this.Parameter != null
+                ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
+                : (T)Attribute.GetCustomAttribute(this.Property, typeof(T), inherit);
+        }
+
+        /// <summary>
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
+        /// </summary>
+        /// <param name="attributeType">The type of attribute to search for.</param>
+        /// <returns>A custom attribute that matches attributeType, or null if no such attribute is found.</returns>
+        public Attribute GetCustomAttribute(Type attributeType)
+        {
+            return this.GetCustomAttribute(attributeType, inherit: true);
+        }
+
+        /// <summary>
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and 
+        /// optionally inspects the ancestors of that parameter.
+        /// </summary>
+        /// <param name="attributeType">The type of attribute to search for.</param>
+        /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
+        /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
+        public Attribute GetCustomAttribute(Type attributeType, bool inherit)
+        {
+            return this.Parameter != null
+                ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
+                : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
+        }
+
+        /// <summary>
+        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified parameter.
+        /// </summary>
+        /// <typeparam name="T">The type of attribute to search for.</typeparam>
+        /// <returns>A collection of the custom attributes that are applied to element and that match T, or 
+        /// an empty collection if no such attributes exist.</returns>
+        public IEnumerable<T> GetCustomAttributes<T>() where T : Attribute
+        {
+            return this.GetCustomAttributes<T>(inherit: true);
+        }
+
+        /// <summary>
+        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified 
+        /// parameter, and optionally inspects the ancestors of that parameter.
+        /// </summary>
+        /// <typeparam name="T">The type of attribute to search for.</typeparam>
+        /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
+        /// <returns>A collection of the custom attributes that are applied to element and that match T, or an 
+        /// empty collection if no such attributes exist.</returns>
+        public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute
+        {
+            return this.Parameter != null
+                ? (T[])Attribute.GetCustomAttributes(this.Parameter, typeof(T), inherit)
+                : (T[])Attribute.GetCustomAttributes(this.Property, typeof(T), inherit);
         }
     }
 }

@@ -80,7 +80,9 @@
     <Compile Include="ActivationException.full.cs" />
     <Compile Include="Advanced\AdvancedExtensions.cs" />
     <Compile Include="Advanced\DefaultBatchRegistrationBehavior.cs" />
+    <Compile Include="Advanced\DefaultDependencyInjectionBehavior.cs" />
     <Compile Include="Advanced\IBatchRegistrationBehavior.cs" />
+    <Compile Include="Advanced\IDependencyInjectionBehavior.cs" />
     <Compile Include="Container.Registration.Conditional.cs" />
     <Compile Include="Diagnostics\DiagnosticSeverity.enum.cs" />
     <Compile Include="InjectionConsumerInfo.cs" />
@@ -89,7 +91,6 @@
     <Compile Include="Internals\ConditionalHashSet.cs" />
     <Compile Include="Internals\ConstantArrayIndexizerVisitor.cs" />
     <Compile Include="Internals\ConstantFinderVisitor.cs" />
-    <Compile Include="Advanced\DefaultConstructorInjectionBehavior.cs" />
     <Compile Include="Advanced\DefaultConstructorResolutionBehavior.cs" />
     <Compile Include="Advanced\DefaultLifestyleSelectionBehavior.cs" />
     <Compile Include="Advanced\DefaultPropertySelectionBehavior.cs" />
