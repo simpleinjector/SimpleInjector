@@ -555,6 +555,7 @@ namespace SimpleInjector
         /// Registers that a new instance of <paramref name="implementationType"/> will be returned every time a
         /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and 
         /// <paramref name="implementationType"/> represent the same type, the type is registered by itself.
+        /// Open and closed generic types are supported.
         /// </summary>
         /// <remarks>
         /// This method uses the container's 
@@ -563,7 +564,8 @@ namespace SimpleInjector
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
-        /// <param name="implementationType">The actual type that will be returned when requested.</param>
+        /// <param name="implementationType">The actual type that will be returned when requested. 
+        /// This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
         /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
@@ -582,10 +584,12 @@ namespace SimpleInjector
         /// <summary>
         /// Registers that an instance of type <paramref name="implementationType"/> will be returned when an
         /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to 
-        /// the supplied <paramref name="lifestyle"/>.
+        /// the supplied <paramref name="lifestyle"/>. Open and closed generic types are supported.
         /// </summary>
-        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
-        /// <param name="implementationType">The concrete type that will be registered.</param>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.
+        /// This can be an open-generic type.</param>
+        /// <param name="implementationType">The concrete type that will be registered.
+        /// This can be an open-generic type.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
@@ -790,10 +794,12 @@ namespace SimpleInjector
         /// time an instance of type <paramref name="serviceType"/> type is requested. If 
         /// <paramref name="serviceType"/> and <paramref name="implementationType"/> represent the same type, the 
         /// type is registered by itself. <paramref name="implementationType"/> must be thread-safe when working 
-        /// in a multi-threaded environment.
+        /// in a multi-threaded environment. Open and closed generic types are supported.
         /// </summary>
-        /// <param name="serviceType">The base type or interface to register.</param>
-        /// <param name="implementationType">The actual type that will be returned when requested.</param>
+        /// <param name="serviceType">The base type or interface to register.
+        /// This can be an open-generic type.</param>
+        /// <param name="implementationType">The actual type that will be returned when requested.
+        /// This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
         /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
