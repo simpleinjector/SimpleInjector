@@ -30,6 +30,8 @@ Version 3.0.0 (v3.0 RTM)
 		 (fixes #25).
 		-[Core] RegisterConditional methods added to make conditional registrations for both non-generic and
 		 closed-generic and open-generic types (fixes #4).
+		-[Core] Improved the message of the Lifestyle Mismatch diagnostic warning to include the concrete type
+		 in the message (fixes #63).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and

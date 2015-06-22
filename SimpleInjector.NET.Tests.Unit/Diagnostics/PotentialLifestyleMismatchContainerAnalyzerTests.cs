@@ -4,6 +4,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class PotentialLifestyleMismatchContainerAnalyzerTests
@@ -27,6 +28,31 @@
 
             // Assert
             Assert.AreEqual("Potential Lifestyle Mismatches", item.Name);
+        }
+
+        [TestMethod]
+        public void Analyze_ContainerWithOneMismatchCausedByDecorator_ReturnsExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
+            container.Register<ILogger, ConsoleLogger>(Lifestyle.Singleton);
+            container.RegisterDecorator<ILogger, LoggerDecorator>(Lifestyle.Transient);
+
+            // RealUserService depends on IUserRepository
+            container.Register<ServiceWithDependency<ILogger>>(Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var result = Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>().Single();
+
+            // Assert
+            Assert.AreEqual(
+                "ServiceWithDependency<ILogger> (Singleton) depends on ILogger implemented by " +
+                "LoggerDecorator (Transient).",
+                result.Description);
         }
 
         [TestMethod]

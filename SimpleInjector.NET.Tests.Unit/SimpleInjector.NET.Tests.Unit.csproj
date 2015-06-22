@@ -104,6 +104,7 @@
     <Compile Include="Diagnostics\AmbiguousLifestylesAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ContainerDebugViewTests.cs" />
     <Compile Include="Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.full.cs" />
     <Compile Include="Diagnostics\CustomLifestyleTests.cs" />
     <Compile Include="Diagnostics\DisposableTransientComponentsTests.cs" />
     <Compile Include="Diagnostics\ExternalProducerCreationAnalysisTests.cs" />

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SimpleInjector.Tests.Unit;
 
     public interface IFoo
     {
@@ -20,10 +21,6 @@
     {
     }
         
-    public interface ILogger
-    {
-    }
-
     public interface IConcreteThing
     {
     }
@@ -235,15 +232,12 @@
         public FakeLogger(ConcreteShizzle shizzle, ConcreteThing thing)
         {
         }
-    }
-    
-    public class NullLogger : ILogger
-    {
-        public NullLogger()
+
+        public void Log(string message)
         {
         }
     }
-
+    
     public class ConcreteThing : IConcreteThing
     {
     }

@@ -230,6 +230,17 @@
         }
     }
 
+    public sealed class LoggerDecorator : ILogger
+    {
+        public LoggerDecorator(ILogger logger)
+        {
+        }
+
+        public void Log(string message)
+        {
+        }
+    }
+
     public sealed class NullValidator<T> : IValidate<T>
     {
         public void Validate(T instance)
