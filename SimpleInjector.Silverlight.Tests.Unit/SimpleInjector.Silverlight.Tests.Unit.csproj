@@ -141,6 +141,57 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\DecoratorTests.cs">
       <Link>DecoratorTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\AmbiguousLifestylesAnalyzerTests.cs">
+      <Link>Diagnostics\AmbiguousLifestylesAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\AnalyzerTests.cs">
+      <Link>Diagnostics\AnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\ContainerDebugViewTests.cs">
+      <Link>Diagnostics\ContainerDebugViewTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.cs">
+      <Link>Diagnostics\ContainerRegisteredServiceContainerAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\CustomLifestyleTests.cs">
+      <Link>Diagnostics\CustomLifestyleTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\DisposableTransientComponentsTests.cs">
+      <Link>Diagnostics\DisposableTransientComponentsTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\ExternalProducerCreationAnalysisTests.cs">
+      <Link>Diagnostics\ExternalProducerCreationAnalysisTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\Helpers\DebuggerViewItemExtensions.cs">
+      <Link>Diagnostics\Helpers\DebuggerViewItemExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\Helpers\DiagnosticGroupExtensions.cs">
+      <Link>Diagnostics\Helpers\DiagnosticGroupExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\LifestyleMismatchServicesTests.cs">
+      <Link>Diagnostics\LifestyleMismatchServicesTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs">
+      <Link>Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\ShortCircuitContainerAnalyzerTests.cs">
+      <Link>Diagnostics\ShortCircuitContainerAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs">
+      <Link>Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\TestClasses.cs">
+      <Link>Diagnostics\TestClasses.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\TestHelpers.cs">
+      <Link>Diagnostics\TestHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\TornLifestyleContainerAnalyzerTests.cs">
+      <Link>Diagnostics\TornLifestyleContainerAnalyzerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\TypeGeneralizerTests.cs">
+      <Link>Diagnostics\TypeGeneralizerTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\EnumerableExtensions.cs">
       <Link>EnumerableExtensions.cs</Link>
     </Compile>
@@ -271,9 +322,7 @@
     <None Include="Properties\AppManifest.xml" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Diagnostics\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
