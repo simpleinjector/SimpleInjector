@@ -32,6 +32,8 @@ Version 3.0.0 (v3.0 RTM)
 		 closed-generic and open-generic types (fixes #4).
 		-[Core] Improved the message of the Lifestyle Mismatch diagnostic warning to include the concrete type
 		 in the message (fixes #63).
+		-[Core] When overriding property injection behavior, property injection can be intercepted the using
+		 the IDependencyInjectionBehavior in the same way as constructor parameters can (fixes #59).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and

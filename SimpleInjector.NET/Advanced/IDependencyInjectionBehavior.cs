@@ -52,6 +52,6 @@ namespace SimpleInjector.Advanced
         /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
         /// <see cref="InjectionConsumerInfo.Target">Target</see>. This method never returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the argument is a null reference.</exception>
-        Expression BuildParameterExpression(InjectionConsumerInfo consumer);
+        Expression BuildExpression(InjectionConsumerInfo consumer);
     }
 }

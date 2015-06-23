@@ -148,7 +148,7 @@
                 this.keyedProducerRetriever = keyedProducerRetriever;
             }
 
-            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+            public Expression BuildExpression(InjectionConsumerInfo consumer)
             {
                 var attribute = consumer.Target.GetCustomAttribute<NamedAttribute>();
 
@@ -158,7 +158,7 @@
                         .BuildExpression();
                 }
 
-                return this.defaultBehavior.BuildParameterExpression(consumer);
+                return this.defaultBehavior.BuildExpression(consumer);
             }
 
             public void Verify(InjectionConsumerInfo consumer)

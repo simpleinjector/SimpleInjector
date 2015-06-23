@@ -102,11 +102,11 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\AdvancedExtensionsTests.cs">
       <Link>Advanced\AdvancedExtensionsTests.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorInjectionBehaviorTests.cs">
-      <Link>Advanced\DefaultConstructorInjectionBehaviorTests.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultConstructorResolutionBehaviorTests.cs">
       <Link>Advanced\DefaultConstructorResolutionBehaviorTests.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\DefaultDependencyInjectionBehaviorTests.cs">
+      <Link>Advanced\DefaultDependencyInjectionBehaviorTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Advanced\IndexableCollectionsTests.cs">
       <Link>Advanced\IndexableCollectionsTests.cs</Link>

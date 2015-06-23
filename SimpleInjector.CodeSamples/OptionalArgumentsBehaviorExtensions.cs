@@ -37,7 +37,7 @@
         }
 
         [DebuggerStepThrough]
-        public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+        public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
             var parameter = consumer.Target.Parameter;
 
@@ -46,7 +46,7 @@
                 return Expression.Constant(parameter.DefaultValue, parameter.ParameterType);
             }
 
-            return this.original.BuildParameterExpression(consumer);
+            return this.original.BuildExpression(consumer);
         }
 
         private static bool IsOptional(ParameterInfo parameter)

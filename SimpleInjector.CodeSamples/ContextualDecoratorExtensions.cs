@@ -75,9 +75,9 @@
                 this.defaultBehavior.Verify(consumer);
             }
 
-            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+            public Expression BuildExpression(InjectionConsumerInfo consumer)
             {
-                var expression = this.defaultBehavior.BuildParameterExpression(consumer);
+                var expression = this.defaultBehavior.BuildExpression(consumer);
 
                 List<PredicatePair> predicatePairs;
 

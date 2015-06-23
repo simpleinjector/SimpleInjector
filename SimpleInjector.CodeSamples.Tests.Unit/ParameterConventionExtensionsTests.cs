@@ -31,9 +31,29 @@
             var instance = container.GetInstance<TypeWithConnectionStringConstructorArgument>();
 
             // Assert
-            Assert.AreEqual(expectedConnectionString, instance.ConnectionString);
+            Assert.AreEqual(expectedConnectionString, instance.Cs1ConnectionString);
         }
+        
+        [TestMethod]
+        public void ConnectionStringsConvention_ResolvingTypeWithConnectionStringProperty_InjectsExpectedValue()
+        {
+            // Arrange
+            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
 
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+
+            container.Options.EnablePropertyAutoWiring();
+
+            container.Register<TypeWithConnectionStringProperty>();
+            container.AutoWireProperty<TypeWithConnectionStringProperty>(t => t.Cs1ConnectionString);
+
+            // Act
+            var instance = container.GetInstance<TypeWithConnectionStringProperty>();
+
+            // Assert
+            Assert.AreEqual(expectedConnectionString, instance.Cs1ConnectionString);
+        }
+        
         [TestMethod]
         public void ConnectionStringsConvention_RegisteringTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
@@ -371,12 +391,17 @@
             // "cs1" is a connection string in the app.config of this test project.
             public TypeWithConnectionStringConstructorArgument(string cs1ConnectionString)
             {
-                this.ConnectionString = cs1ConnectionString;
+                this.Cs1ConnectionString = cs1ConnectionString;
             }
 
-            public string ConnectionString { get; private set; }
+            public string Cs1ConnectionString { get; private set; }
         }
 
+        public class TypeWithConnectionStringProperty
+        {
+            public string Cs1ConnectionString { get; set; }
+        }
+        
         public class TypeWithConnectionStringIntConstructorArgument
         {
             public TypeWithConnectionStringIntConstructorArgument(int cs1ConnectionString)

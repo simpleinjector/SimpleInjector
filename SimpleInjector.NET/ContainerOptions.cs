@@ -431,7 +431,7 @@ namespace SimpleInjector
         {
             var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
 
-            Expression expression = this.DependencyInjectionBehavior.BuildParameterExpression(consumer);
+            Expression expression = this.DependencyInjectionBehavior.BuildExpression(consumer);
 
             // Expression will only be null if a user created a custom IConstructorInjectionBehavior that
             // returned null.

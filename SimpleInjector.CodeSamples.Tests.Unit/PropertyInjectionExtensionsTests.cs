@@ -114,26 +114,19 @@
 
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
-            try
-            {
-                // Act
-                // ServiceWithAttributedProperty depends on ILogger
-                var service = container.GetInstance<ServiceWithAttributedProperty>();
+            // Act
+            // ServiceWithAttributedProperty depends on ILogger
+            Action action = () => container.GetInstance<ServiceWithAttributedProperty>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(
-                    typeof(ServiceWithAttributedProperty).Name + 
-                    " could be found and an implicit registration could not be made.",
-                    ex.Message);
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                typeof(ServiceWithAttributedProperty).Name + 
+                " could be found and an implicit registration could not be made.",
+                action);
 
-                AssertThat.StringContains(
-                    typeof(ILogger).Name + " could be found.",
-                    ex.Message);
-            }
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "ILogger that is not registered",
+                action);
         }
 
         [TestMethod]

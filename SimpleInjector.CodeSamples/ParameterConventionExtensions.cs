@@ -39,11 +39,11 @@
             }
 
             [DebuggerStepThrough]
-            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+            public Expression BuildExpression(InjectionConsumerInfo consumer)
             {
                 if (!this.convention.CanResolve(consumer.Target))
                 {
-                    return this.decorated.BuildParameterExpression(consumer);
+                    return this.decorated.BuildExpression(consumer);
                 }
 
                 return this.convention.BuildExpression(consumer);
@@ -194,7 +194,7 @@
         {
             try
             {
-                return this.injectionBehavior.BuildParameterExpression(consumer);
+                return this.injectionBehavior.BuildExpression(consumer);
             }
             catch (ActivationException)
             {

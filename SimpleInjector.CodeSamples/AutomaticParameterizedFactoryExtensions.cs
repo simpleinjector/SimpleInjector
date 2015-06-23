@@ -233,7 +233,7 @@
                 }
             }
 
-            Expression IDependencyInjectionBehavior.BuildParameterExpression(InjectionConsumerInfo consumer)
+            Expression IDependencyInjectionBehavior.BuildExpression(InjectionConsumerInfo consumer)
             {
                 var local = this.FindThreadLocal(consumer.Target);
 
@@ -250,7 +250,7 @@
                         consumer.Target.TargetType);
                 }
 
-                return this.originalBehavior.BuildParameterExpression(consumer);
+                return this.originalBehavior.BuildExpression(consumer);
             }
 
             // Called by RegisterFactory<TFactory>

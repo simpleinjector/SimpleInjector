@@ -636,7 +636,7 @@
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+            public Expression BuildExpression(InjectionConsumerInfo consumer)
             {
                 throw new NotImplementedException();
             }

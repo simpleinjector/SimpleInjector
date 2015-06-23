@@ -182,9 +182,8 @@ namespace SimpleInjector.Advanced
                 properties = properties.Take(MaximumNumberOfPropertiesPerDelegate).ToArray();
             }
 
-            Expression[] dependencyExpressions = this.GetPropertyExpressions(properties);
+            var dependencyExpressions = this.GetPropertyExpressions(properties);
 
-            // var arguments = new[] { expression }.Concat(dependencyExpressions);
             var arguments = dependencyExpressions.Concat(new[] { expression });
 
             Delegate propertyInjectionDelegate = this.BuildPropertyInjectionDelegate(properties);
@@ -192,32 +191,16 @@ namespace SimpleInjector.Advanced
             return Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments);
         }
 
-        private Expression[] GetPropertyExpressions(PropertyInfo[] properties)
+        private IEnumerable<Expression> GetPropertyExpressions(PropertyInfo[] properties)
         {
-            return (
-                from property in properties
-                select this.GetPropertyExpression(property))
-                .ToArray();
+            return properties.Select(this.GetPropertyExpression);
         }
 
         private Expression GetPropertyExpression(PropertyInfo property)
         {
-            InstanceProducer registration;
+            var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
 
-            try
-            {
-                var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
-
-                registration = 
-                    this.container.GetRegistration(property.PropertyType, consumer, throwOnFailure: true);
-            }
-            catch (Exception ex)
-            {
-                // Throw a more expressive exception.
-                throw new ActivationException(StringResources.NoRegistrationForPropertyFound(property, ex), ex);
-            }
-
-            return registration.BuildExpression();
+            return this.container.Options.DependencyInjectionBehavior.BuildExpression(consumer);
         }
 
         private static Type GetFuncType(PropertyInfo[] properties, Type injecteeType)

@@ -60,15 +60,15 @@
         private bool CanBeResolved(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             return this.container.GetRegistration(parameter.ParameterType) != null ||
-                this.CanBuildParameterExpression(serviceType, implementationType, parameter);
+                this.CanBuildExpression(serviceType, implementationType, parameter);
         }
 
         [DebuggerStepThrough]
-        private bool CanBuildParameterExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        private bool CanBuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
         {
             try
             {
-                this.container.Options.DependencyInjectionBehavior.BuildParameterExpression(
+                this.container.Options.DependencyInjectionBehavior.BuildExpression(
                     new InjectionConsumerInfo(serviceType, implementationType, parameter));
 
                 return true;

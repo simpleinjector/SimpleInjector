@@ -37,7 +37,7 @@ namespace SimpleInjector.Advanced
             this.container = container;
         }
 
-        public Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+        public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
             Requires.IsNotNull(consumer, "consumer");
 

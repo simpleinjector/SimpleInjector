@@ -56,9 +56,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                Property of type ITimeProvider with name 'Dependency' can't be injected, because no
-                registration for type ITimeProvider could be found. 
-                No registration for type ITimeProvider could be found.".TrimInside(), 
+                property with name 'Dependency' and type ITimeProvider that is not registered. 
+                Please ensure ITimeProvider is registered"
+                .TrimInside(), 
                 action);
         }
 

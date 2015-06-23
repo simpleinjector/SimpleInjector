@@ -375,8 +375,8 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "The {0} that was registered through the Container.Options.DependencyInjectionBehavior " +
-                "property, returned a null reference after its BuildParameterExpression() method. " +
-                "{1}.BuildParameterExpression implementations should never return null, but should throw " +
+                "property, returned a null reference after its BuildExpression() method. " +
+                "{1}.BuildExpression implementations should never return null, but should throw " +
                 "a {2} with an expressive message instead.",
                 behavior.GetType().ToFriendlyName(),
                 typeof(IDependencyInjectionBehavior).Name,
@@ -535,17 +535,6 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "Property of type {0} with name '{1}' can't be injected, because it is static.",
                 property.PropertyType.ToFriendlyName(), property.Name);
-        }
-
-        internal static string NoRegistrationForPropertyFound(PropertyInfo property, Exception innerException)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "Property of type {0} with name '{1}' can't be injected, because no registration for type " +
-                "{2} could be found. {3}",
-                property.PropertyType.ToFriendlyName(),
-                property.Name,
-                property.PropertyType.ToFriendlyName(),
-                innerException.Message);
         }
 
         internal static string ThisOverloadDoesNotAllowOpenGenerics(IEnumerable<Type> openGenericTypes)
