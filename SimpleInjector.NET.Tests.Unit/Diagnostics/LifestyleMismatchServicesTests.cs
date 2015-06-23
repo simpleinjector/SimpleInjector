@@ -389,7 +389,7 @@
             return new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
                 lifestyle: parent,
-                dependency: new InstanceProducer(typeof(IDisposable), new DummyRegistration(child)));
+                dependency: new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
         }
 
         private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency)
@@ -397,7 +397,7 @@
             return LifestyleMismatchChecker.HasPossibleLifestyleMismatch(new Container(), dependency);
         }
 
-        private class DummyRegistration : Registration
+        private class DummyRegistration<TImplementation> : Registration
         {
             public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, new Container())
             {
@@ -405,7 +405,7 @@
 
             public override Type ImplementationType
             {
-                get { return typeof(object); }
+                get { return typeof(TImplementation); }
             }
 
             public override Expression BuildExpression()
