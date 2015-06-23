@@ -1060,6 +1060,25 @@
         }
 
         [TestMethod]
+        public void RegisterClosedGeneric_ImplementationThatOverlapsWithPreviousClosedGenericRegistration_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<int>), typeof(GenericType<int>));
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<int>), typeof(GenericType<int>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Type IGeneric<Int32> has already been registered. If your intention is to resolve a collection 
+                of IGeneric<Int32> implementations, use the RegisterCollection overloads."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
         public void RegisterClosedGeneric_ImplementationThatOverlapsWithPreviousPartialOpenGenericRegistrationW_ThrowsExpressiveException()
         {
             // Arrange
