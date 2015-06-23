@@ -464,27 +464,7 @@ namespace SimpleInjector
                     this.GetNumberOfConditionalRegistrationsFor(target.TargetType)));
         }
 
-        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
-        {
-            errorMessage = null;
-
-            try
-            {
-                var constructor = this.Options.SelectConstructor(serviceType, implementationType);
-
-                this.Options.DependencyInjectionBehavior.Verify(serviceType, constructor);
-            }
-            catch (ActivationException ex)
-            {
-                errorMessage = ex.Message;
-            }
-
-            return errorMessage == null;
-        }
-
-        /// <summary>
-        /// Releases all instances that are cached by the <see cref="Container"/> object.
-        /// </summary>
+        /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
         /// <param name="disposing">True for a normal dispose operation; false to finalize the handle.</param>
         protected virtual void Dispose(bool disposing)
         {
@@ -494,6 +474,8 @@ namespace SimpleInjector
                 this.isVerifying.Dispose();
             }
         }
+
+        static partial void GetStackTrace(ref string stackTrace);
 
         private static Func<object> ApplyResolveInterceptor(ResolveInterceptor interceptor,
             InitializationContext context, Func<object> wrappedProducer)
@@ -512,8 +494,6 @@ namespace SimpleInjector
                 this.locked = true;
             }
         }
-
-        static partial void GetStackTrace(ref string stackTrace);
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object instance)
         {
@@ -548,47 +528,34 @@ namespace SimpleInjector
                 .ToArray();
         }
         
-        private void RegisterOpenGeneric(Type openGenericServiceType, Type implementationType, 
+        private void RegisterOpenGeneric(Type serviceType, Type implementationType, 
             Lifestyle lifestyle, Predicate<PredicateContext> predicate = null)
         {
-            Requires.IsGenericType(openGenericServiceType, "serviceType");
-            Requires.IsNotPartiallyClosed(openGenericServiceType, "serviceType");
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(openGenericServiceType,
+            Requires.IsGenericType(serviceType, "serviceType");
+            Requires.IsNotPartiallyClosed(serviceType, "serviceType");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
                 implementationType, "serviceType");
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(openGenericServiceType,
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType,
                 implementationType, "implementationType");
 
-            IRegistrationEntry entry;
-
-            if (!this.explicitRegistrations.TryGetValue(openGenericServiceType, out entry))
-            {
-                this.explicitRegistrations[openGenericServiceType] =
-                    entry = RegistrationEntry.CreateGeneric(openGenericServiceType, this);
-            }
-
-            entry.AddGeneric(openGenericServiceType, implementationType, lifestyle, predicate);
+            this.GetOrCreateRegistrationalEntry(serviceType)
+                .AddGeneric(serviceType, implementationType, lifestyle, predicate);
         }
-
+       
         private void AddInstanceProducer(InstanceProducer producer)
         {
             if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType))
             {
                 this.AddCollectionInstanceProducer(producer);
-                return;
-            }
-
-            IRegistrationEntry entry = this.GetRegistrationalEntryOrNull(producer.ServiceType);
-
-            if (entry == null)
-            {
-                this.explicitRegistrations[GetRegistrationKey(producer.ServiceType)] = RegistrationEntry.Create(producer);
             }
             else
             {
-                entry.Add(producer);
-            }
+                var entry = this.GetOrCreateRegistrationalEntry(producer.ServiceType);
 
-            this.RemoveExternalProducer(producer);
+                entry.Add(producer);
+
+                this.RemoveExternalProducer(producer);
+            }
         }
 
         private void AddCollectionInstanceProducer(InstanceProducer producer)
@@ -604,7 +571,9 @@ namespace SimpleInjector
         {
             var entry = this.GetRegistrationalEntryOrNull(serviceType);
 
-            return entry == null ? 0 : entry.GetNumberOfConditionalRegistrationsFor(serviceType);
+            return entry == null 
+                ? 0 
+                : entry.GetNumberOfConditionalRegistrationsFor(serviceType);
         }
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
@@ -614,7 +583,7 @@ namespace SimpleInjector
         {
             return 
                 this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
-                ?? this.GetInstanceProducerForRegisteredCollection(serviceType)
+                ?? this.TryGetInstanceProducerForRegisteredCollection(serviceType)
                 ?? buildInstanceProducer(consumer);
         }
 
@@ -627,22 +596,35 @@ namespace SimpleInjector
                 : null;
         }
 
+        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType)
+        {
+            return typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
+                ? this.GetInstanceProducerForRegisteredCollection(enumerableServiceType.GetGenericArguments()[0])
+                : null;
+        }
+
         private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType)
         {
-            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType))
+            Type key = GetRegistrationKey(serviceType);
+            var resolver = this.collectionResolvers.GetValueOrDefault(key);
+
+            return resolver != null
+                ? resolver.TryGetInstanceProducer(serviceType)
+                : null;
+        }
+
+        private IRegistrationEntry GetOrCreateRegistrationalEntry(Type serviceType)
+        {
+            Type key = GetRegistrationKey(serviceType);
+
+            var entry = this.explicitRegistrations.GetValueOrDefault(key);
+
+            if (entry == null)
             {
-                Type elementType = serviceType.GetGenericArguments()[0];
-
-                Type key = GetRegistrationKey(elementType);
-
-                var resolver = this.collectionResolvers.GetValueOrDefault(key);
-
-                return resolver != null 
-                    ? resolver.TryGetInstanceProducer(elementType) 
-                    : null;
+                this.explicitRegistrations[key] = entry = RegistrationEntry.Create(serviceType, this);
             }
 
-            return null;
+            return entry;
         }
 
         private IRegistrationEntry GetRegistrationalEntryOrNull(Type serviceType)

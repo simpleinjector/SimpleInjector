@@ -207,7 +207,7 @@ namespace SimpleInjector
         {
             string message;
 
-            if (!container.IsConstructableType(serviceType, implementationType, out message))
+            if (!container.Options.IsConstructableType(serviceType, implementationType, out message))
             {
                 throw new ArgumentException(message, paramName);
             }
@@ -220,14 +220,14 @@ namespace SimpleInjector
             {
                 string message = null;
 
-                if (!container.IsConstructableType(openGenericServiceType, type, out message))
+                if (!container.Options.IsConstructableType(openGenericServiceType, type, out message))
                 {
                     throw new ArgumentException(message, paramName);
                 }
             }
         }
 
-        internal static void DecoratorFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
+        internal static void TypeFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
             Type serviceType, Type implementationType)
         {
             try
@@ -305,7 +305,7 @@ namespace SimpleInjector
         {
             if (!serviceType.IsAssignableFrom(decoratorType))
             {
-                throw new ActivationException(StringResources.DecoratorTypeFactoryReturnedIncompatibleType(
+                throw new ActivationException(StringResources.TypeFactoryReturnedIncompatibleType(
                     serviceType, decoratorType));
             }
         }

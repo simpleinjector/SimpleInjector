@@ -1192,17 +1192,12 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type concreteType, string parameterName)
-        {
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(concreteType, concreteType, parameterName);
-        }
-
-        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType,
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType, 
             Type implementationType, string parameterName)
         {
             string message;
 
-            bool constructable = this.IsConstructableType(serviceType, implementationType, out message);
+            bool constructable = this.Options.IsConstructableType(serviceType, implementationType, out message);
 
             if (!constructable)
             {
@@ -1214,7 +1209,7 @@ namespace SimpleInjector
                 throw new ArgumentException(message, parameterName);
             }
         }
-
+        
         private sealed class ContainerVerificationScope : Scope
         {
             public override void WhenScopeEnds(Action action)

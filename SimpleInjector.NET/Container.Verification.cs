@@ -119,20 +119,6 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowOnDiagnosticWarnings()
-        {
-            var errors = (
-                from result in Analyzer.Analyze(this)
-                where result.Severity > DiagnosticSeverity.Information
-                select result)
-                .ToArray();
-
-            if (errors.Any())
-            {
-                throw new DiagnosticVerificationException(errors);
-            }
-        }
-
         private void VerifyThatAllExpressionsCanBeBuilt()
         {
             int maximumNumberOfIterations = 10;
@@ -234,6 +220,20 @@ namespace SimpleInjector
                 Type serviceType = collectionType.GetGenericArguments()[0];
 
                 Helpers.VerifyCollection((IEnumerable)instance, serviceType);
+            }
+        }
+
+        private void ThrowOnDiagnosticWarnings()
+        {
+            var errors = (
+                from result in Analyzer.Analyze(this)
+                where result.Severity > DiagnosticSeverity.Information
+                select result)
+                .ToArray();
+
+            if (errors.Any())
+            {
+                throw new DiagnosticVerificationException(errors);
             }
         }
     }

@@ -2037,7 +2037,7 @@
         {
             // Arrange
             string expectedMessage = @"
-                The registered decorator type factory returned type TransactionHandlerDecorator<Int32> which
+                The registered type factory returned type TransactionHandlerDecorator<Int32> which
                 does not implement ICommandHandler<RealCommand>"
                 .TrimInside();
 

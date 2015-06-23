@@ -413,6 +413,24 @@ namespace SimpleInjector
             return string.Join(", ", descriptions);
         }
 
+        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
+        {
+            errorMessage = null;
+
+            try
+            {
+                var constructor = this.SelectConstructor(serviceType, implementationType);
+
+                this.DependencyInjectionBehavior.Verify(serviceType, constructor);
+            }
+            catch (ActivationException ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            return errorMessage == null;
+        }
+
         internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)
         {
             var constructor = this.ConstructorResolutionBehavior.GetConstructor(serviceType, implementationType);

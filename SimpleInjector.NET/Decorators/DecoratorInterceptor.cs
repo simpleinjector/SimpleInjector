@@ -190,7 +190,7 @@ namespace SimpleInjector.Decorators
                             requestedServiceType, decoratorType));
                 }
 
-                Requires.DecoratorFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
+                Requires.TypeFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
                     requestedServiceType, decoratorType);
 
                 var builder = new GenericTypeBuilder(requestedServiceType, decoratorType);

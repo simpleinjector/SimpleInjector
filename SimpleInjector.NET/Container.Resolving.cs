@@ -334,45 +334,6 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private void ThrowInvalidRegistrationException(Type serviceType, InstanceProducer producer)
-        {
-            if (producer != null)
-            {
-                throw producer.Exception;
-            }
-            else
-            {
-                this.ThrowMissingInstanceProducerException(serviceType);
-            }
-        }
-
-        private void ThrowMissingInstanceProducerException(Type serviceType)
-        {
-            if (Helpers.IsConcreteConstructableType(serviceType))
-            {
-                this.ThrowNotConstructableException(serviceType);
-            }
-
-            if (serviceType.ContainsGenericParameters)
-            {
-                throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
-            }
-
-            throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
-        }
-
-        private void ThrowNotConstructableException(Type concreteType)
-        {
-            string exceptionMessage;
-
-            // Since we are at this point, we know the concreteType is NOT constructable.
-            this.IsConstructableType(concreteType, concreteType, out exceptionMessage);
-
-            throw new ActivationException(
-                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType) + " " +
-                exceptionMessage);
-        }
-
         private InstanceProducer BuildInstanceProducerForType<TService>(InjectionConsumerInfo context)
             where TService : class
         {
@@ -686,7 +647,7 @@ namespace SimpleInjector
         {
             string errorMesssage;
 
-            return this.IsConstructableType(concreteType, concreteType, out errorMesssage);
+            return this.Options.IsConstructableType(concreteType, concreteType, out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the
@@ -715,6 +676,45 @@ namespace SimpleInjector
             {
                 this.RemoveExternalProducer(rootProducer);
             }
+        }
+
+        private void ThrowInvalidRegistrationException(Type serviceType, InstanceProducer producer)
+        {
+            if (producer != null)
+            {
+                throw producer.Exception;
+            }
+            else
+            {
+                this.ThrowMissingInstanceProducerException(serviceType);
+            }
+        }
+
+        private void ThrowMissingInstanceProducerException(Type serviceType)
+        {
+            if (Helpers.IsConcreteConstructableType(serviceType))
+            {
+                this.ThrowNotConstructableException(serviceType);
+            }
+
+            if (serviceType.ContainsGenericParameters)
+            {
+                throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
+            }
+
+            throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+        }
+
+        private void ThrowNotConstructableException(Type concreteType)
+        {
+            string exceptionMessage;
+
+            // Since we are at this point, we know the concreteType is NOT constructable.
+            this.Options.IsConstructableType(concreteType, concreteType, out exceptionMessage);
+
+            throw new ActivationException(
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType) + " " +
+                exceptionMessage);
         }
     }
 }

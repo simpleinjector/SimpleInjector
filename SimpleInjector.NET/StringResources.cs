@@ -603,6 +603,13 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
+        internal static string ImplementationTypeFactoryReturnedNull(Type serviceType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The implementation type factory delegate that was registered for service type {0} returned null.",
+                serviceType.ToFriendlyName());
+        }
+
         internal static string TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(
             Type serviceType, Type decoratorType)
         {
@@ -614,11 +621,22 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName());
         }
 
-        internal static string DecoratorTypeFactoryReturnedIncompatibleType(Type serviceType, Type decoratorType)
+        internal static string TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
+            Type serviceType, Type implementationType)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The registered decorator type factory returned type {0} which does not implement {1}.",
-                decoratorType.ToFriendlyName(), serviceType.ToFriendlyName());
+                "The registered implementation type factory returned open generic type {0} while the " +
+                "registered service type {1} is not generic, making it impossible for a closed generic " +
+                "decorator type to be constructed.",
+                implementationType.ToFriendlyName(),
+                serviceType.ToFriendlyName());
+        }
+
+        internal static string TypeFactoryReturnedIncompatibleType(Type serviceType, Type implementationType)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "The registered type factory returned type {0} which does not implement {1}.",
+                implementationType.ToFriendlyName(), serviceType.ToFriendlyName());
         }
 
         internal static string RecursiveInstanceRegistrationDetected()
@@ -753,7 +771,7 @@ namespace SimpleInjector
                 solution);
         }
 
-        internal static string MultipleApplicationRegistrationsFound(Type serviceType, 
+        internal static string MultipleApplicableRegistrationsFound(Type serviceType, 
             Tuple<Type, Type, InstanceProducer>[] overlappingRegistrations)
         {
             return string.Format(CultureInfo.InvariantCulture,

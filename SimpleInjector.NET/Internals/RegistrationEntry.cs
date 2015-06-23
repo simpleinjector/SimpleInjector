@@ -42,36 +42,23 @@ namespace SimpleInjector.Internals
 
     internal static class RegistrationEntry
     {
-        internal static IRegistrationEntry Create(InstanceProducer producer)
+        internal static IRegistrationEntry Create(Type serviceType, Container container)
         {
-            if (producer.ServiceType.IsGenericType)
-            {
-                var entry = new GenericRegistrationEntry(
-                    producer.ServiceType.GetGenericTypeDefinition(),
-                    producer.Registration.Container);
-
-                entry.Add(producer);
-
-                return entry;
-            }
-            else
-            {
-                return new NonGenericRegistrationEntry(producer);
-            }
-        }
-
-        internal static IRegistrationEntry CreateGeneric(Type openGenericServiceType, Container container)
-        {
-            return new GenericRegistrationEntry(openGenericServiceType, container);
+            return serviceType.IsGenericType
+                ? (IRegistrationEntry)new GenericRegistrationEntry(serviceType.GetGenericTypeDefinition(), container)
+                : (IRegistrationEntry)new NonGenericRegistrationEntry(serviceType, container);
         }
 
         private sealed class NonGenericRegistrationEntry : IRegistrationEntry
         {
-            private readonly List<InstanceProducer> producers = new List<InstanceProducer>();
+            private readonly List<InstanceProducer> producers = new List<InstanceProducer>(1);
+            private readonly Type serviceType;
+            private readonly Container container;
 
-            public NonGenericRegistrationEntry(InstanceProducer producer)
+            public NonGenericRegistrationEntry(Type serviceType, Container container)
             {
-                this.producers.Add(producer);
+                this.serviceType = serviceType;
+                this.container = container;
             }
 
             public IEnumerable<InstanceProducer> Producers
@@ -89,29 +76,16 @@ namespace SimpleInjector.Internals
                 get { return this.producers.Where(p => !p.IsConditional); }
             }
 
-            private Container Container
-            {
-                get { return this.producers[0].Registration.Container; }
-            }
-
-            private Type ServiceType
-            {
-                get { return this.producers[0].ServiceType; }
-            }
-
             public void Add(InstanceProducer producer)
             {
-                Requires.IsTrue(producer.ServiceType == this.ServiceType, "producer");
-                this.Container.ThrowWhenContainerIsLocked();
+                Requires.IsTrue(producer.ServiceType == this.serviceType, "producer", "wrong service type");
+                this.container.ThrowWhenContainerIsLocked();
                 this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
 
-                if (producer.IsUnconditional && this.producers.Any())
-                {
-                    if (!this.Container.Options.AllowOverridingRegistrations)
-                    {
-                        throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.ServiceType));
-                    }
+                this.ThrowWhenTypeAlreadyRegistered(producer);
 
+                if (producer.IsUnconditional)
+                {
                     this.producers.Clear();
                 }
 
@@ -120,7 +94,7 @@ namespace SimpleInjector.Internals
 
             public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo context)
             {
-                Requires.IsTrue(serviceType == this.ServiceType, "serviceType");
+                Requires.IsTrue(serviceType == this.serviceType, "serviceType");
 
                 var instanceProducers = this.GetInstanceProducers(context).ToArray();
 
@@ -129,18 +103,12 @@ namespace SimpleInjector.Internals
                     return instanceProducers.FirstOrDefault();
                 }
 
-                var producersInfo =
-                    from producer in instanceProducers
-                    select Tuple.Create(this.ServiceType, producer.Registration.ImplementationType, producer);
-
-                throw new ActivationException(
-                    StringResources.MultipleApplicationRegistrationsFound(
-                        this.ServiceType, producersInfo.ToArray()));
+                throw this.ThrowMultipleApplicableRegistrationsFound(instanceProducers);
             }
 
             public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
             {
-                Requires.IsTrue(serviceType == this.ServiceType, "serviceType");
+                Requires.IsTrue(serviceType == this.serviceType, "serviceType");
 
                 return this.producers.Count(p => p.IsConditional);
             }
@@ -149,23 +117,6 @@ namespace SimpleInjector.Internals
                 Lifestyle lifestyle, Predicate<PredicateContext> predicate)
             {
                 throw new NotSupportedException();
-            }
-
-            private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
-            {
-                if (producer.IsConditional && this.UnconditionalProducers.Any())
-                {
-                    throw new InvalidOperationException(
-                        StringResources.NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(
-                            producer.ServiceType));
-                }
-
-                if (producer.IsUnconditional && this.ConditionalProducers.Any())
-                {
-                    throw new InvalidOperationException(
-                        StringResources.NonGenericTypeAlreadyRegisteredAsConditionalRegistration(
-                            producer.ServiceType));
-                }
             }
 
             private IEnumerable<InstanceProducer> GetInstanceProducers(InjectionConsumerInfo consumer)
@@ -180,6 +131,55 @@ namespace SimpleInjector.Internals
                         yield return producer;
                         handled = true;
                     }
+                }
+            }
+
+            private void ThrowWhenTypeAlreadyRegistered(InstanceProducer producer)
+            {
+                if (producer.IsUnconditional && this.producers.Any() &&
+                    !this.container.Options.AllowOverridingRegistrations)
+                {
+                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.serviceType));
+                }
+            }
+
+            private ActivationException ThrowMultipleApplicableRegistrationsFound(
+                InstanceProducer[] instanceProducers)
+            {
+                var producersInfo =
+                    from producer in instanceProducers
+                    select Tuple.Create(this.serviceType, producer.Registration.ImplementationType, producer);
+
+                return new ActivationException(
+                    StringResources.MultipleApplicableRegistrationsFound(
+                        this.serviceType, producersInfo.ToArray()));
+            }
+
+            private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
+            {
+                this.ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(producer);
+                this.ThrowWhenNonGenericTypeAlreadyRegisteredAsConditionalRegistration(producer);
+            }
+
+            private void ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(
+                InstanceProducer producer)
+            {
+                if (producer.IsConditional && this.UnconditionalProducers.Any())
+                {
+                    throw new InvalidOperationException(
+                        StringResources.NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(
+                            producer.ServiceType));
+                }
+            }
+
+            private void ThrowWhenNonGenericTypeAlreadyRegisteredAsConditionalRegistration(
+                InstanceProducer producer)
+            {
+                if (producer.IsUnconditional && this.ConditionalProducers.Any())
+                {
+                    throw new InvalidOperationException(
+                        StringResources.NonGenericTypeAlreadyRegisteredAsConditionalRegistration(
+                            producer.ServiceType));
                 }
             }
         }
@@ -215,41 +215,14 @@ namespace SimpleInjector.Internals
 
             public IEnumerable<InstanceProducer> Producers
             {
-                get
-                {
-                    return
-                        from provider in this.providers
-                        from producer in provider.GetCurrentProducers()
-                        select producer;
-                }
+                get { return this.providers.SelectMany(p => p.GetCurrentProducers()); }
             }
 
             public void Add(InstanceProducer producer)
             {
                 this.container.ThrowWhenContainerIsLocked();
 
-                if (!this.container.Options.AllowOverridingRegistrations)
-                {
-                    var overlappingProviders =
-                        from provider in this.providers
-                        where provider.OverlapsWith(producer.ServiceType)
-                        select provider;
-
-                    if (overlappingProviders.Any())
-                    {
-                        var overlappingProvider = overlappingProviders.First();
-
-                        if (overlappingProvider.ServiceType.IsGenericTypeDefinition)
-                        {
-                            throw new InvalidOperationException(
-                                StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
-                                    producer.ServiceType,
-                                    overlappingProvider.ImplementationType));
-                        }
-
-                        throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(producer.ServiceType));
-                    }
-                }
+                this.ThrowWhenOverlappingRegistrationsExist(producer);
 
                 this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
 
@@ -281,7 +254,7 @@ namespace SimpleInjector.Internals
                 }
 
                 throw new ActivationException(
-                    StringResources.MultipleApplicationRegistrationsFound(closedGenericServiceType, producers));
+                    StringResources.MultipleApplicableRegistrationsFound(closedGenericServiceType, producers));
             }
 
             public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
@@ -294,6 +267,32 @@ namespace SimpleInjector.Internals
                     select producer;
 
                 return conditionalProducersForServiceType.Count();
+            }
+
+            private void ThrowWhenOverlappingRegistrationsExist(InstanceProducer producer)
+            {
+                if (!this.container.Options.AllowOverridingRegistrations)
+                {
+                    var overlappingProviders =
+                        from provider in this.providers
+                        where provider.OverlapsWith(producer.ServiceType)
+                        select provider;
+
+                    if (overlappingProviders.Any())
+                    {
+                        var overlappingProvider = overlappingProviders.First();
+
+                        if (overlappingProvider.ServiceType.IsGenericTypeDefinition)
+                        {
+                            throw new InvalidOperationException(
+                                StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
+                                    producer.ServiceType,
+                                    overlappingProvider.ImplementationType));
+                        }
+
+                        throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(producer.ServiceType));
+                    }
+                }
             }
 
             private void ThrowWhenConditionalIsRegisteredInOverridingMode(Predicate<PredicateContext> predicate)

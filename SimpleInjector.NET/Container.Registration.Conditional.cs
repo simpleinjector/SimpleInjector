@@ -38,11 +38,6 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        // TODO: Add a implementationTypeFactory overload, just like with the RegisterDecorator.
-        // public void RegisterConditional(Type serviceType, 
-        //     Func<PredicateContext, Type> implementationTypeFactory, Lifestyle lifestyle,
-        //     Predicate<PredicateContext> predicate) { }
-
         /// <summary>
         /// Conditionally registers that a new instance of <typeparamref name="TImplementation"/> will be 
         /// returned every time a <typeparamref name="TService"/> is requested (transient) and where the
@@ -193,10 +188,6 @@ namespace SimpleInjector
         internal void AddConditionalRegistration(Type serviceType, Registration registration, 
             Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
-            Requires.IsRegistrationForThisContainer(this, registration, "registration");
-
             this.ThrowWhenContainerIsLocked();
             
             var producer = new InstanceProducer(serviceType, registration, predicate);
