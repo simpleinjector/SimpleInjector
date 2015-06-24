@@ -178,7 +178,7 @@ namespace SimpleInjector
 
         internal bool HasRegistrations
         {
-            get { return this.explicitRegistrations.Count > 1; }
+            get { return this.explicitRegistrations.Count > 1 || this.collectionResolvers.Any(); }
         }
 
         /// <summary>

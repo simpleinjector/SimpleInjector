@@ -537,7 +537,9 @@ namespace SimpleInjector
 
             if (this.IsContainerAutoRegistered)
             {
-                exceptionMessage = StringResources.ImplicitRegistrationCouldNotBeMadeForType(this.ServiceType);
+                exceptionMessage = StringResources.ImplicitRegistrationCouldNotBeMadeForType(
+                    this.ServiceType, 
+                    this.Registration.Container.HasRegistrations);
             }
             else
             {

@@ -323,6 +323,25 @@
         }
 
         [TestMethod]
+        public void ConstructorInjectionBehavior_ChangedAfterFirstCollectionRegistration_Fails()
+        {
+            // Arrange
+            var expectedBehavior = new AlternativeDependencyInjectionBehavior();
+
+            var container = new Container();
+
+            container.RegisterCollection<ILogger>(new[] { typeof(NullLogger) });
+
+            // Act
+            Action action = () => container.Options.DependencyInjectionBehavior = expectedBehavior;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "DependencyInjectionBehavior property cannot be changed after the first registration",
+                action);
+        }
+
+        [TestMethod]
         public void PropertyInjectionBehavior_SetWithNullValue_ThrowsException()
         {
             // Arrange

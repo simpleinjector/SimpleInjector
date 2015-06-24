@@ -243,20 +243,96 @@
             // Arrange
             var container = new Container();
 
-            try
-            {
-                // Act
-                container.GetInstance<Func<object>>();
+            // Act
+            Action action = () => container.GetInstance<Func<object>>();
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                Assert.AreEqual("No registration for type Func<Object> could be found.", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "No registration for type Func<Object> could be found.",
+                action);
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingConcreteTypeWithMissingDependencyOnEmptyContainer_ThrowsMessageWarningAboutEmptyContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithDependency<ILogger>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Please note that the container instance you are resolving from contains no registrations.",
+                action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_ResolvingConcreteTypeWithMissingDependencyOnNoneEmptyContainer_ThrowsMessageWarningWITHOUTAboutEmptyContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<UserController>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithDependency<ILogger>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
+                "Please note that the container instance you are resolving from contains no registrations.",
+                action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_ResolvingAbstractTypeWithMissingDependencyOnEmptyContainer_ThrowsMessageWarningAboutEmptyContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Please note that the container instance you are resolving from contains no registrations.",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingConcreteTypeAfterGettingTheRegistrationWithMissingDependencyOnEmptyContainer_ThrowsMessageWarningAboutEmptyContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetRegistration(typeof(ServiceWithDependency<ILogger>));
+
+            // Act
+            Action action = () => container.GetInstance<ServiceWithDependency<ILogger>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Please note that the container instance you are resolving from contains no registrations.",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAbstractTypeAfterGettingTheRegistrationWithMissingDependencyOnEmptyContainer_ThrowsMessageWarningAboutEmptyContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetRegistration(typeof(ILogger));
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Please note that the container instance you are resolving from contains no registrations.",
+                action);
+        }
+        
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
 
         public class SomeGenericNastyness<TBla>

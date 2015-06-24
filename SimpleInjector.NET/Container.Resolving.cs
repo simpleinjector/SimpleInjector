@@ -702,7 +702,8 @@ namespace SimpleInjector
                 throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
             }
 
-            throw new ActivationException(StringResources.NoRegistrationForTypeFound(serviceType));
+            throw new ActivationException(
+                StringResources.NoRegistrationForTypeFound(serviceType, this.HasRegistrations));
         }
 
         private void ThrowNotConstructableException(Type concreteType)
@@ -711,10 +712,10 @@ namespace SimpleInjector
 
             // Since we are at this point, we know the concreteType is NOT constructable.
             this.Options.IsConstructableType(concreteType, concreteType, out exceptionMessage);
-
+            
             throw new ActivationException(
-                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType) + " " +
-                exceptionMessage);
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations) 
+                + " " + exceptionMessage);
         }
     }
 }

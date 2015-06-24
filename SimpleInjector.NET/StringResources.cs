@@ -75,10 +75,12 @@ namespace SimpleInjector
                 "The registered delegate for type {0} threw an exception.", serviceType.ToFriendlyName());
         }
 
-        internal static string NoRegistrationForTypeFound(Type serviceType)
+        internal static string NoRegistrationForTypeFound(Type serviceType, bool containerHasRegistrations)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.", serviceType.ToFriendlyName());
+                "No registration for type {0} could be found.{1}", 
+                serviceType.ToFriendlyName(),
+                ContainsHasNoRegistrationsAddition(containerHasRegistrations));
         }
 
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType)
@@ -258,11 +260,13 @@ namespace SimpleInjector
                 unregisteredServiceType.ToFriendlyName());
         }
 
-        internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType)
+        internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType, 
+            bool containerHasRegistrations)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found and an implicit registration could not be made.",
-                serviceType.ToFriendlyName());
+                "No registration for type {0} could be found and an implicit registration could not be made.{1}",
+                serviceType.ToFriendlyName(), 
+                ContainsHasNoRegistrationsAddition(containerHasRegistrations));
         }
 
         internal static string TypeDependsOnItself(Type serviceType)
@@ -872,6 +876,14 @@ namespace SimpleInjector
                 "RegisterCollection(typeof({0}), IEnumerable<{1}>) instead.",
                 type.ToFriendlyName(),
                 registeringElement);
+        }
+
+        private static object ContainsHasNoRegistrationsAddition(bool containerHasRegistrations)
+        {
+            return containerHasRegistrations
+                ? string.Empty
+                : " Please note that the container instance you are resolving from contains no " +
+                  "registrations. Could it be that you accidentally created a new -and empty- container?";
         }
     }
 }

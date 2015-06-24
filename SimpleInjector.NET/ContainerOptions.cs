@@ -477,7 +477,7 @@ namespace SimpleInjector
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
         {
-            if (this.Container.HasRegistrations || this.Container.IsLocked)
+            if (this.Container.IsLocked || this.Container.HasRegistrations)
             {
                 throw new InvalidOperationException(
                     StringResources.PropertyCanNotBeChangedAfterTheFirstRegistration(propertyName));
