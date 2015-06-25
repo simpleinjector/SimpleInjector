@@ -23,6 +23,7 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     internal sealed class ScopedProxyLifestyle : ScopedLifestyle
     {
@@ -74,18 +75,28 @@ namespace SimpleInjector.Lifestyles
             return lifestyle.CreateRegistration<TService>(instanceCreator, container);
         }
 
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container)
         {
-            if (container.Options.DefaultScopedLifestyle == null)
+            var lifestyle = container.Options.DefaultScopedLifestyle;
+
+            if (lifestyle == null)
             {
-                throw new InvalidOperationException(
-                    "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
-                    "configured with a default scoped lifestyle by setting the Container.Options." +
-                    "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
-                    "application.");
+                ThrowDefaultScopeLifestyleIsNotSet();
             }
 
-            return container.Options.DefaultScopedLifestyle;
+            return lifestyle;
+        }
+
+        private static void ThrowDefaultScopeLifestyleIsNotSet()
+        {
+            throw new InvalidOperationException(
+                "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
+                "configured with a default scoped lifestyle by setting the Container.Options." +
+                "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
+                "application.");
         }
     }
 }
