@@ -24,6 +24,7 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     internal interface IRegistrationEntry
@@ -52,12 +53,12 @@ namespace SimpleInjector.Internals
         private sealed class NonGenericRegistrationEntry : IRegistrationEntry
         {
             private readonly List<InstanceProducer> producers = new List<InstanceProducer>(1);
-            private readonly Type serviceType;
+            private readonly Type nonGenericServiceType;
             private readonly Container container;
 
-            public NonGenericRegistrationEntry(Type serviceType, Container container)
+            public NonGenericRegistrationEntry(Type nonGenericServiceType, Container container)
             {
-                this.serviceType = serviceType;
+                this.nonGenericServiceType = nonGenericServiceType;
                 this.container = container;
             }
 
@@ -78,7 +79,6 @@ namespace SimpleInjector.Internals
 
             public void Add(InstanceProducer producer)
             {
-                Requires.IsTrue(producer.ServiceType == this.serviceType, "producer", "wrong service type");
                 this.container.ThrowWhenContainerIsLocked();
                 this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
 
@@ -94,8 +94,6 @@ namespace SimpleInjector.Internals
 
             public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo context)
             {
-                Requires.IsTrue(serviceType == this.serviceType, "serviceType");
-
                 var instanceProducers = this.GetInstanceProducers(context).ToArray();
 
                 if (instanceProducers.Length <= 1)
@@ -108,8 +106,6 @@ namespace SimpleInjector.Internals
 
             public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
             {
-                Requires.IsTrue(serviceType == this.serviceType, "serviceType");
-
                 return this.producers.Count(p => p.IsConditional);
             }
 
@@ -139,7 +135,7 @@ namespace SimpleInjector.Internals
                 if (producer.IsUnconditional && this.producers.Any() &&
                     !this.container.Options.AllowOverridingRegistrations)
                 {
-                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.serviceType));
+                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.nonGenericServiceType));
                 }
             }
 
@@ -148,11 +144,11 @@ namespace SimpleInjector.Internals
             {
                 var producersInfo =
                     from producer in instanceProducers
-                    select Tuple.Create(this.serviceType, producer.Registration.ImplementationType, producer);
+                    select Tuple.Create(this.nonGenericServiceType, producer.Registration.ImplementationType, producer);
 
                 return new ActivationException(
                     StringResources.MultipleApplicableRegistrationsFound(
-                        this.serviceType, producersInfo.ToArray()));
+                        this.nonGenericServiceType, producersInfo.ToArray()));
             }
 
             private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
