@@ -21,7 +21,7 @@ Version 3.0.0 (v3.0 RTM)
 		 (fixes #22).
 		-[Core] Added Container.Register(Type, IEnumerable<Assembly>) and 
 		 Container.RegisterCollection(Type, IEnumerable<Assembly>) overloads for batch registration. (fixes #7)
-		-[Core] Added RegisterCollection overloads that take in an assembly to allow simple inject to search 
+		-[Core] Added RegisterCollection overloads that take in an assembly to allow Simple Injector to search 
 		 through the supplied assemblies and register all found types in the collection (fixes #6).
 		-[Core] Batch registration using the Register and RegisterCollection overloads that accept a list
 		 of Assembly instances and the Container.GetTypesToRegister method filter out Code Contract classes
@@ -34,6 +34,7 @@ Version 3.0.0 (v3.0 RTM)
 		 in the message (fixes #63).
 		-[Core] When overriding property injection behavior, property injection can be intercepted the using
 		 the IDependencyInjectionBehavior in the same way as constructor parameters can (fixes #59).
+		-[Core] Lifestyle.Scoped property added to simplify registration of scoped lifestyles. (fixes #38).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and
