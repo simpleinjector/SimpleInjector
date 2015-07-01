@@ -587,8 +587,8 @@
                 Multiple applicable registrations found for IGeneric<Int32>. The applicable registrations are
                 (1) the unconditional closed generic registration for IGeneric<Int32> using IntGenericType and
                 (2) the conditional open generic registration for IGeneric<T> using GenericType<T>.
-                If your goal is to make one registration a fall back in case another registration is not
-                applicable, make the fall back registration last and check the Handled property in the
+                If your goal is to make one registration a fallback in case another registration is not
+                applicable, make the fallback registration last and check the Handled property in the
                 predicate."
                 .TrimInside(),
                 action);
@@ -602,7 +602,7 @@
 
             container.Register<IGeneric<int>, IntGenericType>();
 
-            // Conditional fall back.
+            // Conditional fallback.
             container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled);
 
             // Act
@@ -618,7 +618,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Conditional fall back before the closded registration.
+            // Conditional fallback before the closed registration.
             container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled);
 
             container.Register<IGeneric<int>, IntGenericType>();
@@ -632,7 +632,7 @@
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "make the fall back registration last and check the Handled property in the predicate",
+                "make the fallback registration last and check the Handled property in the predicate",
                 action);
         }
 
@@ -703,8 +703,8 @@
                 Multiple applicable registrations found for ILogger. The applicable registrations are
                 (1) the conditional registration for ILogger using NullLogger and
                 (2) the conditional registration for ILogger using ConsoleLogger.
-                If your goal is to make one registration a fall back in case another registration is not
-                applicable, make the fall back registration last and check the Handled property in the
+                If your goal is to make one registration a fallback in case another registration is not
+                applicable, make the fallback registration last and check the Handled property in the
                 predicate."
                .TrimInside(),
                action);

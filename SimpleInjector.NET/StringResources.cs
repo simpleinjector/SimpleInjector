@@ -740,7 +740,7 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "There is already an open generic registration for {0} (with implementation {1}) that " +
                 "overlaps with the registration of {2} that you are trying to make. If your intention is " +
-                "to use {1} as fall back registration, please instead call: " +
+                "to use {1} as fallback registration, please instead call: " +
                 "RegisterConditional(typeof({3}), typeof({4}), c => !c.Handled).",
                 closedServiceType.GetGenericTypeDefinition().ToFriendlyName(),
                 overlappingGenericImplementationType.ToFriendlyName(),
@@ -780,8 +780,8 @@ namespace SimpleInjector
         {
             return string.Format(CultureInfo.InvariantCulture,
                 "Multiple applicable registrations found for {0}. The applicable registrations are {1}. " +
-                "If your goal is to make one registration a fall back in case another registration is not " +
-                "applicable, make the fall back registration last and check the Handled property in the " +
+                "If your goal is to make one registration a fallback in case another registration is not " +
+                "applicable, make the fallback registration last and check the Handled property in the " +
                 "predicate.",
                 serviceType.ToFriendlyName(),
                 overlappingRegistrations.Select(BuildRegistrationName).ToCommaSeparatedText());

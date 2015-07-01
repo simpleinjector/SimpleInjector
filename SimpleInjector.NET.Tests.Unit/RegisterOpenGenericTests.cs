@@ -1053,7 +1053,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already an open generic registration for IGeneric<T> (with implementation 
                 GenericType<T>) that overlaps with the registration of IGeneric<Int32> that you are trying to 
-                make. If your intention is to use GenericType<T> as fall back registration, please instead
+                make. If your intention is to use GenericType<T> as fallback registration, please instead
                 call: RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
                 .TrimInside(),
                 action);
@@ -1093,7 +1093,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already an open generic registration for IGeneric<T> (with implementation 
                 GenericType<List<T>>) that overlaps with the registration of IGeneric<List<Int32>> that you 
-                are trying to make. If your intention is to use GenericType<List<T>> as fall back 
+                are trying to make. If your intention is to use GenericType<List<T>> as fallback 
                 registration, please instead call: 
                 RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
                 .TrimInside(),

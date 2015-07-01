@@ -54,7 +54,7 @@ namespace SimpleInjector
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="predicate">The predicate that determines whether the <typeparamref name="TImplementation"/> 
         /// can be applied for the requested service type. This predicate
-        /// can be used to build a fall back mechanism where multiple registrations for the same service type
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
         /// are made.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the arguments is a null reference (Nothing in VB).
@@ -81,7 +81,7 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <typeparamref name="TImplementation"/> can be applied for the requested service type. This predicate
-        /// can be used to build a fall back mechanism where multiple registrations for the same service type
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
         /// are made.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the arguments is a null reference (Nothing in VB).
@@ -113,7 +113,7 @@ namespace SimpleInjector
         /// <param name="implementationType">The actual type that will be returned when requested.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
-        /// can be used to build a fall back mechanism where multiple registrations for the same service type
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
         /// are made.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
@@ -137,7 +137,7 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
-        /// can be used to build a fall back mechanism where multiple registrations for the same service type
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
         /// are made.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
