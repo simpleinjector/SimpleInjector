@@ -254,7 +254,7 @@ namespace SimpleInjector
             return types.ToArray();
         }
 
-        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        private static Type[] GetTypesFromAssembly(Assembly assembly)
         {
             try
             {
@@ -264,7 +264,18 @@ namespace SimpleInjector
             {
                 // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
                 // Assembly and it would be safe to skip this exception.
-                return Enumerable.Empty<Type>();
+                return Type.EmptyTypes;
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Return the types that could be loaded.
+                return ex.Types;
+            }
+            catch (Exception ex)
+            {
+                // Throw a more descriptive message containing the name of the assembly.
+                throw new InvalidOperationException(
+                    StringResources.UnableToLoadTypesFromAssembly(assembly.FullName, ex), ex);
             }
         }
 
