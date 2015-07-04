@@ -26,8 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using SimpleInjector.Decorators;
-    
+
 #if !PUBLISH
     /// <summary>Methods for batch registration.</summary>
 #endif
@@ -75,7 +74,7 @@ namespace SimpleInjector
             Requires.IsGenericType(openGenericServiceType, "openGenericServiceType",
                 guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithAssemblies);
             Requires.IsNotPartiallyClosed(openGenericServiceType, "openGenericServiceType");
-            Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType", 
+            Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType",
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
             var implementationTypes = this.GetTypesToRegister(openGenericServiceType, assemblies);
@@ -254,7 +253,7 @@ namespace SimpleInjector
             return types.ToArray();
         }
 
-        private static Type[] GetTypesFromAssembly(Assembly assembly)
+        private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
         {
             try
             {
@@ -264,12 +263,12 @@ namespace SimpleInjector
             {
                 // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
                 // Assembly and it would be safe to skip this exception.
-                return Type.EmptyTypes;
+                return Helpers.Array<Type>.Empty;
             }
             catch (ReflectionTypeLoadException ex)
             {
-                // Return the types that could be loaded.
-                return ex.Types;
+                // Return the types that could be loaded. Types can contain null values.
+                return ex.Types.Where(type => type != null);
             }
             catch (Exception ex)
             {

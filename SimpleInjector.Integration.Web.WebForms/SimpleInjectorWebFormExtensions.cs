@@ -193,22 +193,28 @@ namespace SimpleInjector
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "Several types of exceptions can be thrown here.")]
-        private static Type[] GetExportedTypes(Assembly assembly)
+        private static IEnumerable<Type> GetExportedTypes(Assembly assembly)
         {
             try
             {
                 return assembly.GetExportedTypes();
             }
+            catch (NotSupportedException)
+            {
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // Assembly and it would be safe to skip this exception.
+                return Type.EmptyTypes;
+            }
             catch (ReflectionTypeLoadException ex)
             {
-                // Return the types that were found before the exception was thrown.
-                return ex.Types;
+                // Return the types that could be loaded. Types can contain null values.
+                return ex.Types.Where(type => type != null);
             }
-            catch
+            catch (Exception ex)
             {
-                return new Type[0];
+                // Throw a more descriptive message containing the name of the assembly.
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    "Unable to load types from assembly {0}. {1}", assembly.FullName, ex.Message), ex);
             }
         }
     }
