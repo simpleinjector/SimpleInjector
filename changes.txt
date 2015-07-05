@@ -35,6 +35,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] When overriding property injection behavior, property injection can be intercepted the using
 		 the IDependencyInjectionBehavior in the same way as constructor parameters can (fixes #59).
 		-[Core] Lifestyle.Scoped property added to simplify registration of scoped lifestyles. (fixes #38).
+        -[Core] In case of a cyclic dependency graph, the thrown exception now includes information about
+         the graph (fixes #68).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and

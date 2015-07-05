@@ -24,6 +24,7 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using System.Threading;
 
     /// <summary>
@@ -61,7 +62,7 @@ namespace SimpleInjector.Internals
                     // actual dependency cycle that causes the problem. Using call stack analysis we would be 
                     // able to build a dependency graph and supply it in this exception message, but not 
                     // something we currently do.
-                    throw new ActivationException(StringResources.TypeDependsOnItself(this.typeToValidate));
+                    throw new CyclicDependencyException(this.typeToValidate);
                 }
 
                 this.threads.Add(Thread.CurrentThread);

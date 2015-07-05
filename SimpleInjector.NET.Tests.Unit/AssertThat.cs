@@ -46,6 +46,8 @@
             Action action, string assertMessage = null)
             where TException : Exception
         {
+            Assert.IsFalse(string.IsNullOrEmpty(expectedMessage));
+
             Throws<TException>(() =>
             {
                 try

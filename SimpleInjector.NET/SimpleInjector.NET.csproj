@@ -102,6 +102,7 @@
     <Compile Include="Advanced\InstanceInitializationData.cs" />
     <Compile Include="Internals\ContainerControlledCollectionResolver.cs" />
     <Compile Include="Internals\ContainerUncontrolledCollectionResolver.cs" />
+    <Compile Include="Internals\CyclicDependencyException.cs" />
     <Compile Include="Internals\InternalsFinderVisitor.cs" />
     <Compile Include="Advanced\Internal\LazyScope.cs" />
     <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />

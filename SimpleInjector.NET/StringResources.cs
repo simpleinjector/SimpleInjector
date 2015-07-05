@@ -31,6 +31,7 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Extensions;
+    using SimpleInjector.Internals;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -274,6 +275,14 @@ namespace SimpleInjector
             return string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. The type {0} is directly or indirectly depending on itself.",
                 serviceType.ToFriendlyName());
+        }
+
+        internal static string CyclicDependencyGraphMessage(CyclicDependencyException exception)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0} The cyclic graph contains the following types: {1}.",
+                exception.Message,
+                string.Join(" -> ", exception.DependencyCycle.Select(Helpers.ToFriendlyName)));
         }
 
         internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType,

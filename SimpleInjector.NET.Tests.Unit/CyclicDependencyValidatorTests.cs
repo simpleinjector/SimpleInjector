@@ -575,6 +575,29 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingAnInstanceWithACyclicDependencyGraph_ThrowsAnExceptionDescribingTheExactCycle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IX, XDependingOn<ServiceDependingOn<IY>>>();
+            container.Register<IY, YDependingOn<ServiceDependingOn<IX>>>();
+
+            // Act
+            Action action = () => container.GetInstance<ComponentDependingOn<IX>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                   XDependingOn<ServiceDependingOn<IY>> 
+                -> ServiceDependingOn<IY> 
+                -> YDependingOn<ServiceDependingOn<IX>>
+                -> ServiceDependingOn<IX>
+                -> XDependingOn<ServiceDependingOn<IY>>"
+                .TrimInside(),
+                action);
+        }
+
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
@@ -738,6 +761,35 @@
                     }
                 }
             }
+        }
+    }
+
+    public interface IX
+    {
+    }
+
+    public interface IY
+    {
+    }
+
+    public class ServiceDependingOn<TDependency>
+    {
+        public ServiceDependingOn(TDependency dependency)
+        {
+        }
+    }
+
+    public class XDependingOn<TDependency> : IX
+    {
+        public XDependingOn(TDependency dependency)
+        {
+        }
+    }
+
+    public class YDependingOn<TDependency> : IY
+    {
+        public YDependingOn(TDependency dependency)
+        {
         }
     }
 }

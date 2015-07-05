@@ -245,6 +245,12 @@ namespace SimpleInjector
 
                 this.RemoveValidator();
             }
+            catch (CyclicDependencyException ex)
+            {
+                this.validator.Reset();
+
+                throw new ActivationException(StringResources.CyclicDependencyGraphMessage(ex), ex);
+            }
             catch (Exception ex)
             {
                 this.validator.Reset();
@@ -272,6 +278,11 @@ namespace SimpleInjector
             try
             {
                 return this.lazyExpression.Value;
+            }
+            catch (CyclicDependencyException ex)
+            {
+                ex.AddTypeToCycle(this.Registration.ImplementationType);
+                throw;
             }
             catch (Exception ex)
             {
