@@ -37,6 +37,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Lifestyle.Scoped property added to simplify registration of scoped lifestyles. (fixes #38).
         -[Core] In case of a cyclic dependency graph, the thrown exception now includes information about
          the graph (fixes #68).
+        -[Core] ScopedLifestyle derivatives don't have to override Length anymore and all scoped lifestyles
+         will have the same length. This will make the diagnostic services to treat them as the same lifestyle.
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and

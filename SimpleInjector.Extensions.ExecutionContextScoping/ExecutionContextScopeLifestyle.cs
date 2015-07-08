@@ -82,13 +82,6 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         {
         }
 
-        /// <summary>Gets the length of the lifestyle.</summary>
-        /// <value>The <see cref="Int32"/> representing the length of this lifestyle.</value>
-        protected override int Length
-        {
-            get { return 150; }
-        }
-
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.

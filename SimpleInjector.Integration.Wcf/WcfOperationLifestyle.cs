@@ -64,13 +64,6 @@ namespace SimpleInjector.Integration.Wcf
         {
         }
 
-        /// <summary>Gets the length of the lifestyle.</summary>
-        /// <value>The length of the lifestyle.</value>
-        protected override int Length
-        {
-            get { return 250; }
-        }
-
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the current
         /// WCF operation ends, but before the scope disposes any instances.

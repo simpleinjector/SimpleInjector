@@ -40,11 +40,6 @@ namespace SimpleInjector.Lifestyles
             this.falseLifestyle = falseLifestyle;
         }
 
-        protected override int Length
-        {
-            get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
-        }
-
         private ScopedLifestyle CurrentLifestyle
         {
             get { return this.lifestyleSelector() ? this.trueLifestyle : this.falseLifestyle; }

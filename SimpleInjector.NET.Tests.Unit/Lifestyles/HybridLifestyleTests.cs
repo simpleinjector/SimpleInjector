@@ -607,11 +607,6 @@
                 return base.GetCurrentScopeCore(container);
             }
 
-            protected override int Length
-            {
-                get { throw new NotImplementedException(); }
-            }
-
             protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
             {
                 return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);

@@ -31,11 +31,6 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         internal override int ComponentLength(Container container)
         {
             return GetDefaultScopedLifestyle(container).ComponentLength(container);

@@ -191,11 +191,6 @@
             {
                 return () => this.scope;
             }
-
-            protected override int Length
-            {
-                get { throw new NotImplementedException(); }
-            }
         }
     }
 }

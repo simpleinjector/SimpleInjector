@@ -57,6 +57,13 @@ namespace SimpleInjector
             this.disposeInstances = disposeInstances;
         }
 
+        /// <summary>Gets the length of the lifestyle.</summary>
+        /// <value>The <see cref="Int32"/> representing the length of this lifestyle.</value>
+        protected override int Length
+        {
+            get { return 500; }
+        }
+
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
         /// but before the scope disposes any instances.

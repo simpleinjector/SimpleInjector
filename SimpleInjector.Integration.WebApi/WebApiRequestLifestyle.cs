@@ -59,13 +59,5 @@ namespace SimpleInjector.Integration.WebApi
             : base("Web API Request", disposeInstanceWhenScopeEnds)
         {
         }
-
-        /// <summary>Gets the length of the lifestyle.</summary>
-        /// <value>The length of the lifestyle.</value>
-        protected override int Length
-        {
-            // Same as WebRequestLifestyle, longer than ExecutionContextScopeLifestyle.
-            get { return 300; }
-        }
     }
 }
