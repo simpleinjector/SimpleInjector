@@ -29,7 +29,7 @@ namespace SimpleInjector.Diagnostics
     /// Base class for types that hold information about a single diagnostic message or warning for a
     /// particular type or part of the configuration.
     /// </summary>
-    [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
+    [DebuggerDisplay("{Name,nq} {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
     public abstract class DiagnosticResult
     {
         internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType,
@@ -60,11 +60,25 @@ namespace SimpleInjector.Diagnostics
         [DebuggerDisplay("{Description,nq}")]
         public string Description { get; private set; }
 
+        /// <summary>Gets the documentation URL of the diagnostic result.</summary>
+        /// <value>A <see cref="String"/> with the URL.</value>
+        [DebuggerDisplay("{DocumentationUrl,nq}")]
+        public Uri DocumentationUrl 
+        {
+            get { return DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl; }
+        }
+
         /// <summary>Gets the hierarchical group to which this diagnostic result belongs.</summary>
         /// <value>The <see cref="DiagnosticGroup"/>.</value>
         public DiagnosticGroup Group { get; internal set; }
 
         [DebuggerHidden]
         internal object Value { get; private set; }
+
+        [DebuggerHidden]
+        internal string Name 
+        {
+            get { return DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).Name; }
+        }
     }
 }
