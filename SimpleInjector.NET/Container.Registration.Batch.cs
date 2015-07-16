@@ -259,22 +259,11 @@ namespace SimpleInjector
             {
                 return assembly.GetTypes();
             }
-            catch (NotSupportedException)
-            {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
-                // Assembly and it would be safe to skip this exception.
-                return Helpers.Array<Type>.Empty;
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                // Return the types that could be loaded. Types can contain null values.
-                return ex.Types.Where(type => type != null);
-            }
             catch (Exception ex)
             {
                 // Throw a more descriptive message containing the name of the assembly.
                 throw new InvalidOperationException(
-                    StringResources.UnableToLoadTypesFromAssembly(assembly.FullName, ex), ex);
+                    StringResources.UnableToLoadTypesFromAssembly(assembly, ex), ex);
             }
         }
 

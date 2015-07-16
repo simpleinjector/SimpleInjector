@@ -796,10 +796,10 @@ namespace SimpleInjector
                 overlappingRegistrations.Select(BuildRegistrationName).ToCommaSeparatedText());
         }
 
-        internal static string UnableToLoadTypesFromAssembly(string assemblyName, Exception innerException)
+        internal static string UnableToLoadTypesFromAssembly(Assembly assembly, Exception innerException)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Unable to load types from assembly {0}. {1}", assemblyName, innerException.Message);
+                "Unable to load types from assembly {0}. {1}", assembly.FullName, innerException.Message);
         }
 
         private static string BuildRegistrationName(Tuple<Type, Type, InstanceProducer> registration, int index)
