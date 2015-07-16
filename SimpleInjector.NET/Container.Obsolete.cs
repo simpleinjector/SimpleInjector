@@ -70,7 +70,7 @@ namespace SimpleInjector
         /// that can not be created by the container.</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
-            "This method has been removed. Please call Register<TConcrete>(Lifestyle.Singleton) instead.",
+            "This method has been removed. Please call RegisterSingleton<TConcrete>() instead.",
             error: true)]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
@@ -100,14 +100,14 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been removed. " +
-            "Please call Register<TService, TImplementation>(Lifestyle.Singleton) instead.",
+            "Please call RegisterSingleton<TService, TImplementation>() instead.",
             error: true)]
         public void RegisterSingle<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
-            this.Register<TService, TImplementation>(Lifestyle.Singleton, "TService", "TImplementation");
+            this.RegisterSingleton<TService, TImplementation>();
         }
 
         /// <summary>
@@ -131,15 +131,12 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been removed. " +
-            "Please call Register<TService>(instanceCreator, Lifestyle.Singleton) instead.",
+            "Please call RegisterSingleton<TService>(instanceCreator) instead.",
             error: true)]
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
-            this.Register<TService>(instanceCreator, Lifestyle.Singleton);
+            this.RegisterSingleton<TService>(instanceCreator);
         }
 
         /// <summary>
@@ -163,7 +160,7 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been removed. " +
-            "Please call Register(serviceType, implementation, Lifestyle.Singleton) instead.",
+            "Please call RegisterSingleton(serviceType, implementation) instead.",
             error: true)]
         public void RegisterSingle(Type serviceType, Type implementation)
         {
@@ -189,12 +186,12 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(
             "This method has been removed. " +
-            "Please call Register(serviceType, instanceCreator, Lifestyle.Singleton) instead.",
+            "Please call RegisterSingleton(serviceType, instanceCreator) instead.",
             error: true)]
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
-            this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
+            this.RegisterSingleton(serviceType, instanceCreator);
         }
 
         /// <summary>This method has been removed.</summary>
