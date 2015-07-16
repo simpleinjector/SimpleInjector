@@ -84,12 +84,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                 if (this.initialThreadId != Thread.CurrentThread.ManagedThreadId)
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                        "It is not safe to use a LifetimeScope instance across threads. Make sure the " +
-                        "complete operation that the lifetime scope surrounds gets executed within the " +
-                        "same thread and make sure that the LifetimeScope instance gets disposed on the " +
-                        "same thread as it gets created. Dispose was called on thread with ManagedThreadId " +
-                        "{0}, but was created on thread with id {1}.", Thread.CurrentThread.ManagedThreadId,
-                        this.initialThreadId));
+                        "It is not safe to use a LifetimeScope instance across threads. The LifetimeScope " +
+                        "instance was disposed on thread id {0} but was created on thread id {1}. " +
+                        "Make sure the complete operation that the lifetime scope surrounds gets executed " +
+                        "within the same thread and make sure that the LifetimeScope instance gets " +
+                        "disposed on the same thread as it gets created. In case your intention is to " +
+                        "create a scope that flows with the logical flow of control of asynchronous " +
+                        "methods, please switch to the ExecutionContextScopeLifestyle. Please goto " +
+                        "https://simpleinjector.org/await" + " for more information on this lifestyle.",
+                        Thread.CurrentThread.ManagedThreadId, this.initialThreadId));
                 }
             }
 
