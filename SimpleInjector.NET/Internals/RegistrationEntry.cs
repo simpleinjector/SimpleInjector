@@ -29,7 +29,7 @@ namespace SimpleInjector.Internals
 
     internal interface IRegistrationEntry
     {
-        IEnumerable<InstanceProducer> Producers { get; }
+        IEnumerable<InstanceProducer> CurrentProducers { get; }
 
         void Add(InstanceProducer producer);
 
@@ -62,7 +62,7 @@ namespace SimpleInjector.Internals
                 this.container = container;
             }
 
-            public IEnumerable<InstanceProducer> Producers
+            public IEnumerable<InstanceProducer> CurrentProducers
             {
                 get { return this.producers; }
             }
@@ -205,11 +205,13 @@ namespace SimpleInjector.Internals
 
                 bool OverlapsWith(Type closedServiceType);
 
-                InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                    bool handled = false, bool unconditionally = false);
+                InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer, 
+                    bool handled = false);
+
+                bool MatchesServiceType(Type serviceType);
             }
 
-            public IEnumerable<InstanceProducer> Producers
+            public IEnumerable<InstanceProducer> CurrentProducers
             {
                 get { return this.providers.SelectMany(p => p.GetCurrentProducers()); }
             }
@@ -255,14 +257,13 @@ namespace SimpleInjector.Internals
 
             public int GetNumberOfConditionalRegistrationsFor(Type serviceType)
             {
-                var conditionalProducersForServiceType =
+                var conditionalProvidersForServiceType =
                     from provider in this.providers
-                    let producer =
-                        provider.TryGetProducer(serviceType, InjectionConsumerInfo.Root, unconditionally: true)
-                    where producer != null
-                    select producer;
+                    where provider.IsConditional
+                    where provider.MatchesServiceType(serviceType)
+                    select provider;
 
-                return conditionalProducersForServiceType.Count();
+                return conditionalProvidersForServiceType.Count();
             }
 
             private void ThrowWhenOverlappingRegistrationsExist(InstanceProducer producer)
@@ -385,17 +386,14 @@ namespace SimpleInjector.Internals
                     return !this.producer.IsConditional && this.producer.ServiceType == closedServiceType;
                 }
 
-                public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                    bool handled, bool unconditionally)
+                public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer, bool handled)
                 {
-                    bool match = this.MatchesServiceType(serviceType);
-
-                    return match && (unconditionally || this.MatchesPredicate(consumer, handled))
+                    return this.MatchesServiceType(serviceType) && this.MatchesPredicate(consumer, handled)
                         ? this.producer
                         : null;
                 }
 
-                private bool MatchesServiceType(Type serviceType)
+                public bool MatchesServiceType(Type serviceType)
                 {
                     return serviceType == this.producer.ServiceType;
                 }
@@ -465,42 +463,38 @@ namespace SimpleInjector.Internals
                 }
 
                 public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                    bool handled, bool unconditionally)
+                    bool handled)
                 {
-                    InstanceProducer producer = this.GetOrBuildProducerFromCache(serviceType);
+                    Type closedImplementation =
+                        GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType);
 
-                    if (producer != null)
-                    {
-                        var context = new PredicateContext(producer, consumer, handled);
+                    var context = new PredicateContext(serviceType, closedImplementation, consumer, handled);
 
-                        return unconditionally || this.MatchesPredicate(context)
-                            ? producer
-                            : null;
-                    }
-
-                    return null;
+                    // NOTE: The producer should only get built after it matches the delegate, to prevent
+                    // unneeded producers from being created, because this might cause diagnostic warnings, 
+                    // such as torn lifestyle warnings.
+                    return closedImplementation != null && this.MatchesPredicate(context)
+                        ? this.GetProducer(serviceType, closedImplementation)
+                        : null;
                 }
 
-                private InstanceProducer GetOrBuildProducerFromCache(Type serviceType)
+                public bool MatchesServiceType(Type serviceType)
+                {
+                    return GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
+                }
+
+                private InstanceProducer GetProducer(Type serviceType, Type closedImplementation)
                 {
                     InstanceProducer producer;
 
+                    // Never build a producer twice. This could cause components with a torn lifestyle.
                     lock (this.cache)
                     {
-                        if (this.cache.TryGetValue(serviceType, out producer))
+                        if (!this.cache.TryGetValue(serviceType, out producer))
                         {
-                            return producer;
+                            this.cache[serviceType] = 
+                                producer = this.CreateNewProducerFor(serviceType, closedImplementation);
                         }
-
-                        Type closedImplementation =
-                            GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType);
-
-                        if (closedImplementation != null)
-                        {
-                            producer = this.CreateNewProducerFor(serviceType, closedImplementation);
-                        }
-
-                        this.cache[serviceType] = producer;
                     }
 
                     return producer;

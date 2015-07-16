@@ -55,11 +55,21 @@
         }
     }
 
-    public class RealCommandCommandHandler : ICommandHandler<RealCommand>
+    public class GenericHandler<TCommand, TDependency> : ICommandHandler<TCommand>
     {
-        public void Handle(RealCommand command)
+        public GenericHandler(TDependency dependency)
         {
         }
+    }
+
+    public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    {
+        public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
+        {
+            this.Decoratee = decoratee;
+        }
+
+        public ICommandHandler<TCommand> Decoratee { get; private set; }
     }
 
     public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
@@ -90,17 +100,6 @@
         }
 
         public ICommandHandler<T> Decorated { get; private set; }
-    }
-
-    public class RealCommandCommandHandlerDecorator : ICommandHandler<RealCommand>,
-        ICommandHandlerDecorator<RealCommand>
-    {
-        public RealCommandCommandHandlerDecorator(ICommandHandler<RealCommand> decoratedHandler)
-        {
-            this.Decorated = decoratedHandler;
-        }
-
-        public ICommandHandler<RealCommand> Decorated { get; private set; }
     }
 
     public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>

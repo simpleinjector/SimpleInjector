@@ -320,7 +320,7 @@ namespace SimpleInjector
         {
             var producers =
                 from entry in this.explicitRegistrations.Values
-                from producer in entry.Producers
+                from producer in entry.CurrentProducers
                 select producer;
 
             producers = producers.Concat(this.rootProducerCache.Values);

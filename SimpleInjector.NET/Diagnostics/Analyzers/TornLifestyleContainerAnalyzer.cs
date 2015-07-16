@@ -80,6 +80,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             return
                 from producer in producers
+                where !producer.IsDecorated
                 where producer.Registration.Lifestyle != Lifestyle.Transient
                 where !SingletonLifestyle.IsSingletonInstanceRegistration(producer.Registration)
                 where !producer.Registration.WrapsInstanceCreationDelegate

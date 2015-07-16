@@ -35,9 +35,9 @@
             var container = ContainerFactory.New();
 
             // Use the RegisterAll(Type, Type[]) overload.
-            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
+            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandHandler) });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -45,9 +45,9 @@
             var handler = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), handler);
 
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), ((RealCommandCommandHandlerDecorator)handler).Decorated);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), ((RealCommandHandlerDecorator)handler).Decorated);
         }
 
         [TestMethod]
@@ -56,12 +56,12 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterAll<T>(T[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(expectedSingletonHandler);
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -69,10 +69,10 @@
             var decorator = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), decorator);
 
             Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler,
-                ((RealCommandCommandHandlerDecorator)decorator).Decorated));
+                ((RealCommandHandlerDecorator)decorator).Decorated));
         }
 
         [TestMethod]
@@ -81,12 +81,12 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterAll(Type, IEnumerable) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { expectedSingletonHandler });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -94,10 +94,10 @@
             var decorator = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), decorator);
 
             Assert.IsTrue(object.ReferenceEquals(expectedSingletonHandler,
-                ((RealCommandCommandHandlerDecorator)decorator).Decorated));
+                ((RealCommandHandlerDecorator)decorator).Decorated));
         }
 
         [TestMethod]
@@ -106,12 +106,12 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterSingle<IEnumerable<T>> method.
             container.RegisterSingleton<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -119,9 +119,9 @@
             var decorator = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), decorator);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), decorator);
 
-            var decoratedInstance = ((RealCommandCommandHandlerDecorator)decorator).Decorated;
+            var decoratedInstance = ((RealCommandHandlerDecorator)decorator).Decorated;
 
             Assert.IsNotNull(decoratedInstance);
 
@@ -139,18 +139,18 @@
             // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
             // registering collections.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
-                () => new[] { new RealCommandCommandHandler() });
+                () => new[] { new RealCommandHandler() });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator));
+                typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers1 = container.GetAllInstances<ICommandHandler<RealCommand>>();
             var handlers2 = container.GetAllInstances<ICommandHandler<RealCommand>>();
 
-            var decorator1 = (RealCommandCommandHandlerDecorator)handlers1.Single();
-            var decorator2 = (RealCommandCommandHandlerDecorator)handlers2.Single();
+            var decorator1 = (RealCommandHandlerDecorator)handlers1.Single();
+            var decorator2 = (RealCommandHandlerDecorator)handlers2.Single();
 
             // Assert
             bool isTransient = !object.ReferenceEquals(decorator1.Decorated, decorator2.Decorated);
@@ -170,19 +170,19 @@
             // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
             // registering collections.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
-                () => new[] { new RealCommandCommandHandler() });
+                () => new[] { new RealCommandHandler() });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator),
+                typeof(RealCommandHandlerDecorator),
                 Lifestyle.Singleton);
 
             // Act
             var handlers1 = container.GetAllInstances<ICommandHandler<RealCommand>>();
             var handlers2 = container.GetAllInstances<ICommandHandler<RealCommand>>();
 
-            var decorator1 = (RealCommandCommandHandlerDecorator)handlers1.Single();
-            var decorator2 = (RealCommandCommandHandlerDecorator)handlers2.Single();
+            var decorator1 = (RealCommandHandlerDecorator)handlers1.Single();
+            var decorator2 = (RealCommandHandlerDecorator)handlers2.Single();
 
             // Assert
             bool isSingleton = object.ReferenceEquals(decorator1, decorator2);
@@ -198,11 +198,11 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
+            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandHandler) });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionalCommandHandlerDecorator<>));
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -210,9 +210,9 @@
             var handler = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), handler);
 
-            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), ((RealCommandCommandHandlerDecorator)handler).Decorated);
+            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), ((RealCommandHandlerDecorator)handler).Decorated);
         }
 
         [TestMethod]
@@ -221,9 +221,9 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandCommandHandler) });
+            container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandHandler) });
 
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandCommandHandlerDecorator));
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
 
             // Act
             IEnumerable<ICommandHandler<RealCommand>> handlers =
@@ -233,7 +233,7 @@
             var handler2 = handlers.Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandlerDecorator), handler1);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), handler1);
 
             Assert.IsFalse(object.ReferenceEquals(handler1, handler2),
                 "Since the decorator is registered as transient, every time the collection is iterated, " +
@@ -249,7 +249,7 @@
             // Use the RegisterAll(Type, Type[]) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
@@ -262,7 +262,7 @@
             var handler = decorator.DecorateeFactory();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), handler);
         }
 
         [TestMethod]
@@ -271,7 +271,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterAll<T>(T[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(expectedSingletonHandler);
@@ -286,7 +286,7 @@
             var handler = decorator.DecorateeFactory();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), handler);
         }
 
         [TestMethod]
@@ -295,7 +295,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterAll(Type, IEnumerable) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { expectedSingletonHandler });
@@ -322,7 +322,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the RegisterSingle<IEnumerable<T>> method
             container.RegisterSingleton<IEnumerable<ICommandHandler<RealCommand>>>(new[] { expectedSingletonHandler });
@@ -349,7 +349,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var expectedSingletonHandler = new RealCommandCommandHandler();
+            var expectedSingletonHandler = new RealCommandHandler();
 
             // Use the Register<T>(Func<T>) method. This is a strange (but legal) way of registering a service,
             // but will not work with a Func-Decorator.
@@ -379,7 +379,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
@@ -405,7 +405,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionalCommandHandlerDecorator<>));
@@ -423,7 +423,7 @@
 
             var handler = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator).Decorated;
 
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), handler);
         }
 
         [TestMethod]
@@ -434,7 +434,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(LifetimeScopeCommandHandlerProxy<>));
@@ -450,7 +450,7 @@
             var handler = scopeDecorator.DecorateeFactory();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), handler);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), handler);
         }
 
         [TestMethod]
@@ -461,7 +461,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
@@ -512,7 +512,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>),
@@ -541,7 +541,7 @@
 
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
             });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
@@ -577,22 +577,22 @@
             // Collection that returns both a transient (RealCommandCommandHandler) and singleton.
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator));
+                typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
 
-            var realHandler1 = ((RealCommandCommandHandlerDecorator)handlers.First()).Decorated;
-            var realHandler2 = ((RealCommandCommandHandlerDecorator)handlers.First()).Decorated;
+            var realHandler1 = ((RealCommandHandlerDecorator)handlers.First()).Decorated;
+            var realHandler2 = ((RealCommandHandlerDecorator)handlers.First()).Decorated;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), realHandler1);
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), realHandler1);
 
             bool isTransient = !object.ReferenceEquals(realHandler1, realHandler2);
 
@@ -612,20 +612,20 @@
             // Collection that returns both a transient (RealCommandCommandHandler) and singleton.
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[]
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator));
+                typeof(RealCommandHandlerDecorator));
 
             // Act
             var handlers1 = container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
             var handlers2 = container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
 
-            var nullHandler1 = ((RealCommandCommandHandlerDecorator)handlers1.Last()).Decorated;
-            var nullHandler2 = ((RealCommandCommandHandlerDecorator)handlers2.Last()).Decorated;
+            var nullHandler1 = ((RealCommandHandlerDecorator)handlers1.Last()).Decorated;
+            var nullHandler2 = ((RealCommandHandlerDecorator)handlers2.Last()).Decorated;
 
             // Assert
             AssertThat.IsInstanceOfType(typeof(NullCommandHandler<RealCommand>), nullHandler1);
@@ -641,7 +641,7 @@
             var container = ContainerFactory.New();
 
             // Use the RegisterAll<T>(Type[]) overload.
-            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { typeof(RealCommandCommandHandler) });
+            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { typeof(RealCommandHandler) });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -664,7 +664,7 @@
             var container = ContainerFactory.New();
 
             // Use the RegisterAll<T>(T[]) overload.
-            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { new RealCommandCommandHandler() });
+            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { new RealCommandHandler() });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -684,7 +684,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            IEnumerable<ICommandHandler<RealCommand>> handlers = new[] { new RealCommandCommandHandler() };
+            IEnumerable<ICommandHandler<RealCommand>> handlers = new[] { new RealCommandHandler() };
 
             // Use the RegisterAll<T>(IEnumerable<T>) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(handlers);
@@ -709,7 +709,7 @@
 
             // Use the Register<T>(Func<T>) overload.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
-                () => new[] { new RealCommandCommandHandler() });
+                () => new[] { new RealCommandHandler() });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -731,14 +731,14 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             { 
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                c => c.ImplementationType == typeof(RealCommandCommandHandler));
+                c => c.ImplementationType == typeof(RealCommandHandler));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -760,14 +760,14 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                c => c.ImplementationType == typeof(RealCommandCommandHandler));
+                c => c.ImplementationType == typeof(RealCommandHandler));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -791,7 +791,7 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(DefaultCommandHandler<RealCommand>),
                 typeof(NullCommandHandler<RealCommand>)
             });
@@ -814,7 +814,7 @@
 
             AssertThat.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), real.ImplementationType);
             AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), real.Dependency.ServiceType);
-            AssertThat.AreEqual(typeof(RealCommandCommandHandler), real.Dependency.ImplementationType);
+            AssertThat.AreEqual(typeof(RealCommandHandler), real.Dependency.ImplementationType);
 
             var @default = relationships[1];
 
@@ -831,7 +831,7 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(DefaultCommandHandler<RealCommand>),
                 typeof(NullCommandHandler<RealCommand>)
             });
@@ -855,7 +855,7 @@
             var nullHandler = handlers[2];
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandCommandHandler), realHandler, "The RealCommandCommandHandler was expected not to be decorated.");
+            AssertThat.IsInstanceOfType(typeof(RealCommandHandler), realHandler, "The RealCommandCommandHandler was expected not to be decorated.");
             AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), defaultHandler, "The DefaultCommandHandler was expected to be decorated.");
             AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), nullHandler, "The NullCommandHandler was expected to be decorated.");
         }
@@ -868,20 +868,20 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                c => c.ImplementationType == typeof(RealCommandCommandHandler));
+                c => c.ImplementationType == typeof(RealCommandHandler));
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(AsyncCommandHandlerProxy<>),
                 Lifestyle.Singleton,
-                c => c.ImplementationType == typeof(RealCommandCommandHandler));
+                c => c.ImplementationType == typeof(RealCommandHandler));
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -903,14 +903,14 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                c => c.ImplementationType == typeof(RealCommandCommandHandler));
+                c => c.ImplementationType == typeof(RealCommandHandler));
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -946,7 +946,7 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
@@ -985,20 +985,20 @@
 
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[]
             {
-                typeof(RealCommandCommandHandler),
+                typeof(RealCommandHandler),
                 typeof(NullCommandHandler<RealCommand>)
             });
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                context => context.ImplementationType == typeof(RealCommandCommandHandler));
+                context => context.ImplementationType == typeof(RealCommandHandler));
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(LifetimeScopeCommandHandlerProxy<>),
                 Lifestyle.Singleton,
-                context => context.ImplementationType == typeof(RealCommandCommandHandler));
+                context => context.ImplementationType == typeof(RealCommandHandler));
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
@@ -1032,7 +1032,7 @@
 
             // Uses the RegisterAll<T>(params T[]) that explicitly registers a collection of singletons.
             container.RegisterCollection<ICommandHandler<RealCommand>>(
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>());
 
             container.RegisterDecorator(
@@ -1056,7 +1056,7 @@
 
             // Uses the RegisterAll<T>(params T[]) that explicitly registers a collection of singletons.
             container.RegisterCollection<ICommandHandler<RealCommand>>(
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>());
 
             container.RegisterDecorator(
@@ -1083,7 +1083,7 @@
             DecoratorPredicateContext realContext = predicateContexts[0];
 
             AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), realContext.ServiceType);
-            AssertThat.AreEqual(typeof(RealCommandCommandHandler), realContext.ImplementationType);
+            AssertThat.AreEqual(typeof(RealCommandHandler), realContext.ImplementationType);
             AssertThat.IsInstanceOfType(typeof(ConstantExpression), realContext.Expression);
             Assert.AreEqual(0, realContext.AppliedDecorators.Count);
 
@@ -1105,7 +1105,7 @@
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>()
             };
 
@@ -1152,7 +1152,7 @@
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>()
             };
 
@@ -1165,7 +1165,7 @@
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator), context =>
+                typeof(RealCommandHandlerDecorator), context =>
                 {
                     predicateCallCount++;
 
@@ -1198,7 +1198,7 @@
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>()
             };
 
@@ -1211,7 +1211,7 @@
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator), context =>
+                typeof(RealCommandHandlerDecorator), context =>
                 {
                     predicateCallCount++;
 
@@ -1239,11 +1239,11 @@
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>()
             };
 
-            container.Register<ICommandHandler<RealCommand>, RealCommandCommandHandler>();
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
 
             // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
@@ -1254,7 +1254,7 @@
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
-                typeof(RealCommandCommandHandlerDecorator), context =>
+                typeof(RealCommandHandlerDecorator), context =>
                 {
                     predicateCallCount++;
 
@@ -1290,7 +1290,7 @@
 
             IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
             {
-                new RealCommandCommandHandler(),
+                new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>()
             };
 
@@ -1319,7 +1319,7 @@
 
             var decoratee = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator2).Decorated;
 
-            Assert.AreEqual(typeof(RealCommandCommandHandler).ToFriendlyName(), decoratee.GetType().ToFriendlyName());
+            Assert.AreEqual(typeof(RealCommandHandler).ToFriendlyName(), decoratee.GetType().ToFriendlyName());
         }
 
         [TestMethod]

@@ -87,6 +87,8 @@ namespace SimpleInjector.Decorators
             this.e.Expression = decoratorRegistration.BuildExpression(this.e.InstanceProducer);
 
             this.e.ReplacedRegistration = decoratorRegistration;
+
+            this.e.InstanceProducer.IsDecorated = true;
         }
 
         private Registration CreateRegistrationForDecorator()

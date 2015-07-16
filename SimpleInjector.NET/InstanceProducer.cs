@@ -183,6 +183,8 @@ namespace SimpleInjector
 
         internal Predicate<PredicateContext> Predicate { get; private set; }
 
+        internal bool IsDecorated { get; set; }
+
         internal bool IsConditional
         {
             get { return this.Predicate != null; }

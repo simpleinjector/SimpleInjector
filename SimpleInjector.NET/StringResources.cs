@@ -181,7 +181,7 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
         }
 
-        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int count)
+        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals)
         {
             if (target.Parameter != null)
             {
@@ -191,7 +191,7 @@ namespace SimpleInjector
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, count));
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals));
             }
             else
             {
@@ -201,7 +201,7 @@ namespace SimpleInjector
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, count));
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals));
             }
         }
 
@@ -830,7 +830,7 @@ namespace SimpleInjector
         }
 
         private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
-            InjectionTargetInfo target, int count)
+            InjectionTargetInfo target, int numberOfConditionalRegistrations)
         {
             string serviceTypeName = target.TargetType.ToFriendlyName();
 
@@ -840,17 +840,17 @@ namespace SimpleInjector
                 ? target.TargetType.GetGenericTypeDefinition().ToFriendlyName()
                 : target.TargetType.ToFriendlyName();
 
-            if (count > 1)
+            if (numberOfConditionalRegistrations > 1)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     " {0} conditional registrations for {1} exist{2}, but none of the supplied predicates " +
                     "returned true when provided with the contextual information for {3}.",
-                    count,
+                    numberOfConditionalRegistrations,
                     openServiceTypeName,
                     isGenericType ? (" that are applicable to " + serviceTypeName) : string.Empty,
                     target.Member.DeclaringType.ToFriendlyName());
             }
-            else if (count == 1)
+            else if (numberOfConditionalRegistrations == 1)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     " 1 conditional registration for {0} exists{1}, but its supplied predicate didn't " +

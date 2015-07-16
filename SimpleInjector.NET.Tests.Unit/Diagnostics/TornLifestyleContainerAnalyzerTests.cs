@@ -58,6 +58,7 @@
             Assert.AreEqual(DiagnosticSeverity.Warning, result.Severity);
         }
 
+        // Regression test for issue #79
         [TestMethod]
         public void Analyze_SameInstanceRegisteredForTwoInterfacesUsingRegisterSingleton_DoesNotResultInAWarning()
         {
@@ -467,6 +468,42 @@
 
             // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
+        }
+
+        // regression: v3.0-beta1 had a bug where this code resulted in a torn lifestyle warning.
+        [TestMethod]
+        public void Verify_UnusedConditionalRegistration_DoesNotResultInDiagnosticWarnings()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ServiceDependingOn<ICommandHandler<RealCommand>>>();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>(Lifestyle.Singleton);
+
+            container.RegisterConditional(typeof(ICommandHandler<>), typeof(DefaultCommandHandler<>), Lifestyle.Singleton,
+                c => !c.Handled);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            // Act
+            container.Verify();
+        }
+
+        // regression: v3.0-beta1 had a bug where this code resulted in a torn lifestyle warning.
+        [TestMethod]
+        public void Verify_TwoUniqueComponentsForTheSameAbstractionWithADecorator_DoesNotResultInDiagnosticWarnings()
+        {
+            // Arrange
+            var container = new Container();
+
+            var p1 = Lifestyle.Singleton.CreateProducer<ICommandHandler<RealCommand>, RealCommandHandler>(container);
+            var p2 = Lifestyle.Singleton.CreateProducer<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>(container);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            // Act
+            container.Verify();
         }
 
         private static void Assert_ContainsDescription(TornLifestyleDiagnosticResult[] results,

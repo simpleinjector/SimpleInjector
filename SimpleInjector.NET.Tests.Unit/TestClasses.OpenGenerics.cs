@@ -39,6 +39,10 @@
     {
     }
 
+    public class GenericClassType2<TClass> : IGeneric<TClass> where TClass : class
+    {
+    }
+
     public class GenericDisposableClassType<TDisposableClass> : IGeneric<TDisposableClass>
         where TDisposableClass : class, IDisposable
     {

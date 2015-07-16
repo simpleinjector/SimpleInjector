@@ -472,7 +472,9 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.Register(typeof(IGeneric<>), typeof(GenericClassType<>));
             container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, c => false);
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType2<>), Lifestyle.Singleton, c => false);
 
             // Act
             Action action = () => container.GetInstance<ServiceWithDependency<IGeneric<int>>>();

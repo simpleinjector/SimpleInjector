@@ -138,27 +138,6 @@
         }
     }
 
-    public interface ICommandHandler<TCommand>
-    {
-    }
-
-    public class GenericHandler<TCommand, TDependency> : ICommandHandler<TCommand>
-    {
-        public GenericHandler(TDependency dependency)
-        {
-        }
-    }
-    
-    public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
-    {
-        public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public ICommandHandler<TCommand> Decoratee { get; private set; }
-    }
-
     public class PluginImpl : IPlugin
     {
     }
