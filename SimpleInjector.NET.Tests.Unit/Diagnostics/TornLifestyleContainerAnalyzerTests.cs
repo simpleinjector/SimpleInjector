@@ -59,6 +59,24 @@
         }
 
         [TestMethod]
+        public void Analyze_SameInstanceRegisteredForTwoInterfacesUsingRegisterSingleton_DoesNotResultInAWarning()
+        {
+            var container = new Container();
+
+            var fooBar = new FooBar();
+            container.RegisterSingleton<IFoo>(fooBar);
+            container.RegisterSingleton<IBar>(fooBar);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>();
+
+            // Assert
+            Assert.IsFalse(results.Any(), Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_FourSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
         {
             // Arrange

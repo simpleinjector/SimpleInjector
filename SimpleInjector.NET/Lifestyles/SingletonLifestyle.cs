@@ -79,6 +79,11 @@ namespace SimpleInjector.Lifestyles
             return registration;
         }
 
+        internal static bool IsSingletonInstanceRegistration(Registration registration)
+        {
+            return registration is SingletonInstanceLifestyleRegistration;
+        }
+
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
             Container container)
         {

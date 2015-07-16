@@ -26,6 +26,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using SimpleInjector.Lifestyles;
 
     internal sealed class TornLifestyleContainerAnalyzer : IContainerAnalyzer
     {
@@ -80,6 +81,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return
                 from producer in producers
                 where producer.Registration.Lifestyle != Lifestyle.Transient
+                where !SingletonLifestyle.IsSingletonInstanceRegistration(producer.Registration)
                 where !producer.Registration.WrapsInstanceCreationDelegate
                 group producer by producer.Registration into registrationGroup
                 let registration = registrationGroup.Key
