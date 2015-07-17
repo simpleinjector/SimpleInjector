@@ -40,7 +40,8 @@ namespace SimpleInjector
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
-    /// <see cref="Container.GetCurrentRegistrations()"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
+    /// <see cref="SimpleInjector.Container.GetCurrentRegistrations()">GetCurrentRegistrations()</see> or 
+    /// <see cref="SimpleInjector.Container.GetRegistration(Type, bool)">GetRegistration(Type, bool)</see>.
     /// </summary>
     /// <remarks>
     /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
@@ -51,8 +52,9 @@ namespace SimpleInjector
     /// delegate and allows the actual instance to be created. A <b>Registration</b> itself can't create any
     /// instance. The <b>InsanceProducer</b> allows intercepting created instances by hooking onto the
     /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
-    /// <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for instance work 
-    /// by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance with a decorator.
+    /// <see cref="SimpleInjector.Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for 
+    /// instance work by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance 
+    /// with a decorator.
     /// </remarks>
     /// <example>
     /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap
@@ -132,8 +134,8 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
-        /// is changed by an <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> registration or
-        /// gets decorated.
+        /// is changed by an <see cref="SimpleInjector.Container.ExpressionBuilt">ExpressionBuilt</see> 
+        /// registration or gets decorated.
         /// </summary>
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
         public Lifestyle Lifestyle
@@ -322,11 +324,11 @@ namespace SimpleInjector
         /// This includes relationships between the registered type and its dependencies and relationships 
         /// between applied decorators and their dependencies. Note that types that are not newed up by the 
         /// container and properties that are injected inside a custom delegate that is registered using the
-        /// <see cref="Container.RegisterInitializer{TService}">RegisterInitializer</see> method are unknown
-        /// to the container and are not returned from this method.
+        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">RegisterInitializer</see> 
+        /// method are unknown to the container and are not returned from this method.
         /// Also note that this method will return an empty collection when called before the
-        /// registered type is requested from the container (or before <see cref="Container.Verify()">Verify</see>
-        /// is called). 
+        /// registered type is requested from the container (or before 
+        /// <see cref="SimpleInjector.Container.Verify()">Verify</see> is called). 
         /// </summary>
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
@@ -348,7 +350,8 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
-        /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.</exception>
+        /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
+        /// </exception>
         public string VisualizeObjectGraph()
         {
             if (!this.IsExpressionCreated)
