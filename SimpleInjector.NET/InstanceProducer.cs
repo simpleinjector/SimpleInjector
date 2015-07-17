@@ -154,6 +154,11 @@ namespace SimpleInjector
             get { return this.Registration.ImplementationType ?? this.ServiceType; }
         }
 
+        internal Container Container
+        {
+            get { return this.Registration.Container; }
+        }
+
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
         internal bool IsContainerAutoRegistered { get; set; }
@@ -257,7 +262,12 @@ namespace SimpleInjector
             {
                 this.validator.Reset();
 
-                throw this.GetErrorForTryingToGetInstanceOfType(ex);
+                if (this.MustWrapThrownException(ex))
+                {
+                    throw new ActivationException(this.BuildActivationExceptionMessage(ex), ex);
+                }
+
+                throw;
             }
 
             if (instance == null)
@@ -288,7 +298,12 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw this.GetErrorForTryingToGetInstanceOfType(ex);
+                if (this.MustWrapThrownException(ex))
+                {
+                    throw new ActivationException(this.BuildActivationExceptionMessage(ex), ex);
+                }
+
+                throw;
             }
             finally
             {
@@ -478,9 +493,9 @@ namespace SimpleInjector
 
             try
             {
-                creator = this.Registration.Container.WrapWithResolveInterceptor(
+                creator = this.Container.WrapWithResolveInterceptor(
                     this.initializationContext,
-                        CompilationHelpers.CompileExpression<object>(this.Registration.Container, expression));
+                        CompilationHelpers.CompileExpression<object>(this.Container, expression));
             }
             catch (Exception ex)
             {
@@ -497,7 +512,7 @@ namespace SimpleInjector
 
         private void Analyze()
         {
-            if (!this.Registration.Container.Options.SuppressLifestyleMismatchVerification)
+            if (!this.Container.Options.SuppressLifestyleMismatchVerification)
             {
                 var error = PotentialLifestyleMismatchAnalyzer.Instance.Analyze(new[] { this })
                     .Cast<PotentialLifestyleMismatchDiagnosticResult>()
@@ -514,7 +529,7 @@ namespace SimpleInjector
         private Expression BuildExpressionInternal()
         {
             // We must lock the container, because not locking could lead to race conditions.
-            this.Registration.Container.LockContainer();
+            this.Container.LockContainer();
 
             var expression = this.Registration.BuildExpression(this);
 
@@ -530,7 +545,7 @@ namespace SimpleInjector
             e.InstanceProducer = this;
             e.ReplacedRegistration = this.Registration;
 
-            this.Registration.Container.OnExpressionBuilt(e, this);
+            this.Container.OnExpressionBuilt(e, this);
 
             if (!object.ReferenceEquals(this.Registration, e.ReplacedRegistration))
             {
@@ -544,22 +559,28 @@ namespace SimpleInjector
             return e.Expression;
         }
 
-        private ActivationException GetErrorForTryingToGetInstanceOfType(Exception innerException)
+        private bool MustWrapThrownException(Exception ex)
         {
-            string exceptionMessage;
+            return this.IsContainerAutoRegistered || this.Registration.WrapsInstanceCreationDelegate ||
+                !(ex is ActivationException);
+        }
 
+        private string BuildActivationExceptionMessage(Exception innerException)
+        {
             if (this.IsContainerAutoRegistered)
             {
-                exceptionMessage = StringResources.ImplicitRegistrationCouldNotBeMadeForType(
-                    this.ServiceType, 
-                    this.Registration.Container.HasRegistrations);
+                return StringResources.ImplicitRegistrationCouldNotBeMadeForType(this.ServiceType,
+                    this.Container.HasRegistrations) + " " + innerException.Message;
+            }
+            else if (this.Registration.WrapsInstanceCreationDelegate)
+            {
+                return StringResources.DelegateForTypeThrewAnException(this.ServiceType) + " " + 
+                    innerException.Message;
             }
             else
             {
-                exceptionMessage = StringResources.DelegateForTypeThrewAnException(this.ServiceType);
+                return innerException.Message;
             }
-
-            return new ActivationException(exceptionMessage + " " + innerException.Message, innerException);
         }
 
         // This method will be inlined by the JIT.

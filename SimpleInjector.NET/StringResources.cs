@@ -538,7 +538,7 @@ namespace SimpleInjector
         internal static string PropertyHasNoSetter(PropertyInfo property)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "The property named '{0}' with type {1} and declared on type {2} can't be injected, " +
+                "The property named '{0}' with type {1} and declared on type {2} can't be used for injection, " +
                 "because it has no set method.",
                 property.Name, property.PropertyType.ToFriendlyName(), property.DeclaringType.ToFriendlyName());
         }
@@ -546,7 +546,7 @@ namespace SimpleInjector
         internal static string PropertyIsStatic(PropertyInfo property)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "Property of type {0} with name '{1}' can't be injected, because it is static.",
+                "Property of type {0} with name '{1}' can't be used for injection, because it is static.",
                 property.PropertyType.ToFriendlyName(), property.Name);
         }
 

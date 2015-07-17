@@ -77,7 +77,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The property named 'Dependency' with type ITimeProvider and declared on type
                 PropertyInjectionTests.ServiceWithReadOnlyPropertyDependency<ITimeProvider>
-                can't be injected, because it has no set method.".TrimInside(),
+                can't be used for injection, because it has no set method.".TrimInside(),
                 action);
         }
 
@@ -117,7 +117,7 @@
             // property when it is static would be a bad thing. On the other hand, it would be as bad as trying
             // to inject into the static property.
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Property of type ITimeProvider with name 'Dependency' can't be injected, because it is static.",
+                "Property of type ITimeProvider with name 'Dependency' can't be used for injection, because it is static.",
                 action);
         }
 

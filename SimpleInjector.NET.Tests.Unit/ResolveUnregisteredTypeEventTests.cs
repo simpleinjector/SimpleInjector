@@ -289,23 +289,16 @@
             {
                 e.Register(() => { throw new Exception(); });
             };
+            
+            // Act
+            Action action = () => container.GetInstance<IUserRepository>();
 
-            try
-            {
-                // Act
-                container.GetInstance<IUserRepository>();
-
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (Exception ex)
-            {
-                const string AssertMessage = "Exception message was not descriptive.";
-
-                AssertThat.ExceptionMessageContains(
-                    "registered delegate for type IUserRepository threw an exception", ex,
-                    AssertMessage);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>(
+                "The delegate that was registered for service type IUserRepository using the " +
+                "UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception",
+                action,
+                "Exception message was not descriptive.");
         }
 
         [TestMethod]
@@ -321,22 +314,15 @@
                 e.Register(() => { throw new Exception(); });
             };
 
-            try
-            {
-                // Act
-                container.GetInstance<UserServiceBase>();
+            // Act
+            Action action = () => container.GetInstance<UserServiceBase>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (Exception ex)
-            {
-                const string AssertMessage = "Exception message was not descriptive.";
-
-                AssertThat.ExceptionMessageContains(
-                    "registered delegate for type UserServiceBase threw an exception", ex,
-                    AssertMessage);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>(
+                "The delegate that was registered for service type IUserRepository using the " +
+                "UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception",
+                action,
+                "Exception message was not descriptive.");
         }
 
         [TestMethod]
@@ -395,7 +381,7 @@
             catch (ActivationException ex)
             {
                 var innerExceptions = ex.InnerException.GetExceptionChain();
-                               
+
                 Assert.IsNotNull(ex.InnerException, "No inner exception was supplied.");
                 Assert.IsTrue(innerExceptions.Contains(expectedInnerException),
                     "The supplied inner exception was not the expected inner exception. " +
@@ -590,7 +576,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            
+
             // Act
             // CompositeService<T> depends on IGeneric<T>[] (array)
             Action action = () => container.GetInstance<CompositeService<int>>();
