@@ -125,7 +125,6 @@
     <Compile Include="Container.Verification.cs" />
     <Compile Include="ContainerOptions.cs" />
     <Compile Include="Internals\CyclicDependencyValidator.cs" />
-    <Compile Include="Internals\CyclicDependencyValidatorExtensions.cs" />
     <Compile Include="Diagnostics\Analyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\AmbiguousLifestylesAnalyzer.cs" />
     <Compile Include="Diagnostics\Analyzers\ContainerRegisteredServiceAnalyzer.cs" />

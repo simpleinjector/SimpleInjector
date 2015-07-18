@@ -129,6 +129,8 @@ namespace SimpleInjector
             {
                 registration.Container.RegisterExternalProducer(this);
             }
+
+            this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
         }
 
         /// <summary>
@@ -233,36 +235,29 @@ namespace SimpleInjector
             "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         public object GetInstance()
         {
-            this.validator.CheckForRecursiveCalls();
+            this.CheckForCyclicDependencies();
 
             object instance;
 
             try
             {
-                if (this.instanceCreator == null)
-                {
-                    this.instanceCreator = this.BuildInstanceCreator();
+                instance = this.instanceCreator();
 
-                    instance = this.instanceCreator();
-
-                    this.InstanceSuccessfullyCreated = true;
-                }
-                else
-                {
-                    instance = this.instanceCreator();
-                }
-
-                this.RemoveValidator();
-            }
-            catch (CyclicDependencyException ex)
-            {
-                this.validator.Reset();
-
-                throw new ActivationException(StringResources.CyclicDependencyGraphMessage(ex), ex);
+                // Resolving the instance succeeded; there are no cyclic dependencies. We can remove the
+                // validator. This prevents needless checking and increases performance.
+                this.RemoveCyclicDependencyValidator();
             }
             catch (Exception ex)
             {
-                this.validator.Reset();
+                // We have to clear the counter of the cyclic dependency validator to make sure it will not
+                // throw a false positive on the next resolve.
+                this.ClearCyclicDependencyValidator();
+
+                if (ex is CyclicDependencyException)
+                {
+                    throw new ActivationException(
+                        StringResources.CyclicDependencyGraphMessage(ex as CyclicDependencyException), ex);
+                }
 
                 if (this.MustWrapThrownException(ex))
                 {
@@ -287,7 +282,7 @@ namespace SimpleInjector
         /// <returns>An Expression.</returns>
         public Expression BuildExpression()
         {
-            this.validator.CheckForRecursiveCalls();
+            this.CheckForCyclicDependencies();
 
             try
             {
@@ -315,7 +310,7 @@ namespace SimpleInjector
                 // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into 
                 // the container manually. This will not be detected during building the expression, because 
                 // the delegate won't (always) get executed at this point.
-                this.validator.Reset();
+                this.ClearCyclicDependencyValidator();
             }
         }
 
@@ -586,11 +581,34 @@ namespace SimpleInjector
             }
         }
 
+        // This method allows the GetInstance method to be optimized by making removing one null check in
+        // the library's happy path.
+        private object BuildAndReplaceInstanceCreatorAndCreateFirstInstance()
+        {
+            this.instanceCreator = this.BuildInstanceCreator();
+            var instance = this.instanceCreator();
+            this.InstanceSuccessfullyCreated = true;
+            return instance;
+        }
+
+        // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
 #if NET45
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private void RemoveValidator()
+        private void CheckForCyclicDependencies()
+        {
+            if (this.validator != null)
+            {
+                this.validator.Check();
+            }
+        }
+
+        // This method will be inlined by the JIT.
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private void RemoveCyclicDependencyValidator()
         {
             // No recursive calls detected, we can remove the validator to increase performance.
             // We first check for null, because this is faster. Every time we write, the CPU has to send
@@ -599,6 +617,22 @@ namespace SimpleInjector
             if (this.validator != null)
             {
                 this.validator = null;
+            }
+        }
+
+        // This method will be inlined by the JIT.
+        // Resets the validator to its initial state. This is important when a IInstanceProvider threw an
+        // exception, because a new call to that provider would otherwise make the validator think it is a
+        // recursive call and throw an exception, and this would hide the exception that would otherwise be
+        // thrown by the provider itself.
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private void ClearCyclicDependencyValidator()
+        {
+            if (this.validator != null)
+            {
+                this.validator.RollBack();
             }
         }
 

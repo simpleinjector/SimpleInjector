@@ -322,9 +322,6 @@
     <Compile Include="..\SimpleInjector.NET\Internals\CyclicDependencyValidator.cs">
       <Link>Internals\CyclicDependencyValidator.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Internals\CyclicDependencyValidatorExtensions.cs">
-      <Link>Internals\CyclicDependencyValidatorExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\GenericArgumentFinder.cs">
       <Link>Internals\GenericArgumentFinder.cs</Link>
     </Compile>
