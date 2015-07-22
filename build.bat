@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=3.0.0
-set prereleasePostfix=-alpha1
+set prereleasePostfix=
 set buildNumber=0 
 
 
@@ -17,10 +17,9 @@ set version_Extensions_LifetimeScoping=%version_Core%
 set version_Extensions_ExecutionContextScoping=%version_Core%
 
 
-call "%PROGRAMFILES%\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat"
+call "%PROGRAMFILES%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
 
-set msbuild=%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe
-set msbuild32=%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
+set msbuild="%PROGRAMFILES%\MSBuild\14.0\Bin\MSBuild.exe"
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
 set ilmerge=%buildToolsPath%\ILMerge.exe
@@ -72,8 +71,6 @@ rmdir %targetPathNet% /s /q
 mkdir %targetPathNet%
 rmdir %targetPathPcl% /s /q
 mkdir %targetPathPcl%
-
-copy "Shared Assemblies\*.*" %targetPathPcl%\*.*
 
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Packaging%
