@@ -64,7 +64,7 @@ namespace SimpleInjector.Integration.Wcf
 
         public void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            Requires.IsNotNull(instanceContext, "instanceContext");
+            Requires.IsNotNull(instanceContext, nameof(instanceContext));
 
             var scope = instanceContext.GetCurrentScope();
 

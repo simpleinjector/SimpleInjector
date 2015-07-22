@@ -36,7 +36,7 @@ namespace SimpleInjector.CodeSamples
         public static void RegisterWithContext<TService>(this Container container,
             Func<DependencyContext, TService> contextBasedFactory) where TService : class {
             if (contextBasedFactory == null) 
-                throw new ArgumentNullException("contextBasedFactory");
+                throw new ArgumentNullException(nameof(contextBasedFactory));
 
             Func<TService> rootFactory = () => contextBasedFactory(DependencyContext.Root);
 

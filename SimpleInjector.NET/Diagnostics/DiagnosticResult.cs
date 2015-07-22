@@ -44,41 +44,36 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the severity of this result.</summary>
         /// <value>The <see cref="DiagnosticSeverity"/>.</value>
-        public DiagnosticSeverity Severity { get; private set; }
+        public DiagnosticSeverity Severity { get; }
 
         /// <summary>Gets the diagnostic type of this result.</summary>
         /// <value>The <see cref="DiagnosticType"/>.</value>
-        public DiagnosticType DiagnosticType { get; private set; }
+        public DiagnosticType DiagnosticType { get; }
 
         /// <summary>Gets the service type to which this warning is related.</summary>
         /// <value>A <see cref="Type"/>.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
-        public Type ServiceType { get; private set; }
+        public Type ServiceType { get; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>
         /// <value>A <see cref="String"/> with the description.</value>
         [DebuggerDisplay("{Description,nq}")]
-        public string Description { get; private set; }
+        public string Description { get; }
 
         /// <summary>Gets the documentation URL of the diagnostic result.</summary>
         /// <value>A <see cref="String"/> with the URL.</value>
         [DebuggerDisplay("{DocumentationUrl,nq}")]
-        public Uri DocumentationUrl 
-        {
-            get { return DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl; }
-        }
+        public Uri DocumentationUrl => 
+            DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl;
 
         /// <summary>Gets the hierarchical group to which this diagnostic result belongs.</summary>
         /// <value>The <see cref="DiagnosticGroup"/>.</value>
         public DiagnosticGroup Group { get; internal set; }
 
         [DebuggerHidden]
-        internal object Value { get; private set; }
+        internal object Value { get; }
 
         [DebuggerHidden]
-        internal string Name 
-        {
-            get { return DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).Name; }
-        }
+        internal string Name => DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).Name;
     }
 }

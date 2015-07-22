@@ -40,32 +40,27 @@ namespace SimpleInjector.Internals
 
         protected CollectionResolver(Container container, Type serviceType)
         {
-            Requires.IsNotPartiallyClosed(serviceType, "serviceType");
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
             this.Container = container;
             this.ServiceType = serviceType;
         }
 
-        protected IEnumerable<RegistrationGroup> RegistrationGroups
-        {
-            get { return this.registrationGroups; }
-        }
+        protected IEnumerable<RegistrationGroup> RegistrationGroups => this.registrationGroups;
 
-        protected Type ServiceType { get; private set; }
+        protected Type ServiceType { get; }
 
-        protected Container Container { get; private set; }
+        protected Container Container { get; }
 
         internal abstract void AddControlledRegistrations(Type serviceType, 
             ContainerControlledItem[] registrations, bool append);
 
         internal abstract void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer);
-        
-        internal InstanceProducer TryGetInstanceProducer(Type elementType)
-        {
-            return this.ServiceType == elementType || this.ServiceType.IsGenericTypeDefinitionOf(elementType) 
+
+        internal InstanceProducer TryGetInstanceProducer(Type elementType) => 
+            this.ServiceType == elementType || this.ServiceType.IsGenericTypeDefinitionOf(elementType)
                 ? this.GetInstanceProducerFromCache(elementType)
                 : null;
-        }
 
         internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
         {
@@ -165,16 +160,13 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType)
-        {
-            return
-                from registrationGroup in this.RegistrationGroups
-                where !registrationGroup.Appended
-                where registrationGroup.ServiceType == serviceType
-                    || serviceType.ContainsGenericParameters
-                    || registrationGroup.ServiceType.ContainsGenericParameters
-                select registrationGroup;
-        }
+        private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType) => 
+            from registrationGroup in this.RegistrationGroups
+            where !registrationGroup.Appended
+            where registrationGroup.ServiceType == serviceType
+                || serviceType.ContainsGenericParameters
+                || registrationGroup.ServiceType.ContainsGenericParameters
+            select registrationGroup;
 
         protected sealed class RegistrationGroup
         {
@@ -186,26 +178,22 @@ namespace SimpleInjector.Internals
 
             internal bool Appended { get; private set; }
 
-            internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType, 
-                InstanceProducer producer)
-            {
-                return new RegistrationGroup
+            internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType,
+                InstanceProducer producer) => 
+                new RegistrationGroup
                 {
                     ServiceType = serviceType,
                     UncontrolledProducer = producer
                 };
-            }
 
-            internal static RegistrationGroup CreateForControlledItems(Type serviceType, 
-                ContainerControlledItem[] registrations, bool appended)
-            {
-                return new RegistrationGroup
+            internal static RegistrationGroup CreateForControlledItems(Type serviceType,
+                ContainerControlledItem[] registrations, bool appended) => 
+                new RegistrationGroup
                 {
                     ServiceType = serviceType,
                     ControlledItems = registrations,
                     Appended = appended
                 };
-            }
         }
     }
 }

@@ -61,7 +61,7 @@ namespace SimpleInjector
         /// service type will be returned, even if other decorators have already been applied to this type.
         /// </summary>
         /// <value>The closed generic service type.</value>
-        public Type ServiceType { get; private set; }
+        public Type ServiceType { get; }
 
         /// <summary>
         /// Gets the type of the implementation that is created by the container and for which the decorator
@@ -70,34 +70,28 @@ namespace SimpleInjector
         /// determined. In that case the closed generic service type will be returned.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>
         /// Gets the list of the types of decorators that have already been applied to this instance.
         /// </summary>
         /// <value>The applied decorators.</value>
-        public ReadOnlyCollection<Type> AppliedDecorators { get; private set; }
+        public ReadOnlyCollection<Type> AppliedDecorators { get; }
 
         /// <summary>
         /// Gets the current <see cref="Expression"/> object that describes the intention to create a new
         /// instance with its currently applied decorators.
         /// </summary>
         /// <value>The current expression that is about to be decorated.</value>
-        public Expression Expression { get; private set; }
-        
+        public Expression Expression { get; }
+
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType = {0}, ImplementationType = {1}",
-                    this.ServiceType.ToFriendlyName(),
-                    this.ImplementationType.ToFriendlyName());
-            }
-        }
+        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+            "ServiceType = {0}, ImplementationType = {1}",
+            this.ServiceType.ToFriendlyName(),
+            this.ImplementationType.ToFriendlyName());
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)

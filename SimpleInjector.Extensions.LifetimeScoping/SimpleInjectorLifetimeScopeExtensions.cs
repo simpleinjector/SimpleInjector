@@ -76,7 +76,7 @@ namespace SimpleInjector
         public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);            
         }
@@ -105,7 +105,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(LifetimeScopeLifestyle.WithDisposal);            
         }
@@ -157,7 +157,7 @@ namespace SimpleInjector
             bool disposeWhenLifetimeScopeEnds)
             where TConcrete : class, IDisposable
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
         }
@@ -188,7 +188,7 @@ namespace SimpleInjector
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));            
         }
@@ -216,8 +216,8 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));            
         }
@@ -248,7 +248,7 @@ namespace SimpleInjector
         /// </example>
         public static Scope BeginLifetimeScope(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.GetLifetimeScopeManager().BeginLifetimeScope();
         }
@@ -275,7 +275,7 @@ namespace SimpleInjector
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         public static Scope GetCurrentLifetimeScope(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.GetLifetimeScopeManager().CurrentScope;
         }

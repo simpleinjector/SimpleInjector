@@ -90,7 +90,7 @@ namespace SimpleInjector
         {
             if (container == null)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
 
             RequiresFilterProviderNotRegistered(container);
@@ -147,7 +147,7 @@ namespace SimpleInjector
         {
             if (container == null)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
 
             if (assemblies == null || assemblies.Length == 0)

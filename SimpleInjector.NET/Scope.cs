@@ -70,9 +70,10 @@ namespace SimpleInjector
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public virtual void WhenScopeEnds(Action action)
         {
+            Requires.IsNotNull(action, nameof(action));
+
             lock (this.syncRoot)
             {
-                Requires.IsNotNull(action, "action");
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
@@ -101,9 +102,10 @@ namespace SimpleInjector
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public void RegisterForDisposal(IDisposable disposable)
         {
+            Requires.IsNotNull(disposable, nameof(disposable));
+
             lock (this.syncRoot)
             {
-                Requires.IsNotNull(disposable, "disposable");
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
@@ -130,7 +132,7 @@ namespace SimpleInjector
 
             lock (scope.syncRoot)
             {
-                return scope.GetInstance<TService, TImplementation>(registration);
+                return scope.GetInstance(registration);
             }
         }
 

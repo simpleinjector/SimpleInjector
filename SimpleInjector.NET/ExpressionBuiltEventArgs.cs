@@ -56,9 +56,10 @@ namespace SimpleInjector
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}")]
-        public Type RegisteredServiceType { get; private set; }
+        public Type RegisteredServiceType { get; }
 
-        /// <summary>Gets or sets the currently registered <see cref="Expression"/>.</summary>
+        /// <summary>Gets or sets the currently registered 
+        /// <see cref="System.Linq.Expressions.Expression">Expression</see>.</summary>
         /// <value>The current registration.</value>
         /// <exception cref="ArgumentNullException">Thrown when the supplied value is a null reference.</exception>
         public Expression Expression
@@ -70,7 +71,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
                 this.expression = value;
             }
@@ -87,7 +88,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
                 this.lifestyle = value;
             }
@@ -96,7 +97,7 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
         /// Debug View. Change the contents of this collection to represent the changes made to the
-        /// <see cref="ExpressionBuiltEventArgs.Expression">Expression</see> property (if any). This allows
+        /// <see cref="Expression">Expression</see> property (if any). This allows
         /// the Diagnostics Debug View to analyze those new relationships as well.
         /// </summary>
         /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>

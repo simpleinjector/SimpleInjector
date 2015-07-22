@@ -44,7 +44,7 @@ namespace SimpleInjector.Integration.Wcf
         /// </exception>
         public SimpleInjectorServiceBehavior(Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             this.container = container;
         }
@@ -72,8 +72,8 @@ namespace SimpleInjector.Integration.Wcf
         public void ApplyDispatchBehavior(ServiceDescription serviceDescription,
             ServiceHostBase serviceHostBase)
         {
-            Requires.IsNotNull(serviceDescription, "serviceDescription");
-            Requires.IsNotNull(serviceHostBase, "serviceHostBase");
+            Requires.IsNotNull(serviceDescription, nameof(serviceDescription));
+            Requires.IsNotNull(serviceHostBase, nameof(serviceHostBase));
 
             var instanceProvider =
                 new SimpleInjectorInstanceProvider(this.container, serviceDescription.ServiceType);

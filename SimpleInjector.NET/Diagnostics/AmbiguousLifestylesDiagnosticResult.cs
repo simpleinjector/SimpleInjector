@@ -49,21 +49,21 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the lifestyles that causes the registrations to be conflicting.</summary>
         /// <value><see cref="Lifestyle"/> instances.</value>
-        public ReadOnlyCollection<Lifestyle> Lifestyles { get; private set; }
-        
+        public ReadOnlyCollection<Lifestyle> Lifestyles { get; }
+
         /// <summary>Gets the implementation type that the affected registrations map to.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>Gets the registration that caused this warning.</summary>
         /// /// <value>An <see cref="InstanceProducer"/>.</value>
-        public InstanceProducer DiagnosedRegistration { get; private set; }
+        public InstanceProducer DiagnosedRegistration { get; }
 
         /// <summary>
         /// Gets the list of registrations that are in conflict with the <see cref="DiagnosedRegistration"/>.
         /// </summary>
         /// <value>A list of <see cref="InstanceProducer"/> instances.</value>
-        public ReadOnlyCollection<InstanceProducer> ConflictingRegistrations { get; private set; }
+        public ReadOnlyCollection<InstanceProducer> ConflictingRegistrations { get; }
 
         private static DebuggerViewItem[] CreateDebugValue(Type implementationType, Lifestyle[] lifestyles,
             InstanceProducer[] conflictingRegistrations)
@@ -85,15 +85,11 @@ namespace SimpleInjector.Diagnostics
             };
         }
 
-        private static string ToCommaSeparatedText(IEnumerable<Lifestyle> lifestyles)
-        {
-            return lifestyles.Select(lifestyle => lifestyle.Name).ToCommaSeparatedText();
-        }
+        private static string ToCommaSeparatedText(IEnumerable<Lifestyle> lifestyles) => 
+            lifestyles.Select(lifestyle => lifestyle.Name).ToCommaSeparatedText();
 
-        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers)
-        {
-            return producers.Select(r => r.ServiceType).Distinct().Select(Helpers.ToFriendlyName)
+        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) => 
+            producers.Select(r => r.ServiceType).Distinct().Select(Helpers.ToFriendlyName)
                 .ToCommaSeparatedText();
-        }
     }
 }

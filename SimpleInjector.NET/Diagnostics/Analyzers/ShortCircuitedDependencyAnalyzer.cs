@@ -36,15 +36,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.ShortCircuitedDependency; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.ShortCircuitedDependency;
 
-        public string Name
-        {
-            get { return "Possible Short Circuited Dependencies"; }
-        }
+        public string Name => "Possible Short Circuited Dependencies";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
@@ -92,15 +86,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static Dictionary<Type, IEnumerable<InstanceProducer>> GetRegisteredImplementationTypes(
-            IEnumerable<InstanceProducer> producers)
-        {
-            return (
-                from producer in producers
-                where producer.ServiceType != producer.ImplementationType
-                group producer by producer.ImplementationType into registrationGroup
-                select registrationGroup)
-                .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
-        }
+            IEnumerable<InstanceProducer> producers) => (
+            from producer in producers
+            where producer.ServiceType != producer.ImplementationType
+            group producer by producer.ImplementationType into registrationGroup
+            select registrationGroup)
+            .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
 
         private static Dictionary<Type, InstanceProducer> GetAutoRegisteredRegistrationsWithLifestyleMismatch(
             IEnumerable<InstanceProducer> producers,

@@ -37,8 +37,8 @@ namespace SimpleInjector.Advanced
 
         public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             return this.lifestyle;
         }

@@ -37,15 +37,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.SingleResponsibilityViolation; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.SingleResponsibilityViolation;
 
-        public string Name
-        {
-            get { return "Potential Single Responsibility Violations"; }
-        }
+        public string Name => "Potential Single Responsibility Violations";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
@@ -61,24 +55,21 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + ViolationPlural(count) + ".";
         }
 
-        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
-        {
-            return (
-                from producer in producers
-                where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
-                where IsAnalyzable(producer)
-                from relationship in producer.GetRelationships()
-                group relationship by new { relationship.ImplementationType, producer } into g
-                let numberOfUniqueDependencies = g.Select(i => i.Dependency.ServiceType).Distinct().Count()
-                where numberOfUniqueDependencies > MaximumValidNumberOfDependencies
-                let dependencies = g.Select(r => r.Dependency).ToArray()
-                select new SingleResponsibilityViolationDiagnosticResult(
-                    serviceType: g.Key.producer.ServiceType,
-                    description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
-                    implementationType: g.Key.ImplementationType,
-                    dependencies: dependencies))
-                .ToArray();
-        }
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
+            from producer in producers
+            where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
+            where IsAnalyzable(producer)
+            from relationship in producer.GetRelationships()
+            group relationship by new { relationship.ImplementationType, producer } into g
+            let numberOfUniqueDependencies = g.Select(i => i.Dependency.ServiceType).Distinct().Count()
+            where numberOfUniqueDependencies > MaximumValidNumberOfDependencies
+            let dependencies = g.Select(r => r.Dependency).ToArray()
+            select new SingleResponsibilityViolationDiagnosticResult(
+                serviceType: g.Key.producer.ServiceType,
+                description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
+                implementationType: g.Key.ImplementationType,
+                dependencies: dependencies))
+            .ToArray();
 
         private static bool IsAnalyzable(InstanceProducer producer)
         {
@@ -95,17 +86,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return producer.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
         }
 
-        private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
+        private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies) =>
+            string.Format(CultureInfo.InvariantCulture,
                 "{0} has {1} dependencies which might indicate a SRP violation.",
                 Helpers.ToFriendlyName(implementationType),
                 numberOfDependencies);
-        }
 
-        private static string ViolationPlural(int count)
-        {
-            return count == 1 ? "violation" : "violations";
-        }
+        private static string ViolationPlural(int count) => count == 1 ? "violation" : "violations";
     }
 }

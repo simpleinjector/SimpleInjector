@@ -22,10 +22,8 @@
 
 namespace SimpleInjector.Advanced
 {
-    using System;
     using System.Diagnostics;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     [DebuggerDisplay("{GetType().Name,nq}")]
     internal sealed class DefaultDependencyInjectionBehavior : IDependencyInjectionBehavior
@@ -39,7 +37,7 @@ namespace SimpleInjector.Advanced
 
         public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            Requires.IsNotNull(consumer, "consumer");
+            Requires.IsNotNull(consumer, nameof(consumer));
 
             InstanceProducer producer = this.GetInstanceProducerFor(consumer);
             
@@ -49,7 +47,7 @@ namespace SimpleInjector.Advanced
 
         public void Verify(InjectionConsumerInfo consumer)
         {
-            Requires.IsNotNull(consumer, "consumer");
+            Requires.IsNotNull(consumer, nameof(consumer));
 
             var target = consumer.Target;
 

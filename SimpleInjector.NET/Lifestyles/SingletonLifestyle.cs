@@ -52,7 +52,7 @@ namespace SimpleInjector.Lifestyles
         internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance, 
             Container container, Type implementationType = null)
         {
-            Requires.IsNotNull(instance, "instance");
+            Requires.IsNotNull(instance, nameof(instance));
 
             return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
                 instance, Lifestyle.Singleton, container);

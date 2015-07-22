@@ -516,10 +516,10 @@ namespace SimpleInjector
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
 
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
 
@@ -548,7 +548,7 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type concreteType)
         {
-            this.Register(concreteType, concreteType, this.SelectionBasedLifestyle, "concreteType", "concreteType");
+            this.Register(concreteType, concreteType, this.SelectionBasedLifestyle, nameof(concreteType), nameof(concreteType));
         }
 
         /// <summary>
@@ -578,7 +578,7 @@ namespace SimpleInjector
         public void Register(Type serviceType, Type implementationType)
         {
             this.Register(serviceType, implementationType, this.SelectionBasedLifestyle,
-                "serviceType", "implementationType");
+                nameof(serviceType), nameof(implementationType));
         }
 
         /// <summary>
@@ -605,7 +605,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
-            this.Register(serviceType, implementationType, lifestyle, "serviceType", "implementationType");
+            this.Register(serviceType, implementationType, lifestyle, nameof(serviceType), nameof(implementationType));
         }
 
         /// <summary>
@@ -648,14 +648,14 @@ namespace SimpleInjector
         /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
 
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
@@ -680,8 +680,8 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingleton<TService>(TService instance) where TService : class
         {
-            Requires.IsNotNull(instance, "instance");
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             var registration = SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this,
                 instance.GetType());
@@ -706,11 +706,11 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingleton(Type serviceType, object instance)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instance, "instance");
-            Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), "serviceType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(instance, nameof(instance));
+            Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
 
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, instance, this);
 
@@ -734,7 +734,7 @@ namespace SimpleInjector
         /// that can not be created by the container.</exception>
         public void RegisterSingleton<TConcrete>() where TConcrete : class
         {
-            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, "TConcrete", "TConcrete");
+            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, nameof(TConcrete), nameof(TConcrete));
         }
 
         /// <summary>
@@ -760,7 +760,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            this.Register<TService, TImplementation>(Lifestyle.Singleton, "TService", "TImplementation");
+            this.Register<TService, TImplementation>(Lifestyle.Singleton, nameof(TService), nameof(TImplementation));
         }
 
         /// <summary>
@@ -783,8 +783,8 @@ namespace SimpleInjector
         /// null reference.</exception>
         public void RegisterSingleton<TService>(Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.Register<TService>(instanceCreator, Lifestyle.Singleton);
         }
@@ -811,7 +811,8 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingleton(Type serviceType, Type implementationType)
         {
-            this.Register(serviceType, implementationType, Lifestyle.Singleton, "serviceType", "implementationType");
+            this.Register(serviceType, implementationType, Lifestyle.Singleton, nameof(serviceType), 
+                nameof(implementationType));
         }
 
         /// <summary>
@@ -963,7 +964,7 @@ namespace SimpleInjector
         /// </remarks>
         public void RegisterInitializer<TService>(Action<TService> instanceInitializer) where TService : class
         {
-            Requires.IsNotNull(instanceInitializer, "instanceInitializer");
+            Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
 
             this.ThrowWhenContainerIsLocked();
 
@@ -1000,8 +1001,8 @@ namespace SimpleInjector
         public void RegisterInitializer(Action<InstanceInitializationData> instanceInitializer,
             Predicate<InitializationContext> predicate)
         {
-            Requires.IsNotNull(instanceInitializer, "instanceInitializer");
-            Requires.IsNotNull(predicate, "predicate");
+            Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
+            Requires.IsNotNull(predicate, nameof(predicate));
 
             this.ThrowWhenContainerIsLocked();
 
@@ -1112,9 +1113,9 @@ namespace SimpleInjector
         /// </exception>
         public void AddRegistration(Type serviceType, Registration registration)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
-            Requires.IsRegistrationForThisContainer(this, registration, "registration");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsRegistrationForThisContainer(this, registration, nameof(registration));
 
             this.ThrowWhenContainerIsLocked();
 
@@ -1150,7 +1151,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
 
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
@@ -1167,7 +1168,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, serviceTypeParamName);
             Requires.IsNotNull(implementationType, implementationTypeParamName);
-            Requires.IsNotNull(lifestyle, "lifestyle");
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
 
             Requires.IsReferenceType(serviceType, serviceTypeParamName);
             Requires.IsReferenceType(implementationType, implementationTypeParamName);

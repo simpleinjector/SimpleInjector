@@ -27,7 +27,6 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Lifestyles;
 
@@ -314,16 +313,11 @@ namespace SimpleInjector.Internals
 
             internal OptimizableLifestyleInfo LifestyleInfo { get; set; }
 
-            internal Expression LazyScopeRegistrationGetInstanceExpression
-            {
-                get
-                {
-                    return Expression.Call(
-                        this.Variable, 
-                        this.lazyScopeRegistrationType.GetMethod("GetInstance"),
-                        Expression.Property(this.LifestyleInfo.Variable, "Value"));
-                }
-            }
+            internal Expression LazyScopeRegistrationGetInstanceExpression => 
+                Expression.Call(
+                    this.Variable,
+                    this.lazyScopeRegistrationType.GetMethod("GetInstance"),
+                    Expression.Property(this.LifestyleInfo.Variable, "Value"));
         }
     }
 }

@@ -56,21 +56,21 @@ namespace SimpleInjector.Diagnostics
         /// </summary>
         /// <value>The <see cref="Type"/>.</value>
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(GroupType),nq}")]
-        public Type GroupType { get; private set; }
+        public Type GroupType { get; }
 
         /// <summary>Gets the friendly name of the group.</summary>
         /// <value>The name.</value>
         [DebuggerDisplay("{Name,nq}")]
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>Gets the description of the group.</summary>
         /// <value>The description.</value>
         [DebuggerDisplay("{Description,nq}")]
-        public string Description { get; private set; }
+        public string Description { get; }
 
         /// <summary>Gets the diagnostic type of all grouped <see cref="DiagnosticResult"/> instances.</summary>
         /// <value>The <see cref="DiagnosticType"/>.</value>
-        public DiagnosticType DiagnosticType { get; private set; }
+        public DiagnosticType DiagnosticType { get; }
 
         /// <summary>Gets the parent <see cref="DiagnosticGroup"/> or null (Nothing in VB) when this is the
         /// root group.</summary>
@@ -79,11 +79,11 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the collection of child <see cref="DiagnosticGroup"/>s.</summary>
         /// <value>A collection of <see cref="DiagnosticGroup"/> elements.</value>
-        public ReadOnlyCollection<DiagnosticGroup> Children { get; private set; }
+        public ReadOnlyCollection<DiagnosticGroup> Children { get; }
 
         /// <summary>Gets the collection of <see cref="DiagnosticResult"/> instances.</summary>
         /// /// <value>A collection of <see cref="DiagnosticResult"/> elements.</value>
-        public ReadOnlyCollection<DiagnosticResult> Results { get; private set; }
+        public ReadOnlyCollection<DiagnosticResult> Results { get; }
 
         private void InitializeChildren()
         {

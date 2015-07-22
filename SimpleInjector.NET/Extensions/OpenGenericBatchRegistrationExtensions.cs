@@ -238,7 +238,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
         {
-            Requires.IsNotNull(callback, "callback");
+            Requires.IsNotNull(callback, nameof(callback));
             container.RegisterCollection(openGenericServiceType, assemblies);
         }
 
@@ -266,7 +266,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(callback, "callback");
+            Requires.IsNotNull(callback, nameof(callback));
             container.RegisterCollection(openGenericServiceType, assemblies);
         }
 
@@ -360,7 +360,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback, IEnumerable<Type> typesToRegister)
         {
-            Requires.IsNotNull(callback, "callback");
+            Requires.IsNotNull(callback, nameof(callback));
             container.RegisterCollection(openGenericServiceType, typesToRegister);
         }
 
@@ -578,7 +578,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
         {
-            Requires.IsNotNull(callback, "callback");
+            Requires.IsNotNull(callback, nameof(callback));
 
             var types = GetTypesToRegisterInternal(container, openGenericServiceType, accessibility, assemblies);
 
@@ -609,7 +609,7 @@ namespace SimpleInjector.Extensions
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(callback, "callback");
+            Requires.IsNotNull(callback, nameof(callback));
 
             var types = GetTypesToRegisterInternal(container, openGenericServiceType, accessibility, assemblies);
 
@@ -793,7 +793,7 @@ namespace SimpleInjector.Extensions
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, 
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsValidEnum(accessibility, "accessibility");
+            Requires.IsValidEnum(accessibility, nameof(accessibility));
 
             return container.GetTypesToRegister(openGenericServiceType, assemblies)
                 .Where(GetAccessibilityFilter(accessibility));

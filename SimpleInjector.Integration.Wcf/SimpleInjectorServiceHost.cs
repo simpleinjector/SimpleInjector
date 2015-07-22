@@ -47,7 +47,7 @@ namespace SimpleInjector.Integration.Wcf
         public SimpleInjectorServiceHost(Container container, Type serviceType, params Uri[] baseAddresses)
             : base(serviceType, baseAddresses)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             this.container = container;
         }

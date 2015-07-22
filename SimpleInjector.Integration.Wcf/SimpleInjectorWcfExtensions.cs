@@ -51,7 +51,7 @@ namespace SimpleInjector
         /// a null reference (Nothing in VB).</exception>
         public static void RegisterWcfServices(this Container container, params Assembly[] assemblies)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             if (assemblies == null || assemblies.Length == 0)
             {
@@ -113,7 +113,7 @@ namespace SimpleInjector
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(WcfOperationLifestyle.WithDisposal);
         }
@@ -140,7 +140,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(WcfOperationLifestyle.WithDisposal);
         }
@@ -164,8 +164,8 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             container.Register<TService>(instanceCreator, WcfOperationLifestyle.WithDisposal);
         }
@@ -192,8 +192,8 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             var lifestyle =
                 disposeWhenRequestEnds ? WcfOperationLifestyle.WithDisposal : WcfOperationLifestyle.NoDisposal;
@@ -226,7 +226,7 @@ namespace SimpleInjector
         /// </exception>
         public static Scope GetCurrentWcfOperationScope(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return WcfOperationLifestyle.GetCurrentScopeCore();
         }

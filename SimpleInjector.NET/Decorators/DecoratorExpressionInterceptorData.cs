@@ -38,17 +38,17 @@ namespace SimpleInjector.Decorators
             this.Lifestyle = lifestyle;
         }
 
-        internal Container Container { get; private set; }
+        internal Container Container { get; }
 
-        internal Type ServiceType { get; private set; }
+        internal Type ServiceType { get; }
 
-        internal Type DecoratorType { get; private set; }
+        internal Type DecoratorType { get; }
 
-        internal Func<DecoratorPredicateContext, Type> DecoratorTypeFactory { get; private set; }
+        internal Func<DecoratorPredicateContext, Type> DecoratorTypeFactory { get; }
 
-        internal Predicate<DecoratorPredicateContext> Predicate { get; private set; }
+        internal Predicate<DecoratorPredicateContext> Predicate { get; }
 
-        internal Lifestyle Lifestyle { get; private set; }
+        internal Lifestyle Lifestyle { get; }
 
         private Func<DecoratorPredicateContext, Type> WrapInNullProtector(
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory)

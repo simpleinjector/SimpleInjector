@@ -55,7 +55,7 @@ namespace SimpleInjector.Integration.Web.Forms
         {
             if (baseBehavior == null)
             {
-                throw new ArgumentNullException("baseBehavior");
+                throw new ArgumentNullException(nameof(baseBehavior));
             }
 
             this.baseBehavior = baseBehavior;

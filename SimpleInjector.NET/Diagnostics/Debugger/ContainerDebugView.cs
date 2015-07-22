@@ -41,10 +41,7 @@ namespace SimpleInjector.Diagnostics.Debugger
             this.Initialize();
         }
 
-        public ContainerOptions Options
-        {
-            get { return this.container.Options; }
-        }
+        public ContainerOptions Options => this.container.Options;
 
         [DebuggerDisplay("")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
@@ -111,20 +108,15 @@ namespace SimpleInjector.Diagnostics.Debugger
             };
         }
 
-        private object[] GroupProducers(IEnumerable<InstanceProducer> producers)
-        {
-            return this.GroupProducers(producers, level: 0);
-        }
+        private object[] GroupProducers(IEnumerable<InstanceProducer> producers) => 
+            this.GroupProducers(producers, level: 0);
 
-        private object[] GroupProducers(IEnumerable<InstanceProducer> producers, int level)
-        {
-            return (
-                from producer in producers
-                group producer by TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(producer.ServiceType, level) 
-                    into resultGroup
-                select this.BuildProducerGroup(resultGroup.Key, resultGroup.ToArray(), level + 1))
-                .ToArray();
-        }
+        private object[] GroupProducers(IEnumerable<InstanceProducer> producers, int level) => (
+            from producer in producers
+            group producer by TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(producer.ServiceType, level)
+                into resultGroup
+            select this.BuildProducerGroup(resultGroup.Key, resultGroup.ToArray(), level + 1))
+            .ToArray();
 
         private object BuildProducerGroup(Type groupType, 
             InstanceProducer[] producersForGroup, int level)
@@ -167,13 +159,10 @@ namespace SimpleInjector.Diagnostics.Debugger
                 value: childGroups);
         }
 
-        private static DebuggerViewItem BuildNonGenericGroup(Type closedType,
-            InstanceProducer[] producersForGroup)
-        {
-            return new DebuggerViewItem(
+        private static DebuggerViewItem BuildNonGenericGroup(Type closedType,InstanceProducer[] producersForGroup) => 
+            new DebuggerViewItem(
                 name: Helpers.ToFriendlyName(closedType),
                 description: "Count = " + producersForGroup.Length,
                 value: producersForGroup.ToArray());
-        }
     }
 }

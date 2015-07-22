@@ -37,29 +37,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.TornLifestyle; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.TornLifestyle;
 
-        public string Name
-        {
-            get { return "Torn Lifestyle"; }
-        }
+        public string Name => "Torn Lifestyle";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
-        {
-            int count = results.Count();
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results) =>
+            results.Count() + " possible registrations found with a torn lifestyle.";
 
-            return count + " possible registrations found with a torn lifestyle.";
-        }
-
-        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
-        {
-            int count = results.Count();
-
-            return count + " torn registrations.";
-        }
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results) =>
+            results.Count() + " torn registrations.";
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
@@ -79,22 +65,19 @@ namespace SimpleInjector.Diagnostics.Analyzers
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
             Justification = "FxCop is unable to recognize nicely written LINQ statements from complex code.")]
         private static IEnumerable<InstanceProducer[]> GetTornRegistrationGroups(
-            IEnumerable<InstanceProducer> producers)
-        {
-            return
-                from producer in producers
-                where !producer.IsDecorated
-                where producer.Registration.Lifestyle != Lifestyle.Transient
-                where !SingletonLifestyle.IsSingletonInstanceRegistration(producer.Registration)
-                where !producer.Registration.WrapsInstanceCreationDelegate
-                group producer by producer.Registration into registrationGroup
-                let registration = registrationGroup.Key
-                let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }
-                group registrationGroup by key into registrationLifestyleGroup
-                let hasConflict = registrationLifestyleGroup.Count() > 1
-                where hasConflict
-                select registrationLifestyleGroup.SelectMany(p => p).ToArray();
-        }
+            IEnumerable<InstanceProducer> producers) => 
+            from producer in producers
+            where !producer.IsDecorated
+            where producer.Registration.Lifestyle != Lifestyle.Transient
+            where !SingletonLifestyle.IsSingletonInstanceRegistration(producer.Registration)
+            where !producer.Registration.WrapsInstanceCreationDelegate
+            group producer by producer.Registration into registrationGroup
+            let registration = registrationGroup.Key
+            let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }
+            group registrationGroup by key into registrationLifestyleGroup
+            let hasConflict = registrationLifestyleGroup.Count() > 1
+            where hasConflict
+            select registrationLifestyleGroup.SelectMany(p => p).ToArray();
 
         private static TornLifestyleDiagnosticResult CreateDiagnosticResult(
             InstanceProducer diagnosedProducer,

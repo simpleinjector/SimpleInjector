@@ -117,7 +117,7 @@ namespace SimpleInjector.Internals
 
         void ICollection<TService>.CopyTo(TService[] array, int arrayIndex)
         {
-            Requires.IsNotNull(array, "array");
+            Requires.IsNotNull(array, nameof(array));
 
             foreach (var item in this)
             {

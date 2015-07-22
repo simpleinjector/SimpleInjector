@@ -66,7 +66,7 @@ namespace SimpleInjector
         public static void RegisterWebApiRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(LifestyleWithDisposal);
         }
@@ -93,7 +93,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(LifestyleWithDisposal);
         }
@@ -142,7 +142,7 @@ namespace SimpleInjector
             bool disposeWhenScopeEnds)
             where TConcrete : class, IDisposable
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(GetLifestyle(disposeWhenScopeEnds));
         }
@@ -171,7 +171,7 @@ namespace SimpleInjector
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(GetLifestyle(disposeWhenScopeEnds));
         }
@@ -197,8 +197,8 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenScopeEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             container.Register<TService>(instanceCreator, GetLifestyle(disposeWhenScopeEnds));
         }
@@ -212,8 +212,8 @@ namespace SimpleInjector
             "attributes. See https://simpleinjector.org/webapi.", error: true)]
         public static void RegisterWebApiFilterProvider(this Container container, HttpConfiguration configuration)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(configuration, "configuration");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(configuration, nameof(configuration));
 
             throw new InvalidOperationException(
                 "SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " +
@@ -233,8 +233,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(configuration, "configuration");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(configuration, nameof(configuration));
 
             IEnumerable<Assembly> assemblies = GetAvailableApplicationAssemblies(configuration);
 
@@ -255,9 +255,9 @@ namespace SimpleInjector
         public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration,
             IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(configuration, "configuration");
-            Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(configuration, nameof(configuration));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
 
             IAssembliesResolver assembliesResolver = new AssembliesResolver(assemblies);
 
@@ -293,8 +293,8 @@ namespace SimpleInjector
         public static void EnableHttpRequestMessageTracking(this Container container, 
             HttpConfiguration configuration)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(configuration, "configuration");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(configuration, nameof(configuration));
 
             if (!configuration.MessageHandlers.OfType<SimpleInjectorHttpRequestMessageHandler>().Any())
             {
@@ -315,7 +315,7 @@ namespace SimpleInjector
         /// is a null reference (Nothing in VB).</exception>
         public static HttpRequestMessage GetCurrentHttpRequestMessage(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             if (!httpRequestMessageTrackingEnabled)
             {

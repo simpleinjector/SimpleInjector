@@ -40,12 +40,7 @@ namespace SimpleInjector
         private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
 
         // Flag to signal that the container's configuration has been verified (at least once).
-        private bool succesfullyVerified;
-
-        internal bool SuccesfullyVerified
-        {
-            get { return this.succesfullyVerified; }
-        }
+        internal bool SuccesfullyVerified { get; private set; }
 
         internal Scope VerificationScope { get; private set; }
 
@@ -72,7 +67,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="option"/> has an invalid value.</exception>
         public void Verify(VerificationOption option)
         {
-            Requires.IsValidEnum(option, "option");
+            Requires.IsValidEnum(option, nameof(option));
 
             bool diagnose = option == VerificationOption.VerifyAndDiagnose;
 
@@ -106,7 +101,7 @@ namespace SimpleInjector
                     this.Verifying();
                     this.VerifyThatAllExpressionsCanBeBuilt();
                     this.VerifyThatAllRootObjectsCanBeCreated();
-                    this.succesfullyVerified = true;
+                    this.SuccesfullyVerified = true;
                 }
                 finally
                 {

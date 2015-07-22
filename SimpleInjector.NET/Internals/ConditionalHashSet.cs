@@ -52,7 +52,7 @@ namespace SimpleInjector.Internals
 
         public void Add(T item)
         {
-            Requires.IsNotNull(item, "item");
+            Requires.IsNotNull(item, nameof(item));
 
             lock (this.locker)
             {
@@ -68,7 +68,7 @@ namespace SimpleInjector.Internals
 
         public void Remove(T item)
         {
-            Requires.IsNotNull(item, "item");
+            Requires.IsNotNull(item, nameof(item));
 
             lock (this.locker)
             {

@@ -35,10 +35,8 @@ namespace SimpleInjector.Diagnostics
             this.analyzer = analyzer;
         }
 
-        internal static DiagnosticGroup Group(IContainerAnalyzer analyzer, DiagnosticResult[] results)
-        {
-            return new DiagnosticResultGrouper(analyzer).Group(results);
-        }
+        internal static DiagnosticGroup Group(IContainerAnalyzer analyzer, DiagnosticResult[] results) =>
+            new DiagnosticResultGrouper(analyzer).Group(results);
 
         internal DiagnosticGroup Group(DiagnosticResult[] results)
         {
@@ -55,33 +53,21 @@ namespace SimpleInjector.Diagnostics
                 results: groupResults);
         }
 
-        private DiagnosticGroup[] GroupResults(IEnumerable<DiagnosticResult> results, int level)
-        {
-            return (
-                from result in results
-                group result by MakeTypePartiallyGenericUpToLevel(result.ServiceType, level) into resultGroup
-                where resultGroup.Count() > 1
-                select this.BuildDiagnosticGroup(resultGroup.Key, resultGroup, level + 1))
-                .ToArray();
-        }
+        private DiagnosticGroup[] GroupResults(IEnumerable<DiagnosticResult> results, int level) => (
+            from result in results
+            group result by MakeTypePartiallyGenericUpToLevel(result.ServiceType, level) into resultGroup
+            where resultGroup.Count() > 1
+            select this.BuildDiagnosticGroup(resultGroup.Key, resultGroup, level + 1))
+            .ToArray();
 
-        private static Type MakeTypePartiallyGenericUpToLevel(Type serviceType, int level)
-        {
-            return TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(serviceType, level);
-        }
+        private static Type MakeTypePartiallyGenericUpToLevel(Type serviceType, int level) => 
+            TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(serviceType, level);
 
-        private DiagnosticGroup BuildDiagnosticGroup(Type groupType,
-            IEnumerable<DiagnosticResult> results, int level)
-        {
-            if (groupType.ContainsGenericParameters)
-            {
-                return this.BuildGenericGroup(groupType, results, level);
-            }
-            else
-            {
-                return this.BuildNonGenericGroup(groupType, results);
-            }
-        }
+        private DiagnosticGroup BuildDiagnosticGroup(Type groupType, IEnumerable<DiagnosticResult> results, 
+            int level) => 
+            groupType.ContainsGenericParameters
+                ? this.BuildGenericGroup(groupType, results, level)
+                : this.BuildNonGenericGroup(groupType, results);
 
         private DiagnosticGroup BuildGenericGroup(Type groupType, IEnumerable<DiagnosticResult> results,
             int level)
@@ -105,25 +91,20 @@ namespace SimpleInjector.Diagnostics
                 results: groupResults);
         }
 
-        private DiagnosticGroup BuildNonGenericGroup(Type closedType, IEnumerable<DiagnosticResult> results)
-        {
-            return new DiagnosticGroup(
+        private DiagnosticGroup BuildNonGenericGroup(Type closedType, IEnumerable<DiagnosticResult> results) => 
+            new DiagnosticGroup(
                 diagnosticType: this.analyzer.DiagnosticType,
                 groupType: closedType,
                 name: Helpers.ToFriendlyName(closedType),
                 description: this.analyzer.GetGroupDescription(results),
                 children: Enumerable.Empty<DiagnosticGroup>(),
                 results: results);
-        }
 
-        private static DiagnosticResult[] GetGroupResults(IEnumerable<DiagnosticResult> results, int level)
-        {
-            return (
-                from result in results
-                group result by MakeTypePartiallyGenericUpToLevel(result.ServiceType, level) into resultGroup
-                where resultGroup.Count() == 1
-                select resultGroup.Single())
-                .ToArray();
-        }
+        private static DiagnosticResult[] GetGroupResults(IEnumerable<DiagnosticResult> results, int level) => (
+            from result in results
+            group result by MakeTypePartiallyGenericUpToLevel(result.ServiceType, level) into resultGroup
+            where resultGroup.Count() == 1
+            select resultGroup.Single())
+            .ToArray();
     }
 }

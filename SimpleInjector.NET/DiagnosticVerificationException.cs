@@ -37,7 +37,7 @@ namespace SimpleInjector
             new ReadOnlyCollection<DiagnosticResult>(Helpers.Array<DiagnosticResult>.Empty);
 
 #if !PCL
-        [NonSerializedAttribute]
+        [NonSerialized]
 #endif
         private readonly ReadOnlyCollection<DiagnosticResult> errors = Empty;
 
@@ -91,18 +91,13 @@ namespace SimpleInjector
             this.errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
         }
 
-        /// <summary>
-        /// Gets the list of <see cref="DiagnosticResult"/> instances.
-        /// </summary>
+        /// <summary>Gets the list of <see cref="DiagnosticResult"/> instances.</summary>
         /// <value>A list of <see cref="DiagnosticResult"/> instances.</value>
-        public ReadOnlyCollection<DiagnosticResult> Errors
-        {
-            get { return this.errors; }
-        }
+        public ReadOnlyCollection<DiagnosticResult> Errors => this.errors;
 
         private static string BuildMessage(IList<DiagnosticResult> errors)
         {
-            Requires.IsNotNull(errors, "errors");
+            Requires.IsNotNull(errors, nameof(errors));
             return StringResources.DiagnosticWarningsReported(errors);
         }
     }

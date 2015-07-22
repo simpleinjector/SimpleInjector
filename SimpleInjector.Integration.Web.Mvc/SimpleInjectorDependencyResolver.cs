@@ -74,7 +74,7 @@ namespace SimpleInjector.Integration.Web.Mvc
         {
             if (container == null)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
 
             this.Container = container;
@@ -82,7 +82,7 @@ namespace SimpleInjector.Integration.Web.Mvc
 
         /// <summary>Gets the container.</summary>
         /// <value>The <see cref="Container"/>.</value>
-        public Container Container { get; private set; }
+        public Container Container { get; }
 
         /// <summary>Resolves singly registered services that support arbitrary object creation.</summary>
         /// <param name="serviceType">The type of the requested service or object.</param>

@@ -115,8 +115,8 @@ namespace SimpleInjector
 
         internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
 
             this.ServiceType = serviceType;
             this.Registration = registration;
@@ -140,28 +140,19 @@ namespace SimpleInjector
         /// registration or gets decorated.
         /// </summary>
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
-        public Lifestyle Lifestyle
-        {
-            get { return this.overriddenLifestyle ?? this.Registration.Lifestyle; }
-        }
+        public Lifestyle Lifestyle => this.overriddenLifestyle ?? this.Registration.Lifestyle;
 
         /// <summary>Gets the service type for which this producer produces instances.</summary>
         /// <value>A <see cref="Type"/> instance.</value>
-        public Type ServiceType { get; private set; }
+        public Type ServiceType { get; }
 
         /// <summary>Gets the <see cref="Registration"/> instance for this instance.</summary>
         /// <value>The <see cref="Registration"/>.</value>
         public Registration Registration { get; private set; }
 
-        internal Type ImplementationType
-        {
-            get { return this.Registration.ImplementationType ?? this.ServiceType; }
-        }
+        internal Type ImplementationType => this.Registration.ImplementationType ?? this.ServiceType;
 
-        internal Container Container
-        {
-            get { return this.Registration.Container; }
-        }
+        internal Container Container => this.Registration.Container;
 
         // Flag that indicates that this type is created by the container (concrete or collection) or resolved
         // using unregistered type resolution.
@@ -190,43 +181,25 @@ namespace SimpleInjector
         // when the producer is valid.
         internal Exception Exception { get; private set; }
 
-        internal Predicate<PredicateContext> Predicate { get; private set; }
+        internal Predicate<PredicateContext> Predicate { get; }
 
         internal bool IsDecorated { get; set; }
 
-        internal bool IsConditional
-        {
-            get { return this.Predicate != null; }
-        }
+        internal bool IsConditional => this.Predicate != null;
 
-        internal bool IsUnconditional
-        {
-            get { return !this.IsConditional; }
-        }
+        internal bool IsUnconditional => !this.IsConditional;
 
-        internal bool IsExpressionCreated
-        {
-            get { return this.lazyExpression.IsValueCreated && !this.Registration.MustBeVerified; }
-        }
+        internal bool IsExpressionCreated => this.lazyExpression.IsValueCreated && !this.Registration.MustBeVerified;
 
-        internal bool MustBeExplicitlyVerified
-        {
-            get { return this.verifiers != null; }
-        }
+        internal bool MustBeExplicitlyVerified => this.verifiers != null;
 
         internal bool InstanceSuccessfullyCreated { get; private set; }
 
         internal bool VerifiersAreSuccessfullyCalled { get; private set; }
 
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType = {0}, Lifestyle = {1}",
-                    this.ServiceType.ToFriendlyName(), this.Lifestyle.Name);
-            }
-        }
+        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+            "ServiceType = {0}, Lifestyle = {1}",
+            this.ServiceType.ToFriendlyName(), this.Lifestyle.Name);
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -713,42 +686,24 @@ namespace SimpleInjector
                 this.instanceProducer = instanceProducer;
             }
 
-            public Lifestyle Lifestyle
-            {
-                get { return this.instanceProducer.Lifestyle; }
-            }
+            public Lifestyle Lifestyle => this.instanceProducer.Lifestyle;
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
-            public Type ServiceType
-            {
-                get { return this.instanceProducer.ServiceType; }
-            }
+            public Type ServiceType => this.instanceProducer.ServiceType;
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
-            public Type ImplementationType
-            {
-                get { return this.instanceProducer.ImplementationType; }
-            }
+            public Type ImplementationType => this.instanceProducer.ImplementationType;
 
-            public KnownRelationship[] Relationships
-            {
-                get { return this.instanceProducer.GetRelationships(); }
-            }
+            public KnownRelationship[] Relationships => this.instanceProducer.GetRelationships();
 
             // By using the TruncatedDependencyGraph as value of this DependencyGraph property, we allow the
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
             [DebuggerDisplay(value: "{TruncatedDependencyGraph,nq}")]
-            public string DependencyGraph
-            {
-                get { return this.instanceProducer.VisualizeIndentedObjectGraph(indentingDepth: 0); }
-            }
+            public string DependencyGraph => this.instanceProducer.VisualizeIndentedObjectGraph(indentingDepth: 0);
 
             [DebuggerHidden]
-            private string TruncatedDependencyGraph
-            {
-                get { return this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160); }
-            }
+            private string TruncatedDependencyGraph => this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160);
         }
     }
 }

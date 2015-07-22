@@ -59,7 +59,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// </example>
         public static Scope BeginExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.GetExecutionContextScopeManager().BeginExecutionContextScope();
         }
@@ -86,7 +86,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         public static Scope GetCurrentExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.GetExecutionContextScopeManager().CurrentScope;
         }

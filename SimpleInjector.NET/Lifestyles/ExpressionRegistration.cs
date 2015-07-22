@@ -40,8 +40,8 @@ namespace SimpleInjector.Lifestyles
             Container container)
             : base(lifestyle, container)
         {
-            Requires.IsNotNull(expression, "expression");
-            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.expression = expression;
             this.implementationType = implementationType;

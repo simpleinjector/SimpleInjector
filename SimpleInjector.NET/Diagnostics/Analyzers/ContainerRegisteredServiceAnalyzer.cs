@@ -35,31 +35,21 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.ContainerRegisteredComponent; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.ContainerRegisteredComponent;
 
-        public string Name
-        {
-            get { return "Container-registered components"; }
-        }
+        public string Name => "Container-registered components";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
             int typeCount = GetNumberOfAutoRegisteredServices(results);
-
             int componentCount = GetNumberOfComponents(results);
-
             return GetTypeRootDescription(typeCount) + GetComponentDescription(componentCount) + ".";
         }
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int componentCount = GetNumberOfComponents(results);
-
             int typeCount = GetNumberOfAutoRegisteredServices(results);
-
             return GetTypeGroupDescription(typeCount) + GetComponentDescription(componentCount) + ".";
         }
 
@@ -80,13 +70,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static ContainerRegisteredServiceDiagnosticResult BuildDiagnosticResult(
-            InstanceProducer registration, KnownRelationship[] relationships)
-        {
-            return new ContainerRegisteredServiceDiagnosticResult(
+            InstanceProducer registration, KnownRelationship[] relationships) => 
+            new ContainerRegisteredServiceDiagnosticResult(
                 serviceType: registration.ServiceType,
                 description: BuildDescription(registration, relationships),
                 relationships: relationships);
-        }
 
         private static string BuildDescription(InstanceProducer registration, KnownRelationship[] relationships)
         {
@@ -132,49 +120,29 @@ namespace SimpleInjector.Diagnostics.Analyzers
             }
         }
 
-        private static string GetTypeRootDescription(int number)
-        {
-            if (number == 1)
-            {
-                return "1 container-registered type has been detected that is referenced by ";
-            }
+        private static string GetTypeRootDescription(int number) => 
+            number == 1
+                ? "1 container-registered type has been detected that is referenced by "
+                : number + " container-registered types have been detected that are referenced by ";
 
-            return number + " container-registered types have been detected that are referenced by ";
-        }
+        private static string GetTypeGroupDescription(int number) => 
+            number == 1
+                ? "1 container-registered type is referenced by "
+                : number + " container-registered types are referenced by ";
 
-        private static string GetTypeGroupDescription(int number)
-        {
-            if (number == 1)
-            {
-                return "1 container-registered type is referenced by ";
-            }
+        private static string GetComponentDescription(int number) => 
+            number == 1
+                ? "1 component"
+                : number + " components";
 
-            return number + " container-registered types are referenced by ";
-        }
+        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results) => 
+            results.Select(result => result.ServiceType).Distinct().Count();
 
-        private static string GetComponentDescription(int number)
-        {
-            if (number == 1)
-            {
-                return "1 component";
-            }
-
-            return number + " components";
-        }
-
-        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results)
-        {
-            return results.Select(result => result.ServiceType).Distinct().Count();
-        }
-
-        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results)
-        {
-            return (
-                from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
-                from relationship in result.Relationships
-                select relationship.Dependency.ServiceType)
-                .Distinct()
-                .Count();
-        }
+        private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results) => (
+            from result in results.Cast<ContainerRegisteredServiceDiagnosticResult>()
+            from relationship in result.Relationships
+            select relationship.Dependency.ServiceType)
+            .Distinct()
+            .Count();
     }
 }

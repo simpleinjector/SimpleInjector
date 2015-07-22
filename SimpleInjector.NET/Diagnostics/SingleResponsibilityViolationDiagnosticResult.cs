@@ -45,11 +45,11 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the created type.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>Gets the list of registrations that are dependencies of the <see cref="ImplementationType"/>.</summary>
         /// <value>A collection of <see cref="InstanceProducer"/> instances.</value>
-        public ReadOnlyCollection<InstanceProducer> Dependencies { get; private set; }
+        public ReadOnlyCollection<InstanceProducer> Dependencies { get; }
 
         private static DebuggerViewItem[] GetDebugValue(Type implementationType, InstanceProducer[] dependencies)
         {

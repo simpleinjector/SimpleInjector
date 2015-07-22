@@ -252,11 +252,9 @@ namespace SimpleInjector.Decorators
                 .ToArray();
         }
 
-        internal static bool IsDecorateeParameter(Type parameterType, Type decoratingType)
-        {
-            return IsDecorateeDependencyParameter(parameterType, decoratingType) ||
-                IsDecorateeFactoryDependencyParameter(parameterType, decoratingType);
-        }
+        internal static bool IsDecorateeParameter(Type parameterType, Type decoratingType) => 
+            IsDecorateeDependencyParameter(parameterType, decoratingType) ||
+            IsDecorateeFactoryDependencyParameter(parameterType, decoratingType);
 
         // Checks if the given parameterType can function as the decorated instance of the given service type.
         private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
@@ -272,10 +270,8 @@ namespace SimpleInjector.Decorators
         }
 
         // Checks if the given parameterType can function as the decorated instance of the given service type.
-        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType)
-        {
-            return parameterType == serviceType;
-        }
+        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType) => 
+            parameterType == serviceType;
 
         private sealed class ContainerControlledCollectionRegistration : Registration
         {
@@ -289,27 +285,16 @@ namespace SimpleInjector.Decorators
                 this.serviceType = serviceType;
             }
 
-            public override Type ImplementationType
-            {
-                get { return this.serviceType; }
-            }
+            public override Type ImplementationType => this.serviceType;
 
-            internal override bool MustBeVerified
-            {
-                get { return !this.Collection.AllProducersVerified; }
-            }
+            internal override bool MustBeVerified => !this.Collection.AllProducersVerified;
 
-            internal IContainerControlledCollection Collection { get; private set; }
+            internal IContainerControlledCollection Collection { get; }
 
-            public override Expression BuildExpression()
-            {
-                return Expression.Constant(this.Collection, this.serviceType);
-            }
+            public override Expression BuildExpression() => Expression.Constant(this.Collection, this.serviceType);
 
-            internal override KnownRelationship[] GetRelationshipsCore()
-            {
-                return base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
-            }
+            internal override KnownRelationship[] GetRelationshipsCore() => 
+                base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
         }
     }
 }

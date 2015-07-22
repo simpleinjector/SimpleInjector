@@ -49,23 +49,14 @@ namespace SimpleInjector.Decorators
         // Must be set after construction.
         internal DecoratorPredicateContext Context { get; set; }
 
-        protected Container Container
-        {
-            get { return this.data.Container; }
-        }
+        protected Container Container => this.data.Container;
 
         protected Lifestyle Lifestyle { get; set; }
 
         // The decorator type definition (possibly open generic).
-        protected Type DecoratorTypeDefinition
-        {
-            get { return this.data.DecoratorType; }
-        }
+        protected Type DecoratorTypeDefinition => this.data.DecoratorType;
 
-        protected Predicate<DecoratorPredicateContext> Predicate
-        {
-            get { return this.data.Predicate; }
-        }
+        protected Predicate<DecoratorPredicateContext> Predicate => this.data.Predicate;
 
         protected abstract Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {

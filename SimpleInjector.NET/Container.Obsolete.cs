@@ -227,7 +227,7 @@ namespace SimpleInjector
             error: true)]
         public void InjectProperties(object instance)
         {
-            Requires.IsNotNull(instance, "instance");
+            Requires.IsNotNull(instance, nameof(instance));
 
             throw new InvalidOperationException(
                 "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +

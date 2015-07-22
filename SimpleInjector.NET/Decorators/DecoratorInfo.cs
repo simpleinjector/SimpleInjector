@@ -26,14 +26,13 @@ namespace SimpleInjector.Decorators
 
     internal sealed class DecoratorInfo
     {
+        internal readonly Type DecoratorType;
+        internal readonly InstanceProducer DecoratorProducer;
+
         internal DecoratorInfo(Type decoratorType, InstanceProducer decoratorProducer)
         {
             this.DecoratorType = decoratorType;
             this.DecoratorProducer = decoratorProducer;
         }
-
-        internal Type DecoratorType { get; private set; }
-
-        internal InstanceProducer DecoratorProducer { get; private set; }
     }
 }

@@ -53,7 +53,7 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TConcrete, TConcrete>(WebRequestLifestyle.WithDisposal);
         }
@@ -80,7 +80,7 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             container.Register<TService, TImplementation>(WebRequestLifestyle.WithDisposal);
         }
@@ -103,8 +103,8 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             RegisterPerWebRequest(container, instanceCreator, disposeInstanceWhenWebRequestEnds: true);
         }
@@ -130,8 +130,8 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             
             container.Register<TService>(instanceCreator, 
                 WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));

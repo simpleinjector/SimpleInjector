@@ -151,14 +151,14 @@ namespace SimpleInjector
         public void RegisterConditional(Type serviceType, Type implementationType, Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(predicate, "predicate");
-            Requires.IsNotPartiallyClosed(serviceType, "serviceType", "implementationType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), "implementationType");
 
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, "serviceType");
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, "implementationType");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, nameof(serviceType));
+            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, "implementationType");
 
             if (serviceType.ContainsGenericParameters)

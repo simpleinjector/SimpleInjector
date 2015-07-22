@@ -36,7 +36,7 @@ namespace SimpleInjector.Diagnostics
 
         protected override void InsertItem(int index, KnownRelationship item)
         {
-            Requires.IsNotNull(item, "item");
+            Requires.IsNotNull(item, nameof(item));
 
             this.HasChanged = true;
 
@@ -45,7 +45,7 @@ namespace SimpleInjector.Diagnostics
 
         protected override void SetItem(int index, KnownRelationship item)
         {
-            Requires.IsNotNull(item, "item");
+            Requires.IsNotNull(item, nameof(item));
 
             this.HasChanged = true;
 

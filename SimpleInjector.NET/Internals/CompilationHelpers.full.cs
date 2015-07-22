@@ -33,7 +33,6 @@ namespace SimpleInjector.Internals
     using System.Runtime.CompilerServices;
     using System.Security;
     using System.Threading;
-    using SimpleInjector.Advanced;
 
     internal static partial class CompilationHelpers
     {
@@ -124,21 +123,14 @@ namespace SimpleInjector.Internals
                 constants, constantsParameter);
         }
 
-        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda)
-        {
-            return (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda,
+        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda) => 
+            (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda,
                 "DynamicInstanceProducer" + GetNextDynamicClassId(), "GetInstance");
-        }
 
-        private static List<ConstantExpression> GetConstants(Expression expression)
-        {
-            return ConstantFinderVisitor.FindConstants(expression);
-        }
+        private static List<ConstantExpression> GetConstants(Expression expression) => 
+            ConstantFinderVisitor.FindConstants(expression);
 
-        private static long GetNextDynamicClassId()
-        {
-            return Interlocked.Increment(ref dynamicClassCounter);
-        }
+        private static long GetNextDynamicClassId() => Interlocked.Increment(ref dynamicClassCounter);
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Not all delegates can be JITted. We fall back to the slower expression.Compile " +

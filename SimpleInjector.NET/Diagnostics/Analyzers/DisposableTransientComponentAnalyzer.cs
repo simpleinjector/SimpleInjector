@@ -35,27 +35,19 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.DisposableTransientComponent; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.DisposableTransientComponent;
 
-        public string Name
-        {
-            get { return "Disposable Transient Components"; }
-        }
+        public string Name => "Disposable Transient Components";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
             var count = results.Count();
-
             return count + " disposable transient " + ComponentPlural(count) + " found.";
         }
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             var count = results.Count();
-
             return count + " disposable transient " + ComponentPlural(count) + ".";
         }
 
@@ -77,16 +69,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return results.ToArray();
         }
 
-        private static string BuildDescription(InstanceProducer producer)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
+        private static string BuildDescription(InstanceProducer producer) => 
+            string.Format(CultureInfo.InvariantCulture,
                 "{0} is registered as transient, but implements IDisposable.",
                 producer.Registration.ImplementationType.ToFriendlyName());
-        }
 
-        private static string ComponentPlural(int number)
-        {
-            return number == 1 ? "component" : "components";
-        }
+        private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
     }
 }

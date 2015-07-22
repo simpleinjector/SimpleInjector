@@ -82,8 +82,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         protected Registration(Lifestyle lifestyle, Container container)
         {
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(container, nameof(container));
 
             this.Lifestyle = lifestyle;
             this.Container = container;
@@ -95,18 +95,15 @@ namespace SimpleInjector
 
         /// <summary>Gets the <see cref="Lifestyle"/> this that created this registration.</summary>
         /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
-        public Lifestyle Lifestyle { get; private set; }
+        public Lifestyle Lifestyle { get; }
 
         /// <summary>Gets the <see cref="Container"/> instance for this registration.</summary>
         /// <value>The <see cref="Container"/> instance for this registration.</value>
-        public Container Container { get; private set; }
+        public Container Container { get; }
 
         internal bool IsCollection { get; set; }
 
-        internal virtual bool MustBeVerified
-        {
-            get { return false; }
-        }
+        internal virtual bool MustBeVerified => false;
 
         /// <summary>Gets or sets a value indicating whether this registration object contains a user 
         /// supplied instanceCreator factory delegate.</summary>
@@ -124,10 +121,7 @@ namespace SimpleInjector
         /// after calling <see cref="BuildExpression()"/>.
         /// </summary>
         /// <returns>A new array containing the <see cref="KnownRelationship"/> instances.</returns>
-        public KnownRelationship[] GetRelationships()
-        {
-            return this.GetRelationshipsCore();
-        }
+        public KnownRelationship[] GetRelationships() => this.GetRelationshipsCore();
 
         /// <summary>
         /// Initializes an already created instance and applies properties and initializers to that instance.
@@ -145,9 +139,9 @@ namespace SimpleInjector
         /// of type <see cref="ImplementationType"/>.</exception>
         public void InitializeInstance(object instance)
         {
-            Requires.IsNotNull(instance, "instance");
+            Requires.IsNotNull(instance, nameof(instance));
             Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(),
-                "instance");
+                nameof(instance));
 
             if (this.instanceInitializer == null)
             {
@@ -169,8 +163,8 @@ namespace SimpleInjector
         /// </exception>
         public void SuppressDiagnosticWarning(DiagnosticType type, string justification)
         {
-            Requires.IsValidEnum(type, "type");
-            Requires.IsNotNullOrEmpty(justification, "justification");
+            Requires.IsValidEnum(type, nameof(type));
+            Requires.IsNotNullOrEmpty(justification, nameof(justification));
 
             if (this.suppressions == null)
             {
@@ -232,7 +226,7 @@ namespace SimpleInjector
 
         internal void AddRelationship(KnownRelationship relationship)
         {
-            Requires.IsNotNull(relationship, "relationship");
+            Requires.IsNotNull(relationship, nameof(relationship));
 
             lock (this.knownRelationships)
             {
@@ -276,10 +270,7 @@ namespace SimpleInjector
             return expression;
         }
 
-        internal InstanceProducer GetCurrentProducer()
-        {
-            return this.currentProducer.Value;
-        }
+        internal InstanceProducer GetCurrentProducer() => this.currentProducer.Value;
 
         /// <summary>
         /// Builds a <see cref="Func{T}"/> delegate for the creation of the <typeparamref name="TService"/>
@@ -297,7 +288,7 @@ namespace SimpleInjector
         protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             Expression expression = this.BuildTransientExpression<TService>(instanceCreator);
 
@@ -343,16 +334,13 @@ namespace SimpleInjector
         protected Expression BuildTransientExpression<TService>(Func<TService> instanceCreator)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
 
             expression = WrapWithNullChecker<TService>(expression);
-
             expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TService), expression);
-
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TService), expression);
-
             expression = this.WrapWithInitializer<TService>(expression);
 
             return expression;
@@ -377,9 +365,7 @@ namespace SimpleInjector
             Expression expression = this.BuildNewExpression(typeof(TService), typeof(TImplementation));
 
             expression = this.WrapWithPropertyInjector(typeof(TService), typeof(TImplementation), expression);
-
             expression = this.InterceptInstanceCreation(typeof(TService), typeof(TImplementation), expression);
-
             expression = this.WrapWithInitializer<TImplementation>(expression);
 
             return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
@@ -396,7 +382,6 @@ namespace SimpleInjector
             Expression expression = castedParameter;
 
             expression = this.WrapWithPropertyInjector(type, type, castedParameter);
-
             expression = this.InterceptInstanceCreation(type, type, expression);
 
             // NOTE: We can't wrap with the instance created callback, since the InitializeInstance is called

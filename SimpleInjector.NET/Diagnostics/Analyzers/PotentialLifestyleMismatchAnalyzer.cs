@@ -35,15 +35,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.PotentialLifestyleMismatch; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.PotentialLifestyleMismatch;
 
-        public string Name
-        {
-            get { return "Potential Lifestyle Mismatches"; }
-        }
+        public string Name => "Potential Lifestyle Mismatches";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
@@ -62,24 +56,20 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return count + " possible " + MismatchPlural(count) + ".";
         }
 
-        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
-        {
-            return (
-              from producer in producers
-              where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
-              from relationship in producer.GetRelationships()
-              let container = producer.Registration.Container
-              where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(container, relationship)
-              select new PotentialLifestyleMismatchDiagnosticResult(
-                  serviceType: producer.ServiceType,
-                  description: BuildRelationshipDescription(relationship),
-                  relationship: relationship))
-              .ToArray();
-        }
-        
-        private static string BuildRelationshipDescription(KnownRelationship relationship)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
+            from producer in producers
+            where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
+            from relationship in producer.GetRelationships()
+            let container = producer.Registration.Container
+            where LifestyleMismatchChecker.HasPossibleLifestyleMismatch(container, relationship)
+            select new PotentialLifestyleMismatchDiagnosticResult(
+                serviceType: producer.ServiceType,
+                description: BuildRelationshipDescription(relationship),
+                relationship: relationship))
+            .ToArray();
+
+        private static string BuildRelationshipDescription(KnownRelationship relationship) => 
+            string.Format(CultureInfo.InvariantCulture,
                 "{0} ({1}) depends on {2}{3} ({4}).",
                 Helpers.ToFriendlyName(relationship.ImplementationType),
                 relationship.Lifestyle.Name,
@@ -88,16 +78,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     ? " implemented by " + Helpers.ToFriendlyName(relationship.Dependency.ImplementationType)
                     : string.Empty,
                 relationship.Dependency.Lifestyle.Name);
-        }
-        
-        private static string ServicePlural(int number)
-        {
-            return number == 1 ? "service" : "services";
-        }
 
-        private static string MismatchPlural(int number)
-        {
-            return number == 1 ? "mismatch" : "mismatches";
-        }
+        private static string ServicePlural(int number) => number == 1 ? "service" : "services";
+
+        private static string MismatchPlural(int number) => number == 1 ? "mismatch" : "mismatches";
     }
 }

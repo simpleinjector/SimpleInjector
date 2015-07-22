@@ -53,16 +53,13 @@ namespace SimpleInjector
         /// this instance.
         /// </summary>
         /// <value>The indication whether the event has been handled.</value>
-        public bool Handled
-        {
-            get { return this.Expression != null || this.Registration != null; }
-        }
-        
+        public bool Handled => this.Expression != null || this.Registration != null;
+
         internal Expression Expression { get; private set; }
 
         internal Registration Registration { get; private set; }
 
-        internal InjectionConsumerInfo Context { get; private set; }
+        internal InjectionConsumerInfo Context { get; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type
@@ -78,10 +75,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Func<object> instanceCreator)
         {
-            if (instanceCreator == null)
-            {
-                throw new ArgumentNullException("instanceCreator");
-            }
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             this.RequiresNotHandled();
 
@@ -111,7 +105,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Expression expression)
         {
-            Requires.IsNotNull(expression, "expression");
+            Requires.IsNotNull(expression, nameof(expression));
 
             this.RequiresNotHandled();
 
@@ -136,7 +130,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Registration registration)
         {
-            Requires.IsNotNull(registration, "registration");
+            Requires.IsNotNull(registration, nameof(registration));
 
             this.RequiresNotHandled();
 

@@ -134,7 +134,7 @@ namespace SimpleInjector.Integration.Web
         /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
         protected override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return () => GetCurrentScope(HttpContext.Current);
         }

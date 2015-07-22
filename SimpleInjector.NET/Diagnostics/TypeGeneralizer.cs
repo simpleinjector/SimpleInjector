@@ -36,7 +36,7 @@ namespace SimpleInjector.Diagnostics
             {
                 // Stack overflow prevention
                 throw new ArgumentException("nesting level bigger than 100 too high. Type: " +
-                    type.ToFriendlyName(), "nestingLevel");
+                    type.ToFriendlyName(), nameof(nestingLevel));
             }
 
             // example given type: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>>

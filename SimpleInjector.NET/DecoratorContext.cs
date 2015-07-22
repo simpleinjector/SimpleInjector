@@ -50,10 +50,7 @@ namespace SimpleInjector
         /// service type will be returned, even if other decorators have already been applied to this type.
         /// </summary>
         /// <value>The closed generic service type.</value>
-        public Type ServiceType 
-        {
-            get { return this.context.ServiceType; }
-        }
+        public Type ServiceType => this.context.ServiceType;
 
         /// <summary>
         /// Gets the type of the implementation that is created by the container and for which the decorator
@@ -62,36 +59,24 @@ namespace SimpleInjector
         /// determined. In that case the closed generic service type will be returned.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType
-        {
-            get { return this.context.ImplementationType; }
-        }
+        public Type ImplementationType => this.context.ImplementationType;
 
         /// <summary>
         /// Gets the list of the types of decorators that have already been applied to this instance.
         /// </summary>
         /// <value>The applied decorators.</value>
-        public ReadOnlyCollection<Type> AppliedDecorators
-        {
-            get { return this.context.AppliedDecorators; }
-        }
+        public ReadOnlyCollection<Type> AppliedDecorators => this.context.AppliedDecorators;
 
         /// <summary>
         /// Gets the current <see cref="Expression"/> object that describes the intention to create a new
         /// instance with its currently applied decorators.
         /// </summary>
         /// <value>The current expression that is about to be decorated.</value>
-        public Expression Expression
-        {
-            get { return this.context.Expression; }
-        }
+        public Expression Expression => this.context.Expression;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay
-        {
-            get { return this.context.DebuggerDisplay; }
-        }
+        internal string DebuggerDisplay => this.context.DebuggerDisplay;
     }
 }

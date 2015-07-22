@@ -42,10 +42,10 @@ namespace SimpleInjector.Internals
         }
 
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(Argument),nq}")]
-        internal Type Argument { get; private set; }
+        internal Type Argument { get; }
 
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
-        internal Type ConcreteType { get; private set; }
+        internal Type ConcreteType { get; }
 
         internal bool TypeConstraintsAreSatisfied
         {
@@ -55,29 +55,21 @@ namespace SimpleInjector.Internals
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
         /// <returns>True or false.</returns>
-        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other)
-        {
-            return this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
-        }
+        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other) => 
+            this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
 
         /// <summary>Overrides the default hash code. Needed for doing LINQ distinct operations.</summary>
         /// <returns>An 32 bit integer.</returns>
-        public override int GetHashCode()
-        {
-            return this.Argument.GetHashCode() ^ this.ConcreteType.GetHashCode();
-        }
+        public override int GetHashCode() =>
+            this.Argument.GetHashCode() ^ this.ConcreteType.GetHashCode();
 
-        internal static ArgumentMapping Create(Type argument, Type concreteType)
-        {
-            return new ArgumentMapping(argument, concreteType);
-        }
+        internal static ArgumentMapping Create(Type argument, Type concreteType) =>
+            new ArgumentMapping(argument, concreteType);
 
-        internal static ArgumentMapping[] Zip(Type[] arguments, Type[] concreteTypes)
-        {
-            return arguments.Zip(concreteTypes,
+        internal static ArgumentMapping[] Zip(Type[] arguments, Type[] concreteTypes) =>
+            arguments.Zip(concreteTypes,
                 (argument, concreteType) => new ArgumentMapping(argument, concreteType))
                 .ToArray();
-        }
 
         internal bool ConcreteTypeMatchesPartialArgument()
         {

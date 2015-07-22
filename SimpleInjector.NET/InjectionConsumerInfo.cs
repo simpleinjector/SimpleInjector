@@ -41,9 +41,9 @@ namespace SimpleInjector
         public InjectionConsumerInfo(Type serviceType, Type implementationType, ParameterInfo parameter)
             : this(serviceType, implementationType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(parameter, "parameter");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(parameter, nameof(parameter));
 
             this.Target = new InjectionTargetInfo(parameter);
         }
@@ -51,15 +51,15 @@ namespace SimpleInjector
         internal InjectionConsumerInfo(Type serviceType, Type implementationType, PropertyInfo property)
             : this(serviceType, implementationType)
         {
-            Requires.IsNotNull(property, "property");
+            Requires.IsNotNull(property, nameof(property));
 
             this.Target = new InjectionTargetInfo(property);
         }
 
         private InjectionConsumerInfo(Type serviceType, Type implementationType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
@@ -67,28 +67,25 @@ namespace SimpleInjector
 
         /// <summary>Gets the service type of the consumer of the component that should be created.</summary>
         /// <value>The closed generic service type.</value>
-        public Type ServiceType { get; private set; }
+        public Type ServiceType { get; }
 
         /// <summary>Gets the implementation type of the consumer of the component that should be created.</summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>
         /// Gets the information about the consumer's target in which the dependency is injected. The target
         /// can be either a property or a constructor parameter.
         /// </summary>
         /// <value>The <see cref="InjectionTargetInfo"/> for this context.</value>
-        public InjectionTargetInfo Target { get; private set; }
+        public InjectionTargetInfo Target { get; }
 
         /// <summary>Returns a string that represents the <see cref="InjectionConsumerInfo"/>.</summary>
         /// <returns>A string.</returns>
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "{{ ServiceType: {0}, ImplementationType: {1}, Target.Name: '{2}' }}",
-                this.ServiceType.ToFriendlyName(),
-                this.ImplementationType.ToFriendlyName(),
-                this.Target.Name);
-        }
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture,
+            "{{ ServiceType: {0}, ImplementationType: {1}, Target.Name: '{2}' }}",
+            this.ServiceType.ToFriendlyName(),
+            this.ImplementationType.ToFriendlyName(),
+            this.Target.Name);
     }
 }

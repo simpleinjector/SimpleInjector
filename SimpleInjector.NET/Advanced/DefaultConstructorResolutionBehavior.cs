@@ -24,7 +24,6 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
-    using System.Linq.Expressions;
     using System.Reflection;
 
     [DebuggerDisplay("{GetType().Name,nq}")]
@@ -35,8 +34,8 @@ namespace SimpleInjector.Advanced
         // constructor of that proxy instead of returning a constructor of the implementationType.
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             VerifyTypeIsConcrete(implementationType);
 

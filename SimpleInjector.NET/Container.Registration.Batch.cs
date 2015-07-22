@@ -68,13 +68,13 @@ namespace SimpleInjector
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(assemblies, "assemblies");
-            Requires.IsGenericType(openGenericServiceType, "openGenericServiceType",
+            Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
+            Requires.IsGenericType(openGenericServiceType, nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithAssemblies);
-            Requires.IsNotPartiallyClosed(openGenericServiceType, "openGenericServiceType");
-            Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType",
+            Requires.IsNotPartiallyClosed(openGenericServiceType, nameof(openGenericServiceType));
+            Requires.IsOpenGenericType(openGenericServiceType, nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
             var implementationTypes = this.GetTypesToRegister(openGenericServiceType, assemblies);
@@ -120,21 +120,21 @@ namespace SimpleInjector
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(implementationTypes, "implementationTypes");
-            Requires.IsGenericType(openGenericServiceType, "openGenericServiceType",
+            Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(implementationTypes, nameof(implementationTypes));
+            Requires.IsGenericType(openGenericServiceType, nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithTypes);
-            Requires.IsNotPartiallyClosed(openGenericServiceType, "openGenericServiceType");
-            Requires.IsOpenGenericType(openGenericServiceType, "openGenericServiceType",
+            Requires.IsNotPartiallyClosed(openGenericServiceType, nameof(openGenericServiceType));
+            Requires.IsOpenGenericType(openGenericServiceType, nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithTypes);
 
             implementationTypes = implementationTypes.Distinct().ToArray();
 
-            Requires.DoesNotContainNullValues(implementationTypes, "implementationTypes");
-            Requires.CollectionDoesNotContainOpenGenericTypes(implementationTypes, "implementationTypes");
+            Requires.DoesNotContainNullValues(implementationTypes, nameof(implementationTypes));
+            Requires.CollectionDoesNotContainOpenGenericTypes(implementationTypes, nameof(implementationTypes));
             Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, implementationTypes,
-                "implementationTypes", typeCanBeServiceType: false);
+                nameof(implementationTypes), typeCanBeServiceType: false);
 
             var mappings =
                 from mapping in BatchMapping.Build(openGenericServiceType, implementationTypes)
@@ -237,8 +237,8 @@ namespace SimpleInjector
         /// (Nothing in VB).</exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var types =
                 from assembly in assemblies.Distinct()

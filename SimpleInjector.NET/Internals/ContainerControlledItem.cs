@@ -38,14 +38,14 @@ namespace SimpleInjector.Internals
 
         private ContainerControlledItem(Registration registration)
         {
-            Requires.IsNotNull(registration, "registration");
+            Requires.IsNotNull(registration, nameof(registration));
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
         }
 
         private ContainerControlledItem(Type implementationType)
         {
-            Requires.IsNotNull(implementationType, "implementationType");
+            Requires.IsNotNull(implementationType, nameof(implementationType));
             this.ImplementationType = implementationType;
         }
         

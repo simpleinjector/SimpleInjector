@@ -47,8 +47,8 @@ namespace SimpleInjector.Advanced
         /// <param name="instance">The created instance.</param>
         public InstanceInitializationData(InitializationContext context, object instance)
         {
-            Requires.IsNotNull(context, "context");
-            Requires.IsNotNull(instance, "instance");
+            Requires.IsNotNull(context, nameof(context));
+            Requires.IsNotNull(instance, nameof(instance));
 
             this.context = context;
             this.instance = instance;
@@ -57,49 +57,32 @@ namespace SimpleInjector.Advanced
         /// <summary>Gets the <see cref="InitializationContext"/> with contextual information about the 
         /// created instance.</summary>
         /// <value>The <see cref="InitializationContext"/>.</value>
-        public InitializationContext Context
-        {
-            get { return this.context; }
-        }
+        public InitializationContext Context => this.context;
 
         /// <summary>Gets the created instance.</summary>
         /// <value>The created instance.</value>
-        public object Instance
-        {
-            get { return this.instance; }
-        }
+        public object Instance => this.instance;
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-        public override int GetHashCode()
-        {
-            return
-                (this.context == null ? 0 : this.context.GetHashCode()) ^
-                (this.instance == null ? 0 : this.instance.GetHashCode());
-        }
+        public override int GetHashCode() => 
+            (this.context == null ? 0 : this.context.GetHashCode()) ^
+            (this.instance == null ? 0 : this.instance.GetHashCode());
 
         /// <summary>Indicates whether this instance and a specified object are equal.</summary>
         /// <param name="obj">Another object to compare to.</param>
         /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            if (!(obj is InstanceInitializationData))
-            {
-                return false;
-            }
-
-            return this.Equals((InstanceInitializationData)obj);
-        }
+        public override bool Equals(object obj) => 
+            obj is InstanceInitializationData
+                ? this.Equals((InstanceInitializationData)obj)
+                : false;
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(InstanceInitializationData other)
-        {
-            return this == other;
-        }
+        public bool Equals(InstanceInitializationData other) => this == other;
 
         /// <summary>
         /// Indicates whether the values of two specified <see cref="InstanceInitializationData"/> objects are equal.
@@ -107,11 +90,9 @@ namespace SimpleInjector.Advanced
         /// <param name="first">The first object to compare.</param>
         /// <param name="second">The second object to compare.</param>
         /// <returns>True if a and b are equal; otherwise, false.</returns>
-        public static bool operator ==(InstanceInitializationData first, InstanceInitializationData second)
-        {
-            return object.ReferenceEquals(first.context, second.context) &&
-                object.ReferenceEquals(first.instance, second.instance);
-        }
+        public static bool operator ==(InstanceInitializationData first, InstanceInitializationData second) => 
+            object.ReferenceEquals(first.context, second.context) &&
+            object.ReferenceEquals(first.instance, second.instance);
 
         /// <summary>
         /// Indicates whether the values of two specified  <see cref="InstanceInitializationData"/>  objects are 
@@ -120,9 +101,7 @@ namespace SimpleInjector.Advanced
         /// <param name="first">The first object to compare.</param>
         /// <param name="second">The second object to compare.</param>
         /// <returns>True if a and b are not equal; otherwise, false.</returns>
-        public static bool operator !=(InstanceInitializationData first, InstanceInitializationData second)
-        {
-            return !(first == second);
-        }
+        public static bool operator !=(InstanceInitializationData first, InstanceInitializationData second) => 
+            !(first == second);
     }
 }

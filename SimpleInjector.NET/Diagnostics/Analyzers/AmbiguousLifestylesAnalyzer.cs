@@ -36,29 +36,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
         }
 
-        public DiagnosticType DiagnosticType
-        {
-            get { return DiagnosticType.AmbiguousLifestyles; }
-        }
+        public DiagnosticType DiagnosticType => DiagnosticType.AmbiguousLifestyles;
 
-        public string Name
-        {
-            get { return "Component with ambiguous lifestyles"; }
-        }
+        public string Name => "Component with ambiguous lifestyles";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
-        {
-            int count = results.Count();
+        public string GetRootDescription(IEnumerable<DiagnosticResult> results) =>
+            results.Count() + " possible registrations found with ambiguous lifestyles.";
 
-            return count + " possible registrations found with ambiguous lifestyles.";
-        }
-
-        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
-        {
-            int count = results.Count();
-
-            return count + " ambiguous lifestyles.";
-        }
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results) =>
+            results.Count() + " ambiguous lifestyles.";
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
@@ -137,9 +123,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static string BuildDescription(InstanceProducer diagnosedProducer,
-             InstanceProducer[] conflictingProducers)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
+            InstanceProducer[] conflictingProducers) =>
+            string.Format(CultureInfo.InvariantCulture,
                 "The registration for {0} ({1}) maps to the same implementation ({2}) as the {3} for {4} " +
                 "{5}, but the {3} {6} to a different lifestyle. This will cause each registration to " +
                 "resolve to a different instance.",
@@ -150,11 +135,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 conflictingProducers.Select(ToFriendlyNameWithLifestyle).ToCommaSeparatedText(),
                 conflictingProducers.Length == 1 ? "does" : "do",
                 conflictingProducers.Length == 1 ? "maps" : "map");
-        }
 
-        private static string ToFriendlyNameWithLifestyle(InstanceProducer producer)
-        {
-            return producer.ServiceType.ToFriendlyName() + " (" + producer.Registration.Lifestyle.Name + ")";
-        }
+        private static string ToFriendlyNameWithLifestyle(InstanceProducer producer) =>
+            producer.ServiceType.ToFriendlyName() + " (" + producer.Registration.Lifestyle.Name + ")";
     }
 }

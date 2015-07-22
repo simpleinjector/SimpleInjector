@@ -459,7 +459,7 @@ namespace SimpleInjector
         public void RegisterDecorator(Type serviceType, Type decoratorType,
             Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(predicate, "predicate");
+            Requires.IsNotNull(predicate, nameof(predicate));
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
         }
@@ -543,10 +543,10 @@ namespace SimpleInjector
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory, Lifestyle lifestyle,
             Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(decoratorTypeFactory, "decoratorTypeFactory");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(predicate, "predicate");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(decoratorTypeFactory, nameof(decoratorTypeFactory));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(predicate, nameof(predicate));
 
             var interceptor = new DecoratorInterceptor(
                 new DecoratorExpressionInterceptorData(
@@ -620,7 +620,7 @@ namespace SimpleInjector
         public void RegisterDecorator(Type serviceType, Type decoratorType,
             Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(predicate, "predicate");
+            Requires.IsNotNull(predicate, nameof(predicate));
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate);
         }
@@ -628,15 +628,15 @@ namespace SimpleInjector
         private void RegisterDecoratorCore(Type serviceType, Type decoratorType, 
             Predicate<DecoratorPredicateContext> predicate = null, Lifestyle lifestyle = null)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(decoratorType, "decoratorType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(decoratorType, nameof(decoratorType));
 
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, decoratorType, "serviceType");
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, decoratorType, "decoratorType");
-            Requires.IsDecorator(this, serviceType, decoratorType, "decoratorType");
-            Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType, decoratorType, "decoratorType");
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, "decoratorType");
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, decoratorType, nameof(serviceType));
+            Requires.ImplementationHasSelectableConstructor(this, serviceType, decoratorType, nameof(decoratorType));
+            Requires.IsDecorator(this, serviceType, decoratorType, nameof(decoratorType));
+            Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType, decoratorType, nameof(decoratorType));
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, nameof(decoratorType));
 
             var interceptor = new DecoratorInterceptor(
                 new DecoratorExpressionInterceptorData(

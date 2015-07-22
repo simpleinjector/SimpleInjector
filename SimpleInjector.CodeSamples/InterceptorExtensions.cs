@@ -61,8 +61,8 @@ namespace SimpleInjector.CodeSamples
         public static void InterceptWith<TInterceptor>(this Container container,
             Func<Type, bool> predicate)
             where TInterceptor : class, IInterceptor {
-            RequiresIsNotNull(container, "container");
-            RequiresIsNotNull(predicate, "predicate");
+            RequiresIsNotNull(container, nameof(container));
+            RequiresIsNotNull(predicate, nameof(predicate));
             container.Options.ConstructorResolutionBehavior.GetConstructor(
                 typeof(TInterceptor), typeof(TInterceptor));
 
@@ -77,9 +77,9 @@ namespace SimpleInjector.CodeSamples
 
         public static void InterceptWith(this Container container,
             Func<IInterceptor> interceptorCreator, Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, "container");
-            RequiresIsNotNull(interceptorCreator, "interceptorCreator");
-            RequiresIsNotNull(predicate, "predicate");
+            RequiresIsNotNull(container, nameof(container));
+            RequiresIsNotNull(interceptorCreator, nameof(interceptorCreator));
+            RequiresIsNotNull(predicate, nameof(predicate));
 
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression =
@@ -93,9 +93,9 @@ namespace SimpleInjector.CodeSamples
         public static void InterceptWith(this Container container,
             Func<ExpressionBuiltEventArgs, IInterceptor> interceptorCreator,
             Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, "container");
-            RequiresIsNotNull(interceptorCreator, "interceptorCreator");
-            RequiresIsNotNull(predicate, "predicate");
+            RequiresIsNotNull(container, nameof(container));
+            RequiresIsNotNull(interceptorCreator, nameof(interceptorCreator));
+            RequiresIsNotNull(predicate, nameof(predicate));
 
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Invoke(
@@ -109,9 +109,9 @@ namespace SimpleInjector.CodeSamples
 
         public static void InterceptWith(this Container container,
             IInterceptor interceptor, Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, "container");
-            RequiresIsNotNull(interceptor, "interceptor");
-            RequiresIsNotNull(predicate, "predicate");
+            RequiresIsNotNull(container, nameof(container));
+            RequiresIsNotNull(interceptor, nameof(interceptor));
+            RequiresIsNotNull(predicate, nameof(predicate));
 
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Constant(interceptor),

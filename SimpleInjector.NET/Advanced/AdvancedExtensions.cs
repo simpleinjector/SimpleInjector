@@ -45,7 +45,7 @@ namespace SimpleInjector.Advanced
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
         public static bool IsLocked(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.IsLocked;
         }
@@ -56,7 +56,7 @@ namespace SimpleInjector.Advanced
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
         public static bool IsVerifying(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return container.IsVerifying;
         }
@@ -72,7 +72,7 @@ namespace SimpleInjector.Advanced
             error: true)]
         public static Action<TService> GetInitializer<TService>(this Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             throw new InvalidOperationException(
                 "This method has been removed. Use Container.GetRegistration().Registration." +
@@ -94,8 +94,8 @@ namespace SimpleInjector.Advanced
         /// reference (Nothing in VB).</exception>
         public static object GetItem(this Container container, object key)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(key, "key");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(key, nameof(key));
 
             return container.GetItem(key);
         }
@@ -114,8 +114,8 @@ namespace SimpleInjector.Advanced
         /// <paramref name="key"/> is a null reference (Nothing in VB).</exception>
         public static void SetItem(this Container container, object key, object item)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(key, "key");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(key, nameof(key));
 
             container.SetItem(key, item);
         }
@@ -138,15 +138,15 @@ namespace SimpleInjector.Advanced
         public static void AppendToCollection(this Container container, Type serviceType, 
             Registration registration)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registration, "registration");
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
-            Requires.IsRegistrationForThisContainer(container, registration, "registration");
+            Requires.IsRegistrationForThisContainer(container, registration, nameof(registration));
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                registration.ImplementationType, "registration");
+                registration.ImplementationType, nameof(registration));
 
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, new[] { registration }, 
                 "registration");
@@ -172,17 +172,17 @@ namespace SimpleInjector.Advanced
         public static void AppendToCollection(this Container container, Type serviceType,
             Type implementationType)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                implementationType, "implementationType");
+                implementationType, nameof(implementationType));
 
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, 
-                new[] { implementationType }, "implementationType");
+                new[] { implementationType }, nameof(implementationType));
 
             container.AppendToCollectionInternal(serviceType, implementationType);
         }

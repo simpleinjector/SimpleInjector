@@ -146,37 +146,28 @@ namespace SimpleInjector
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly string name;
-
         /// <summary>Initializes a new instance of the <see cref="Lifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
         protected Lifestyle(string name)
         {
-            Requires.IsNotNullOrEmpty(name, "name");
+            Requires.IsNotNullOrEmpty(name, nameof(name));
 
-            this.name = name;
+            this.Name = name;
         }
 
         /// <summary>Gets the user friendly name of this lifestyle.</summary>
         /// <value>The user friendly name of this lifestyle.</value>
-        public string Name
-        {
-            get { return this.name; }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the length of the lifestyle. Implementers must implement this property. The diagnostic
         /// services use this value to compare lifestyles with each other to determine lifestyle 
         /// misconfigurations.
         /// </summary>
-        /// <value>The <see cref="Int32"/> representing the length of this lifestyle.</value>
-        protected abstract int Length
-        {
-            get;
-        }
+        /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
+        protected abstract int Length { get; }
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
@@ -235,9 +226,9 @@ namespace SimpleInjector
         public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle,
             Lifestyle falseLifestyle)
         {
-            Requires.IsNotNull(lifestyleSelector, "lifestyleSelector");
-            Requires.IsNotNull(trueLifestyle, "trueLifestyle");
-            Requires.IsNotNull(falseLifestyle, "falseLifestyle");
+            Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
+            Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
+            Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
             return new HybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
         }
@@ -281,9 +272,9 @@ namespace SimpleInjector
         public static ScopedLifestyle CreateHybrid(Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle,
             ScopedLifestyle falseLifestyle)
         {
-            Requires.IsNotNull(lifestyleSelector, "lifestyleSelector");
-            Requires.IsNotNull(trueLifestyle, "trueLifestyle");
-            Requires.IsNotNull(falseLifestyle, "falseLifestyle");
+            Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
+            Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
+            Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
             return new ScopedHybridLifestyle(lifestyleSelector, trueLifestyle, falseLifestyle);
         }
@@ -352,8 +343,8 @@ namespace SimpleInjector
         /// </example>
         public static Lifestyle CreateCustom(string name, CreateLifestyleApplier lifestyleApplierFactory)
         {
-            Requires.IsNotNullOrEmpty(name, "name");
-            Requires.IsNotNull(lifestyleApplierFactory, "lifestyleApplierFactory");
+            Requires.IsNotNullOrEmpty(name, nameof(name));
+            Requires.IsNotNull(lifestyleApplierFactory, nameof(lifestyleApplierFactory));
 
             return new CustomLifestyle(name, lifestyleApplierFactory);
         }
@@ -428,7 +419,7 @@ namespace SimpleInjector
         public Registration CreateRegistration<TConcrete>(Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return this.CreateRegistrationCore<TConcrete, TConcrete>(container);
         }
@@ -448,7 +439,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             return this.CreateRegistrationCore<TService, TImplementation>(container);
         }
@@ -469,8 +460,8 @@ namespace SimpleInjector
         public Registration CreateRegistration<TService>(Func<TService> instanceCreator, Container container)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(container, nameof(container));
 
             var registration = this.CreateRegistrationCore<TService>(instanceCreator, container);
 
@@ -493,7 +484,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(Type concreteType, Container container)
         {
-            Requires.IsNotNull(concreteType, "concreteType");
+            Requires.IsNotNull(concreteType, nameof(concreteType));
 
             return this.CreateRegistration(concreteType, concreteType, container);
         }
@@ -513,15 +504,15 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(container, nameof(container));
 
-            Requires.IsReferenceType(serviceType, "serviceType");
-            Requires.IsReferenceType(implementationType, "implementationType");
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsReferenceType(implementationType, nameof(implementationType));
 
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
-                "implementationType");
+                nameof(implementationType));
 
             var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceTImplementationMethod
                 .MakeGenericMethod(serviceType, implementationType);
@@ -533,7 +524,7 @@ namespace SimpleInjector
             catch (MemberAccessException ex)
             {
                 throw BuildUnableToResolveTypeDueToSecurityConfigException(implementationType, ex,
-                    "implementationType");
+                    nameof(implementationType));
             }
         }
 
@@ -552,11 +543,11 @@ namespace SimpleInjector
         public Registration CreateRegistration(Type serviceType, Func<object> instanceCreator,
             Container container)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(instanceCreator, "instanceCreator");
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(container, nameof(container));
 
-            Requires.IsReferenceType(serviceType, "serviceType");
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
 
             var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceFuncMethod
                 .MakeGenericMethod(serviceType);
@@ -571,19 +562,13 @@ namespace SimpleInjector
             }
             catch (MemberAccessException ex)
             {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(serviceType, ex, "serviceType");
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(serviceType, ex, nameof(serviceType));
             }
         }
 
-        internal virtual int ComponentLength(Container container)
-        {
-            return this.Length;
-        }
+        internal virtual int ComponentLength(Container container) => this.Length;
 
-        internal virtual int DependencyLength(Container container)
-        {
-            return this.Length;
-        }
+        internal virtual int DependencyLength(Container container) => this.Length;
 
         internal Registration CreateRegistration(Type serviceType, Type implementationType,
             Container container, params OverriddenParameter[] overriddenParameters)

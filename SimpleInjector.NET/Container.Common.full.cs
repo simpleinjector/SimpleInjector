@@ -26,27 +26,19 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Reflection;
     using System.Reflection.Emit;
-    using SimpleInjector.Diagnostics;
 
 #if !PUBLISH
     /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
 #endif
     public partial class Container
     {
-        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(CreateModuleBuilder);
-
-        internal static ModuleBuilder ModuleBuilder
-        {
-            get { return LazyBuilder.Value; }
-        }
-
-        private static ModuleBuilder CreateModuleBuilder()
-        {
-            return AppDomain.CurrentDomain.DefineDynamicAssembly(
+        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(() => 
+            AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName("SimpleInjector.Compiled"),
                 AssemblyBuilderAccess.Run)
-                .DefineDynamicModule("SimpleInjector.CompiledModule");
-        }
+                .DefineDynamicModule("SimpleInjector.CompiledModule"));
+
+        internal static ModuleBuilder ModuleBuilder => LazyBuilder.Value;
 
         [DebuggerStepThrough]
         static partial void GetStackTrace(ref string stackTrace)

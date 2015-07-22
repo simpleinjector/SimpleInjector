@@ -183,7 +183,7 @@ namespace SimpleInjector.Extensions
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> openGenericImplementations)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             RegisterAllOpenGeneric(container, openGenericServiceType, container.SelectionBasedLifestyle,
                 (IEnumerable<Type>)openGenericImplementations);
@@ -223,10 +223,10 @@ namespace SimpleInjector.Extensions
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Type> openGenericImplementations)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(openGenericServiceType, "openGenericServiceType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(openGenericImplementations, "openGenericImplementations");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(openGenericImplementations, nameof(openGenericImplementations));
 
             throw new InvalidOperationException("This extension method has been removed. " +
                 "Please use one of the Container.RegisterCollection() overloads instead.");

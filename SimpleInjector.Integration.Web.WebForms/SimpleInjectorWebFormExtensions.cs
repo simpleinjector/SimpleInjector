@@ -69,8 +69,8 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies.</param>
         public static void RegisterPages(this Container container, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var pageTypes = GetConcreteTypesThatDeriveFrom<Page>(assemblies);
 
@@ -109,8 +109,8 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies.</param>
         public static void RegisterUserControls(this Container container, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var userControlTypes = GetConcreteTypesThatDeriveFrom<UserControl>(assemblies);
 
@@ -152,8 +152,8 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies.</param>
         public static void RegisterHttpHandlers(this Container container, IEnumerable<Assembly> assemblies)
         {
-            Requires.IsNotNull(container, "container");
-            Requires.IsNotNull(assemblies, "assemblies");
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var handlerTypes =
                 from type in GetConcreteTypesThatDeriveFrom<IHttpHandler>(assemblies)

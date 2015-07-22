@@ -55,7 +55,7 @@ namespace SimpleInjector.Diagnostics
         /// warnings and messages.</returns>
         public static DiagnosticResult[] Analyze(Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
             RequiresContainerToBeVerified(container);
 
             var producersToAnalyze = GetProducersToAnalyze(container);
@@ -79,15 +79,12 @@ namespace SimpleInjector.Diagnostics
                 .ToArray();
         }
 
-        internal static InstanceProducer[] GetProducersToAnalyze(Container container)
-        {
-            return (
-                from producer in container.GetCurrentRegistrations()
-                from p in GetSelfAndDependentProducers(producer)
-                select p)
-                .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
-                .ToArray();
-        }
+        internal static InstanceProducer[] GetProducersToAnalyze(Container container) => (
+            from producer in container.GetCurrentRegistrations()
+            from p in GetSelfAndDependentProducers(producer)
+            select p)
+            .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
+            .ToArray();
 
         private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
             HashSet<InstanceProducer> set = null)

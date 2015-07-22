@@ -69,29 +69,23 @@ namespace SimpleInjector
         /// <summary>Gets a value indicating whether a previous <b>Register</b> registration has already
         /// been applied for the given <see cref="ServiceType"/>.</summary>
         /// <value>The indication whether the event has been handled.</value>
-        public bool Handled { get; private set; }
+        public bool Handled { get; }
 
         /// <summary>
         /// Gets the contextual information of the consuming component that directly depends on the resolved
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer { get; private set; }
+        public InjectionConsumerInfo Consumer { get; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "ServiceType: {0}, ImplementationType: {1}, Handled: {2}, Consumer: {3}",
-                    this.ServiceType.ToFriendlyName(),
-                    this.ImplementationType.ToFriendlyName(),
-                    this.Handled,
-                    this.Consumer);
-            }
-        }
+        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+            "ServiceType: {0}, ImplementationType: {1}, Handled: {2}, Consumer: {3}",
+            this.ServiceType.ToFriendlyName(),
+            this.ImplementationType.ToFriendlyName(),
+            this.Handled,
+            this.Consumer);
     }
 }

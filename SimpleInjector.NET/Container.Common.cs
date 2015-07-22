@@ -134,7 +134,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
-        public ContainerOptions Options { get; private set; }
+        public ContainerOptions Options { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container is currently being verified on the current thread.
@@ -151,12 +151,9 @@ namespace SimpleInjector
         /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is 
         /// returned from the registered container.Options.LifestyleSelectionBehavior.
         /// </summary>
-        internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; private set; }
+        internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; }
 
-        internal long ContainerId
-        {
-            get { return this.containerId; }
-        }
+        internal long ContainerId => this.containerId;
 
         internal bool IsLocked
         {
@@ -176,10 +173,7 @@ namespace SimpleInjector
             }
         }
 
-        internal bool HasRegistrations
-        {
-            get { return this.explicitRegistrations.Count > 1 || this.collectionResolvers.Any(); }
-        }
+        internal bool HasRegistrations => this.explicitRegistrations.Count > 1 || this.collectionResolvers.Any();
 
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
@@ -239,7 +233,7 @@ namespace SimpleInjector
         /// <see cref="Verify()"/> has been successfully called.</exception>
         public InstanceProducer[] GetRootRegistrations()
         {
-            if (!this.succesfullyVerified)
+            if (!this.SuccesfullyVerified)
             {
                 throw new InvalidOperationException(
                     StringResources.GetRootRegistrationsCanNotBeCalledBeforeVerify());
@@ -255,18 +249,12 @@ namespace SimpleInjector
         /// True if the specified System.Object is equal to the current System.Object; otherwise, false.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
+        public override bool Equals(object obj) => base.Equals(obj);
 
         /// <summary>Returns the hash code of the current instance.</summary>
         /// <returns>The hash code of the current instance.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents the <see cref="Container"/>.
@@ -275,10 +263,7 @@ namespace SimpleInjector
         /// A <see cref="System.String"/> that represents the <see cref="Container"/>.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+        public override string ToString() => base.ToString();
 
         /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
         /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime 
@@ -289,10 +274,7 @@ namespace SimpleInjector
             EditorBrowsableAttribute to the GetType method, which will hide the method when the user browses 
             the methods of the Container class with IntelliSense. The GetType method has no value for the user
             who will only use this class for registration.")]
-        public new Type GetType()
-        {
-            return base.GetType();
-        }
+        public new Type GetType() => base.GetType();
 
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
         public void Dispose()
@@ -342,7 +324,7 @@ namespace SimpleInjector
 
         internal object GetItem(object key)
         {
-            Requires.IsNotNull(key, "key");
+            Requires.IsNotNull(key, nameof(key));
 
             lock (this.items)
             {
@@ -352,7 +334,7 @@ namespace SimpleInjector
 
         internal void SetItem(object key, object item)
         {
-            Requires.IsNotNull(key, "key");
+            Requires.IsNotNull(key, nameof(key));
 
             lock (this.items)
             {
@@ -531,12 +513,12 @@ namespace SimpleInjector
         private void RegisterOpenGeneric(Type serviceType, Type implementationType, 
             Lifestyle lifestyle, Predicate<PredicateContext> predicate = null)
         {
-            Requires.IsGenericType(serviceType, "serviceType");
-            Requires.IsNotPartiallyClosed(serviceType, "serviceType");
+            Requires.IsGenericType(serviceType, nameof(serviceType));
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                implementationType, "serviceType");
+                implementationType, nameof(serviceType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType,
-                implementationType, "implementationType");
+                implementationType, nameof(implementationType));
 
             this.GetOrCreateRegistrationalEntry(serviceType)
                 .AddGeneric(serviceType, implementationType, lifestyle, predicate);
@@ -685,10 +667,7 @@ namespace SimpleInjector
             private Predicate<InitializationContext> predicate;
             private Action<InstanceInitializationData> instanceInitializer;
 
-            public bool AppliesTo(Type implementationType, InitializationContext context)
-            {
-                return this.predicate(context);
-            }
+            public bool AppliesTo(Type implementationType, InitializationContext context) => this.predicate(context);
 
             public Action<T> CreateAction<T>(InitializationContext context)
             {

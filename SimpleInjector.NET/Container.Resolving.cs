@@ -415,7 +415,7 @@ namespace SimpleInjector
         {
             var arrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
 
-            var singletonCollection = this.GetAllInstances(elementType);
+            IEnumerable<object> singletonCollection = this.GetAllInstances(elementType);
 
             var collectionExpression = Expression.Constant(
                 singletonCollection,
@@ -429,7 +429,7 @@ namespace SimpleInjector
 
             var producer = new InstanceProducer(serviceType, registration);
 
-            if (!((IEnumerable<object>)singletonCollection).Any())
+            if (!singletonCollection.Any())
             {
                 producer.IsContainerAutoRegistered = true;
             }

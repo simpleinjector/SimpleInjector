@@ -54,8 +54,8 @@ namespace SimpleInjector
         public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
-            Requires.IsNotNull(containerUncontrolledCollection, "containerUncontrolledCollection");
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
 
             this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
         }
@@ -77,17 +77,17 @@ namespace SimpleInjector
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
-            Requires.IsNotNull(singletons, "singletons");
-            Requires.DoesNotContainNullValues(singletons, "singletons");
+            Requires.IsNotNull(singletons, nameof(singletons));
+            Requires.DoesNotContainNullValues(singletons, nameof(singletons));
 
             if (typeof(TService) == typeof(Type) && singletons.Any())
             {
                 throw new ArgumentException(
                     StringResources.RegisterCollectionCalledWithTypeAsTService(singletons.Cast<Type>()),
-                    "TService");
+                    nameof(TService));
             }
 
-            Requires.IsNotAnAmbiguousType(typeof(TService), "TService");
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             var singletonRegistrations =
                 from singleton in singletons
@@ -164,18 +164,19 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(serviceTypes, "serviceTypes");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
 
             // Make a copy for correctness and performance.
             serviceTypes = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(serviceTypes, "serviceTypes");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, "serviceTypes",
+            Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
+            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, nameof(serviceTypes),
                 typeCanBeServiceType: true);
             Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypes,
-                "serviceTypes");
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypes, "serviceTypes");
+                nameof(serviceTypes));
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypes, 
+                nameof(serviceTypes));
 
             this.RegisterCollectionInternal(serviceType, serviceTypes);
         }
@@ -201,16 +202,18 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(registrations, "registrations");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registrations, nameof(registrations));
 
             // Make a copy for performance and correctness.
             registrations = registrations.ToArray();
 
-            Requires.DoesNotContainNullValues(registrations, "registrations");
-            Requires.AreRegistrationsForThisContainer(this, registrations, "registrations");
-            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, "registrations", typeCanBeServiceType: true);
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, "registrations");
+            Requires.DoesNotContainNullValues(registrations, nameof(registrations));
+            Requires.AreRegistrationsForThisContainer(this, registrations, nameof(registrations));
+            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, nameof(registrations), 
+                typeCanBeServiceType: true);
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, 
+                nameof(registrations));
 
             this.RegisterCollectionInternal(serviceType, registrations);
         }
@@ -230,10 +233,10 @@ namespace SimpleInjector
         /// open generic type.</exception>
         public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
-            Requires.IsNotNull(serviceType, "serviceType");
-            Requires.IsNotNull(containerUncontrolledCollection, "containerUncontrolledCollection");
-            Requires.IsNotOpenGenericType(serviceType, "serviceType");
-            Requires.IsNotAnAmbiguousType(serviceType, "serviceType");
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             try
             {
@@ -245,7 +248,7 @@ namespace SimpleInjector
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ArgumentException(
                     StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex) +
-                    "\nparamName: " + "serviceType", ex);
+                    "\nparamName: " + nameof(serviceType), ex);
             }
         }
 

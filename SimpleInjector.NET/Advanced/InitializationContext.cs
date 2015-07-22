@@ -42,7 +42,7 @@ namespace SimpleInjector.Advanced
         {
             // producer will be null when a user calls Registration.BuildExpression() directly, instead of
             // calling InstanceProducer.BuildExpression() or InstanceProducer.GetInstance(). 
-            Requires.IsNotNull(registration, "registration");
+            Requires.IsNotNull(registration, nameof(registration));
 
             this.Producer = producer;
             this.Registration = registration;
@@ -54,27 +54,22 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <value>The <see cref="InstanceProducer"/> or null (Nothing in VB) when the instance producer is
         /// unknown.</value>
-        public InstanceProducer Producer { get; private set; }
+        public InstanceProducer Producer { get; }
 
         /// <summary>
         /// Gets the <see cref="Registration"/> that is responsible for the initialization of the created
         /// instance.
         /// </summary>
         /// /// <value>The <see cref="Registration"/>.</value>
-        public Registration Registration { get; private set; }
+        public Registration Registration { get; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "Producer.ServiceType: {0}, Registration.Implementation: {1}",
-                    this.Producer.ServiceType.ToFriendlyName(),
-                    this.Registration.ImplementationType.ToFriendlyName());
-            }
-        }
+        private string DebuggerDisplay => 
+            string.Format(CultureInfo.InvariantCulture,
+                "Producer.ServiceType: {0}, Registration.Implementation: {1}",
+                this.Producer.ServiceType.ToFriendlyName(),
+                this.Registration.ImplementationType.ToFriendlyName());
     }
 }

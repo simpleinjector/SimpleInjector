@@ -187,7 +187,7 @@ namespace SimpleInjector.Internals
 
             internal GenericRegistrationEntry(Type serviceType, Container container)
             {
-                Requires.IsTrue(serviceType.IsGenericTypeDefinition, "serviceType");
+                Requires.IsTrue(serviceType.IsGenericTypeDefinition, nameof(serviceType));
                 this.container = container;
             }
 

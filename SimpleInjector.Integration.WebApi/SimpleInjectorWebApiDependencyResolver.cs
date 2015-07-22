@@ -123,7 +123,7 @@ namespace SimpleInjector.Integration.WebApi
             DependencyResolverScopeOption scopeOption)
             : this(container, beginScope: false)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             if (scopeOption < DependencyResolverScopeOption.UseAmbientScope ||
                 scopeOption > DependencyResolverScopeOption.RequiresNew)

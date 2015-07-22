@@ -92,7 +92,7 @@ namespace SimpleInjector
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
         {
-            Requires.IsNotNull(genericTypeDefinition, "genericTypeDefinition");
+            Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
 
             return genericTypeDefinition.ToFriendlyName(arguments =>
                 string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
@@ -100,7 +100,7 @@ namespace SimpleInjector
 
         internal static string ToFriendlyName(this Type type)
         {
-            Requires.IsNotNull(type, "type");
+            Requires.IsNotNull(type, nameof(type));
 
             return type.ToFriendlyName(arguments =>
                 string.Join(", ", arguments.Select(argument => argument.ToFriendlyName()).ToArray()));
@@ -406,6 +406,7 @@ namespace SimpleInjector
             }
         }
 
+        // .NET 4.6 adds System.Array.Empty<T>, but we don't have that yet in .NET 4.0 and 4.5.
         internal static class Array<T> 
         {
             internal static readonly T[] Empty = new T[0];

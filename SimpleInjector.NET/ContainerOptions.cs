@@ -89,7 +89,7 @@ namespace SimpleInjector
 
         internal ContainerOptions(Container container)
         {
-            Requires.IsNotNull(container, "container");
+            Requires.IsNotNull(container, nameof(container));
 
             this.Container = container;
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
@@ -98,6 +98,13 @@ namespace SimpleInjector
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(Lifestyle.Transient);
             this.batchRegistrationBehavior = new DefaultBatchRegistrationBehavior(container);
         }
+
+        /// <summary>
+        /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
+        /// </summary>
+        /// <value>The current <see cref="SimpleInjector.Container">Container</see>.</value>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Container Container { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the container allows overriding registrations. The default
@@ -133,9 +140,9 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("ConstructorResolutionBehavior");
+                this.ThrowWhenContainerHasRegistrations(nameof(ConstructorResolutionBehavior));
 
                 this.resolutionBehavior = value;
             }
@@ -182,9 +189,9 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("DependencyInjectionBehavior");
+                this.ThrowWhenContainerHasRegistrations(nameof(DependencyInjectionBehavior));
 
                 this.injectionBehavior = value;
             }
@@ -208,9 +215,9 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("PropertySelectionBehavior");
+                this.ThrowWhenContainerHasRegistrations(nameof(PropertySelectionBehavior));
 
                 this.propertyBehavior = value;
             }
@@ -233,9 +240,9 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("LifestyleSelectionBehavior");
+                this.ThrowWhenContainerHasRegistrations(nameof(LifestyleSelectionBehavior));
 
                 this.lifestyleBehavior = value;
             }
@@ -258,20 +265,13 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("DefaultScopedLifestyle");
+                this.ThrowWhenContainerHasRegistrations(nameof(DefaultScopedLifestyle));
 
                 this.defaultScopedLifestyle = value;
             }
         }
-
-        /// <summary>
-        /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
-        /// </summary>
-        /// <value>The current <see cref="SimpleInjector.Container">Container</see>.</value>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Container Container { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation. 
@@ -306,9 +306,9 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, "value");
+                Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations("BatchRegistrationBehavior");
+                this.ThrowWhenContainerHasRegistrations(nameof(BatchRegistrationBehavior));
 
                 this.batchRegistrationBehavior = value;
             }
@@ -366,8 +366,8 @@ namespace SimpleInjector
         public void RegisterResolveInterceptor(ResolveInterceptor interceptor,
             Predicate<InitializationContext> predicate)
         {
-            Requires.IsNotNull(interceptor, "interceptor");
-            Requires.IsNotNull(predicate, "predicate");
+            Requires.IsNotNull(interceptor, nameof(interceptor));
+            Requires.IsNotNull(predicate, nameof(predicate));
 
             this.Container.ThrowWhenContainerIsLocked();
 

@@ -52,7 +52,7 @@ namespace SimpleInjector.Integration.Web.Forms
         {
             if (container == null)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
 
             if (SimpleInjectorWebFormsHttpModule.container != null)

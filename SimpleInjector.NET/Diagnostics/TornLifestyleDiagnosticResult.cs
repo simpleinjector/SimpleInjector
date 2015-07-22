@@ -47,15 +47,15 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the lifestyle on which instances are torn.</summary>
         /// <value>A <see cref="Lifestyle"/>.</value>
-        public Lifestyle Lifestyle { get; private set; }
-        
+        public Lifestyle Lifestyle { get; }
+
         /// <summary>Gets the implementation type that the affected registrations map to.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>Gets the list of registrations that are affected by this warning.</summary>
         /// <value>A list of <see cref="InstanceProducer"/> instances.</value>
-        public ReadOnlyCollection<InstanceProducer> AffectedRegistrations { get; private set; }
+        public ReadOnlyCollection<InstanceProducer> AffectedRegistrations { get; }
 
         private static DebuggerViewItem[] CreateDebugValue(Type implementationType, Lifestyle lifestyle,
             InstanceProducer[] affectedRegistrations)
@@ -77,10 +77,8 @@ namespace SimpleInjector.Diagnostics
             };
         }
 
-        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers)
-        {
-            return producers.Select(r => r.ServiceType).Distinct().Select(Helpers.ToFriendlyName)
+        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) => 
+            producers.Select(r => r.ServiceType).Distinct().Select(Helpers.ToFriendlyName)
                 .ToCommaSeparatedText();
-        }
     }
 }

@@ -49,16 +49,10 @@ namespace SimpleInjector.Decorators
         }
 
         // The service type definition (possibly open generic).
-        protected Type ServiceTypeDefinition
-        {
-            get { return this.data.ServiceType; }
-        }
+        protected Type ServiceTypeDefinition => this.data.ServiceType;
 
         // The decorator type definition (possibly open generic).
-        protected Type DecoratorTypeDefinition
-        {
-            get { return this.data.DecoratorType; }
-        }
+        protected Type DecoratorTypeDefinition => this.data.DecoratorType;
 
         internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
         {

@@ -23,11 +23,11 @@
 namespace SimpleInjector.Decorators
 {
     using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using SimpleInjector.Advanced;
-using SimpleInjector.Lifestyles;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     // A list of all decorators applied to a given service type.
     internal sealed class ServiceTypeDecoratorInfo
@@ -43,19 +43,14 @@ using SimpleInjector.Lifestyles;
             this.OriginalProducer = originalProducer;
         }
 
-        internal Type ImplementationType { get; private set; }
+        internal Type ImplementationType { get; }
 
-        internal InstanceProducer OriginalProducer { get; private set; }
+        internal InstanceProducer OriginalProducer { get; }
 
-        internal IEnumerable<DecoratorInfo> AppliedDecorators
-        {
-            get { return this.appliedDecorators; }
-        }
+        internal IEnumerable<DecoratorInfo> AppliedDecorators => this.appliedDecorators;
 
-        internal InstanceProducer GetCurrentInstanceProducer()
-        {
-            return this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
-        }
+        internal InstanceProducer GetCurrentInstanceProducer() => 
+            this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
 
         internal void AddAppliedDecorator(Type decoratorType, Container container, Lifestyle lifestyle, 
             Expression decoratedExpression, IEnumerable<KnownRelationship> decoratorRelationships = null)

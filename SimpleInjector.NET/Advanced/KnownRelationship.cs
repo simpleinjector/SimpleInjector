@@ -41,9 +41,9 @@ namespace SimpleInjector.Advanced
         public KnownRelationship(Type implementationType, Lifestyle lifestyle, 
             InstanceProducer dependency)
         {
-            Requires.IsNotNull(implementationType, "implementationType");
-            Requires.IsNotNull(lifestyle, "lifestyle");
-            Requires.IsNotNull(dependency, "dependency");
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(dependency, nameof(dependency));
 
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;
@@ -53,48 +53,35 @@ namespace SimpleInjector.Advanced
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
         /// <value>The implementation type of the parent type of the relationship.</value>
         [DebuggerDisplay("{ImplementationTypeDebuggerDisplay,nq}")]
-        public Type ImplementationType { get; private set; }
+        public Type ImplementationType { get; }
 
         /// <summary>Gets the lifestyle of the parent type of the relationship.</summary>
         /// <value>The lifestyle of the parent type of the relationship.</value>
-        public Lifestyle Lifestyle { get; private set; }
+        public Lifestyle Lifestyle { get; }
 
         /// <summary>Gets the type that the parent depends on (it is injected into the parent).</summary>
         /// <value>The type that the parent depends on.</value>
-        public InstanceProducer Dependency { get; private set; }
+        public InstanceProducer Dependency { get; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "ImplementationType = {0}, Lifestyle = {1}, Dependency = {{{2}}}",
-                    this.ImplementationTypeDebuggerDisplay,
-                    this.Lifestyle.Name,
-                    this.Dependency.DebuggerDisplay);
-            }
-        }
+        private string DebuggerDisplay => 
+            string.Format(CultureInfo.InvariantCulture,
+                "ImplementationType = {0}, Lifestyle = {1}, Dependency = {{{2}}}",
+                this.ImplementationTypeDebuggerDisplay,
+                this.Lifestyle.Name,
+                this.Dependency.DebuggerDisplay);
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string ImplementationTypeDebuggerDisplay
-        {
-            get { return this.ImplementationType.ToFriendlyName(); }
-        }
+        private string ImplementationTypeDebuggerDisplay => this.ImplementationType.ToFriendlyName();
 
         /// <summary>Serves as a hash function for a particular type.</summary>
         /// <returns>A hash code for the current <see cref="KnownRelationship"/>.</returns>
-        public override int GetHashCode()
-        {
-            return
-                this.ImplementationType.GetHashCode() ^
-                this.Lifestyle.GetHashCode() ^
-                this.Dependency.GetHashCode();
-        }
+        public override int GetHashCode() => 
+            this.ImplementationType.GetHashCode() ^ this.Lifestyle.GetHashCode() ^ this.Dependency.GetHashCode();
 
         /// <summary>
         /// Determines whether the specified <see cref="KnownRelationship"/> is equal to the current 
