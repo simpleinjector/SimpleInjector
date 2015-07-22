@@ -14,7 +14,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // In previous versions of the framework a call to Verify() didn't lock the container. This meaned
+            // In previous versions of the framework a call to Verify() didn't lock the container. This meant
             // that GetCurrentRegistrations could return registrations that where automatically registered by
             // the container (created during the verification process). Since GetCurrentRegistrations can only
             // return valid registrations, those auto registered registrations have to be checked by building

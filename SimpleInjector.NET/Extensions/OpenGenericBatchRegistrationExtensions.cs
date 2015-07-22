@@ -622,10 +622,10 @@ namespace SimpleInjector.Extensions
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>. 
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>. 
         /// The <b>RegisterManyForOpenGeneric</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method to get the list of types that need to be registered. Instead of calling 
-        /// such overload, you can call an overload that takes a list of <see cref="Type"/> objects and pass 
+        /// such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects and pass 
         /// in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
@@ -640,7 +640,7 @@ namespace SimpleInjector.Extensions
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
         /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>
         /// overload that takes a list of types to finish the
         /// registration.
         /// </remarks>
@@ -667,10 +667,10 @@ namespace SimpleInjector.Extensions
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>.
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>.
         /// The <b>RegisterManyForOpenGeneric</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method to get the list of types that need to be registered. Instead of calling 
-        /// such overload, you can call an overload that takes a list of <see cref="Type"/> objects and pass 
+        /// such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects and pass 
         /// in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
@@ -685,7 +685,7 @@ namespace SimpleInjector.Extensions
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
         /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>
         /// overload that takes a list of types to finish the registration.
         /// </remarks>
         /// <param name="container">The container to use.</param>
@@ -712,10 +712,10 @@ namespace SimpleInjector.Extensions
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>. 
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>. 
         /// The <b>RegisterManyForOpenGeneric</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method to get the list of types that need to be registered. Instead of calling 
-        /// such overload, you can call an overload that takes a list of <see cref="Type"/> objects and pass 
+        /// such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects and pass 
         /// in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
@@ -729,7 +729,7 @@ namespace SimpleInjector.Extensions
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
         /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>
         /// overload that takes a list of types to finish the
         /// registration.
         /// </remarks>
@@ -755,10 +755,10 @@ namespace SimpleInjector.Extensions
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>. 
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>. 
         /// The <b>RegisterManyForOpenGeneric</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method to get the list of types that need to be registered. Instead of calling 
-        /// such overload, you can call an overload that takes a list of <see cref="Type"/> objects and pass 
+        /// such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects and pass 
         /// in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
@@ -772,7 +772,7 @@ namespace SimpleInjector.Extensions
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
         /// all types which name ends with 'Decorator' are filtered out. This list is supplied to an
-        /// <see cref="RegisterManyForOpenGeneric(Container,Type,Assembly[])">RegisterManyForOpenGeneric</see>
+        /// <see cref="RegisterManyForOpenGeneric(Container, System.Type, System.Reflection.Assembly[])">RegisterManyForOpenGeneric</see>
         /// overload that takes a list of types to finish the registration.
         /// </remarks>
         /// <param name="container">The container to use.</param>

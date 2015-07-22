@@ -209,10 +209,10 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="Register(Type,IEnumerable{Assembly})">Register</see>. 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>. 
         /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling  such overload, you can call an overload that takes a list of <see cref="Type"/> objects 
+        /// calling  such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
         /// and pass  in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
@@ -226,7 +226,7 @@ namespace SimpleInjector
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
         /// all internal types are filtered out. This list is supplied to the
-        /// <see cref="Register(Type,IEnumerable{Type})">Register(Type, IEnumerable&lt;Type&gt;)</see>
+        /// <see cref="Container.Register(System.Type,IEnumerable{System.Type})">Register(Type, IEnumerable&lt;Type&gt;)</see>
         /// overload to finish the registration.
         /// </remarks>
         /// <param name="serviceType">The base type or interface to find derived types for. This can be both

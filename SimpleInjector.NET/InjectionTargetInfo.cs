@@ -69,7 +69,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Gets the type of the target.</summary>
-        /// <value>A <see cref="Type"/> containing the type of the target.</value>
+        /// <value>A <see cref="System.Type"/> containing the type of the target.</value>
         public Type TargetType
         {
             get { return this.Parameter != null ? this.Parameter.ParameterType : this.Property.PropertyType; }
