@@ -267,6 +267,13 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
+                if (object.ReferenceEquals(value, Lifestyle.Scoped))
+                {
+                    throw new ArgumentException(
+                        StringResources.DefaultScopedLifestyleCanNotBeSetWithLifetimeScoped(),
+                        nameof(value));
+                }
+
                 this.ThrowWhenContainerHasRegistrations(nameof(DefaultScopedLifestyle));
 
                 this.defaultScopedLifestyle = value;

@@ -177,7 +177,25 @@
             // Act
             container.Verify();
         }
-        
+
+        [TestMethod]
+        public void DefaultScopedLifestyle_SetWithLifestyleScoped_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Options.DefaultScopedLifestyle = Lifestyle.Scoped;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "DefaultScopedLifestyle can't be set with the value of Lifestyle.Scoped.",
+                action,
+                "Setting the DefaultScopedLifestyle with the value of Lifestyle.Scoped is not allowed, " +
+                "because that would cause a cyclic reference and will trigger a stack overflow exception " +
+                "later on when Lifestyle.Scoped is supplied to one of the Register methods.");
+        }
+
         private sealed class CustomScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;

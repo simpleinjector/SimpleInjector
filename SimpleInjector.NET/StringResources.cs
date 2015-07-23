@@ -222,6 +222,11 @@ namespace SimpleInjector
                 serviceType.ToFriendlyName(),
                 ContainsHasNoRegistrationsAddition(containerHasRegistrations));
 
+        internal static string DefaultScopedLifestyleCanNotBeSetWithLifetimeScoped() =>
+            string.Format(CultureInfo.InvariantCulture,
+                "{0} can't be set with the value of {1}.{2}.",
+                nameof(ContainerOptions.DefaultScopedLifestyle), nameof(Lifestyle), nameof(Lifestyle.Scoped));
+
         internal static string TypeDependsOnItself(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. The type {0} is directly or indirectly depending on itself.",
