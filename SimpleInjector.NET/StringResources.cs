@@ -38,8 +38,11 @@ namespace SimpleInjector
     {
         internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
         {
-            string message = "The container can't be changed after the first call to GetInstance, GetAllInstances " +
-                "and Verify.";
+            string message = string.Format(CultureInfo.InvariantCulture, 
+                "The container can't be changed after the first call to {0}, {1} and {2}.",
+                nameof(Container.GetInstance),
+                nameof(Container.GetAllInstances),
+                nameof(Container.Verify));
 
             if (stackTrace == null)
             {
@@ -55,8 +58,10 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} returned null.", serviceType.ToFriendlyName());
 
-        internal static string ResolveInterceptorDelegateReturnedNull() => 
-            "The delegate that was registered using 'RegisterResolveInterceptor' returned null.";
+        internal static string ResolveInterceptorDelegateReturnedNull() =>
+            string.Format(CultureInfo.InvariantCulture,
+                "The delegate that was registered using '{0}' returned null.",
+                nameof(ContainerOptions.RegisterResolveInterceptor));
 
         internal static string ErrorWhileBuildingDelegateFromExpression(Type serviceType,
             Expression expression, Exception exception) => 
@@ -120,18 +125,22 @@ namespace SimpleInjector
 
         internal static string TypeAlreadyRegistered(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
-                "Type {0} has already been registered. If your intention is to resolve " +
-                "a collection of {0} implementations, use the RegisterCollection overloads. More info: " +
-                "https://simpleinjector.org/coll1" +
+                "Type {0} has already been registered. If your intention is to resolve a collection of " + 
+                "{0} implementations, use the {1} overloads. More info: https://simpleinjector.org/coll1" +
                 ". If your intention is to replace the existing registration with this new registration, " +
-                "you can allow overriding the current registration by setting Container.Options." +
-                "AllowOverridingRegistrations to true. More info: https://simpleinjector.org/ovrrd.",
-                serviceType.ToFriendlyName());
+                "you can allow overriding the current registration by setting {2}.{3} to true. " +
+                "More info: https://simpleinjector.org/ovrrd.",
+                serviceType.ToFriendlyName(),
+                nameof(Container.RegisterCollection),
+                nameof(Container) + "." + nameof(Container.Options),
+                nameof(ContainerOptions.AllowOverridingRegistrations));
 
-        internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported() => 
-            "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
-            "is set, because it is impossible for the container to detect whether the registration " +
-            "should replace a different registration or not.";
+        internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported() =>
+            string.Format(CultureInfo.InvariantCulture,
+                "The making of conditional registrations is not supported when {0} is set, because it is " +
+                "impossible for the container to detect whether the registration should replace a " +
+                "different registration or not.",
+                nameof(ContainerOptions.AllowOverridingRegistrations));
 
         internal static string NonGenericTypeAlreadyRegisteredAsConditionalRegistration(Type serviceType) => 
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
@@ -144,9 +153,10 @@ namespace SimpleInjector
                 "Collection of items for type {0} has already been registered " +
                 "and the container is currently not configured to allow overriding registrations. " +
                 "To allow overriding the current registration, please create the container using the " +
-                "constructor overload that takes a {1} instance and set the " +
-                "AllowOverridingRegistrations property to true.",
-                serviceType.ToFriendlyName(), typeof(ContainerOptions).Name);
+                "constructor overload that takes a {1} instance and set the {2} property to true.",
+                serviceType.ToFriendlyName(),
+                nameof(ContainerOptions),
+                nameof(ContainerOptions.AllowOverridingRegistrations));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals) =>
             target.Parameter != null
@@ -210,10 +220,13 @@ namespace SimpleInjector
         internal static string MultipleObserversRegisteredTheSameTypeToResolveUnregisteredType(
             Type unregisteredServiceType) => 
             string.Format(CultureInfo.InvariantCulture,
-                "Multiple observers of the ResolveUnregisteredType event are registering a delegate for " +
-                "the same service type: {0}. Make sure only one of the registered handlers calls the " +
-                "ResolveUnregisteredType.Register method for a given service type.",
-                unregisteredServiceType.ToFriendlyName());
+                "Multiple observers of the {0} event are registering a delegate for the same service " + 
+                "type: {1}. Make sure only one of the registered handlers calls the {2}.{3} method for a " +
+                "given service type.",
+                nameof(Container.ResolveUnregisteredType),
+                unregisteredServiceType.ToFriendlyName(),
+                nameof(UnregisteredTypeEventArgs),
+                nameof(UnregisteredTypeEventArgs.Register));
 
         internal static string ImplicitRegistrationCouldNotBeMadeForType(Type serviceType,
             bool containerHasRegistrations) => 
@@ -243,8 +256,8 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "Unable to resolve type {0}. The security restrictions of your application's sandbox do " +
                 "not permit the creation of this type. Explicitly register the type using one of the " +
-                "generic 'Register' overloads or consider making it public. {1}",
-                serviceType.ToFriendlyName(), innerException.Message);
+                "generic '{2}' overloads or consider making it public. {1}",
+                serviceType.ToFriendlyName(), innerException.Message, nameof(Container.Register));
 
         internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type serviceType,
             Exception innerException) => 
@@ -258,8 +271,8 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "Unable to inject properties into type {0}. The security restrictions of your application's " +
                 "sandbox do not permit the creation of one of its dependencies. Explicitly register that " +
-                "dependency using one of the generic 'Register' overloads or consider making it public. {1}",
-                injectee.ToFriendlyName(), innerException.Message);
+                "dependency using one of the generic '{2}' overloads or consider making it public. {1}",
+                injectee.ToFriendlyName(), innerException.Message, nameof(Container.Register));
 
         internal static string PropertyCanNotBeChangedAfterTheFirstRegistration(string propertyName) => 
             "The " + propertyName + " property cannot be changed after the first registration has " +
@@ -269,11 +282,12 @@ namespace SimpleInjector
             TypeIsAmbiguous(typeof(Type)) + " " + string.Format(CultureInfo.InvariantCulture,
                 "The most likely cause of this happening is because the C# overload resolution picked " +
                 "a different method for you than you expected to call. The method C# selected for you is: " +
-                "RegisterCollection<Type>(new[] {{ {0} }}). Instead, you probably intended to call: " +
-                "RegisterCollection(typeof({1}), new[] {{ {2} }}).",
+                "{3}<Type>(new[] {{ {0} }}). Instead, you probably intended to call: " +
+                "{3}(typeof({1}), new[] {{ {2} }}).",
                 ToTypeOCfSharpFriendlyList(types),
                 Helpers.ToCSharpFriendlyName(types.First()),
-                ToTypeOCfSharpFriendlyList(types.Skip(1)));
+                ToTypeOCfSharpFriendlyList(types.Skip(1)),
+                nameof(Container.RegisterCollection));
 
         internal static string TypeIsAmbiguous(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -293,8 +307,8 @@ namespace SimpleInjector
         internal static string SuppliedTypeIsAnOpenGenericType(Type type) => 
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} is an open generic type. This type cannot be used for registration " +
-                "using this method. Please use the RegisterCollection(Type, Type[]) method instead.",
-                type.ToFriendlyName());
+                "using this method. Please use the {1}(Type, Type[]) method instead.",
+                type.ToFriendlyName(), nameof(Container.RegisterCollection));
 
         internal static string SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(Type type) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -316,45 +330,51 @@ namespace SimpleInjector
 
         internal static string DependencyInjectionBehaviorReturnedNull(IDependencyInjectionBehavior behavior) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through the Container.Options.DependencyInjectionBehavior " +
-                "property, returned a null reference after its BuildExpression() method. " +
-                "{1}.BuildExpression implementations should never return null, but should throw " +
-                "a {2} with an expressive message instead.",
+                "The {0} that was registered through the Container.{3}.{4} property, returned a null " +
+                "reference after its BuildExpression() method. {1}.BuildExpression implementations should " +
+                "never return null, but should throw a {2} with an expressive message instead.",
                 behavior.GetType().ToFriendlyName(),
-                typeof(IDependencyInjectionBehavior).Name,
-                typeof(ActivationException).FullName);
+                nameof(IDependencyInjectionBehavior),
+                typeof(ActivationException).FullName,
+                nameof(Container.Options),
+                nameof(ContainerOptions.DependencyInjectionBehavior));
 
         internal static string ConstructorResolutionBehaviorReturnedNull(
             IConstructorResolutionBehavior selectionBehavior, Type serviceType, Type implementationType) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through Container.Options.ConstructorResolutionBehavior " +
-                "returned a null reference after its GetConstructor(Type, Type) method was " +
-                "supplied with values '{1}' for serviceType and '{2}' for implementationType. " +
-                "{3}.GetConstructor implementations should never return null, but should throw " +
+                "The {0} that was registered through Container.{5}.{6} returned a null reference after " +
+                "its {7}(Type, Type) method was supplied with values '{1}' for serviceType and '{2}' for " +
+                "implementationType. {3}.{7} implementations should never return null, but should throw " +
                 "a {4} with an expressive message instead.",
                 selectionBehavior.GetType().ToFriendlyName(),
                 serviceType.ToFriendlyName(),
                 implementationType.ToFriendlyName(),
-                typeof(IConstructorResolutionBehavior).Name,
-                typeof(ActivationException).FullName);
+                nameof(IConstructorResolutionBehavior),
+                typeof(ActivationException).FullName,
+                nameof(Container.Options),
+                nameof(ContainerOptions.ConstructorResolutionBehavior),
+                nameof(IConstructorResolutionBehavior.GetConstructor));
 
         internal static string LifestyleSelectionBehaviorReturnedNull(
             ILifestyleSelectionBehavior selectionBehavior, Type serviceType, Type implementationType) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through Container.Options.LifestyleSelectionBehavior " +
-                "returned a null reference after its SelectLifestyle(Type, Type) method was " +
-                "supplied with values '{1}' for serviceType and '{2}' for implementationType. " +
-                "{3}.SelectLifestyle implementations should never return null.",
+                "The {0} that was registered through Container.{4}.{5} returned a null reference after " +
+                "its {6}(Type, Type) method was supplied with values '{1}' for serviceType and '{2}' for " +
+                "implementationType. {3}.{6} implementations should never return null.",
                 selectionBehavior.GetType().ToFriendlyName(),
                 serviceType.ToFriendlyName(),
                 implementationType.ToFriendlyName(),
-                typeof(ILifestyleSelectionBehavior).Name);
+                nameof(ILifestyleSelectionBehavior),
+                nameof(Container.Options),
+                nameof(ContainerOptions.LifestyleSelectionBehavior),
+                nameof(ILifestyleSelectionBehavior.SelectLifestyle));
 
         internal static string RegistrationReturnedNullFromBuildExpression(Registration lifestyleRegistration) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} for the {1} returned a null reference from its BuildExpression method.",
+                "The {0} for the {1} returned a null reference from its {2} method.",
                 lifestyleRegistration.GetType().ToFriendlyName(),
-                lifestyleRegistration.Lifestyle.GetType().ToFriendlyName());
+                lifestyleRegistration.Lifestyle.GetType().ToFriendlyName(),
+                nameof(Registration.BuildExpression));
 
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations) => 
@@ -369,12 +389,14 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
                 "decorator, that will be wrapped around instances of the collection of {0} instances, " +
-                "because the registration hasn't been made using one of the RegisterCollection overloads " +
-                "that take a list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is " +
-                "impossible for the container to determine its lifestyle, which makes it impossible to " +
-                "generate a Func<T>. Either switch to one of the other RegisterCollection overloads, or " +
-                "don't use a decorator that depends on a Func<T> for injecting the decoratee.",
-                serviceType.ToFriendlyName(), decoratorType.ToFriendlyName());
+                "because the registration hasn't been made using one of the {2} overloads that take a " +
+                "list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is impossible " +
+                "for the container to determine its lifestyle, which makes it impossible to generate a" +
+                "Func<T>. Either switch to one of the other {2} overloads, or don't use a decorator that " +
+                "depends on a Func<T> for injecting the decoratee.",
+                serviceType.ToFriendlyName(), 
+                decoratorType.ToFriendlyName(),
+                nameof(Container.RegisterCollection));
 
         internal static string SuppliedTypeIsNotAGenericType(Type type) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -427,9 +449,11 @@ namespace SimpleInjector
                 "type {2}, but the registered collection is not controlled by the container. Since the " +
                 "number of returned items might change on each call, the decorator with this lifestyle " +
                 "cannot be applied to the collection. Instead, register the decorator with the Transient " +
-                "lifestyle, or use one of the RegisterCollection overloads that takes a collection of " +
-                "System.Type types.",
-                decoratorType.ToFriendlyName(), lifestyle.Name, serviceType.ToFriendlyName());
+                "lifestyle, or use one of the {3} overloads that takes a collection of System.Type types.",
+                decoratorType.ToFriendlyName(), 
+                lifestyle.Name, 
+                serviceType.ToFriendlyName(),
+                nameof(Container.RegisterCollection));
 
         internal static string PropertyHasNoSetter(PropertyInfo property) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -446,33 +470,40 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied list of types contains one or multiple open generic types, but this method is " +
                 "unable to handle open generic types because it can only map closed generic service types " +
-                "to a single implementation. Try using RegisterCollection instead. Invalid types: {0}.",
-                openGenericTypes.Select(type => type.ToFriendlyName()).ToCommaSeparatedText());
+                "to a single implementation. Try using {1} instead. Invalid types: {0}.",
+                openGenericTypes.Select(type => type.ToFriendlyName()).ToCommaSeparatedText(),
+                nameof(Container.RegisterCollection));
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
             Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
                 "You are trying to append a registration to the registered collection of {0} instances, " +
-                "which is either registered using RegisterCollection<TService>(IEnumerable<TService>) or " +
-                "RegisterCollection(Type, IEnumerable). Since the number of returned items might change on " +
-                "each call, appending registrations to these collections is not supported. Please register " +
-                "the collection with one of the other RegisterCollection overloads if appending is required.",
-                serviceType.ToFriendlyName());
+                "which is either registered using {1}<TService>(IEnumerable<TService>) or " +
+                "{1}(Type, IEnumerable). Since the number of returned items might change on each call, " +
+                "appending registrations to these collections is not supported. Please register the " +
+                "collection with one of the other {1} overloads if appending is required.",
+                serviceType.ToFriendlyName(),
+                nameof(Container.RegisterCollection));
 
         internal static string UnregisteredTypeEventArgsRegisterDelegateReturnedUncastableInstance(
             Type serviceType, InvalidCastException exception) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The delegate that was registered for service type {0} using the " +
-                "UnregisteredTypeEventArgs.Register(Func<object>) method returned an object that " +
-                "couldn't be casted to {0}. {1}",
-                serviceType.ToFriendlyName(), exception.Message);
+                "The delegate that was registered for service type {0} using the {2}.{3}(Func<object>) " +
+                "method returned an object that couldn't be casted to {0}. {1}",
+                serviceType.ToFriendlyName(), 
+                exception.Message,
+                nameof(UnregisteredTypeEventArgs),
+                nameof(UnregisteredTypeEventArgs.Register));
 
         internal static string UnregisteredTypeEventArgsRegisterDelegateThrewAnException(Type serviceType,
             Exception exception) => 
             string.Format(CultureInfo.InvariantCulture,
-                "The delegate that was registered for service type {0} using the " +
-                "UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception. {1}",
-                serviceType.ToFriendlyName(), exception.Message);
+                "The delegate that was registered for service type {0} using the {2}.{3}(Func<object>) " + 
+                "method threw an exception. {1}",
+                serviceType.ToFriendlyName(), 
+                exception.Message,
+                nameof(UnregisteredTypeEventArgs),
+                nameof(UnregisteredTypeEventArgs.Register));
 
         internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType,
             ScopedLifestyle lifestyle) => 
@@ -528,25 +559,30 @@ namespace SimpleInjector
         internal static string GetRootRegistrationsCanNotBeCalledBeforeVerify() => 
             "Root registrations can't be determined before Verify is called. Please call Verify first.";
 
-        internal static string VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated() => 
-            "This method can only be called after GetInstance() or BuildExpression() have been called.";
+        internal static string VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated() =>
+            string.Format(CultureInfo.InvariantCulture,
+                "This method can only be called after {0}() or {1}() have been called.",
+                nameof(Container.GetInstance),
+                nameof(Registration.BuildExpression));
 
         internal static string MixingCallsToRegisterCollectionIsNotSupported(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
-                "Mixing calls to RegisterCollection for the same open generic service type is not " +
-                "supported. Consider making one single call to RegisterCollection(typeof({0}), types).",
-                Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()));
+                "Mixing calls to {1} for the same open generic service type is not supported. Consider " +
+                "making one single call to {1}(typeof({0}), types).",
+                Helpers.ToCSharpFriendlyName(serviceType.GetGenericTypeDefinition()),
+                nameof(Container.RegisterCollection));
 
         internal static string MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(Type serviceType,
             bool controlled) => 
             string.Format(CultureInfo.InvariantCulture,
-                "You already made a registration for the {0} type using one of the RegisterCollection " +
+                "You already made a registration for the {0} type using one of the {3} " +
                 "overloads that registers container-{1} collections, while this method registers container-" +
                 "{2} collections. Mixing calls is not supported. Consider merging those calls or make both " +
                 "calls either as controlled or uncontrolled registration.",
                 (serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType).ToFriendlyName(),
                 controlled ? "uncontrolled" : "controlled",
-                controlled ? "controlled" : "uncontrolled");
+                controlled ? "controlled" : "uncontrolled",
+                nameof(Container.RegisterCollection));
 
         internal static string ValueInvalidForEnumType(string paramName, object invalidValue, Type enumClass) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -591,12 +627,13 @@ namespace SimpleInjector
                 "There is already an open generic registration for {0} (with implementation {1}) that " +
                 "overlaps with the registration of {2} that you are trying to make. If your intention is " +
                 "to use {1} as fallback registration, please instead call: " +
-                "RegisterConditional(typeof({3}), typeof({4}), c => !c.Handled).",
+                "{5}(typeof({3}), typeof({4}), c => !c.Handled).",
                 closedServiceType.GetGenericTypeDefinition().ToFriendlyName(),
                 overlappingGenericImplementationType.ToFriendlyName(),
                 closedServiceType.ToFriendlyName(),
                 Helpers.ToCSharpFriendlyName(closedServiceType.GetGenericTypeDefinition()),
-                Helpers.ToCSharpFriendlyName(overlappingGenericImplementationType));
+                Helpers.ToCSharpFriendlyName(overlappingGenericImplementationType),
+                nameof(Container.RegisterConditional));
 
         internal static string AnOverlappingGenericRegistrationExists(Type openGenericServiceType,
             Type overlappingImplementationType, bool isExistingRegistrationConditional,
@@ -704,11 +741,11 @@ namespace SimpleInjector
         private static string SuppliedTypeIsNotOpenGenericExplainingAlternatives(Type type, string registeringElement) =>
             string.Format(CultureInfo.InvariantCulture,
                 "Supply this method with the open generic type {0} to register all available " +
-                "implementations of this type, or call RegisterCollection(Type, IEnumerable<{1}>) either " +
-                "with the open or closed version of that type to register a collection of instances based " +
-                "on that type.",
+                "implementations of this type, or call {2}(Type, IEnumerable<{1}>) either with the open " +
+                "or closed version of that type to register a collection of instances based on that type.",
                 Helpers.ToCSharpFriendlyName(type.GetGenericTypeDefinition()),
-                registeringElement);
+                registeringElement,
+                nameof(Container.RegisterCollection));
 
         private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types) => 
             string.Join(", ",
@@ -719,9 +756,10 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "This method only supports open generic types. " +
                 "If you meant to register all available implementations of {0}, call " +
-                "RegisterCollection(typeof({0}), IEnumerable<{1}>) instead.",
+                "{2}(typeof({0}), IEnumerable<{1}>) instead.",
                 type.ToFriendlyName(),
-                registeringElement);
+                registeringElement,
+                nameof(Container.RegisterCollection));
 
         private static object ContainsHasNoRegistrationsAddition(bool containerHasRegistrations) =>
             containerHasRegistrations
