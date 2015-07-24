@@ -12,12 +12,9 @@ namespace $rootnamespace$.App_Start
         /// <summary>Initialize the container and register it for the WCF ServiceHostFactory.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration?
-            // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
 
-            container.EnablePerWcfOperationLifestyle();
-            
             InitializeContainer(container);
 
             container.RegisterWcfServices(Assembly.GetExecutingAssembly());
@@ -35,7 +32,7 @@ namespace $rootnamespace$.App_Start
 #error Register your services here (remove this line).
 
             // For instance:
-            // container.RegisterPerWcfOperation<IUserRepository, SqlUserRepository>();
+            // container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
         }
     }
 }

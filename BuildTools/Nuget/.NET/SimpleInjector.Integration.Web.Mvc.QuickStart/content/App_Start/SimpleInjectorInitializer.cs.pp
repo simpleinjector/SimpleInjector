@@ -15,9 +15,8 @@ namespace $rootnamespace$.App_Start
         /// <summary>Initialize the container and register it as MVC3 Dependency Resolver.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration? 
-            // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
             
             InitializeContainer(container);
 
@@ -33,7 +32,7 @@ namespace $rootnamespace$.App_Start
 #error Register your services here (remove this line).
 
             // For instance:
-            // container.Register<IUserRepository, SqlUserRepository>();
+            // container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
         }
     }
 }

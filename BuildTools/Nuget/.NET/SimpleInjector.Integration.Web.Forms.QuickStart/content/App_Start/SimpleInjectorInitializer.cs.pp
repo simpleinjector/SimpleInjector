@@ -5,6 +5,7 @@ namespace $rootnamespace$.App_Start
 {
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
     using SimpleInjector;
+    using SimpleInjector.Integration.Web;
     using SimpleInjector.Integration.Web.Forms;
     
     public static class SimpleInjectorInitializer
@@ -13,10 +14,9 @@ namespace $rootnamespace$.App_Start
         public static void PreInitialize()
         {
             // Enable initialization of Web Form Pages, User Controls and HTTP handlers according to 
-            // the container's configuration. When used in combination with the 
             // WebFormsPropertySelectionBehavior class, properties will be injected into those type.
             DynamicModuleUtility.RegisterModule(typeof(SimpleInjectorWebFormsHttpModule));
-		}
+        }
 
         /// <summary>Creates and initializes the container.</summary>
         public static void Initialize()
@@ -24,6 +24,7 @@ namespace $rootnamespace$.App_Start
             // Did you know the container can diagnose your configuration?
             // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
 
             // Override the default behavior and allows properties to be injected into pages, handlers
             // and user controls.
@@ -46,7 +47,7 @@ namespace $rootnamespace$.App_Start
 #error Register your services here (remove this line).
 
             // For instance:
-            // container.Register<IUserRepository, SqlUserRepository>();
+            // container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
         }
     }
 }

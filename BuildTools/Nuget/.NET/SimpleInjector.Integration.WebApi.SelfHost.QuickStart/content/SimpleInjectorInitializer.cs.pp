@@ -8,12 +8,11 @@ namespace $rootnamespace$.App_Start
     
     public static class SimpleInjectorWebApiInitializer
     {
-        /// <summary>Initialize the container and register it as MVC3 Dependency Resolver.</summary>
+        /// <summary>Initialize the container and register it as Web API Dependency Resolver.</summary>
         public static void Initialize()
         {
-            // Did you know the container can diagnose your configuration? 
-            // Go to: https://simpleinjector.org/diagnostics
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
             
             InitializeContainer(container);
 
@@ -30,7 +29,7 @@ namespace $rootnamespace$.App_Start
 #error Register your services here (remove this line).
 
             // For instance:
-            // container.RegisterWebApiRequest<IUserRepository, SqlUserRepository>();
+            // container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Scoped);
         }
     }
 }
