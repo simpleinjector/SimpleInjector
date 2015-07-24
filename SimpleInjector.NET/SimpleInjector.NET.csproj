@@ -200,6 +200,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="StringResources.cs" />
+    <Compile Include="TypeFactoryContext.cs" />
     <Compile Include="UnregisteredTypeEventArgs.cs" />
     <Compile Include="VerificationOption.enum.cs" />
   </ItemGroup>

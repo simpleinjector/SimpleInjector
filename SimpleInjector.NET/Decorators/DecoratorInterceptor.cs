@@ -199,7 +199,7 @@ namespace SimpleInjector.Decorators
             }
             else
             {
-                Requires.DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(decoratorType, requestedServiceType);
+                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(requestedServiceType, decoratorType);
             }
 
             return decoratorType;

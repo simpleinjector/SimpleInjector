@@ -518,9 +518,14 @@ namespace SimpleInjector
                 "This method can only be called within the context of an active {0}.",
                 lifestyleName);
 
-        internal static string DecoratorFactoryReturnedNull(Type serviceType) => 
+        internal static string DecoratorFactoryReturnedNull(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The decorator type factory delegate that was registered for service type {0} returned null.",
+                serviceType.ToFriendlyName());
+
+        internal static string FactoryReturnedNull(Type serviceType) => 
+            string.Format(CultureInfo.InvariantCulture,
+                "The type factory delegate that was registered for service type {0} returned null.",
                 serviceType.ToFriendlyName());
 
         internal static string ImplementationTypeFactoryReturnedNull(Type serviceType) => 
@@ -540,9 +545,8 @@ namespace SimpleInjector
         internal static string TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
             Type serviceType, Type implementationType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The registered implementation type factory returned open generic type {0} while the " +
-                "registered service type {1} is not generic, making it impossible for a closed generic " +
-                "decorator type to be constructed.",
+                "The registered type factory returned open generic type {0} while the registered service " +
+                "type {1} is not generic, making it impossible for a closed generic type to be constructed.",
                 implementationType.ToFriendlyName(),
                 serviceType.ToFriendlyName());
 

@@ -403,6 +403,9 @@
     <Compile Include="..\SimpleInjector.NET\StringResources.cs">
       <Link>StringResources.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\TypeFactoryContext.cs">
+      <Link>TypeFactoryContext.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\UnregisteredTypeEventArgs.cs">
       <Link>UnregisteredTypeEventArgs.cs</Link>
     </Compile>

@@ -215,6 +215,13 @@
         }
     }
 
+    public sealed class Logger<T> : ILogger
+    {
+        public void Log(string message)
+        {
+        }
+    }
+
     public sealed class NullLogger : ILogger
     {
         public void Log(string message)

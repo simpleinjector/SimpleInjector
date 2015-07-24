@@ -1,10 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>Tests for testing conditional registrations.</summary>
@@ -52,16 +49,14 @@
         [TestMethod]
         public void RegisterOpenGeneric_PredicateContext_ServiceTypeIsClosedImplentation()
         {
-            bool called = false;
-
             // Arrange
+            Type actualServiceType = null;
+
             var container = ContainerFactory.New();
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
                 {
-                    Assert.IsFalse(c.ServiceType.ContainsGenericParameter(), "ServiceType should be a closed type");
-
-                    called = true;
+                    actualServiceType = c.ServiceType;
                     return true;
                 });
 
@@ -69,22 +64,21 @@
             var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
 
             // Assert
-            Assert.IsTrue(called, "Predicate was not called");
+            Assert.IsNotNull(actualServiceType, "Predicate was not called");
+            Assert.IsFalse(actualServiceType.ContainsGenericParameter(), "ServiceType should be a closed type");
         }
 
         [TestMethod]
         public void RegisterOpenGeneric_PredicateContext_ImplementationTypeIsClosedImplentation()
         {
-            bool called = false;
-
             // Arrange
+            Type actualImplementationType = null;
+
             var container = ContainerFactory.New();
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
                 {
-                    Assert.IsFalse(c.ImplementationType.ContainsGenericParameter(), "ImplementationType should be a closed type");
-
-                    called = true;
+                    actualImplementationType = c.ImplementationType;
                     return true;
                 });
 
@@ -92,9 +86,10 @@
             var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
 
             // Assert
-            Assert.IsTrue(called, "Predicate was not called");
+            Assert.IsNotNull(actualImplementationType, "Predicate was not called");
+            Assert.IsFalse(actualImplementationType.ContainsGenericParameter(), "ImplementationType should be a closed type");
         }
-
+      
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate1()
         {
@@ -182,7 +177,7 @@
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
         }
-
+        
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
         {
@@ -337,6 +332,28 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<T> (with implementation 
                 GenericType<T>) that overlaps with the registration for GenericType<T> that you are trying to 
+                make. This new registration would cause ambiguity, because both registrations would be used 
+                for the same closed service types. You can merge both registrations into a single conditional 
+                registration and combine both predicates into one single predicate."
+                .TrimInside(),
+                action);
+        }
+        
+        [TestMethod]
+        public void RegisterConditional_DoneTwiceConditionallyForTheExactSameImplementationType_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<ILogger, NullLogger>(Lifestyle.Singleton, c => false);
+
+            // Act
+            Action action = () => container.RegisterConditional<ILogger, NullLogger>(Lifestyle.Singleton, c => false);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already a conditional registration for ILogger (with implementation 
+                NullLogger) that overlaps with the registration for NullLogger that you are trying to 
                 make. This new registration would cause ambiguity, because both registrations would be used 
                 for the same closed service types. You can merge both registrations into a single conditional 
                 registration and combine both predicates into one single predicate."
@@ -522,11 +539,11 @@
             var container = ContainerFactory.New();
 
             container.RegisterConditional(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton, c => false);
-            container.RegisterConditional(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton, c => false);
+            container.RegisterConditional(typeof(ILogger), typeof(ConsoleLogger), Lifestyle.Singleton, c => false);
 
             // Act
             Action action = () => container.GetInstance<ServiceWithDependency<ILogger>>();
-
+            
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 2 conditional registrations for ILogger exist, but none of the supplied predicates returned 
@@ -710,6 +727,384 @@
                 predicate."
                .TrimInside(),
                action);
+        }
+        
+        [TestMethod]
+        public void RegisterConditionalFactory_AllowOverridingRegistrations_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>),
+                c => typeof(GenericType<>),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "not supported when AllowOverridingRegistrations",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterConditionalFactory_PredicateContext_ServiceTypeIsClosedImplentation()
+        {
+            // Arrange
+            Type actualServiceType = null;
+
+            var container = ContainerFactory.New();
+            container.RegisterConditional(
+                typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c =>
+                {
+                    actualServiceType = c.ServiceType;
+                    return true;
+                });
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsNotNull(actualServiceType, "Predicate was not called");
+            Assert.IsFalse(actualServiceType.ContainsGenericParameter(), "ServiceType should be a closed type");
+        }
+
+
+        [TestMethod]
+        public void RegisterConditionalFactory_FactoryReturningOpenGenericType_WorksCorrectly()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(OpenGenericWithPredicate1<int>), result);
+        }
+
+        [TestMethod]
+        public void RegisterConditionalFactory_PredicateCallingImplementationType_CallsFactoryToConstructClosedImplementationType()
+        {
+            // Arrange
+            Type actualImplementationType = null;
+
+            var container = ContainerFactory.New();
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient, c =>
+                {
+                    actualImplementationType = c.ImplementationType;
+                    return true;
+                });
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.AreEqual(actualImplementationType, typeof(OpenGenericWithPredicate1<int>));
+        }
+
+        [TestMethod]
+        public void RegisterConditionalFactory_FactoryReturningAnOpenGenericTypeThatCanNotBeAppliedToRequestedService_ImplementationTypeIsNull()
+        {
+            // Arrange
+            Type actualImplementationType = typeof(object); // we just assign something invalid here.
+
+            var container = ContainerFactory.New();
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicateWithClassConstraint<>),
+                Lifestyle.Transient, c =>
+                {
+                    actualImplementationType = c.ImplementationType;
+                    return true;
+                });
+
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsNull(actualImplementationType, @"
+                Since the returned OpenGenericWithPredicateWithClassConstraint<T> can't be applied to
+                IOpenGenericWithPredicate<int> (due to its type constraints), the ImplementationType 
+                property is expected to return null.");
+        }
+
+        [TestMethod]
+        public void RegisterConditionalFactoryGeneric_PredicateReturningFalse_FactoryDoesNotGetCalled()
+        {
+            bool predicateCalled = false;
+
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c =>
+                {
+                    Assert.Fail("Factory is not expected to be called when the predicate returns false." +
+                        "This allows the user to check generic type constrains in the predicate and " +
+                        "correctly build a type in the factory without having to return some kind of dummy " +
+                        "type.");
+                    return null;
+                },
+                Lifestyle.Transient,
+                c =>
+                {
+                    predicateCalled = true;
+                    return false;
+                });
+
+            // Register a second conditional that allows to be selected, because the first returns false.
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            var result = container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            Assert.IsTrue(predicateCalled);
+        }
+        
+        [TestMethod]
+        public void RegisterConditionalFactory_PredicateReturningFalse_FactoryDoesNotGetCalled()
+        {
+            bool predicateCalled = false;
+
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterConditional(typeof(ILogger),
+                c =>
+                {
+                    Assert.Fail("Factory is not expected to be called when the predicate returns false." +
+                        "This allows the user to check generic type constrains in the predicate and " +
+                        "correctly build a type in the factory without having to return some kind of dummy " +
+                        "type.");
+                    return null;
+                },
+                Lifestyle.Transient,
+                c =>
+                {
+                    predicateCalled = true;
+                    return false;
+                });
+
+            // Register a second conditional that allows to be selected, because the first returns false.
+            container.RegisterConditional<ILogger, NullLogger>(c => true);
+
+            // Act
+            var result = container.GetInstance<ServiceDependingOn<ILogger>>();
+
+            // Assert
+            Assert.IsTrue(predicateCalled);
+        }
+        
+        [TestMethod]
+        public void RegisterConditionalFactory_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate1<>),
+                Lifestyle.Transient,
+                c => c.ImplementationType.GetGenericArguments().Single() == typeof(int));
+
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate2<>),
+                Lifestyle.Transient,
+                c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
+
+            // Act
+            var result1 = container.GetInstance<IOpenGenericWithPredicate<long>>();
+            Action action = () =>
+                container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Multiple applicable registrations found for IOpenGenericWithPredicate<Int32>",
+                action,
+                "GetInstance should fail because the framework should detect that more than one " +
+                "implementation of the requested service.");
+        }
+                
+        [TestMethod]
+        public void GetInstance_RegisterTypeFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                // Here we make a partial open-generic type by filling in the TUnresolved.
+                c => typeof(OpenGenericWithUnresolvableArgument<,>)
+                    .MakePartialOpenGenericType(
+                        secondArgument: typeof(double)),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            var service = container.GetInstance<ServiceDependingOn<IOpenGenericWithPredicate<string>>>();
+
+            var result = service.Dependency;
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(OpenGenericWithUnresolvableArgument<string, double>), result);
+        }
+        
+        [TestMethod]
+        public void GetInstance_WithClosedGenericServiceAndFactoryReturningIncompatibleClosedImplementation_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+            
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicate1<string>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.GetInstance<IOpenGenericWithPredicate<object>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The registered type factory returned type OpenGenericWithPredicate1<String> which
+                does not implement IOpenGenericWithPredicate<Object>"
+                .TrimInside(), 
+                action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithMultiplePublicConstructors_ThrowsExceptedException()
+        {
+            // Arrange
+            string expectedMessage = "it should contain exactly one public constructor";
+
+            var container = new Container();
+            
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithPredicateWithMultipleCtors<>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisterTypeWithNonGenericServiceAndFactoryReturningAnOpenGenericType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(IDisposable),
+                c => typeof(DisposableOpenGenericWithPredicate<>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.GetInstance<IDisposable>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                @"The registered type factory returned open generic type DisposableOpenGenericWithPredicate<T> 
+                while the registered service type IDisposable is not generic, making it impossible for a 
+                closed generic type to be constructed"
+                .TrimInside(), 
+                action);
+        }
+        
+        [TestMethod]
+        public void GetInstance_RegisterTypeWithFactoryReturningTypeWithUnresolvableArgument_ThrowsExceptedException()
+        {
+            // Arrange
+            var container = new Container();
+            
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => typeof(OpenGenericWithUnresolvableArgument<,>),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                typeof(OpenGenericWithUnresolvableArgument<,>).ToFriendlyName() +
+                " contains unresolvable type arguments.", action);
+        }
+
+        [TestMethod]
+        public void RegisterWithFactory_FactoryThatReturnsNull_ThrowsExpectedExceptionWhenResolving()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
+                c => null,
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.GetInstance<IOpenGenericWithPredicate<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "The type factory delegate that was registered for service type " +
+                "IOpenGenericWithPredicate<T> returned null.", 
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ConditionalNonGenericRegistrationWithFactory_InjectsTheExpectedImplementation()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(ILogger),
+                c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            ILogger logger = container.GetInstance<ServiceDependingOn<ILogger>>().Dependency;
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(Logger<ServiceDependingOn<ILogger>>), logger);
+        }
+        
+        [TestMethod]
+        public void GetInstance_ConditionalNonGenericRegistrationWithFactoryInjectedIntoMultipleConsumersAsSingleton_AlwaysInjectSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(ILogger),
+                c => typeof(Logger<int>),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            ILogger logger1 = container.GetInstance<ServiceDependingOn<ILogger>>().Dependency;
+            ILogger logger2 = container.GetInstance<ComponentDependingOn<ILogger>>().Dependency;
+
+            // Assert
+            Assert.AreSame(logger1, logger2);
         }
     }
 }

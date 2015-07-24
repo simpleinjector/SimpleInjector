@@ -15,6 +15,16 @@
     {
     }
 
+    public sealed class ComponentDependingOn<TDependency>
+    {
+        public readonly TDependency Dependency;
+
+        public ComponentDependingOn(TDependency dependency)
+        {
+            this.Dependency = dependency;
+        }
+    }
+
     public class ConstraintedGeneric<T> : IConstraintedGeneric<T> where T : class
     {
     }
@@ -109,5 +119,32 @@
 
     public class OpenGenericWithPredicate2<T> : IOpenGenericWithPredicate<T>
     {
+    }
+
+    public class DisposableOpenGenericWithPredicate<T> : IOpenGenericWithPredicate<T>, IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public class OpenGenericWithPredicateWithClassConstraint<T> : IOpenGenericWithPredicate<T>
+        where T : class
+    {
+    }
+
+    public class OpenGenericWithUnresolvableArgument<T, TUnresolved> : IOpenGenericWithPredicate<T>
+    {
+    }
+
+    public class OpenGenericWithPredicateWithMultipleCtors<T> : IOpenGenericWithPredicate<T>
+    {
+        public OpenGenericWithPredicateWithMultipleCtors()
+        {
+        }
+
+        public OpenGenericWithPredicateWithMultipleCtors(IOpenGenericWithPredicate<object> x)
+        {
+        }
     }
 }

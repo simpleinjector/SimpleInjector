@@ -232,7 +232,7 @@ namespace SimpleInjector
         {
             try
             {
-                Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
                     serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType,
                     implementationType,
                     null);
@@ -300,13 +300,13 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DecoratorFactoryReturnsATypeThatIsAssignableFromServiceType(Type decoratorType,
-            Type serviceType)
+        internal static void FactoryReturnsATypeThatIsAssignableFromServiceType(Type serviceType,
+            Type implementationType)
         {
-            if (!serviceType.IsAssignableFrom(decoratorType))
+            if (!serviceType.IsAssignableFrom(implementationType))
             {
                 throw new ActivationException(StringResources.TypeFactoryReturnedIncompatibleType(
-                    serviceType, decoratorType));
+                    serviceType, implementationType));
             }
         }
 

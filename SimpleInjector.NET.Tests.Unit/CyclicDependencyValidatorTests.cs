@@ -697,16 +697,6 @@
             }
         }
 
-        private sealed class ComponentDependingOn<TDependency>
-        {
-            public readonly TDependency Dependency;
-
-            public ComponentDependingOn(TDependency dependency)
-            {
-                this.Dependency = dependency;
-            }
-        }
-
         #endregion
 
         private sealed class ThreadWrapper
@@ -774,8 +764,11 @@
 
     public class ServiceDependingOn<TDependency>
     {
+        public readonly TDependency Dependency;
+
         public ServiceDependingOn(TDependency dependency)
         {
+            this.Dependency = dependency;
         }
     }
 

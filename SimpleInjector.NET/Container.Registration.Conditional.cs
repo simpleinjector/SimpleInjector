@@ -155,11 +155,11 @@ namespace SimpleInjector
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotNull(predicate, nameof(predicate));
-            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), "implementationType");
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), nameof(implementationType));
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, nameof(serviceType));
             Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, "implementationType");
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
 
             if (serviceType.ContainsGenericParameters)
             {
@@ -170,6 +170,22 @@ namespace SimpleInjector
                 var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
                 this.AddConditionalRegistration(serviceType, registration, predicate);
             }
+        }
+
+        public void RegisterConditional(
+            Type serviceType, 
+            Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationTypeFactory, nameof(implementationTypeFactory));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
+            
+            this.GetOrCreateRegistrationalEntry(serviceType)
+                .Add(serviceType, implementationTypeFactory, lifestyle, predicate);
         }
 
         // We keep this method internal for now. It might not be intuitive for users that the registration is
