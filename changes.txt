@@ -65,6 +65,8 @@ Version 3.0.0 (v3.0 RTM)
 		 mismatches unless Container.Options.SuppressLifestyleMismatchVerification is set (fixes #46).
 		-[Core] Calling Verify() will now standard do diagnostic analysis (fixes #10).
 		-[Core] Class constraint "where TService : class" added to GetAllInstances<TService>() method.
+		-[Core] Rename PotentialLifestyleMismatchDiagnosticResult class to LifestyleMismatchDiagnosticResult
+		 (fixes #84).
 		-[LifetimeScoping] Made the LifetimeScope class internal (fixes #12).
 		-[LifetimeScoping] Removed SimpleInjectorLifetimeScopeExtensions.EnableLifetimeScoping method (fixes #12).
 		-[Core] UnregisteredTypeEventArgs constructor made internal.
