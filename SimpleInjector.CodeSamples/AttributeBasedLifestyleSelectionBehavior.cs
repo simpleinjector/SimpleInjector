@@ -26,12 +26,6 @@
     public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior
     {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
-        private readonly ScopedLifestyle scopedLifestyle;
-
-        public AttributeBasedLifestyleSelectionBehavior(ScopedLifestyle scopedLifestyle)
-        {
-            this.scopedLifestyle = scopedLifestyle;
-        }
 
         public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
         {
@@ -45,7 +39,7 @@
                 case CreationPolicy.Singleton:
                     return Lifestyle.Singleton;
                 case CreationPolicy.Scoped:
-                    return this.scopedLifestyle;
+                    return Lifestyle.Scoped;
                 default:
                     return Lifestyle.Transient;
             }
