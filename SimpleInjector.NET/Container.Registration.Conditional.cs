@@ -172,6 +172,31 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>
+        /// Conditionally registers that an instance of the type returned from 
+        /// <paramref name="implementationTypeFactory"/> will be returned every time a 
+        /// <paramref name="serviceType"/> is requested and where the supplied <paramref name="predicate"/> 
+        /// returns true. The instance is cached according to the supplied 
+        /// <paramref name="lifestyle"/>. Both the <paramref name="predicate"/> and 
+        /// <paramref name="implementationTypeFactory"/> will only be evaluated a finite number of times; 
+        /// they unsuited for making decisions based on runtime conditions.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
+        /// <param name="implementationTypeFactory">A factory that allows building Type objects that define the
+        /// implementation type to inject, based on the given contextual information. The delegate is allowed 
+        /// to return (partially) open-generic types.</param>
+        /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
+        /// <param name="predicate">The predicate that determines whether the registration can be applied for
+        /// the requested service type. This predicate can be used to build a fallback mechanism where 
+        /// multiple registrations for the same service type are made.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is a 
+        /// partially-closed generic type.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.
+        /// </exception>
         public void RegisterConditional(
             Type serviceType, 
             Func<TypeFactoryContext, Type> implementationTypeFactory,
