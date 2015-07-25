@@ -23,18 +23,20 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
+    using System.ComponentModel;
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Diagnostic result for a warning about a
-    /// component that depends on a service with a lifestyle that is shorter than that of the component.
-    /// For more information, see: https://simpleinjector.org/dialm.
+    /// This type is obsolete. Please use <see cref="LifestyleMismatchDiagnosticResult"/> instead.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This class has been renamed to LifestyleMismatchDiagnosticResult. " + 
+        "Please use LifestyleMismatchDiagnosticResult instead.", error: true)]
     public class PotentialLifestyleMismatchDiagnosticResult : DiagnosticResult
     {
         internal PotentialLifestyleMismatchDiagnosticResult(Type serviceType, string description,
             KnownRelationship relationship)
-            : base(serviceType, description, DiagnosticType.PotentialLifestyleMismatch,
+            : base(serviceType, description, DiagnosticType.LifestyleMismatch,
                 DiagnosticSeverity.Warning, relationship)
         {
             this.Relationship = relationship;

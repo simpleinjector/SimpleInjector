@@ -111,7 +111,7 @@
     <Compile Include="Diagnostics\Helpers\DebuggerViewItemExtensions.cs" />
     <Compile Include="Diagnostics\Helpers\DiagnosticGroupExtensions.cs" />
     <Compile Include="Diagnostics\LifestyleMismatchServicesTests.cs" />
-    <Compile Include="Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs" />
+    <Compile Include="Diagnostics\LifestyleMismatchContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\ShortCircuitContainerAnalyzerTests.cs" />
     <Compile Include="Diagnostics\SingleResponsibilityViolationsAnalyzerTests.cs" />
     <Compile Include="Diagnostics\TestClasses.cs" />

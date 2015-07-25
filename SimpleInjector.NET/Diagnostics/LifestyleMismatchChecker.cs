@@ -26,7 +26,7 @@ namespace SimpleInjector.Diagnostics
 
     internal static class LifestyleMismatchChecker
     {
-        internal static bool HasPossibleLifestyleMismatch(Container container, KnownRelationship relationship)
+        internal static bool HasLifestyleMismatch(Container container, KnownRelationship relationship)
         {
             Lifestyle componentLifestyle = relationship.Lifestyle;
             Lifestyle dependencyLifestyle = relationship.Dependency.Lifestyle;

@@ -184,8 +184,8 @@
     <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\DisposableTransientComponentAnalyzer.cs">
       <Link>Diagnostics\Analyzers\DisposableTransientComponentAnalyzer.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\PotentialLifestyleMismatchAnalyzer.cs">
-      <Link>Diagnostics\Analyzers\PotentialLifestyleMismatchAnalyzer.cs</Link>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\LifestyleMismatchAnalyzer.cs">
+      <Link>Diagnostics\Analyzers\LifestyleMismatchAnalyzer.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\Analyzers\ShortCircuitedDependencyAnalyzer.cs">
       <Link>Diagnostics\Analyzers\ShortCircuitedDependencyAnalyzer.cs</Link>
@@ -237,6 +237,9 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\LifestyleMismatchChecker.cs">
       <Link>Diagnostics\LifestyleMismatchChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Diagnostics\LifestyleMismatchDiagnosticResult.cs">
+      <Link>Diagnostics\LifestyleMismatchDiagnosticResult.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs">
       <Link>Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs</Link>

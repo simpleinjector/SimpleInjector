@@ -24,10 +24,7 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics;
     using System.Linq;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
     /// <summary>
@@ -40,8 +37,8 @@ namespace SimpleInjector.Diagnostics
     /// 
     /// var typesWithAShortedLifetimeThanTheirDependencies =
     ///     from result in results
-    ///     where result.DiagnosticType == DiagnosticType.PotentialLifestyleMismatch
-    ///     let mismatch = (PotentialLifestyleMismatchDiagnosticResult)result
+    ///     where result.DiagnosticType == DiagnosticType.LifestyleMismatch
+    ///     let mismatch = (LifestyleMismatchDiagnosticResult)result
     ///     select mismatch.Relationship.ImplementationType;
     /// ]]></code>
     /// </example>

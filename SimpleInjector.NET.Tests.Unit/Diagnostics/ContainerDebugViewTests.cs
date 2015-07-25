@@ -122,7 +122,7 @@
         }
 
         [TestMethod]
-        public void Ctor_VerifiedContainerWithoutConfigurationErrors_ContainsAPotentialLifestyleMismatchesSection()
+        public void Ctor_VerifiedContainerWithoutConfigurationErrors_ContainsALifestyleMismatchesSection()
         {
             // Arrange
             var container = new Container();
@@ -141,7 +141,7 @@
             var items = warningsItem.Value as DebuggerViewItem[];
 
             // Assert
-            Assert.IsTrue(items.Any(item => item.Name == "Potential Lifestyle Mismatches"));
+            Assert.IsTrue(items.Any(item => item.Name == "Lifestyle Mismatches"));
         }
     }
 }

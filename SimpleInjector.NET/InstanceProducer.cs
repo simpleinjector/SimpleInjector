@@ -485,8 +485,8 @@ namespace SimpleInjector
         {
             if (!this.Container.Options.SuppressLifestyleMismatchVerification)
             {
-                var error = PotentialLifestyleMismatchAnalyzer.Instance.Analyze(new[] { this })
-                    .Cast<PotentialLifestyleMismatchDiagnosticResult>()
+                var error = LifestyleMismatchAnalyzer.Instance.Analyze(new[] { this })
+                    .Cast<LifestyleMismatchDiagnosticResult>()
                     .FirstOrDefault();
 
                 if (error != null)

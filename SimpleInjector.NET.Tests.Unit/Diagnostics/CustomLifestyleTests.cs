@@ -47,7 +47,7 @@
             var items = VerifyAndGetDebuggerViewItems(container);
 
             // Assert
-            Assert_HasPotentialLifestyleMismatch(items);
+            Assert_HasLifestyleMismatch(items);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@
             var items = VerifyAndGetDebuggerViewItems(container);
 
             // Assert
-            Assert_HasPotentialLifestyleMismatch(items);
+            Assert_HasLifestyleMismatch(items);
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@
             var items = VerifyAndGetDebuggerViewItems(container);
 
             // Assert
-            Assert_HasPotentialLifestyleMismatch(items);
+            Assert_HasLifestyleMismatch(items);
         }
 
         [TestMethod]
@@ -124,7 +124,7 @@
             var items = VerifyAndGetDebuggerViewItems(container);
 
             // Assert
-            Assert_HasPotentialLifestyleMismatch(items);
+            Assert_HasLifestyleMismatch(items);
         }
 
         private static DebuggerViewItem[] VerifyAndGetDebuggerViewItems(Container container)
@@ -142,9 +142,9 @@
                 "There are warnings detected.");
         }
 
-        private static void Assert_HasPotentialLifestyleMismatch(DebuggerViewItem[] items)
+        private static void Assert_HasLifestyleMismatch(DebuggerViewItem[] items)
         {
-            Assert.IsTrue(items.Any(item => item.Name == "Potential Lifestyle Mismatches"),
+            Assert.IsTrue(items.Any(item => item.Name == "Lifestyle Mismatches"),
                 "No lifestyle mismatch was detected.");
         }
         

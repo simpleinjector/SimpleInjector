@@ -12,7 +12,7 @@
     public class ExternalProducerCreationAnalysisTests
     {
         [TestMethod]
-        public void Analyze_ProducerGenericWithLifestyleMismatch_ProducesAPotentialLifestyleMismatchWarning()
+        public void Analyze_ProducerGenericWithLifestyleMismatch_ProducesALifestyleMismatchWarning()
         {
             // Arrange
             Action<Container> createLifestyleMismatch = container =>
@@ -23,7 +23,7 @@
         }
 
         [TestMethod]
-        public void Analyze_ProducerNonGenericWithLifestyleMismatch_ProducesAPotentialLifestyleMismatchWarning()
+        public void Analyze_ProducerNonGenericWithLifestyleMismatch_ProducesALifestyleMismatchWarning()
         {
             // Arrange
             Action<Container> createLifestyleMismatch = container =>
@@ -49,7 +49,7 @@
 
             // Act
             var results =
-                Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>().ToArray();
+                Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(0, results.Length,
@@ -116,7 +116,7 @@
 
             // Act
             var results =
-                Analyzer.Analyze(container).OfType<PotentialLifestyleMismatchDiagnosticResult>().ToArray();
+                Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(1, results.Length,

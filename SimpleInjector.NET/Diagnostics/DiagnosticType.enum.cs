@@ -49,6 +49,12 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/dialm.
         /// </summary>
         [Documentation("Lifestyle Mismatch", "https://simpleinjector.org/dialm")]
+        LifestyleMismatch,
+
+        /// <summary>
+        /// This enum options has been replaced with <see cref="LifestyleMismatch"/>.
+        /// </summary>
+        [Obsolete("Please use DiagnosticType.LifestyleMismatch instead.", error: true)]
         PotentialLifestyleMismatch,
 
         /// <summary>

@@ -87,7 +87,7 @@ namespace SimpleInjector
                 "compiler.",
                 serviceType.ToFriendlyName());
 
-        internal static string LifestyleMismatchesReported(PotentialLifestyleMismatchDiagnosticResult error) => 
+        internal static string LifestyleMismatchesReported(LifestyleMismatchDiagnosticResult error) => 
             string.Format(CultureInfo.InvariantCulture,
                 "A lifestyle mismatch is encountered. {0} Lifestyle mismatches can cause concurrency " +
                 "bugs in your application. Please see https://simpleinjector.org/dialm to understand this " +

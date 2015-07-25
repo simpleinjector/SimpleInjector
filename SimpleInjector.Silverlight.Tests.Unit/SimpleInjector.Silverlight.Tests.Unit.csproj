@@ -168,11 +168,11 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\Helpers\DiagnosticGroupExtensions.cs">
       <Link>Diagnostics\Helpers\DiagnosticGroupExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\LifestyleMismatchContainerAnalyzerTests.cs">
+      <Link>Diagnostics\LifestyleMismatchContainerAnalyzerTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\LifestyleMismatchServicesTests.cs">
       <Link>Diagnostics\LifestyleMismatchServicesTests.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs">
-      <Link>Diagnostics\PotentialLifestyleMismatchContainerAnalyzerTests.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\Diagnostics\ShortCircuitContainerAnalyzerTests.cs">
       <Link>Diagnostics\ShortCircuitContainerAnalyzerTests.cs</Link>

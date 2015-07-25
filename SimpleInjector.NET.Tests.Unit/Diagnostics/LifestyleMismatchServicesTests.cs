@@ -394,7 +394,7 @@
 
         private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency)
         {
-            return LifestyleMismatchChecker.HasPossibleLifestyleMismatch(new Container(), dependency);
+            return LifestyleMismatchChecker.HasLifestyleMismatch(new Container(), dependency);
         }
 
         private class DummyRegistration<TImplementation> : Registration

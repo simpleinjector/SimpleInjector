@@ -31,7 +31,7 @@ namespace SimpleInjector.Diagnostics
         internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = 
             new ReadOnlyCollection<IContainerAnalyzer>(new List<IContainerAnalyzer>
             {
-                PotentialLifestyleMismatchAnalyzer.Instance,
+                LifestyleMismatchAnalyzer.Instance,
                 ShortCircuitedDependencyAnalyzer.Instance,
                 SingleResponsibilityViolationsAnalyzer.Instance,
                 ContainerRegisteredServiceAnalyzer.Instance,

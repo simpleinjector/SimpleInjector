@@ -144,10 +144,10 @@
             container.Register<IService, ServiceThatDependsOnRepository>(Lifestyle.Singleton);
 
             container.GetRegistration(typeof(IRepository)).Registration.SuppressDiagnosticWarning(
-                DiagnosticType.PotentialLifestyleMismatch, "Depending on ContextualLogger is fine.");
+                DiagnosticType.LifestyleMismatch, "Depending on ContextualLogger is fine.");
 
             container.GetRegistration(typeof(IService)).Registration.SuppressDiagnosticWarning(
-                DiagnosticType.PotentialLifestyleMismatch, "Depending on ContextualLogger is fine.");
+                DiagnosticType.LifestyleMismatch, "Depending on ContextualLogger is fine.");
 
             // Act
             var service = container.GetInstance<IService>() as ServiceThatDependsOnRepository;
