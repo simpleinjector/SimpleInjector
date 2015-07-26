@@ -23,18 +23,22 @@
 namespace SimpleInjector.Internals
 {
     using System;
+    using System.Collections.Generic;
 
-    internal static class RegistrationEntry
+    internal interface IRegistrationEntry
     {
-        internal static IRegistrationEntry Create(Type serviceType, Container container) =>
-            serviceType.IsGenericType
-                ? CreateGenericEntry(serviceType, container)
-                : CreateNonGenericEntry(serviceType, container);
+        IEnumerable<InstanceProducer> CurrentProducers { get; }
 
-        private static IRegistrationEntry CreateGenericEntry(Type serviceType, Container container) =>
-            new GenericRegistrationEntry(serviceType.GetGenericTypeDefinition(), container);
+        void Add(InstanceProducer producer);
 
-        private static IRegistrationEntry CreateNonGenericEntry(Type serviceType, Container container) =>
-            new NonGenericRegistrationEntry(serviceType, container);
+        void AddGeneric(Type serviceType, Type implementationType, Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate = null);
+
+        void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle, Predicate<PredicateContext> predicate = null);
+
+        InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer);
+
+        int GetNumberOfConditionalRegistrationsFor(Type serviceType);
     }
 }

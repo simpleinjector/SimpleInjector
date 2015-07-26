@@ -104,10 +104,13 @@
     <Compile Include="Internals\ContainerControlledCollectionResolver.cs" />
     <Compile Include="Internals\ContainerUncontrolledCollectionResolver.cs" />
     <Compile Include="Internals\CyclicDependencyException.cs" />
+    <Compile Include="Internals\GenericRegistrationEntry.cs" />
     <Compile Include="Internals\InternalsFinderVisitor.cs" />
     <Compile Include="Advanced\Internal\LazyScope.cs" />
     <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />
     <Compile Include="Advanced\IPropertySelectionBehavior.cs" />
+    <Compile Include="Internals\IRegistrationEntry.cs" />
+    <Compile Include="Internals\NonGenericRegistrationEntry.cs" />
     <Compile Include="Internals\OverriddenParameter.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.cs" />
     <Compile Include="Advanced\PropertyInjectionHelper.full.cs" />

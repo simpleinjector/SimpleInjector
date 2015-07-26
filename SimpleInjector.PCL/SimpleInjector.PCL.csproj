@@ -328,6 +328,9 @@
     <Compile Include="..\SimpleInjector.NET\Internals\GenericArgumentFinder.cs">
       <Link>Internals\GenericArgumentFinder.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\GenericRegistrationEntry.cs">
+      <Link>Internals\GenericRegistrationEntry.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\GenericTypeBuilder.cs">
       <Link>Internals\GenericTypeBuilder.cs</Link>
     </Compile>
@@ -336,6 +339,12 @@
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\InternalsFinderVisitor.cs">
       <Link>Internals\InternalsFinderVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\IRegistrationEntry.cs">
+      <Link>Internals\IRegistrationEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\NonGenericRegistrationEntry.cs">
+      <Link>Internals\NonGenericRegistrationEntry.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\OverriddenParameter.cs">
       <Link>Internals\OverriddenParameter.cs</Link>

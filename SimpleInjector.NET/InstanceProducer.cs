@@ -183,7 +183,7 @@ namespace SimpleInjector
         internal Exception Exception { get; private set; }
 
         // Will never return null.
-        internal Predicate<PredicateContext> Predicate { get; };
+        internal Predicate<PredicateContext> Predicate { get; }
 
         internal bool IsDecorated { get; set; }
 
