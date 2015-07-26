@@ -183,7 +183,7 @@ namespace SimpleInjector
         internal Exception Exception { get; private set; }
 
         // Will never return null.
-        internal Predicate<PredicateContext> Predicate { get; }
+        internal Predicate<PredicateContext> Predicate { get; } = Always;
 
         internal bool IsDecorated { get; set; }
 
@@ -324,52 +324,7 @@ namespace SimpleInjector
         /// </exception>
         public string VisualizeObjectGraph()
         {
-            if (!this.IsExpressionCreated)
-            {
-                throw new InvalidOperationException(
-                    StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
-            }
-
-            return this.VisualizeIndentedObjectGraph(indentingDepth: 0);
-        }
-
-        internal string VisualizeIndentedObjectGraph(int indentingDepth, HashSet<InstanceProducer> set = null)
-        {
-            set = set ?? new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
-
-            var visualizedDependencies =
-                from relationship in this.GetRelationships()
-                let dependency = relationship.Dependency
-                let isCyclicGraph = set.Contains(dependency)
-                let visualizeSubGraph = isCyclicGraph
-                    ? dependency.VisualizeCyclicProducerWithoutDependencies(indentingDepth + 1)
-                    : set.AddReturn(dependency).VisualizeIndentedObjectGraph(indentingDepth + 1, set)
-                select Environment.NewLine + visualizeSubGraph;
-
-            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
-                new string(' ', indentingDepth * 4),
-                this.ImplementationType.ToFriendlyName(),
-                string.Join(",", visualizedDependencies));
-        }
-
-        internal string VisualizeCyclicProducerWithoutDependencies(int indentingDepth)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
-                new string(' ', indentingDepth * 4),
-                this.ImplementationType.ToFriendlyName(),
-                "/* cyclic dependency graph detected */");
-        }
-
-        internal string VisualizeInlinedAndTruncatedObjectGraph(int maxLength)
-        {
-            string implementationName = this.ImplementationType.ToFriendlyName();
-
-            var visualizedDependencies =
-                this.VisualizeInlinedDependencies(maxLength - implementationName.Length - 2);
-
-            return string.Format(CultureInfo.InvariantCulture, "{0}({1})",
-                implementationName,
-                string.Join(", ", visualizedDependencies));
+            return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this);
         }
 
         // Throws an InvalidOperationException on failure.
@@ -626,48 +581,6 @@ namespace SimpleInjector
             }
         }
 
-        private IEnumerable<string> VisualizeInlinedDependencies(int maxLength)
-        {
-            var relationships = new Stack<KnownRelationship>(this.GetRelationships().Reverse());
-
-            if (!relationships.Any())
-            {
-                yield break;
-            }
-
-            while (maxLength > 0 && relationships.Any())
-            {
-                var relationship = relationships.Pop();
-
-                bool lastDependency = !relationships.Any();
-
-                string childGraph = relationship.Dependency.VisualizeInlinedAndTruncatedObjectGraph(
-                    !lastDependency ? maxLength - ", ...".Length : maxLength);
-
-                maxLength -= childGraph.Length;
-
-                bool displayingThisGraphWillCauseAnOverflow =
-                    (!lastDependency && maxLength < ", ...".Length) || maxLength < 0;
-
-                if (displayingThisGraphWillCauseAnOverflow)
-                {
-                    yield return "...";
-                    yield break;
-                }
-                else
-                {
-                    yield return childGraph;
-                }
-
-                maxLength -= ", ".Length;
-            }
-
-            if (relationships.Any())
-            {
-                yield return "...";
-            }
-        }
-
         private static bool ShouldBeRegisteredAsAnExternalProducer(Registration registration)
         {
             // ExpressionRegistration is an internal Registration type. An InstanceProducer with this type
@@ -702,10 +615,11 @@ namespace SimpleInjector
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
             [DebuggerDisplay(value: "{TruncatedDependencyGraph,nq}")]
-            public string DependencyGraph => this.instanceProducer.VisualizeIndentedObjectGraph(indentingDepth: 0);
+            public string DependencyGraph => this.instanceProducer.VisualizeIndentedObjectGraph();
 
             [DebuggerHidden]
-            private string TruncatedDependencyGraph => this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160);
+            private string TruncatedDependencyGraph => 
+                this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160);
         }
     }
 }

@@ -105,6 +105,7 @@
     <Compile Include="Internals\ContainerUncontrolledCollectionResolver.cs" />
     <Compile Include="Internals\CyclicDependencyException.cs" />
     <Compile Include="Internals\GenericRegistrationEntry.cs" />
+    <Compile Include="Internals\InstanceProducerVisualizer.cs" />
     <Compile Include="Internals\InternalsFinderVisitor.cs" />
     <Compile Include="Advanced\Internal\LazyScope.cs" />
     <Compile Include="Advanced\Internal\LazyScopedRegistration.cs" />

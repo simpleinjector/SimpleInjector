@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Internals;
 
     [TestClass]
     public class InstanceProducerInlineVisualizerTests
@@ -92,10 +93,10 @@
         private static void AssertGraph(int maxLength, string expectedGraph)
         {
             // Arrange
-            var registration = GetInstanceProducerForConsumer();
+            var producer = GetInstanceProducerForConsumer();
 
             // Act
-            string actualGraph = registration.VisualizeInlinedAndTruncatedObjectGraph(maxLength);
+            string actualGraph = producer.VisualizeInlinedAndTruncatedObjectGraph(maxLength);
 
             // Assert
             Assert.IsTrue(actualGraph.Length <= maxLength, "Graph too long: " + actualGraph);

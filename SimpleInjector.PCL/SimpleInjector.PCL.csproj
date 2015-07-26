@@ -337,6 +337,9 @@
     <Compile Include="..\SimpleInjector.NET\Internals\IContainerControlledCollection.cs">
       <Link>Internals\IContainerControlledCollection.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET\Internals\InstanceProducerVisualizer.cs">
+      <Link>Internals\InstanceProducerVisualizer.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET\Internals\InternalsFinderVisitor.cs">
       <Link>Internals\InternalsFinderVisitor.cs</Link>
     </Compile>
