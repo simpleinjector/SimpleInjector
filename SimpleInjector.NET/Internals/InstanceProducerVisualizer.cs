@@ -30,12 +30,13 @@ namespace SimpleInjector.Internals
 
     internal static class InstanceProducerVisualizer
     {
+        private const string ExpressionNotCreatedYetMessage = "{ Expression not created yet }";
+
         internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer)
         {
             if (!producer.IsExpressionCreated)
             {
-                throw new InvalidOperationException(
-                    StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
+                return ExpressionNotCreatedYetMessage;
             }
 
             var set = new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
@@ -46,6 +47,11 @@ namespace SimpleInjector.Internals
         internal static string VisualizeInlinedAndTruncatedObjectGraph(this InstanceProducer producer,
             int maxLength)
         {
+            if (!producer.IsExpressionCreated)
+            {
+                return ExpressionNotCreatedYetMessage;
+            }
+
             string implementationName = producer.ImplementationType.ToFriendlyName();
 
             var visualizedDependencies =

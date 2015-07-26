@@ -324,6 +324,12 @@ namespace SimpleInjector
         /// </exception>
         public string VisualizeObjectGraph()
         {
+            if (!this.IsExpressionCreated)
+            {
+                throw new InvalidOperationException(
+                    StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
+            }
+
             return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this);
         }
 
