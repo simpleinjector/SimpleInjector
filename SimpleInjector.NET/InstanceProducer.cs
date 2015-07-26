@@ -87,6 +87,7 @@ namespace SimpleInjector
     public class InstanceProducer
     {
         private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
+        private static Predicate<PredicateContext> Always = context => true;
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;
@@ -110,7 +111,7 @@ namespace SimpleInjector
         internal InstanceProducer(Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
             : this(serviceType, registration)
         {
-            this.Predicate = predicate;
+            this.Predicate = predicate ?? Always;
         }
 
         internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
@@ -181,11 +182,12 @@ namespace SimpleInjector
         // when the producer is valid.
         internal Exception Exception { get; private set; }
 
-        internal Predicate<PredicateContext> Predicate { get; }
+        // Will never return null.
+        internal Predicate<PredicateContext> Predicate { get; };
 
         internal bool IsDecorated { get; set; }
 
-        internal bool IsConditional => this.Predicate != null;
+        internal bool IsConditional => this.Predicate != Always;
 
         internal bool IsUnconditional => !this.IsConditional;
 
