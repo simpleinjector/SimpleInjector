@@ -600,32 +600,31 @@ namespace SimpleInjector
 
         internal sealed class InstanceProducerDebugView
         {
-            private readonly InstanceProducer instanceProducer;
+            private readonly InstanceProducer producer;
 
-            internal InstanceProducerDebugView(InstanceProducer instanceProducer)
+            internal InstanceProducerDebugView(InstanceProducer producer)
             {
-                this.instanceProducer = instanceProducer;
+                this.producer = producer;
             }
 
-            public Lifestyle Lifestyle => this.instanceProducer.Lifestyle;
+            public Lifestyle Lifestyle => this.producer.Lifestyle;
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
-            public Type ServiceType => this.instanceProducer.ServiceType;
+            public Type ServiceType => this.producer.ServiceType;
 
             [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
-            public Type ImplementationType => this.instanceProducer.ImplementationType;
+            public Type ImplementationType => this.producer.ImplementationType;
 
-            public KnownRelationship[] Relationships => this.instanceProducer.GetRelationships();
+            public KnownRelationship[] Relationships => this.producer.GetRelationships();
 
             // By using the TruncatedDependencyGraph as value of this DependencyGraph property, we allow the
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
             [DebuggerDisplay(value: "{TruncatedDependencyGraph,nq}")]
-            public string DependencyGraph => this.instanceProducer.VisualizeIndentedObjectGraph();
+            public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph();
 
             [DebuggerHidden]
-            private string TruncatedDependencyGraph => 
-                this.instanceProducer.VisualizeInlinedAndTruncatedObjectGraph(160);
+            private string TruncatedDependencyGraph => this.producer.VisualizeInlinedAndTruncatedObjectGraph(160);
         }
     }
 }
