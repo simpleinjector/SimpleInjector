@@ -1240,6 +1240,48 @@
                 "Multiple applicable registrations found for IGeneric<IDisposable>.",
                 action);
         }
+        
+        // This is a regression test: This is a bug in v2.8's RegisterOpenGeneric extension method.
+        [TestMethod]
+        public void GetInstance_RegisterConditionalWithTypeWithCyclicDependency_DoesNotCauseAStackOverflow()
+        {
+            // Arrange
+            int recursiveCount = 0;
+
+            var container = new Container();
+
+            container.RegisterConditional(typeof(ICommandHandler<>), typeof(CyclicDependencyCommandHandler<>), c =>
+            {
+                if (recursiveCount++ > 10)
+                {
+                    Assert.Fail("Recursive loop detected.");
+                }
+
+                return !c.Handled;
+            });
+
+            // Act
+            Action action = () => container.GetInstance(typeof(ICommandHandler<RealCommand>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "CyclicDependencyCommandHandler<RealCommand> is directly or indirectly depending on itself",
+                action);
+        }
+
+        public class CyclicDependencyCommandHandler<TCommand> : ICommandHandler<TCommand>
+        {
+            private readonly ICommandHandler<TCommand> recursive;
+
+            public CyclicDependencyCommandHandler(ICommandHandler<TCommand> recursive)
+            {
+                this.recursive = recursive;
+            }
+
+            public void Handle(TCommand command)
+            {
+            }
+        }
     }
 
     public sealed class DefaultStuffDoer<T> : IDoStuff<T>
