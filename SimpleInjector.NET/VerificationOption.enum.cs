@@ -22,8 +22,6 @@
 
 namespace SimpleInjector
 {
-    using System;
-
     /// <summary>
     /// This enumeration has defines in which way the container should run the verification process.
     /// </summary>

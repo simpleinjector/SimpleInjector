@@ -23,10 +23,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
-    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Extension methods for enable advanced scenarios.

@@ -23,8 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Linq;
-    using SimpleInjector.Internals;
 
 #if !PUBLISH
     /// <summary>Methods for conditional registrations.</summary>

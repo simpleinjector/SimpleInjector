@@ -47,7 +47,7 @@ namespace SimpleInjector.Internals
 
             Type ImplementationType { get; }
 
-            IEnumerable<InstanceProducer> GetCurrentProducers();
+            IEnumerable<InstanceProducer> CurrentProducers { get; }
 
             bool OverlapsWith(Type closedServiceType);
 
@@ -57,8 +57,7 @@ namespace SimpleInjector.Internals
             bool MatchesServiceType(Type serviceType);
         }
 
-        public IEnumerable<InstanceProducer> CurrentProducers =>
-            this.providers.SelectMany(p => p.GetCurrentProducers());
+        public IEnumerable<InstanceProducer> CurrentProducers => this.providers.SelectMany(p => p.CurrentProducers);
 
         public void Add(InstanceProducer producer)
         {
@@ -232,7 +231,7 @@ namespace SimpleInjector.Internals
             public bool AppliesToAllClosedServiceTypes => false;
             public Type ServiceType => this.producer.ServiceType;
             public Type ImplementationType => this.producer.Registration.ImplementationType;
-            public IEnumerable<InstanceProducer> GetCurrentProducers() => Enumerable.Repeat(this.producer, 1);
+            public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
             public bool MatchesServiceType(Type serviceType) => serviceType == this.producer.ServiceType;
 
             public bool OverlapsWith(Type closedServiceType) =>
@@ -288,7 +287,17 @@ namespace SimpleInjector.Internals
             public Type ServiceType { get; }
             public Type ImplementationType { get; }
             public Func<TypeFactoryContext, Type> ImplementationTypeFactory { get; }
-            public IEnumerable<InstanceProducer> GetCurrentProducers() => this.cache.Values;
+
+            public IEnumerable<InstanceProducer> CurrentProducers
+            {
+                get
+                {
+                    lock (this.cache)
+                    {
+                        return this.cache.Values.ToArray();
+                    }
+                }
+            }
 
             public bool OverlapsWith(Type serviceType) =>
                 this.Predicate != null || this.ImplementationType == null

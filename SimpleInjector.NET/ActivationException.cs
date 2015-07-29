@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Runtime.Serialization;
 
     /// <summary>
     /// The standard exception thrown when a container has an error in resolving an object.

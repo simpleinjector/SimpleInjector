@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Internals;
 
     /// <summary>Internal helper for string resources.</summary>

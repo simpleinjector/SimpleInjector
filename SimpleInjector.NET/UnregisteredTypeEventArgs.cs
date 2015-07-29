@@ -25,8 +25,6 @@ namespace SimpleInjector
     using System;
     using System.Linq.Expressions;
 
-    using SimpleInjector.Lifestyles;
-
     /// <summary>
     /// Provides data for and interaction with the 
     /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of 
