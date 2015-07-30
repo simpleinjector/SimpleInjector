@@ -231,6 +231,25 @@
                 "Transients should not get disposed. That would keep them alive for the lifetime of the container.");
         }
 
+        [TestMethod]
+        public void Dispose_ResolvedDisposableSingletonForExternalInstanceProducer_DisposesInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var producer = Lifestyle.Singleton.CreateProducer<DisposableService, DisposableService>(container);
+
+            var instance = producer.GetInstance();
+
+            Assert.IsFalse(instance.Disposed, "Test setup failed.");
+
+            // Act
+            container.Dispose();
+
+            // Assert
+            Assert.IsTrue(instance.Disposed);
+        }
+
         public class DisposableService : IDisposable, IService
         {
             public bool Disposed { get; private set; }
