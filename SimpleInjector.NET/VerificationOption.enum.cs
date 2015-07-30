@@ -30,7 +30,7 @@ namespace SimpleInjector
         /// <summary>
         /// Specifies that the container performs verification only, which means that it will test whether
         /// all registrations can be constructed by iterating the registrations and letting the container
-        /// create at least one instance of each registration. An <see cref="InvalidOperationException"/>
+        /// create at least one instance of each registration. An <see cref="System.InvalidOperationException"/>
         /// will be thrown in case the configuration is invalid.
         /// </summary>
         VerifyOnly,

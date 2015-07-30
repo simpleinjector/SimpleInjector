@@ -22,12 +22,13 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     /// <summary>
-    /// An instance of this type will be supplied to the <see cref="Predicate{T}" />
+    /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
     /// delegate that is that is supplied to the 
     /// <see cref="Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializationContext})">RegisterInitializer</see>
     /// overload that takes this delegate. This type contains contextual information about the creation and it 
