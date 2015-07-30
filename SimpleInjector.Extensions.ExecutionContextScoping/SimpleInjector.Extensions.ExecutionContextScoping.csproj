@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisRuleSet>..\SimpleInjector.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>

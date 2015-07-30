@@ -29,6 +29,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>..\SimpleInjector.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\bin\NET\SimpleInjector.Integration.Web.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
