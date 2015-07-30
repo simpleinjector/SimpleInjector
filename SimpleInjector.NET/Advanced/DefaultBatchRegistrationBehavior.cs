@@ -24,8 +24,6 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
     using SimpleInjector.Decorators;
 
     [DebuggerDisplay("{GetType().Name,nq}")]
@@ -40,30 +38,12 @@ namespace SimpleInjector.Advanced
 
         public bool ShouldRegisterType(Type serviceType, Type implementationType)
         {
-            return
-                !this.IsDecorator(serviceType, implementationType) &&
-                !IsContractClass(serviceType, implementationType);
+            return !this.IsDecorator(serviceType, implementationType);
         }
 
         private bool IsDecorator(Type serviceType, Type implementationType)
         {
             return DecoratorHelpers.IsDecorator(this.container, serviceType, implementationType);
-        }
-
-        private static bool IsContractClass(Type serviceType, Type implementationType)
-        {
-            // NOTE: The ContractClassForAttribute is marked with [Conditional("CONTRACTS_FULL")].
-            // This means that without the CONTRACTS_FULL compiler directive, a class marked with this
-            // attribute will just become a regular class and will end up as a normal class, and it will be
-            // included.
-            var attributes = implementationType.GetCustomAttributes(typeof(ContractClassForAttribute), true);
-
-            var contractAttributesForServiceType =
-                from ContractClassForAttribute attribute in attributes
-                where attribute.TypeContractsAreFor == serviceType
-                select attribute;
-
-            return contractAttributesForServiceType.Any();
         }
     }
 }
