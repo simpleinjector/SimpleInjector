@@ -311,4 +311,13 @@
         {
         }
     }
+
+    public class ServiceWithProperty<TProperty> : INonGenericService
+    {
+        public TProperty Property { get; set; }
+
+        public void DoSomething()
+        {
+        }
+    }
 }

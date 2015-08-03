@@ -1,8 +1,11 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Advanced;
 
     /// <summary>Tests for testing conditional registrations.</summary>
     [TestClass]
@@ -1105,6 +1108,36 @@
 
             // Assert
             Assert.AreSame(logger1, logger2);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAbstractionForComponentThatDependsOnConditionalRegistration_ContextGetsSuppliedWithActualImplementation()
+        {
+            // Arrange
+            var contexts = new List<PredicateContext>();
+            
+            var container = new Container();
+
+            container.Options.PropertySelectionBehavior = new InjectAllProperties();
+
+            container.Register<INonGenericService, ServiceWithProperty<ILogger>>();
+
+            container.RegisterConditional<ILogger, Logger<int>>(c =>
+            {
+                contexts.Add(c);
+                return true;
+            });
+
+            // Act
+            container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.AreEqual(typeof(ServiceWithProperty<ILogger>), contexts.First().Consumer.ImplementationType);
+        }
+
+        private sealed class InjectAllProperties : IPropertySelectionBehavior
+        {
+            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) => true;
         }
     }
 }
