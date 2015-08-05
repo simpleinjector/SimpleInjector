@@ -68,16 +68,35 @@ namespace SimpleInjector.Internals
             var visualizedDependencies =
                 from relationship in producer.GetRelationships()
                 let dependency = relationship.Dependency
-                let isCyclicGraph = set.Contains(dependency)
-                let visualizeSubGraph = isCyclicGraph
-                    ? dependency.VisualizeCyclicProducerWithoutDependencies(indentingDepth + 1)
-                    : set.AddReturn(dependency).VisualizeIndentedObjectGraph(indentingDepth + 1, set)
-                select Environment.NewLine + visualizeSubGraph;
+                let subGraph = dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, set)
+                select Environment.NewLine + subGraph;
 
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
                 new string(' ', indentingDepth * 4),
                 producer.ImplementationType.ToFriendlyName(),
                 string.Join(",", visualizedDependencies));
+        }
+
+        private static string VisualizeIndentedObjectSubGraph(this InstanceProducer dependency, 
+            int indentingDepth, HashSet<InstanceProducer> set)
+        {
+            bool isCyclicGraph = set.Contains(dependency);
+
+            if (isCyclicGraph)
+            {
+                return dependency.VisualizeCyclicProducerWithoutDependencies(indentingDepth);
+            }
+
+            set.Add(dependency);
+
+            try
+            {
+                return dependency.VisualizeIndentedObjectGraph(indentingDepth, set);
+            }
+            finally
+            {
+                set.Remove(dependency);
+            }
         }
 
         private static string VisualizeCyclicProducerWithoutDependencies(this InstanceProducer producer,

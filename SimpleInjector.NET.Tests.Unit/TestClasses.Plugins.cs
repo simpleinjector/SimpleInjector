@@ -64,6 +64,14 @@
         }
     }
 
+
+    public class PluginWithDependencies<TDependency1, TDependency2> : IPlugin
+    {
+        public PluginWithDependencies(TDependency1 dep1, TDependency2 dep2)
+        {
+        }
+    }
+
     public class PluginManager
     {
         public PluginManager(IEnumerable<IPlugin> plugins)

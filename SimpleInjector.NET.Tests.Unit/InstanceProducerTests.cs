@@ -185,6 +185,35 @@
             // Assert
             Assert.AreEqual(expectedGraph, actualGraph);
         }
+        
+        [TestMethod]
+        public void VisualizeObjectGraph_DependenciesAppearingMultipleTimesInObjectGraph_BuildsTheExpectedGraph()
+        {
+            // Arrange
+            string expectedObjectGraph =
+@"PluginWithDependencies<PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>, ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>>(
+    PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>(
+        PluginWithDependencyOfType<RealTimeProvider>(
+            RealTimeProvider())),
+    ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>(
+        PluginWithDependencyOfType<RealTimeProvider>(
+            RealTimeProvider())))";
+
+            var container = ContainerFactory.New();
+
+            var pluginProducer = container.GetRegistration(
+                typeof(PluginWithDependencies<
+                    PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>,
+                    ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>>));
+
+            container.Verify();
+
+            // Act
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph();
+
+            // Assert
+            Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
 
         public class OneAndTwo : IOne, ITwo 
         {

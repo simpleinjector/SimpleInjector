@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
 
     internal static class DebuggerViewItemExtensions

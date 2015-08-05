@@ -53,7 +53,8 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Removed RegisterSingleDecorator extension methods (fixed #7).
 		-[Core] Removed RegisterAllOpenGeneric extension methods (fixes #7).
 		-[Core] Removed RegisterOpenGeneric and RegisterSingleOpenGeneric extension methods (fixes #7).
-		-[Core] Moved OpenGenericPredicateContext to the SimpleInjector root namespace (fixes #7).
+		-[Core] Renamed OpenGenericPredicateContext to PredicateContext and moved it to the SimpleInjector 
+		 root namespace (fixes #7).
 		-[Core] Second argument of Container.Register(Type, Type) renamed from "implementation" to
 		 "implementationType".
 		-[Core] Removed RegisterManyForOpenGeneric extension methods (fixes #7).
@@ -77,6 +78,7 @@ Version 3.0.0 (v3.0 RTM)
 		-[Core] Registering a Func<object> using UnregisteredTypeEventArgs.Register(Func<object>) caused the
 		 Diagnostic system to throw a NullRefernceException (fixes #49).
 		-[Core] Prevented incorrectly mixing registrations for several types of collections (fixes #8).
+		-[Core] Object graph visualized incorrectly in case dependencies reoccur within the same graph (fixes #88).
 
 	Project Changes:
 		-Removed Common Service Locator adapter (fixes #26).
