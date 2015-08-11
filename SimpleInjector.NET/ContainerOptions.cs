@@ -76,6 +76,12 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal int MaximumNumberOfNodesPerDelegate = 350;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal Action<Expression> ExpressionCompiling = _ => { };
+
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(

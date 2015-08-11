@@ -36,6 +36,7 @@ Version 3.0.0 (v3.0 RTM)
          the graph (fixes #68).
         -[Core] ScopedLifestyle derivatives don't have to override Length anymore and all scoped lifestyles
          will have the same length. This will make the diagnostic services to treat them as the same lifestyle.
+		-[Core] Memory footprint lowered for applications with very big object graphs (fixes #91).
 
 	Breaking Changes:
 		-[Core] IConstructorVerificationBehavior and IConstructorVerificationBehavior made obsolete and
@@ -79,6 +80,8 @@ Version 3.0.0 (v3.0 RTM)
 		 Diagnostic system to throw a NullRefernceException (fixes #49).
 		-[Core] Prevented incorrectly mixing registrations for several types of collections (fixes #8).
 		-[Core] Object graph visualized incorrectly in case dependencies reoccur within the same graph (fixes #88).
+		-[Core] Compiling huge object graphs (with over 40,000 Expression nodes) caused stack overflow 
+		 exception (fixes #91).
 
 	Project Changes:
 		-Removed Common Service Locator adapter (fixes #26).

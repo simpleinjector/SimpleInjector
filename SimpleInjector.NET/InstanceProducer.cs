@@ -427,9 +427,8 @@ namespace SimpleInjector
 
             try
             {
-                creator = this.Container.WrapWithResolveInterceptor(
-                    this.initializationContext,
-                        CompilationHelpers.CompileExpression<object>(this.Container, expression));
+                creator = CompilationHelpers.CompileExpression<object>(this.Container, expression);
+                creator = this.Container.WrapWithResolveInterceptor(this.initializationContext, creator);
             }
             catch (Exception ex)
             {

@@ -71,21 +71,21 @@ namespace SimpleInjector.Internals
             RuntimeHelpers.PrepareDelegate(@delegate);
         }
 
-        private static Func<TResult> CompileInDynamicAssembly<TResult>(Expression expression)
+        private static Delegate CompileInDynamicAssembly(Type resultType, Expression expression)
         {
             ConstantExpression[] constantExpressions = GetConstants(expression).Distinct().ToArray();
 
             if (constantExpressions.Any())
             {
-                return CompileInDynamicAssemblyAsClosure<TResult>(expression, constantExpressions);
+                return CompileInDynamicAssemblyAsClosure(resultType, expression, constantExpressions);
             }
             else
             {
-                return CompileInDynamicAssemblyAsStatic<TResult>(expression);
+                return CompileInDynamicAssemblyAsStatic(resultType, expression);
             }
         }
 
-        private static Func<TResult> CompileInDynamicAssemblyAsClosure<TResult>(Expression expression,
+        private static Delegate CompileInDynamicAssemblyAsClosure(Type resultType, Expression expression,
             ConstantExpression[] constantExpressions)
         {
             // ConstantExpressions can't be compiled to a delegate using a MethodBuilder. We will have
@@ -95,9 +95,14 @@ namespace SimpleInjector.Internals
             var replacedExpression =
                 ReplaceConstantsWithArrayLookup(expression, constantExpressions, constantsParameter);
 
-            var lambda = Expression.Lambda<Func<object[], TResult>>(replacedExpression, constantsParameter);
+            var lambda = Expression.Lambda(
+                typeof(Func<,>).MakeGenericType(typeof(object[]), resultType),
+                replacedExpression, 
+                constantsParameter);
+            // var lambda = Expression.Lambda<Func<object[], TResult>>(replacedExpression, constantsParameter);
 
-            Func<object[], TResult> create = CompileDelegateInDynamicAssembly(lambda);
+            Delegate create = CompileDelegateInDynamicAssembly(lambda);
+            // Func<object[], TResult> create = CompileDelegateInDynamicAssembly(lambda);
 
             // Test the creation. Since we're using a dynamically created assembly, we can't create every
             // delegate we can create using expression.Compile(), so we need to test this.
@@ -105,13 +110,21 @@ namespace SimpleInjector.Internals
 
             object[] constants = constantExpressions.Select(constant => constant.Value).ToArray();
 
-            return () => create(constants);
+            var builder = (IDelegateBuilder)Activator.CreateInstance(
+                typeof(ConstantsClosure<>).MakeGenericType(resultType),
+                new object[] { create, constants });
+
+            return builder.BuildDelegate();
+
+            // return () => create(constants);
         }
 
-        private static Func<TResult> CompileInDynamicAssemblyAsStatic<TResult>(Expression expression)
+        private static Delegate CompileInDynamicAssemblyAsStatic(Type resultType, Expression expression)
         {
-            Expression<Func<TResult>> lambda =
-                Expression.Lambda<Func<TResult>>(expression, Helpers.Array<ParameterExpression>.Empty);
+            LambdaExpression lambda = Expression.Lambda(
+                typeof(Func<>).MakeGenericType(resultType), 
+                expression, 
+                Helpers.Array<ParameterExpression>.Empty);
 
             return CompileDelegateInDynamicAssembly(lambda);
         }
@@ -123,8 +136,8 @@ namespace SimpleInjector.Internals
                 constants, constantsParameter);
         }
 
-        private static TDelegate CompileDelegateInDynamicAssembly<TDelegate>(Expression<TDelegate> lambda) => 
-            (TDelegate)(object)CompileLambdaInDynamicAssembly(lambda,
+        private static Delegate CompileDelegateInDynamicAssembly(LambdaExpression lambda) => 
+            CompileLambdaInDynamicAssembly(lambda,
                 "DynamicInstanceProducer" + GetNextDynamicClassId(), "GetInstance");
 
         private static List<ConstantExpression> GetConstants(Expression expression) => 
@@ -136,8 +149,8 @@ namespace SimpleInjector.Internals
             Justification = "Not all delegates can be JITted. We fall back to the slower expression.Compile " +
                             "in that case.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static partial void TryCompileInDynamicAssembly<TResult>(Expression expression,
-            ref Func<TResult> compiledLambda)
+        static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
+            ref Delegate compiledLambda)
         {
             // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in 
             // the debugger with VS2013 (See work item 20904).
@@ -158,7 +171,7 @@ namespace SimpleInjector.Internals
             {
                 try
                 {
-                    var @delegate = CompileInDynamicAssembly<TResult>(expression);
+                    var @delegate = CompileInDynamicAssembly(resultType, expression);
 
                     // Test the creation. Since we're using a dynamically created assembly, we can't create 
                     // every delegate we can create using expression.Compile(), so we need to test this.
@@ -169,6 +182,33 @@ namespace SimpleInjector.Internals
                 catch
                 {
                 }
+            }
+        }
+
+        public interface IDelegateBuilder
+        {
+            Delegate BuildDelegate();
+        }
+
+        public class ConstantsClosure<TResult> : IDelegateBuilder
+        {
+            private readonly Func<object[], TResult> create;
+            private readonly object[] constants;
+
+            public ConstantsClosure(Func<object[], TResult> create, object[] constants)
+            {
+                this.create = create;
+                this.constants = constants;
+            }
+
+            public TResult GetInstance()
+            {
+                return this.create(this.constants);
+            }
+
+            public Delegate BuildDelegate()
+            {
+                return new Func<TResult>(this.GetInstance);
             }
         }
     }

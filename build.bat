@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=3.0.0
-set prereleasePostfix=
+set prereleasePostfix=-beta4
 set buildNumber=0 
 
 
@@ -194,6 +194,8 @@ copy bin\NET\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
 copy bin\NET\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 copy bin\NET\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector.dll
 copy bin\NET\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
+copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\dotnet\SimpleInjector.dll"
+copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\dotnet\SimpleInjector.xml"
 copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.dll"
 copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.xml"
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
@@ -207,6 +209,8 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\net40-client\SimpleInjector.Packaging.dll
 copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\net40-client\SimpleInjector.Packaging.xml
+copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\dotnet\SimpleInjector.Packaging.dll
+copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\dotnet\SimpleInjector.Packaging.xml
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %named_version_Packaging%
@@ -221,6 +225,8 @@ copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net
 copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.xml
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.dll"
 copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.xml"
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.dll"
+copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%
@@ -233,6 +239,8 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
 copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
 copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%

@@ -245,13 +245,11 @@ namespace SimpleInjector.Lifestyles
 
             private static Func<TService> CompileExpression(Expression expression)
             {
-                Func<TService> func;
-
                 try
                 {
                     // Don't call BuildTransientDelegate, because that might do optimizations that are simply
                     // not needed, since the delegate will be called just once.
-                    func = CompilationHelpers.CompileLambda<TService>(expression);
+                    return CompilationHelpers.CompileLambda<TService>(expression);
                 }
                 catch (Exception ex)
                 {
@@ -260,8 +258,6 @@ namespace SimpleInjector.Lifestyles
 
                     throw new ActivationException(message, ex);
                 }
-
-                return func;
             }
             
             private static void EnsureInstanceIsNotNull(object instance)
