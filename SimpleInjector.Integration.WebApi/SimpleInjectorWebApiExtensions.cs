@@ -240,6 +240,23 @@ namespace SimpleInjector
 
             RegisterWebApiControllers(container, configuration, assemblies);
         }
+        
+        /// <summary>
+        /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
+        /// method uses the configured <see cref="IHttpControllerTypeResolver"/> to determine which controller
+        /// types to register.
+        /// </summary>
+        /// <param name="container">The container the controllers should be registered in.</param>
+        /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
+        /// types to register.</param>
+        /// <param name="assemblies">The assemblies to search.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
+        /// reference (Nothing in VB).</exception>
+        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration,
+            params Assembly[] assemblies)
+        {
+            container.RegisterWebApiControllers(configuration, (IEnumerable<Assembly>)assemblies);
+        }
 
         /// <summary>
         /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
