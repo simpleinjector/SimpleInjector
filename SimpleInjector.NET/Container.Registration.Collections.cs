@@ -119,6 +119,29 @@ namespace SimpleInjector
         {
             this.RegisterCollection(typeof(TService), serviceTypes);
         }
+        
+        /// <summary>
+        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// registered, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
+        public void RegisterCollection<TService>(params Type[] serviceTypes) where TService : class
+        {
+            this.RegisterCollection(typeof(TService), (IEnumerable<Type>)serviceTypes);
+        }
 
         /// <summary>
         /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
