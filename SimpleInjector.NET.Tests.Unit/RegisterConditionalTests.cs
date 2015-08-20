@@ -610,8 +610,8 @@
                 (1) the unconditional closed generic registration for IGeneric<Int32> using IntGenericType and
                 (2) the conditional open generic registration for IGeneric<T> using GenericType<T>.
                 If your goal is to make one registration a fallback in case another registration is not
-                applicable, make the fallback registration last and check the Handled property in the
-                predicate."
+                applicable, make the fallback registration last using RegisterConditional and make sure
+                the supplied predicate returns false in case the Handled property is true."
                 .TrimInside(),
                 action);
         }
@@ -654,7 +654,7 @@
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "make the fallback registration last and check the Handled property in the predicate",
+                "make the fallback registration last using RegisterConditional and make sure",
                 action);
         }
 
@@ -726,8 +726,8 @@
                 (1) the conditional registration for ILogger using NullLogger and
                 (2) the conditional registration for ILogger using ConsoleLogger.
                 If your goal is to make one registration a fallback in case another registration is not
-                applicable, make the fallback registration last and check the Handled property in the
-                predicate."
+                applicable, make the fallback registration last using RegisterConditional and make sure
+                the supplied predicate returns false in case the Handled property is true."
                .TrimInside(),
                action);
         }

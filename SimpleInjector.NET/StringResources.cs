@@ -669,8 +669,8 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "Multiple applicable registrations found for {0}. The applicable registrations are {1}. " +
                 "If your goal is to make one registration a fallback in case another registration is not " +
-                "applicable, make the fallback registration last and check the Handled property in the " +
-                "predicate.",
+                "applicable, make the fallback registration last using RegisterConditional and make sure " +
+                "the supplied predicate returns false in case the Handled property is true.",
                 serviceType.ToFriendlyName(),
                 overlappingRegistrations.Select(BuildRegistrationName).ToCommaSeparatedText());
 
