@@ -52,6 +52,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             // Act
             IReadOnlyCollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOn<IReadOnlyCollection<IPlugin>>>().Dependency;
@@ -103,6 +105,8 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             // Act
             IReadOnlyList<IPlugin> list = 

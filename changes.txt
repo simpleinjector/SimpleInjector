@@ -1,6 +1,15 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.0.1 (v3.0.1 RTM)
+
+	Breaking Changes:
+		Unregistered collections are not resolved by default as empty collections (fixes #98).
+
+	Bug fixes:
+		Small improvement to exception message concering overlapping registrations.
+
+
 Version 3.0.0 (v3.0 RTM)
 
 	Improvements/Changes:

@@ -380,6 +380,30 @@
             AssertThat.SequenceEquals(new[] { typeof(DerivedAConverter), typeof(DerivedBConverter) }, types);
         }
 
+        [TestMethod]
+        public void GetAllInstances_RequestingGenericTypeRegisteredAsOpenGenericEmptyCollection_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(IEventHandler<>), Type.EmptyTypes);
+
+            // Act
+            container.GetAllInstances<IEventHandler<UserServiceBase>>();
+        }
+
+        [TestMethod]
+        public void GetAllInstances_RequestingGenericTypeOnlyRegisteredForADifferentClosedVersion_StillSucceeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterCollection(typeof(IEventHandler<int>), Type.EmptyTypes);
+
+            // Act
+            container.GetAllInstances<IEventHandler<double>>();
+        }
+
         private static void Assert_RegisterCollectionWithAllOpenGenericResultsInExpectedListOfTypes<TService>(
             Type[] openGenericTypesToRegister, Type[] expectedTypes)
             where TService : class

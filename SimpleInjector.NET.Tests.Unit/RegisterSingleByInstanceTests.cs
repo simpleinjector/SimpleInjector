@@ -87,6 +87,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredCollections = true;
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Calling count will iterate the collections. 

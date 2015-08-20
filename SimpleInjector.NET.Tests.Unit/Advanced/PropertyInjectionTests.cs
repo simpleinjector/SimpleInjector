@@ -268,12 +268,10 @@
 
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
-            IService[] services = new[] { singleton };
-
-            container.RegisterCollection<IService>(services);
+            container.RegisterCollection<IService>(new[] { singleton });
 
             // Act
-            container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
+            container.GetAllInstances<IService>().ToArray();
 
             // Assert
             Assert.IsNull(singleton.Dependency);

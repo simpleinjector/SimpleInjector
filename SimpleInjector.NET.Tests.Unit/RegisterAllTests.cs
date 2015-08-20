@@ -74,6 +74,25 @@
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
             // We expect this call to succeed, even while no IPlugin implementations are registered.
+            Action action = () => container.GetInstance<PluginManager>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "IEnumerable<IPlugin>",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ConcreteTypeWithEnumerableArgumentOfUnregisteredTypeWithResolveMissingCollectionRegistrationAsEmptyCollectionTrue_InjectsZeroInstances()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
+
+            // Act
+            // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
+            // We expect this call to succeed, even while no IPlugin implementations are registered.
             var manager = container.GetInstance<PluginManager>();
 
             // Assert
@@ -113,7 +132,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithEnumerableCalledAfterRegisterSingleWithSameType_Fails()
+        public void RegisterCollection_WithEnumerableCalledAfterRegisterSingleWithSameType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -130,7 +149,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithEnumerableCalledAfterRegisterWithSameType_Fails()
+        public void RegisterCollection_WithEnumerableCalledAfterRegisterWithSameType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -183,12 +202,29 @@
             Assert.IsNotNull(repositories, "This method MUST NOT return null.");
             Assert.AreEqual(2, repositories.Count(), "Collection is expected to contain two values.");
         }
-
+        
         [TestMethod]
-        public void GetAllInstances_NoInstancesRegistered_ReturnsEmptyCollection()
+        public void GetAllInstances_NoInstancesRegistered_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.GetAllInstances<IUserRepository>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "No registration for type IEnumerable<IUserRepository> could be found",
+                action);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_NoInstancesRegisteredAndResolveMissingCollectionRegistrationAsEmptyCollectionTrue_ReturnsEmptyCollection()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             // Act
             var repositories = container.GetAllInstances<IUserRepository>();
@@ -201,7 +237,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_AfterCallingGetInstance_ThrowsException()
+        public void RegisterCollection_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -217,10 +253,11 @@
         }
 
         [TestMethod]
-        public void RegisterAll_AfterCallingGetAllInstances_ThrowsException()
+        public void RegisterCollection_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredCollections = true;
             var repositories = container.GetAllInstances<IUserRepository>();
             var count = repositories.Count();
 
@@ -293,7 +330,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithListOfTypes_ThrowsExpressiveExceptionExplainingAboutAmbiguity()
+        public void RegisterCollection_WithListOfTypes_ThrowsExpressiveExceptionExplainingAboutAmbiguity()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -320,7 +357,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_CalledTwiceOnSameType_ThrowsException()
+        public void RegisterCollection_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -335,10 +372,12 @@
         }
 
         [TestMethod]
-        public void GetAllInstancesNonGeneric_WithoutAnRegistration_ReturnsAnEmptyCollection()
+        public void GetAllInstancesNonGeneric_WithoutEmptyRegistration_ReturnsAnEmptyCollection()
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.RegisterCollection<IUserRepository>();
 
             // Act
             var repositories = container.GetAllInstances(typeof(IUserRepository));
@@ -512,6 +551,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             // Act
             // PluginContainer depends on IEnumerable<IPlugin>
             var firstContainer = container.GetInstance<PluginContainer>();
@@ -537,7 +578,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithOpenGenericType_FailsWithExpectedExceptionMessage()
+        public void RegisterCollection_WithOpenGenericType_FailsWithExpectedExceptionMessage()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -557,7 +598,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidCollectionOfServices_Succeeds()
+        public void RegisterCollection_WithValidCollectionOfServices_Succeeds()
         {
             // Arrange
             var instance = new SqlUserRepository();
@@ -575,7 +616,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidObjectCollectionOfServices_Succeeds()
+        public void RegisterCollection_WithValidObjectCollectionOfServices_Succeeds()
         {
             // Arrange
             var instance = new SqlUserRepository();
@@ -593,7 +634,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidCollectionOfImplementations_Succeeds()
+        public void RegisterCollection_WithValidCollectionOfImplementations_Succeeds()
         {
             // Arrange
             var instance = new SqlUserRepository();
@@ -611,7 +652,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidListOfTypes_Succeeds()
+        public void RegisterCollection_WithValidListOfTypes_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -622,7 +663,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidEnumeableOfTypes_Succeeds()
+        public void RegisterCollection_WithValidEnumeableOfTypes_Succeeds()
         {
             // Arrange
             IEnumerable<Type> types = new[] { typeof(SqlUserRepository) };
@@ -634,7 +675,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithValidParamListOfTypes_Succeeds()
+        public void RegisterCollection_WithValidParamListOfTypes_Succeeds()
         {
             // Arrange
             Type[] types = new[] { typeof(SqlUserRepository) };
@@ -646,7 +687,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_RegisteringValidListOfTypesWithRegisterAll_ReturnsExpectedList()
+        public void GetAllInstances_RegisteringValidListOfTypesWithRegisterCollection_ReturnsExpectedList()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -664,7 +705,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
+        public void RegisterCollection_WithInvalidListOfTypes_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
             string expectedMessage = "The supplied type IDisposable does not implement IUserRepository.";
@@ -689,7 +730,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_RegisteringATypeThatEqualsTheRegisteredServiceType_Succeeds()
+        public void RegisterCollection_RegisteringATypeThatEqualsTheRegisteredServiceType_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -702,7 +743,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_RegisteringAnInterfaceOnACollectionOfObjects_Succeeds()
+        public void RegisterCollection_RegisteringAnInterfaceOnACollectionOfObjects_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -804,7 +845,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder1()
+        public void RegisterCollection_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder1()
         {
             // Arrange
             Type[] registeredTypes = new[]
@@ -844,7 +885,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder2()
+        public void RegisterCollection_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder2()
         {
             // Arrange
             Type[] registeredTypes = new[]
@@ -884,7 +925,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder3()
+        public void RegisterCollection_MixOfOpenClosedAndNonGenericTypes_ResolvesExpectedTypesInExpectedOrder3()
         {
             // Arrange
             Type[] registeredTypes = new[]
@@ -960,7 +1001,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_SuppliedWithATypeThatContainsUnresolvableTypeArguments_ThrowsDescriptiveException()
+        public void RegisterCollection_SuppliedWithATypeThatContainsUnresolvableTypeArguments_ThrowsDescriptiveException()
         {
             // Arrange
             Type[] registeredTypes = new[]
@@ -1017,7 +1058,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithNonGenericType_DelegatesBackIntoTheContainer()
+        public void RegisterCollection_WithNonGenericType_DelegatesBackIntoTheContainer()
         {
             // Arrange
             var container = new Container();
@@ -1033,7 +1074,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithClosedGenericType_DelegatesBackIntoTheContainer()
+        public void RegisterCollection_WithClosedGenericType_DelegatesBackIntoTheContainer()
         {
             // Arrange
             var container = new Container();
@@ -1052,7 +1093,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithOpenGenericType_DelegatesBackIntoTheContainer()
+        public void RegisterCollection_WithOpenGenericType_DelegatesBackIntoTheContainer()
         {
             // Arrange
             var container = new Container();
@@ -1073,7 +1114,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithClosedGenericType_DelegatesBackIntoTheContainerToOpenGenericRegistration()
+        public void RegisterCollection_WithClosedGenericType_DelegatesBackIntoTheContainerToOpenGenericRegistration()
         {
             // Arrange
             var container = new Container();
@@ -1096,7 +1137,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithOpenGenericType_DelegatesBackIntoTheContainerToCloseRegistration()
+        public void RegisterCollection_WithOpenGenericType_DelegatesBackIntoTheContainerToCloseRegistration()
         {
             // Arrange
             var container = new Container();
@@ -1116,7 +1157,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_WithAbstractType_DelegatesBackIntoTheContainerToCloseRegistration()
+        public void RegisterCollection_WithAbstractType_DelegatesBackIntoTheContainerToCloseRegistration()
         {
             // Arrange
             var container = new Container();
@@ -1209,10 +1250,12 @@
         }
 
         [TestMethod]
-        public void Verify_NonGenericTypeWithUnregisteredDependencyResolvedBeforeCallingVerift_StillThrowsException()
+        public void Verify_NonGenericTypeWithUnregisteredDependencyResolvedBeforeCallingVerify_StillThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
+            
+            container.RegisterCollection(typeof(IEventHandler<>), Type.EmptyTypes);
 
             container.RegisterCollection(typeof(UserServiceBase), new[]
             {
@@ -1277,6 +1320,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.RegisterCollection<IPlugin>();
+
             // Act
             ICollection<IPlugin> collection =
                 container.GetInstance<ClassDependingOn<ICollection<IPlugin>>>().Dependency;
@@ -1327,6 +1372,8 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             // Act
             IList<IPlugin> list =
@@ -1558,7 +1605,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_MultipleRegistrationsForDifferentClosedVersions_InfluenceOtherRegistrations()
+        public void RegisterCollection_MultipleRegistrationsForDifferentClosedVersions_InfluenceOtherRegistrations()
         {
             // Arrange
             var container = ContainerFactory.New();

@@ -1641,6 +1641,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.RegisterCollection(typeof(ICommandHandler<>), Type.EmptyTypes);
+
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
                 Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
 

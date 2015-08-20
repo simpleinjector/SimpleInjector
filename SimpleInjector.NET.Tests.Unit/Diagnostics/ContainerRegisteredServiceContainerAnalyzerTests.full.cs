@@ -19,6 +19,8 @@
             // Arrange
             var container = new Container();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             container.Register<Consumer<IReadOnlyCollection<ILogger>>>();
 
             container.Verify();
@@ -39,6 +41,8 @@
         {
             // Arrange
             var container = new Container();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             container.Register<Consumer<IReadOnlyList<ILogger>>>();
 

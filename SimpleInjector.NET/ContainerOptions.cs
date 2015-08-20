@@ -129,6 +129,15 @@ namespace SimpleInjector
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the container will return an empty collection when
+        /// a collection is requested that hasn't been explicitly registered. The default value is <b>false</b>,
+        /// which means that the container will throw an exception. Set the value to <b>true</b> to get the
+        /// old behavior of Simple Injector v1.x and v2.x.
+        /// </summary>
+        /// <value>The value indicating whether the container will return an empty collection.</value>
+        public bool ResolveUnregisteredCollections { get; set; }
+
+        /// <summary>
         /// Gets or sets the constructor resolution behavior. By default, the container only supports types
         /// that have a single public constructor.
         /// </summary>

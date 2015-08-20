@@ -543,6 +543,11 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
         {
+            if (!this.Options.ResolveUnregisteredCollections)
+            {
+                return null;
+            }
+
             if (serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 // During the time that this method is called we are after the registration phase and there is

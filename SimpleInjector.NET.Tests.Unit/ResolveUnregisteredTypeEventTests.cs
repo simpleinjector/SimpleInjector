@@ -492,9 +492,10 @@
             };
 
             // Act
-            container.GetAllInstances<Exception>();
+            Action action = () => container.GetAllInstances<Exception>();
 
             // Assert
+            AssertThat.Throws<ActivationException>(action);
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
@@ -518,9 +519,10 @@
             };
 
             // Act
-            container.GetAllInstances(typeof(Exception));
+            Action action = () => container.GetAllInstances(typeof(Exception));
 
             // Assert
+            AssertThat.Throws<ActivationException>(action);
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
         }
 
@@ -531,6 +533,8 @@
             bool resolveUnregisteredTypeWasTriggered = false;
 
             var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -554,6 +558,8 @@
             bool resolveUnregisteredTypeWasTriggered = false;
 
             var container = ContainerFactory.New();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             container.ResolveUnregisteredType += (s, e) =>
             {

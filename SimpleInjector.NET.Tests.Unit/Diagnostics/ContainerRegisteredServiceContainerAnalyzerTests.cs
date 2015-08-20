@@ -55,6 +55,8 @@
             // Arrange
             var container = new Container();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             container.Register<Consumer<IEnumerable<ILogger>>>();
 
             container.Verify();
@@ -80,6 +82,8 @@
             // Arrange
             var container = new Container();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             container.Register<Consumer<ICollection<ILogger>>>();
 
             container.Verify();
@@ -100,6 +104,8 @@
         {
             // Arrange
             var container = new Container();
+
+            container.Options.ResolveUnregisteredCollections = true;
 
             container.Register<Consumer<IList<ILogger>>>();
 

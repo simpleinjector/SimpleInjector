@@ -57,6 +57,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredCollections = true;
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Only during iterating the collection, will the underlying container be called. This is a

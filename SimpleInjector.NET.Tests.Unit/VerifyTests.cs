@@ -363,6 +363,8 @@
 
             var container = ContainerFactory.New();
 
+            container.Options.ResolveUnregisteredCollections = true;
+
             // Service<T> depends on IEnumerable<T>
             container.RegisterCollection(typeof(ServiceWithEnumerable<>), new[] { typeof(ServiceWithEnumerable<>) });
 
