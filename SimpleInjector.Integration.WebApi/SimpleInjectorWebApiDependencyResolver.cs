@@ -24,6 +24,7 @@ namespace SimpleInjector.Integration.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dependencies;
@@ -145,6 +146,8 @@ namespace SimpleInjector.Integration.WebApi
             }
         }
 
+        private IServiceProvider ServiceProvider => this.container;
+
         /// <summary>Starts a resolution scope.</summary>
         /// <returns>The dependency scope.</returns>
         IDependencyScope IDependencyResolver.BeginScope()
@@ -170,7 +173,7 @@ namespace SimpleInjector.Integration.WebApi
                 return this.container.GetInstance(serviceType);
             }
 
-            return ((IServiceProvider)this.container).GetService(serviceType);
+            return this.ServiceProvider.GetService(serviceType);
         }
 
         /// <summary>Retrieves a collection of services from the scope.</summary>
@@ -178,7 +181,11 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The retrieved collection of services.</returns>
         IEnumerable<object> IDependencyScope.GetServices(Type serviceType)
         {
-            return this.container.GetAllInstances(serviceType);
+            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
+
+            return services ?? Enumerable.Empty<object>();
         }
 
         /// <summary>

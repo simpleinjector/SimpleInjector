@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,6 +25,7 @@ namespace SimpleInjector.Integration.Web.Mvc
     using System;
     using System.Collections.Generic;
     using System.Web.Mvc;
+    using System.Linq;
 
     /// <summary>MVC <see cref="IDependencyResolver"/> for Simple Injector.</summary>
     /// <example>
@@ -84,6 +85,8 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <value>The <see cref="Container"/>.</value>
         public Container Container { get; }
 
+        private IServiceProvider ServiceProvider => this.Container;
+
         /// <summary>Resolves singly registered services that support arbitrary object creation.</summary>
         /// <param name="serviceType">The type of the requested service or object.</param>
         /// <returns>The requested service or object.</returns>
@@ -98,8 +101,9 @@ namespace SimpleInjector.Integration.Web.Mvc
             {
                 return this.Container.GetInstance(serviceType);
             }
+            
 
-            return ((IServiceProvider)this.Container).GetService(serviceType);
+            return ServiceProvider.GetService(serviceType);
         }
 
         /// <summary>Resolves multiply registered services.</summary>
@@ -107,7 +111,11 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <returns>The requested services.</returns>
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return this.Container.GetAllInstances(serviceType);
+            Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
+
+            var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
+
+            return services ?? Enumerable.Empty<object>();
         }
     }
 }

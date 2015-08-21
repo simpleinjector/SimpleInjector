@@ -1,7 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version 3.0.2 (v3.0.2 RTM) 2015-08-21
 
-Version 3.0.1 (v3.0.1 RTM)
+	Bug fixes:
+		[MVC] Issue #98 caused SimpleInjectorDependencyResolver to break. (fixes #99)
+		[WebApi] Issue #98 caused SimpleInjectorWebApiDependencyResolver to break. (fixes #99)
+
+
+Version 3.0.1 (v3.0.1 RTM) 2015-08-20
 
 	Breaking Changes:
 		Unregistered collections are not resolved by default as empty collections (fixes #98).
@@ -10,7 +16,7 @@ Version 3.0.1 (v3.0.1 RTM)
 		Small improvement to exception message concering overlapping registrations.
 
 
-Version 3.0.0 (v3.0 RTM)
+Version 3.0.0 (v3.0 RTM) 2015-08-18
 
 	Improvements/Changes:
 		-[Core] Container now implements IDisposable (fixes #5).
