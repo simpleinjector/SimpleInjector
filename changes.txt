@@ -1,5 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+
+Version vNext
+
+	Bug fixes:
+		[Core] Container.Verify() does not dispose created instances, while running in an active scope.
+		This is especially a problem with the WebRequestLifestyle, because during application start, an
+		active HttpContext is available. (fixes #95)
+
+
 Version 3.0.2 (v3.0.2 RTM) 2015-08-21
 
 	Bug fixes:
@@ -13,7 +22,7 @@ Version 3.0.1 (v3.0.1 RTM) 2015-08-20
 		Unregistered collections are not resolved by default as empty collections (fixes #98).
 
 	Bug fixes:
-		Small improvement to exception message concering overlapping registrations.
+		Small improvement to exception message concerning overlapping registrations.
 
 
 Version 3.0.0 (v3.0 RTM) 2015-08-18

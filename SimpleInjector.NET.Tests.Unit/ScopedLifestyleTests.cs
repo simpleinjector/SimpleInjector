@@ -729,17 +729,180 @@
                 "(but registration should succeed). Users are allowed to do any ");
         }
 
+        [TestMethod]
+        public void Verify_ExecutedWithinActiveScope_CreatesScopedInstancesInItsOwnScope()
+        {
+            // Arrange
+            DisposablePlugin plugin = null;
+
+            var container = new Container();
+
+            var scopedLifestyle = new FakeScopedLifestyle(new Scope());
+
+            container.Register<ServiceDependingOn<IPlugin>>();
+            container.Register<IPlugin, DisposablePlugin>(scopedLifestyle);
+            container.RegisterInitializer<DisposablePlugin>(p => plugin = p);
+
+            // By resolving IPlugin here, it becomes cached within the created Scope.
+            container.GetInstance<IPlugin>();
+            plugin = null;
+
+            // Act
+            // When calling verify, we expect DisposablePlugin to be created again.
+            container.Verify();
+
+            // Assert
+            Assert.IsNotNull(plugin);
+        }
+
+        [TestMethod]
+        public void GetCurrentScope_CalledOnSameThreadDuringVerification_ReturnsTheVerificationScope()
+        {
+            // Arrange
+            Scope verificationScope = null;
+
+            var container = new Container();
+
+            var scope = new Scope();
+            var scopedLifestyle = new FakeScopedLifestyle(scope);
+
+            container.Register<IPlugin, DisposablePlugin>(scopedLifestyle);
+            container.RegisterInitializer<DisposablePlugin>(p =>
+            {
+                verificationScope = scopedLifestyle.GetCurrentScope(container);
+            });
+
+            // Act
+            // When calling verify, we expect DisposablePlugin to be created again.
+            container.Verify();
+
+            // Assert
+            Assert.AreNotSame(verificationScope, scope);
+            Assert.IsTrue(verificationScope.ToString().Contains("VerificationScope"));
+        }
+
+        [TestMethod]
+        public void Verify_ExecutedWithinActiveScope_DisposesThatInstanceWhenVerifyFinishes()
+        {
+            // Arrange
+            DisposablePlugin plugin = null;
+
+            var container = new Container();
+
+            var lifestyle = new FakeScopedLifestyle(new Scope());
+
+            container.Register<IPlugin, DisposablePlugin>(lifestyle);
+            container.RegisterInitializer<DisposablePlugin>(p => plugin = p);
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsNotNull(plugin);
+            Assert.IsTrue(plugin.IsDisposedOnce);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingScopedInstanceWhileDifferentThreadIsVerifying_DoesNotResolveInstanceFromVerificationScope()
+        {
+            // Arrange
+            DisposablePlugin verifiedPlugin = null;
+            DisposablePlugin backgroundResolvedPlugin = null;
+            Task task = null;
+
+            var container = new Container();
+
+            var scope = new Scope();
+            var lifestyle = new FakeScopedLifestyle(scope);
+
+            container.Register<IPlugin, DisposablePlugin>(lifestyle);
+            container.RegisterInitializer<DisposablePlugin>(p =>
+            {
+                verifiedPlugin = p;
+
+                // Resolve on a different thread (so not during verification)
+                task = Task.Run(() =>
+                {
+                    backgroundResolvedPlugin = (DisposablePlugin)container.GetInstance<IPlugin>();
+                });
+
+                Thread.Sleep(150);
+            });
+
+            // Act
+            container.Verify();
+
+            task.Wait();
+
+            // Assert
+            Assert.IsFalse(backgroundResolvedPlugin.IsDisposedOnce,
+                "Since this instance isn't resolved during verification, but within an active scope, " +
+                "The instance should not have been disposed here.");
+
+            scope.Dispose();
+
+            Assert.IsTrue(backgroundResolvedPlugin.IsDisposedOnce, "Now it should have been disposed.");
+        }
+
+        [TestMethod]
+        public void GetCurrentScope_CalledDuringVerificationOnADifferentThread_ReturnsARealScope()
+        {
+            // Arrange
+            Scope backgroundRequestedScope = null;
+            Task task = null;
+
+            var container = new Container();
+
+            var scope = new Scope();
+            var lifestyle = new FakeScopedLifestyle(scope);
+
+            container.Register<IPlugin, DisposablePlugin>(lifestyle);
+            container.RegisterInitializer<DisposablePlugin>(p =>
+            {
+                // Resolve on a different thread (so not during verification)
+                task = Task.Run(() =>
+                {
+                    backgroundRequestedScope = lifestyle.GetCurrentScope(container);
+                });
+
+                Thread.Sleep(150);
+            });
+
+            // Act
+            container.Verify();
+
+            task.Wait();
+
+            // Assert
+            Assert.AreSame(scope, backgroundRequestedScope, 
+                "Since the background thread does not run verify, the returned scope should not be the " +
+                "verification scope.");
+        }
+
         private class DisposablePlugin : IPlugin, IDisposable
         {
             private readonly Action<DisposablePlugin> disposing;
 
-            public DisposablePlugin(Action<DisposablePlugin> disposing = null)
+            public DisposablePlugin()
+            {
+            }
+
+            internal DisposablePlugin(Action<DisposablePlugin> disposing = null)
             {
                 this.disposing = disposing;
             }
 
+            public int DisposeCount { get; private set; }
+
+            public bool IsDisposedOnce
+            {
+                get { return this.DisposeCount == 1; }
+            }
+
             public void Dispose()
             {
+                this.DisposeCount++;
+
                 if (this.disposing != null)
                 {
                     this.disposing(this);

@@ -27,6 +27,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
@@ -77,6 +78,16 @@ namespace SimpleInjector
             {
                 this.ThrowOnDiagnosticWarnings();
             }
+        }
+
+#if NET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal Scope GetVerificationScopeForCurrentThread()
+        {
+            // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
+            // different thread.
+            return this.VerificationScope != null && this.IsVerifying ? this.VerificationScope : null;
         }
 
         private void VerifyInternal(bool suppressLifestyleMismatchVerification)
