@@ -131,7 +131,7 @@ For more information about Simple Injector please visit the following links:
 * The [lifetimes](https://simpleinjector.readthedocs.org/en/latest/lifetimes.html) page explains how to configure lifestyles such as *transient*, *singleton*, and many others.
 * See the [Reference library](https://simpleinjector.org/ReferenceLibrary/) for the complete API documentation of the latest version.
 * See the [integration guide](https://simpleinjector.readthedocs.org/en/latest/integration.html) for more information about how to integrate Simple Injector into your specific application framework.
-* For more information about dependency injection in general, please visit [this page on Stackoverflow)[https://stackoverflow.com/tags/dependency-injection/info).
+* For more information about dependency injection in general, please visit [this page on Stackoverflow](https://stackoverflow.com/tags/dependency-injection/info).
 * If you have any questions about how to use Simple Injector or about dependency injection in general, the experts at [Stackoverflow.com](https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23) are waiting for you.
 * For all other Simple Injector related question and discussions, such as bug reports and feature requests, the [Simple Injector discussion forum](https://simpleinjector.org/forum) will be the place to start.
 
