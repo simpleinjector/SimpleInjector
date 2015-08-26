@@ -1,6 +1,8 @@
 # Simple Injector
 
-> To get a high level overview of Simple Injector, **please [visit our website](https://simpleinjector.org/)**.
+> **To get a high level overview of Simple Injector, please [visit our website](https://simpleinjector.org/)**.
+
+> Did you there's a [Simple Injector blog](https://simpleinjector.org/blog)?
 
 The goal of **Simple Injector** is to provide .NET application developers with an easy, flexible, and fast **Dependency Injection library** that promotes best practice to steer developers towards the pit of success.
 
