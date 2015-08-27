@@ -110,7 +110,7 @@ namespace SimpleInjector
         internal static string ConfigurationInvalidCreatingInstanceFailed(Type serviceType, Exception exception) => 
             string.Format(CultureInfo.InvariantCulture,
                 "The configuration is invalid. Creating the instance for type {0} failed. {1}",
-                serviceType.ToFriendlyName(), exception.Message);
+                serviceType.ToFriendlyName(), exception);
 
         internal static string ConfigurationInvalidIteratingCollectionFailed(Type serviceType, Exception exception) => 
             string.Format(CultureInfo.InvariantCulture,
