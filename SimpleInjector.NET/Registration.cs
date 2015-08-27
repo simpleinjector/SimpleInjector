@@ -403,10 +403,12 @@ namespace SimpleInjector
             ConstructorInfo constructor =
                 this.Container.Options.SelectConstructor(serviceType, implementationType);
 
+            var expression = Expression.New(constructor, 
+                this.BuildConstructorParameters(serviceType, implementationType, constructor));
+
             this.AddConstructorParametersAsKnownRelationship(serviceType, implementationType, constructor);
 
-            return Expression.New(constructor, 
-                this.BuildConstructorParameters(serviceType, implementationType, constructor));
+            return expression;
         }
 
         private Expression[] BuildConstructorParameters(Type serviceType, Type implementationType,
