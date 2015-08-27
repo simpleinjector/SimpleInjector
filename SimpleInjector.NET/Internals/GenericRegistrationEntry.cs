@@ -254,7 +254,8 @@ namespace SimpleInjector.Internals
             private readonly Lifestyle lifestyle;
             private readonly Container container;
 
-            private readonly Dictionary<Type, InstanceProducer> cache = new Dictionary<Type, InstanceProducer>();
+            private readonly Dictionary<object, InstanceProducer> cache = new Dictionary<object, InstanceProducer>();
+            private readonly Dictionary<Type, Registration> registrationCache = new Dictionary<Type, Registration>();
 
             internal OpenGenericToInstanceProducerProvider(Type serviceType, Type implementationType,
                 Lifestyle lifestyle, Predicate<PredicateContext> predicate, Container container)
@@ -326,9 +327,7 @@ namespace SimpleInjector.Internals
                     && this.MatchesPredicate(context)
                     && context.ImplementationType != null;
 
-                return shouldBuildProducer
-                    ? this.GetProducer(serviceType, context.ImplementationType)
-                    : null;
+                return shouldBuildProducer ? this.GetProducer(context) : null;
             }
 
             private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
@@ -361,28 +360,50 @@ namespace SimpleInjector.Internals
             public bool MatchesServiceType(Type serviceType) =>
                 GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
 
-            private InstanceProducer GetProducer(Type serviceType, Type closedImplementation)
+            private InstanceProducer GetProducer(PredicateContext context)
             {
                 InstanceProducer producer;
 
                 // Never build a producer twice. This could cause components with a torn lifestyle.
                 lock (this.cache)
                 {
-                    if (!this.cache.TryGetValue(serviceType, out producer))
+                    // Use both the service and implementation type as key. Using just the service type would
+                    // case multiple consumers to accidentally get the same implementation type, which
+                    // using only the implementation type, would break when one implementation type could be
+                    // used for multiple services (implements multiple closed interfaces).
+                    var key = new { context.ServiceType, context.ImplementationType };
+
+                    if (!this.cache.TryGetValue(key, out producer))
                     {
-                        this.cache[serviceType] =
-                            producer = this.CreateNewProducerFor(serviceType, closedImplementation);
+                        this.cache[key] = producer = this.CreateNewProducerFor(context);
                     }
                 }
 
                 return producer;
             }
 
-            private InstanceProducer CreateNewProducerFor(Type serviceType, Type closedImplementation) =>
-                new InstanceProducer(
-                    serviceType,
-                    this.lifestyle.CreateRegistration(serviceType, closedImplementation, this.container),
-                    this.Predicate);
+            private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
+                new InstanceProducer(context.ServiceType, this.GetRegistration(context), this.Predicate);
+
+            private Registration GetRegistration(PredicateContext context)
+            {
+                Type key = context.ImplementationType;
+
+                Registration registration;
+
+                // Never build a registration for a particular implementation type twice. This would break
+                // the promise of returning singletons.
+                if (!this.registrationCache.TryGetValue(key, out registration))
+                {
+                    this.registrationCache[key] = registration = this.CreateNewRegistrationFor(context);
+                }
+
+                return registration;
+            }
+
+            private Registration CreateNewRegistrationFor(PredicateContext context) =>
+                this.lifestyle.CreateRegistration(context.ImplementationType, context.ImplementationType,
+                    this.container);
 
             private bool MatchesPredicate(PredicateContext context) =>
                 this.Predicate != null ? this.Predicate(context) : true;

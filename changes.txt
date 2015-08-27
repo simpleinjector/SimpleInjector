@@ -1,28 +1,29 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version vNext
+Version 3.0.3
 
 	Bug fixes:
-		[Core] Container.Verify() does not dispose created instances, while running in an active scope.
-		This is especially a problem with the WebRequestLifestyle, because during application start, an
-		active HttpContext is available. (fixes #95)
+		-[Core] Container.Verify() does not dispose created instances, while running in an active scope.
+		 This is especially a problem with the WebRequestLifestyle, because during application start, an
+		 active HttpContext is available. (fixes #95)
+		-[Core] RegisterConditional with type factory always injected the first resolved type. (fixes #104)
 
 
 Version 3.0.2 (v3.0.2 RTM) 2015-08-21
 
 	Bug fixes:
-		[MVC] Issue #98 caused SimpleInjectorDependencyResolver to break. (fixes #99)
-		[WebApi] Issue #98 caused SimpleInjectorWebApiDependencyResolver to break. (fixes #99)
+		-[MVC] Issue #98 caused SimpleInjectorDependencyResolver to break. (fixes #99)
+		-[WebApi] Issue #98 caused SimpleInjectorWebApiDependencyResolver to break. (fixes #99)
 
 
 Version 3.0.1 (v3.0.1 RTM) 2015-08-20
 
 	Breaking Changes:
-		Unregistered collections are not resolved by default as empty collections (fixes #98).
+		-[Core] Unregistered collections are not resolved by default as empty collections (fixes #98).
 
 	Bug fixes:
-		Small improvement to exception message concerning overlapping registrations.
+		-[Core] Small improvement to exception message concerning overlapping registrations.
 
 
 Version 3.0.0 (v3.0 RTM) 2015-08-18

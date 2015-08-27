@@ -251,9 +251,7 @@ namespace SimpleInjector.Internals
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
                 // unneeded producers from being created, because this might cause diagnostic warnings, 
                 // such as torn lifestyle warnings.
-                return this.predicate(context)
-                    ? this.GetProducer(serviceType, context.ImplementationType)
-                    : null;
+                return this.predicate(context) ? this.GetProducer(context) : null;
             }
 
             private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
@@ -278,27 +276,28 @@ namespace SimpleInjector.Internals
                 return implementationType;
             }
 
-            private InstanceProducer GetProducer(Type serviceType, Type closedImplementation)
+            private InstanceProducer GetProducer(PredicateContext context)
             {
                 InstanceProducer producer;
 
                 // Never build a producer twice. This could cause components with a torn lifestyle.
                 lock (this.cache)
                 {
-                    if (!this.cache.TryGetValue(serviceType, out producer))
+                    // We need to cache on implementation, because service type is always the same.
+                    if (!this.cache.TryGetValue(context.ImplementationType, out producer))
                     {
-                        this.cache[serviceType] =
-                            producer = this.CreateNewProducerFor(serviceType, closedImplementation);
+                        this.cache[context.ImplementationType] = producer = this.CreateNewProducerFor(context);
                     }
                 }
 
                 return producer;
             }
 
-            private InstanceProducer CreateNewProducerFor(Type serviceType, Type closedImplementation) =>
+            private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
                 new InstanceProducer(
                     serviceType,
-                    this.lifestyle.CreateRegistration(serviceType, closedImplementation, this.container),
+                    this.lifestyle.CreateRegistration(context.ServiceType, context.ImplementationType, 
+                        this.container),
                     this.predicate);
         }
     }

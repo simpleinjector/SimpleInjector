@@ -41,6 +41,10 @@
     {
     }
 
+    public class IntAndFloatGeneric : IGeneric<int>, IGeneric<float>
+    {
+    }
+
     public class DefaultGenericType<T> : IGeneric<T>
     {
     }

@@ -753,6 +753,70 @@
         }
 
         [TestMethod]
+        public void GetInstance_ResolvingDifferentConsumersDependingOnConditionalTypeWithFactory_EachComponentGetsItsSpecificDependency()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(ILogger),
+                c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            var a = container.GetInstance<ServiceDependingOn<ILogger>>();
+            var b = container.GetInstance<ComponentDependingOn<ILogger>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(Logger<ServiceDependingOn<ILogger>>), a.Dependency);
+            AssertThat.IsInstanceOfType(typeof(Logger<ComponentDependingOn<ILogger>>), b.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstance_ConditionalTypeFactoryReturnsSameTypeForSingletonRegistration_DependencyIsAlwaysSameInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(ILogger),
+                c => typeof(Logger<int>),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            var a = container.GetInstance<ServiceDependingOn<ILogger>>();
+            var b = container.GetInstance<ComponentDependingOn<ILogger>>();
+
+            // Assert
+            Assert.AreSame(a.Dependency, b.Dependency);
+        }
+        
+        [TestMethod]
+        public void GetInstance_ConditionalSingletonWithMutlipleClosedMappingAtSameImplementationThroughFactory_InjectsSameInstanceForDifferentClosedVersions()
+        {
+            // Arrange
+            var container = new Container();
+
+            // This is a bit nasty: IntAndFloatGeneric implements IGeneric<int> and IGeneric<float>.
+            container.RegisterConditional(
+                typeof(IGeneric<>),
+                c => typeof(IntAndFloatGeneric),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            var a = container.GetInstance<ServiceDependingOn<IGeneric<int>>>();
+            var b = container.GetInstance<ComponentDependingOn<IGeneric<float>>>();
+
+            // Assert
+            Assert.AreSame(a.Dependency, b.Dependency,
+                "Since both dependencies are IntAndFloatGeneric<object> and it is registered as singleton " +
+                ", there should only be one single instance.");
+        }
+        
+        [TestMethod]
         public void RegisterConditionalFactory_PredicateContext_ServiceTypeIsClosedImplentation()
         {
             // Arrange
@@ -775,8 +839,7 @@
             Assert.IsNotNull(actualServiceType, "Predicate was not called");
             Assert.IsFalse(actualServiceType.ContainsGenericParameter(), "ServiceType should be a closed type");
         }
-
-
+        
         [TestMethod]
         public void RegisterConditionalFactory_FactoryReturningOpenGenericType_WorksCorrectly()
         {
