@@ -8,6 +8,7 @@ Version 3.0.3
 		 This is especially a problem with the WebRequestLifestyle, because during application start, an
 		 active HttpContext is available. (fixes #95)
 		-[Core] RegisterConditional with type factory always injected the first resolved type. (fixes #104)
+		-[Core] Suppression of Lifestyle mismatch worked on wrong registration. (fixes #108)
 
 
 Version 3.0.2 (v3.0.2 RTM) 2015-08-21

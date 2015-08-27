@@ -122,7 +122,7 @@
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
 
             // Act
-            var service = container.GetInstance<ServiceThatDependsOnRepository>();
+            var service = container.GetInstance<ServiceThatDependsOnRepositoryAndCommand>();
 
             // Assert
             var logger = service.InjectedRepository.Logger;
@@ -137,16 +137,11 @@
             // Arrange
             var container = new Container();
 
+            container.Register<IService, ServiceThatDependsOnRepository>(Lifestyle.Singleton);
+            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
-            container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Singleton);
-
-            container.Register<IService, ServiceThatDependsOnRepository>(Lifestyle.Singleton);
-
-            container.GetRegistration(typeof(IRepository)).Registration.SuppressDiagnosticWarning(
-                DiagnosticType.LifestyleMismatch, "Depending on ContextualLogger is fine.");
-
-            container.GetRegistration(typeof(IService)).Registration.SuppressDiagnosticWarning(
+            container.GetRegistration(typeof(IContextualLogger)).Registration.SuppressDiagnosticWarning(
                 DiagnosticType.LifestyleMismatch, "Depending on ContextualLogger is fine.");
 
             // Act
@@ -278,7 +273,7 @@
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
-            container.Register<IService, ServiceThatDependsOnRepository>();
+            container.Register<IService, ServiceThatDependsOnRepositoryAndCommand>();
 
             container.RegisterDecorator(typeof(IService), typeof(ServiceDecoratorWithLoggerDependency));
 
@@ -299,7 +294,7 @@
             container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>();
-            container.Register<IService, ServiceThatDependsOnRepository>();
+            container.Register<IService, ServiceThatDependsOnRepositoryAndCommand>();
 
             container.RegisterDecorator(typeof(IService), typeof(ServiceDecoratorWithLoggerDependency));
 
@@ -368,7 +363,20 @@
 
         public sealed class ServiceThatDependsOnRepository : IService
         {
-            public ServiceThatDependsOnRepository(IRepository repository, IContextualLogger logger,
+            public ServiceThatDependsOnRepository(IRepository repository, IContextualLogger logger)
+            {
+                this.InjectedRepository = (RepositoryThatDependsOnLogger)repository;
+                this.InjectedLogger = (ContextualLogger)logger;
+            }
+
+            public RepositoryThatDependsOnLogger InjectedRepository { get; private set; }
+
+            public ContextualLogger InjectedLogger { get; private set; }
+        }
+
+        public sealed class ServiceThatDependsOnRepositoryAndCommand : IService
+        {
+            public ServiceThatDependsOnRepositoryAndCommand(IRepository repository, IContextualLogger logger,
                 ConcreteCommand justAnExtraArgumentToMakeUsFindBugsFaster)
             {
                 this.InjectedRepository = (RepositoryThatDependsOnLogger)repository;

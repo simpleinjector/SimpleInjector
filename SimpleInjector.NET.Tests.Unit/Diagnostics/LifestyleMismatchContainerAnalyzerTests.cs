@@ -127,12 +127,10 @@
             // Arrange
             var container = new Container();
 
-            container.Register<IUserRepository, InMemoryUserRepository>();
+            container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
+            container.Register<UserServiceBase, RealUserService>(Lifestyle.Singleton);
 
-            var registration = 
-                Lifestyle.Singleton.CreateRegistration<UserServiceBase, RealUserService>(container);
-
-            container.AddRegistration(typeof(UserServiceBase), registration);
+            var registration = container.GetRegistration(typeof(IUserRepository)).Registration;
 
             container.Options.SuppressLifestyleMismatchVerification = true;
 

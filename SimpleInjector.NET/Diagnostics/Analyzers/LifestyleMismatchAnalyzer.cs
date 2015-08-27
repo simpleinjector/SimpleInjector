@@ -58,8 +58,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
             from producer in producers
-            where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
             from relationship in producer.GetRelationships()
+            where relationship.Dependency.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
             let container = producer.Registration.Container
             where LifestyleMismatchChecker.HasLifestyleMismatch(container, relationship)
             select new LifestyleMismatchDiagnosticResult(
