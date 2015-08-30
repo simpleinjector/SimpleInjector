@@ -364,7 +364,7 @@ namespace SimpleInjector
         private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType,
             InjectionConsumerInfo context)
         {
-            var e = new UnregisteredTypeEventArgs(serviceType, context);
+            var e = new UnregisteredTypeEventArgs(serviceType);
 
             if (this.resolveUnregisteredType != null)
             {

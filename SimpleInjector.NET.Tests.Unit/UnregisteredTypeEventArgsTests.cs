@@ -100,12 +100,7 @@
 
         private static UnregisteredTypeEventArgs CreateValidUnregisteredTypeEventArgs()
         {
-            return new UnregisteredTypeEventArgs(
-                typeof(IUserRepository),
-                new InjectionConsumerInfo(
-                    typeof(IUserRepository),
-                    typeof(InMemoryUserRepository),
-                    typeof(RealUserService).GetConstructors().Single().GetParameters().First()));
+            return new UnregisteredTypeEventArgs(typeof(IUserRepository));
         }
     }
 }
