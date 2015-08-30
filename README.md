@@ -1,8 +1,8 @@
 # Simple Injector
 
-> **To get a high level overview of Simple Injector, please [visit our website](https://simpleinjector.org/)**.
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/simpleinjector/SimpleInjector?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-> Did you know there's a [Simple Injector blog](https://simpleinjector.org/blog)?
+_**To get a high level overview of Simple Injector, please [visit our website](https://simpleinjector.org/)**. And did you know there's a [Simple Injector blog](https://simpleinjector.org/blog)?_
 
 The goal of **Simple Injector** is to provide .NET application developers with an easy, flexible, and fast **Dependency Injection library** that promotes best practice to steer developers towards the pit of success.
 
