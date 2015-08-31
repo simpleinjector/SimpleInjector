@@ -591,6 +591,36 @@
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("Nullable<Int32>[]", action);
         }
 
+        [TestMethod]
+        public void ResolveUnregisteredType_Always_IsExpectedToBeCached()
+        {
+            // Arrange
+            int callCount = 0;
+
+            var container = ContainerFactory.New();
+
+            container.Register<ComponentDependingOn<IUserRepository>>();
+            container.RegisterSingleton<ServiceDependingOn<IUserRepository>>();
+
+            var r = Lifestyle.Singleton.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IUserRepository))
+                {
+                    callCount++;
+
+                    e.Register(r);
+                }
+            };
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.AreEqual(1, callCount, "The result of ResolveUnregisteredType is expected to be cached.");
+        }
+
         public class CompositeService<T> where T : struct
         {
             public CompositeService(Nullable<T>[] dependencies)

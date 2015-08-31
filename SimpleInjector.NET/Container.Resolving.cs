@@ -38,7 +38,16 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
-        private readonly Dictionary<Type, InstanceProducer> emptyAndRedirectedCollectionRegistrationCache = 
+        // Cache for producers that are resolved as root type
+        // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
+        // PERF: This collection is updated by replacing the complete collection.
+        private Dictionary<Type, InstanceProducer> rootProducerCache =
+            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
+
+        private readonly Dictionary<Type, InstanceProducer> resolveUnregisteredTypeRegistrations =
+            new Dictionary<Type, InstanceProducer>();
+
+        private readonly Dictionary<Type, InstanceProducer> emptyAndRedirectedCollectionRegistrationCache =
             new Dictionary<Type, InstanceProducer>();
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
@@ -230,7 +239,7 @@ namespace SimpleInjector
         {
             // Don't cache this root producer here, because this causes us to invalidly flag the registration 
             // is invalid.
-            return this.GetRegistration(serviceType, InjectionConsumerInfo.Root, 
+            return this.GetRegistration(serviceType, InjectionConsumerInfo.Root,
                 throwOnFailure: false,
                 autoCreateConcreteTypes: false);
         }
@@ -364,22 +373,61 @@ namespace SimpleInjector
         private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType,
             InjectionConsumerInfo context)
         {
-            var e = new UnregisteredTypeEventArgs(serviceType);
+            // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
+            // don't want to hold a lock while calling back into user code, because who knows what the user 
+            // is doing there. We don't want a dead lock.
+            return this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
+                ?? this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
+        }
+
+        private InstanceProducer TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(Type serviceType)
+        {
+            lock (this.resolveUnregisteredTypeRegistrations)
+            {
+                return this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType)
+                    ? this.resolveUnregisteredTypeRegistrations[serviceType]
+                    : null;
+            }
+        }
+
+        private InstanceProducer TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(Type serviceType)
+        {
+            UnregisteredTypeEventArgs e = null;
 
             if (this.resolveUnregisteredType != null)
             {
+                e = new UnregisteredTypeEventArgs(serviceType);
+
                 this.resolveUnregisteredType(this, e);
             }
 
-            if (e.Handled)
-            {
-                var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
+            return e != null && e.Handled
+                ? TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(e)
+                : null;
+        }
 
-                return new InstanceProducer(serviceType, registration);
-            }
-            else
+        private InstanceProducer TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(
+            UnregisteredTypeEventArgs e)
+        {
+            Type serviceType = e.UnregisteredServiceType;
+
+            var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
+
+            lock (this.resolveUnregisteredTypeRegistrations)
             {
-                return null;
+                if (this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType))
+                {
+                    return this.resolveUnregisteredTypeRegistrations[serviceType];
+                }
+
+                // By creating the InstanceProducer after checking the dictionary, we prevent the producer
+                // from being created twice when multiple threads are running. Having the same duplicate
+                // producer can cause a torn lifestyle warning in the container.
+                var producer = new InstanceProducer(serviceType, registration);
+
+                this.resolveUnregisteredTypeRegistrations[serviceType] = producer;
+
+                return producer;
             }
         }
 
@@ -717,9 +765,9 @@ namespace SimpleInjector
 
             // Since we are at this point, we know the concreteType is NOT constructable.
             this.Options.IsConstructableType(concreteType, concreteType, out exceptionMessage);
-            
+
             throw new ActivationException(
-                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations) 
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations)
                 + " " + exceptionMessage);
         }
     }

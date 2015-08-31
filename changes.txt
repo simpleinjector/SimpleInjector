@@ -1,11 +1,12 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 3.0.4
+Version 3.0.4 (v3.0.4 RTM) 2015-08-31
 
 	Bug fixes:
 		-[Core] Overriding a registration failed when done with same implementation, and registration of
 		 conditional non-generic registrations was accidentally allowed. (fixes #114)
+		-[Core] ResolveUnregisteredType registrations didn't get cached. (fixes #113)
 
 
 Version 3.0.3  (v3.0.3 RTM) 2015-08-27

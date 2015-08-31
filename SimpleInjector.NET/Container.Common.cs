@@ -92,12 +92,6 @@ namespace SimpleInjector
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();
 
-        // Cache for producers that are resolved as root type
-        // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
-        // PERF: This collection is updated by replacing the complete collection.
-        private Dictionary<Type, InstanceProducer> rootProducerCache =
-            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
-
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
 
