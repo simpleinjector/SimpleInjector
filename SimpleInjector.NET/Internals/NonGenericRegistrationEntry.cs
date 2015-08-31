@@ -54,9 +54,10 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLocked();
             this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
+            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
 
             this.ThrowWhenTypeAlreadyRegistered(producer);
-            this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(producer);
+            this.ThrowWhenIdenticalImplementationIsAlreadyRegistered(producer);
 
             if (producer.IsUnconditional)
             {
@@ -64,33 +65,6 @@ namespace SimpleInjector.Internals
             }
 
             this.providers.Add(new SingleInstanceProducerProvider(producer));
-        }
-
-        private void ThrowWhenProviderToRegisterOverlapsWithExistingProvider(
-            InstanceProducer producerToRegister)
-        {
-            // A provider is a superset of the providerToRegister when it can be applied to ALL generic
-            // types that the providerToRegister can be applied to as well.
-            var overlappingProducers =
-                from producer in this.CurrentProducers
-                where producer.ImplementationType != null
-                where !producer.Registration.WrapsInstanceCreationDelegate
-                where !producerToRegister.Registration.WrapsInstanceCreationDelegate
-                where producer.ImplementationType == producerToRegister.ImplementationType
-                select producer;
-
-            if (overlappingProducers.Any())
-            {
-                var overlappingProducer = overlappingProducers.FirstOrDefault();
-
-                throw new InvalidOperationException(
-                    StringResources.AnOverlappingGenericRegistrationExists(
-                        producerToRegister.ServiceType,
-                        overlappingProducer.ImplementationType,
-                        overlappingProducer.IsConditional,
-                        producerToRegister.ImplementationType,
-                        producerToRegister.IsConditional));
-            }
         }
 
         public void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
@@ -153,6 +127,41 @@ namespace SimpleInjector.Internals
             }
         }
 
+        private void ThrowWhenIdenticalImplementationIsAlreadyRegistered(
+            InstanceProducer producerToRegister)
+        {
+            // A provider overlaps the providerToRegister when it can be applied to ALL generic
+            // types that the providerToRegister can be applied to as well.
+            var overlappingProducers = this.GetOverlappingProducers(producerToRegister);
+
+            bool isReplacement =
+                producerToRegister.IsUnconditional && this.container.Options.AllowOverridingRegistrations;
+
+            if (!isReplacement && overlappingProducers.Any())
+            {
+                var overlappingProducer = overlappingProducers.FirstOrDefault();
+
+                throw new InvalidOperationException(
+                    StringResources.AnOverlappingRegistrationExists(
+                        producerToRegister.ServiceType,
+                        overlappingProducer.ImplementationType,
+                        overlappingProducer.IsConditional,
+                        producerToRegister.ImplementationType,
+                        producerToRegister.IsConditional));
+            }
+        }
+
+        private IEnumerable<InstanceProducer> GetOverlappingProducers(InstanceProducer producerToRegister)
+        {
+            return
+                from producer in this.CurrentProducers
+                where producer.ImplementationType != null
+                where !producer.Registration.WrapsInstanceCreationDelegate
+                where !producerToRegister.Registration.WrapsInstanceCreationDelegate
+                where producer.ImplementationType == producerToRegister.ImplementationType
+                select producer;
+        }
+
         private ActivationException ThrowMultipleApplicableRegistrationsFound(
             InstanceProducer[] instanceProducers)
         {
@@ -169,6 +178,15 @@ namespace SimpleInjector.Internals
         {
             this.ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(producer);
             this.ThrowWhenNonGenericTypeAlreadyRegisteredAsConditionalRegistration(producer);
+        }
+
+        private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
+        {
+            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
+            {
+                throw new NotSupportedException(
+                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+            }
         }
 
         private void ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(

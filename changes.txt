@@ -1,7 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 3.0.3
+Version 3.0.4
+
+	Bug fixes:
+		-[Core] Overriding a registration failed when done with same implementation, and registration of
+		 conditional non-generic registrations was accidentally allowed. (fixes #114)
+
+
+Version 3.0.3  (v3.0.3 RTM) 2015-08-27
 
 	Bug fixes:
 		-[Core] Container.Verify() does not dispose created instances, while running in an active scope.

@@ -74,12 +74,18 @@ namespace SimpleInjector.Internals
             Lifestyle lifestyle, Predicate<PredicateContext> predicate)
         {
             this.container.ThrowWhenContainerIsLocked();
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(predicate);
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationType, lifestyle, predicate, this.container);
 
+            this.ThrowWhenConditionalIsRegisteredInOverridingMode(provider);
+
             this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
+
+            if (provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
+            {
+                this.providers.RemoveAll(p => p.AppliesToAllClosedServiceTypes);
+            }
 
             this.providers.Add(provider);
         }
@@ -88,10 +94,11 @@ namespace SimpleInjector.Internals
             Lifestyle lifestyle, Predicate<PredicateContext> predicate)
         {
             this.container.ThrowWhenContainerIsLocked();
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(predicate);
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationTypeFactory, lifestyle, predicate, this.container);
+
+            this.ThrowWhenConditionalIsRegisteredInOverridingMode(provider);
 
             this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
 
@@ -147,9 +154,10 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private void ThrowWhenConditionalIsRegisteredInOverridingMode(Predicate<PredicateContext> predicate)
+        private void ThrowWhenConditionalIsRegisteredInOverridingMode(
+            OpenGenericToInstanceProducerProvider provider)
         {
-            if (predicate != null && this.container.Options.AllowOverridingRegistrations)
+            if (!provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
             {
                 throw new NotSupportedException(
                     StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
@@ -162,11 +170,16 @@ namespace SimpleInjector.Internals
             bool providerToRegisterIsSuperset =
                 providerToRegister.AppliesToAllClosedServiceTypes && this.providers.Any();
 
+            bool isReplacement = providerToRegister.AppliesToAllClosedServiceTypes 
+                && this.container.Options.AllowOverridingRegistrations;
+
             // A provider is a superset of the providerToRegister when it can be applied to ALL generic
             // types that the providerToRegister can be applied to as well.
             var supersetProviders = this.GetSupersetProvidersFor(providerToRegister.ImplementationType);
 
-            if (providerToRegisterIsSuperset || supersetProviders.Any())
+            bool overlaps = providerToRegisterIsSuperset || supersetProviders.Any();
+
+            if (!isReplacement && overlaps)
             {
                 var overlappingProvider = supersetProviders.FirstOrDefault() ?? this.providers.First();
 
@@ -188,7 +201,7 @@ namespace SimpleInjector.Internals
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider)
         {
             return new InvalidOperationException(
-                StringResources.AnOverlappingGenericRegistrationExists(
+                StringResources.AnOverlappingRegistrationExists(
                     providerToRegister.ServiceType,
                     overlappingProvider.ImplementationType,
                     overlappingProvider.IsConditional,

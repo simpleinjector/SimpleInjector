@@ -638,7 +638,7 @@ namespace SimpleInjector
                 Helpers.ToCSharpFriendlyName(overlappingGenericImplementationType),
                 nameof(Container.RegisterConditional));
 
-        internal static string AnOverlappingGenericRegistrationExists(Type openGenericServiceType,
+        internal static string AnOverlappingRegistrationExists(Type openGenericServiceType,
             Type overlappingImplementationType, bool isExistingRegistrationConditional,
             Type implementationTypeOfNewRegistration, bool isNewRegistrationConditional)
         {

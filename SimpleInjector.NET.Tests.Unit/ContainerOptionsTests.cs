@@ -220,6 +220,120 @@
             AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
 
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrueWhileOverridingRegistrationWithSameImplementation_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ILogger), typeof(NullLogger));
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.Register(typeof(ILogger), typeof(NullLogger));
+        }
+
+        [TestMethod]
+        public void RegisterConditional_AllowOverridingRegistrationsSetTrueAndOverlappingConditionalExists_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(ILogger), typeof(NullLogger), c => true);
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(ILogger), typeof(ConsoleLogger), c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "making of conditional registrations is not supported when AllowOverridingRegistrations is set",
+                action);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrueWhileOverridingRegistrationWithDifferentGenericImplementation_ResolvesNewType()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.Register(typeof(ICommandHandler<>), typeof(DefaultCommandHandler<>));
+
+            // Act
+            var instance = container.GetInstance<ICommandHandler<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(DefaultCommandHandler<int>), instance);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrueWhileOverridingRegistrationWithSameGenericImplementation_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+
+            // Act
+            container.GetInstance<ICommandHandler<int>>();
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToFalseWhileOverridingRegistrationWithSameGenericImplementation_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+            container.Options.AllowOverridingRegistrations = false;
+
+            // Act
+            Action action = () => container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrueWhileOverridingGenericTypeWithoutConstraints_SuccessfullyReplacesTheOld()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<>), typeof(NullCommandHandler<>));
+            container.Options.AllowOverridingRegistrations = true;
+            container.Register(typeof(ICommandHandler<>), typeof(DefaultCommandHandler<>));
+
+            // Act
+            var instance = container.GetInstance<ICommandHandler<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(DefaultCommandHandler<int>), instance);
+        }
+
+        [TestMethod]
+        public void Verify_SingletonRegistrationOverriddenWithExactSameImplementation_DoesNotCauseTornLifestyleError()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton);
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.Register(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton);
+
+            // Act
+            container.Verify(VerificationOption.VerifyAndDiagnose);
+        }
+
+
         [TestMethod]
         public void ConstructorResolutionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {

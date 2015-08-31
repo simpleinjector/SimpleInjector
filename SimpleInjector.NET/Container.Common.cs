@@ -113,8 +113,6 @@ namespace SimpleInjector
         {
             this.containerId = Interlocked.Increment(ref counter);
 
-            this.RegisterSingleton<Container>(this);
-
             this.Options = new ContainerOptions(this)
             {
                 EnableDynamicAssemblyCompilation =
@@ -122,6 +120,8 @@ namespace SimpleInjector
             };
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
+
+            this.RegisterSingleton(this);
         }
 
         // Wrapper for instance initializer delegates
