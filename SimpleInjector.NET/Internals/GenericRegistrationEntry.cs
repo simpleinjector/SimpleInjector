@@ -159,8 +159,14 @@ namespace SimpleInjector.Internals
         {
             if (!provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
             {
-                throw new NotSupportedException(
-                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+                // We allow the registration in case it doesn't have a predicate (meaning that the type is
+                // solely conditional by its generic type constraints) while it is the first registration.
+                // In that case there is no ambiguity, since there's nothing to replace (fixes #116).
+                if (providers.Any() || provider.Predicate != null)
+                {
+                    throw new NotSupportedException(
+                        StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+                }
             }
         }
 

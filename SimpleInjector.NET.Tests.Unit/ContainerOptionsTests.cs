@@ -96,6 +96,35 @@
         }
 
         [TestMethod]
+        public void Register_OpenGenericRegistrationWithTypeConstraintWithWithNoOverlappingRegistrationsAndAllowOverridingRegistrationsTrue_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.Register(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+        }
+
+        [TestMethod]
+        public void Register_OpenGenericRegistrationWithTypeConstraintWithExistingConditionalAndAllowOverridingRegistrationsTrue_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(IEventHandler<>), typeof(ClassConstraintEventHandler<>));
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            Action action = () => container.Register(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "making of conditional registrations is not supported when AllowOverridingRegistrations is set",
+                action);
+        }
+
+        [TestMethod]
         public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsDuplicateRegistrationsForAnOpenGenericType()
         {
             // Arrange

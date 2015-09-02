@@ -1,6 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.0.5
+
+	Bug fixes:
+		-[Core] Unconditional generic registration with type constraint could not be made when
+		 AllowOverridingRegistrations  was set to true. (fixes #116)
+
+
 Version 3.0.4 (v3.0.4 RTM) 2015-08-31
 
 	Bug fixes:
