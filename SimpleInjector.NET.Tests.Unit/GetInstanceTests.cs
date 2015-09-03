@@ -333,6 +333,120 @@
                 action);
         }
         
+        [TestMethod]
+        public void GetInstance_NoRegistrationExistsButRegistrationForCollectionDoes_ThrowsExceptionReferingToThatCollectionRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type ILogger could be found. 
+                There is, however, a registration for IEnumerable<ILogger>;
+                Did you mean to call GetAllInstances<ILogger>() or depend on IEnumerable<ILogger>?"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingATypeDependingOnAnUnregisteredTypeWhileACollectionRegistrationExists_ThrowsExceptionReferingToThatRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+
+            // Act
+            Action action = () => container.GetInstance<ComponentDependingOn<ILogger>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                There is, however, a registration for IEnumerable<ILogger>; 
+                Did you mean to depend on IEnumerable<ILogger>?"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_NoRegistrationFExistsAndNoCollectionRegistrationEither_ExceptionMessageDoesNotReferToOtherRegistrations()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
+                "GetInstance<ILogger>()",
+                action);
+
+            AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
+                "GetAllInstances<ILogger>()",
+                action);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_NoRegistrationForCollectionButRegistrationForSingleElementExists_ThrowsExceptionReferingToThatRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, NullLogger>();
+
+            // Act
+            Action action = () => container.GetAllInstances<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type IEnumerable<ILogger> could be found.
+                There is, however, a registration for ILogger; 
+                Did you mean to call GetInstance<ILogger>() or depend on ILogger?"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingATypeDependingOnAnUnregisteredCollectionWhileASingleRegistrationExists_ThrowsExceptionReferingToThatRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, NullLogger>();
+
+            // Act
+            Action action = () => container.GetInstance<ComponentDependingOn<IEnumerable<ILogger>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "There is, however, a registration for ILogger; Did you mean to depend on ILogger?",
+                action);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_NoRegistrationForCollectionAndNoSingleRegistrationEither_ExceptionMessageDoesNotReferToOtherRegistrations()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.GetAllInstances<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
+                "Did you mean to call GetInstance<ILogger>()",
+                action);
+
+            AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
+                "GetAllInstances<ILogger>()",
+                action);
+        }
+
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
 
         public class SomeGenericNastyness<TBla>

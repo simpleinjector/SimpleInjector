@@ -755,9 +755,24 @@ namespace SimpleInjector
                 throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
             }
 
-            throw new ActivationException(
-                StringResources.NoRegistrationForTypeFound(serviceType, this.HasRegistrations));
+            throw new ActivationException(StringResources.NoRegistrationForTypeFound(
+                serviceType, 
+                this.HasRegistrations,
+                this.ContainsOneToOneRegistrationForCollectionType(serviceType),
+                this.ContainsCollectionRegistrationFor(serviceType)));
         }
+
+        private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
+            IsGenericCollectionType(collectionServiceType) && 
+                this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
+
+        // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
+        private bool ContainsCollectionRegistrationFor(Type serviceType) =>
+            !IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
+                this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
+
+        private bool ContainsExplicitRegistrationFor(Type serviceType) =>
+            this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, false) != null;
 
         private void ThrowNotConstructableException(Type concreteType)
         {

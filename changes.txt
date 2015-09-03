@@ -1,11 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 3.0.5
+Version 3.0.5 (v3.0.5 RTM) 2015-09-03
 
 	Bug fixes:
 		-[Core] Unconditional generic registration with type constraint could not be made when
 		 AllowOverridingRegistrations  was set to true. (fixes #116)
+		-[Core] Improved exception message that communicates that registrations of collections are separated
+		 from other registrations. (fixes #115)
 
 
 Version 3.0.4 (v3.0.4 RTM) 2015-08-31

@@ -437,7 +437,9 @@ namespace SimpleInjector
             throw new ActivationException(
                 StringResources.ParameterTypeMustBeRegistered(
                     target,
-                    this.GetNumberOfConditionalRegistrationsFor(target.TargetType)));
+                    this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
+                    this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),
+                    this.ContainsCollectionRegistrationFor(target.TargetType)));
         }
 
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>

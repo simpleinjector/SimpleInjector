@@ -72,11 +72,14 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} threw an exception.", serviceType.ToFriendlyName());
 
-        internal static string NoRegistrationForTypeFound(Type serviceType, bool containerHasRegistrations) => 
+        internal static string NoRegistrationForTypeFound(Type serviceType, bool containerHasRegistrations,
+            bool containerHasRelatedOneToOneMapping, bool containerHasRelatedCollectionMapping) => 
             string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.{1}",
+                "No registration for type {0} could be found.{1}{2}{3}",
                 serviceType.ToFriendlyName(),
-                ContainsHasNoRegistrationsAddition(containerHasRegistrations));
+                ContainerHasNoRegistrationsAddition(containerHasRegistrations),
+                DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
+                DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType));
 
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -157,22 +160,27 @@ namespace SimpleInjector
                 nameof(ContainerOptions),
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
-        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals) =>
+        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
+            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping) =>
             target.Parameter != null
                 ? string.Format(CultureInfo.InvariantCulture,
                     "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
-                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}",
+                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}",
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals))
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
+                    DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
+                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType))
                 : string.Format(CultureInfo.InvariantCulture,
                     "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}",
+                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}",
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals));
+                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
+                    DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
+                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType));
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -232,7 +240,7 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found and an implicit registration could not be made.{1}",
                 serviceType.ToFriendlyName(),
-                ContainsHasNoRegistrationsAddition(containerHasRegistrations));
+                ContainerHasNoRegistrationsAddition(containerHasRegistrations));
 
         internal static string DefaultScopedLifestyleCanNotBeSetWithLifetimeScoped() =>
             string.Format(CultureInfo.InvariantCulture,
@@ -764,10 +772,44 @@ namespace SimpleInjector
                 registeringElement,
                 nameof(Container.RegisterCollection));
 
-        private static object ContainsHasNoRegistrationsAddition(bool containerHasRegistrations) =>
+        private static object ContainerHasNoRegistrationsAddition(bool containerHasRegistrations) =>
             containerHasRegistrations
                 ? string.Empty
                 : " Please note that the container instance you are resolving from contains no " +
                   "registrations. Could it be that you accidentally created a new -and empty- container?";
+
+        private static object DidYouMeanToCallGetInstanceInstead(bool hasRelatedOneToOneMapping, 
+            Type collectionServiceType) =>
+            hasRelatedOneToOneMapping
+                ? string.Format(CultureInfo.InvariantCulture,
+                    " There is, however, a registration for {0}; Did you mean to call GetInstance<{0}>() " +
+                    "or depend on {0}?",
+                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
+                : string.Empty;
+
+        private static object DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
+            Type collectionServiceType) =>
+            hasRelatedOneToOneMapping
+                ? string.Format(CultureInfo.InvariantCulture,
+                    " There is, however, a registration for {0}; Did you mean to depend on {0}?",
+                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
+                : string.Empty;
+
+        private static object DidYouMeanToCallGetAllInstancesInstead(bool hasCollection, Type serviceType) =>
+            hasCollection
+                ? string.Format(CultureInfo.InvariantCulture,
+                    " There is, however, a registration for {0}; Did you mean to call " +
+                    "GetAllInstances<{1}>() or depend on {0}?",
+                    typeof(IEnumerable<>).MakeGenericType(serviceType).ToFriendlyName(),
+                    serviceType.ToFriendlyName())
+                : string.Empty;
+
+        private static object DidYouMeanToDependOnCollectionInstead(bool hasCollection, Type serviceType) =>
+            hasCollection
+                ? string.Format(CultureInfo.InvariantCulture,
+                    " There is, however, a registration for {0}; Did you mean to depend on {0}?",
+                    typeof(IEnumerable<>).MakeGenericType(serviceType).ToFriendlyName(),
+                    serviceType.ToFriendlyName())
+                : string.Empty;
     }
 }
