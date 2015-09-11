@@ -1198,6 +1198,92 @@
             Assert.AreEqual(typeof(ServiceWithProperty<ILogger>), contexts.First().Consumer.ImplementationType);
         }
 
+        [TestMethod]
+        public void ConditionalRegistration_SupplyingOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration = Lifestyle.Transient.CreateRegistration<GenericClassType<object>>(container);
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), registration, c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "IGeneric<T> is an open generic type",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ConditionalRegistration_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
+
+            container.RegisterConditional(typeof(ILogger), registration, c => true);
+
+            // Act
+            container.GetInstance<ILogger>();
+        }
+
+        [TestMethod]
+        public void ConditionalRegistration_RegisteringTheSameRegistrationTwice_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
+
+            container.RegisterConditional(typeof(ILogger), registration, c => true);
+            
+            // Act
+            Action action = () => container.RegisterConditional(typeof(ILogger), registration, c => false);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "This new registration would cause ambiguity",
+                action);
+        }
+
+        [TestMethod]
+        public void ConditionalRegistration_RegisteringTwoRegistrationsForSameImplementationType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration1 = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
+            var registration2 = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
+
+            container.RegisterConditional(typeof(ILogger), registration1, c => true);
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(ILogger), registration2, c => false);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "This new registration would cause ambiguity",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegisteringTheTwoDifferentRegistrationsWithDelegate_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var registration1 = Lifestyle.Transient.CreateRegistration<ILogger>(() => new NullLogger(), container);
+            var registration2 = Lifestyle.Transient.CreateRegistration<ILogger>(() => new NullLogger(), container);
+
+            container.RegisterConditional(typeof(ILogger), registration1, c => false);
+            container.RegisterConditional(typeof(ILogger), registration2, c => true);
+
+            // Act
+            container.GetInstance<ILogger>();
+        }
+
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
             public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) => true;

@@ -5,6 +5,7 @@ Version 3.1.0 (v3.1.0 RTM)
 
 	Improvements/Changes:
 		-[Core] Lifestyle.CreateProducer<TService>(Type, Container) overload added. (fixes #100)
+		-[Core] Container.RegisterConditional overload added that accepts an Registration. (fixes #102)
 
 
 Version 3.0.5 (v3.0.5 RTM) 2015-09-03

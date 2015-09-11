@@ -166,7 +166,7 @@ namespace SimpleInjector
             else
             {
                 var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
-                this.AddConditionalRegistration(serviceType, registration, predicate);
+                this.RegisterConditional(serviceType, registration, predicate);
             }
         }
 
@@ -211,22 +211,35 @@ namespace SimpleInjector
                 .Add(serviceType, implementationTypeFactory, lifestyle, predicate);
         }
 
-        // We keep this method internal for now. It might not be intuitive for users that the registration is
-        // wrapped with a new InstanceProducer. If a user would do this:
-        //     var reg = Lifestyle.Singleton.Create<IPlugin, PluginImpl>(container);
-        //     container.AddConditionalRegistration(typeof(IPlugin), reg, someCondition);
-        //     container.AddConditionalRegistration(typeof(IPlugin), reg, someOtherCond);
-        //     container.RegisterDecorator<IPlugin, PluginDecorator>(Lifestyle.Singleton);
-        // The user might not expect that although there will only be one PluginImpl instance, there will be
-        // two PluginDecorator instances. Of course, the would be easily solved by changing the registration
-        // to the following:
-        //     var reg = Lifestyle.Singleton.Create<IPlugin, PluginImpl>(container);
-        //     container.AddConditionalRegistration(typeof(IPlugin), reg, c => someCondition(c) || someOtherCond(c));
-        //     container.RegisterDecorator<IPlugin, PluginDecorator>(Lifestyle.Singleton);
-        // But still, let's keep it internal for now.
-        internal void AddConditionalRegistration(Type serviceType, Registration registration, 
+        /// <summary>
+        /// Conditionally registers that <paramref name="registration"/> will be used every time a 
+        /// <paramref name="serviceType"/> is requested and where the supplied <paramref name="predicate"/> 
+        /// returns true. The predicate will only be evaluated a finite number of times; the predicate is 
+        /// unsuited for making decisions based on runtime conditions.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
+        /// <param name="registration">The <see cref="Registration"/> instance to register.</param>
+        /// <param name="predicate">The predicate that determines whether the 
+        /// <paramref name="registration"/> can be applied for the requested service type. This predicate
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
+        /// are made.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is open generic or
+        /// <paramref name="registration" /> is not assignable to <paramref name="serviceType"/>.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.
+        /// </exception>
+        public void RegisterConditional(Type serviceType, Registration registration, 
             Predicate<PredicateContext> predicate)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
+            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
+                nameof(serviceType));
+
             this.ThrowWhenContainerIsLocked();
             
             var producer = new InstanceProducer(serviceType, registration, predicate);
