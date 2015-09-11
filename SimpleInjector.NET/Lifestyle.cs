@@ -368,6 +368,25 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <typeparamref name="TService"/>
+        /// that will create new instances of specified <paramref name="implementationType"/> caching as 
+        /// specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="implementationType">The concrete type that will be created.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="InstanceProducer"/> must be created.</param>
+        /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="implementationType"/> or
+        /// <paramref name="container"/> are null references (Nothing in VB).</exception>
+        public InstanceProducer<TService> CreateProducer<TService>(Type implementationType, Container container)
+            where TService : class
+        {
+            return new InstanceProducer<TService>(
+                this.CreateRegistration(typeof(TService), implementationType, container));
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="InstanceProducer"/> instance for the given <typeparamref name="TService"/>
         /// that will create new instances instance using the supplied <paramref name="instanceCreator"/> 
         /// with the caching as specified by this lifestyle.
         /// </summary>

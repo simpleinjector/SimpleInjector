@@ -244,7 +244,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            var producer = Lifestyle.Transient.CreateProducer<ITimeProvider, RealTimeProvider>(container);
+            var producer = Lifestyle.Transient.CreateProducer<ITimeProvider>(typeof(RealTimeProvider), container);
 
             // Assert
             Assert.IsTrue(container.GetCurrentRegistrations().Contains(producer),
