@@ -71,9 +71,6 @@ namespace SimpleInjector
         private ILifestyleSelectionBehavior lifestyleBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IBatchRegistrationBehavior batchRegistrationBehavior;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -102,7 +99,6 @@ namespace SimpleInjector
             this.injectionBehavior = new DefaultDependencyInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(Lifestyle.Transient);
-            this.batchRegistrationBehavior = new DefaultBatchRegistrationBehavior(container);
         }
 
         /// <summary>
@@ -309,32 +305,6 @@ namespace SimpleInjector
         /// </value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool EnableDynamicAssemblyCompilation { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the batch registration behavior. The container uses the batch registration behavior
-        /// to determine which types should be registered from a supplied assembly. The container's default 
-        /// behavior is to filter out decorators.</summary>
-        /// <value>The batch registration behavior.</value>
-        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the container already contains registrations.
-        /// </exception>
-        internal IBatchRegistrationBehavior BatchRegistrationBehavior
-        {
-            get
-            {
-                return this.batchRegistrationBehavior;
-            }
-
-            set
-            {
-                Requires.IsNotNull(value, nameof(value));
-
-                this.ThrowWhenContainerHasRegistrations(nameof(BatchRegistrationBehavior));
-
-                this.batchRegistrationBehavior = value;
-            }
-        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription

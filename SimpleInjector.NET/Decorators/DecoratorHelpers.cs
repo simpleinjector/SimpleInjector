@@ -152,27 +152,6 @@ namespace SimpleInjector.Decorators
             return Expression.Call(selectMethod, collectionExpression, Expression.Constant(selector));
         }
 
-        internal static bool IsDecorator(Container container, Type serviceType, Type typeToCheck)
-        {
-            ConstructorInfo constructorToCheck;
-
-            try
-            {
-                constructorToCheck = container.Options.SelectConstructor(serviceType, typeToCheck);
-            }
-            catch (ActivationException)
-            {
-                // If the constructor resolution behavior fails, we can't determine whether this type is a
-                // decorator. Since this method is used by batch registration, by returning false the type
-                // will be included in batch registration and at that point GetConstructor is called again
-                // -and will fail again- giving the user the required information.
-                return false;
-            }
-
-            return DecoratesServiceType(serviceType, constructorToCheck) &&
-                DecoratesBaseTypes(serviceType, constructorToCheck);
-        }
-        
         internal static bool DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
             int numberOfServiceTypeDependencies =
@@ -181,26 +160,17 @@ namespace SimpleInjector.Decorators
             return numberOfServiceTypeDependencies == 1;
         }
 
-        // Returns the base type of the decorator that can be used for decoration.
+        // Returns the base type of the decorator that can be used for decoration (because serviceType might
+        // be open generic, while the base type might not be).
         internal static Type GetDecoratingBaseType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
             var decoratorInterfaces =
-                from abstraction in GetDecoratingBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
+                from abstraction in Helpers.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
                 where decoratorConstructor.GetParameters()
                     .Any(parameter => IsDecorateeParameter(parameter.ParameterType, abstraction))
                 select abstraction;
 
             return decoratorInterfaces.FirstOrDefault();
-        }
-
-        internal static IEnumerable<Type> GetDecoratingBaseTypeCandidates(Type serviceType, Type decoratorType)
-        {
-            return
-                from abstraction in decoratorType.GetBaseTypesAndInterfaces()
-                where abstraction == serviceType || (
-                    abstraction.IsGenericType && serviceType.IsGenericType &&
-                    abstraction.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
-                select abstraction;
         }
 
         internal static int GetNumberOfServiceTypeDependencies(Type serviceType,

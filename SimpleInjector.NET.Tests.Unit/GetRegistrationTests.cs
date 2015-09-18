@@ -331,16 +331,18 @@
         }
 
         [TestMethod]
-        public void GetRegistration_OnOpenGenericType_ReturnsNull()
+        public void GetRegistration_OnOpenGenericType_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            var registration = container.GetRegistration(typeof(IEnumerable<>));
+            Action action = () => container.GetRegistration(typeof(IEnumerable<>));
 
             // Assert
-            Assert.IsNull(registration);
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "IEnumerable<T> is invalid because it is an open generic type",
+                action);
         }
 
         [TestMethod]
@@ -351,7 +353,7 @@
 
             // Act
             var registration = container.GetRegistration(
-                typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
+                typeof(SomeGenericNastyness<int>.ReadOnlyDictionary<object, string>.KeyCollection));
 
             // Assert
             Assert.IsNull(registration);

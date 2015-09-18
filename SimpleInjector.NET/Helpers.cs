@@ -30,7 +30,10 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Threading;
+    using Advanced;
+    using Decorators;
     using SimpleInjector.Internals;
 
     /// <summary>
@@ -54,6 +57,11 @@ namespace SimpleInjector
         internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck)
         {
             return typeToCheck.IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
+        }
+
+        internal static bool IsAmbiguousOrValueType(Type type)
+        {
+            return IsAmbiguousType(type) || type.IsValueType;
         }
 
         internal static bool IsAmbiguousType(Type type)
@@ -177,6 +185,37 @@ namespace SimpleInjector
                 !typeof(Delegate).IsAssignableFrom(serviceType);
         }
 
+        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor)
+        {
+            // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
+            return DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor) &&
+                DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
+        }
+
+        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor)
+        {
+            return CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
+        }
+
+        internal static bool IsGenericCollectionType(Type serviceType)
+        {
+            if (!serviceType.IsGenericType)
+            {
+                return false;
+            }
+
+            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+
+            return
+#if NET45
+                serviceTypeDefinition == typeof(IReadOnlyList<>) ||
+                serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
+#endif
+                serviceTypeDefinition == typeof(IEnumerable<>) ||
+                serviceTypeDefinition == typeof(IList<>) ||
+                serviceTypeDefinition == typeof(ICollection<>);
+        }
+
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
         internal static Type[] GetTypeHierarchyFor(Type type)
         {
@@ -187,6 +226,32 @@ namespace SimpleInjector
             types.AddRange(type.GetInterfaces());
 
             return types.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a list of base types and interfaces of implementationType that either
+        /// equal to serviceType or are closed or partially closed version of serviceType (in case 
+        /// serviceType itself is generic).
+        /// So:
+        /// -in case serviceType is non generic, only serviceType will be returned.
+        /// -If implementationType is open generic, serviceType will be returned (or a partially closed 
+        ///  version of serviceType is returned).
+        /// -If serviceType is generic and implementationType is not, a closed version of serviceType will
+        ///  be returned.
+        /// -If implementationType implements multiple (partially) closed versions of serviceType, all those
+        ///  (partially) closed versions will be returned.
+        /// </summary>
+        /// <param name="serviceType">The (open generic) service type to match.</param>
+        /// <param name="implementationType">The implementationType to search.</param>
+        /// <returns>A list of types.</returns>
+        internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType)
+        {
+            return
+                from baseType in implementationType.GetBaseTypesAndInterfaces()
+                where baseType == serviceType || (
+                    baseType.IsGenericType && serviceType.IsGenericType &&
+                    baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
+                select baseType;
         }
 
         internal static Action<T> CreateAction<T>(object action)

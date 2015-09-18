@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using SimpleInjector.Decorators;
 
 #if !PUBLISH
     /// <summary>Methods for batch registration.</summary>
@@ -237,20 +238,84 @@ namespace SimpleInjector
         /// (Nothing in VB).</exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies)
         {
+            return this.GetTypesToRegister(serviceType, assemblies, new TypesToRegisterOptions());
+        }
+
+        /// <summary>
+        /// Returns all concrete types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="serviceType"/> and match the specified
+        /// <paramref name="options."/>. <paramref name="serviceType"/> can be an open-generic type.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>. 
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// objects use this method internally to get the list of types that need to be registered. Instead of
+        /// calling  such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// and pass  in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
+        /// var options = new TypesToRegisterOptions { IncludeGenericTypeDefinitions: true };
+        /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies, options)
+        ///     .Where(type => !type.IsPublic);
+        /// 
+        /// container.Register(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all internal types are filtered out. This list is supplied to the
+        /// <see cref="Container.Register(System.Type,IEnumerable{System.Type})">Register(Type, IEnumerable&lt;Type&gt;)</see>
+        /// overload to finish the registration.
+        /// </remarks>
+        /// <param name="serviceType">The base type or interface to find derived types for. This can be both
+        /// a non-generic and open-generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <param name="options">The options.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// (Nothing in VB).</exception>
+        public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies,
+            TypesToRegisterOptions options)
+        {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(assemblies, nameof(assemblies));
+            Requires.IsNotNull(options, nameof(options));
 
-            var types =
+            var types = 
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
                 from type in GetTypesFromAssembly(assembly)
+                where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition
                 where Helpers.IsConcreteType(type)
-                where !type.IsGenericType
                 where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
-                where this.Options.BatchRegistrationBehavior.ShouldRegisterType(serviceType, type)
+                select type;
+
+            types =
+                from type in types
+                let ctor = this.SelectImplementationTypeConstructorOrNull(serviceType, type)
+                where ctor == null || options.IncludeDecorators || !Helpers.IsDecorator(serviceType, ctor)
+                where ctor == null || options.IncludeComposites || !Helpers.IsComposite(serviceType, ctor)
                 select type;
 
             return types.ToArray();
+        }
+
+        private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type serviceType, Type implementationType)
+        {
+            try
+            {
+                return this.Options.SelectConstructor(serviceType, implementationType);
+            }
+            catch (ActivationException)
+            {
+                // If the constructor resolution behavior fails, we can't determine the type's constructor.
+                // Since this method is used by batch registration, by returning null the type
+                // will be included in batch registration and at that point GetConstructor is called again
+                // -and will fail again- giving the user the required information.
+                return null;
+            }
         }
 
         private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)

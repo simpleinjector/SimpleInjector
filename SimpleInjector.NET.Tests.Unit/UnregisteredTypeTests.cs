@@ -261,18 +261,13 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(GenericType<>));
+            // Act
+            Action action = () => container.GetInstance(typeof(GenericType<>));
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains("GenericType<T>", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "GenericType<T>",
+                action);
         }
 
         [TestMethod]

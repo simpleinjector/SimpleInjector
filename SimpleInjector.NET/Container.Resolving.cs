@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -257,6 +257,12 @@ namespace SimpleInjector
         internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType, InjectionConsumerInfo consumer,
             bool autoCreateConcreteTypes = true)
         {
+            if (serviceType.ContainsGenericParameters)
+            {
+                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
+                    nameof(serviceType));
+            }
+
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
             Func<InjectionConsumerInfo, InstanceProducer> buildProducer =
                 context => this.BuildInstanceProducerForType(serviceType, context, autoCreateConcreteTypes);
@@ -325,6 +331,12 @@ namespace SimpleInjector
 
         private object GetInstanceForRootType(Type serviceType)
         {
+            if (serviceType.ContainsGenericParameters)
+            {
+                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
+                    nameof(serviceType));
+            }
+
             InstanceProducer producer = this.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
             this.AppendRootInstanceProducer(serviceType, producer);
             return this.GetInstanceFromProducer(producer, serviceType);
@@ -506,7 +518,13 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
         {
-            if (!IsGenericCollectionType(serviceType))
+            if (!Helpers.IsGenericCollectionType(serviceType))
+            {
+                return null;
+            }
+
+            // We don't auto-register collections for ambiguous types.
+            if (Helpers.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
             {
                 return null;
             }
@@ -529,53 +547,21 @@ namespace SimpleInjector
             }
         }
 
-        private static bool IsGenericCollectionType(Type serviceType)
+        private InstanceProducer TryBuildCollectionInstanceProducer(Type collectionType)
         {
-            if (!serviceType.IsGenericType)
+            Type serviceTypeDefinition = collectionType.GetGenericTypeDefinition();
+
+            if (serviceTypeDefinition != typeof(IEnumerable<>))
             {
-                return false;
-            }
-
-            Type[] arguments = serviceType.GetGenericArguments();
-
-            // IEnumerable<T>, IList<T>, ICollection<T>, IReadOnlyCollection<T> and IReadOnlyList<T> are supported.
-            if (serviceType.ContainsGenericParameters || arguments.Length != 1)
-            {
-                return false;
-            }
-
-            Type elementType = arguments.First();
-
-            // We don't auto-register collections for ambiguous types.
-            if (elementType.IsValueType || Helpers.IsAmbiguousType(elementType))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private InstanceProducer TryBuildCollectionInstanceProducer(Type serviceType)
-        {
-            Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
-
-            if (
-#if NET45
-                serviceTypeDefinition == typeof(IReadOnlyList<>) ||
-                serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
-#endif
-                serviceTypeDefinition == typeof(IList<>) ||
-                serviceTypeDefinition == typeof(ICollection<>))
-            {
-                Type elementType = serviceType.GetGenericArguments()[0];
+                Type elementType = collectionType.GetGenericArguments()[0];
 
                 var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
 
                 if (collection != null)
                 {
-                    var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, collection, this);
+                    var registration = SingletonLifestyle.CreateSingleInstanceRegistration(collectionType, collection, this);
 
-                    var producer = new InstanceProducer(serviceType, registration);
+                    var producer = new InstanceProducer(collectionType, registration);
 
                     if (!((IEnumerable<object>)collection).Any())
                     {
@@ -750,11 +736,6 @@ namespace SimpleInjector
                 this.ThrowNotConstructableException(serviceType);
             }
 
-            if (serviceType.ContainsGenericParameters)
-            {
-                throw new ActivationException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType));
-            }
-
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(
                 serviceType, 
                 this.HasRegistrations,
@@ -763,12 +744,12 @@ namespace SimpleInjector
         }
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
-            IsGenericCollectionType(collectionServiceType) && 
+            Helpers.IsGenericCollectionType(collectionServiceType) && 
                 this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>
-            !IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
+            !Helpers.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
                 this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
 
         private bool ContainsExplicitRegistrationFor(Type serviceType) =>

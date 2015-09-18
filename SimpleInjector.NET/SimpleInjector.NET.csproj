@@ -78,11 +78,10 @@
     <Compile Include="ActivationException.cs" />
     <Compile Include="ActivationException.full.cs" />
     <Compile Include="Advanced\AdvancedExtensions.cs" />
-    <Compile Include="Advanced\DefaultBatchRegistrationBehavior.cs" />
     <Compile Include="Advanced\DefaultDependencyInjectionBehavior.cs" />
-    <Compile Include="Advanced\IBatchRegistrationBehavior.cs" />
     <Compile Include="Advanced\IDependencyInjectionBehavior.cs" />
     <Compile Include="Container.Registration.Conditional.cs" />
+    <Compile Include="Decorators\CompositeHelpers.cs" />
     <Compile Include="Diagnostics\DiagnosticSeverity.enum.cs" />
     <Compile Include="Diagnostics\LifestyleMismatchDiagnosticResult.cs" />
     <Compile Include="InjectionConsumerInfo.cs" />
@@ -205,6 +204,7 @@
     <Compile Include="Requires.cs" />
     <Compile Include="StringResources.cs" />
     <Compile Include="TypeFactoryContext.cs" />
+    <Compile Include="TypesToRegisterOptions.cs" />
     <Compile Include="UnregisteredTypeEventArgs.cs" />
     <Compile Include="VerificationOption.enum.cs" />
   </ItemGroup>

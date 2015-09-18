@@ -112,7 +112,7 @@
                 () => container.GetInstance(typeof(SomeGenericNastyness<>.ReadOnlyDictionary<,>.KeyCollection));
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "GetInstanceTests.SomeGenericNastyness<TBla>.ReadOnlyDictionary<TKey, TValue>.KeyCollection", 
                 action);
         }
@@ -130,7 +130,7 @@
             Action action = () => container.GetInstance(nastyOpenGenericType);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The request for type Lazy<T> is invalid because it is an open generic type: it is only 
                 possible to instantiate instances of closed generic types. A generic type is closed if all of 
                 its type parameters have been substituted with types that are recognized by the compiler."
@@ -148,7 +148,7 @@
             Action action = () => container.GetAllInstances(typeof(IEnumerable<>));
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "The request for type IEnumerable<IEnumerable<T>> is invalid", action);
         }
         
@@ -162,7 +162,7 @@
             Action action = () => container.GetInstance(typeof(ICollection<>).MakeGenericType(typeof(List<>)));
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "The request for type ICollection<List<T>> is invalid",
                 action);
         }

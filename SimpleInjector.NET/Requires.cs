@@ -399,10 +399,10 @@ namespace SimpleInjector
         }
 
         private static void ThrowMustDecorateServiceType(Type serviceType,
-            ConstructorInfo decoratorConstructor, string paramName)
+            ConstructorInfo constructor, string paramName)
         {
             int numberOfServiceTypeDependencies =
-                DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, decoratorConstructor);
+                DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, constructor);
 
             if (numberOfServiceTypeDependencies == 0)
             {
@@ -410,15 +410,13 @@ namespace SimpleInjector
                 // confusing to the user.
                 // At this point we know that the decorator type implements an service type in some way
                 // (either open or closed), so we this call will return at least one record.
-                serviceType = DecoratorHelpers.GetDecoratingBaseTypeCandidates(serviceType,
-                    decoratorConstructor.DeclaringType)
-                    .First();
+                serviceType = Helpers.GetBaseTypeCandidates(serviceType, constructor.DeclaringType).First();
 
-                ThrowMustContainTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);
+                ThrowMustContainTheServiceTypeAsArgument(serviceType, constructor, paramName);
             }
             else
             {
-                ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(serviceType, decoratorConstructor, paramName);
+                ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(serviceType, constructor, paramName);
             }
         }
 
