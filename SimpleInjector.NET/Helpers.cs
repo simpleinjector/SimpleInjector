@@ -32,7 +32,6 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
-    using Advanced;
     using Decorators;
     using SimpleInjector.Internals;
 
@@ -290,13 +289,46 @@ namespace SimpleInjector
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
 
+        // PERF: This method is a hot path in the registration phase and can get called thousands of times
+        // during application startup. For that reason it is heavily optimized to prevent unneeded memory 
+        // allocations as much as possible. This method is called in a loop by Container.GetTypesToRegister 
+        // and GetTypesToRegister is called by overloads of Register and RegisterCollection.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            bool serviceIsGenericTypeDefinitionOfImplementation =
-                implementation.IsGenericType && implementation.GetGenericTypeDefinition() == service;
+            if (!service.IsGenericType)
+            {
+                return service.IsAssignableFrom(implementation);
+            }
 
-            return serviceIsGenericTypeDefinitionOfImplementation ||
-                implementation.GetBaseTypesAndInterfacesFor(service).Any();
+            if (implementation.IsGenericType && implementation.GetGenericTypeDefinition() == service)
+            {
+                return true;
+            }
+
+            // PERF: We don't use LINQ to prevent unneeded memory allocations.
+            // Unfortunately we can't prevent memory allocations while calling GetInstances() :-(
+            foreach (Type interfaceType in implementation.GetInterfaces())
+            {
+                if (IsGenericImplementationOf(interfaceType, service))
+                {
+                    return true;
+                }
+            }
+
+            // PERF: We don't call GetBaseTypes(), to prevent memory allocations.
+            Type baseType = implementation.BaseType ?? (implementation != typeof(object) ? typeof(object) : null);
+
+            while (baseType != null)
+            {
+                if (IsGenericImplementationOf(baseType, service))
+                {
+                    return true;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return false;
         }
 
         // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
@@ -352,14 +384,19 @@ namespace SimpleInjector
                 baseType = baseType.BaseType;
             }
         }
-
+        
         private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType)
         {
             return
                 from type in types
-                where type == serviceType || serviceType.IsVariantVersionOf(type) ||
-                    (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType)
+                where IsGenericImplementationOf(type, serviceType)
                 select type;
+        }
+
+        private static bool IsGenericImplementationOf(Type type, Type serviceType)
+        {
+            return type == serviceType || serviceType.IsVariantVersionOf(type) ||
+                (type.IsGenericType && type.GetGenericTypeDefinition() == serviceType);
         }
 
         private static bool IsVariantVersionOf(this Type type, Type otherType)
