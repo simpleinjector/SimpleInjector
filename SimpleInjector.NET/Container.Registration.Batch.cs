@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Advanced;
     using SimpleInjector.Decorators;
 
 #if !PUBLISH
@@ -36,7 +37,11 @@ namespace SimpleInjector
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
-        /// with the transient lifestyle.
+        /// with container's default lifestyle (which is transient by default).
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
@@ -56,6 +61,10 @@ namespace SimpleInjector
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
         /// with the supplied <paramref name="lifestyle"/>.
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
@@ -173,7 +182,11 @@ namespace SimpleInjector
         /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
         /// Unless overridden using a custom 
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>. 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration.
         /// </summary>
         /// <param name="serviceType">The element type of the collections to register. This can be either
         /// a non-generic, closed-generic or open-generic type.</param>
@@ -192,6 +205,10 @@ namespace SimpleInjector
         /// Unless overridden using a custom 
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration.
         /// </summary>
         /// <param name="serviceType">The element type of the collections to register. This can be either
         /// a non-generic, closed-generic or open-generic type.</param>
@@ -200,7 +217,9 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
-            this.RegisterCollection(serviceType, this.GetTypesToRegister(serviceType, assemblies));
+            var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
+            var types = this.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
+            this.RegisterCollection(serviceType, types);
         }
 
         /// <summary>
@@ -282,18 +301,15 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(assemblies, nameof(assemblies));
             Requires.IsNotNull(options, nameof(options));
+            Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
             var types = 
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
                 from type in GetTypesFromAssembly(assembly)
-                where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition
                 where Helpers.IsConcreteType(type)
+                where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition
                 where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
-                select type;
-
-            types =
-                from type in types
                 let ctor = this.SelectImplementationTypeConstructorOrNull(serviceType, type)
                 where ctor == null || options.IncludeDecorators || !Helpers.IsDecorator(serviceType, ctor)
                 where ctor == null || options.IncludeComposites || !Helpers.IsComposite(serviceType, ctor)

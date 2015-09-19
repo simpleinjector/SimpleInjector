@@ -8,6 +8,8 @@ Version 3.1.0 (v3.1.0 RTM)
 		-[Core] Container.RegisterConditional overload added that accepts an Registration. (fixes #102)
 		-[Core] Container.GetTypesToRegister overload added that accepts an TypesToRegisterOptions to allow
 		 excluding composites and including decorators and generic type definitions. (fixes #122)
+		-[Core] RegisterCollection overloads that accept a list of assemblies now suppress composite types.
+		 (fixes  #119)
 
 
 Version 3.0.5 (v3.0.5 RTM) 2015-09-03
