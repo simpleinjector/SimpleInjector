@@ -114,8 +114,8 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceTypeInfo.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle,
-                decoratedExpression);
+            serviceTypeInfo.AddAppliedDecorator(this.registeredServiceType, this.decoratorType, 
+                this.Container, this.Lifestyle, decoratedExpression);
 
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }

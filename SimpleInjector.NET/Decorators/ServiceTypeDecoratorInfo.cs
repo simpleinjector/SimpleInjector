@@ -52,15 +52,16 @@ namespace SimpleInjector.Decorators
         internal InstanceProducer GetCurrentInstanceProducer() => 
             this.AppliedDecorators.Any() ? this.AppliedDecorators.Last().DecoratorProducer : this.OriginalProducer;
 
-        internal void AddAppliedDecorator(Type decoratorType, Container container, Lifestyle lifestyle, 
-            Expression decoratedExpression, IEnumerable<KnownRelationship> decoratorRelationships = null)
+        internal void AddAppliedDecorator(Type serviceType, Type decoratorType, Container container, 
+            Lifestyle lifestyle, Expression decoratedExpression, 
+            IEnumerable<KnownRelationship> decoratorRelationships = null)
         {
             var registration = new ExpressionRegistration(decoratedExpression, decoratorType,
                 lifestyle, container);
 
             registration.ReplaceRelationships(decoratorRelationships ?? Enumerable.Empty<KnownRelationship>());
 
-            var producer = new InstanceProducer(this.registeredServiceType, registration);
+            var producer = new InstanceProducer(serviceType, registration);
 
             this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));
         }

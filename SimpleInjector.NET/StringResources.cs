@@ -323,6 +323,15 @@ namespace SimpleInjector
                 "of collections of non-generic types.",
                 type.ToFriendlyName());
 
+        internal static string SuppliedElementDoesNotInheritFromOrImplement(Type serviceType, Type elementType,
+            string elementDescription) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "The supplied {0} of type {1} does not {2} {3}.",
+                elementDescription,
+                elementType.ToFriendlyName(),
+                serviceType.IsInterface ? "implement" : "inherit from",
+                serviceType.ToFriendlyName());
+
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation) => 
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} does not {1} {2}.",

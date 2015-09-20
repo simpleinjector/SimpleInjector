@@ -44,10 +44,10 @@
             // Arrange
             var e = CreateValidUnregisteredTypeEventArgs();
 
-            e.Register(Expression.Constant(null));
+            e.Register(Expression.Constant(null, e.UnregisteredServiceType));
 
             // Act
-            Action action = () => e.Register(Expression.Constant(null));
+            Action action = () => e.Register(Expression.Constant(null, e.UnregisteredServiceType));
 
             // Assert
             AssertThat.Throws<ActivationException>(action);
@@ -77,7 +77,7 @@
             e.Register(() => null);
 
             // Act
-            Action action = () => e.Register(Expression.Constant(null));
+            Action action = () => e.Register(Expression.Constant(null, e.UnregisteredServiceType));
 
             // Assert
             AssertThat.Throws<ActivationException>(action);
@@ -89,7 +89,7 @@
             // Arrange
             var e = CreateValidUnregisteredTypeEventArgs();
 
-            e.Register(Expression.Constant(null));
+            e.Register(Expression.Constant(null, e.UnregisteredServiceType));
 
             // Act
             Action action = () => e.Register(() => null);

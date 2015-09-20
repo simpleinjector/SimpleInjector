@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using SimpleInjector.Decorators;
@@ -82,6 +83,28 @@ namespace SimpleInjector
             if (type.ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
+            }
+        }
+
+        [DebuggerStepThrough]
+        internal static void ServiceIsAssignableFromExpression(Type service, Expression expression,
+            string paramName)
+        {
+            if (!service.IsAssignableFrom(expression.Type))
+            {
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, expression.Type, "expression", 
+                    paramName);
+            }
+        }
+
+        [DebuggerStepThrough]
+        internal static void ServiceIsAssignableFromRegistration(Type service, Registration registration,
+            string paramName)
+        {
+            if (!service.IsAssignableFrom(registration.ImplementationType))
+            {
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, registration.ImplementationType, 
+                    "registration", paramName);
             }
         }
 
@@ -442,6 +465,15 @@ namespace SimpleInjector
         private static void ThrowArgumentNullException(string paramName)
         {
             throw new ArgumentNullException(paramName);
+        }
+
+        private static void ThrowSuppliedElementDoesNotInheritFromOrImplement(Type service, 
+            Type implementation, string elementDescription, string paramName)
+        {
+            throw new ArgumentException(
+                StringResources.SuppliedElementDoesNotInheritFromOrImplement(service, implementation, 
+                    elementDescription),
+                paramName);
         }
 
         private static void ThrowSuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation,

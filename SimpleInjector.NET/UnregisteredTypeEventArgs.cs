@@ -101,6 +101,11 @@ namespace SimpleInjector
         public void Register(Expression expression)
         {
             Requires.IsNotNull(expression, nameof(expression));
+            Requires.ServiceIsAssignableFromExpression(this.UnregisteredServiceType, expression, 
+                nameof(expression));
+
+            Requires.ServiceIsAssignableFromImplementation(this.UnregisteredServiceType, expression.Type,
+                nameof(expression));
 
             this.RequiresNotHandled();
 
@@ -126,6 +131,8 @@ namespace SimpleInjector
         public void Register(Registration registration)
         {
             Requires.IsNotNull(registration, nameof(registration));
+            Requires.ServiceIsAssignableFromRegistration(this.UnregisteredServiceType, registration, 
+                nameof(registration));
 
             this.RequiresNotHandled();
 

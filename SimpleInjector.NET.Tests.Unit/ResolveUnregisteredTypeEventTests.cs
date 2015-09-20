@@ -338,23 +338,13 @@
                 e.Register(invalidExpression);
             };
 
-            try
-            {
-                // Act
-                container.GetInstance<IUserRepository>();
+            // Act
+            Action action = () => container.GetInstance<IUserRepository>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (Exception ex)
-            {
-                const string AssertMessage = "Exception message was not descriptive enough.";
-
-                AssertThat.ExceptionMessageContains(
-                    "Error occurred while trying to build a delegate for type", ex, AssertMessage);
-                AssertThat.ExceptionMessageContains(
-                    "Expression of type 'System.Boolean' cannot be used for return type", ex, AssertMessage);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied expression of type Boolean does not implement IUserRepository",
+                action);
         }
 
         [TestMethod]

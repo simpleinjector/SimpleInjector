@@ -120,8 +120,8 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(this.decoratorType, this.Container, this.Lifestyle, this.e.Expression, 
-                decoratorRelationships);
+            info.AddAppliedDecorator(this.e.RegisteredServiceType, this.decoratorType, this.Container, 
+                this.Lifestyle, this.e.Expression, decoratorRelationships);
         }
     }
 }

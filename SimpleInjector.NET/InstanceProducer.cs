@@ -106,6 +106,8 @@ namespace SimpleInjector
         public InstanceProducer(Type serviceType, Registration registration)
             : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
         {
+            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
+                nameof(serviceType));
         }
 
         internal InstanceProducer(Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
@@ -118,6 +120,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
             this.ServiceType = serviceType;
             this.Registration = registration;
