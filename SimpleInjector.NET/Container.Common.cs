@@ -439,7 +439,8 @@ namespace SimpleInjector
                     target,
                     this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
                     this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),
-                    this.ContainsCollectionRegistrationFor(target.TargetType)));
+                    this.ContainsCollectionRegistrationFor(target.TargetType),
+                    this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(target.TargetType)));
         }
 
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>

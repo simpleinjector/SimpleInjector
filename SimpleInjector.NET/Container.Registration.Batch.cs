@@ -26,7 +26,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Advanced;
     using SimpleInjector.Decorators;
 
 #if !PUBLISH
@@ -34,6 +33,8 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
+        private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators = new Dictionary<Type, List<Type>>();
+
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
@@ -87,9 +88,14 @@ namespace SimpleInjector
             Requires.IsOpenGenericType(openGenericServiceType, nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
-            var implementationTypes = this.GetTypesToRegister(openGenericServiceType, assemblies);
+            Type[] skippedDecorators;
+            
+            Type[] implementationTypes = this.GetNonGenericTypesToRegisterForOneToOneMapping(
+                openGenericServiceType, assemblies, out skippedDecorators);
 
             this.Register(openGenericServiceType, implementationTypes, lifestyle);
+
+            this.AddSkippedDecorators(openGenericServiceType, skippedDecorators);
         }
 
         /// <summary>
@@ -303,7 +309,7 @@ namespace SimpleInjector
             Requires.IsNotNull(options, nameof(options));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
-            var types = 
+            var types =
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
                 from type in GetTypesFromAssembly(assembly)
@@ -316,6 +322,27 @@ namespace SimpleInjector
                 select type;
 
             return types.ToArray();
+        }
+
+        private Type[] GetNonGenericTypesToRegisterForOneToOneMapping(Type openGenericServiceType,
+            IEnumerable<Assembly> assemblies, out Type[] skippedDecorators)
+        {
+            var options = new TypesToRegisterOptions { IncludeDecorators = true };
+
+            var typesIncludingDecorators = this.GetTypesToRegister(openGenericServiceType, assemblies, options);
+
+            var partitions = 
+                typesIncludingDecorators.Partition(type => this.IsDecorator(openGenericServiceType, type));
+
+            skippedDecorators = partitions.Item1;
+
+            return partitions.Item2;
+        }
+
+        private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
+        {
+            var ctor = this.SelectImplementationTypeConstructorOrNull(openGenericServiceType, implemenationType);
+            return ctor != null && Helpers.IsDecorator(openGenericServiceType, ctor);
         }
 
         private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type serviceType, Type implementationType)
@@ -346,6 +373,33 @@ namespace SimpleInjector
                 throw new InvalidOperationException(
                     StringResources.UnableToLoadTypesFromAssembly(assembly, ex), ex);
             }
+        }
+
+        private void AddSkippedDecorators(Type openGenericServiceType, IEnumerable<Type> nonGenericDecorators)
+        {
+            if (!this.skippedNonGenericDecorators.ContainsKey(openGenericServiceType))
+            {
+                this.skippedNonGenericDecorators[openGenericServiceType] = new List<Type>();
+            }
+
+            this.skippedNonGenericDecorators[openGenericServiceType].AddRange(nonGenericDecorators);
+        }
+
+        private Type[] GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(Type serviceType)
+        {
+            if (serviceType.IsGenericType)
+            {
+                var typeDef = serviceType.GetGenericTypeDefinition();
+
+                if (this.skippedNonGenericDecorators.ContainsKey(typeDef))
+                {
+                    return this.skippedNonGenericDecorators[typeDef]
+                        .Where(serviceType.IsAssignableFrom)
+                        .ToArray();
+                }
+            }
+
+            return Helpers.Array<Type>.Empty;
         }
 
         private sealed class BatchMapping

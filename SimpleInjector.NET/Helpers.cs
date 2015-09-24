@@ -373,6 +373,21 @@ namespace SimpleInjector
                 .ToArray();
         }
 
+        // Partitions a collection in two seperate collections, based on the predicate.
+        internal static Tuple<T[], T[]> Partition<T>(this IEnumerable<T> collection, Predicate<T> predicate)
+        {
+            var trueList = new List<T>();
+            var falseList = new List<T>();
+
+            foreach (var item in collection)
+            {
+                var list = predicate(item) ? trueList : falseList;
+                list.Add(item);
+            }
+
+            return Tuple.Create(trueList.ToArray(), falseList.ToArray());
+        }
+
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type baseType = type.BaseType ?? (type != typeof(object) ? typeof(object) : null);

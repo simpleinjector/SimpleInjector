@@ -27,6 +27,10 @@
         {
         }
         
+        public interface ISkipDecorator<T>
+        {
+        }
+
         [TestMethod]
         public void RegisterAssemblies_WithNonGenericType_Fails()
         {
@@ -504,6 +508,54 @@
             // Assert
             Assert.AreSame(decorator1.Decoratee, decorator2.Decoratee);
             Assert.AreSame(decorator2.Decoratee, decorator3.Decoratee);
+        }
+
+        [TestMethod]
+        public void Register_WithSkippedDecorator_ResolveAsDependencyThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ISkipDecorator<>), new[] { typeof(ISkipDecorator<>).Assembly });
+
+            // Act
+            Action action = () => container.GetInstance<SkippedDecoratorController>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "was skipped during batch-registration by the container because it is considered to be a decorator",
+                action);
+        }
+
+        [TestMethod]
+        public void Register_WithSkippedDecorator_DirectResolveThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ISkipDecorator<>), new[] { typeof(ISkipDecorator<>).Assembly });
+
+            // Act
+            Action action = () => container.GetInstance<ISkipDecorator<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "was skipped during batch-registration by the container because it is considered to be a decorator",
+                action);
+        }
+
+        public class SkippedDecorator : ISkipDecorator<int>
+        {
+            public SkippedDecorator(ISkipDecorator<int> validator)
+            {
+            }
+        }
+
+        public class SkippedDecoratorController
+        {
+            public SkippedDecoratorController(ISkipDecorator<int> service)
+            {
+            }
         }
 
         #region IInvalid

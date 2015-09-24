@@ -73,13 +73,15 @@ namespace SimpleInjector
                 "The registered delegate for type {0} threw an exception.", serviceType.ToFriendlyName());
 
         internal static string NoRegistrationForTypeFound(Type serviceType, bool containerHasRegistrations,
-            bool containerHasRelatedOneToOneMapping, bool containerHasRelatedCollectionMapping) => 
+            bool containerHasRelatedOneToOneMapping, bool containerHasRelatedCollectionMapping,
+            Type[] skippedDecorators) => 
             string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.{1}{2}{3}",
+                "No registration for type {0} could be found.{1}{2}{3}{4}",
                 serviceType.ToFriendlyName(),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations),
                 DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
-                DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType));
+                DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType),
+                NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators));
 
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -161,26 +163,28 @@ namespace SimpleInjector
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
-            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping) =>
+            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators) =>
             target.Parameter != null
                 ? string.Format(CultureInfo.InvariantCulture,
                     "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
-                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}",
+                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}{6}",
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
                     GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
-                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType))
+                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
+                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators))
                 : string.Format(CultureInfo.InvariantCulture,
                     "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}",
+                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}",
                     target.Member.DeclaringType.ToFriendlyName(),
                     target.Name,
                     target.TargetType.ToFriendlyName(),
                     GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
-                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType));
+                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
+                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators));
 
         internal static string TypeMustHaveASinglePublicConstructor(Type serviceType) => 
             string.Format(CultureInfo.InvariantCulture,
@@ -796,7 +800,7 @@ namespace SimpleInjector
                     collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
-        private static object DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
+        private static string DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
             Type collectionServiceType) =>
             hasRelatedOneToOneMapping
                 ? string.Format(CultureInfo.InvariantCulture,
@@ -804,7 +808,7 @@ namespace SimpleInjector
                     collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
-        private static object DidYouMeanToCallGetAllInstancesInstead(bool hasCollection, Type serviceType) =>
+        private static string DidYouMeanToCallGetAllInstancesInstead(bool hasCollection, Type serviceType) =>
             hasCollection
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to call " +
@@ -813,12 +817,26 @@ namespace SimpleInjector
                     serviceType.ToFriendlyName())
                 : string.Empty;
 
-        private static object DidYouMeanToDependOnCollectionInstead(bool hasCollection, Type serviceType) =>
+        private static string DidYouMeanToDependOnCollectionInstead(bool hasCollection, Type serviceType) =>
             hasCollection
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to depend on {0}?",
                     typeof(IEnumerable<>).MakeGenericType(serviceType).ToFriendlyName(),
                     serviceType.ToFriendlyName())
+                : string.Empty;
+
+        private static string NoteThatSkippedDecoratorsWereFound(Type serviceType, Type[] decorators) =>
+            decorators.Any()
+                ? string.Format(CultureInfo.InvariantCulture,
+                    " Note that {0} {1} found as implementation of {2}, but {1} skipped during batch-" +
+                    "registration by the container because {3} considered to be a decorator (because {4} " +
+                    "a cyclic reference to {5}).",
+                    Helpers.ToCommaSeparatedText(decorators.Select(Helpers.ToFriendlyName)),
+                    decorators.Length == 1 ? "was" : "were",
+                    serviceType.GetGenericTypeDefinition().ToFriendlyName(),
+                    decorators.Length == 1 ? "it is" : "there are",
+                    decorators.Length == 1 ? "it contains" : "they contain",
+                    decorators.Length == 1 ? "itself" : "themselves")
                 : string.Empty;
     }
 }
