@@ -255,6 +255,128 @@
             Assert.IsNotNull(registration);
         }
 
+        [TestMethod]
+        public void CreateProducer_SuppliedWithOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateProducer(typeof(ICommandHandler<>), 
+                typeof(StubCommandHandler), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type ICommandHandler<TCommand> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("serviceType", action);
+        }
+
+        [TestMethod]
+        public void CreateProducer_SuppliedWithOpenGenericImplementationType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateProducer(typeof(object),
+                typeof(NullCommandHandler<>), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type NullCommandHandler<T> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("implementationType", action);
+        }
+        
+        [TestMethod]
+        public void CreateProducerTService_SuppliedWithOpenGenericImplementationType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateProducer<object>(typeof(NullCommandHandler<>), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type NullCommandHandler<T> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("implementationType", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationTConcrete_SuppliedWithOpenGenericConcreteType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateRegistration(typeof(NullCommandHandler<>), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type NullCommandHandler<T> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("concreteType", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistration_SuppliedWithOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateRegistration(typeof(ICommandHandler<>), 
+                typeof(StubCommandHandler), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type ICommandHandler<TCommand> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("serviceType", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistration_SuppliedWithOpenGenericImplementationType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateRegistration(typeof(object), typeof(NullCommandHandler<>), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type NullCommandHandler<T> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("implementationType", action);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationFunc_SuppliedWithOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateRegistration(typeof(ICommandHandler<>), () => null, container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type ICommandHandler<TCommand> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("serviceType", action);
+        }
+
         private sealed class FakeLifestyle : Lifestyle
         {
             public FakeLifestyle(string name)

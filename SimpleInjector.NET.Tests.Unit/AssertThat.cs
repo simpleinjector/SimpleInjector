@@ -73,7 +73,7 @@
             }
             catch (ArgumentException ex)
             {
-                ExceptionContainsParamName(ex, expectedParamName);
+                ExceptionContainsParamName(expectedParamName, ex);
             }
         }
 
@@ -90,7 +90,7 @@
             {
                 AssertThat.IsInstanceOfType(typeof(TArgumentException), ex);
 
-                ExceptionContainsParamName(ex, expectedParamName);
+                ExceptionContainsParamName(expectedParamName, ex);
             }
         }
 
@@ -131,12 +131,12 @@
             return value.Trim();
         }
 
-        public static void ExceptionContainsParamName(ArgumentException exception, string expectedParamName)
+        public static void ExceptionContainsParamName(string expectedParamName, ArgumentException exception)
         {
             string assertMessage = "Exception does not contain parameter with name: " + expectedParamName;
 
 #if !SILVERLIGHT
-            Assert.AreEqual(exception.ParamName, expectedParamName, assertMessage);
+            Assert.AreEqual(expectedParamName, exception.ParamName, assertMessage);
 #else
             Assert.IsTrue(exception.Message.Contains(expectedParamName), assertMessage);
 #endif

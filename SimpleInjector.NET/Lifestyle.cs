@@ -502,6 +502,7 @@ namespace SimpleInjector
         public Registration CreateRegistration(Type concreteType, Container container)
         {
             Requires.IsNotNull(concreteType, nameof(concreteType));
+            Requires.IsNotOpenGenericType(concreteType, nameof(concreteType));
 
             return this.CreateRegistration(concreteType, concreteType, container);
         }
@@ -527,6 +528,9 @@ namespace SimpleInjector
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsReferenceType(implementationType, nameof(implementationType));
+
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
+            Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
 
             Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
                 nameof(implementationType));
@@ -565,6 +569,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
             var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceFuncMethod
                 .MakeGenericMethod(serviceType);

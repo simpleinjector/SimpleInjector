@@ -1112,6 +1112,7 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
             Requires.IsRegistrationForThisContainer(this, registration, nameof(registration));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
             this.ThrowWhenContainerIsLocked();
 

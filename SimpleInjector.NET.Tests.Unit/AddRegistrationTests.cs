@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -49,6 +50,44 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "The supplied Registration belongs to a different container.", action);
+        }
+
+        [TestMethod]
+        public void AddRegistration_SuppliedWithOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+
+            var registration = Lifestyle.Transient.CreateRegistration<StructCommandHandler>(container);
+
+            // Act
+            Action action = () => container.AddRegistration(typeof(ICommandHandler<>), registration);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type ICommandHandler<TCommand> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("serviceType", action);
+        }
+        
+        [TestMethod]
+        public void AddRegistration_SuppliedWithPartialOpenGenericServiceType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+
+            var registration = Lifestyle.Transient.CreateRegistration<StructCommandHandler>(container);
+
+            // Act
+            Action action = () => container.AddRegistration(
+                typeof(ICommandHandler<>).MakeGenericType(typeof(List<>)), 
+                registration);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type ICommandHandler<List<T>> is an open generic type.",
+                action);
+            AssertThat.ThrowsWithParamName("serviceType", action);
         }
 
         public class Implementation : IService1, IService2 

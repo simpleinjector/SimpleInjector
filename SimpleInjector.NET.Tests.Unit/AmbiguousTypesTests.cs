@@ -112,7 +112,7 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.ExceptionContainsParamName(ex, "TService");
+                AssertThat.ExceptionContainsParamName("TService", ex);
             }
         }
 

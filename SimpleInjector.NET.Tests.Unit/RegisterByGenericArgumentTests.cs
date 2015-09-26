@@ -79,7 +79,7 @@
             }
             catch (ArgumentException ex)
             {
-                AssertThat.ExceptionContainsParamName(ex, expectedParamName);
+                AssertThat.ExceptionContainsParamName(expectedParamName, ex);
             }
         }
 
