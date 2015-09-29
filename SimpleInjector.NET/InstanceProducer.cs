@@ -600,6 +600,7 @@ namespace SimpleInjector
             return !(registration is ExpressionRegistration);
         }
 
+        [ExcludeFromCodeCoverage]
         internal sealed class InstanceProducerDebugView
         {
             private readonly InstanceProducer producer;

@@ -147,8 +147,6 @@ namespace SimpleInjector
         /// </summary>
         internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; }
 
-        internal long ContainerId => this.containerId;
-
         internal bool IsLocked
         {
             get
