@@ -124,6 +124,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Assembly>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Assembly[] assemblies)
         {
@@ -150,6 +151,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Assembly>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
@@ -180,6 +182,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Assembly>, Lifestyle) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, params Assembly[] assemblies)
         {
@@ -210,6 +213,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Assembly>, Lifestyle) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Assembly> assemblies)
         {
@@ -236,6 +240,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.RegisterCollection(Type, IEnumerable<Assembly>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
@@ -264,6 +269,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.RegisterCollection(Type, IEnumerable<Assembly>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
@@ -296,6 +302,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, params Type[] typesToRegister)
         {
@@ -326,6 +333,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> typesToRegister)
         {
@@ -359,6 +367,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.RegisterCollection(Type, IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, BatchRegistrationCallback callback, IEnumerable<Type> typesToRegister)
         {
@@ -394,6 +403,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Type>, Lifestyle) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, params Type[] typesToRegister)
         {
@@ -428,6 +438,7 @@ namespace SimpleInjector.Extensions
         [Obsolete(
             "This extension method has been removed. Please use Container.Register(Type, IEnumerable<Type>, Lifestyle) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Type> typesToRegister)
         {
@@ -453,6 +464,7 @@ namespace SimpleInjector.Extensions
         /// version of the given <paramref name="openGenericServiceType"/>.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteOneToOneWithAccessibilityMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, params Assembly[] assemblies)
         {
@@ -482,6 +494,7 @@ namespace SimpleInjector.Extensions
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteOneToOneWithAccessibilityMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
@@ -514,6 +527,7 @@ namespace SimpleInjector.Extensions
         /// version of the given <paramref name="openGenericServiceType"/>.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteOneToOneWithAccessibilityAndLifestyleMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, Lifestyle lifestyle,
             params Assembly[] assemblies)
@@ -547,6 +561,7 @@ namespace SimpleInjector.Extensions
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteOneToOneWithAccessibilityAndLifestyleMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, Lifestyle lifestyle,
             IEnumerable<Assembly> assemblies)
@@ -576,6 +591,7 @@ namespace SimpleInjector.Extensions
         /// an open generic type or when <paramref name="accessibility"/> contains an invalid value.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteCollectionWithAccessibilityMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             params Assembly[] assemblies)
@@ -607,6 +623,7 @@ namespace SimpleInjector.Extensions
         /// an open generic type or when <paramref name="accessibility"/> contains an invalid value.</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteCollectionWithAccessibilityMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterManyForOpenGeneric(this Container container,
             Type openGenericServiceType, AccessibilityOption accessibility, BatchRegistrationCallback callback,
             IEnumerable<Assembly> assemblies)
@@ -657,6 +674,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteGetTypesToRegisterMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             AccessibilityOption accessibility, params Assembly[] assemblies)
         {
@@ -701,6 +719,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteGetTypesToRegisterMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
@@ -743,6 +762,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteGetTypesToRegisterMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             params Assembly[] assemblies)
         {
@@ -785,6 +805,7 @@ namespace SimpleInjector.Extensions
         /// <paramref name="assemblies"/> contain a null reference (Nothing in VB).</exception>
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         [Obsolete(ObsoleteGetTypesToRegisterMessage, error: true)]
+        [ExcludeFromCodeCoverage]
         public static IEnumerable<Type> GetTypesToRegister(Container container, Type openGenericServiceType,
             IEnumerable<Assembly> assemblies)
         {
@@ -792,6 +813,7 @@ namespace SimpleInjector.Extensions
                 assemblies);
         }
 
+        [ExcludeFromCodeCoverage]
         private static IEnumerable<Type> GetTypesToRegisterInternal(Container container, 
             Type openGenericServiceType, AccessibilityOption accessibility, IEnumerable<Assembly> assemblies)
         {
@@ -801,6 +823,7 @@ namespace SimpleInjector.Extensions
                 .Where(GetAccessibilityFilter(accessibility));
         }
 
+        [ExcludeFromCodeCoverage]
         private static Func<Type, bool> GetAccessibilityFilter(AccessibilityOption accessibility)
         {
             if (accessibility == AccessibilityOption.AllTypes)
