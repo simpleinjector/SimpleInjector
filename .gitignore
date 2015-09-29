@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*ncrunch*
 
 # Security
 *.snk

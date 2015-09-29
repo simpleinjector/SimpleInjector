@@ -1,0 +1,25 @@
+version: 3.1.0.{build}
+branches:
+  only:
+  - CI
+os: Visual Studio 2015
+before_build:
+- nuget restore
+skip_tags: true
+configuration: Debug
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+build_script:
+- cmd: >-
+    appveyor.bat
+environment:
+    COVERALLS_REPO_TOKEN:  
+       secure: Hw9xA9D3SRGgpH9hNHoiHqnilSWV6/32NecYMp0Pa7LDykWa1oXpjN0CQ4JLDz/e
+after_test: 
+  - mkdir reports
+  - packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -mergeoutput -register:user -target:"C:\Tools\NUnit\bin\nunit-console.exe" "-targetargs:\"SimpleInjector.NET.Tests.Unit\bin\Debug\SimpleInjector.Tests.Unit.dll\" -noshadow" -filter:"+[*]SimpleInjector.* -[*.Tests.*]*" -output:reports\opencoverCoverage.xml
+  - packages\coveralls.net.0.6.0\tools\csmacnz.Coveralls.exe --opencover -i reports\opencoverCoverage.xml --repoToken %COVERALLS_REPO_TOKEN% --commitBranch %APPVEYOR_REPO_BRANCH%
