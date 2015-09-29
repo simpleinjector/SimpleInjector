@@ -46,7 +46,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets or sets the indication whether decorator types should be included in the result. The default
+        /// Gets or sets a value indicating whether decorator types should be included in the result. The default
         /// value of this property is <b>false</b>. A type is considered a decorator if the type's constructor 
         /// contains a parameter of the type that exactly matches the <code>serviceType</code> argument, 
         /// supplied to the
@@ -54,17 +54,19 @@ namespace SimpleInjector
         /// method, or when there is a <see cref="System.Func{T}"/> argument where <code>T</code> matches the
         /// <code>serviceType</code> argument.
         /// </summary>
+        /// <value>A boolean.</value>
         public bool IncludeDecorators { get; set; }
 
         /// <summary>
-        /// Gets or sets the indication whether generic type definitions (types that have
+        /// Gets or sets a value indicating whether generic type definitions (types that have
         /// <see cref="System.Type.IsGenericTypeDefinition">Type.IsGenericTypeDefinition</see> set to true) 
         /// should be included in the result. The default value for this property is <b>false</b>.
         /// </summary>
+        /// <value>A boolean.</value>
         public bool IncludeGenericTypeDefinitions { get; set; }
 
         /// <summary>
-        /// Gets or sets the indication whether composite types should be included in the result. The default
+        /// Gets or sets a value indicating whether composite types should be included in the result. The default
         /// value of this property is <b>true</b>. A type is considered a composite if the type's constructor
         /// contains a parameter of <code>IEnumerable&lt;T&gt;</code>, <code>ICollection&lt;T&gt;</code>,
         /// <code>IList&lt;T&gt;</code>, <code>IReadOnlyCollection&lt;T&gt;</code>, 
@@ -73,6 +75,7 @@ namespace SimpleInjector
         /// <see cref="Container.GetTypesToRegister(System.Type, System.Collections.Generic.IEnumerable{System.Reflection.Assembly}, TypesToRegisterOptions)">GetTypesToRegister</see>
         /// method.
         /// </summary>
+        /// <value>A boolean.</value>
         public bool IncludeComposites { get; set; }
     }
 }

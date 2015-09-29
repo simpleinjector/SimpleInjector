@@ -232,6 +232,7 @@
             // This is not a composite
             public GenericWrappingCollection(IEnumerable<IService<string>> services) { }
         }
+
         public class NonGenericCompositeDecorator : IService<int>
         {
             public NonGenericCompositeDecorator(IService<int> d, IEnumerable<IService<int>> services) { }

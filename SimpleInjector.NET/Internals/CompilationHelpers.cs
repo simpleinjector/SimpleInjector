@@ -191,17 +191,17 @@ namespace SimpleInjector.Internals
         // delegates. Besides preventing the CLR from throwing stack overflow exceptions (which will happen
         // when the tree gets somewhere between 20,000 and 50,000 nodes), this can reduce the amount of code 
         // that needs to be JITted and can therefore reduce the memory footprint of the application.
-        internal static Expression ReduceObjectGraphSize(Expression expression, Container container,
+        private static Expression ReduceObjectGraphSize(Expression expression, Container container,
             Dictionary<Expression, InvocationExpression> reducedNodes = null)
         {
             var results = NodeSizeCalculator.Calculate(expression);
 
-            while (results.TotalSize > container.Options.MaximumNumberOfNodesPerDelegate)
+            while (results.TotalSize > ContainerOptions.MaximumNumberOfNodesPerDelegate)
             {
                 reducedNodes = reducedNodes ?? new Dictionary<Expression, InvocationExpression>(16);
 
                 Expression mostReductiveNode = FindMostReductiveNodeOrNull(expression, results,
-                    container.Options.MaximumNumberOfNodesPerDelegate);
+                    ContainerOptions.MaximumNumberOfNodesPerDelegate);
 
                 if (mostReductiveNode == null)
                 {
@@ -424,21 +424,21 @@ namespace SimpleInjector.Internals
         [DebuggerDisplay("TotalCost: {TotalCost}, Count: {Count}, NumberOfNodes: {NumberOfNodes}, Node: {Node}")]
         private sealed class ExpressionInfo
         {
-            public Expression Node;
-            public int Count;
-            public int TreeSize;
+            public Expression Node { get; set; }
+            public int Count { get; set; }
+            public int TreeSize { get; set; }
             public int TotalCost => this.Count * this.TreeSize;
         }
         
         private sealed class NodeSizes
         {
-            public int TotalSize;
-            public ICollection<ExpressionInfo> Nodes;
+            public int TotalSize { get; set; }
+            public ICollection<ExpressionInfo> Nodes { get; set; }
         }
 
         private sealed class NodeSizeCalculator : ExpressionVisitor
         {
-            public readonly Dictionary<Expression, ExpressionInfo> nodes =
+            private readonly Dictionary<Expression, ExpressionInfo> nodes =
                 new Dictionary<Expression, ExpressionInfo>(ReferenceEqualityComparer<Expression>.Instance);
 
             private int size;

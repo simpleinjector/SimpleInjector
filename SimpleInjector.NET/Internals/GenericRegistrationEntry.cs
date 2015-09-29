@@ -162,7 +162,7 @@ namespace SimpleInjector.Internals
                 // We allow the registration in case it doesn't have a predicate (meaning that the type is
                 // solely conditional by its generic type constraints) while it is the first registration.
                 // In that case there is no ambiguity, since there's nothing to replace (fixes #116).
-                if (providers.Any() || provider.Predicate != null)
+                if (this.providers.Any() || provider.Predicate != null)
                 {
                     throw new NotSupportedException(
                         StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
@@ -291,7 +291,7 @@ namespace SimpleInjector.Internals
                 this.AppliesToAllClosedServiceTypes = this.RegistrationAppliesToAllClosedServiceTypes();
             }
 
-            public OpenGenericToInstanceProducerProvider(Type serviceType,
+            internal OpenGenericToInstanceProducerProvider(Type serviceType,
                 Func<TypeFactoryContext, Type> implementationTypeFactory, Lifestyle lifestyle,
                 Predicate<PredicateContext> predicate, Container container)
             {
@@ -349,6 +349,9 @@ namespace SimpleInjector.Internals
                 return shouldBuildProducer ? this.GetProducer(context) : null;
             }
 
+            public bool MatchesServiceType(Type serviceType) =>
+                GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
+
             private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
             {
                 Type implementationType =
@@ -375,9 +378,6 @@ namespace SimpleInjector.Internals
 
                 return implementationType;
             }
-
-            public bool MatchesServiceType(Type serviceType) =>
-                GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
 
             private InstanceProducer GetProducer(PredicateContext context)
             {

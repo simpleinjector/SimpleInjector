@@ -202,8 +202,7 @@
             var container = ContainerFactory.New();
 
             var pluginProducer = container.GetRegistration(
-                typeof(PluginWithDependencies<
-                    PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>,
+                typeof(PluginWithDependencies<PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>,
                     ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>>));
 
             container.Verify();

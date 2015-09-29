@@ -1013,8 +1013,8 @@
             // Arrange
             var container = new Container();
 
+            // Here we make a partial open-generic type by filling in the TUnresolved.
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
-                // Here we make a partial open-generic type by filling in the TUnresolved.
                 c => typeof(OpenGenericWithUnresolvableArgument<,>)
                     .MakePartialOpenGenericType(
                         secondArgument: typeof(double)),

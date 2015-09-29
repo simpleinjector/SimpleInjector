@@ -59,6 +59,9 @@ namespace SimpleInjector
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal static readonly int MaximumNumberOfNodesPerDelegate = 350;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -72,12 +75,6 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal int MaximumNumberOfNodesPerDelegate = 350;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal Action<Expression> ExpressionCompiling = _ => { };
 
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -311,6 +308,14 @@ namespace SimpleInjector
         {
             get { return this.ToString(); }
         }
+
+        // This property enables a hidden hook to allow to get notified just before expression trees get
+        // compiled. It isn't used internally, but enables debugging in case compiling expressions crashes 
+        // the process (which has happened in the past). A user can add the hook using reflection to find out 
+        // which expression crashes the system. This property is internal, its not part of the official API, 
+        // and we might remove it again in the future.
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal Action<Expression> ExpressionCompiling { get; set; } = _ => { };
 
         /// <summary>
         /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to

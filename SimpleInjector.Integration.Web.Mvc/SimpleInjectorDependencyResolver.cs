@@ -24,8 +24,8 @@ namespace SimpleInjector.Integration.Web.Mvc
 {
     using System;
     using System.Collections.Generic;
-    using System.Web.Mvc;
     using System.Linq;
+    using System.Web.Mvc;
 
     /// <summary>MVC <see cref="IDependencyResolver"/> for Simple Injector.</summary>
     /// <example>
@@ -102,8 +102,7 @@ namespace SimpleInjector.Integration.Web.Mvc
                 return this.Container.GetInstance(serviceType);
             }
             
-
-            return ServiceProvider.GetService(serviceType);
+            return this.ServiceProvider.GetService(serviceType);
         }
 
         /// <summary>Resolves multiply registered services.</summary>

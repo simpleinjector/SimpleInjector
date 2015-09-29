@@ -43,6 +43,11 @@ namespace SimpleInjector.Internals
 
         private static long dynamicClassCounter;
 
+        private interface IDelegateBuilder
+        {
+            Delegate BuildDelegate();
+        }
+
         internal static Delegate CompileLambdaInDynamicAssembly(LambdaExpression lambda, string typeName,
             string methodName)
         {
@@ -99,10 +104,8 @@ namespace SimpleInjector.Internals
                 typeof(Func<,>).MakeGenericType(typeof(object[]), resultType),
                 replacedExpression, 
                 constantsParameter);
-            // var lambda = Expression.Lambda<Func<object[], TResult>>(replacedExpression, constantsParameter);
 
             Delegate create = CompileDelegateInDynamicAssembly(lambda);
-            // Func<object[], TResult> create = CompileDelegateInDynamicAssembly(lambda);
 
             // Test the creation. Since we're using a dynamically created assembly, we can't create every
             // delegate we can create using expression.Compile(), so we need to test this.
@@ -115,8 +118,6 @@ namespace SimpleInjector.Internals
                 new object[] { create, constants });
 
             return builder.BuildDelegate();
-
-            // return () => create(constants);
         }
 
         private static Delegate CompileInDynamicAssemblyAsStatic(Type resultType, Expression expression)
@@ -183,11 +184,6 @@ namespace SimpleInjector.Internals
                 {
                 }
             }
-        }
-
-        public interface IDelegateBuilder
-        {
-            Delegate BuildDelegate();
         }
 
         public class ConstantsClosure<TResult> : IDelegateBuilder

@@ -159,7 +159,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                 value: childGroups);
         }
 
-        private static DebuggerViewItem BuildNonGenericGroup(Type closedType,InstanceProducer[] producersForGroup) => 
+        private static DebuggerViewItem BuildNonGenericGroup(Type closedType, InstanceProducer[] producersForGroup) => 
             new DebuggerViewItem(
                 name: Helpers.ToFriendlyName(closedType),
                 description: "Count = " + producersForGroup.Length,

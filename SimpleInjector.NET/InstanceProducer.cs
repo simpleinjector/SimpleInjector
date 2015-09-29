@@ -87,7 +87,7 @@ namespace SimpleInjector
     public class InstanceProducer
     {
         private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
-        private static Predicate<PredicateContext> Always = context => true;
+        private static readonly Predicate<PredicateContext> Always = context => true;
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;

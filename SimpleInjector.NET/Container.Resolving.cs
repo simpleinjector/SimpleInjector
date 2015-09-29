@@ -38,17 +38,17 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
-        // Cache for producers that are resolved as root type
-        // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
-        // PERF: This collection is updated by replacing the complete collection.
-        private Dictionary<Type, InstanceProducer> rootProducerCache =
-            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
-
         private readonly Dictionary<Type, InstanceProducer> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, InstanceProducer>();
 
         private readonly Dictionary<Type, InstanceProducer> emptyAndRedirectedCollectionRegistrationCache =
             new Dictionary<Type, InstanceProducer>();
+
+        // Cache for producers that are resolved as root type
+        // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
+        // PERF: This collection is updated by replacing the complete collection.
+        private Dictionary<Type, InstanceProducer> rootProducerCache =
+            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
@@ -414,7 +414,7 @@ namespace SimpleInjector
             }
 
             return e != null && e.Handled
-                ? TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(e)
+                ? this.TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(e)
                 : null;
         }
 

@@ -223,12 +223,12 @@ namespace SimpleInjector.Internals
             public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
 
             public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled) =>
-                producer.Predicate(new PredicateContext(producer, consumer, handled))
+                this.producer.Predicate(new PredicateContext(this.producer, consumer, handled))
                     ? this.producer
                     : null;
         }
 
-        internal class ImplementationTypeFactoryInstanceProducerProvider : IProducerProvider
+        private class ImplementationTypeFactoryInstanceProducerProvider : IProducerProvider
         {
             private readonly Dictionary<Type, InstanceProducer> cache = new Dictionary<Type, InstanceProducer>();
             private readonly Func<TypeFactoryContext, Type> implementationTypeFactory;
@@ -262,9 +262,10 @@ namespace SimpleInjector.Internals
             public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled)
             {
                 Func<Type> implementationTypeProvider = () =>
-                    this.GetImplementationTypeThroughFactory(serviceType, consumer);
+                    this.GetImplementationTypeThroughFactory(this.serviceType, consumer);
 
-                var context = new PredicateContext(serviceType, implementationTypeProvider, consumer, handled);
+                var context = 
+                    new PredicateContext(this.serviceType, implementationTypeProvider, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
                 // unneeded producers from being created, because this might cause diagnostic warnings, 
@@ -313,7 +314,7 @@ namespace SimpleInjector.Internals
 
             private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
                 new InstanceProducer(
-                    serviceType,
+                    this.serviceType,
                     this.lifestyle.CreateRegistration(context.ServiceType, context.ImplementationType, 
                         this.container),
                     this.predicate);

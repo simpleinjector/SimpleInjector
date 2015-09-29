@@ -248,8 +248,7 @@
             var instance = container.GetAllInstances<IUserRepository>().Single();
             AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
-
-
+        
         [TestMethod]
         public void AllowOverridingRegistrations_SetToTrueWhileOverridingRegistrationWithSameImplementation_Succeeds()
         {
@@ -361,8 +360,7 @@
             // Act
             container.Verify(VerificationOption.VerifyAndDiagnose);
         }
-
-
+        
         [TestMethod]
         public void ConstructorResolutionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
