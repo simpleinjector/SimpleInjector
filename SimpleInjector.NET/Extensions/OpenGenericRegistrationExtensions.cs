@@ -35,8 +35,6 @@ namespace SimpleInjector.Extensions
     [ExcludeFromCodeCoverage]
     public static class OpenGenericRegistrationExtensions
     {
-        private static readonly Predicate<PredicateContext> Fallback = c => !c.Handled;
-
         /// <summary>
         /// Registers that a new instance of <paramref name="openGenericImplementation"/> will be returned 
         /// every time a <paramref name="openGenericServiceType"/> is requested.
@@ -58,7 +56,6 @@ namespace SimpleInjector.Extensions
             "registration acts as fallback registration (in case an explicit registration is missing), " +
             "please use Container.RegisterConditional(Type, Type, c => !c.Handled) instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
@@ -87,7 +84,6 @@ namespace SimpleInjector.Extensions
             "missing), please use Container.RegisterConditional(Type, Type, Lifestyle.Singleton, c => !c.Handled) " +
             "instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterSingleOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation)
         {
@@ -115,7 +111,6 @@ namespace SimpleInjector.Extensions
             "please use Container.RegisterConditional(Type, Type, Lifestyle, c => !c.Handled) " +
             "instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementation, Lifestyle lifestyle)
         {
@@ -147,7 +142,6 @@ namespace SimpleInjector.Extensions
             "add the !c.Handled check to the supplied predicate. For instance: " +
             "Container.RegisterConditional(Type, Type, Lifestyle, c => !c.Handled && yourOriginalPredicate).",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterOpenGeneric(this Container container,
             Type openGenericServiceType, Type openGenericImplementationType, Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
@@ -168,7 +162,6 @@ namespace SimpleInjector.Extensions
             "This extension method has been removed. " +
             "Please use Container.RegisterCollection(Type, IEnumerable<Type>) instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, params Type[] openGenericImplementations)
         {
@@ -187,7 +180,6 @@ namespace SimpleInjector.Extensions
             "This extension method has been removed. " +
             "Please use Container.RegisterCollection(Type, Type[]) instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, IEnumerable<Type> openGenericImplementations)
         {
@@ -209,7 +201,6 @@ namespace SimpleInjector.Extensions
             "This extension method has been removed. " +
             "Please use Container.RegisterCollection(Type, Type[]) instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterAllOpenGeneric(this Container container,
           Type openGenericServiceType, Lifestyle lifestyle, params Type[] openGenericImplementations)
         {
@@ -229,7 +220,6 @@ namespace SimpleInjector.Extensions
             "This extension method has been removed. " +
             "Please use Container.RegisterCollection(Type, Type[]) instead.",
             error: true)]
-        [ExcludeFromCodeCoverage]
         public static void RegisterAllOpenGeneric(this Container container,
             Type openGenericServiceType, Lifestyle lifestyle, IEnumerable<Type> openGenericImplementations)
         {
@@ -240,6 +230,11 @@ namespace SimpleInjector.Extensions
 
             throw new InvalidOperationException("This extension method has been removed. " +
                 "Please use one of the Container.RegisterCollection() overloads instead.");
+        }
+
+        private static bool Fallback(PredicateContext context)
+        {
+            return !context.Handled;
         }
     }
 }
