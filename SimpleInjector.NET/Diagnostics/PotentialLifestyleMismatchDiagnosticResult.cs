@@ -24,6 +24,7 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.ComponentModel;
+    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
 
     /// <summary>
@@ -32,6 +33,7 @@ namespace SimpleInjector.Diagnostics
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("This class has been renamed to LifestyleMismatchDiagnosticResult. " + 
         "Please use LifestyleMismatchDiagnosticResult instead.", error: true)]
+    [ExcludeFromCodeCoverage]
     public class PotentialLifestyleMismatchDiagnosticResult : DiagnosticResult
     {
         internal PotentialLifestyleMismatchDiagnosticResult(Type serviceType, string description,

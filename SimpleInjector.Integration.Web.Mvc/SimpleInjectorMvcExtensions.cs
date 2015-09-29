@@ -62,6 +62,7 @@ namespace SimpleInjector
             "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +
             "Use RegisterMvcIntegratedFilterProvider instead. See https://simpleinjector.org/depr2",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterMvcAttributeFilterProvider(this Container container)
         {
             throw new InvalidOperationException(

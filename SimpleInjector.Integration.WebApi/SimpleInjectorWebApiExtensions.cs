@@ -210,6 +210,7 @@ namespace SimpleInjector
         [Obsolete("SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " + 
             "consult the Web API integration guide on how to inject dependencies into Web API filter " + 
             "attributes. See https://simpleinjector.org/webapi.", error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterWebApiFilterProvider(this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, nameof(container));

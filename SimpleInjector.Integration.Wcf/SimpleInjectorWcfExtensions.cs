@@ -86,6 +86,7 @@ namespace SimpleInjector
         [Obsolete("The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
             "This method has therefore become a no-op and the call to this method can be removed safely.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void EnablePerWcfOperationLifestyle(this Container container)
         {

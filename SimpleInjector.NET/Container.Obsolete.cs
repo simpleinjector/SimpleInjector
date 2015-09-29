@@ -47,6 +47,7 @@ namespace SimpleInjector
         [Obsolete(
             "This method is not supported anymore. Please use Container.Options to configure the container.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public Container(ContainerOptions options)
         {
             throw new InvalidOperationException(
@@ -72,6 +73,7 @@ namespace SimpleInjector
         [Obsolete(
             "This method has been removed. Please call RegisterSingleton<TConcrete>() instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle<TConcrete>() where TConcrete : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -102,6 +104,7 @@ namespace SimpleInjector
             "This method has been removed. " +
             "Please call RegisterSingleton<TService, TImplementation>() instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -133,6 +136,7 @@ namespace SimpleInjector
             "This method has been removed. " +
             "Please call RegisterSingleton<TService>(instanceCreator) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle<TService>(Func<TService> instanceCreator) where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -162,6 +166,7 @@ namespace SimpleInjector
             "This method has been removed. " +
             "Please call RegisterSingleton(serviceType, implementation) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle(Type serviceType, Type implementation)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -188,6 +193,7 @@ namespace SimpleInjector
             "This method has been removed. " +
             "Please call RegisterSingleton(serviceType, instanceCreator) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle(Type serviceType, Func<object> instanceCreator)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -199,6 +205,7 @@ namespace SimpleInjector
         /// <param name="instance">The instance to register.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method has been removed. Please call RegisterSingleton<TService>(TService) instead.", error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle<TService>(TService instance) where TService : class
         {
             this.RegisterSingleton<TService>(instance);
@@ -211,6 +218,7 @@ namespace SimpleInjector
         /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method has been removed. Please call RegisterSingleton(Type, object) instead.", error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterSingle(Type serviceType, object instance)
         {
             this.RegisterSingleton(serviceType, instance);
@@ -225,6 +233,7 @@ namespace SimpleInjector
             "Container.InjectProperties has been deprecated. Please read https://simpleinjector.org/depr1 " +
             "on why and how what to do instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void InjectProperties(object instance)
         {
             Requires.IsNotNull(instance, nameof(instance));
@@ -244,6 +253,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection<TService>(IEnumerable<TService>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll<TService>(IEnumerable<TService> collection) where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -260,6 +270,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection<TService>(TService[]) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll<TService>(params TService[] singletons) where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -277,6 +288,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection<TService>(IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll<TService>(params Type[] serviceTypes) where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -294,6 +306,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection<TService>(IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -311,6 +324,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection(Type, IEnumerable<Type>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll(Type serviceType, IEnumerable<Type> serviceTypes)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -328,6 +342,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection(Type, IEnumerable<Registration>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll(Type serviceType, IEnumerable<Registration> registrations)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -345,6 +360,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection(Type, IEnumerable<Registration>) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll(Type serviceType, params Registration[] registrations)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.
@@ -361,6 +377,7 @@ namespace SimpleInjector
             "This method has been renamed to RegisterCollection. " +
             "Please call RegisterCollection(Type, IEnumerable) instead.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public void RegisterAll(Type serviceType, IEnumerable collection)
         {
             // Forward the call. This allows external NuGet packages that depend on this method to keep working.

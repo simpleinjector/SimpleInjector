@@ -23,6 +23,7 @@
 namespace SimpleInjector.Extensions
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Extension methods for applying decorators.
@@ -32,6 +33,7 @@ namespace SimpleInjector.Extensions
         "The methods in this class have been replaced with an instances methods on the Container class. " + 
         " Please use one of the Container.RegisterDecorator overloads instead.",
         error: true)]
+    [ExcludeFromCodeCoverage]
     public static class DecoratorExtensions
     {
         /// <summary>This method has been removed.</summary>

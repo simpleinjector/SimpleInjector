@@ -428,6 +428,7 @@
     <Compile Include="..\SimpleInjector.NET\VerificationOption.enum.cs">
       <Link>VerificationOption.enum.cs</Link>
     </Compile>
+    <Compile Include="PclSpecific\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="PclSpecific\Helpers.cs" />
     <Compile Include="PclSpecific\ThreadLocal.cs" />
     <Compile Include="PclSpecific\ThreadLocalValue.cs" />

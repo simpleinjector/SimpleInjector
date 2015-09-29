@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
@@ -81,6 +82,7 @@ namespace SimpleInjector
         [Obsolete(
             "This method is not supported anymore. Please use Container.Options to configure the container.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public ContainerOptions()
         {
             throw new InvalidOperationException(
@@ -167,6 +169,7 @@ namespace SimpleInjector
             "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
             "DependencyInjectionBehavior property to override Simple Injector's verification behavior.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
 
@@ -180,6 +183,7 @@ namespace SimpleInjector
             "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
             "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public IConstructorInjectionBehavior ConstructorInjectionBehavior { get; set; }
 
         /// <summary>Gets or sets the dependency injection behavior.</summary>

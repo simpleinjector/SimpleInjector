@@ -24,6 +24,7 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector;
 
     /// <summary>
@@ -31,6 +32,7 @@ namespace SimpleInjector.Extensions
     /// types in the <see cref="Container"/>.
     /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    [ExcludeFromCodeCoverage]
     public static class OpenGenericRegistrationExtensions
     {
         private static readonly Predicate<PredicateContext> Fallback = c => !c.Handled;

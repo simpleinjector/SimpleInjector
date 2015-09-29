@@ -48,6 +48,7 @@ namespace SimpleInjector
         [Obsolete("LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
             "Remove the call to this method.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void EnableLifetimeScoping(this Container container)
         {
             throw new InvalidOperationException(

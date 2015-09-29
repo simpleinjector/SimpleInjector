@@ -23,6 +23,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <summary>
@@ -67,6 +68,7 @@ namespace SimpleInjector.Advanced
             "This method has been removed. Use Container.GetRegistration().Registration." +
             "InitializeInstance instead to initialize an existing instance.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static Action<TService> GetInitializer<TService>(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));

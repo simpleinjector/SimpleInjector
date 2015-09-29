@@ -146,6 +146,7 @@ namespace SimpleInjector
             "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +
             "request's current scope instance.",
             error: true)]
+        [ExcludeFromCodeCoverage]
         public static void RegisterForDisposal(IDisposable disposable)
         {
             throw new InvalidOperationException(

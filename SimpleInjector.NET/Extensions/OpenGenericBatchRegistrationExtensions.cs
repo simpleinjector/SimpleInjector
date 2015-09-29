@@ -24,6 +24,7 @@ namespace SimpleInjector.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -79,6 +80,7 @@ namespace SimpleInjector.Extensions
     /// once that implement the same open generic service types in the <see cref="Container"/>.
     /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    [ExcludeFromCodeCoverage]
     public static partial class OpenGenericBatchRegistrationExtensions
     {
         private const string ObsoleteOneToOneWithAccessibilityMessage =
