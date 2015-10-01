@@ -150,6 +150,38 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
+        // See issue #128.
+        [TestMethod]
+        public void Analyze_MismatchBetweenDecoratorAndDecorateeWithThreeLayersOfDecorators_ReturnsExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            // Adding this third decorator caused the warning to not be shown in v3.0
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
+
+            // Arrange
+            Assert.AreEqual(1, results.Length, Actual(results));
+
+            Assert.AreEqual(
+                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32> implemented " +
+                "by NullCommandHandler<Int32> (Transient).",
+                results.Single().Description);
+        }
+
         private static string Actual(LifestyleMismatchDiagnosticResult[] results)
         {
             return "actual: " + string.Join(" - ", results.Select(r => r.Description));

@@ -100,8 +100,6 @@ namespace SimpleInjector.Diagnostics
             // Return dependent producers
             foreach (var relationship in producer.GetRelationships())
             {
-                yield return set.AddReturn(relationship.Dependency);
-
                 foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency, set))
                 {
                     yield return set.AddReturn(dependentProducer);
