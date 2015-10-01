@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -76,18 +76,20 @@ namespace SimpleInjector.Diagnostics
                 .ToArray();
         }
 
-        internal static InstanceProducer[] GetProducersToAnalyze(Container container) => (
-            from producer in container.GetCurrentRegistrations()
-            from p in GetSelfAndDependentProducers(producer)
-            select p)
+        internal static InstanceProducer[] GetProducersToAnalyze(Container container) =>
+            container
+            .GetCurrentRegistrations()
+            .SelectMany(GetSelfAndDependentProducers)
             .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
             .ToArray();
 
-        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
-            HashSet<InstanceProducer> set = null)
-        {
-            set = set ?? new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer) =>
+            GetSelfAndDependentProducers(producer,
+                new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance));
 
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
+            HashSet<InstanceProducer> set)
+        {
             // Prevent stack overflow exception in case the graph is cyclic.
             if (set.Contains(producer))
             {
