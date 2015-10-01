@@ -132,8 +132,6 @@ namespace SimpleInjector.Decorators
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             InstanceProducer registeredProducer, Func<Type, InstanceProducer> producerBuilder)
         {
-            Type registeredServiceType = registeredProducer.ServiceType;
-
             var predicateCache = this.ThreadStaticServiceTypePredicateCache;
 
             if (!predicateCache.ContainsKey(registeredProducer))
@@ -143,8 +141,7 @@ namespace SimpleInjector.Decorators
 
                 var producer = producerBuilder(implementationType);
 
-                predicateCache[registeredProducer] =
-                    new ServiceTypeDecoratorInfo(registeredServiceType, implementationType, producer);
+                predicateCache[registeredProducer] = new ServiceTypeDecoratorInfo(implementationType, producer);
             }
 
             return predicateCache[registeredProducer];

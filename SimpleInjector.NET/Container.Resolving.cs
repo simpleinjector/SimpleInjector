@@ -264,8 +264,8 @@ namespace SimpleInjector
             }
 
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
-            Func<InjectionConsumerInfo, InstanceProducer> buildProducer =
-                context => this.BuildInstanceProducerForType(serviceType, context, autoCreateConcreteTypes);
+            Func<InstanceProducer> buildProducer =
+                () => this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
 
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
         }
@@ -319,7 +319,7 @@ namespace SimpleInjector
         private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
             return this.GetInstanceProducerForType(serviceType, context,
-                c => this.BuildInstanceProducerForType(serviceType, c));
+                () => this.BuildInstanceProducerForType(serviceType));
         }
 
         private object GetInstanceForRootType<TService>() where TService : class
@@ -355,35 +355,34 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private InstanceProducer BuildInstanceProducerForType<TService>(InjectionConsumerInfo context)
+        private InstanceProducer BuildInstanceProducerForType<TService>()
             where TService : class
         {
-            return this.BuildInstanceProducerForType(typeof(TService), context,
+            return this.BuildInstanceProducerForType(typeof(TService),
                 this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>);
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType, InjectionConsumerInfo context,
+        private InstanceProducer BuildInstanceProducerForType(Type serviceType, 
             bool autoCreateConcreteTypes = true)
         {
             Func<InstanceProducer> tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes
                 ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
                 : (Func<InstanceProducer>)(() => null);
 
-            return this.BuildInstanceProducerForType(serviceType, context, tryBuildInstanceProducerForConcrete);
+            return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType, InjectionConsumerInfo context,
+        private InstanceProducer BuildInstanceProducerForType(Type serviceType,
             Func<InstanceProducer> tryBuildInstanceProducerForConcreteType)
         {
             return
-                this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType, context) ??
+                this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
                 this.TryBuildArrayInstanceProducer(serviceType) ??
                 this.TryBuildInstanceProducerForCollection(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
         }
 
-        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType,
-            InjectionConsumerInfo context)
+        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
         {
             // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
             // don't want to hold a lock while calling back into user code, because who knows what the user 

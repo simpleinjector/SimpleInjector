@@ -189,7 +189,7 @@ namespace SimpleInjector.Internals
             {
                 var overlappingProvider = supersetProviders.FirstOrDefault() ?? this.providers.First();
 
-                throw this.GetAnOverlappingGenericRegistrationExistsException(
+                throw GetAnOverlappingGenericRegistrationExistsException(
                     providerToRegister,
                     overlappingProvider);
             }
@@ -203,7 +203,7 @@ namespace SimpleInjector.Internals
                 || provider.ImplementationType == implementationType
             select provider;
 
-        private InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
+        private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider)
         {
             return new InvalidOperationException(

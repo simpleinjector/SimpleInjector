@@ -821,8 +821,7 @@ namespace SimpleInjector
             hasCollection
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to depend on {0}?",
-                    typeof(IEnumerable<>).MakeGenericType(serviceType).ToFriendlyName(),
-                    serviceType.ToFriendlyName())
+                    typeof(IEnumerable<>).MakeGenericType(serviceType).ToFriendlyName())
                 : string.Empty;
 
         private static string NoteThatSkippedDecoratorsWereFound(Type serviceType, Type[] decorators) =>

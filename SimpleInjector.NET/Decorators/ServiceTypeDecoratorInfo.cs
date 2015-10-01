@@ -32,13 +32,10 @@ namespace SimpleInjector.Decorators
     // A list of all decorators applied to a given service type.
     internal sealed class ServiceTypeDecoratorInfo
     {
-        private readonly Type registeredServiceType;
         private readonly List<DecoratorInfo> appliedDecorators = new List<DecoratorInfo>();
 
-        internal ServiceTypeDecoratorInfo(Type registeredServiceType, Type implementationType,
-            InstanceProducer originalProducer)
+        internal ServiceTypeDecoratorInfo(Type implementationType, InstanceProducer originalProducer)
         {
-            this.registeredServiceType = registeredServiceType;
             this.ImplementationType = implementationType;
             this.OriginalProducer = originalProducer;
         }

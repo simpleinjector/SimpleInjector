@@ -556,12 +556,12 @@ namespace SimpleInjector
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
         private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo consumer,
-            Func<InjectionConsumerInfo, InstanceProducer> buildInstanceProducer)
+            Func<InstanceProducer> buildInstanceProducer)
         {
             return 
                 this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
                 ?? this.TryGetInstanceProducerForRegisteredCollection(serviceType)
-                ?? buildInstanceProducer(consumer);
+                ?? buildInstanceProducer();
         }
 
         private InstanceProducer GetExplicitlyRegisteredInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)

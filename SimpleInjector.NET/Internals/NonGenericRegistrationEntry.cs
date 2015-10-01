@@ -261,8 +261,8 @@ namespace SimpleInjector.Internals
 
             public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled)
             {
-                Func<Type> implementationTypeProvider = () =>
-                    this.GetImplementationTypeThroughFactory(this.serviceType, consumer);
+                Func<Type> implementationTypeProvider = 
+                    () => this.GetImplementationTypeThroughFactory(consumer);
 
                 var context = 
                     new PredicateContext(this.serviceType, implementationTypeProvider, consumer, handled);
@@ -273,10 +273,11 @@ namespace SimpleInjector.Internals
                 return this.predicate(context) ? this.GetProducer(context) : null;
             }
 
-            private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
+            private Type GetImplementationTypeThroughFactory(InjectionConsumerInfo consumer)
             {
-                Type implementationType =
-                    this.implementationTypeFactory(new TypeFactoryContext(serviceType, consumer));
+                var context = new TypeFactoryContext(this.serviceType, consumer);
+
+                Type implementationType = this.implementationTypeFactory(context);
 
                 if (implementationType == null)
                 {
@@ -287,10 +288,10 @@ namespace SimpleInjector.Internals
                 {
                     throw new ActivationException(
                         StringResources.TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
-                            serviceType, implementationType));
+                            this.serviceType, implementationType));
                 }
 
-                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(serviceType, implementationType);
+                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(this.serviceType, implementationType);
 
                 return implementationType;
             }
