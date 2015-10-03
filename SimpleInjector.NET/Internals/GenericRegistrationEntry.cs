@@ -31,9 +31,8 @@ namespace SimpleInjector.Internals
         private readonly List<IProducerProvider> providers = new List<IProducerProvider>();
         private readonly Container container;
 
-        internal GenericRegistrationEntry(Type serviceType, Container container)
+        internal GenericRegistrationEntry(Container container)
         {
-            Requires.IsTrue(serviceType.IsGenericTypeDefinition, nameof(serviceType));
             this.container = container;
         }
 

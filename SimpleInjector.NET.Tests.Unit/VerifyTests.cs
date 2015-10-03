@@ -22,6 +22,23 @@
         }
 
         [TestMethod]
+        public void Verify_SuppliedWithInvalidVerificationOptionEnum_ThrowsExpectedException()
+        {
+            // Arrange
+            VerificationOption invalidOption = (VerificationOption)2;
+
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Verify(invalidOption);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The value of argument 'option' (2) is invalid for Enum type 'VerificationOption'.",
+                action);
+        }
+
+        [TestMethod]
         public void Verify_CalledMultipleTimes_Succeeds()
         {
             // Arrange

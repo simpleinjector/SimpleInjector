@@ -344,6 +344,22 @@
         }
 
         [TestMethod]
+        public void CreateRegistration_CalledWithValueType_ThrowsExpectedException()
+        {
+            // Arrange
+            Container container = new Container();
+            Lifestyle lifestyle = Lifestyle.Transient;
+
+            // Act
+            Action action = () => lifestyle.CreateRegistration(typeof(int), typeof(int), container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type Int32 is not a reference type. Only reference types are supported.",
+                action);
+        }
+
+        [TestMethod]
         public void CreateRegistration_SuppliedWithOpenGenericImplementationType_ThrowsExpectedException()
         {
             // Arrange

@@ -58,15 +58,6 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static void IsTrue(bool predicate, string paramName, string message = null)
-        {
-            if (!predicate)
-            {
-                throw new ArgumentException(message ?? string.Empty, paramName);
-            }
-        }
-
-        [DebuggerStepThrough]
         internal static void IsReferenceType(Type type, string paramName)
         {
             if (!type.IsClass && !type.IsInterface)
@@ -233,20 +224,6 @@ namespace SimpleInjector
             if (!container.Options.IsConstructableType(serviceType, implementationType, out message))
             {
                 throw new ArgumentException(message, paramName);
-            }
-        }
-
-        internal static void ImplementationsAllHaveSelectableConstructor(Container container,
-            Type openGenericServiceType, IEnumerable<Type> openGenericImplementations, string paramName)
-        {
-            foreach (Type type in openGenericImplementations)
-            {
-                string message = null;
-
-                if (!container.Options.IsConstructableType(openGenericServiceType, type, out message))
-                {
-                    throw new ArgumentException(message, paramName);
-                }
             }
         }
 

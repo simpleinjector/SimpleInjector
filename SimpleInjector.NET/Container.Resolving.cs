@@ -199,29 +199,16 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
-            return this.GetRegistration(serviceType, InjectionConsumerInfo.Root, throwOnFailure);
-        }
-
-        internal InstanceProducer GetRegistration(Type serviceType, InjectionConsumerInfo consumer, bool throwOnFailure)
-        {
             this.LockContainer();
 
             InstanceProducer producer;
 
-            if (consumer == InjectionConsumerInfo.Root)
+            if (!this.rootProducerCache.TryGetValue(serviceType, out producer))
             {
-                if (!this.rootProducerCache.TryGetValue(serviceType, out producer))
-                {
-                    producer =
-                        this.GetRegistrationEvenIfInvalid(serviceType, consumer, autoCreateConcreteTypes: true);
+                producer = this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, 
+                    autoCreateConcreteTypes: true);
 
-                    this.AppendRootInstanceProducer(serviceType, producer);
-                }
-            }
-            else
-            {
-                producer =
-                    this.GetRegistrationEvenIfInvalid(serviceType, consumer, autoCreateConcreteTypes: true);
+                this.AppendRootInstanceProducer(serviceType, producer);
             }
 
             bool producerIsValid = producer != null && producer.IsValid;
