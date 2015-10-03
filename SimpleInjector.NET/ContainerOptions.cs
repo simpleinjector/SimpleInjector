@@ -60,9 +60,6 @@ namespace SimpleInjector
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal static readonly int MaximumNumberOfNodesPerDelegate = 350;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -307,6 +304,9 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool EnableDynamicAssemblyCompilation { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal int MaximumNumberOfNodesPerDelegate { get; set; } = 350;
+        
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription
         {

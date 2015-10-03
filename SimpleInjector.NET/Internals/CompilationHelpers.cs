@@ -196,11 +196,12 @@ namespace SimpleInjector.Internals
         {
             var results = NodeSizeCalculator.Calculate(expression);
 
-            while (results.TotalSize > ContainerOptions.MaximumNumberOfNodesPerDelegate)
+            while (results.TotalSize > container.Options.MaximumNumberOfNodesPerDelegate)
             {
                 reducedNodes = reducedNodes ?? new Dictionary<Expression, InvocationExpression>(16);
 
-                Expression mostReductiveNode = FindMostReductiveNodeOrNull(results);
+                Expression mostReductiveNode = FindMostReductiveNodeOrNull(results,
+                    container.Options.MaximumNumberOfNodesPerDelegate);
 
                 if (mostReductiveNode == null)
                 {
@@ -234,12 +235,13 @@ namespace SimpleInjector.Internals
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }
 
-        private static Expression FindMostReductiveNodeOrNull(NodeSizes results)
+        private static Expression FindMostReductiveNodeOrNull(NodeSizes results, 
+            int maximumNumberOfNodesPerDelegate)
         {
             // By setting a maximum size, we prevent that the one of the root nodes will be selected as most
             // reductive node. Although this would reduce the expression to a few nodes, this will leave us
             // with a new expression that is as big or almost as big, and might even cause a stack overflow.
-            int maximumSizeOfReducibleNode = ContainerOptions.MaximumNumberOfNodesPerDelegate * 9 / 10; // 90%
+            int maximumSizeOfReducibleNode = maximumNumberOfNodesPerDelegate * 9 / 10; // 90%
             int maximumSizeOfNode = results.TotalSize - maximumSizeOfReducibleNode;
 
             // We must set a minimum size for the nodes to prevent selecting nodes with just a few sub nodes
