@@ -159,6 +159,7 @@
     <Compile Include="RegisterInitializerTests.cs" />
     <Compile Include="RegisterResolveInterceptorTests.cs" />
     <Compile Include="RegisterSingleByInstanceTests.cs" />
+    <Compile Include="RegisterSingletonTests.cs" />
     <Compile Include="ResolveUnregisteredTypeEventTests.cs" />
     <Compile Include="ScopedLifestyleTests.cs" />
     <Compile Include="TestClasses.CommandHandlers.cs" />

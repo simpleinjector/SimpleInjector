@@ -798,7 +798,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IPlugin), new[] 
+            container.RegisterCollection<IPlugin>(new[] 
             { 
                 Lifestyle.Transient.CreateRegistration<PluginImpl, PluginImpl>(container),
                 Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container)

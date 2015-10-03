@@ -264,6 +264,9 @@
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingleByInstanceTests.cs">
       <Link>RegisterSingleByInstanceTests.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.NET.Tests.Unit\RegisterSingletonTests.cs">
+      <Link>RegisterSingletonTests.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.NET.Tests.Unit\ResolveUnregisteredTypeEventTests.cs">
       <Link>ResolveUnregisteredTypeEventTests.cs</Link>
     </Compile>
