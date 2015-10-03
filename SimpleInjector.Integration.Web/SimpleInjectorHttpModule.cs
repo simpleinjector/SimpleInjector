@@ -39,7 +39,7 @@ namespace SimpleInjector.Integration.Web
         {
             context.EndRequest += (sender, e) =>
             {
-                WebRequestLifestyle.CleanUpWebRequest();
+                WebRequestLifestyle.CleanUpWebRequest(HttpContext.Current);
             };
         }
 

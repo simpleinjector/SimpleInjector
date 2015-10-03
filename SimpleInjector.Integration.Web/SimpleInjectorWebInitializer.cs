@@ -24,21 +24,24 @@
 // AppDomain startup.
 [assembly: System.Web.PreApplicationStartMethod(
     typeof(SimpleInjector.Integration.Web.SimpleInjectorWebInitializer),
-    "Initialize")]
+    nameof(SimpleInjector.Integration.Web.SimpleInjectorWebInitializer.Initialize))]
 
 namespace SimpleInjector.Integration.Web
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
     /// <summary>
     /// Pre application start code.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class SimpleInjectorWebInitializer
     {
         private static bool hasStarted;
 
         /// <summary>Registers an HttpModule that allows disposing instances that are registered as
         /// Per Web Request.</summary>
+        [ExcludeFromCodeCoverage]
         public static void Initialize()
         {
             if (!hasStarted)

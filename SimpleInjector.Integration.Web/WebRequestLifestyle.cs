@@ -84,23 +84,11 @@ namespace SimpleInjector.Integration.Web
             return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
         }
 
-        internal static void CleanUpWebRequest()
+        internal static void CleanUpWebRequest(HttpContext context)
         {
-            var context = HttpContext.Current;
+            Requires.IsNotNull(context, nameof(context));
 
-            if (context == null)
-            {
-                throw new InvalidOperationException("HttpContext.Current == null.");
-            }
-
-            var items = context.Items;
-
-            if (items == null)
-            {
-                throw new InvalidOperationException("HttpContext.Current.Items == null.");
-            }
-
-            Scope scope = (Scope)items[ScopeKey];
+            Scope scope = (Scope)context.Items[ScopeKey];
 
             if (scope != null)
             {

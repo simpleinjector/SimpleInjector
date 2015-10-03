@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Web;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
@@ -249,6 +250,16 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "This method can only be called within the context of an active Web Request.", action);
+        }
+
+        [TestMethod]
+        public void SimpleInjectorHttpModuleDispose_Always_Succeeds()
+        {
+            // Arrange
+            IHttpModule module = new SimpleInjectorHttpModule();
+
+            // Act
+            module.Dispose();
         }
     }
 }
