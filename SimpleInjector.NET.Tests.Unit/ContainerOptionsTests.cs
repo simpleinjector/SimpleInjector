@@ -750,6 +750,23 @@
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
+        
+        [TestMethod]
+        public void PropertySelectionBehaviorSelectProperty_WithDefaultConfiguration_ReturnsFalse()
+        {
+            // Arrange
+            Type serviceType = typeof(ClassWithLoggerProperty);
+
+            PropertyInfo property = GetProperty<ClassWithLoggerProperty>(c => c.Logger);
+
+            var options = GetContainerOptions();
+
+            // Act
+            var result = options.PropertySelectionBehavior.SelectProperty(serviceType, property);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
 
         [TestMethod]
         public void LifestyleSelectionBehavior_SetWithNullValue_ThrowsException()
@@ -764,11 +781,11 @@
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
-        private static MemberInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
+        private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
         {
             var body = (MemberExpression)propertySelector.Body;
 
-            return body.Member;
+            return (PropertyInfo)body.Member;
         }
 
         private static ContainerOptions GetContainerOptions()
@@ -784,6 +801,11 @@
             }
 
             public Container Container { get; private set; }
+        }
+
+        public class ClassWithLoggerProperty
+        {
+            public ILogger Logger { get; set; }
         }
 
         private sealed class AlternativeConstructorResolutionBehavior : IConstructorResolutionBehavior
