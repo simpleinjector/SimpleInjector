@@ -255,6 +255,8 @@ namespace SimpleInjector.Decorators
             {
                 AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
 
+                realProducer.AddProducerToVerify(currentProducer);
+
                 currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);
             }
 

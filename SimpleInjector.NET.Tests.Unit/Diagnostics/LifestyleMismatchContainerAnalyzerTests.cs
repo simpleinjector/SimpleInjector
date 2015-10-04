@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
+    using System;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
@@ -184,6 +185,95 @@
                 "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32> implemented " +
                 "by NullCommandHandler<Int32> (Transient).",
                 results.Single().Description);
+        }
+
+        // See issue #128.
+        [TestMethod]
+        public void Analyze_MismatchBetweenDecoratorAndDecorateeWrappedWithDecoratorWithDecorateeFactory_ReturnsExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            // AsyncCommandHandlerProxy<T> depends on Func<ICommandHandler<T>>. Due to the bug reported in
+            // #128, this suppressed the mismatch warning.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
+
+            // Arrange
+            Assert.AreEqual(1, results.Length, Actual(results));
+
+            Assert.AreEqual(
+                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32> implemented " +
+                "by NullCommandHandler<Int32> (Transient).",
+                results.Single().Description);
+        }
+
+        // See issue #128.
+        [TestMethod]
+        public void Verify_WithDecorateeGraphWithLifestyleMismatch_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32>",
+                action);
+        }
+
+        // See issue #128.
+        [TestMethod]
+        public void GetInstance_WithDecorateeGraphWithLifestyleMismatch_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.GetInstance<ICommandHandler<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32>",
+                action);
+        }
+
+        [TestMethod]
+        public void InvokeDecorateeFactory_WithDecorateeGraphWithLifestyleMismatchContainerSuppressingLifestyleMismatchVerification_Succeeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressLifestyleMismatchVerification = true;
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+
+            var proxy = (AsyncCommandHandlerProxy<int>)container.GetInstance<ICommandHandler<int>>();
+
+            // Act
+            proxy.DecorateeFactory();
         }
 
         private static string Actual(LifestyleMismatchDiagnosticResult[] results)

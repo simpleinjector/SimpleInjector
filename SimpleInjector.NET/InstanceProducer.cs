@@ -99,6 +99,7 @@ namespace SimpleInjector
         private Lifestyle overriddenLifestyle;
         private ReadOnlyCollection<KnownRelationship> knownRelationships;
         private List<Action> verifiers;
+        private List<InstanceProducer> wrappedProducers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
@@ -206,6 +207,11 @@ namespace SimpleInjector
             "{0} = {1}, {2} = {3}",
             nameof(ServiceType), this.ServiceType.ToFriendlyName(),
             nameof(Lifestyle), this.Lifestyle.Name);
+
+        internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
+            this.wrappedProducers == null
+                ? new[] { this }
+                : this.wrappedProducers.Concat(new[] { this });
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -385,6 +391,19 @@ namespace SimpleInjector
                 this.verifiers.Add(action);
             }
         }
+        
+        internal void AddProducerToVerify(InstanceProducer currentProducer)
+        {
+            lock (this.locker)
+            {
+                if (this.wrappedProducers == null)
+                {
+                    this.wrappedProducers = new List<InstanceProducer>();
+                }
+
+                this.wrappedProducers.Add(currentProducer);
+            }
+        }
 
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
         {
@@ -451,7 +470,7 @@ namespace SimpleInjector
         {
             if (!this.Container.Options.SuppressLifestyleMismatchVerification)
             {
-                var error = LifestyleMismatchAnalyzer.Instance.Analyze(new[] { this })
+                var error = LifestyleMismatchAnalyzer.Instance.Analyze(this.SelfAndWrappedProducers)
                     .Cast<LifestyleMismatchDiagnosticResult>()
                     .FirstOrDefault();
 
