@@ -78,8 +78,9 @@ namespace SimpleInjector.Diagnostics
 
         internal static InstanceProducer[] GetProducersToAnalyze(Container container) => (
             from producer in container.GetCurrentRegistrations()
-            from p in GetSelfAndDependentProducers(producer)
-            select p)
+            from p1 in producer.SelfAndWrappedProducers
+            from p2 in GetSelfAndDependentProducers(p1)
+            select p2)
             .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
             .ToArray();
 
