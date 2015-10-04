@@ -36,8 +36,9 @@ namespace SimpleInjector
     /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the component that is currently 
     /// being built. 
     /// </summary>
-    [DebuggerDisplay("ExpressionBuiltEventArgs (RegisteredServiceType: " + 
-        "{SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}, Expression: {Expression})")]
+    [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " (" + 
+        nameof(RegisteredServiceType) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}, " + 
+        nameof(Expression) + ": {" + nameof(Expression) + "})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;
@@ -55,7 +56,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(RegisteredServiceType),nq}")]
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}")]
         public Type RegisteredServiceType { get; }
 
         /// <summary>Gets or sets the currently registered 

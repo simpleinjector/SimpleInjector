@@ -25,7 +25,7 @@ namespace SimpleInjector.Advanced
     using System.Diagnostics;
     using System.Linq.Expressions;
 
-    [DebuggerDisplay("{GetType().Name,nq}")]
+    [DebuggerDisplay(nameof(DefaultDependencyInjectionBehavior))]
     internal sealed class DefaultDependencyInjectionBehavior : IDependencyInjectionBehavior
     {
         private readonly Container container;

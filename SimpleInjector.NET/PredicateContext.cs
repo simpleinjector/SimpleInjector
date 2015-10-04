@@ -40,7 +40,7 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("PredicateContext ({DebuggerDisplay,nq})")]
+    [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class PredicateContext
     {
         private readonly Func<Type> implementationTypeProvider;
@@ -104,10 +104,10 @@ namespace SimpleInjector
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
-            "ServiceType: {0}, ImplementationType: {1}, Handled: {2}, Consumer: {3}",
-            this.ServiceType.ToFriendlyName(),
-            this.ImplementationType.ToFriendlyName(),
-            this.Handled,
-            this.Consumer);
+            "{0}: {1}, {2}: {3}, {4}: {5}, {6}: {7}",
+            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(ImplementationType), this.ImplementationType.ToFriendlyName(),
+            nameof(Handled), this.Handled,
+            nameof(Consumer), this.Consumer);
     }
 }

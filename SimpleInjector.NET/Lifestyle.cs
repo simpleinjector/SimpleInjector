@@ -54,7 +54,7 @@ namespace SimpleInjector
     /// <remarks>
     /// This type is abstract and can be overridden to implement a custom lifestyle.
     /// </remarks>
-    [DebuggerDisplay("{Name,nq}")]
+    [DebuggerDisplay("{" + nameof(Name) + ", nq}")]
     public abstract class Lifestyle
     {
         /// <summary>

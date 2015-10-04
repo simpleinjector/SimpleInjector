@@ -44,7 +44,7 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterDecorator(Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("DecoratorPredicateContext ({DebuggerDisplay,nq})")]
+    [DebuggerDisplay(nameof(DecoratorPredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class DecoratorPredicateContext
     {
         internal DecoratorPredicateContext(Type serviceType, Type implementationType,
@@ -89,9 +89,9 @@ namespace SimpleInjector
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
-            "ServiceType = {0}, ImplementationType = {1}",
-            this.ServiceType.ToFriendlyName(),
-            this.ImplementationType.ToFriendlyName());
+            "{0} = {1}, {2} = {3}",
+            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(ImplementationType), this.ImplementationType.ToFriendlyName());
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)

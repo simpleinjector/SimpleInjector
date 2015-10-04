@@ -32,7 +32,7 @@ namespace SimpleInjector
     /// Discovers the attributes of the code element (a property or parameter) where a dependency will be
     /// injected into, and provides access to its meta data.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public sealed class InjectionTargetInfo
 #if !PCL
  : ICustomAttributeProvider

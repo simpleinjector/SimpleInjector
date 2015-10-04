@@ -35,7 +35,7 @@ namespace SimpleInjector.Advanced
     /// allows the user to examine the given instance to decide whether the instance should be initialized or 
     /// not.
     /// </summary>
-    [DebuggerDisplay("InitializationContext ({DebuggerDisplay,nq})")]
+    [DebuggerDisplay(nameof(InitializationContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public class InitializationContext
     {
         internal InitializationContext(InstanceProducer producer, Registration registration)
@@ -66,9 +66,9 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => 
+        internal string DebuggerDisplay => 
             string.Format(CultureInfo.InvariantCulture,
-                "Producer.ServiceType: {0}, Registration.Implementation: {1}",
+                "Producer.ServiceType: {0}, Registration.ImplementationType: {1}",
                 this.Producer.ServiceType.ToFriendlyName(),
                 this.Registration.ImplementationType.ToFriendlyName());
     }

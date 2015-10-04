@@ -34,7 +34,7 @@ namespace SimpleInjector
     /// contextual information about the applied decoration and it allows users to examine the given instance 
     /// to make runtime decisions.
     /// </summary>
-    [DebuggerDisplay("DecoratorContext ({DebuggerDisplay,nq})")]
+    [DebuggerDisplay(nameof(DecoratorContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class DecoratorContext
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

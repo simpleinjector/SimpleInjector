@@ -35,7 +35,7 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay("TypeFactoryContext ({DebuggerDisplay,nq})")]
+    [DebuggerDisplay(nameof(TypeFactoryContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class TypeFactoryContext
     {
         internal TypeFactoryContext(Type serviceType, InjectionConsumerInfo consumer)
@@ -59,8 +59,8 @@ namespace SimpleInjector
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
-            "ServiceType: {0}, Consumer: {1}",
-            this.ServiceType.ToFriendlyName(),
-            this.Consumer);
+            "{0}: {1}, {2}: {3}",
+            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(Consumer), this.Consumer);
     }
 }

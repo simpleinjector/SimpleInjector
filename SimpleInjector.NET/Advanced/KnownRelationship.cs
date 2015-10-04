@@ -31,7 +31,7 @@ namespace SimpleInjector.Advanced
     /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
     /// information to spot possible misconfigurations. 
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(nameof(KnownRelationship))]
     public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
         /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
@@ -52,7 +52,7 @@ namespace SimpleInjector.Advanced
 
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
         /// <value>The implementation type of the parent type of the relationship.</value>
-        [DebuggerDisplay("{ImplementationTypeDebuggerDisplay,nq}")]
+        [DebuggerDisplay("{" + nameof(ImplementationTypeDebuggerDisplay) + ", nq}")]
         public Type ImplementationType { get; }
 
         /// <summary>Gets the lifestyle of the parent type of the relationship.</summary>
@@ -66,12 +66,11 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => 
-            string.Format(CultureInfo.InvariantCulture,
-                "ImplementationType = {0}, Lifestyle = {1}, Dependency = {{{2}}}",
-                this.ImplementationTypeDebuggerDisplay,
-                this.Lifestyle.Name,
-                this.Dependency.DebuggerDisplay);
+        private string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+            "{0} = {1}, {2} = {3}, {4} = {{{5}}}",
+            nameof(ImplementationType), this.ImplementationTypeDebuggerDisplay,
+            nameof(Lifestyle), this.Lifestyle.Name,
+            nameof(Dependency), this.Dependency.DebuggerDisplay);
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]

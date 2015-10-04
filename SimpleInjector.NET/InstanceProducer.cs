@@ -83,7 +83,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class InstanceProducer
     {
         private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
@@ -203,8 +203,9 @@ namespace SimpleInjector
         internal bool VerifiersAreSuccessfullyCalled { get; private set; }
 
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
-            "ServiceType = {0}, Lifestyle = {1}",
-            this.ServiceType.ToFriendlyName(), this.Lifestyle.Name);
+            "{0} = {1}, {2} = {3}",
+            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(Lifestyle), this.Lifestyle.Name);
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -612,10 +613,10 @@ namespace SimpleInjector
 
             public Lifestyle Lifestyle => this.producer.Lifestyle;
 
-            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "), nq}")]
             public Type ServiceType => this.producer.ServiceType;
 
-            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ImplementationType),nq}")]
+            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ImplementationType) + "), nq}")]
             public Type ImplementationType => this.producer.ImplementationType;
 
             public KnownRelationship[] Relationships => this.producer.GetRelationships();
@@ -623,7 +624,7 @@ namespace SimpleInjector
             // By using the TruncatedDependencyGraph as value of this DependencyGraph property, we allow the
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
-            [DebuggerDisplay(value: "{TruncatedDependencyGraph,nq}")]
+            [DebuggerDisplay(value: "{" + nameof(TruncatedDependencyGraph) + ", nq}")]
             public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph();
 
             [DebuggerHidden]

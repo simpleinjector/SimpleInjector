@@ -31,8 +31,8 @@ namespace SimpleInjector.Internals
     /// represents.
     /// </summary>
     [DebuggerDisplay(
-        "Argument: {SimpleInjector.Helpers.ToFriendlyName(Argument),nq}, " +
-        "ConcreteType: {SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
+        nameof(Argument) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(Argument) + "), nq}, " +
+        nameof(ConcreteType) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(ConcreteType) + "), nq}")]
     internal sealed class ArgumentMapping : IEquatable<ArgumentMapping>
     {
         internal ArgumentMapping(Type argument, Type concreteType)
@@ -41,10 +41,10 @@ namespace SimpleInjector.Internals
             this.ConcreteType = concreteType;
         }
 
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(Argument),nq}")]
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(Argument) + "), nq}")]
         internal Type Argument { get; }
 
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ConcreteType),nq}")]
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ConcreteType) + "), nq}")]
         internal Type ConcreteType { get; }
 
         internal bool TypeConstraintsAreSatisfied

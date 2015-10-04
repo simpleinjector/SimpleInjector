@@ -29,7 +29,10 @@ namespace SimpleInjector.Diagnostics
     /// Base class for types that hold information about a single diagnostic message or warning for a
     /// particular type or part of the configuration.
     /// </summary>
-    [DebuggerDisplay("{Name,nq} {SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}: {Description,nq}")]
+    [DebuggerDisplay(
+        "{" + nameof(Name) + ", nq} " + 
+        "{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "), nq}: " + 
+        "{" + nameof(Description) + ", nq}")]
     public abstract class DiagnosticResult
     {
         internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType,
@@ -52,17 +55,17 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the service type to which this warning is related.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(ServiceType),nq}")]
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "),nq}")]
         public Type ServiceType { get; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>
-        /// <value>A <see cref="String"/> with the description.</value>
-        [DebuggerDisplay("{Description,nq}")]
+        /// <value>A <see cref="string"/> with the description.</value>
+        [DebuggerDisplay("{" + nameof(Description) + ", nq}")]
         public string Description { get; }
 
         /// <summary>Gets the documentation URL of the diagnostic result.</summary>
-        /// <value>A <see cref="String"/> with the URL.</value>
-        [DebuggerDisplay("{DocumentationUrl,nq}")]
+        /// <value>A <see cref="string"/> with the URL.</value>
+        [DebuggerDisplay("{" + nameof(DocumentationUrl) + ", nq}")]
         public Uri DocumentationUrl => 
             DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl;
 

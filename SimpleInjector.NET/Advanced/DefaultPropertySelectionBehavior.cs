@@ -26,7 +26,7 @@ namespace SimpleInjector.Advanced
     using System.Diagnostics;
     using System.Reflection;
 
-    [DebuggerDisplay("{GetType().Name,nq}")]
+    [DebuggerDisplay(nameof(DefaultPropertySelectionBehavior))]
     internal sealed class DefaultPropertySelectionBehavior : IPropertySelectionBehavior
     {
         public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)

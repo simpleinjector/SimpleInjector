@@ -31,7 +31,7 @@ namespace SimpleInjector.Diagnostics
     /// <summary>
     /// A hierarchical group of <see cref="DiagnosticResult"/>.
     /// </summary>
-    [DebuggerDisplay("DiagnosticGroup (Name: {Name,nq})")]
+    [DebuggerDisplay(nameof(DiagnosticGroup) + " (" + nameof(Name) + ": {" + nameof(Name) + ", nq})")]
     public class DiagnosticGroup
     {
         internal DiagnosticGroup(DiagnosticType diagnosticType, Type groupType, string name, string description,
@@ -55,17 +55,17 @@ namespace SimpleInjector.Diagnostics
         /// generic types.
         /// </summary>
         /// <value>The <see cref="Type"/>.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(GroupType),nq}")]
+        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(GroupType) + "), nq}")]
         public Type GroupType { get; }
 
         /// <summary>Gets the friendly name of the group.</summary>
         /// <value>The name.</value>
-        [DebuggerDisplay("{Name,nq}")]
+        [DebuggerDisplay("{" + nameof(Name) + ", nq}")]
         public string Name { get; }
 
         /// <summary>Gets the description of the group.</summary>
         /// <value>The description.</value>
-        [DebuggerDisplay("{Description,nq}")]
+        [DebuggerDisplay("{" + nameof(Description) + ", nq}")]
         public string Description { get; }
 
         /// <summary>Gets the diagnostic type of all grouped <see cref="DiagnosticResult"/> instances.</summary>

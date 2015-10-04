@@ -56,7 +56,7 @@ namespace SimpleInjector
     /// container.Register<ITimeProvider, CustomTimeProvider>();
     /// ]]></code>
     /// </example>
-    [DebuggerDisplay("{DebuggerDisplayDescription,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplayDescription) + ", nq}")]
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
