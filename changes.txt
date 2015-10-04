@@ -12,7 +12,7 @@ Version 3.1.0 (v3.1.0 RTM)
 		 (fixes  #119)
 		-[Core] Improved performance of GetTypesToRegister method and the Register and RegisterCollection
 		 overloads that accept a list of collections.
-		-[Core] Check added to InstanceProducer constructor to prevent incompatible Registration objects 
+		-[Core] Check added to InstanceProducer constructor to prevent incompatible Registration objects
 		 from being supplied. (fixes #52)
 		-[Core] Exception message improved in case batch-registration skipped decorator. (fixes #13)
 		-[Core] Lifestyle.CreateRegistration and Container.AddRegistration methods now throw a clear
