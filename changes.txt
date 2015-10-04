@@ -1,6 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.0.6 (v3.0.6 RTM) 2015-10-04
+
+ 	Bug fixes:
+ 		-[Core] Registrations that where wrapped with three or more decorators didn't get diagnosed. 
+ 		 (fixes #129)
+
+
 Version 3.0.5 (v3.0.5 RTM) 2015-09-03
 
 	Bug fixes:
