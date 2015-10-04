@@ -150,7 +150,7 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
-        // See issue #128.
+        // See issue #129.
         [TestMethod]
         public void Analyze_MismatchBetweenDecoratorAndDecorateeWithThreeLayersOfDecorators_ReturnsExpectedWarning()
         {
@@ -162,10 +162,14 @@
             container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
-
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
 
             // Adding this third decorator caused the warning to not be shown in v3.0
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            // To make sure the warning is never lost, let's add a few extra decorators.
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
 
             container.Verify(VerificationOption.VerifyOnly);
