@@ -39,7 +39,7 @@ namespace SimpleInjector.Internals
                 return ExpressionNotCreatedYetMessage;
             }
 
-            var set = new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance);
+            var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
 
             return producer.VisualizeIndentedObjectGraph(indentingDepth: 0, set: set);
         }

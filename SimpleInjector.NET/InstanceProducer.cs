@@ -86,6 +86,9 @@ namespace SimpleInjector
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class InstanceProducer
     {
+        internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
+            ReferenceEqualityComparer<InstanceProducer>.Instance;
+
         private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
         private static readonly Predicate<PredicateContext> Always = context => true;
 

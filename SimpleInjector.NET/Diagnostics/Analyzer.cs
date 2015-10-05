@@ -81,7 +81,7 @@ namespace SimpleInjector.Diagnostics
             .GetCurrentRegistrations()
             .SelectMany(SelfAndWrappedProducers)
             .SelectMany(GetSelfAndDependentProducers)
-            .Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
+            .Distinct(InstanceProducer.EqualityComparer)
             .ToArray();
 
         private static IEnumerable<InstanceProducer> SelfAndWrappedProducers(InstanceProducer producer) =>
@@ -89,7 +89,7 @@ namespace SimpleInjector.Diagnostics
 
         private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer) =>
             GetSelfAndDependentProducers(producer,
-                new HashSet<InstanceProducer>(ReferenceEqualityComparer<InstanceProducer>.Instance));
+                new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer));
 
         private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
             HashSet<InstanceProducer> set)

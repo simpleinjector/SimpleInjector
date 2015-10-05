@@ -285,8 +285,7 @@ namespace SimpleInjector
                 from relationship in registration.GetRelationships()
                 select relationship.Dependency;
 
-            return currentRegistrations.Except(nonRootProducers, ReferenceEqualityComparer<InstanceProducer>.Instance)
-                .ToArray();
+            return currentRegistrations.Except(nonRootProducers, InstanceProducer.EqualityComparer).ToArray();
         }
 
         internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
@@ -306,7 +305,7 @@ namespace SimpleInjector
 
             // Filter out the invalid registrations (see the IsValid property for more information).
             producers =
-                from producer in producers.Distinct(ReferenceEqualityComparer<InstanceProducer>.Instance)
+                from producer in producers.Distinct(InstanceProducer.EqualityComparer)
                 where producer != null
                 where includeInvalidContainerRegisteredTypes || producer.IsValid
                 select producer;
