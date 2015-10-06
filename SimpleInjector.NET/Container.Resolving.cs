@@ -222,15 +222,6 @@ namespace SimpleInjector
             return producerIsValid ? producer : null;
         }
 
-        internal InstanceProducer GetRootRegistrationNoAutoCreateConcretesAndIgnoreFailures(Type serviceType)
-        {
-            // Don't cache this root producer here, because this causes us to invalidly flag the registration 
-            // is invalid.
-            return this.GetRegistration(serviceType, InjectionConsumerInfo.Root,
-                throwOnFailure: false,
-                autoCreateConcreteTypes: false);
-        }
-
         internal Action<TImplementation> GetInitializer<TImplementation>(InitializationContext context)
         {
             return this.GetInitializer<TImplementation>(typeof(TImplementation), context);
@@ -244,6 +235,8 @@ namespace SimpleInjector
         internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType, InjectionConsumerInfo consumer,
             bool autoCreateConcreteTypes = true)
         {
+            this.LockContainer();
+
             if (serviceType.ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
@@ -255,24 +248,6 @@ namespace SimpleInjector
                 () => this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
 
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
-        }
-
-        private InstanceProducer GetRegistration(Type serviceType, InjectionConsumerInfo context,
-            bool throwOnFailure, bool autoCreateConcreteTypes)
-        {
-            this.LockContainer();
-
-            var producer = this.GetRegistrationEvenIfInvalid(serviceType, context, autoCreateConcreteTypes);
-
-            bool producerIsValid = producer != null && producer.IsValid;
-
-            if (!producerIsValid && throwOnFailure)
-            {
-                this.ThrowInvalidRegistrationException(serviceType, producer);
-            }
-
-            // Prevent returning invalid producers
-            return producerIsValid ? producer : null;
         }
 
         private Action<T> GetInitializer<T>(Type implementationType, InitializationContext context)
@@ -390,16 +365,16 @@ namespace SimpleInjector
 
         private InstanceProducer TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(Type serviceType)
         {
-            UnregisteredTypeEventArgs e = null;
-
-            if (this.resolveUnregisteredType != null)
+            if (this.resolveUnregisteredType == null)
             {
-                e = new UnregisteredTypeEventArgs(serviceType);
-
-                this.resolveUnregisteredType(this, e);
+                return null;
             }
+            
+            var e = new UnregisteredTypeEventArgs(serviceType);
 
-            return e != null && e.Handled
+            this.resolveUnregisteredType(this, e);
+
+            return e.Handled
                 ? this.TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(e)
                 : null;
         }
@@ -415,6 +390,7 @@ namespace SimpleInjector
             {
                 if (this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType))
                 {
+                    // This line will only get hit, in case a different thread came here first.
                     return this.resolveUnregisteredTypeRegistrations[serviceType];
                 }
 
@@ -467,9 +443,14 @@ namespace SimpleInjector
                 singletonCollection,
                 typeof(IEnumerable<>).MakeGenericType(elementType));
 
-            // Enumerable.ToArray(collection)
+            // Build the call "Enumerable.ToArray(collection)".
             var arrayExpression = Expression.Call(arrayMethod, collectionExpression);
 
+            // Technically, we could determine the longest lifestyle out of the elements of the collection,
+            // instead of using Transient here. This would make it less likely for the user to get false
+            // positive Lifestyle Mismatch warnings. Problem with that is that trying to retrieve the
+            // longest lifestyle might cause the array to be cached in a way that is incorrect, because
+            // who knows what kind of lifestyles the used created.
             Registration registration =
                 new ExpressionRegistration(arrayExpression, serviceType, Lifestyle.Transient, this);
 

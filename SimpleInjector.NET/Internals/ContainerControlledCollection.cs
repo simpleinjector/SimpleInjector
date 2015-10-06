@@ -248,7 +248,13 @@ namespace SimpleInjector.Internals
 
         private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
         {
-            return this.container.GetRootRegistrationNoAutoCreateConcretesAndIgnoreFailures(implementationType);
+            var producer = this.container.GetRegistrationEvenIfInvalid(implementationType, 
+                InjectionConsumerInfo.Root, autoCreateConcreteTypes: false);
+
+            bool producerIsValid = producer != null && producer.IsValid;
+
+            // Prevent returning invalid producers
+            return producerIsValid ? producer : null;
         }
 
         private InstanceProducer CreateNewExternalProducer(Type implementationType)
