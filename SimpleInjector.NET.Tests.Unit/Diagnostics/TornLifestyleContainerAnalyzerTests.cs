@@ -506,6 +506,27 @@
             container.Verify();
         }
 
+        // See issue #131
+        [TestMethod]
+        public void Verify_MultipleProxyDecorators_DoesNotCauseAnyDiagnosticWarnings()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>), Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>();
+
+            // Assert
+            Assert.IsFalse(results.Any(), Actual(results));
+        }
+
         private static void Assert_ContainsDescription(TornLifestyleDiagnosticResult[] results,
             string expectedDescription)
         {

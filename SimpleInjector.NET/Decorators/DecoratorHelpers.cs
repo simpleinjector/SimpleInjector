@@ -227,7 +227,7 @@ namespace SimpleInjector.Decorators
             IsDecorateeFactoryDependencyParameter(parameterType, decoratingType);
 
         // Checks if the given parameterType can function as the decorated instance of the given service type.
-        private static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
+        internal static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
         {
             if (!parameterType.IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
             {
