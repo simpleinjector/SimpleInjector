@@ -1,5 +1,11 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version 3.0.7 (v3.0.7 RTM)
+
+	Bug fixes:
+		-[Core] Applying multiple decorator proxies around a registration caused invalid Torn Lifestyle 
+		 warnings. (fixes #131)
+
 
 Version 3.0.6 (v3.0.6 RTM) 2015-10-04
 
