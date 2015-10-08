@@ -24,6 +24,7 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Reflection;
 
     [DebuggerDisplay(nameof(DefaultConstructorResolutionBehavior))]
@@ -63,12 +64,17 @@ namespace SimpleInjector.Advanced
         {
             var constructors = implementationType.GetConstructors();
 
-            bool hasSuitableConstructor = constructors.Length == 1;
-
-            if (!hasSuitableConstructor)
+            if (!constructors.Any())
             {
                 throw new ActivationException(
-                    StringResources.TypeMustHaveASinglePublicConstructor(implementationType));
+                    StringResources.TypeMustHaveASinglePublicConstructorButItHasNone(implementationType));
+            }
+
+            if (constructors.Length > 1)
+            {
+                throw new ActivationException(
+                    StringResources.TypeMustHaveASinglePublicConstructorButItHas(implementationType,
+                        constructors.Length));
             }
 
             return constructors[0];

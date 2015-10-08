@@ -1056,7 +1056,7 @@
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithMultiplePublicConstructors_ThrowsExceptedException()
         {
             // Arrange
-            string expectedMessage = "it should contain exactly one public constructor";
+            string expectedMessage = "it should have only one public constructor";
 
             var container = new Container();
             

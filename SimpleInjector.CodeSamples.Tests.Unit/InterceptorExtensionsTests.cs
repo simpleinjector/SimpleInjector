@@ -2,6 +2,7 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     public interface IWithOutAndRef
     {
@@ -404,21 +405,15 @@
 
             container.Register<ICommand, FakeCommand>();
 
-            try
-            {
-                // Act
-                container.InterceptWith<InterceptorWithInternalConstructor>(IsACommandPredicate);
+            // Act
+            Action action = () => container.InterceptWith<InterceptorWithInternalConstructor>(IsACommandPredicate);
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("For the container to be able to create " + 
-                    "InterceptorExtensionsTests.InterceptorWithInternalConstructor, it should contain " +
-                    "exactly one public constructor"),
-                    "Actual: " + ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "For the container to be able to create " +
+                "InterceptorExtensionsTests.InterceptorWithInternalConstructor it should have only " +
+                "one public constructor",
+                action);
         }
 
         [TestMethod]

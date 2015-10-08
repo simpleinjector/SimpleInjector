@@ -114,21 +114,17 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance<ConcreteTypeWithMultiplePublicConstructors>();
+            // Act
+            Action action = () => container.GetInstance<ConcreteTypeWithMultiplePublicConstructors>();
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                string message = ex.Message;
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                typeof(ConcreteTypeWithMultiplePublicConstructors).Name,
+                action);
 
-                AssertThat.StringContains(typeof(ConcreteTypeWithMultiplePublicConstructors).Name, message);
-                AssertThat.StringContains("should contain exactly one public constructor, but it has 2.", message);
-            }
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "should have only one public constructor: it has 2.",
+                action);
         }
 
         [TestMethod]
@@ -157,26 +153,16 @@
         public void GetInstanceNonGeneric_UnregisteredConcreteTypeWithMultiplePublicConstructors_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
-            string expectedMessage = "should contain exactly one public constructor, but it has 2.";
-
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(ConcreteTypeWithMultiplePublicConstructors));
+            // Act
+            Action action = () => container.GetInstance(typeof(ConcreteTypeWithMultiplePublicConstructors));
 
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (ActivationException ex)
-            {
-                string actualMessage = ex.Message;
-
-                Assert.IsTrue(actualMessage.Contains(expectedMessage),
-                    "The exception message should describe the actual problem. Actual message: " +
-                    actualMessage);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "should have only one public constructor: it has 2.",
+                action,
+                "The exception message should describe the actual problem.");
         }
 
         [TestMethod]

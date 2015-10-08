@@ -186,11 +186,18 @@ namespace SimpleInjector
                     DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                     NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators));
 
-        internal static string TypeMustHaveASinglePublicConstructor(Type serviceType) => 
+        internal static string TypeMustHaveASinglePublicConstructorButItHasNone(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain exactly one public " +
-                "constructor, but it has {1}.",
-                serviceType.ToFriendlyName(), serviceType.GetConstructors().Length);
+                "For the container to be able to create {0} it should have only one public constructor: " +
+                "it has none.",
+                serviceType.ToFriendlyName());
+
+        internal static string TypeMustHaveASinglePublicConstructorButItHas(Type serviceType, int count) => 
+            string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0} it should have only one public constructor: " +
+                "it has {1}. See https://simpleinjector.org/one-constructor for more " +
+                "information.",
+                serviceType.ToFriendlyName(), count);
 
         internal static string TypeMustNotContainInvalidInjectionTarget(InjectionTargetInfo invalidTarget)
         {

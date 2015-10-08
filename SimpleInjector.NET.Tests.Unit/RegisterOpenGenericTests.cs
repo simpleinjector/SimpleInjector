@@ -650,8 +650,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
-                it should contain exactly one public constructor, but it has 2."
+                For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>
+                it should have only one public constructor: it has 2."
                 .TrimInside(),
                 action);
         }
@@ -662,21 +662,17 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                container.Register(typeof(IService<,>), typeof(ServiceImplWithMultipleCtors<,>), Lifestyle.Singleton);
+            // Act
+            Action action = () => container.Register(
+                typeof(IService<,>), 
+                typeof(ServiceImplWithMultipleCtors<,>), 
+                Lifestyle.Singleton);
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ArgumentException ex)
-            {
-                AssertThat.StringContains(@"
-                    For the container to be able to create ServiceImplWithMultipleCtors<TA, TB>, 
-                    it should contain exactly one public constructor, but it has 2.".TrimInside(),
-                    ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                For the container to be able to create ServiceImplWithMultipleCtors<TA, TB> 
+                it should have only one public constructor: it has 2.".TrimInside(),
+                action);
         }
 
         [TestMethod]

@@ -64,8 +64,8 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains("For the container to be able to create " +
-                    "DefaultConstructorResolutionBehaviorTests.TypeWithMultiplePublicConstructors, it should " +
-                    "contain exactly one public constructor, but it has 2.", ex.Message);
+                    "DefaultConstructorResolutionBehaviorTests.TypeWithMultiplePublicConstructors it " +
+                    "should have only one public constructor: it has 2.", ex.Message);
             }
         }
 
@@ -75,21 +75,16 @@
             // Arrange
             var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
-            try
-            {
-                // Act
-                behavior.GetConstructor(typeof(TypeWithSingleInternalConstructor),
-                    typeof(TypeWithSingleInternalConstructor));
+            // Act
+            Action action = () => behavior.GetConstructor(typeof(TypeWithSingleInternalConstructor),
+                typeof(TypeWithSingleInternalConstructor));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains("For the container to be able to create " +
-                    "DefaultConstructorResolutionBehaviorTests.TypeWithSingleInternalConstructor, it should " +
-                    "contain exactly one public constructor, but it has 0.", ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "For the container to be able to create " +
+                "DefaultConstructorResolutionBehaviorTests.TypeWithSingleInternalConstructor it should " +
+                "have only one public constructor: it has none.",
+                action);
         }
 
         private static ContainerOptions GetContainerOptions()

@@ -191,15 +191,13 @@
 
             Type invalidConcrete = typeof(ServiceImplWithTwoConstructors);
 
-            try
-            {
-                // Act
-                container.Register(invalidConcrete);
-            }
-            catch (ArgumentException ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("it should contain exactly one public constructor"));
-            }
+            // Act
+            Action action = () => container.Register(invalidConcrete);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "it should have only one public constructor",
+                action);
         }
 
         [TestMethod]
