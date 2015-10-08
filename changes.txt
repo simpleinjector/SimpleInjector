@@ -17,7 +17,7 @@ Version 3.1.0 (v3.1.0 RTM)
 		-[Core] Exception message improved in case batch-registration skipped decorator. (fixes #13)
 		-[Core] Lifestyle.CreateRegistration and Container.AddRegistration methods now throw a clear
 		 exception explaining that open generic types can't be supplied. (fixes #126)
-
+	
 
 Version 3.0.7 (v3.0.7 RTM)
 
