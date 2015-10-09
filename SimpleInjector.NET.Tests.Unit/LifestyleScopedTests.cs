@@ -90,22 +90,27 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void GetInstance_DefaultLifestyleWrappingTheOldLifestyle_RegistersTheInstanceUsingTheExpectedLifestyle()
         {
             // Arrange
             var container = new Container();
 
             container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
-            container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
+            var expectedLifestyle = Lifestyle.CreateHybrid(
                 () => true,
                 new CustomScopedLifestyle(new Scope()),
                 container.Options.DefaultScopedLifestyle);
 
+            container.Options.DefaultScopedLifestyle = expectedLifestyle;
+
             container.Register<RealTimeProvider>(Lifestyle.Scoped);
 
             // Act
-            container.GetInstance<RealTimeProvider>();
+            var registration = container.GetRegistration(typeof(RealTimeProvider));
+
+            // Assert
+            Assert.AreSame(expectedLifestyle, registration.Lifestyle);
         }
 
         [TestMethod]
