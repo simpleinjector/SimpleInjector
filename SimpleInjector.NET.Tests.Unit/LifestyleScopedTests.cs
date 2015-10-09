@@ -201,15 +201,72 @@
                 "later on when Lifestyle.Scoped is supplied to one of the Register methods.");
         }
 
+        [TestMethod]
+        public void ScopedProxyLifestyleDependencyLength_Always_ReturnsLengthOfDefaultScopedLifestyle()
+        {
+            // Arrange
+            int expectedLength = 502; // Anything different than the default length for scoped (500).
+
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new CustomScopedLifestyle(length: expectedLength);
+
+            // Act
+            int actualLength = Lifestyle.Scoped.DependencyLength(container);
+
+            // Assert
+            Assert.AreEqual(expectedLength, actualLength);
+        }
+
+        [TestMethod]
+        public void ScopedProxyLifestyleCreateCurrentScopeProvider_Always_ReturnsScopeOfDefaultScopedLifestyle()
+        {
+            // Arrange
+            Scope expectedScope = new Scope();
+
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new CustomScopedLifestyle(scope: expectedScope);
+
+            // Act
+            Scope actualScope = Lifestyle.Scoped.CreateCurrentScopeProvider(container)();
+
+            // Assert
+            Assert.AreSame(expectedScope, actualScope);
+        }
+
+        [TestMethod]
+        public void ScopedProxyLifestyleCreateRegistration_Always_WrapsTheScopeOfDefaultScopedLifestyle()
+        {
+            // Arrange
+            var expectedLifestyle = new LifetimeScopeLifestyle();
+
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = expectedLifestyle;
+
+            // Act
+            var registration = Lifestyle.Scoped.CreateRegistration(typeof(NullLogger), container);
+
+            var actualLifestyle = registration.Lifestyle;
+
+            // Assert
+            Assert.AreSame(expectedLifestyle, actualLifestyle);
+        }
+
         private sealed class CustomScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;
+            private readonly int length;
 
-            public CustomScopedLifestyle(Scope scope = null) : base("Custom Scope")
+            public CustomScopedLifestyle(Scope scope = null, int? length = null) : base("Custom Scope")
             {
                 this.scope = scope;
+                this.length = length ?? base.Length;
             }
 
+            protected override int Length => this.length;
+     
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
             {
                 return () => this.scope;
