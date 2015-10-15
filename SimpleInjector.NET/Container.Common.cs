@@ -170,7 +170,7 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TService">The interface or base type to check for</typeparam>
         /// <returns>true if registered; false otherwise</returns>
-        public bool HasRegistration<TService>() where TService : class
+        public bool IsRegistered<TService>() where TService : class
         {
             return this.explicitRegistrations.ContainsKey(typeof(TService));
         }
