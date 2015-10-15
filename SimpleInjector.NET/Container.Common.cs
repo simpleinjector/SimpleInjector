@@ -165,6 +165,16 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>
+        /// checks if <typeparamref name="TService"/> has been registered
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type to check for</typeparam>
+        /// <returns>true if registered; false otherwise</returns>
+        public bool IsRegistered<TService>() where TService : class
+        {
+            return this.explicitRegistrations.ContainsKey(typeof(TService));
+        }
+
         internal bool HasRegistrations => this.explicitRegistrations.Count > 1 || this.collectionResolvers.Any();
 
         /// <summary>
