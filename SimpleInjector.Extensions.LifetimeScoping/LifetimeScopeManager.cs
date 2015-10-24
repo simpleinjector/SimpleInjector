@@ -23,7 +23,7 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
+    using SimpleInjector.Internals;
 
     // This class will be registered as singleton within a container, allowing each container (if the
     // application -for some reason- has multiple containers) to have it's own set of lifetime scopes, without
@@ -38,7 +38,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     {
         // Here we use .NET 4.0 ThreadLocal instead of the [ThreadStatic] attribute, to allow each container
         // to have it's own set of scopes.
-        private readonly ThreadLocal<LifetimeScope> threadLocalScopes = new ThreadLocal<LifetimeScope>();
+        // NOTE: We now use our custom ThreadSpecific that mimics ThreadLocal.
+        private readonly ThreadSpecific<LifetimeScope> threadLocalScopes = new ThreadSpecific<LifetimeScope>();
 
         internal LifetimeScopeManager()
         {

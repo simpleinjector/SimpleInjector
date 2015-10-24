@@ -1,7 +1,13 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+Version 3.1.1 (v3.1.1 RTM)
 
-Version 3.1.0 (v3.1.0 RTM)
+	Bug fixes:
+		-[Core] Using decorators in full version of Simple Injector prevented Container instances from being
+		 collected by the garbage collector. (fixes #135)
+
+
+Version 3.1.0 (v3.1.0 RTM) 2015-10-10
 
 	Improvements/Changes:
 		-[Core] Lifestyle.CreateProducer<TService>(Type, Container) overload added. (fixes #100)
@@ -19,7 +25,7 @@ Version 3.1.0 (v3.1.0 RTM)
 		 exception explaining that open generic types can't be supplied. (fixes #126)
 	
 
-Version 3.0.7 (v3.0.7 RTM)
+Version 3.0.7 (v3.0.7 RTM) 2015-10-08
 
 	Bug fixes:
 		-[Core] Applying multiple decorator proxies around a registration caused invalid Torn Lifestyle 

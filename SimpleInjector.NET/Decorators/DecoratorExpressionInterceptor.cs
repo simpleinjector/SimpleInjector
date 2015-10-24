@@ -28,7 +28,6 @@ namespace SimpleInjector.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Threading;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -42,7 +41,6 @@ namespace SimpleInjector.Decorators
         protected DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
         {
             this.data = data;
-
             this.Lifestyle = data.Lifestyle;
         }
 
@@ -75,22 +73,17 @@ namespace SimpleInjector.Decorators
         // DecoratorExpressionInterceptor and the ContainerUncontrolledServiceDecoratorInterceptor can have
         // their own dictionary. This is needed because they both use the same key, but store different
         // information.
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The ThreadLocal<T> instances are cached for the lifetime of the container. " +
-                "We have no mechanism to dispose them, but this isn't a big problem, because the container " +
-                "will typically live for the duration of the AppDomain and we will only created a limited " +
-                "amount of ThreadLocal<T> instances.")]
         protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(
             object key)
         {
             lock (key)
             {
                 var threadLocal =
-                    (ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
+                    (ThreadSpecific<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
 
                 if (threadLocal == null)
                 {
-                    threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>();
+                    threadLocal = new ThreadSpecific<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>();
                     this.Container.SetItem(key, threadLocal);
                 }
 

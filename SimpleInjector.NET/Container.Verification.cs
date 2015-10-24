@@ -38,7 +38,7 @@ namespace SimpleInjector
     public partial class Container
     {
         // Flag to signal that the container's configuration is currently being verified.
-        private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
+        private readonly ThreadSpecific<bool> isVerifying = new ThreadSpecific<bool>();
 
         // Flag to signal that the container's configuration has been verified (at least once).
         internal bool SuccesfullyVerified { get; private set; }

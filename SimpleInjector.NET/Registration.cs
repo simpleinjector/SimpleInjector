@@ -28,7 +28,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
@@ -49,25 +48,12 @@ namespace SimpleInjector
     /// <example>
     /// See the <see cref="Lifestyle"/> documentation for an example.
     /// </example>
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        // I'm still wondering whether it was better to use Dictionary<Thread, InstanceProducer> instead of
-        // ThreadLocal<InstanceProducer>. That would have prevented me from having to write all this :-)
-        Justification = @"This class references ThreadLocal<InstanceProducer> and ThreadLocal<T> implements
-            IDisposable. Not letting Registration implement IDisposable however is not a problem, because:
-            -Unless a user registers the InstanceCreated event, no ThreadLocal<T> will get created. 
-            -Registration objects will typically live as long as the AppDomain, so for those instances   
-             disposing is not an issue.                                                                  
-            -The InstanceProducers stored in the ThreadLocal<T> also live long and will be removed from the 
-             ThreadLocal<T> during the call to BuildExpression(InstanceProducer) and the ThreadLocal will 
-             because of this not keep those instances alive unnecessary.                             
-            -ThreadLocal<T> implements a finalizer and the GC will eventually clean up those few instances
-             that are referenced in a Registration that gets dereferenced.")]
     public abstract class Registration
     {
         private static readonly Action<object> NoOp = instance => { };
 
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
-        private readonly ThreadLocal<InstanceProducer> currentProducer = new ThreadLocal<InstanceProducer>();
+        private readonly ThreadSpecific<InstanceProducer> currentProducer = new ThreadSpecific<InstanceProducer>();
 
         private HashSet<DiagnosticType> suppressions;
         private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;

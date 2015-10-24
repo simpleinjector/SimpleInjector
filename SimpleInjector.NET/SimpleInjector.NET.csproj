@@ -176,6 +176,8 @@
     <Compile Include="Internals\GenericArgumentFinder.cs" />
     <Compile Include="Internals\GenericTypeBuilder.cs" />
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
+    <Compile Include="Internals\ThreadSpecific.cs" />
+    <Compile Include="Internals\ThreadSpecificValue.cs" />
     <Compile Include="PredicateContext.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Internals\TypeConstraintValidator.cs" />
