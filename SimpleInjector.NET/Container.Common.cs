@@ -59,8 +59,6 @@ namespace SimpleInjector
     /// </remarks>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
         Justification = "Not much we can do about this. Container is the facade where users work with.")]
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "This warning is right; we will fix this in v3.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
@@ -446,8 +444,18 @@ namespace SimpleInjector
         {
             if (disposing)
             {
-                this.disposableSingletonsScope.Dispose();
-                this.isVerifying.Dispose();
+                try
+                {
+                    this.disposableSingletonsScope.Dispose();
+                }
+                finally
+                {
+                    this.isVerifying.Dispose();
+
+                    // HACK: Due to a bug (https://stackoverflow.com/questions/33156432) in ThreadLocal<T>,
+                    // the container gets rooted when decorators are applied. See issue #135.
+                    this.items.Clear();
+                }
             }
         }
 
