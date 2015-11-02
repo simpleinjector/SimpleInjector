@@ -50,9 +50,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.NET\Internals\ThreadSpecific.cs">
-      <Link>ThreadSpecific.cs</Link>
-    </Compile>
     <Compile Include="LifetimeScopeLifestyle.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="SimpleInjectorLifetimeScopeExtensions.cs" />

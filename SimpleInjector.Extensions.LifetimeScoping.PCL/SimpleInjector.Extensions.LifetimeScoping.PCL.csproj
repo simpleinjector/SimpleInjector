@@ -53,8 +53,8 @@
     <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.cs">
       <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.NET\Internals\ThreadSpecific.cs">
-      <Link>ThreadSpecific.cs</Link>
+    <Compile Include="..\SimpleInjector.PCL\PclSpecific\ThreadLocal.cs">
+      <Link>PclSpecific\ThreadLocal.cs</Link>
     </Compile>
     <Compile Include="PclSpecific\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

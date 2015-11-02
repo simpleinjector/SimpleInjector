@@ -59,6 +59,8 @@ namespace SimpleInjector
     /// </remarks>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
         Justification = "Not much we can do about this. Container is the facade where users work with.")]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification = "This warning is right; we will fix this in v3.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
@@ -445,6 +447,7 @@ namespace SimpleInjector
             if (disposing)
             {
                 this.disposableSingletonsScope.Dispose();
+                this.isVerifying.Dispose();
             }
         }
 
