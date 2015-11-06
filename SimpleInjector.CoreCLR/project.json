@@ -1,0 +1,16 @@
+﻿{
+    "version": "3.0.0-*",
+    "compilationOptions": { "keyFile": "..\\SimpleInjector.snk" },
+    "frameworks": {
+        "dotnet": {
+            "dependencies": {
+                "Microsoft.NETCore": "5.0.0",
+                "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+            },
+            "imports": "portable-net452+win81",
+            "compilationOptions": {
+                "define": [ "DNXCORE50", "PCL" ]
+            }
+        }
+    }
+}
