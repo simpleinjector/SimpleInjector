@@ -27,6 +27,7 @@ namespace SimpleInjector.Internals
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Helper class for building closed generic type for a given open generic type and a closed generic base.
@@ -50,7 +51,8 @@ namespace SimpleInjector.Internals
 
             this.openGenericImplementation = openGenericImplementation;
 
-            if (openGenericImplementation.IsGenericType && !openGenericImplementation.IsGenericTypeDefinition)
+            if (openGenericImplementation.Info().IsGenericType && 
+                !openGenericImplementation.Info().IsGenericTypeDefinition)
             {
                 this.openGenericImplementation = openGenericImplementation.GetGenericTypeDefinition();
                 this.partialOpenGenericImplementation = openGenericImplementation;
@@ -109,7 +111,7 @@ namespace SimpleInjector.Internals
         {
             // Performance optimization: In case the user registers a very large set with mainly non-generic
             // types, we see a considerable performance improvement by adding this simple check.
-            if (this.openGenericImplementation.IsGenericType ||
+            if (this.openGenericImplementation.Info().IsGenericType ||
                 this.closedGenericBaseType.IsAssignableFrom(this.openGenericImplementation))
             {
                 var serviceType = this.FindMatchingOpenGenericServiceType();
@@ -145,7 +147,7 @@ namespace SimpleInjector.Internals
         private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(
             CandicateServiceType candicateServiceType)
         {
-            if (this.openGenericImplementation.IsGenericType)
+            if (this.openGenericImplementation.Info().IsGenericType)
             {
                 try
                 {
@@ -185,7 +187,7 @@ namespace SimpleInjector.Internals
 
         private CandicateServiceType ToCandicateServiceType(Type openCandidateServiceType)
         {
-            if (openCandidateServiceType.IsGenericType)
+            if (openCandidateServiceType.Info().IsGenericType)
             {
                 return new CandicateServiceType(openCandidateServiceType,
                     this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
@@ -196,7 +198,7 @@ namespace SimpleInjector.Internals
 
         private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)
         {
-            if (this.openGenericImplementation.IsGenericType)
+            if (this.openGenericImplementation.Info().IsGenericType)
             {
                 return this.SatisfiesGenericTypeConstraints(openCandidateServiceType);
             }
@@ -263,14 +265,14 @@ namespace SimpleInjector.Internals
             if (argument.IsGenericParameter)
             {
                 var nestedArguments =
-                    from constraint in argument.GetGenericParameterConstraints()
+                    from constraint in argument.Info().GetGenericParameterConstraints()
                     from arg in GetNestedTypeArgumentsForTypeArgument(constraint, processedArguments)
                     select arg;
 
                 return nestedArguments.Concat(new[] { argument });
             }
 
-            if (!argument.IsGenericType)
+            if (!argument.Info().IsGenericType)
             {
                 return Enumerable.Empty<Type>();
             }

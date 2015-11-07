@@ -27,6 +27,7 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Reflection;
     using SimpleInjector.Diagnostics.Analyzers;
     
     internal sealed class ContainerDebugView
@@ -132,7 +133,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                     value: producersForGroup[0]);
             }
 
-            if (groupType.ContainsGenericParameters)
+            if (groupType.Info().ContainsGenericParameters)
             {
                 return this.BuildGenericGroup(groupType, producersForGroup, level);
             }

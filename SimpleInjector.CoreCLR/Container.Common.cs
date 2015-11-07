@@ -30,7 +30,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
+    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
@@ -49,7 +49,7 @@ namespace SimpleInjector
     /// </para>
     /// <para> 
     /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
-    /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(Type)"/> and
+    /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(System.Type)"/> and
     /// <see cref="GetCurrentRegistrations()"/> and anything related to resolving instances from multiple thread 
     /// concurrently. It is however <b>unsafe</b> to call
     /// <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
@@ -384,7 +384,7 @@ namespace SimpleInjector
 
         /// <summary>Prevents any new registrations to be made to the container.</summary>
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         internal void LockContainer()
         {
@@ -580,12 +580,11 @@ namespace SimpleInjector
                 : null;
         }
 
-        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType)
-        {
-            return typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
-                ? this.GetInstanceProducerForRegisteredCollection(enumerableServiceType.GetGenericArguments()[0])
+        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
+            typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
+                ? this.GetInstanceProducerForRegisteredCollection(
+                    enumerableServiceType.GetGenericArguments()[0])
                 : null;
-        }
 
         private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType)
         {
@@ -618,7 +617,7 @@ namespace SimpleInjector
 
         private static Type GetRegistrationKey(Type serviceType)
         {
-            return serviceType.IsGenericType
+            return serviceType.Info().IsGenericType
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
         }

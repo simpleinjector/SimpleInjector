@@ -71,7 +71,7 @@ namespace SimpleInjector.Lifestyles
         }
 
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container)
         {

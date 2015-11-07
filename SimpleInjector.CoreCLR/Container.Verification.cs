@@ -27,7 +27,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
+    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
@@ -81,7 +81,7 @@ namespace SimpleInjector
         }
 
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         internal Scope GetVerificationScopeForCurrentThread()
         {

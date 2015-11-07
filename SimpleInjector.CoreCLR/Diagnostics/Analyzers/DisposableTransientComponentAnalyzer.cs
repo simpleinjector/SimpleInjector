@@ -26,6 +26,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
 
     internal class DisposableTransientComponentAnalyzer : IContainerAnalyzer
     {

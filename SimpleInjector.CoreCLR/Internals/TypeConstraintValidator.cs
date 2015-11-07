@@ -48,7 +48,7 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (this.Mapping.ConcreteType.IsValueType)
+            if (this.Mapping.ConcreteType.Info().IsValueType)
             {
                 // Value types always have a default constructor.
                 return true;
@@ -66,7 +66,7 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            return !this.Mapping.ConcreteType.IsValueType;
+            return !this.Mapping.ConcreteType.Info().IsValueType;
         }
 
         private bool ParameterSatisfiesNotNullableValueTypeConstraint()
@@ -76,12 +76,12 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (!this.Mapping.ConcreteType.IsValueType)
+            if (!this.Mapping.ConcreteType.Info().IsValueType)
             {
                 return false;
             }
 
-            bool isNullable = this.Mapping.ConcreteType.IsGenericType &&
+            bool isNullable = this.Mapping.ConcreteType.Info().IsGenericType &&
                 this.Mapping.ConcreteType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             return !isNullable;
@@ -90,7 +90,7 @@ namespace SimpleInjector.Internals
         private bool ParameterSatisfiesGenericParameterConstraints()
         {
             var unsatisfiedConstraints =
-                from constraint in this.Mapping.Argument.GetGenericParameterConstraints()
+                from constraint in this.Mapping.Argument.Info().GetGenericParameterConstraints()
                 where !this.MappingMightBeCompatibleWithTypeConstraint(constraint)
                 select constraint;
 
@@ -132,7 +132,7 @@ namespace SimpleInjector.Internals
 
         private bool MappingHasConstraint(GenericParameterAttributes constraint)
         {
-            var constraints = this.Mapping.Argument.GenericParameterAttributes;
+            var constraints = this.Mapping.Argument.Info().GenericParameterAttributes;
             return (constraints & constraint) != GenericParameterAttributes.None;
         }
     }

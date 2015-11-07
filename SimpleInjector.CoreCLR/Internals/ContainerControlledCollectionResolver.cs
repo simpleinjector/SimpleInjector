@@ -25,6 +25,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Decorators;
 
@@ -71,7 +72,7 @@ namespace SimpleInjector.Internals
                 from registrationGroup in this.RegistrationGroups
                 from item in registrationGroup.ControlledItems
                 let implementation = item.ImplementationType
-                where !implementation.ContainsGenericParameters
+                where !implementation.Info().ContainsGenericParameters
                 from service in implementation.GetBaseTypesAndInterfacesFor(this.ServiceType)
                 select service;
 
@@ -82,7 +83,7 @@ namespace SimpleInjector.Internals
         {
             var items = this.GetItemsFor(serviceType);
 
-            return serviceType.IsGenericType
+            return serviceType.Info().IsGenericType
                 ? Helpers.GetClosedGenericImplementationsFor(serviceType, items)
                 : items.ToArray();
         }
@@ -91,7 +92,7 @@ namespace SimpleInjector.Internals
         {
             return
                 from registrationGroup in this.RegistrationGroups
-                where registrationGroup.ServiceType.ContainsGenericParameters ||
+                where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
                     closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
                 from item in registrationGroup.ControlledItems
                 select item;

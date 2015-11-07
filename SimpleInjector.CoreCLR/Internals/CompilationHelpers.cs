@@ -26,6 +26,7 @@ namespace SimpleInjector.Internals
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced.Internal;
@@ -169,13 +170,11 @@ namespace SimpleInjector.Internals
                         .Concat(new[] { optimizedExpression })));
         }
 
-        private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container)
-        {
-            return Expression.New(
+        private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container) =>
+            Expression.New(
                 typeof(LazyScope).GetConstructor(new[] { typeof(Func<Scope>), typeof(Container) }),
                 Expression.Constant(scopeFactory, typeof(Func<Scope>)),
                 Expression.Constant(container, typeof(Container)));
-        }
 
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)
         {
@@ -318,7 +317,7 @@ namespace SimpleInjector.Internals
                 {
                     Type type = registration.GetType();
 
-                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<,>))
+                    if (type.Info().IsGenericType && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<,>))
                     {
                         return registration;
                     }

@@ -25,6 +25,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     internal sealed class GenericRegistrationEntry : IRegistrationEntry
     {
@@ -140,7 +141,7 @@ namespace SimpleInjector.Internals
                 {
                     var overlappingProvider = overlappingProviders.First();
 
-                    if (overlappingProvider.ServiceType.IsGenericTypeDefinition)
+                    if (overlappingProvider.ServiceType.Info().IsGenericTypeDefinition)
                     {
                         throw new InvalidOperationException(
                             StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
@@ -361,7 +362,7 @@ namespace SimpleInjector.Internals
                     throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.ServiceType));
                 }
 
-                if (implementationType.ContainsGenericParameters)
+                if (implementationType.Info().ContainsGenericParameters)
                 {
                     Requires.TypeFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
                         serviceType, implementationType);
@@ -434,7 +435,7 @@ namespace SimpleInjector.Internals
                 // able to construct a new open service type, based on the generic type arguments of the
                 // implementation. If it can't, it means that the implementionType applies to a subset.
                 return this.Predicate == null
-                    && this.ImplementationType.IsGenericType
+                    && this.ImplementationType.Info().IsGenericType
                     && !this.ImplementationType.IsPartiallyClosed()
                     && this.IsImplementationApplicableToEveryGenericType();
             }

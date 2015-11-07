@@ -24,6 +24,7 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Specifies the list of diagnostic types that are currently supported by the diagnostic 

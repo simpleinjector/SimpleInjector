@@ -203,7 +203,7 @@ namespace SimpleInjector
         {
             string reason = string.Empty;
 
-            if (invalidTarget.TargetType.IsValueType)
+            if (invalidTarget.TargetType.Info().IsValueType)
             {
                 reason = " because it is a value type";
             }
@@ -340,14 +340,14 @@ namespace SimpleInjector
                 "The supplied {0} of type {1} does not {2} {3}.",
                 elementDescription,
                 elementType.ToFriendlyName(),
-                serviceType.IsInterface ? "implement" : "inherit from",
+                serviceType.Info().IsInterface ? "implement" : "inherit from",
                 serviceType.ToFriendlyName());
 
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation) => 
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} does not {1} {2}.",
                 implementation.ToFriendlyName(),
-                service.IsInterface ? "implement" : "inherit from",
+                service.Info().IsInterface ? "implement" : "inherit from",
                 service.ToFriendlyName());
 
         internal static string TheInitializersCouldNotBeApplied(Type type, Exception innerException) => 
@@ -610,7 +610,7 @@ namespace SimpleInjector
                 "overloads that registers container-{1} collections, while this method registers container-" +
                 "{2} collections. Mixing calls is not supported. Consider merging those calls or make both " +
                 "calls either as controlled or uncontrolled registration.",
-                (serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType).ToFriendlyName(),
+                (serviceType.Info().IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType).ToFriendlyName(),
                 controlled ? "uncontrolled" : "controlled",
                 controlled ? "controlled" : "uncontrolled",
                 nameof(Container.RegisterCollection));
@@ -716,9 +716,9 @@ namespace SimpleInjector
                 "({0}) the {1} {2}registration for {3} using {4}",
                 index + 1,
                 producer.IsConditional ? "conditional" : "unconditional",
-                serviceType.IsGenericTypeDefinition 
+                serviceType.Info().IsGenericTypeDefinition 
                     ? "open generic " 
-                    : serviceType.IsGenericType ? "closed generic " : string.Empty,
+                    : serviceType.Info().IsGenericType ? "closed generic " : string.Empty,
                 serviceType.ToFriendlyName(),
                 implementationType.ToFriendlyName());
         }
@@ -738,7 +738,7 @@ namespace SimpleInjector
         {
             string serviceTypeName = target.TargetType.ToFriendlyName();
 
-            bool isGenericType = target.TargetType.IsGenericType;
+            bool isGenericType = target.TargetType.Info().IsGenericType;
 
             string openServiceTypeName = isGenericType
                 ? target.TargetType.GetGenericTypeDefinition().ToFriendlyName()

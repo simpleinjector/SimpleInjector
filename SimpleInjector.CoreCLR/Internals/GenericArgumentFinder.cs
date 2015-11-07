@@ -24,9 +24,8 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
     using System.Reflection;
+    using System.Linq;
 
     /// <summary>
     /// Allows retrieving the concrete types of the generic type arguments of that must be used to create a
@@ -148,7 +147,7 @@ namespace SimpleInjector.Internals
                 //// If the type itself is a generic parameter such as TKey (and not for instance IBar<TValue>)
                 //// We must skip it, since there is no mappings we can extract from it (while IBar<TValue> could).
                 constraints =
-                    from constraint in mapping.Argument.GetGenericParameterConstraints()
+                    from constraint in mapping.Argument.Info().GetGenericParameterConstraints()
                     where !constraint.IsGenericParameter
                     select constraint;
             }

@@ -26,9 +26,10 @@ namespace SimpleInjector.Internals
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
-    
+
     // This resolver allows multiple registrations for the same generic type to be combined in case the generic
     // type is variant.
     internal sealed class ContainerUncontrolledCollectionResolver : CollectionResolver

@@ -24,6 +24,7 @@ namespace SimpleInjector.Internals
 {
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     internal sealed class ConstantFinderVisitor : ExpressionVisitor
     {
@@ -42,7 +43,7 @@ namespace SimpleInjector.Internals
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (!node.Type.IsPrimitive)
+            if (!node.Type.Info().IsPrimitive)
             {
                 this.constants.Add(node);
             }

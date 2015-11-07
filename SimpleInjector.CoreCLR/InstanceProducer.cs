@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
@@ -239,7 +238,7 @@ namespace SimpleInjector
             {
                 // We have to clear the counter of the cyclic dependency validator to make sure it will not
                 // throw a false positive on the next resolve.
-                this.ClearCyclicDependencyValidator();
+                this.ResetCyclicDependencyValidator();
 
                 if (ex is CyclicDependencyException)
                 {
@@ -298,7 +297,7 @@ namespace SimpleInjector
                 // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into 
                 // the container manually. This will not be detected during building the expression, because 
                 // the delegate won't (always) get executed at this point.
-                this.ClearCyclicDependencyValidator();
+                this.ResetCyclicDependencyValidator();
             }
         }
 
@@ -555,7 +554,7 @@ namespace SimpleInjector
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void CheckForCyclicDependencies()
         {
@@ -567,7 +566,7 @@ namespace SimpleInjector
 
         // This method will be inlined by the JIT.
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RemoveCyclicDependencyValidator()
         {
@@ -587,13 +586,13 @@ namespace SimpleInjector
         // recursive call and throw an exception, and this would hide the exception that would otherwise be
         // thrown by the provider itself.
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        private void ClearCyclicDependencyValidator()
+        private void ResetCyclicDependencyValidator()
         {
             if (this.validator != null)
             {
-                this.validator.RollBack();
+                this.validator.Reset();
             }
         }
 

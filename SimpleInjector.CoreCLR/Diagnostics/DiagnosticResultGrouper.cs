@@ -25,6 +25,7 @@ namespace SimpleInjector.Diagnostics
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     internal class DiagnosticResultGrouper
     {
@@ -65,7 +66,7 @@ namespace SimpleInjector.Diagnostics
 
         private DiagnosticGroup BuildDiagnosticGroup(Type groupType, IEnumerable<DiagnosticResult> results, 
             int level) => 
-            groupType.ContainsGenericParameters
+            groupType.Info().ContainsGenericParameters
                 ? this.BuildGenericGroup(groupType, results, level)
                 : this.BuildNonGenericGroup(groupType, results);
 

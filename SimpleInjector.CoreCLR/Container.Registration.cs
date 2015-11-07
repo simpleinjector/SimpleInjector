@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -1175,7 +1176,7 @@ namespace SimpleInjector
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(serviceType, implementationType,
                 implementationTypeParamName);
 
-            if (serviceType.ContainsGenericParameters)
+            if (serviceType.Info().ContainsGenericParameters)
             {
                 this.RegisterOpenGeneric(serviceType, implementationType, lifestyle);
             }

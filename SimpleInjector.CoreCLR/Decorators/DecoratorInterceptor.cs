@@ -25,7 +25,8 @@ namespace SimpleInjector.Decorators
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using SimpleInjector.Internals;
+    using Internals;
+    using System.Reflection;
 
     internal class DecoratorInterceptor
     {
@@ -175,9 +176,9 @@ namespace SimpleInjector.Decorators
         {
             Type decoratorType = this.data.DecoratorTypeFactory(context);
 
-            if (decoratorType.ContainsGenericParameters)
+            if (decoratorType.Info().ContainsGenericParameters)
             {
-                if (!requestedServiceType.IsGenericType)
+                if (!requestedServiceType.Info().IsGenericType)
                 {
                     throw new ActivationException(
                         StringResources.TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(

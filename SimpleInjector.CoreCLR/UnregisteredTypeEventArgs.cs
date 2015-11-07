@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     /// <summary>
     /// Provides data for and interaction with the 

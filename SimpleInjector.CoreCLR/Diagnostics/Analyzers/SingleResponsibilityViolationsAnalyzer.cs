@@ -26,6 +26,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
@@ -78,7 +79,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selves still get analyzed, so the only thing we'd miss here is the decorator.
-            if (!producer.ServiceType.IsGenericType)
+            if (!producer.ServiceType.Info().IsGenericType)
             {
                 return true;
             }

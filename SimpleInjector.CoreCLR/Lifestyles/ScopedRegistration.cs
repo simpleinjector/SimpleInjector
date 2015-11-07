@@ -24,6 +24,7 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     internal sealed class ScopedRegistration<TService, TImplementation> : Registration
         where TImplementation : class, TService
@@ -48,22 +49,13 @@ namespace SimpleInjector.Lifestyles
             this.RegisterForDisposal = registerForDisposal;
         }
 
-        public override Type ImplementationType
-        {
-            get { return typeof(TImplementation); }
-        }
+        public override Type ImplementationType => typeof(TImplementation);
 
-        public new ScopedLifestyle Lifestyle
-        {
-            get { return (ScopedLifestyle)base.Lifestyle; }
-        }
+        public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
-        internal Func<TService> InstanceCreator
-        {
-            get { return this.instanceCreator; }
-        }
+        internal Func<TService> InstanceCreator => this.instanceCreator;
 
-        internal bool RegisterForDisposal { get; private set; }
+        internal bool RegisterForDisposal { get; }
 
         public override Expression BuildExpression()
         {
@@ -100,7 +92,7 @@ namespace SimpleInjector.Lifestyles
                 var transientInstanceCreator = this.BuildTransientDelegate<TService, TImplementation>();
 
                 // WTF! Somehow Func<T> is not contra-variant in PCL :-(
-#if PCL
+#if PCL && !DNXCORE50
                 return () => transientInstanceCreator();
 #else
                 return transientInstanceCreator;

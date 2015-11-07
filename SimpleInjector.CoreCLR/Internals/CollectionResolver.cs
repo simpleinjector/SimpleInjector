@@ -23,12 +23,11 @@
 namespace SimpleInjector.Internals
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using SimpleInjector;
+    using System.Reflection;
     using SimpleInjector.Decorators;
-    using SimpleInjector.Lifestyles;
 
     internal abstract class CollectionResolver
     {
@@ -148,7 +147,7 @@ namespace SimpleInjector.Internals
 
             if (overlappingGroups.Any())
             {
-                if (!serviceType.ContainsGenericParameters &&
+                if (!serviceType.Info().ContainsGenericParameters &&
                     overlappingGroups.Any(group => group.ServiceType == serviceType))
                 {
                     throw new InvalidOperationException(
@@ -164,8 +163,8 @@ namespace SimpleInjector.Internals
             from registrationGroup in this.RegistrationGroups
             where !registrationGroup.Appended
             where registrationGroup.ServiceType == serviceType
-                || serviceType.ContainsGenericParameters
-                || registrationGroup.ServiceType.ContainsGenericParameters
+                || serviceType.Info().ContainsGenericParameters
+                || registrationGroup.ServiceType.Info().ContainsGenericParameters
             select registrationGroup;
 
         protected sealed class RegistrationGroup

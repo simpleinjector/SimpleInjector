@@ -24,6 +24,7 @@ namespace SimpleInjector.Advanced
 {
     using System.Diagnostics;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     [DebuggerDisplay(nameof(DefaultDependencyInjectionBehavior))]
     internal sealed class DefaultDependencyInjectionBehavior : IDependencyInjectionBehavior
@@ -51,7 +52,7 @@ namespace SimpleInjector.Advanced
 
             var target = consumer.Target;
 
-            if (target.TargetType.IsValueType || target.TargetType == typeof(string))
+            if (target.TargetType.Info().IsValueType || target.TargetType == typeof(string))
             {
                 throw new ActivationException(StringResources.TypeMustNotContainInvalidInjectionTarget(target));
             }

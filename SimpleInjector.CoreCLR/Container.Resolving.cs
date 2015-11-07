@@ -27,6 +27,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Decorators;
@@ -161,11 +162,11 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either 
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
-        /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
+        /// <param name="serviceType">The <see cref="System.Type"/> that the returned instance producer should produce.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
         public InstanceProducer GetRegistration(Type serviceType)
         {
@@ -187,11 +188,11 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either 
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
-        /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
+        /// <param name="serviceType">The <see cref="System.Type"/> that the returned instance producer should produce.</param>
         /// <param name="throwOnFailure">The indication whether the method should return null or throw
         /// an exception when the type is not registered.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
@@ -237,7 +238,7 @@ namespace SimpleInjector
         {
             this.LockContainer();
 
-            if (serviceType.ContainsGenericParameters)
+            if (serviceType.Info().ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
                     nameof(serviceType));
@@ -293,7 +294,7 @@ namespace SimpleInjector
 
         private object GetInstanceForRootType(Type serviceType)
         {
-            if (serviceType.ContainsGenericParameters)
+            if (serviceType.Info().ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
                     nameof(serviceType));
@@ -412,7 +413,7 @@ namespace SimpleInjector
                 Type elementType = serviceType.GetElementType();
 
                 // We don't auto-register collections for ambiguous types.
-                if (elementType.IsValueType || Helpers.IsAmbiguousType(elementType))
+                if (elementType.Info().IsValueType || Helpers.IsAmbiguousType(elementType))
                 {
                     return null;
                 }
@@ -597,7 +598,7 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type concreteType)
         {
-            if (!concreteType.IsValueType && !concreteType.ContainsGenericParameters &&
+            if (!concreteType.Info().IsValueType && !concreteType.Info().ContainsGenericParameters &&
                 this.IsConcreteConstructableType(concreteType))
             {
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(concreteType, () =>
@@ -673,7 +674,11 @@ namespace SimpleInjector
             // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
             // producer from being added after the snapshot has been made accessible to other threads.
             // This is important on architectures with a weak memory model (such as ARM).
+#if DNXCORE50
+            Interlocked.MemoryBarrier();
+#else
             Thread.MemoryBarrier();
+#endif
 
             // Replace the original with the new version that includes the serviceType (make snapshot public).
             this.rootProducerCache = snapshotCopy;

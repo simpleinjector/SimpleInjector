@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -92,8 +93,8 @@ namespace SimpleInjector
         /// defined on this member.</exception>
         public object[] GetCustomAttributes(bool inherit) => 
             this.Parameter != null
-                ? this.Parameter.GetCustomAttributes(inherit)
-                : this.Property.GetCustomAttributes(inherit);
+                ? this.Parameter.GetCustomAttributes(inherit).ToArray()
+                : this.Property.GetCustomAttributes(inherit).ToArray();
 
         /// <summary>
         /// Returns an array of custom attributes defined on either the <see cref="Parameter"/> or
@@ -107,8 +108,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">attributeType is null.</exception>
         public object[] GetCustomAttributes(Type attributeType, bool inherit) => 
             this.Parameter != null
-                ? this.Parameter.GetCustomAttributes(attributeType, inherit)
-                : this.Property.GetCustomAttributes(attributeType, inherit);
+                ? this.Parameter.GetCustomAttributes(attributeType, inherit).ToArray()
+                : this.Property.GetCustomAttributes(attributeType, inherit).ToArray();
 
         /// <summary>
         /// Indicates whether one or more instance of attributeType is defined on this either the 
@@ -122,6 +123,7 @@ namespace SimpleInjector
                 ? this.Parameter.IsDefined(attributeType, inherit)
                 : this.Property.IsDefined(attributeType, inherit);
 
+#if !DNXCORE50
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
         /// </summary>
@@ -159,6 +161,7 @@ namespace SimpleInjector
             this.Parameter != null
                 ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
                 : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
+#endif
 
         /// <summary>
         /// Retrieves a collection of custom attributes of a specified type that are applied to a specified parameter.
@@ -178,7 +181,7 @@ namespace SimpleInjector
         /// empty collection if no such attributes exist.</returns>
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute => 
             this.Parameter != null
-                ? (T[])Attribute.GetCustomAttributes(this.Parameter, typeof(T), inherit)
-                : (T[])Attribute.GetCustomAttributes(this.Property, typeof(T), inherit);
+                ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
+                : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();
     }
 }

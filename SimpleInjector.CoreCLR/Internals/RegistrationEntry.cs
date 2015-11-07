@@ -23,11 +23,12 @@
 namespace SimpleInjector.Internals
 {
     using System;
+    using System.Reflection;
 
     internal static class RegistrationEntry
     {
         internal static IRegistrationEntry Create(Type serviceType, Container container) =>
-            serviceType.IsGenericType
+            serviceType.Info().IsGenericType
                 ? (IRegistrationEntry)new GenericRegistrationEntry(container)
                 : (IRegistrationEntry)new NonGenericRegistrationEntry(serviceType, container);
     }

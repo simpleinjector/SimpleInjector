@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Reflection;
 
 #if !PUBLISH
     /// <summary>Methods for conditional registrations.</summary>
@@ -159,7 +160,7 @@ namespace SimpleInjector
             Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
 
-            if (serviceType.ContainsGenericParameters)
+            if (serviceType.Info().ContainsGenericParameters)
             {
                 this.RegisterOpenGeneric(serviceType, implementationType, lifestyle, predicate);
             }

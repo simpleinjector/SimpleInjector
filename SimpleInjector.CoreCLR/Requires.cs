@@ -28,14 +28,13 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
     using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
 
     internal static class Requires
     {
 #if NET45
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         [DebuggerStepThrough]
         internal static void IsNotNull(object instance, string paramName)
@@ -60,7 +59,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsReferenceType(Type type, string paramName)
         {
-            if (!type.IsClass && !type.IsInterface)
+            if (!type.Info().IsClass && !type.Info().IsInterface)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsNotAReferenceType(type), paramName);
             }
@@ -71,7 +70,7 @@ namespace SimpleInjector
         {
             // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
             // to find out if this type can be created.
-            if (type.ContainsGenericParameters)
+            if (type.Info().ContainsGenericParameters)
             {
                 throw new ArgumentException(StringResources.SuppliedTypeIsAnOpenGenericType(type), paramName);
             }
@@ -121,7 +120,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsGenericType(Type type, string paramName, Func<Type, string> guidance = null)
         {
-            if (!type.IsGenericType)
+            if (!type.Info().IsGenericType)
             {
                 string message = StringResources.SuppliedTypeIsNotAGenericType(type) +
                     (guidance == null ? string.Empty : (" " + guidance(type)));
@@ -136,7 +135,7 @@ namespace SimpleInjector
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
             // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
             // implementation of the GenericArgumentFinder. That's not an easy thing to fix :-(
-            if (!type.ContainsGenericParameters)
+            if (!type.Info().ContainsGenericParameters)
             {
                 string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type) +
                     (guidance == null ? string.Empty : (" " + guidance(type)));
@@ -157,9 +156,9 @@ namespace SimpleInjector
         internal static void DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(Type serviceType,
             IEnumerable<Type> serviceTypes, string paramName)
         {
-            Type openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters);
+            Type openGenericType = serviceTypes.FirstOrDefault(t => t.Info().ContainsGenericParameters);
 
-            if (!serviceType.IsGenericType && openGenericType != null)
+            if (!serviceType.Info().IsGenericType && openGenericType != null)
             {
                 throw new ArgumentException(
                     StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(openGenericType),
@@ -169,8 +168,11 @@ namespace SimpleInjector
 
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
-            bool implementationIsOpen = implementation.IsGenericType && implementation.ContainsGenericParameters;
-            bool serviceTypeIsClosed = service.IsGenericType && !service.ContainsGenericParameters;
+            bool implementationIsOpen = 
+                implementation.Info().IsGenericType && implementation.Info().ContainsGenericParameters;
+
+            bool serviceTypeIsClosed = 
+                service.Info().IsGenericType && !service.Info().ContainsGenericParameters;
 
             if (implementationIsOpen && serviceTypeIsClosed)
             {
@@ -233,7 +235,7 @@ namespace SimpleInjector
             try
             {
                 OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
-                    serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType,
+                    serviceType.Info().IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType,
                     implementationType,
                     null);
             }
@@ -263,7 +265,7 @@ namespace SimpleInjector
         internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
             Type implementationType, string parameterName)
         {
-            if (serviceType.ContainsGenericParameters && implementationType.ContainsGenericParameters)
+            if (serviceType.Info().ContainsGenericParameters && implementationType.Info().ContainsGenericParameters)
             {
                 var builder = new GenericTypeBuilder(serviceType, implementationType);
 
@@ -280,7 +282,7 @@ namespace SimpleInjector
         internal static void DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(Type serviceType,
             Type decoratorType, string parameterName)
         {
-            if (!serviceType.ContainsGenericParameters && decoratorType.ContainsGenericParameters)
+            if (!serviceType.Info().ContainsGenericParameters && decoratorType.Info().ContainsGenericParameters)
             {
                 throw new ArgumentException(
                     StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(
@@ -344,7 +346,7 @@ namespace SimpleInjector
         {
             var openGenericTypes =
                 from type in typesToRegister
-                where type.ContainsGenericParameters
+                where type.Info().ContainsGenericParameters
                 select type;
 
             if (openGenericTypes.Any())

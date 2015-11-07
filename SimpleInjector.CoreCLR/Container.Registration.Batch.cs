@@ -314,7 +314,7 @@ namespace SimpleInjector
                 where !assembly.IsDynamic
                 from type in GetTypesFromAssembly(assembly)
                 where Helpers.IsConcreteType(type)
-                where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition
+                where options.IncludeGenericTypeDefinitions || !type.Info().IsGenericTypeDefinition
                 where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
                 let ctor = this.SelectImplementationTypeConstructorOrNull(serviceType, type)
                 where ctor == null || options.IncludeDecorators || !Helpers.IsDecorator(serviceType, ctor)
@@ -387,7 +387,7 @@ namespace SimpleInjector
 
         private Type[] GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(Type serviceType)
         {
-            if (serviceType.IsGenericType)
+            if (serviceType.Info().IsGenericType)
             {
                 var typeDef = serviceType.GetGenericTypeDefinition();
 

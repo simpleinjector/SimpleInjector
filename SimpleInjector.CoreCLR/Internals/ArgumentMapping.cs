@@ -25,6 +25,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     
     /// <summary>
     /// A map containing a generic argument (such as T) and the concrete type (such as Int32) that it
@@ -78,7 +79,7 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (!this.ConcreteType.IsGenericType || !this.Argument.IsGenericType)
+            if (!this.ConcreteType.Info().IsGenericType || !this.Argument.Info().IsGenericType)
             {
                 return false;
             }

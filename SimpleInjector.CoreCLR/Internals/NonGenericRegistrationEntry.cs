@@ -25,6 +25,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     internal sealed class NonGenericRegistrationEntry : IRegistrationEntry
     {
@@ -284,7 +285,7 @@ namespace SimpleInjector.Internals
                     throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.serviceType));
                 }
 
-                if (implementationType.ContainsGenericParameters)
+                if (implementationType.Info().ContainsGenericParameters)
                 {
                     throw new ActivationException(
                         StringResources.TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
