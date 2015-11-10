@@ -6,7 +6,7 @@ _**To get a high level overview of Simple Injector, please [visit our website](h
 
 The goal of **Simple Injector** is to provide .NET application developers with an easy, flexible, and fast **Dependency Injection library** that promotes best practice to steer developers towards the pit of success.
 
-Many of the existing DI libraries have a big complicated legacy API or are new, immature, and lack features often required by large scale development projects. Simple Injector fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features and allows almost any [advanced scenario](https://simpleinjector.readthedocs.org/en/latest/advanced.html).
+Many of the existing DI libraries have a big complicated legacy API or are new, immature, and lack features often required by large scale development projects. Simple Injector fills this gap by supplying a simple implementation with a carefully selected and complete set of features. File and attribute based configuration methods have been abandoned (they invariably result in brittle and maintenance heavy applications), favoring simple code based configuration instead. This is enough for most applications, requiring only that the configuration be performed at the start of the program. The core library contains many features for all your [advanced](https://simpleinjector.readthedocs.org/en/latest/advanced.html) needs.
 
 The following platforms are supported:
 
@@ -15,6 +15,7 @@ The following platforms are supported:
 * *Windows Phone 8*.
 * *Windows Store Apps*.
 * *Mono*.
+* *CoreCLR* (coming soon).
 
 > Simple Injector is carefully designed to run in **partial / medium trust**, and it is fast; blazingly fast.
 
