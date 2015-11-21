@@ -1,6 +1,6 @@
 ﻿{
     "version": "3.0.0-*",
-    "compilationOptions": { "keyFile": "..\\SimpleInjector.snk" },
+    "compilationOptions": { "keyFile": "../SimpleInjector.snk" },
     "frameworks": {
         "dotnet": {
             "dependencies": {
