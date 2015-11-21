@@ -514,6 +514,8 @@ namespace SimpleInjector
                 this.overriddenLifestyle = e.Lifestyle;
             }
 
+            this.Analyze();
+
             return e.Expression;
         }
 
