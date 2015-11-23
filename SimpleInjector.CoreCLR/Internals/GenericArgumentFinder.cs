@@ -24,8 +24,8 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Allows retrieving the concrete types of the generic type arguments of that must be used to create a

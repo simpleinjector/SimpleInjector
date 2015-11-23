@@ -23,10 +23,10 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
 
     /// <summary>

@@ -25,8 +25,8 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using SimpleInjector;
     using System.Reflection;
+    using SimpleInjector;
     using SimpleInjector.Decorators;
 
     internal abstract class CollectionResolver
