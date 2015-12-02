@@ -1,7 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // https://simpleinjector.codeplex.com/discussions/353520
+    // https://simpleinjector.readthedocs.org/en/latest/extensibility.html#overriding-constructor-resolution-behavior
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
@@ -30,7 +31,7 @@
         [DebuggerStepThrough]
         public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
         {
-            var constructor = this.GetConstructorOrNull(serviceType, implementationType);
+            var constructor = this.GetConstructors(serviceType, implementationType).FirstOrDefault();
 
             if (constructor != null)
             {
@@ -41,23 +42,25 @@
         }
 
         [DebuggerStepThrough]
-        private ConstructorInfo GetConstructorOrNull(Type serviceType, Type implementationType)
+        private IEnumerable<ConstructorInfo> GetConstructors(Type service, Type implementation)
         {
+            var constructors = implementation.GetConstructors();
+
             // We prevent calling GetRegistration during the registration phase, because at this point not
             // all dependencies might be registered, and calling GetRegistration would lock the container,
             // making it impossible to do other registrations.
-            return (
-                from ctor in implementationType.GetConstructors()
+            return
+                from ctor in constructors
                 let parameters = ctor.GetParameters()
+                where this.IsCalledDuringRegistrationPhase
+                    || constructors.Length == 1
+                    || ctor.GetParameters().All(p => this.CanBeResolved(p, service, implementation))
                 orderby parameters.Length descending
-                where this.IsCalledDuringRegistrationPhase || 
-                    parameters.All(parameter => this.CanBeResolved(serviceType, implementationType, parameter))
-                select ctor)
-                .FirstOrDefault();
+                select ctor;
         }
 
         [DebuggerStepThrough]
-        private bool CanBeResolved(Type serviceType, Type implementationType, ParameterInfo parameter)
+        private bool CanBeResolved(ParameterInfo parameter, Type serviceType, Type implementationType)
         {
             return this.container.GetRegistration(parameter.ParameterType) != null ||
                 this.CanBuildExpression(serviceType, implementationType, parameter);
