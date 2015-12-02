@@ -1,9 +1,9 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
+    using System.Linq;
     using System.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -129,7 +129,7 @@
             // Act
             container.GetInstance<IValidator<int>>();
         }
-        
+
         [TestMethod]
         public void GetInstance_ContainerWithOverriddenConstructorInjectionBehavior_ResolvesInstanceSuccessfully()
         {
@@ -262,6 +262,29 @@
             }
         }
 
+        [TestMethod]
+        public void GetAllInstances_CollectionWithDecoratorWithSingleConstructor_Succeeds()
+        {
+            // Arrange
+            Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
+
+            container.Register<ICommand, ConcreteCommand>();
+
+            container.RegisterCollection(typeof(IValidator<>), new[]
+            {
+                typeof(MultipleCtorNullValidator<>),
+            });
+
+            // We have a design flaw in the library where it is really hard to deal with decorators that
+            // are applied to collections. The issue was easily fixed for decorators with a single ctor,
+            // but unfortunately not for decorators with multiple ctors. This test is missing, because it
+            // will fail :(.
+            container.RegisterDecorator(typeof(IValidator<>), typeof(SingleCtorValidatorDecorator<>));
+
+            // Act
+            container.GetAllInstances<IValidator<object>>().ToArray().First();
+        }
+
         private static Container CreateContainerWithMostResolvableParametersConstructorResolutionBehavior()
         {
             var container = new Container();
@@ -274,6 +297,9 @@
 
         public sealed class MultipleConstructorsType : IDisposable
         {
+            public readonly ILogger Logger;
+            public readonly ICommand Command;
+
             public MultipleConstructorsType(ILogger logger)
             {
                 this.Logger = logger;
@@ -289,10 +315,6 @@
                 this.Logger = logger;
                 this.Command = command;
             }
-
-            public ILogger Logger { get; private set; }
-
-            public ICommand Command { get; private set; }
 
             public void Dispose()
             {
@@ -320,15 +342,15 @@
 
         public class TypeWithConnectionStringConstructorArgument
         {
+            public readonly string ConnectionString;
+
             // "cs1" is a connection string in the app.config of this test project.
             public TypeWithConnectionStringConstructorArgument(string cs1ConnectionString)
             {
                 this.ConnectionString = cs1ConnectionString;
             }
-
-            public string ConnectionString { get; private set; }
         }
-        
+
         public class MultipleCtorNullValidator<T> : IValidator<T>
         {
             public MultipleCtorNullValidator(ICommand command)
@@ -359,8 +381,24 @@
             }
         }
 
+        public class SingleCtorValidatorDecorator<T> : IValidator<T>
+        {
+            public readonly IValidator<T> WrappedValidator;
+
+            public SingleCtorValidatorDecorator(IValidator<T> validator)
+            {
+                this.WrappedValidator = validator;
+            }
+
+            public void Validate(T instance)
+            {
+            }
+        }
+
         public class MultipleCtorsValidatorDecorator<T> : IValidator<T>
         {
+            public readonly IValidator<T> WrappedValidator;
+
             public MultipleCtorsValidatorDecorator(ICommand command)
             {
             }
@@ -369,8 +407,6 @@
             {
                 this.WrappedValidator = validator;
             }
-
-            public IValidator<T> WrappedValidator { get; private set; }
 
             public void Validate(T instance)
             {
