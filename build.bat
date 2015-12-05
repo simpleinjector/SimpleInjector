@@ -16,7 +16,6 @@ set version_Integration_WebApi=%version_Core%
 set version_Extensions_LifetimeScoping=%version_Core%
 set version_Extensions_ExecutionContextScoping=%version_Core%
 
-
 call "%PROGRAMFILES%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
 
 set msbuild="%PROGRAMFILES%\MSBuild\14.0\Bin\MSBuild.exe"
@@ -72,6 +71,7 @@ mkdir %targetPathNet%
 rmdir %targetPathPcl% /s /q
 mkdir %targetPathPcl%
 
+
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Packaging%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
@@ -89,6 +89,12 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 
 %msbuild% "SimpleInjector.PCL\SimpleInjector.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Core%
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+
+%replace% /source:SimpleInjector.CoreCLR\project.json /line """version"": " "  ""version"": ""%named_version_Core%""," 
+%msbuild% "SimpleInjector.CoreCLR\SimpleInjector.CoreCLR.xproj" /nologo /p:VersionNumber=%numeric_version_Core%
+
+move artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.dll %targetPathNet%\SimpleInjector_dotnet.dll
+move artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.xml %targetPathNet%\SimpleInjector_dotnet.xml
 
 
 echo BUILD DOCUMENTATION
@@ -132,6 +138,10 @@ copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
 mkdir Releases\temp\NET40
 copy bin\NET\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
 copy bin\NET\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
+
+mkdir Releases\temp\dotnet
+copy bin\NET\SimpleInjector_dotnet.dll Releases\temp\dotnet\SimpleInjector.dll
+copy bin\NET\SimpleInjector_dotnet.xml Releases\temp\dotnet\SimpleInjector.xml
 
 mkdir Releases\temp\NET45\Extensions
 copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
