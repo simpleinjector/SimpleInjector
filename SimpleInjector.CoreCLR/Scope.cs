@@ -30,7 +30,8 @@ namespace SimpleInjector
 
     /// <summary>Implements a cache for <see cref="ScopedLifestyle"/> implementations.</summary>
     /// <remarks>
-    /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently.
+    /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently, but note that the
+    /// cached instances might not be thread-safe.
     /// </remarks>
     public class Scope : IDisposable
     {
@@ -177,6 +178,12 @@ namespace SimpleInjector
                     finally
                     {
                         this.state = DisposeState.Disposed;
+
+                        // Remove all references, so we won't hold on to created instances even if the
+                        // scope accidentally keeps referenced. This prevents leaking memory.
+                        this.cachedInstances = null;
+                        this.scopeEndActions = null;
+                        this.disposables = null;
                     }
                 }
             }
@@ -268,6 +275,8 @@ namespace SimpleInjector
         {
             this.RequiresInstanceNotDisposed();
 
+            bool cacheIsEmpty = this.cachedInstances == null;
+
             if (this.cachedInstances == null)
             {
                 this.cachedInstances =
@@ -276,14 +285,9 @@ namespace SimpleInjector
 
             object instance;
 
-            if (this.cachedInstances.TryGetValue(registration, out instance))
-            {
-                return (TService)instance;
-            }
-            else
-            {
-                return this.CreateAndCacheInstance(registration);
-            }
+            return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
+                ? (TService)instance
+                : this.CreateAndCacheInstance(registration);
         }
 
         private TService CreateAndCacheInstance<TService, TImplementation>(
@@ -308,6 +312,9 @@ namespace SimpleInjector
             return service;
         }
 
+#if NET45
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         private void RegisterForDisposalInternal(IDisposable disposable)
         {
             if (this.disposables == null)
@@ -330,6 +337,9 @@ namespace SimpleInjector
             }
         }
 
+#if NET45
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         private void RequiresInstanceNotDisposed()
         {
             if (this.state == DisposeState.Disposed)
@@ -343,6 +353,9 @@ namespace SimpleInjector
             throw new ObjectDisposedException(this.GetType().FullName);
         }
 
+#if NET45
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         private void PreventCyclicDependenciesDuringDisposal()
         {
             if (this.recursionDuringDisposalCounter > MaxRecursion)
