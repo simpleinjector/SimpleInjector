@@ -138,14 +138,14 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
         public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
-#if PCL && !DNXCORE50
-            this.Parameter != null
-                ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
-                : (T)Attribute.GetCustomAttribute(this.Property, typeof(T), inherit);
-#else
+#if DNXCORE50 || NET45
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property.GetCustomAttribute<T>(inherit);
+#else
+            this.Parameter != null
+                ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
+                : (T)Attribute.GetCustomAttribute(this.Property, typeof(T), inherit);
 #endif
 
         /// <summary>
@@ -163,14 +163,14 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
-#if PCL && !DNXCORE50
-            this.Parameter != null
-                ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
-                : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
-#else
+#if DNXCORE50 || NET45
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property.GetCustomAttribute(attributeType, inherit);
+#else
+            this.Parameter != null
+                ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
+                : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
 #endif
 
         /// <summary>
