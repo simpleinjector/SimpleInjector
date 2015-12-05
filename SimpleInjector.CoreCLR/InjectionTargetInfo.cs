@@ -123,7 +123,6 @@ namespace SimpleInjector
                 ? this.Parameter.IsDefined(attributeType, inherit)
                 : this.Property.IsDefined(attributeType, inherit);
 
-#if !DNXCORE50
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
         /// </summary>
@@ -138,10 +137,16 @@ namespace SimpleInjector
         /// <typeparam name="T">The parameter to inspect.The parameter to inspect.</typeparam>
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
-        public T GetCustomAttribute<T>(bool inherit) where T : Attribute => 
+        public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
+#if PCL && !DNXCORE50
             this.Parameter != null
                 ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
                 : (T)Attribute.GetCustomAttribute(this.Property, typeof(T), inherit);
+#else
+            this.Parameter != null
+                ? this.Parameter.GetCustomAttribute<T>(inherit)
+                : this.Property.GetCustomAttribute<T>(inherit);
+#endif
 
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
@@ -157,10 +162,15 @@ namespace SimpleInjector
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
-        public Attribute GetCustomAttribute(Type attributeType, bool inherit) => 
+        public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
+#if PCL && !DNXCORE50
             this.Parameter != null
                 ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
                 : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
+#else
+            this.Parameter != null
+                ? this.Parameter.GetCustomAttribute(attributeType, inherit)
+                : this.Property.GetCustomAttribute(attributeType, inherit);
 #endif
 
         /// <summary>
