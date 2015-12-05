@@ -1,7 +1,7 @@
 @ECHO OFF
 
-set version=3.1.1
-set prereleasePostfix=
+set version=3.1.2
+set prereleasePostfix=-alpha1
 set buildNumber=0 
 
 
@@ -30,6 +30,7 @@ set defineConstantsPcl=PUBLISH;PCL
 set targetPath=bin
 set targetPathNet=%targetPath%\NET
 set targetPathPcl=%targetPath%\PCL
+set targetPathCoreClr=%targetPath%\DOTNET
 set targetPathSilverlight=%targetPath%\Silverlight
 set silverlightFrameworkFolder=%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0
 set v4targetPlatform="v4,%PROGRAMFILES(X86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
@@ -70,6 +71,8 @@ rmdir %targetPathNet% /s /q
 mkdir %targetPathNet%
 rmdir %targetPathPcl% /s /q
 mkdir %targetPathPcl%
+rmdir %targetPathCoreClr% /s /q
+mkdir %targetPathCoreClr%
 
 
 %msbuild% "SimpleInjector.NET\SimpleInjector.NET.csproj" /nologo /p:%net40ClientProfile% /p:VersionNumber=%numeric_version_Core%
@@ -92,9 +95,13 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 
 %replace% /source:SimpleInjector.CoreCLR\project.json /line """version"": " "  ""version"": ""%named_version_Core%""," 
 %msbuild% "SimpleInjector.CoreCLR\SimpleInjector.CoreCLR.xproj" /nologo /p:VersionNumber=%numeric_version_Core%
+copy artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.dll %targetPathCoreClr%\SimpleInjector.dll
+copy artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.xml %targetPathCoreClr%\SimpleInjector.xml
 
-move artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.dll %targetPathNet%\SimpleInjector_dotnet.dll
-move artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.xml %targetPathNet%\SimpleInjector_dotnet.xml
+%replace% /source:SimpleInjector.Extensions.LifetimeScoping.CoreCLR\project.json /line """version"": " "  ""version"": ""%numeric_version_Extensions_LifetimeScoping%""," 
+%msbuild% "SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.xproj" /nologo /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+copy artifacts\bin\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.dll %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll
+copy artifacts\bin\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.xml %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml
 
 
 echo BUILD DOCUMENTATION
@@ -110,8 +117,8 @@ copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\Portable\Documentation\SimpleInjector.chm
 
-copy bin\NET\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
+copy %targetPathNet%\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
+copy %targetPathNet%\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
 
 echo %named_version% >> Releases\v%named_version%\version.txt 
 
@@ -126,54 +133,56 @@ mkdir Releases\temp\Documentation
 copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 
 mkdir Releases\temp\Portable
-copy bin\PCL\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
-copy bin\PCL\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.dll
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.xml
+copy %targetPathPcl%\SimpleInjector.dll Releases\temp\Portable\SimpleInjector.dll
+copy %targetPathPcl%\SimpleInjector.xml Releases\temp\Portable\SimpleInjector.xml
+copy %targetPathPcl%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.dll
+copy %targetPathPcl%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\Portable\SimpleInjector.Extensions.LifetimeScoping.xml
 
 mkdir Releases\temp\NET45
-copy bin\NET\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
+copy %targetPathNet%\SimpleInjector.dll Releases\temp\NET45\SimpleInjector.dll
+copy %targetPathNet%\SimpleInjector.xml Releases\temp\NET45\SimpleInjector.xml
 
 mkdir Releases\temp\NET40
-copy bin\NET\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
-copy bin\NET\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
+copy %targetPathNet%\SimpleInjector_40.dll Releases\temp\NET40\SimpleInjector.dll
+copy %targetPathNet%\SimpleInjector_40.xml Releases\temp\NET40\SimpleInjector.xml
 
-mkdir Releases\temp\dotnet
-copy bin\NET\SimpleInjector_dotnet.dll Releases\temp\dotnet\SimpleInjector.dll
-copy bin\NET\SimpleInjector_dotnet.xml Releases\temp\dotnet\SimpleInjector.xml
+mkdir Releases\temp\DNX
+copy %targetPathCoreClr%\SimpleInjector_dotnet.dll Releases\temp\DNX\SimpleInjector.dll
+copy %targetPathCoreClr%\SimpleInjector_dotnet.xml Releases\temp\DNX\SimpleInjector.xml
+copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\DNX\SimpleInjector.Extensions.LifetimeScoping.dll
+copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\DNX\SimpleInjector.Extensions.LifetimeScoping.xml
 
 mkdir Releases\temp\NET45\Extensions
-copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
-copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET45\Extensions\SimpleInjector.Packaging.xml
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.dll
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.xml
+copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
+copy %targetPathNet%\SimpleInjector.Packaging.xml Releases\temp\NET45\Extensions\SimpleInjector.Packaging.xml
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\NET45\Extensions\SimpleInjector.Extensions.ExecutionContextScoping.xml
 
 mkdir Releases\temp\NET40\Extensions
-copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
-copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
+copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\NET40\Extensions\SimpleInjector.Packaging.dll
+copy %targetPathNet%\SimpleInjector.Packaging.xml Releases\temp\NET40\Extensions\SimpleInjector.Packaging.xml
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\NET40\Extensions\SimpleInjector.Extensions.LifetimeScoping.xml
 
 mkdir Releases\temp\NET45\Integration
-copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.dll
-copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.xml
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.dll
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.xml
-copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.dll
-copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.xml
-copy bin\NET\SimpleInjector.Integration.WebApi.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.dll
-copy bin\NET\SimpleInjector.Integration.WebApi.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Web.Mvc.xml
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.dll
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.Wcf.xml
+copy %targetPathNet%\SimpleInjector.Integration.WebApi.dll Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.dll
+copy %targetPathNet%\SimpleInjector.Integration.WebApi.xml Releases\temp\NET45\Integration\SimpleInjector.Integration.WebApi.xml
 
 mkdir Releases\temp\NET40\Integration
-copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
-copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.xml
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.dll
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.xml
-copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
-copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Web.Mvc.xml
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.dll Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.dll
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.xml Releases\temp\NET40\Integration\SimpleInjector.Integration.Wcf.xml
 
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector Runtime Library v%named_version%.zip"
 
@@ -200,14 +209,16 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
-copy bin\NET\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
-copy bin\NET\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector.dll
-copy bin\NET\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
-copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\dotnet\SimpleInjector.dll"
-copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\dotnet\SimpleInjector.xml"
-copy bin\PCL\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.dll"
-copy bin\PCL\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.xml"
+copy %targetPathNet%\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
+copy %targetPathNet%\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
+copy %targetPathNet%\SimpleInjector_40.dll Releases\temp\lib\net40-client\SimpleInjector.dll
+copy %targetPathNet%\SimpleInjector_40.xml Releases\temp\lib\net40-client\SimpleInjector.xml
+copy %targetPathPcl%\SimpleInjector.dll "Releases\temp\lib\dotnet\SimpleInjector.dll"
+copy %targetPathPcl%\SimpleInjector.xml "Releases\temp\lib\dotnet\SimpleInjector.xml"
+copy %targetPathPcl%\SimpleInjector.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.dll"
+copy %targetPathPcl%\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.xml"
+copy %targetPathCoreClr%\SimpleInjector.dll Releases\temp\lib\dotnet\SimpleInjector.dll
+copy %targetPathCoreClr%\SimpleInjector.xml Releases\temp\lib\dotnet\SimpleInjector.xml
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
@@ -217,10 +228,12 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\net40-client\SimpleInjector.Packaging.dll
-copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\net40-client\SimpleInjector.Packaging.xml
-copy bin\NET\SimpleInjector.Packaging.dll Releases\temp\lib\dotnet\SimpleInjector.Packaging.dll
-copy bin\NET\SimpleInjector.Packaging.xml Releases\temp\lib\dotnet\SimpleInjector.Packaging.xml
+copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\lib\net40-client\SimpleInjector.Packaging.dll
+copy %targetPathNet%\SimpleInjector.Packaging.xml Releases\temp\lib\net40-client\SimpleInjector.Packaging.xml
+copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\lib\dotnet\SimpleInjector.Packaging.dll
+copy %targetPathNet%\SimpleInjector.Packaging.xml Releases\temp\lib\dotnet\SimpleInjector.Packaging.xml
+copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Packaging.dll
+copy %targetPathNet%\SimpleInjector.Packaging.xml Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Packaging.xml
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %named_version_Packaging%
@@ -231,12 +244,12 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.LifetimeScoping Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.dll
-copy bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.xml
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.dll"
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.xml"
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.dll"
-copy bin\PCL\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.xml"
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40-client\SimpleInjector.Extensions.LifetimeScoping.xml
+copy %targetPathPcl%\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.dll"
+copy %targetPathPcl%\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Extensions.LifetimeScoping.xml"
+copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.dll"
+copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%
@@ -247,10 +260,10 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.ExecutionContextScoping Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.dll
-copy bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%
@@ -261,8 +274,8 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.dll
-copy bin\NET\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %named_version_Integration_Web%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\fb4dd696b20548afa09bcbbf3ea6c7d0.psmdcp {version} %named_version_Integration_Web%
@@ -273,8 +286,8 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Mvc Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
-copy bin\NET\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
+copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version} %named_version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version_Integration_Web} %named_version_Integration_Web%
@@ -297,8 +310,8 @@ mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
-copy bin\NET\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.dll
-copy bin\NET\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.dll
+copy %targetPathNet%\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\13850374b87d467da12f21ca32dac632.psmdcp {version} %named_version_Integration_Wcf%
@@ -318,8 +331,8 @@ rmdir Releases\temp /s /q
 mkdir Releases\temp
 xcopy %nugetTemplatePath%\.NET\SimpleInjector.Integration.WebApi Releases\temp /E /H
 attrib -r "%CD%\Releases\temp\*.*" /s /d
-copy bin\NET\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
-copy bin\NET\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
+copy %targetPathNet%\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
+copy %targetPathNet%\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version_Extensions_ExecutionContextScoping} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {versionCore} %named_version_Core%

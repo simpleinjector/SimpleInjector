@@ -38,19 +38,19 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScope.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScope.cs">
       <Link>LifetimeScope.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScopeLifestyle.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeLifestyle.cs">
       <Link>LifetimeScopeLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScopeManager.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeManager.cs">
       <Link>LifetimeScopeManager.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\Requires.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Requires.cs">
       <Link>Requires.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjectorLifetimeScopeExtensions.cs">
       <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.PCL\PclSpecific\ThreadLocal.cs">

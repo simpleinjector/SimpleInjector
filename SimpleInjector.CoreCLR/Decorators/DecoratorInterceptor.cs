@@ -25,8 +25,8 @@ namespace SimpleInjector.Decorators
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using SimpleInjector.Internals;
     using System.Reflection;
+    using SimpleInjector.Internals;
 
     internal class DecoratorInterceptor
     {

@@ -50,11 +50,21 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LifetimeScopeLifestyle.cs" />
-    <Compile Include="Requires.cs" />
-    <Compile Include="SimpleInjectorLifetimeScopeExtensions.cs" />
-    <Compile Include="LifetimeScope.cs" />
-    <Compile Include="LifetimeScopeManager.cs" />
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScope.cs">
+      <Link>LifetimeScope.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeLifestyle.cs">
+      <Link>LifetimeScopeLifestyle.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeManager.cs">
+      <Link>LifetimeScopeManager.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Requires.cs">
+      <Link>Requires.cs</Link>
+    </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjectorLifetimeScopeExtensions.cs">
+      <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
