@@ -94,14 +94,19 @@ ren %targetPathNet%\SimpleInjector.xml SimpleInjector_40.xml
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsPcl%" /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
 
 %replace% /source:SimpleInjector.CoreCLR\project.json /line """version"": " "  ""version"": ""%named_version_Core%""," 
-%msbuild% "SimpleInjector.CoreCLR\SimpleInjector.CoreCLR.xproj" /nologo /p:VersionNumber=%numeric_version_Core%
+%msbuild% "SimpleInjector.CoreCLR\SimpleInjector.CoreCLR.xproj" /nologo
 copy artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.dll %targetPathCoreClr%\SimpleInjector.dll
 copy artifacts\bin\SimpleInjector.CoreCLR\Release\dotnet\SimpleInjector.CoreCLR.xml %targetPathCoreClr%\SimpleInjector.xml
 
 %replace% /source:SimpleInjector.Extensions.LifetimeScoping.CoreCLR\project.json /line """version"": " "  ""version"": ""%numeric_version_Extensions_LifetimeScoping%""," 
-%msbuild% "SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.xproj" /nologo /p:VersionNumber=%numeric_version_Extensions_LifetimeScoping%
+%msbuild% "SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.xproj" /nologo
 copy artifacts\bin\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.dll %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll
 copy artifacts\bin\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.LifetimeScoping.CoreCLR.xml %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml
+
+%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR\project.json /line """version"": " "  ""version"": ""%numeric_version_Extensions_ExecutionContextScoping%""," 
+%msbuild% "SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR\SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR.xproj" /nologo
+copy artifacts\bin\SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR.dll %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy artifacts\bin\SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR\Release\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.CoreCLR.xml %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.xml
 
 
 echo BUILD DOCUMENTATION
@@ -151,6 +156,8 @@ copy %targetPathCoreClr%\SimpleInjector_dotnet.dll Releases\temp\DNX\SimpleInjec
 copy %targetPathCoreClr%\SimpleInjector_dotnet.xml Releases\temp\DNX\SimpleInjector.xml
 copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\DNX\SimpleInjector.Extensions.LifetimeScoping.dll
 copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\DNX\SimpleInjector.Extensions.LifetimeScoping.xml
+copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\DNX\SimpleInjector.Extensions.ExecutionContextScoping.dll
+copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\DNX\SimpleInjector.Extensions.ExecutionContextScoping.xml
 
 mkdir Releases\temp\NET45\Extensions
 copy %targetPathNet%\SimpleInjector.Packaging.dll Releases\temp\NET45\Extensions\SimpleInjector.Packaging.dll
@@ -262,8 +269,8 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 del Releases\temp\.gitignore /s /q
 copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
 copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
-copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.dll
-copy %targetPathNet%\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml
+copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.dll "Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.dll"
+copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%
