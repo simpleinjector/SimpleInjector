@@ -32,15 +32,13 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// Thread and container specific cache for services that are registered with one of the 
     /// <see cref="SimpleInjectorLifetimeScopeExtensions">RegisterLifetimeScope</see> extension method overloads.
     /// </summary>
-    [DebuggerDisplay("LifetimeScope {scopeId}")]
     internal sealed class LifetimeScope : Scope
     {
-        private static int id;
 #if !DNXCORE50
         private readonly int initialThreadId = Thread.CurrentThread.ManagedThreadId;
 #endif
-        private readonly int scopeId = Interlocked.Increment(ref id);
-        private LifetimeScopeManager manager;
+        private readonly LifetimeScopeManager manager;
+        private bool disposed;
 
         internal LifetimeScope(LifetimeScopeManager manager, LifetimeScope parentScope)
         {
@@ -61,10 +59,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
                             "used over multiple threads is here.")]
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                this.VerifyThatScopeIsDisposedOnOriginatingThread();
-            }
+            this.VerifyThatScopeIsDisposedOnOriginatingThread();
 
             try
             {
@@ -72,24 +67,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
             finally
             {
-                if (disposing && this.manager != null)
-                {
-                    try
-                    {
-                        this.manager.RemoveLifetimeScope(this);
-                    }
-                    finally
-                    {
-                        this.manager = null;
-                    }
-                }
+                this.disposed = true;
+                this.manager.RemoveLifetimeScope(this);
             }
         }
 
         private void VerifyThatScopeIsDisposedOnOriginatingThread()
         {
 #if !DNXCORE50
-            if (this.manager != null)
+            if (!this.disposed)
             {
                 // EndLifetimeScope should not be called from a different thread than where it was started.
                 // Calling this method from another thread could remove the wrong scope.
