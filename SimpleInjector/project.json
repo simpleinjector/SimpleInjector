@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0.0",
+  "version": "3.1.2-alpha2",
   "compilationOptions": { "keyFile": "../SimpleInjector.snk" },
   "supports": {
     "net46.app": { },

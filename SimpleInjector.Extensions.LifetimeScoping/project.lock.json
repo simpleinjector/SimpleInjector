@@ -144,7 +144,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector.CoreCLR/3.0.0": {
+      "SimpleInjector/3.1.2-alpha2": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1003,7 +1003,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector.CoreCLR/3.0.0": {
+      "SimpleInjector/3.1.2-alpha2": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1904,7 +1904,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector.CoreCLR/3.0.0": {
+      "SimpleInjector/3.1.2-alpha2": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -2665,9 +2665,9 @@
     }
   },
   "libraries": {
-    "SimpleInjector.CoreCLR/3.0.0": {
+    "SimpleInjector/3.1.2-alpha2": {
       "type": "project",
-      "path": "../SimpleInjector.CoreCLR/project.json"
+      "path": "../SimpleInjector/project.json"
     },
     "Microsoft.CSharp/4.0.0": {
       "type": "package",
@@ -4626,7 +4626,7 @@
       "Microsoft.NETCore >= 5.0.0",
       "Microsoft.NETCore.Portable.Compatibility >= 1.0.0",
       "NuSpec.ReferenceGenerator >= 1.0.0",
-      "SimpleInjector.CoreCLR >= 3.0.0-*"
+      "SimpleInjector >= 3.0.0"
     ],
     ".NETPlatform,Version=v5.0": []
   }

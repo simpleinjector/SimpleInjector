@@ -23,7 +23,6 @@
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
     using System;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Threading;
@@ -34,11 +33,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </summary>
     internal sealed class LifetimeScope : Scope
     {
+        private readonly LifetimeScopeManager manager;
 #if !DNXCORE50
         private readonly int initialThreadId = Thread.CurrentThread.ManagedThreadId;
-#endif
-        private readonly LifetimeScopeManager manager;
         private bool disposed;
+#endif
 
         internal LifetimeScope(LifetimeScopeManager manager, LifetimeScope parentScope)
         {
@@ -67,7 +66,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
             finally
             {
+#if !DNXCORE50
                 this.disposed = true;
+#endif
                 this.manager.RemoveLifetimeScope(this);
             }
         }

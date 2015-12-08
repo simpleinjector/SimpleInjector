@@ -201,9 +201,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
+    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping.NET\SimpleInjector.Extensions.LifetimeScoping.NET.csproj">
       <Project>{d140d43c-b7ab-43b2-a287-394df871eb56}</Project>
-      <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
+      <Name>SimpleInjector.Extensions.LifetimeScoping.NET</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET\SimpleInjector.NET.csproj">
       <Project>{d9d90efd-c9b8-4e08-ad99-7d4c324d5e7f}</Project>

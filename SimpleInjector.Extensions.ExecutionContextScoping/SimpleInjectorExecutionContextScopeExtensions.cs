@@ -28,7 +28,6 @@
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
 
     /// <summary>

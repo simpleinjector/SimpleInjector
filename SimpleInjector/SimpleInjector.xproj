@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>47906a2b-b633-4d07-94bc-95dc272aad2d</ProjectGuid>
-    <RootNamespace>SimpleInjector.CoreCLR</RootNamespace>
+    <ProjectGuid>b70b03f6-7320-4a40-a8a0-1ffe2b7db815</ProjectGuid>
+    <RootNamespace>SimpleInjector</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>

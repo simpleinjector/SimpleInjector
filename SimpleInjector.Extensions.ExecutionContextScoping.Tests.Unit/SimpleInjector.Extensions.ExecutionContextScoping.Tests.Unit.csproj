@@ -61,9 +61,9 @@
     <Compile Include="TestClasses.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.csproj">
+    <ProjectReference Include="..\SimpleInjector.Extensions.ExecutionContextScoping.NET\SimpleInjector.Extensions.ExecutionContextScoping.NET.csproj">
       <Project>{5b6e8f1a-ae62-4861-bb07-5980b8614a0b}</Project>
-      <Name>SimpleInjector.Extensions.ExecutionContextScoping</Name>
+      <Name>SimpleInjector.Extensions.ExecutionContextScoping.NET</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj">
       <Project>{1ad3ba5c-662d-41d5-b00f-27af3f84c87c}</Project>

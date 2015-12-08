@@ -28,7 +28,7 @@
     <CodeAnalysisRuleSet>..\empty.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\PCL\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -38,19 +38,19 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScope.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScope.cs">
       <Link>LifetimeScope.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeLifestyle.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScopeLifestyle.cs">
       <Link>LifetimeScopeLifestyle.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\LifetimeScopeManager.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\LifetimeScopeManager.cs">
       <Link>LifetimeScopeManager.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\Requires.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\Requires.cs">
       <Link>Requires.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping.CoreCLR\SimpleInjectorLifetimeScopeExtensions.cs">
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.cs">
       <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector.PCL\PclSpecific\ThreadLocal.cs">
