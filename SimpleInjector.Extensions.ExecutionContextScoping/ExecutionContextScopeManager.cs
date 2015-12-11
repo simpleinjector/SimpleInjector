@@ -30,13 +30,10 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     [SecuritySafeCritical]
     internal sealed partial class ExecutionContextScopeManager
     {
-        internal ExecutionContextScope BeginExecutionContextScope()
-        {
-            var parentScope = this.CurrentScope;
-            var scope = new ExecutionContextScope(this, parentScope);
-            this.CurrentScope = scope;
-            return scope;
-        }
+        internal ExecutionContextScope BeginExecutionContextScope() => 
+            this.CurrentScopeInternal = new ExecutionContextScope(this, this.GetCurrentScopeWithAutoCleanup());
+
+        internal ExecutionContextScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
         internal void EndExecutionContextScope(ExecutionContextScope scope)
         {
@@ -45,17 +42,17 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
             // since would cause an invalid scope to be registered as the current scope (this scope will
             // either be disposed or does not belong to the current execution context).
-            if (this.IsScopeForCurrentContext(scope))
+            if (this.IsScopeInLocalChain(scope))
             {
-                this.CurrentScope = scope.ParentScope;
+                this.CurrentScopeInternal = scope.ParentScope;
             }
         }
 
         // Determines whether this instance is the currently registered execution context scope or an ancestor 
         // of it.
-        private bool IsScopeForCurrentContext(ExecutionContextScope scope)
+        private bool IsScopeInLocalChain(ExecutionContextScope scope)
         {
-            var currentScope = this.CurrentScope;
+            var currentScope = this.CurrentScopeInternal;
 
             while (currentScope != null)
             {
@@ -68,6 +65,19 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             }
 
             return false;
+        }
+
+        private ExecutionContextScope GetCurrentScopeWithAutoCleanup()
+        {
+            var scope = this.CurrentScopeInternal;
+
+            // When the current scope is disposed, make the parent scope the current.
+            while (scope != null && scope.Disposed)
+            {
+                this.CurrentScopeInternal = scope = scope.ParentScope;
+            }
+
+            return scope;
         }
     }
 }

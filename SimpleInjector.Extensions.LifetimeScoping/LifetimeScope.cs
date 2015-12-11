@@ -36,7 +36,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         private readonly LifetimeScopeManager manager;
 #if !DNXCORE50
         private readonly int initialThreadId = Thread.CurrentThread.ManagedThreadId;
-        private bool disposed;
 #endif
 
         internal LifetimeScope(LifetimeScopeManager manager, LifetimeScope parentScope)
@@ -46,6 +45,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         }
 
         internal LifetimeScope ParentScope { get; }
+
+        internal bool Disposed { get; private set; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
@@ -66,9 +67,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
             finally
             {
-#if !DNXCORE50
-                this.disposed = true;
-#endif
+                this.Disposed = true;
                 this.manager.RemoveLifetimeScope(this);
             }
         }
@@ -76,7 +75,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         private void VerifyThatScopeIsDisposedOnOriginatingThread()
         {
 #if !DNXCORE50
-            if (!this.disposed)
+            if (!this.Disposed)
             {
                 // EndLifetimeScope should not be called from a different thread than where it was started.
                 // Calling this method from another thread could remove the wrong scope.

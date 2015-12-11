@@ -44,7 +44,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
         }
 
-        internal LifetimeScope CurrentScope => this.threadLocalScopes.Value;
+        internal LifetimeScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
         internal LifetimeScope BeginLifetimeScope() => 
             this.threadLocalScopes.Value = new LifetimeScope(this, parentScope: this.CurrentScope);
@@ -56,16 +56,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
             // since would cause an invalid scope to be registered as the current scope (this scope will
             // either be disposed or does not belong to the current execution context).
-            if (this.IsScopeForCurrentThread(scope))
+            if (this.IsScopeInLocalChain(scope))
             {
                 this.threadLocalScopes.Value = scope.ParentScope;
             }
         }
 
         // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
-        private bool IsScopeForCurrentThread(LifetimeScope scope)
+        private bool IsScopeInLocalChain(LifetimeScope scope)
         {
-            var currentScope = this.CurrentScope;
+            var currentScope = this.threadLocalScopes.Value;
 
             while (currentScope != null)
             {
@@ -78,6 +78,19 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             }
 
             return false;
+        }
+
+        private LifetimeScope GetCurrentScopeWithAutoCleanup()
+        {
+            var scope = this.threadLocalScopes.Value;
+
+            // When the current scope is disposed, make the parent scope the current.
+            while (scope != null && scope.Disposed)
+            {
+                this.threadLocalScopes.Value = scope = scope.ParentScope;
+            }
+
+            return scope;
         }
     }
 }

@@ -38,6 +38,8 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         internal ExecutionContextScope ParentScope { get; }
 
+        internal bool Disposed { get; private set; }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
         /// resources.
@@ -52,6 +54,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             }
             finally
             {
+                this.Disposed = true;
                 this.manager.EndExecutionContextScope(this);
             }
         }

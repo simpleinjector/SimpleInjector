@@ -22,7 +22,6 @@
 
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
-    using System.Security;
     using System.Threading;
 
     // This class will be registered as singleton within a container, allowing each container (if the
@@ -33,11 +32,10 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         private readonly AsyncLocal<ExecutionContextScope> asyncLocalScope =
             new AsyncLocal<ExecutionContextScope>();
 
-        internal ExecutionContextScope CurrentScope
+        private ExecutionContextScope CurrentScopeInternal
         {
             get { return this.asyncLocalScope.Value; }
-
-            private set { this.asyncLocalScope.Value = value; }
+            set { this.asyncLocalScope.Value = value; }
         }
     }
 }

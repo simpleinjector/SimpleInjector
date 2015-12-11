@@ -32,7 +32,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     {
         private readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
-        internal ExecutionContextScope CurrentScope
+        private ExecutionContextScope CurrentScopeInternal
         {
             get
             {
@@ -41,7 +41,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
                 return wrapper != null ? wrapper.Scope : null;
             }
 
-            private set
+            set
             {
                 var wrapper = value == null ? null : new ExecutionContextScopeWrapper(value);
 
