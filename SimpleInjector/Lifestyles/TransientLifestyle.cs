@@ -23,19 +23,15 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
-    
+
     internal sealed class TransientLifestyle : Lifestyle
     {
         internal TransientLifestyle() : base("Transient")
         {
         }
 
-        protected override int Length
-        {
-            get { return 1; }
-        }
+        protected override int Length => 1;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
@@ -60,15 +56,9 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TService); }
-            }
+            public override Type ImplementationType => typeof(TService);
 
-            public override Expression BuildExpression()
-            {
-                return this.BuildTransientExpression<TService>(this.instanceCreator);
-            }
+            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
         }
 
         private class TransientLifestyleRegistration<TService, TImplementation> : Registration
@@ -80,15 +70,9 @@ namespace SimpleInjector.Lifestyles
             {
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
+            public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression()
-            {
-                return this.BuildTransientExpression<TService, TImplementation>();
-            }
+            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImplementation>();
         }
     }
 }
