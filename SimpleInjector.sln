@@ -29,6 +29,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET", "SimpleInjector.NET\SimpleInjector.NET.csproj", "{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.NET.Tests.Unit", "SimpleInjector.NET.Tests.Unit\SimpleInjector.NET.Tests.Unit.csproj", "{1AD3BA5C-662D-41D5-B00F-27AF3F84C87C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServiceLocator.SimpleInjectorAdapter", "CommonServiceLocator.SimpleInjectorAdapter\CommonServiceLocator.SimpleInjectorAdapter.csproj", "{442373FD-50BC-4833-B791-6DCC681ABF31}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -114,16 +117,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Integration.
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.PCL", "SimpleInjector.Extensions.LifetimeScoping.PCL\SimpleInjector.Extensions.LifetimeScoping.PCL.csproj", "{B7AE02F3-D306-4028-8646-4844DBA2CFCD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7EB69A84-E589-460D-ABA2-43D34B12BC27} = {7EB69A84-E589-460D-ABA2-43D34B12BC27}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CI", "SimpleInjector.CI\SimpleInjector.CI.csproj", "{6C96DF05-104B-4AD0-B686-0FB59AEF1DC2}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Extensions.ExecutionContextScoping", "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.xproj", "{D9682551-4E0F-49C7-F304-D0C2B172E67D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.ExecutionContextScoping.NET", "SimpleInjector.Extensions.ExecutionContextScoping.NET\SimpleInjector.Extensions.ExecutionContextScoping.NET.csproj", "{5B6E8F1A-AE62-4861-BB07-5980B8614A0B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Extensions.LifetimeScoping", "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.xproj", "{DA576DA1-55A9-4600-EB88-DE71449D3F1A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.Extensions.LifetimeScoping.NET", "SimpleInjector.Extensions.LifetimeScoping.NET\SimpleInjector.Extensions.LifetimeScoping.NET.csproj", "{D140D43C-B7AB-43B2-A287-394DF871EB56}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F} = {D9D90EFD-C9B8-4E08-AD99-7D4C324D5E7F}
+	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector", "SimpleInjector\SimpleInjector.xproj", "{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}"
 EndProject
