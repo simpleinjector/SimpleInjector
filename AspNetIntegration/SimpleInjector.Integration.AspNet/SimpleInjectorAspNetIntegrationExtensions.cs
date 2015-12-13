@@ -29,6 +29,7 @@ namespace SimpleInjector
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Mvc.Controllers;
     using Microsoft.Extensions.DependencyInjection;
+    using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET applications.
@@ -38,8 +39,29 @@ namespace SimpleInjector
         private static readonly Predicate<Type> AllTypes = type => true;
 
         /// <summary>
-        /// Cross-wires a registration made in the ASP.NET configuration into Simple Injector, to allow
-        /// that instance to be injected into application components.
+        /// Wraps an ASP.NET request in a execution context scope.
+        /// </summary>
+        /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
+        /// framework components.</param>
+        /// <param name="container"></param>
+        public static void UseSimpleInjector(this IApplicationBuilder applicationBuilder, Container container)
+        {
+            Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
+            Requires.IsNotNull(container, nameof(container));
+
+            applicationBuilder.Use(async (context, next) =>
+            {
+                using (container.BeginExecutionContextScope())
+                {
+                    await next();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Cross-wires a registration made in the ASP.NET configuration into Simple Injector with the
+        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle, to allow that instance to be injected 
+        /// into application components.
         /// </summary>
         /// <typeparam name="TService">The type of the ASP.NET abstraction to cross-wire.</typeparam>
         /// <param name="container">The container to cross-wire that registration in.</param>

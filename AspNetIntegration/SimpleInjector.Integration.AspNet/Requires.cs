@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleInjector.Integration.AspNet
+namespace SimpleInjector
 {
     internal static class Requires
     {

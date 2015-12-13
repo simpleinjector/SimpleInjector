@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector
+namespace SimpleInjector.Integration.AspNet
 {
     using System;
     using Microsoft.AspNet.Mvc;
@@ -39,10 +39,7 @@ namespace SimpleInjector
         /// <param name="container">The container instance.</param>
         public SimpleInjectorControllerActivator(Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            Requires.IsNotNull(container, nameof(container));
 
             this.container = container;
         }
