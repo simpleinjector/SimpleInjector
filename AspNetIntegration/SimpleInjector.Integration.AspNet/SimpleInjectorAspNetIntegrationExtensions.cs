@@ -44,7 +44,8 @@ namespace SimpleInjector
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
         /// framework components.</param>
         /// <param name="container"></param>
-        public static void UseSimpleInjector(this IApplicationBuilder applicationBuilder, Container container)
+        public static void UseSimpleInjectorAspNetRequestScoping(this IApplicationBuilder applicationBuilder, 
+            Container container)
         {
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
             Requires.IsNotNull(container, nameof(container));
