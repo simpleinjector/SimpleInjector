@@ -1,7 +1,7 @@
 @ECHO OFF
 
 set version=3.1.2
-set prereleasePostfix=-alpha2
+set prereleasePostfix=
 set buildNumber=0 
 
 
