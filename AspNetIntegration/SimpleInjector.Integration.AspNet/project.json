@@ -1,11 +1,16 @@
 {
-  "version": "3.1.2-alpha3",
+  "version": "3.1.2-beta1",
   "compilationOptions": { "keyFile": "../../SimpleInjector.snk" },
-  "description": "Integration library for ASP.NET 5 and up for the Simple Injector Inversion of Control library.",
+  "description": "Integration library for ASP.NET 5 and up for Simple Injector.",
   "authors": [ "Simple Injector Contributors" ],
-  "tags": [ "" ],
+  "owners": [ "Simple Injector Contributors" ],
+  "tags": [ "simpleinjector", "dependency-injection", "DI", "ASP.NET", "ASP.NET 5", "asp.net-5" ],
   "projectUrl": "https://simpleinjector.org",
-  "licenseUrl": "",
+  "licenseUrl": "https://simpleinjector.org/license",
+  "iconUrl": "https://simpleinjector.org/simpleinjector.ico",
+  "title": "Simple Injector ASP.NET 5 Integration",
+  "requireLicenseAcceptance": false,
+  "language": "en-US",
   "frameworks": {
     "net451": {
       "dependencies": {
@@ -23,7 +28,7 @@
   },
   "dependencies": {
     "Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final",
-    "SimpleInjector": "3.1.2-alpha2",
-    "SimpleInjector.Extensions.ExecutionContextScoping": "3.1.2-alpha2"
+    "SimpleInjector": "3.1.2",
+    "SimpleInjector.Extensions.ExecutionContextScoping": "3.1.2"
   }
 }
