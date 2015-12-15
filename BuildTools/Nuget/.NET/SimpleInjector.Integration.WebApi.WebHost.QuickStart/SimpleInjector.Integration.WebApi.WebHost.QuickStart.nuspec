@@ -5,7 +5,7 @@
     <authors>Simple Injector Contributors</authors>
     <owners>Simple Injector Contributors</owners>
     <licenseUrl>https://simpleinjector.org/license</licenseUrl>
-    <projectUrl>https://simpleinjector.readthedocs.org/en/latest/webapiintegration.html</projectUrl>
+    <projectUrl>https://simpleinjector.org/webapi</projectUrl>
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
