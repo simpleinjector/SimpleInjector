@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNet.Mvc.ViewComponents
 {
-    internal abstract partial class _DefaultViewComponentInvoker : IViewComponentInvoker
+    internal partial class _DefaultViewComponentInvoker : IViewComponentInvoker
     {
         private readonly ITypeActivatorCache _typeActivatorCache;
         private readonly IViewComponentActivator _viewComponentActivator;
