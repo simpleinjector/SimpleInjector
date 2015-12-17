@@ -47,6 +47,7 @@
             return new SimpleInjectorViewComponentInvoker(
                 provider.GetRequiredService<DiagnosticSource>(),
                 provider.GetRequiredService<ILoggerFactory>().CreateLogger<SimpleInjectorViewComponentInvoker>(),
+                provider.GetRequiredService<IViewComponentActivator>(),
                 this.container);
         }
     }
