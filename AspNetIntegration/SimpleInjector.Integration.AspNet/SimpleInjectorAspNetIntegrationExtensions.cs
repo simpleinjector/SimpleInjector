@@ -25,9 +25,11 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Diagnostics;
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Mvc.Controllers;
+    using Microsoft.AspNet.Mvc.ViewComponents;
     using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
@@ -36,11 +38,7 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorAspNetIntegrationExtensions
     {
-        private static readonly Predicate<Type> AllTypes = type => true;
-
-        /// <summary>
-        /// Wraps an ASP.NET request in a execution context scope.
-        /// </summary>
+        /// <summary>Wraps an ASP.NET request in a execution context scope.</summary>
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
         /// framework components.</param>
         /// <param name="container"></param>
@@ -88,10 +86,6 @@ namespace SimpleInjector
         /// Registers the ASP.NET controller instances that are defined in the application.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
-        /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> or 
-        /// <paramref name="applicationBuilder" /> are null references (Nothing in VB).</exception>
-        /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="applicationBuilder">The ASP.NET object that holds the 
         /// <see cref="IControllerTypeProvider"/> that allows retrieving the application's controller types.
         /// </param>
@@ -121,37 +115,78 @@ namespace SimpleInjector
 
             var controllerTypes = controllerTypeProvider.ControllerTypes.Select(t => t.AsType());
 
-            RegisterAspNetControllers(container, controllerTypes);
+            RegisterControllerTypes(container, controllerTypes);
         }
 
         /// <summary>
-        /// Registers the supplied list of ASP.NET controller types.
+        /// Registers the ASP.NET view component instances that are defined in the application.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
-        /// <param name="controllerTypes">The controller types to register.</param>
-        public static void RegisterAspNetControllers(this Container container, IEnumerable<Type> controllerTypes)
+        /// <param name="applicationBuilder">The ASP.NET object that holds the 
+        /// <see cref="IControllerTypeProvider"/> that allows retrieving the application's controller types.
+        /// </param>
+        public static void RegisterAspNetViewComponents(this Container container,
+            IApplicationBuilder applicationBuilder)
         {
             Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(controllerTypes, nameof(controllerTypes));
+            Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
 
-            foreach (Type type in controllerTypes.ToArray())
+            IServiceProvider serviceProvider = applicationBuilder.ApplicationServices;
+            var componentProvider = serviceProvider.GetRequiredService<IViewComponentDescriptorProvider>();
+
+            RegisterAspNetViewComponents(container, componentProvider);
+        }
+
+        /// <summary>
+        /// Registers the ASP.NET view component types using the supplied 
+        /// <paramref name="viewComponentDescriptorProvider"/>.
+        /// </summary>
+        /// <param name="container">The container the controllers should be registered in.</param>
+        /// <param name="viewComponentDescriptorProvider">The provider that contains the list of view
+        /// components to register.</param>
+        public static void RegisterAspNetViewComponents(this Container container,
+            IViewComponentDescriptorProvider viewComponentDescriptorProvider)
+        {
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(viewComponentDescriptorProvider, nameof(viewComponentDescriptorProvider));
+
+            var componentTypes = viewComponentDescriptorProvider
+                .GetViewComponents()
+                .Select(description => description.Type);
+
+            RegisterViewComponentTypes(container, componentTypes);
+        }
+
+        private static void RegisterControllerTypes(this Container container, IEnumerable<Type> types)
+        {
+            foreach (Type type in types.ToArray())
             {
-                Registration registration = CreateControllerRegistration(container, type);
+                var registration = CreateConcreteRegistration(container, type);
+
+                if (typeof(IDisposable).IsAssignableFrom(type))
+                {
+                    registration.SuppressDiagnosticWarning(
+                        DiagnosticType.DisposableTransientComponent, "ASP.NET disposes controllers.");
+                }
 
                 container.AddRegistration(type, registration);
             }
         }
 
-        private static Registration CreateControllerRegistration(Container container, Type type)
+        private static void RegisterViewComponentTypes(this Container container, IEnumerable<Type> types)
         {
-            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(type, type);
+            foreach (Type type in types.ToArray())
+            {
+                container.AddRegistration(type, CreateConcreteRegistration(container, type));
+            }
+        }
 
-            var registration = lifestyle.CreateRegistration(type, container);
+        private static Registration CreateConcreteRegistration(Container container, Type concreteType)
+        {
+            var lifestyle = 
+                container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType, concreteType);
 
-            registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
-                "ASP.NET disposes controllers.");
-
-            return registration;
+            return lifestyle.CreateRegistration(concreteType, container);
         }
     }
 }

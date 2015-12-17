@@ -1,5 +1,5 @@
 {
-  "version": "3.1.2-beta3",
+  "version": "3.1.2-beta4",
   "compilationOptions": { "keyFile": "../../SimpleInjector.snk" },
   "description": "Integration library for ASP.NET 5 and up for Simple Injector.",
   "authors": [ "Simple Injector Contributors" ],
