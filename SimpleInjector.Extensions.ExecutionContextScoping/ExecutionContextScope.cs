@@ -28,7 +28,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     /// </summary>
     internal sealed class ExecutionContextScope : Scope
     {
-        private ExecutionContextScopeManager manager;
+        private readonly ExecutionContextScopeManager manager;
 
         internal ExecutionContextScope(ExecutionContextScopeManager manager, ExecutionContextScope parentScope)
         {
@@ -36,29 +36,9 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             this.ParentScope = parentScope;
         }
 
-        internal ExecutionContextScope ParentScope { get; private set; }
+        internal ExecutionContextScope ParentScope { get; }
 
-        // Determines whether this instance is the currently registered execution context scope or an ancestor 
-        // of it.
-        internal bool IsCurrentScopeOrAncestor
-        {
-            get
-            {
-                var currentScope = this.manager.CurrentScope;
-
-                while (currentScope != null)
-                {
-                    if (object.ReferenceEquals(this, currentScope))
-                    {
-                        return true;
-                    }
-
-                    currentScope = currentScope.ParentScope;
-                }
-
-                return false;
-            }
-        }
+        internal bool Disposed { get; private set; }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged 
@@ -74,17 +54,8 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             }
             finally
             {
-                if (disposing && this.manager != null)
-                {
-                    try
-                    {
-                        this.manager.EndExecutionContextScope(this);
-                    }
-                    finally
-                    {
-                        this.manager = null;
-                    }
-                }
+                this.Disposed = true;
+                this.manager.EndExecutionContextScope(this);
             }
         }
     }

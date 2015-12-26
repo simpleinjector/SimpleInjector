@@ -73,9 +73,12 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\Shared Assemblies\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleInjector">
-      <HintPath>..\bin\PCL\SimpleInjector.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.PCL\SimpleInjector.PCL.csproj">
+      <Project>{7eb69a84-e589-460d-aba2-43d34b12bc27}</Project>
+      <Name>SimpleInjector.PCL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\BuildTools\Microsoft.VersionNumber.Targets" />

@@ -134,9 +134,9 @@
       <Project>{2F5AA12A-FAED-4AB6-A7E4-7BFB5A7E7A62}</Project>
       <Name>SimpleInjector.CodeSamples</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.csproj">
+    <ProjectReference Include="..\SimpleInjector.Extensions.LifetimeScoping.NET\SimpleInjector.Extensions.LifetimeScoping.NET.csproj">
       <Project>{d140d43c-b7ab-43b2-a287-394df871eb56}</Project>
-      <Name>SimpleInjector.Extensions.LifetimeScoping</Name>
+      <Name>SimpleInjector.Extensions.LifetimeScoping.NET</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj">
       <Project>{fb925c19-cda9-44b4-a149-b20e8516a382}</Project>

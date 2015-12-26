@@ -1,5 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -36,6 +38,37 @@
             
             // Assert
             Assert.IsFalse(shouldCall, "ResolveUnregisteredType was not called.");
+        }
+
+        [TestMethod]
+        public void GCCollect_OnUnreferencedVerifiedContainersWithDecorators_CollectsThoseContainers()
+        {
+            // Arrange
+            Func<Container> buildContainer = () =>
+            {
+                var container = new Container();
+                container.Options.EnableDynamicAssemblyCompilation = false;
+                container.Register<INonGenericService, RealNonGenericService>();
+
+                container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>();
+
+                container.GetInstance<INonGenericService>();
+
+                container.Dispose();
+
+                return container;
+            };
+
+            var containers =
+                Enumerable.Range(0, 10).Select(_ => new WeakReference(buildContainer())).ToArray();
+
+            // Act
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            // Assert
+            Assert.AreEqual(0, containers.Count(c => c.IsAlive), "We've got a memory leak.");
         }
 
         private class Concrete

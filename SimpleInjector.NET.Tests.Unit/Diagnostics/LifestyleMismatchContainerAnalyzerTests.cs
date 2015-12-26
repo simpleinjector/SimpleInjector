@@ -276,6 +276,46 @@
             proxy.DecorateeFactory();
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingcTypeWithLifestyleMismatchInGraph_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ServiceWithDependency<ServiceDependingOn<ILogger>>>(Lifestyle.Transient);
+            container.Register<ServiceDependingOn<ILogger>>(Lifestyle.Singleton);
+            container.Register<ILogger, NullLogger>(Lifestyle.Transient);
+
+            // Act
+            Action action = () => container.GetInstance(typeof(ServiceWithDependency<ServiceDependingOn<ILogger>>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "lifestyle mismatch is encountered",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingGenericTypeWithLifestyleMismatchInGraph_ThrowsException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(ServiceWithDependency<>), typeof(ServiceWithDependency<>), Lifestyle.Transient);
+            container.Register(typeof(ServiceDependingOn<>), typeof(ServiceDependingOn<>), Lifestyle.Singleton);
+            container.Register<ILogger, NullLogger>(Lifestyle.Transient);
+
+            // Act
+            // Resolve graph: 
+            // ServiceWithDependency<T> (Transient) -> ServiceDependingOn<T> (Singleton) -> NullLogger (Transient)
+            Action action = () => container.GetInstance(typeof(ServiceWithDependency<ServiceDependingOn<ILogger>>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "lifestyle mismatch is encountered",
+                action);
+        }
+
         private static string Actual(LifestyleMismatchDiagnosticResult[] results)
         {
             return "actual: " + string.Join(" - ", results.Select(r => r.Description));

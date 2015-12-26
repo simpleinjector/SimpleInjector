@@ -1,8 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-    using System.Linq;
     using System.Configuration;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 

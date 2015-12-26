@@ -194,6 +194,8 @@ namespace SimpleInjector.Integration.WebApi
         /// </summary>
         public void Dispose()
         {
+            // NOTE: Dispose is called by Web API outside the context of the CallContext in which it was 
+            // created (which is fucking awful btw and should be considered a design flaw).
             if (this.scope != null)
             {
                 this.scope.Dispose();

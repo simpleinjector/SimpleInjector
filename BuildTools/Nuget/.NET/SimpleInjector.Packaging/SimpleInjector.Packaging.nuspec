@@ -4,11 +4,36 @@
     <version>{version}</version>
     <authors>Simple Injector Contributors</authors>
     <owners>Simple Injector Contributors</owners>
-    <licenseUrl>https://simpleinjector.codeplex.com/license</licenseUrl>
+    <licenseUrl>https://simpleinjector.org/license</licenseUrl>
     <projectUrl>https://simpleinjector.org/</projectUrl>
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
-      <dependency id="SimpleInjector" version="{versionCore}" />
+      <group targetFramework=".NETFramework4.0">
+        <dependency id="SimpleInjector" version="{versionCore}" />
+      </group>
+      <group targetFramework="WindowsPhone8.0">
+        <dependency id="SimpleInjector" version="{versionCore}" />
+      </group>
+      <group targetFramework="Windows8.0">
+        <dependency id="SimpleInjector" version="{versionCore}" />
+      </group>
+      <group targetFramework=".NETPlatform5.0">
+        <dependency id="SimpleInjector" version="{versionCore}" />
+        <dependency id="System.Collections" version="4.0.10" />
+        <dependency id="System.Collections.Concurrent" version="4.0.10" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.10" />
+        <dependency id="System.Globalization" version="4.0.10" />
+        <dependency id="System.IO" version="4.0.10" />
+        <dependency id="System.Linq" version="4.0.0" />
+        <dependency id="System.Linq.Expressions" version="4.0.10" />
+        <dependency id="System.Reflection" version="4.0.10" />
+        <dependency id="System.Reflection.Extensions" version="4.0.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.0.0" />
+        <dependency id="System.Runtime" version="4.0.20" />
+        <dependency id="System.Runtime.Extensions" version="4.0.10" />
+        <dependency id="System.Threading" version="4.0.10" />
+        <dependency id="System.Threading.Tasks" version="4.0.10" />
+      </group>
     </dependencies>
     <id>SimpleInjector.Packaging</id>
     <title>Simple Injector Packaging</title>

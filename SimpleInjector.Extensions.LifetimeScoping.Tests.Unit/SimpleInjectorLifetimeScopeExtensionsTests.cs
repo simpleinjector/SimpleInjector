@@ -1213,8 +1213,15 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                 // Act
                 var actualScope = container.GetCurrentLifetimeScope();
 
+                string scopeName =
+                    object.ReferenceEquals(actualScope, null) ? "null" :
+                    object.ReferenceEquals(actualScope, innerScope) ? "inner" :
+                    object.ReferenceEquals(actualScope, middleScope) ? "middle" :
+                    object.ReferenceEquals(actualScope, outerScope) ? "outer" : 
+                    "other";
+
                 // Assert
-                Assert.AreSame(outerScope, actualScope);
+                Assert.AreSame(outerScope, actualScope, "Actual: " + scopeName + " scope.");
             }
         }
 

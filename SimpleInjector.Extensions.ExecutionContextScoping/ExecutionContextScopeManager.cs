@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,42 +22,18 @@
 
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
-    using System;
-    using System.Runtime.Remoting.Messaging;
     using System.Security;
 
     // This class will be registered as singleton within a container, allowing each container (if the
     // application -for some reason- has multiple containers) to have it's own set of execution context scopes, 
     // without influencing other scopes from other containers.
     [SecuritySafeCritical]
-    internal sealed class ExecutionContextScopeManager
+    internal sealed partial class ExecutionContextScopeManager
     {
-        private readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
+        internal ExecutionContextScope BeginExecutionContextScope() => 
+            this.CurrentScopeInternal = new ExecutionContextScope(this, this.GetCurrentScopeWithAutoCleanup());
 
-        internal ExecutionContextScope CurrentScope
-        {
-            get 
-            {
-                var wrapper = (ExecutionContextScopeWrapper)CallContext.LogicalGetData(this.key);
-
-                return wrapper != null ? wrapper.Scope : null;
-            }
-
-            private set 
-            {
-                var wrapper = value == null ? null : new ExecutionContextScopeWrapper(value);
-
-                CallContext.LogicalSetData(this.key, wrapper);
-            }
-        }
-
-        internal ExecutionContextScope BeginExecutionContextScope()
-        {
-            var parentScope = this.CurrentScope;
-            var scope = new ExecutionContextScope(this, parentScope);
-            this.CurrentScope = scope;
-            return scope;
-        }
+        internal ExecutionContextScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
         internal void EndExecutionContextScope(ExecutionContextScope scope)
         {
@@ -66,22 +42,42 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
             // since would cause an invalid scope to be registered as the current scope (this scope will
             // either be disposed or does not belong to the current execution context).
-            if (scope.IsCurrentScopeOrAncestor)
+            if (this.IsScopeInLocalChain(scope))
             {
-                this.CurrentScope = scope.ParentScope;
+                this.CurrentScopeInternal = scope.ParentScope;
             }
         }
 
-        [Serializable]
-        internal sealed class ExecutionContextScopeWrapper : MarshalByRefObject
+        // Determines whether this instance is the currently registered execution context scope or an ancestor 
+        // of it.
+        private bool IsScopeInLocalChain(ExecutionContextScope scope)
         {
-            [NonSerializedAttribute]
-            internal readonly ExecutionContextScope Scope;
+            var currentScope = this.CurrentScopeInternal;
 
-            internal ExecutionContextScopeWrapper(ExecutionContextScope scope)
+            while (currentScope != null)
             {
-                this.Scope = scope;
+                if (object.ReferenceEquals(scope, currentScope))
+                {
+                    return true;
+                }
+
+                currentScope = currentScope.ParentScope;
             }
+
+            return false;
+        }
+
+        private ExecutionContextScope GetCurrentScopeWithAutoCleanup()
+        {
+            var scope = this.CurrentScopeInternal;
+
+            // When the current scope is disposed, make the parent scope the current.
+            while (scope != null && scope.Disposed)
+            {
+                this.CurrentScopeInternal = scope = scope.ParentScope;
+            }
+
+            return scope;
         }
     }
 }

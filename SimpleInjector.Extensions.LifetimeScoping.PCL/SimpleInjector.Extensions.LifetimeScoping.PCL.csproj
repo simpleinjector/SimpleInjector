@@ -28,7 +28,7 @@
     <CodeAnalysisRuleSet>..\empty.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\PCL\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>

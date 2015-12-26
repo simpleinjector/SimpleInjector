@@ -1,0 +1,35 @@
+{
+  "version": "3.1.2-beta4",
+  "compilationOptions": { "keyFile": "../../SimpleInjector.snk" },
+  "description": "Integration library for ASP.NET 5 and up for Simple Injector.",
+  "authors": [ "Simple Injector Contributors" ],
+  "owners": [ "Simple Injector Contributors" ],
+  "tags": [ "simpleinjector", "dependency-injection", "DI", "ASP.NET", "ASP.NET 5", "asp.net-5" ],
+  "projectUrl": "https://simpleinjector.org/aspnet5",
+  "licenseUrl": "https://simpleinjector.org/license",
+  "iconUrl": "https://simpleinjector.org/simpleinjector.ico",
+  "title": "Simple Injector ASP.NET 5 Integration",
+  "requireLicenseAcceptance": false,
+  "language": "en-US",
+  "frameworks": {
+    "net451": {
+      "dependencies": {
+      }
+    },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.ViewFeatures": "6.0.0-rc1-final",
+    "SimpleInjector": "3.1.2",
+    "SimpleInjector.Extensions.ExecutionContextScoping": "3.1.2"
+  }
+}

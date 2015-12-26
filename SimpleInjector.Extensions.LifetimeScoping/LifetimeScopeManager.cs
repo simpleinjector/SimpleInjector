@@ -44,16 +44,10 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
         }
 
-        internal LifetimeScope CurrentScope
-        {
-            get { return this.threadLocalScopes.Value; }
-            private set { this.threadLocalScopes.Value = value; }
-        }
+        internal LifetimeScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
-        internal LifetimeScope BeginLifetimeScope()
-        {
-            return this.CurrentScope = new LifetimeScope(this, parentScope: this.CurrentScope);
-        }
+        internal LifetimeScope BeginLifetimeScope() => 
+            this.threadLocalScopes.Value = new LifetimeScope(this, parentScope: this.CurrentScope);
 
         internal void RemoveLifetimeScope(LifetimeScope scope)
         {
@@ -62,10 +56,41 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             // unrelated thread. In both cases we shouldn't change the CurrentScope, since doing this,
             // since would cause an invalid scope to be registered as the current scope (this scope will
             // either be disposed or does not belong to the current execution context).
-            if (scope.IsCurrentScopeOrAncestor)
+            if (this.IsScopeInLocalChain(scope))
             {
-                this.CurrentScope = scope.ParentScope;
+                this.threadLocalScopes.Value = scope.ParentScope;
             }
+        }
+
+        // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
+        private bool IsScopeInLocalChain(LifetimeScope scope)
+        {
+            var currentScope = this.threadLocalScopes.Value;
+
+            while (currentScope != null)
+            {
+                if (object.ReferenceEquals(scope, currentScope))
+                {
+                    return true;
+                }
+
+                currentScope = currentScope.ParentScope;
+            }
+
+            return false;
+        }
+
+        private LifetimeScope GetCurrentScopeWithAutoCleanup()
+        {
+            var scope = this.threadLocalScopes.Value;
+
+            // When the current scope is disposed, make the parent scope the current.
+            while (scope != null && scope.Disposed)
+            {
+                this.threadLocalScopes.Value = scope = scope.ParentScope;
+            }
+
+            return scope;
         }
     }
 }
