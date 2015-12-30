@@ -1,6 +1,7 @@
 version: 3.1.0.{build}
 os: Visual Studio 2015
 before_build:
+- cd src
 - nuget restore
 skip_tags: true
 configuration: Debug
