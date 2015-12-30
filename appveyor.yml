@@ -13,7 +13,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 build_script:
 - cmd: >-
-    appveyor.bat
+    ..\appveyor.bat
 environment:
     COVERALLS_REPO_TOKEN:  
        secure: Hw9xA9D3SRGgpH9hNHoiHqnilSWV6/32NecYMp0Pa7LDykWa1oXpjN0CQ4JLDz/e
