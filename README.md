@@ -15,7 +15,7 @@ The following platforms are supported:
 * *Windows Phone 8*.
 * *Windows Store Apps*.
 * *Mono*.
-* *CoreCLR* (coming soon).
+* *CoreCLR*.
 
 > Simple Injector is carefully designed to run in **partial / medium trust**, and it is fast; blazingly fast.
 
