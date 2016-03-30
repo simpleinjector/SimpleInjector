@@ -90,6 +90,9 @@
           "System.Xml.XDocument": "4.0.10"
         }
       },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
+      },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
         "compile": {
@@ -939,6 +942,9 @@
           "System.Xml.ReaderWriter": "4.0.10",
           "System.Xml.XDocument": "4.0.10"
         }
+      },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
       },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
@@ -1832,6 +1838,9 @@
           "System.Xml.XDocument": "4.0.10"
         }
       },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
+      },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
         "compile": {
@@ -2687,6 +2696,16 @@
         "Microsoft.NETCore.5.0.0.nupkg",
         "Microsoft.NETCore.5.0.0.nupkg.sha512",
         "Microsoft.NETCore.nuspec"
+      ]
+    },
+    "Microsoft.NETCore.Platforms/1.0.0": {
+      "type": "package",
+      "sha512": "0N77OwGZpXqUco2C/ynv1os7HqdFYifvNIbveLDKqL5PZaz05Rl9enCwVBjF61aumHKueLWIJ3prnmdAXxww4A==",
+      "files": [
+        "Microsoft.NETCore.Platforms.1.0.0.nupkg",
+        "Microsoft.NETCore.Platforms.1.0.0.nupkg.sha512",
+        "Microsoft.NETCore.Platforms.nuspec",
+        "runtime.json"
       ]
     },
     "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
