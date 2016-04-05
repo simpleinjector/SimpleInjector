@@ -1,6 +1,27 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.1.2 (v3.1.2 RTM)
+
+	Improvements/Changes:
+		-[Core] DNXCORE50/CoreCLR version available. (fixes #57)
+		-[LifetimeScoping] DNXCORE50/CoreCLR version available. (fixes #57)
+		-[ExecutionContextScoping] DNXCORE50/CoreCLR version available. (fixes #57)
+		-[Core] Memory usage of Scope instances reduced after scope is disposed. (fixes #160)
+
+	Bug fixes:
+		-[LifetimeScoping] GetCurrentLifetimeScope() will never return disposed scopes anymore. (fixes #159)
+		-[ExecutionContextScoping] GetCurrentExecutionContextScope() will never return disposed scopes anymore. (fixes #159)
+
+
+Version 3.1.1 (v3.1.1 RTM)
+
+	Bug fixes:
+		-[Core] Container instance was rooted in case decorators where used. (fixes #135)
+		-[Core] Lifestyle mismatch was not detected in a deeper part of the object graph when GetInstance was
+		 called. (fixes #140)
+
+
 Version 3.1.0 (v3.1.0 RTM)
 
 	Improvements/Changes:
