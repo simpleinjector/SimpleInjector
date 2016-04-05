@@ -144,7 +144,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1003,7 +1003,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1904,7 +1904,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -2665,7 +2665,7 @@
     }
   },
   "libraries": {
-    "SimpleInjector/3.1.2": {
+    "SimpleInjector/3.1.2-beta5": {
       "type": "project",
       "path": "../SimpleInjector/project.json"
     },
