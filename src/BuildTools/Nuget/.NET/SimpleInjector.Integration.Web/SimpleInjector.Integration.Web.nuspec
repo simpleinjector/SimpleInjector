@@ -9,10 +9,8 @@
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="Microsoft.Web.Infrastructure" version="1.0.0" />
     </dependencies>
-    <frameworkAssemblies>
-      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
-    </frameworkAssemblies>
     <id>SimpleInjector.Integration.Web</id>
     <title>Simple Injector ASP.NET Integration</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

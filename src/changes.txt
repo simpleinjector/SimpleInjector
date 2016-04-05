@@ -1,6 +1,14 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.1.3 (v3.1.3 RTM)
+
+	Improvements/Changes:
+		-[Web] SimpleInjector.Integration.Web NuGet package now references the Microsoft.Web.Infrastructure
+		 NuGet package instead of the Microsoft.Web.Infrastructure.dll from the GAC. (fixes #170)
+
+	Bug fixes:
+
 
 Version 3.1.2 (v3.1.2 RTM) 2015-12-13
 
