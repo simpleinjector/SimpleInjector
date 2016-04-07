@@ -68,10 +68,7 @@
 
     public class RealTimeProvider : ITimeProvider
     {
-        public DateTime Now
-        {
-            get { return DateTime.Now; }
-        }
+        public DateTime Now => DateTime.Now;
     }
 
     public class FakeTimeProvider : ITimeProvider
@@ -129,7 +126,7 @@
 
         public int UserKarmaOffset { get; set; }
 
-        public UserServiceBase UserService { get; private set; }
+        public UserServiceBase UserService { get; }
     }
 
     public class ConcreteTypeWithConcreteTypeConstructorArgument
@@ -285,7 +282,7 @@
             this.Dependency = dependency;
         }
 
-        public TDependency Dependency { get; private set; }
+        public TDependency Dependency { get; }
     }
 
     public class AnotherServiceWithDependency<TDependency>
@@ -295,7 +292,7 @@
             this.Dependency = dependency;
         }
 
-        public TDependency Dependency { get; private set; }
+        public TDependency Dependency { get; }
     }
 
     public class ServiceDecorator : IService<int, object>

@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     internal sealed class GenericRegistrationEntry : IRegistrationEntry
     {
@@ -63,6 +62,7 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLocked();
 
+            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
             this.ThrowWhenOverlappingRegistrationsExist(producer);
 
             this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
@@ -151,6 +151,15 @@ namespace SimpleInjector.Internals
 
                     throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(producer.ServiceType));
                 }
+            }
+        }
+
+        private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
+        {
+            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
+            {
+                throw new NotSupportedException(
+                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
             }
         }
 
