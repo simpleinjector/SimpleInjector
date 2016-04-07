@@ -130,6 +130,7 @@
             Assert.IsNotNull(actualImplementationType, "Predicate was not called");
             Assert.IsFalse(actualImplementationType.ContainsGenericParameter(), "ImplementationType should be a closed type");
         }
+
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate1()
         {
