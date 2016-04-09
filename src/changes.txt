@@ -12,7 +12,10 @@ Version 3.1.3 (v3.1.3 RTM)
 	Bug fixes:
 		-[Core] Registration of conditional closed-generic types prevented when container allows
 		 overriding registrations. (fixes #216)
-		-[WCF] WCF integration failed to create WCF services marked with InstanceContextMode.Single. (fixes #197)
+		-[WCF] WCF integration failed to create WCF services marked with InstanceContextMode.Single.
+		 (fixes #197)
+		-[Core] Mixing conditional and unconditional registrations for same closed-generic type did not fail
+		 at registration time. (fixes #217)
 
 
 Version 3.1.2 (v3.1.2 RTM) 2015-12-13

@@ -683,12 +683,13 @@ namespace SimpleInjector
 
             return string.Format(CultureInfo.InvariantCulture,
                 "There is already a {0}registration for {1} (with implementation {2}) that " +
-                "overlaps with the registration for {3} that you are trying to make. This new " +
+                "overlaps with the {3}registration for {4} that you are trying to make. This new " +
                 "registration would cause ambiguity, because both registrations would be used for the " +
-                "same closed service types. {4}",
+                "same closed service types. {5}",
                 isExistingRegistrationConditional ? "conditional " : string.Empty,
                 openGenericServiceType.ToFriendlyName(),
                 overlappingImplementationType.ToFriendlyName(),
+                isNewRegistrationConditional ? "conditional " : string.Empty,
                 implementationTypeOfNewRegistration.ToFriendlyName(),
                 solution);
         }

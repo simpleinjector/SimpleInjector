@@ -290,6 +290,63 @@
         }
 
         [TestMethod]
+        public void RegisterClosedUnconditional_AfterAClosedConditionalRegistrationForTheSameServcieTypeHasBeenMade_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), c => true);
+
+            // Act
+            Action action = () => container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already a conditional registration for IGeneric<Int32> (with implementation 
+                IntGenericType) that overlaps with the registration for GenericType<Int32> that 
+                you are trying to make. This new registration would cause ambiguity, because both 
+                registrations would be used for the same closed service types. Either remove one of the 
+                registrations or make them both conditional."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterClosedConditional_AfterAClosedUnconditionalRegistrationForTheSameServiceTypeHasBeenMade_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), 
+                c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already a registration for IGeneric<Int32> (with implementation 
+                GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that 
+                you are trying to make. This new registration would cause ambiguity, because both 
+                registrations would be used for the same closed service types. Either remove one of the 
+                registrations or make them both conditional."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterClosedUnconditional_AfterAClosedConditionalRegistrationForTheDifferentClosedVersionHasBeenMade_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), c => true);
+
+            // Act
+            container.Register<IGeneric<float>, GenericType<float>>();
+        }
+
+        [TestMethod]
         public void RegisterGeneric_ForUnconstraintedTypeAfterAConditionalRegistrationForTheSameServiceTypeHasBeenMade_ThrowsAnExpressiveException()
         {
             // Arrange
@@ -321,14 +378,16 @@
             container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             // Act
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), c => true);
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+                c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericType<T>) that
-                overlaps with the registration for GenericClassType<TClass> that you are trying to make. This 
-                new registration would cause ambiguity, because both registrations would be used for the same
-                closed service types. Either remove one of the registrations or make them both conditional."
+                overlaps with the conditional registration for GenericClassType<TClass> that you are trying 
+                to make. This new registration would cause ambiguity, because both registrations would be 
+                used for the same closed service types. Either remove one of the registrations or make them 
+                both conditional."
                 .TrimInside(),
                 action);
         }
@@ -344,15 +403,16 @@
             // Act
             // Although we skip checks for types with type constraints, these two registrations use the same
             // implementation type and this will always cause overlap.
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), c => true);
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+                c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericClassType<TClass>) 
-                that overlaps with the registration for GenericClassType<TClass> that you are trying to make. 
-                This new registration would cause ambiguity, because both registrations would be used for the 
-                same closed service types. Either remove one of the registrations or make them both 
-                conditional."
+                that overlaps with the conditional registration for GenericClassType<TClass> that you are 
+                trying to make. This new registration would cause ambiguity, because both registrations would
+                be used for the same closed service types. Either remove one of the registrations or make 
+                them both conditional."
                 .TrimInside(),
                 action);
         }
@@ -363,7 +423,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, c => false);
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, 
+                c => false);
 
             // Act
             Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>),
@@ -372,10 +433,10 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<T> (with implementation 
-                GenericType<T>) that overlaps with the registration for GenericType<T> that you are trying to 
-                make. This new registration would cause ambiguity, because both registrations would be used 
-                for the same closed service types. You can merge both registrations into a single conditional 
-                registration and combine both predicates into one single predicate."
+                GenericType<T>) that overlaps with the conditional registration for GenericType<T> that you 
+                are trying to make. This new registration would cause ambiguity, because both registrations 
+                would be used for the same closed service types. You can merge both registrations into a 
+                single conditional registration and combine both predicates into one single predicate."
                 .TrimInside(),
                 action);
         }
@@ -394,8 +455,8 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for ILogger (with implementation 
-                NullLogger) that overlaps with the registration for NullLogger that you are trying to 
-                make. This new registration would cause ambiguity, because both registrations would be used 
+                NullLogger) that overlaps with the conditional registration for NullLogger that you are trying
+                to make. This new registration would cause ambiguity, because both registrations would be used 
                 for the same closed service types. You can merge both registrations into a single conditional 
                 registration and combine both predicates into one single predicate."
                 .TrimInside(),
@@ -435,10 +496,10 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IConstraintedGeneric<T> (with implementation 
-                ConstraintedGeneric<T>) that overlaps with the registration for ConstraintedGeneric2<T> that 
-                you are trying to make. This new registration would cause ambiguity, because both 
-                registrations would be used for the same closed service types. Either remove one of the 
-                registrations or make them both conditional."
+                ConstraintedGeneric<T>) that overlaps with the conditional registration for 
+                ConstraintedGeneric2<T> that you are trying to make. This new registration would cause 
+                ambiguity, because both registrations would be used for the same closed service types. Either 
+                remove one of the registrations or make them both conditional."
                 .TrimInside(),
                 action);
         }
