@@ -1,7 +1,7 @@
 #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -48,6 +48,24 @@ namespace SimpleInjector.Integration.Wcf
             : base(serviceType, baseAddresses)
         {
             Requires.IsNotNull(container, nameof(container));
+
+            this.container = container;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleInjectorServiceHost"/> class.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="singletonInstance">The instance of the hosted service.</param>
+        /// <param name="baseAddresses">The base addresses.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
+        /// reference or <paramref name="singletonInstance"/> is a null reference.</exception>
+        public SimpleInjectorServiceHost(Container container, object singletonInstance, 
+            params Uri[] baseAddresses)
+            : base(singletonInstance, baseAddresses)
+        {
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(singletonInstance, nameof(singletonInstance));
 
             this.container = container;
         }

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,7 +23,7 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.ServiceModel;
     using System.ServiceModel.Activation;
 
@@ -82,7 +82,49 @@ namespace SimpleInjector.Integration.Wcf
                     "documentation: https://simpleinjector.org/wcf.");
             }
 
-            return new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
+            if (GetInstanceContextMode(serviceType) == InstanceContextMode.Single)
+            {
+                object singletonInstance = GetSingletonInstance(serviceType);
+
+                return new SimpleInjectorServiceHost(container, singletonInstance, baseAddresses);
+            }
+            else
+            {
+                return new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
+            }
+        }
+
+        private static InstanceContextMode GetInstanceContextMode(Type serviceType)
+        {
+            var behavior = serviceType.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
+                .OfType<ServiceBehaviorAttribute>()
+                .FirstOrDefault();
+
+            return behavior?.InstanceContextMode ?? InstanceContextMode.PerCall;
+        }
+
+        private static object GetSingletonInstance(Type serviceType)
+        {
+            InstanceProducer registration = container.GetRegistration(serviceType);
+
+            // Call GetInstance BEFORE checking the Lifestyle property; decorators might be applied at this
+            // point, causing the lifestyle and registration properties to change.
+            object singletonInstance = registration.GetInstance();
+
+            if (registration.Lifestyle != Lifestyle.Singleton)
+            {
+                throw new InvalidOperationException(string.Format(
+                    "Service type {0} has been flagged as 'Single' using the ServiceBehaviorAttribute, " +
+                    "causing WCF to hold on to this instance indefinitely, while {1} has been registered " +
+                    "with the {2} lifestyle in the container. Please make sure that {1} is registered " +
+                    "as Singleton as well, or mark {0} with " +
+                    "[ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)] instead.",
+                    serviceType.FullName,
+                    registration.Registration.ImplementationType.FullName,
+                    registration.Lifestyle.Name));
+            }
+
+            return singletonInstance;
         }
     }
 }
