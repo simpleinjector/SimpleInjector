@@ -23,7 +23,6 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
-    using System.Linq;
     using System.ServiceModel;
     using System.ServiceModel.Activation;
 
@@ -82,26 +81,13 @@ namespace SimpleInjector.Integration.Wcf
                     "documentation: https://simpleinjector.org/wcf.");
             }
 
-            if (GetInstanceContextMode(serviceType) == InstanceContextMode.Single)
-            {
-                object singletonInstance = GetSingletonInstance(serviceType);
-
-                return new SimpleInjectorServiceHost(container, singletonInstance, baseAddresses);
-            }
-            else
-            {
-                return new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
-            }
+            return HasInstanceContextModeSingle(serviceType)
+                ? new SimpleInjectorServiceHost(container, GetSingletonInstance(serviceType), baseAddresses)
+                : new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
         }
 
-        private static InstanceContextMode GetInstanceContextMode(Type serviceType)
-        {
-            var behavior = serviceType.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
-                .OfType<ServiceBehaviorAttribute>()
-                .FirstOrDefault();
-
-            return behavior?.InstanceContextMode ?? InstanceContextMode.PerCall;
-        }
+        internal static bool HasInstanceContextModeSingle(Type serviceType) =>
+            serviceType.GetServiceBehaviorAttribute()?.InstanceContextMode == InstanceContextMode.Single;
 
         private static object GetSingletonInstance(Type serviceType)
         {
