@@ -49,6 +49,9 @@ namespace SimpleInjector.Integration.Wcf
             SimpleInjectorServiceHostFactory.container = container;
         }
 
+        internal static bool HasInstanceContextModeSingle(Type serviceType) =>
+            serviceType.GetServiceBehaviorAttribute()?.InstanceContextMode == InstanceContextMode.Single;
+
         /// <summary>
         /// Creates a <see cref="SimpleInjectorServiceHost"/> for a specified type of service with a specific 
         /// base address. 
@@ -85,9 +88,6 @@ namespace SimpleInjector.Integration.Wcf
                 ? new SimpleInjectorServiceHost(container, GetSingletonInstance(serviceType), baseAddresses)
                 : new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
         }
-
-        internal static bool HasInstanceContextModeSingle(Type serviceType) =>
-            serviceType.GetServiceBehaviorAttribute()?.InstanceContextMode == InstanceContextMode.Single;
 
         private static object GetSingletonInstance(Type serviceType)
         {
