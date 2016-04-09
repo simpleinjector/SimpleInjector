@@ -9,7 +9,6 @@
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
-      <dependency id="SimpleInjector" version="{versionCore}" />
       <dependency id="SimpleInjector.Integration.Wcf" version="{version_Integration_Wcf}" />
     </dependencies>
     <frameworkAssemblies>
