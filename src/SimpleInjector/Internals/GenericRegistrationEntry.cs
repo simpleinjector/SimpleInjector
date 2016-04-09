@@ -65,7 +65,10 @@ namespace SimpleInjector.Internals
             this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
             this.ThrowWhenOverlappingRegistrationsExist(producer);
 
-            this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
+            if (this.container.Options.AllowOverridingRegistrations)
+            {
+                this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
+            }
 
             this.providers.Add(new ClosedToInstanceProducerProvider(producer));
         }

@@ -1382,6 +1382,38 @@
             // Act
             container.GetInstance<ILogger>();
         }
+        
+        [TestMethod]
+        public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended1()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<IGeneric<int>, IntGenericType>(c => true);
+            container.RegisterConditional<IGeneric<int>, GenericType<int>>(c => false);
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(IntGenericType), instance);
+        }
+        
+        [TestMethod]
+        public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<IGeneric<int>, IntGenericType>(c => false);
+            container.RegisterConditional<IGeneric<int>, GenericType<int>>(c => true);
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(GenericType<int>), instance);
+        }
 
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
