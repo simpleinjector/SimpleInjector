@@ -90,6 +90,9 @@
           "System.Xml.XDocument": "4.0.10"
         }
       },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
+      },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
         "compile": {
@@ -144,7 +147,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -949,6 +952,9 @@
           "System.Xml.XDocument": "4.0.10"
         }
       },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
+      },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
         "compile": {
@@ -1003,7 +1009,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1850,6 +1856,9 @@
           "System.Xml.XDocument": "4.0.10"
         }
       },
+      "Microsoft.NETCore.Platforms/1.0.0": {
+        "type": "package"
+      },
       "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
         "type": "package",
         "compile": {
@@ -1904,7 +1913,7 @@
       "NuSpec.ReferenceGenerator/1.0.0": {
         "type": "package"
       },
-      "SimpleInjector/3.1.2": {
+      "SimpleInjector/3.1.2-beta5": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -2665,7 +2674,7 @@
     }
   },
   "libraries": {
-    "SimpleInjector/3.1.2": {
+    "SimpleInjector/3.1.2-beta5": {
       "type": "project",
       "path": "../SimpleInjector/project.json"
     },
@@ -2718,6 +2727,16 @@
         "Microsoft.NETCore.5.0.0.nupkg",
         "Microsoft.NETCore.5.0.0.nupkg.sha512",
         "Microsoft.NETCore.nuspec"
+      ]
+    },
+    "Microsoft.NETCore.Platforms/1.0.0": {
+      "type": "package",
+      "sha512": "0N77OwGZpXqUco2C/ynv1os7HqdFYifvNIbveLDKqL5PZaz05Rl9enCwVBjF61aumHKueLWIJ3prnmdAXxww4A==",
+      "files": [
+        "Microsoft.NETCore.Platforms.1.0.0.nupkg",
+        "Microsoft.NETCore.Platforms.1.0.0.nupkg.sha512",
+        "Microsoft.NETCore.Platforms.nuspec",
+        "runtime.json"
       ]
     },
     "Microsoft.NETCore.Portable.Compatibility/1.0.0": {
