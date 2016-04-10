@@ -202,3 +202,8 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+# Included stuff
+!BuildTools/*.*
+!Shared Assemblies/*.*
+!Shared Silverlight Assemblies/*.*
