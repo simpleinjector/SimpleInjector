@@ -1,14 +1,14 @@
 {
   "version": "3.1.2-beta4",
   "compilationOptions": { "keyFile": "../../SimpleInjector.snk" },
-  "description": "Integration library for ASP.NET 5 and up for Simple Injector.",
+  "description": "Integration library for ASP.NET Core and up for Simple Injector.",
   "authors": [ "Simple Injector Contributors" ],
   "owners": [ "Simple Injector Contributors" ],
-  "tags": [ "simpleinjector", "dependency-injection", "DI", "ASP.NET", "ASP.NET 5", "asp.net-5" ],
-  "projectUrl": "https://simpleinjector.org/aspnet5",
+  "tags": [ "simpleinjector", "dependency-injection", "DI", "ASP.NET", "ASP.NET 5", "ASP.NET Core", "asp.net-5", "asp.net-core" ],
+  "projectUrl": "https://simpleinjector.org/aspnetcore",
   "licenseUrl": "https://simpleinjector.org/license",
   "iconUrl": "https://simpleinjector.org/simpleinjector.ico",
-  "title": "Simple Injector ASP.NET 5 Integration",
+  "title": "Simple Injector ASP.NET Core Integration",
   "requireLicenseAcceptance": false,
   "language": "en-US",
   "frameworks": {
