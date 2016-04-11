@@ -94,6 +94,46 @@
             Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(ClassConstraintEventHandler<ClassEvent>),
                 "Actual: " + handlers.ToFriendlyNamesText());
         }
+        
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsOverridingClosedGenericRegistrations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, IntGenericType>();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Replaces the previous registration
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(GenericType<int>), instance);
+        }
+
+        [TestMethod]
+        public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsOverridingClosedGenericConditionalRegistrationByNonConditional()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<IGeneric<int>, IntGenericType>(c => true);
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Replaces the previous (conditional) registration
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(GenericType<int>), instance);
+        }
 
         [TestMethod]
         public void Register_OpenGenericRegistrationWithTypeConstraintWithWithNoOverlappingRegistrationsAndAllowOverridingRegistrationsTrue_Succeeds()
@@ -788,10 +828,7 @@
             return (PropertyInfo)body.Member;
         }
 
-        private static ContainerOptions GetContainerOptions()
-        {
-            return new Container().Options;
-        }
+        private static ContainerOptions GetContainerOptions() => new Container().Options;
 
         public sealed class ClassWithContainerAsDependency
         {

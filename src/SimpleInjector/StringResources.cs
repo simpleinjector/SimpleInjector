@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -38,7 +38,8 @@ namespace SimpleInjector
         internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
         {
             string message = string.Format(CultureInfo.InvariantCulture, 
-                "The container can't be changed after the first call to {0}, {1} and {2}.",
+                "The container can't be changed after the first call to {0}, {1} and {2}. " +
+                "Please see https://simpleinjector.org/locked to understand why the container is locked.",
                 nameof(Container.GetInstance),
                 nameof(Container.GetAllInstances),
                 nameof(Container.Verify));
@@ -682,12 +683,13 @@ namespace SimpleInjector
 
             return string.Format(CultureInfo.InvariantCulture,
                 "There is already a {0}registration for {1} (with implementation {2}) that " +
-                "overlaps with the registration for {3} that you are trying to make. This new " +
+                "overlaps with the {3}registration for {4} that you are trying to make. This new " +
                 "registration would cause ambiguity, because both registrations would be used for the " +
-                "same closed service types. {4}",
+                "same closed service types. {5}",
                 isExistingRegistrationConditional ? "conditional " : string.Empty,
                 openGenericServiceType.ToFriendlyName(),
                 overlappingImplementationType.ToFriendlyName(),
+                isNewRegistrationConditional ? "conditional " : string.Empty,
                 implementationTypeOfNewRegistration.ToFriendlyName(),
                 solution);
         }
@@ -803,7 +805,8 @@ namespace SimpleInjector
             hasRelatedOneToOneMapping
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to call GetInstance<{0}>() " +
-                    "or depend on {0}?",
+                    "or depend on {0}? Or did you mean to register a collection of types using " +
+                    "RegisterCollection?",
                     collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 

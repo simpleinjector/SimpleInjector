@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -232,6 +232,11 @@ namespace SimpleInjector
             return WcfOperationLifestyle.GetCurrentScopeCore();
         }
 
+        internal static ServiceBehaviorAttribute GetServiceBehaviorAttribute(this Type type) => 
+            type.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
+                .OfType<ServiceBehaviorAttribute>()
+                .FirstOrDefault();
+
         private static bool IsWcfServiceType(Type type)
         {
             bool typeIsDecorated = type.GetCustomAttributes(typeof(ServiceContractAttribute), true).Any();
@@ -277,16 +282,9 @@ namespace SimpleInjector
         {
             var attribute = GetServiceBehaviorAttribute(wcfServiceType);
 
-            bool singleton = attribute != null && attribute.InstanceContextMode == InstanceContextMode.Single;
+            bool singleton = attribute?.InstanceContextMode == InstanceContextMode.Single;
 
             return singleton ? Lifestyle.Singleton : behavior.SelectLifestyle(wcfServiceType, wcfServiceType);
-        }
-
-        private static ServiceBehaviorAttribute GetServiceBehaviorAttribute(Type type)
-        {
-            return type.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
-                .OfType<ServiceBehaviorAttribute>()
-                .FirstOrDefault();
         }
 
         private static IEnumerable<Type> GetExportedTypes(Assembly assembly)

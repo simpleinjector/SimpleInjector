@@ -30,10 +30,10 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     [SecuritySafeCritical]
     internal sealed partial class ExecutionContextScopeManager
     {
-        internal ExecutionContextScope BeginExecutionContextScope() => 
-            this.CurrentScopeInternal = new ExecutionContextScope(this, this.GetCurrentScopeWithAutoCleanup());
-
         internal ExecutionContextScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
+
+        internal ExecutionContextScope BeginExecutionContextScope() =>
+            this.CurrentScopeInternal = new ExecutionContextScope(this, this.GetCurrentScopeWithAutoCleanup());
 
         internal void EndExecutionContextScope(ExecutionContextScope scope)
         {

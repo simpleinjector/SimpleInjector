@@ -15,7 +15,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The Simple Injector WCF Integration package adds a ServiceHost and ServiceHostFactory to allow dependency injection on WCF service types.</description>
     <summary>Integration package for WCF applications.</summary>
-    <copyright>Simple Injector Contributors 2012 - 2014</copyright>
+    <copyright>Simple Injector Contributors 2012 - {year}</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC per-web-request web wcf integration</tags>
   </metadata>

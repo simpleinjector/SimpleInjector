@@ -16,7 +16,7 @@ set version=%1
 set superSecretApiKey=%2
 set packageDirectory=Releases\v%version%\.NET
 set options=-Verbosity detailed
-set nugetexe=..\nuget.exe
+set nugetexe=..\..\nuget.exe
 
 IF NOT EXIST %packageDirectory% (
     ECHO The directory "%packageDirectory%" could not be found.

@@ -1,9 +1,9 @@
 @ECHO OFF
 
-set version=3.1.2
-set prereleasePostfix=-beta5
+set version=3.1.3
+set prereleasePostfix=
 set buildNumber=0 
-
+set copyrightYear=2016
 
 set version_Core=%version%
 set version_Packaging=%version_Core%
@@ -230,6 +230,7 @@ copy %targetPathPcl%\SimpleInjector.xml "Releases\temp\lib\portable-net4+sl4+wp8
 copy %targetPathCoreClr%\SimpleInjector.dll Releases\temp\lib\dotnet\SimpleInjector.dll
 copy %targetPathCoreClr%\SimpleInjector.xml Releases\temp\lib\dotnet\SimpleInjector.xml
 %replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.%named_version_Core%.zip"
 rmdir Releases\temp /s /q
@@ -246,6 +247,7 @@ copy %targetPathNet%\SimpleInjector.Packaging.dll "Releases\temp\lib\portable-ne
 copy %targetPathNet%\SimpleInjector.Packaging.xml "Releases\temp\lib\portable-net4+sl4+wp8+win8+wpa81\SimpleInjector.Packaging.xml"
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %named_version_Packaging%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Packaging.%named_version_Packaging%.zip"
 rmdir Releases\temp /s /q
@@ -262,6 +264,7 @@ copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.dll "Releases
 copy %targetPathCoreClr%\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.LifetimeScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.LifetimeScoping.%named_version_Extensions_LifetimeScoping%.zip"
 rmdir Releases\temp /s /q
@@ -276,6 +279,7 @@ copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.dll "
 copy %targetPathCoreClr%\SimpleInjector.Extensions.ExecutionContextScoping.xml "Releases\temp\lib\dotnet\SimpleInjector.Extensions.ExecutionContextScoping.xml"
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Extensions.ExecutionContextScoping.%named_version_Extensions_ExecutionContextScoping%.zip"
 rmdir Releases\temp /s /q
@@ -288,6 +292,7 @@ copy %targetPathNet%\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\
 copy %targetPathNet%\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %named_version_Integration_Web%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\fb4dd696b20548afa09bcbbf3ea6c7d0.psmdcp {version} %named_version_Integration_Web%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.%named_version_Integration_Web%.zip"
 rmdir Releases\temp /s /q
@@ -301,6 +306,7 @@ copy %targetPathNet%\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\ne
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version} %named_version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version_Integration_Web} %named_version_Integration_Web%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\916f6977dc7a462395f59f05d2cc6a76.psmdcp {version} %named_version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Web.Mvc.%named_version_Integration_Mvc%.zip"
 rmdir Releases\temp /s /q
@@ -312,6 +318,7 @@ del Releases\temp\.gitignore /s /q
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version} %named_version_Integration_Mvc%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {version_Integration_Mvc} %named_version_Integration_Mvc%
+%replace% /source:Releases\temp\SimpleInjector.MVC3.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\7594fa13b1164869a9b2b67b8b5ad9a3.psmdcp {version} %named_version_Integration_Mvc%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.MVC3.%named_version_Integration_Mvc%.zip"
 rmdir Releases\temp /s /q
@@ -324,6 +331,7 @@ copy %targetPathNet%\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\
 copy %targetPathNet%\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\13850374b87d467da12f21ca32dac632.psmdcp {version} %named_version_Integration_Wcf%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.%named_version_Integration_Wcf%.zip"
 rmdir Releases\temp /s /q
@@ -334,6 +342,7 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {version} %named_version_Integration_Wcf%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {version_Integration_Wcf} %named_version_Integration_Wcf%
+%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.QuickStart.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\a47c8b1328f541fc8a5cd4c0446d5fe1.psmdcp {version} %named_version_Integration_Wcf%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.Wcf.QuickStart.%named_version_Integration_Wcf%.zip"
 rmdir Releases\temp /s /q
@@ -346,6 +355,7 @@ copy %targetPathNet%\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version_Extensions_ExecutionContextScoping} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {versionCore} %named_version_Core%
+%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\a3b1f940a1584e868b3266ff38ba4e08.psmdcp {version} %named_version_Integration_WebApi%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.WebApi.%named_version_Integration_WebApi%.zip"
 rmdir Releases\temp /s /q
@@ -356,6 +366,7 @@ attrib -r "%CD%\Releases\temp\*.*" /s /d
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {version} %named_version_Integration_WebApi%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {version_Integration_WebApi} %named_version_Integration_WebApi%
+%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.WebHost.QuickStart.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\28cf0010982e4a44bd982823a7b4b6be.psmdcp {version} %named_version_Integration_WebApi%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\.NET\SimpleInjector.Integration.WebApi.WebHost.QuickStart.%named_version_Integration_WebApi%.zip"
 rmdir Releases\temp /s /q

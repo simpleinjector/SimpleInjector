@@ -12,7 +12,27 @@
     public class RegisterConditionalTests
     {
         [TestMethod]
-        public void RegisterConditional_AllowOverridingRegistrations_NotSupported()
+        public void RegisterConditionalNonGeneric_AllowOverridingRegistrations_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(ILogger), typeof(NullLogger),
+                Lifestyle.Singleton, c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
+                "is set, because it is impossible for the container to detect whether the registration " +
+                "should replace a different registration or not.",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterConditionalOpenGeneric_AllowOverridingRegistrations_NotSupported()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -21,6 +41,26 @@
 
             // Act
             Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>),
+                Lifestyle.Singleton, c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
+                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
+                "is set, because it is impossible for the container to detect whether the registration " +
+                "should replace a different registration or not.",
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterConditionalOnClosedGeneric_AllowOverridingRegistrations_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(IGeneric<int>), typeof(GenericType<int>),
                 Lifestyle.Singleton, c => true);
 
             // Assert
@@ -45,8 +85,6 @@
 
             // Act
             container.Verify();
-
-            // Assert
         }
 
         [TestMethod]
@@ -92,7 +130,7 @@
             Assert.IsNotNull(actualImplementationType, "Predicate was not called");
             Assert.IsFalse(actualImplementationType.ContainsGenericParameter(), "ImplementationType should be a closed type");
         }
-      
+
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsOfTheSameInterfaceWithValidPredicate_AppliesPredicate1()
         {
@@ -180,7 +218,7 @@
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
         }
-        
+
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
         {
@@ -232,7 +270,7 @@
                 "Type ILogger has already been registered as conditional registration.",
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterConditional_AfterAnUnconditionalRegistrationForTheSameServiceTypeHasBeenMade_ThrowsAnExpressiveException()
         {
@@ -240,7 +278,7 @@
             var container = ContainerFactory.New();
 
             container.Register<ILogger, ConsoleLogger>();
-            
+
             // Act
             Action action = () => container.RegisterConditional(typeof(ILogger), typeof(NullLogger), c => true);
 
@@ -249,7 +287,64 @@
                 "Type ILogger has already been registered as unconditional registration. For non-generic " +
                 "types, conditional and unconditional registrations can't be mixed.",
                 action);
-        }    
+        }
+
+        [TestMethod]
+        public void RegisterClosedUnconditional_AfterAClosedConditionalRegistrationForTheSameServcieTypeHasBeenMade_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), c => true);
+
+            // Act
+            Action action = () => container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already a conditional registration for IGeneric<Int32> (with implementation 
+                IntGenericType) that overlaps with the registration for GenericType<Int32> that 
+                you are trying to make. This new registration would cause ambiguity, because both 
+                registrations would be used for the same closed service types. Either remove one of the 
+                registrations or make them both conditional."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterClosedConditional_AfterAClosedUnconditionalRegistrationForTheSameServiceTypeHasBeenMade_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericType<int>>();
+
+            // Act
+            Action action = () => container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), 
+                c => true);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                There is already a registration for IGeneric<Int32> (with implementation 
+                GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that 
+                you are trying to make. This new registration would cause ambiguity, because both 
+                registrations would be used for the same closed service types. Either remove one of the 
+                registrations or make them both conditional."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterClosedUnconditional_AfterAClosedConditionalRegistrationForTheDifferentClosedVersionHasBeenMade_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), c => true);
+
+            // Act
+            container.Register<IGeneric<float>, GenericType<float>>();
+        }
 
         [TestMethod]
         public void RegisterGeneric_ForUnconstraintedTypeAfterAConditionalRegistrationForTheSameServiceTypeHasBeenMade_ThrowsAnExpressiveException()
@@ -283,14 +378,16 @@
             container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             // Act
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), c => true);
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+                c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericType<T>) that
-                overlaps with the registration for GenericClassType<TClass> that you are trying to make. This 
-                new registration would cause ambiguity, because both registrations would be used for the same
-                closed service types. Either remove one of the registrations or make them both conditional."
+                overlaps with the conditional registration for GenericClassType<TClass> that you are trying 
+                to make. This new registration would cause ambiguity, because both registrations would be 
+                used for the same closed service types. Either remove one of the registrations or make them 
+                both conditional."
                 .TrimInside(),
                 action);
         }
@@ -306,42 +403,44 @@
             // Act
             // Although we skip checks for types with type constraints, these two registrations use the same
             // implementation type and this will always cause overlap.
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), c => true);
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+                c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericClassType<TClass>) 
-                that overlaps with the registration for GenericClassType<TClass> that you are trying to make. 
-                This new registration would cause ambiguity, because both registrations would be used for the 
-                same closed service types. Either remove one of the registrations or make them both 
-                conditional."
+                that overlaps with the conditional registration for GenericClassType<TClass> that you are 
+                trying to make. This new registration would cause ambiguity, because both registrations would
+                be used for the same closed service types. Either remove one of the registrations or make 
+                them both conditional."
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterConditionalGeneric_DoneTwiceConditionallyForTheExactSameImplementationType_ThrowsAnExpressiveException()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, c => false);
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, 
+                c => false);
 
             // Act
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), 
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>),
                 Lifestyle.Singleton, c => false);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<T> (with implementation 
-                GenericType<T>) that overlaps with the registration for GenericType<T> that you are trying to 
-                make. This new registration would cause ambiguity, because both registrations would be used 
-                for the same closed service types. You can merge both registrations into a single conditional 
-                registration and combine both predicates into one single predicate."
+                GenericType<T>) that overlaps with the conditional registration for GenericType<T> that you 
+                are trying to make. This new registration would cause ambiguity, because both registrations 
+                would be used for the same closed service types. You can merge both registrations into a 
+                single conditional registration and combine both predicates into one single predicate."
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterConditional_DoneTwiceConditionallyForTheExactSameImplementationType_ThrowsAnExpressiveException()
         {
@@ -356,8 +455,8 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for ILogger (with implementation 
-                NullLogger) that overlaps with the registration for NullLogger that you are trying to 
-                make. This new registration would cause ambiguity, because both registrations would be used 
+                NullLogger) that overlaps with the conditional registration for NullLogger that you are trying
+                to make. This new registration would cause ambiguity, because both registrations would be used 
                 for the same closed service types. You can merge both registrations into a single conditional 
                 registration and combine both predicates into one single predicate."
                 .TrimInside(),
@@ -397,14 +496,14 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IConstraintedGeneric<T> (with implementation 
-                ConstraintedGeneric<T>) that overlaps with the registration for ConstraintedGeneric2<T> that 
-                you are trying to make. This new registration would cause ambiguity, because both 
-                registrations would be used for the same closed service types. Either remove one of the 
-                registrations or make them both conditional."
+                ConstraintedGeneric<T>) that overlaps with the conditional registration for 
+                ConstraintedGeneric2<T> that you are trying to make. This new registration would cause 
+                ambiguity, because both registrations would be used for the same closed service types. Either 
+                remove one of the registrations or make them both conditional."
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterConditional_RegisteredSingletonWithPredicateTrue_InjectsSameInstanceInAllConsumers()
         {
@@ -534,7 +633,7 @@
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void GetInstance_ConsumerDependingOnConditionalRegistrationsThatDoNotGetInjected_ThrowsExpectedExceptions()
         {
@@ -546,7 +645,7 @@
 
             // Act
             Action action = () => container.GetInstance<ServiceWithDependency<ILogger>>();
-            
+
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 2 conditional registrations for ILogger exist, but none of the supplied predicates returned 
@@ -567,7 +666,7 @@
             container.RegisterConditional<IPlugin, PluginImpl2>(Lifestyle.Singleton, c => !c.Handled);
 
             container.RegisterDecorator<IPlugin, PluginDecorator>(Lifestyle.Singleton);
-            
+
             // Act
             var decorator1 = container.GetInstance<ServiceWithDependency<IPlugin>>().Dependency;
             var decorator2 = container.GetInstance<ServiceWithDependency<IPlugin>>().Dependency;
@@ -707,7 +806,7 @@
                 .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void GetInstance_MultipleApplicableConditionalNonGenericRegistrations_ThrowsExpectedException()
         {
@@ -731,7 +830,7 @@
                .TrimInside(),
                action);
         }
-        
+
         [TestMethod]
         public void RegisterConditionalFactory_AllowOverridingRegistrations_NotSupported()
         {
@@ -792,7 +891,7 @@
             // Assert
             Assert.AreSame(a.Dependency, b.Dependency);
         }
-        
+
         [TestMethod]
         public void GetInstance_ConditionalSingletonWithMutlipleClosedMappingAtSameImplementationThroughFactory_InjectsSameInstanceForDifferentClosedVersions()
         {
@@ -815,7 +914,7 @@
                 "Since both dependencies are IntAndFloatGeneric<object> and it is registered as singleton " +
                 ", there should only be one single instance.");
         }
-        
+
         [TestMethod]
         public void RegisterConditionalFactory_PredicateContext_ServiceTypeIsClosedImplentation()
         {
@@ -839,7 +938,7 @@
             Assert.IsNotNull(actualServiceType, "Predicate was not called");
             Assert.IsFalse(actualServiceType.ContainsGenericParameter(), "ServiceType should be a closed type");
         }
-        
+
         [TestMethod]
         public void RegisterConditionalFactory_FactoryReturningOpenGenericType_WorksCorrectly()
         {
@@ -945,7 +1044,7 @@
             // Assert
             Assert.IsTrue(predicateCalled);
         }
-        
+
         [TestMethod]
         public void RegisterConditionalFactory_PredicateReturningFalse_FactoryDoesNotGetCalled()
         {
@@ -978,7 +1077,7 @@
             // Assert
             Assert.IsTrue(predicateCalled);
         }
-        
+
         [TestMethod]
         public void RegisterConditionalFactory_TwoEquivalentImplementationsOfTheSameInterfaceWithOverlappingPredicate_ThrowsException2()
         {
@@ -1006,7 +1105,7 @@
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
         }
-                
+
         [TestMethod]
         public void GetInstance_RegisterTypeFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
         {
@@ -1029,13 +1128,13 @@
             // Assert
             AssertThat.IsInstanceOfType(typeof(OpenGenericWithUnresolvableArgument<string, double>), result);
         }
-        
+
         [TestMethod]
         public void GetInstance_WithClosedGenericServiceAndFactoryReturningIncompatibleClosedImplementation_FailsWithExpectedException()
         {
             // Arrange
             var container = new Container();
-            
+
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
                 c => typeof(OpenGenericWithPredicate1<string>),
                 Lifestyle.Transient,
@@ -1048,10 +1147,10 @@
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The registered type factory returned type OpenGenericWithPredicate1<String> which
                 does not implement IOpenGenericWithPredicate<Object>"
-                .TrimInside(), 
+                .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void GetInstance_RegisterDecoratorWithFactoryReturningTypeWithMultiplePublicConstructors_ThrowsExceptedException()
         {
@@ -1059,7 +1158,7 @@
             string expectedMessage = "it should have only one public constructor";
 
             var container = new Container();
-            
+
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
                 c => typeof(OpenGenericWithPredicateWithMultipleCtors<>),
                 Lifestyle.Transient,
@@ -1091,16 +1190,16 @@
                 @"The registered type factory returned open generic type DisposableOpenGenericWithPredicate<T> 
                 while the registered service type IDisposable is not generic, making it impossible for a 
                 closed generic type to be constructed"
-                .TrimInside(), 
+                .TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void GetInstance_RegisterTypeWithFactoryReturningTypeWithUnresolvableArgument_ThrowsExceptedException()
         {
             // Arrange
             var container = new Container();
-            
+
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
                 c => typeof(OpenGenericWithUnresolvableArgument<,>),
                 Lifestyle.Transient,
@@ -1132,7 +1231,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "The type factory delegate that was registered for service type " +
-                "IOpenGenericWithPredicate<T> returned null.", 
+                "IOpenGenericWithPredicate<T> returned null.",
                 action);
         }
 
@@ -1153,7 +1252,7 @@
             // Assert
             AssertThat.IsInstanceOfType(typeof(Logger<ServiceDependingOn<ILogger>>), logger);
         }
-        
+
         [TestMethod]
         public void GetInstance_ConditionalNonGenericRegistrationWithFactoryInjectedIntoMultipleConsumersAsSingleton_AlwaysInjectSameInstance()
         {
@@ -1178,7 +1277,7 @@
         {
             // Arrange
             var contexts = new List<PredicateContext>();
-            
+
             var container = new Container();
 
             container.Options.PropertySelectionBehavior = new InjectAllProperties();
@@ -1238,7 +1337,7 @@
             var registration = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
 
             container.RegisterConditional(typeof(ILogger), registration, c => true);
-            
+
             // Act
             Action action = () => container.RegisterConditional(typeof(ILogger), registration, c => false);
 
@@ -1282,6 +1381,38 @@
 
             // Act
             container.GetInstance<ILogger>();
+        }
+        
+        [TestMethod]
+        public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended1()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<IGeneric<int>, IntGenericType>(c => true);
+            container.RegisterConditional<IGeneric<int>, GenericType<int>>(c => false);
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(IntGenericType), instance);
+        }
+        
+        [TestMethod]
+        public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional<IGeneric<int>, IntGenericType>(c => false);
+            container.RegisterConditional<IGeneric<int>, GenericType<int>>(c => true);
+
+            // Act
+            var instance = container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(typeof(GenericType<int>), instance);
         }
 
         private sealed class InjectAllProperties : IPropertySelectionBehavior

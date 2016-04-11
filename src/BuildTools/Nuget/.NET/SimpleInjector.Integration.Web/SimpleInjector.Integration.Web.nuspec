@@ -9,16 +9,14 @@
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="Microsoft.Web.Infrastructure" version="1.0.0" />
     </dependencies>
-    <frameworkAssemblies>
-      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
-    </frameworkAssemblies>
     <id>SimpleInjector.Integration.Web</id>
     <title>Simple Injector ASP.NET Integration</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The Simple Injector ASP.NET Integration package adds a lifestyle to the Simple Injector called 'Per Web Request', which allows instances to live within a single HTTP request and get disposed when the request ends.</description>
     <summary>ASP.NET integration for Simple Injector. General integration package for web applications such as Web Forms, MVC and IIS hosted Web API projects.</summary>
-    <copyright>Simple Injector Contributors 2012 - 2014</copyright>
+    <copyright>Simple Injector Contributors 2012 - {year}</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC per-web-request web integration</tags>
   </metadata>

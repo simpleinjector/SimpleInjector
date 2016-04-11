@@ -1,7 +1,26 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
-Version 3.1.2 (v3.1.2 RTM)
+Version 3.1.3 (v3.1.3 RTM)
+
+	Improvements/Changes:
+		-[Web] SimpleInjector.Integration.Web NuGet package now references the Microsoft.Web.Infrastructure
+		 NuGet package instead of the Microsoft.Web.Infrastructure.dll from the GAC. (fixes #170)
+		-[Core] URL to documentation added to "container can't be changed" exception message. (fixes #177)
+		-[Core] Improved exception message when resolving unregistered collections. (fixes #204)
+
+	Bug fixes:
+		-[Core] Registration of conditional closed-generic types prevented when container allows
+		 overriding registrations. (fixes #216)
+		-[WCF] WCF integration failed to create WCF services marked with InstanceContextMode.Single.
+		 (fixes #197)
+		-[Core] Mixing conditional and unconditional registrations for same closed-generic type did not fail
+		 at registration time. (fixes #217)
+		-[Core] Conditional registration for closed-generic types replaced earlier registrations instead of 
+		 being appended. (fixes #186)
+
+
+Version 3.1.2 (v3.1.2 RTM) 2015-12-13
 
 	Improvements/Changes:
 		-[Core] DNXCORE50/CoreCLR version available. (fixes #57)
@@ -14,7 +33,7 @@ Version 3.1.2 (v3.1.2 RTM)
 		-[ExecutionContextScoping] GetCurrentExecutionContextScope() will never return disposed scopes anymore. (fixes #159)
 
 
-Version 3.1.1 (v3.1.1 RTM)
+Version 3.1.1 (v3.1.1 RTM) 2015-11-23
 
 	Bug fixes:
 		-[Core] Container instance was rooted in case decorators where used. (fixes #135)
@@ -22,7 +41,7 @@ Version 3.1.1 (v3.1.1 RTM)
 		 called. (fixes #140)
 
 
-Version 3.1.0 (v3.1.0 RTM)
+Version 3.1.0 (v3.1.0 RTM) 2015-10-09
 
 	Improvements/Changes:
 		-[Core] Lifestyle.CreateProducer<TService>(Type, Container) overload added. (fixes #100)
@@ -40,7 +59,7 @@ Version 3.1.0 (v3.1.0 RTM)
 		 exception explaining that open generic types can't be supplied. (fixes #126)
 	
 
-Version 3.0.7 (v3.0.7 RTM)
+Version 3.0.7 (v3.0.7 RTM) 2015-10-07
 
 	Bug fixes:
 		-[Core] Applying multiple decorator proxies around a registration caused invalid Torn Lifestyle 

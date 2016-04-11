@@ -27,7 +27,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The Execution Context Scoping package adds the 'Execution Context Scope' lifestyle, which allows instances to live within an explicitly defined execution context scope (or logical call context) and get disposed when this scope ends. This scope allows flowing through asynchronous method calls.</description>
     <summary>Execution context scoping for the Simple Injector Inversion of Control library.</summary>
-    <copyright>Simple Injector Contributors 2014 - 2015</copyright>
+    <copyright>Simple Injector Contributors 2014 - {year}</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC lifestyle execution context scope scoping logical call async await</tags>
   </metadata>

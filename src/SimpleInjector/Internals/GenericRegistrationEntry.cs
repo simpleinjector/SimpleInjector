@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     internal sealed class GenericRegistrationEntry : IRegistrationEntry
     {
@@ -49,7 +48,7 @@ namespace SimpleInjector.Internals
 
             IEnumerable<InstanceProducer> CurrentProducers { get; }
 
-            bool OverlapsWith(Type closedServiceType);
+            bool OverlapsWith(InstanceProducer producerToCheck);
 
             InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
                 bool handled = false);
@@ -63,9 +62,13 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLocked();
 
+            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
             this.ThrowWhenOverlappingRegistrationsExist(producer);
 
-            this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
+            if (this.container.Options.AllowOverridingRegistrations)
+            {
+                this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType);
+            }
 
             this.providers.Add(new ClosedToInstanceProducerProvider(producer));
         }
@@ -128,13 +131,13 @@ namespace SimpleInjector.Internals
             where provider.MatchesServiceType(serviceType)
             select provider;
 
-        private void ThrowWhenOverlappingRegistrationsExist(InstanceProducer producer)
+        private void ThrowWhenOverlappingRegistrationsExist(InstanceProducer producerToRegister)
         {
             if (!this.container.Options.AllowOverridingRegistrations)
             {
                 var overlappingProviders =
                     from provider in this.providers
-                    where provider.OverlapsWith(producer.ServiceType)
+                    where provider.OverlapsWith(producerToRegister)
                     select provider;
 
                 if (overlappingProviders.Any())
@@ -145,12 +148,29 @@ namespace SimpleInjector.Internals
                     {
                         throw new InvalidOperationException(
                             StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
-                                producer.ServiceType,
+                                producerToRegister.ServiceType,
                                 overlappingProvider.ImplementationType));
                     }
 
-                    throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(producer.ServiceType));
+                    bool eitherOneRegistrationIsConditional =
+                        overlappingProvider.IsConditional != producerToRegister.IsConditional;
+
+                    throw eitherOneRegistrationIsConditional
+                        ? GetAnOverlappingGenericRegistrationExistsException(
+                            new ClosedToInstanceProducerProvider(producerToRegister),
+                            overlappingProvider)
+                        : new InvalidOperationException(
+                            StringResources.TypeAlreadyRegistered(producerToRegister.ServiceType));
                 }
+            }
+        }
+
+        private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
+        {
+            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
+            {
+                throw new NotSupportedException(
+                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
             }
         }
 
@@ -204,16 +224,24 @@ namespace SimpleInjector.Internals
             select provider;
 
         private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
-            IProducerProvider providerToRegister, IProducerProvider overlappingProvider)
-        {
-            return new InvalidOperationException(
+            InstanceProducer providerToRegister, IProducerProvider overlappingProvider) =>
+            new InvalidOperationException(
+                StringResources.AnOverlappingRegistrationExists(
+                    providerToRegister.ServiceType,
+                    overlappingProvider.ImplementationType,
+                    overlappingProvider.IsConditional,
+                    providerToRegister.ImplementationType,
+            providerToRegister.IsConditional));
+
+        private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
+            IProducerProvider providerToRegister, IProducerProvider overlappingProvider) =>
+            new InvalidOperationException(
                 StringResources.AnOverlappingRegistrationExists(
                     providerToRegister.ServiceType,
                     overlappingProvider.ImplementationType,
                     overlappingProvider.IsConditional,
                     providerToRegister.ImplementationType,
                     providerToRegister.IsConditional));
-        }
 
         private IEnumerable<Tuple<Type, Type, InstanceProducer>> GetInstanceProducers(
             Type closedGenericServiceType, InjectionConsumerInfo consumer)
@@ -253,8 +281,9 @@ namespace SimpleInjector.Internals
             public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
             public bool MatchesServiceType(Type serviceType) => serviceType == this.producer.ServiceType;
 
-            public bool OverlapsWith(Type closedServiceType) =>
-                !this.producer.IsConditional && this.producer.ServiceType == closedServiceType;
+            public bool OverlapsWith(InstanceProducer producerToCheck) =>
+                (this.producer.IsUnconditional || producerToCheck.IsUnconditional) &&
+                this.producer.ServiceType == producerToCheck.ServiceType;
 
             public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
                 bool handled) =>
@@ -319,10 +348,11 @@ namespace SimpleInjector.Internals
                 }
             }
 
-            public bool OverlapsWith(Type serviceType) =>
-                this.Predicate != null || this.ImplementationType == null
+            public bool OverlapsWith(InstanceProducer producerToCheck) =>
+                this.IsConditional || this.ImplementationType == null
                     ? false // Conditionals never overlap compile time.
-                    : GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(serviceType,
+                    : GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(
+                        producerToCheck.ServiceType,
                         this.ImplementationType);
 
             public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
