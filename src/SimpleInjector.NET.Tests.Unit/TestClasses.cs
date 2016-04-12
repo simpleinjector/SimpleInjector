@@ -98,7 +98,7 @@
             this.Repository = repository;
         }
 
-        public IUserRepository Repository { get; private set; }
+        public IUserRepository Repository { get; }
     }
 
     public class RealUserService : UserServiceBase

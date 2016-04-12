@@ -135,9 +135,7 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
-        private static string Actual(DisposableTransientComponentDiagnosticResult[] results)
-        {
-            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(DisposableTransientComponentDiagnosticResult[] results) => 
+            "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

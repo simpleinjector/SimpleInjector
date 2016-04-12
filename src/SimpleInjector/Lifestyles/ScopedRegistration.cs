@@ -72,14 +72,11 @@ namespace SimpleInjector.Lifestyles
         // This method needs to be public, because the BuildExpression methods build a
         // MethodCallExpression using this method, and this would fail in partial trust when the 
         // method is not public.
-        public TService GetInstance()
-        {
-            // Simple Injector does some aggressive optimizations for scoped lifestyles and this method will
-            // is most cases not be called. It will however be called when the expression that is built by
-            // this instance will get compiled by someone else than the core library. That's why this method
-            // is still important.
-            return Scope.GetInstance(this, this.scopeFactory());
-        }
+        // Simple Injector does some aggressive optimizations for scoped lifestyles and this method will
+        // is most cases not be called. It will however be called when the expression that is built by
+        // this instance will get compiled by someone else than the core library. That's why this method
+        // is still important.
+        public TService GetInstance() => Scope.GetInstance(this, this.scopeFactory());
 
         private Func<TService> BuildInstanceCreator()
         {

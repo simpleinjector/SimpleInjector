@@ -248,15 +248,12 @@ namespace SimpleInjector.Internals
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
         }
 
-        private static IEnumerable<Type> GetNestedTypeArgumentsForType(Type type)
-        {
-            return (
-                from argument in type.GetGenericArguments()
-                from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument, new List<Type>())
-                select nestedArgument)
-                .Distinct()
-                .ToArray();
-        }
+        private static IEnumerable<Type> GetNestedTypeArgumentsForType(Type type) => (
+            from argument in type.GetGenericArguments()
+            from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument, new List<Type>())
+            select nestedArgument)
+            .Distinct()
+            .ToArray();
 
         private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(Type argument, IList<Type> processedArguments)
         {
@@ -294,10 +291,8 @@ namespace SimpleInjector.Internals
 
             internal Type ClosedGenericImplementation { get; private set; }
 
-            internal static BuildResult Invalid()
-            {
-                return new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
-            }
+            internal static BuildResult Invalid() => 
+                new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
 
             internal static BuildResult Valid(Type closedGenericImplementation)
             {

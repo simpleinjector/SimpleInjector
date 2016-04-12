@@ -384,14 +384,12 @@
 
         public class ServiceWithReadOnlyPropertyDependency<TDependency>
         {
-            public TDependency Dependency
-            {
-                get { return default(TDependency); }
-            }
+            public TDependency Dependency => default(TDependency);
         }
 
         public class ServiceWithPrivateSetPropertyDependency<TDependency>
         {
+            // NOTE: 'private set' is required for tests to work.
             public TDependency Dependency { get; private set; }
         }
 
@@ -470,22 +468,20 @@
         
         private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
         {
+            // NOTE: 'private set' is required.
             internal TDependency Dependency { get; private set; }
         }
 
         private class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
         {
-            private readonly Predicate<PropertyInfo> propertySelector;
+            private readonly Predicate<PropertyInfo> selector;
 
-            public PredicatePropertySelectionBehavior(Predicate<PropertyInfo> propertySelector)
+            public PredicatePropertySelectionBehavior(Predicate<PropertyInfo> selector)
             {
-                this.propertySelector = propertySelector;
+                this.selector = selector;
             }
 
-            public bool SelectProperty(Type serviceType, PropertyInfo property)
-            {
-                return this.propertySelector(property);
-            }
+            public bool SelectProperty(Type serviceType, PropertyInfo property) => this.selector(property);
         }
     }
 }

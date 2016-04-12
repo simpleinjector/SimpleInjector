@@ -44,10 +44,7 @@ namespace SimpleInjector.Internals
             return visitor.needsAccessToInternals;
         }
 
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
+        public override Expression Visit(Expression node) => base.Visit(node);
 
         internal void MayAccessExpression(bool mayAccess)
         {
@@ -115,17 +112,11 @@ namespace SimpleInjector.Internals
             return base.VisitMember(node);
         }
 
-        private static bool IsPublic(Type type)
-        {
-            return GetTypeAndDeclaringTypes(type).All(IsPublicInternal);
-        }
+        private static bool IsPublic(Type type) => GetTypeAndDeclaringTypes(type).All(IsPublicInternal);
 
-        private static bool IsPublicInternal(Type type)
-        {
-            return
-                (type.IsNested ? type.Info().IsNestedPublic : type.Info().IsPublic) &&
-                (!type.Info().IsGenericType || type.GetGenericArguments().All(IsPublic));
-        }
+        private static bool IsPublicInternal(Type type) => 
+            (type.IsNested ? type.Info().IsNestedPublic : type.Info().IsPublic) 
+            && (!type.Info().IsGenericType || type.GetGenericArguments().All(IsPublic));
 
         private static IEnumerable<Type> GetTypeAndDeclaringTypes(Type type)
         {

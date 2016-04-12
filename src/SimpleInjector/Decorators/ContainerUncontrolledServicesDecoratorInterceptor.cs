@@ -276,14 +276,11 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private bool DecoratorNeedsADecorateeFactory()
-        {
-            return (
-                from parameter in this.decoratorConstructor.GetParameters()
-                where IsDecorateeFactoryDependencyParameter(parameter, this.registeredServiceType)
-                select parameter)
-                .Any();
-        }
+        private bool DecoratorNeedsADecorateeFactory() => (
+            from parameter in this.decoratorConstructor.GetParameters()
+            where IsDecorateeFactoryDependencyParameter(parameter, this.registeredServiceType)
+            select parameter)
+            .Any();
 
         private void ThrownWhenLifestyleIsNotSupported()
         {

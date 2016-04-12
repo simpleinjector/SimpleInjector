@@ -61,11 +61,8 @@ namespace SimpleInjector.Integration.Web.Forms
             this.baseBehavior = baseBehavior;
         }
 
-        bool IPropertySelectionBehavior.SelectProperty(Type serviceType, PropertyInfo propertyInfo)
-        {
-            return ShouldInjectProperty(propertyInfo) ||
-                this.baseBehavior.SelectProperty(serviceType, propertyInfo);
-        }
+        bool IPropertySelectionBehavior.SelectProperty(Type serviceType, PropertyInfo propertyInfo) => 
+            ShouldInjectProperty(propertyInfo) || this.baseBehavior.SelectProperty(serviceType, propertyInfo);
 
         private static bool ShouldInjectProperty(PropertyInfo property)
         {
@@ -77,31 +74,22 @@ namespace SimpleInjector.Integration.Web.Forms
                 IsPropertyDeclaredOnCustomType(property);
         }
 
-        private static bool IsAmbiguousType(Type propertyType)
-        {
-            return propertyType.IsValueType || propertyType == typeof(string);
-        }
+        private static bool IsAmbiguousType(Type propertyType) => 
+            propertyType.IsValueType || propertyType == typeof(string);
 
-        private static bool IsPropertyDeclaredOnCustomType(PropertyInfo property)
-        {
-            return IsPropertyDeclaredOnCustomTypeOnCustomHttpHandler(property) || 
-                IsPropertyDeclaredOnCustomTypeOnCustomUserControl(property);
-        }
+        private static bool IsPropertyDeclaredOnCustomType(PropertyInfo property) =>
+            IsPropertyDeclaredOnCustomTypeOnCustomHttpHandler(property) 
+            || IsPropertyDeclaredOnCustomTypeOnCustomUserControl(property);
 
-        private static bool IsPropertyDeclaredOnCustomTypeOnCustomHttpHandler(PropertyInfo property)
-        {
-            // The property must be declared on a type that implements IHttpHandler, but must not be 
-            // declared on Page, TemplateControl or Control.
-            // In other words it can be declared on sub types of Page, but also on custom IHttpHandler
-            // implementations that don't inherit from page.
-            return 
-                typeof(IHttpHandler).IsAssignableFrom(property.DeclaringType) &&
-                !property.DeclaringType.IsAssignableFrom(typeof(Page));
-        }
+        // The property must be declared on a type that implements IHttpHandler, but must not be 
+        // declared on Page, TemplateControl or Control.
+        // In other words it can be declared on sub types of Page, but also on custom IHttpHandler
+        // implementations that don't inherit from page.
+        private static bool IsPropertyDeclaredOnCustomTypeOnCustomHttpHandler(PropertyInfo property) =>
+            typeof(IHttpHandler).IsAssignableFrom(property.DeclaringType) 
+            && !property.DeclaringType.IsAssignableFrom(typeof(Page));
 
-        private static bool IsPropertyDeclaredOnCustomTypeOnCustomUserControl(PropertyInfo property)
-        {
-            return property.DeclaringType.IsSubclassOf(typeof(UserControl));
-        }
+        private static bool IsPropertyDeclaredOnCustomTypeOnCustomUserControl(PropertyInfo property) => 
+            property.DeclaringType.IsSubclassOf(typeof(UserControl));
     }
 }

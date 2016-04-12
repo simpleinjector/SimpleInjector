@@ -48,20 +48,11 @@ namespace SimpleInjector.Internals
             this.container = container;
         }
 
-        public bool AllProducersVerified
-        {
-            get { return this.producers.All(lazy => lazy.IsValueCreated); }
-        }
- 
-        public int Count
-        {
-            get { return this.producers.Count; }
-        }
+        public bool AllProducersVerified => this.producers.All(lazy => lazy.IsValueCreated);
 
-        bool ICollection<TService>.IsReadOnly
-        {
-            get { return true; }
-        }
+        public int Count => this.producers.Count;
+
+        bool ICollection<TService>.IsReadOnly => true;
 
         public TService this[int index]
         {
@@ -160,10 +151,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         private static object VerifyCreatingProducer(Lazy<InstanceProducer> lazy)
         {
@@ -271,14 +259,9 @@ namespace SimpleInjector.Internals
             return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
         }
 
-        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException()
-        {
-            return new NotSupportedException("Collection is read-only.");
-        }
+        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException() => 
+            new NotSupportedException("Collection is read-only.");
 
-        private static NotSupportedException GetNotSupportedException()
-        {
-            return new NotSupportedException();
-        }
-   }
+        private static NotSupportedException GetNotSupportedException() => new NotSupportedException();
+    }
 }

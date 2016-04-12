@@ -43,7 +43,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the unregistered service type that is currently requested.</summary>
         /// <value>The unregistered service type that is currently requested.</value>
-        public Type UnregisteredServiceType { get; private set; }
+        public Type UnregisteredServiceType { get; }
 
         /// <summary>
         /// Gets a value indicating whether the event represented by this instance has been handled. 

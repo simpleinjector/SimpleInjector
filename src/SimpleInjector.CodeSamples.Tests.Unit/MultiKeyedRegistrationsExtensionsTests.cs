@@ -175,7 +175,7 @@
                 this.DecoratedService = service;
             }
 
-            public IService2 DecoratedService { get; private set; }
+            public IService2 DecoratedService { get; }
         }
     }
 }

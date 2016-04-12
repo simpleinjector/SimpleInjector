@@ -306,12 +306,9 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal int MaximumNumberOfNodesPerDelegate { get; set; } = 350;
-        
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplayDescription
-        {
-            get { return this.ToString(); }
-        }
+        internal string DebuggerDisplayDescription => this.ToString();
 
         // This property enables a hidden hook to allow to get notified just before expression trees get
         // compiled. It isn't used internally, but enables debugging in case compiling expressions crashes 

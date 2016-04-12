@@ -174,10 +174,8 @@ namespace SimpleInjector
             this.suppressions.Add(type);
         }
 
-        internal bool ShouldNotBeSuppressed(DiagnosticType type)
-        {
-            return this.suppressions == null || !this.suppressions.Contains(type);
-        }
+        internal bool ShouldNotBeSuppressed(DiagnosticType type) => 
+            this.suppressions == null || !this.suppressions.Contains(type);
 
         internal Expression BuildExpression(InstanceProducer producer)
         {

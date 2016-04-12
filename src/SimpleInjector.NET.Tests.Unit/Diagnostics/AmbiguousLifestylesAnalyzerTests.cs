@@ -315,9 +315,7 @@
             Assert.IsFalse(notOfT.Any(), "Not all items where of type " + typeof(T).Name + ". " + Actual(items));
         }
 
-        private static string Actual(IEnumerable<DiagnosticResult> results)
-        {
-            return "Actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(IEnumerable<DiagnosticResult> results) => 
+            "Actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

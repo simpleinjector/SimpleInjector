@@ -197,15 +197,9 @@ namespace SimpleInjector.Internals
                 this.constants = constants;
             }
 
-            public TResult GetInstance()
-            {
-                return this.create(this.constants);
-            }
+            public TResult GetInstance() => this.create(this.constants);
 
-            public Delegate BuildDelegate()
-            {
-                return new Func<TResult>(this.GetInstance);
-            }
+            public Delegate BuildDelegate() => new Func<TResult>(this.GetInstance);
         }
     }
 }

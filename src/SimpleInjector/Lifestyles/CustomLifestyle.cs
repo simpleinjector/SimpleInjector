@@ -24,7 +24,6 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Linq.Expressions;
-    using System.Threading;
 
     internal sealed class CustomLifestyle : Lifestyle
     {
@@ -40,18 +39,12 @@ namespace SimpleInjector.Lifestyles
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
-        
+
         // Ensure that this lifestyle can only be safely used with singleton dependencies.
-        internal override int ComponentLength(Container container)
-        {
-            return Lifestyle.Singleton.ComponentLength(container);
-        }
+        internal override int ComponentLength(Container container) => Singleton.ComponentLength(container);
 
         // Ensure that this lifestyle can only be safely used with transient components/consumers.
-        internal override int DependencyLength(Container container)
-        {
-            return Lifestyle.Transient.DependencyLength(container);
-        }
+        internal override int DependencyLength(Container container) => Transient.DependencyLength(container);
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
@@ -78,10 +71,8 @@ namespace SimpleInjector.Lifestyles
 
             public Func<TService> InstanceCreator { get; set; }
 
-            protected override Func<TService> BuildTransientDelegate()
-            {
-                return this.BuildTransientDelegate<TService>(this.InstanceCreator);
-            }
+            protected override Func<TService> BuildTransientDelegate() => 
+                this.BuildTransientDelegate(this.InstanceCreator);
         }
 
         private class CustomRegistration<TService, TImplementation> : Registration
@@ -102,23 +93,16 @@ namespace SimpleInjector.Lifestyles
                 this.lazyLifestyleApplier = new Lazy<Func<object>>(initializer);
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
+            public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression()
-            {
-                return Expression.Convert(
+            public override Expression BuildExpression() => 
+                Expression.Convert(
                     Expression.Invoke(
                         Expression.Constant(this.lazyLifestyleApplier.Value)),
                     typeof(TService));
-            }
 
-            protected virtual Func<TImplementation> BuildTransientDelegate()
-            {
-                return this.BuildTransientDelegate<TService, TImplementation>();
-            }
+            protected virtual Func<TImplementation> BuildTransientDelegate() => 
+                this.BuildTransientDelegate<TService, TImplementation>();
         }
     }
 }

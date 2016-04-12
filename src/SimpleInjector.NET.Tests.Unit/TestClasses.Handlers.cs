@@ -35,6 +35,6 @@
             this.Decoratee = decoratee;
         }
 
-        public IHandler<TRequest, TResponse> Decoratee { get; private set; }
+        public IHandler<TRequest, TResponse> Decoratee { get; }
     }
 }

@@ -130,11 +130,9 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private static bool IsCollectionType(Type serviceType)
-        {
-            return typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType);
-        }
-        
+        private static bool IsCollectionType(Type serviceType) => 
+            typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType);
+
         private bool MustDecorate(Type serviceType, out Type decoratorType)
         {
             decoratorType = null;

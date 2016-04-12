@@ -29,7 +29,7 @@
             this.Decoratee = decoratee;
         }
 
-        public IPlugin Decoratee { get; private set; }
+        public IPlugin Decoratee { get; }
     }
 
     public class PluginDecorator<T> : IPlugin
@@ -39,7 +39,7 @@
             this.Decoratee = decoratee;
         }
 
-        public IPlugin Decoratee { get; private set; }
+        public IPlugin Decoratee { get; }
     }
 
     public class PluginDecoratorWithDependencyOfType<TDependency> : IPlugin
@@ -49,7 +49,7 @@
             this.Decoratee = decoratee;
         }
 
-        public IPlugin Decoratee { get; private set; }
+        public IPlugin Decoratee { get; }
     }
 
     public class PluginWithPropertyDependencyOfType<TDependency> : IPlugin
@@ -78,6 +78,6 @@
             this.Plugins = plugins.ToArray();
         }
 
-        public IPlugin[] Plugins { get; private set; }
+        public IPlugin[] Plugins { get; }
     }
 }

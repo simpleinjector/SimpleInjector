@@ -26,7 +26,7 @@ namespace SimpleInjector.Internals
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    
+
     /// <summary>
     /// A map containing a generic argument (such as T) and the concrete type (such as Int32) that it
     /// represents.
@@ -48,10 +48,8 @@ namespace SimpleInjector.Internals
         [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ConcreteType) + "), nq}")]
         internal Type ConcreteType { get; }
 
-        internal bool TypeConstraintsAreSatisfied
-        {
-            get { return (new TypeConstraintValidator { Mapping = this }).AreTypeConstraintsSatisfied(); }
-        }
+        internal bool TypeConstraintsAreSatisfied => 
+            new TypeConstraintValidator { Mapping = this }.AreTypeConstraintsSatisfied();
 
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
@@ -68,9 +66,7 @@ namespace SimpleInjector.Internals
             new ArgumentMapping(argument, concreteType);
 
         internal static ArgumentMapping[] Zip(Type[] arguments, Type[] concreteTypes) =>
-            arguments.Zip(concreteTypes,
-                (argument, concreteType) => new ArgumentMapping(argument, concreteType))
-                .ToArray();
+            arguments.Zip(concreteTypes, Create).ToArray();
 
         internal bool ConcreteTypeMatchesPartialArgument()
         {

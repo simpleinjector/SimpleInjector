@@ -414,7 +414,7 @@
                 this.Command = command;
             }
 
-            public ICommand Command { get; private set; }
+            public ICommand Command { get; }
         }
     }
 }

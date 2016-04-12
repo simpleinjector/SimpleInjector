@@ -98,9 +98,7 @@
             AssertThat.Throws<ActivationException>(action);
         }
 
-        private static UnregisteredTypeEventArgs CreateValidUnregisteredTypeEventArgs()
-        {
-            return new UnregisteredTypeEventArgs(typeof(IUserRepository));
-        }
+        private static UnregisteredTypeEventArgs CreateValidUnregisteredTypeEventArgs() => 
+            new UnregisteredTypeEventArgs(typeof(IUserRepository));
     }
 }

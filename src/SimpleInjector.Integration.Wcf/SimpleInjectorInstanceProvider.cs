@@ -23,7 +23,6 @@
 namespace SimpleInjector.Integration.Wcf
 {
     using System;
-    using System.Diagnostics;
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Dispatcher;
@@ -39,10 +38,7 @@ namespace SimpleInjector.Integration.Wcf
             this.serviceType = serviceType;
         }
 
-        public object GetInstance(InstanceContext instanceContext, Message message)
-        {
-            return this.GetInstance(instanceContext);
-        }
+        public object GetInstance(InstanceContext instanceContext, Message message) => this.GetInstance(instanceContext);
 
         public object GetInstance(InstanceContext instanceContext)
         {

@@ -384,18 +384,15 @@
                 "hybrid lifestyle should be considered to be a transient when evaluated on the child.");
         }
 
-        private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child)
-        {
-            return new KnownRelationship(
+        private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child) => 
+            new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
                 lifestyle: parent,
-                dependency: new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
-        }
+                dependency: 
+                    new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
 
-        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency)
-        {
-            return LifestyleMismatchChecker.HasLifestyleMismatch(new Container(), dependency);
-        }
+        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency) => 
+            LifestyleMismatchChecker.HasLifestyleMismatch(new Container(), dependency);
 
         private class DummyRegistration<TImplementation> : Registration
         {
@@ -403,10 +400,7 @@
             {
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
+            public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression()
             {
@@ -446,17 +440,15 @@
                 throw new NotImplementedException();
             }
 
-            protected override int Length
-            {
-                get { return this.realLifestyle.ComponentLength(null); }
-            }
+            protected override int Length => this.realLifestyle.ComponentLength(null);
 
             protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
             {
                 return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, Container container)
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+                Container container)
             {
                 return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
             }
@@ -472,20 +464,12 @@
             this.length = length;
         }
 
-        protected override int Length
-        {
-            get { return this.length; }
-        }
+        protected override int Length => this.length;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-        {
-            return Lifestyle.Transient.CreateRegistration<TService, TImplementation>(container);
-        }
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
+            Transient.CreateRegistration<TService, TImplementation>(c);
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
-        {
-            return Lifestyle.Transient.CreateRegistration<TService>(instanceCreator, container);
-        }
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+            Transient.CreateRegistration(creator, c);
     }
 }

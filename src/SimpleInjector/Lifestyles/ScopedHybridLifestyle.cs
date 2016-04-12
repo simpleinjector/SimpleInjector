@@ -27,7 +27,7 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class ScopedHybridLifestyle : ScopedLifestyle
     {
-        private readonly Func<bool> lifestyleSelector;
+        private readonly Func<bool> selector;
         private readonly ScopedLifestyle trueLifestyle;
         private readonly ScopedLifestyle falseLifestyle;
 
@@ -35,37 +35,29 @@ namespace SimpleInjector.Lifestyles
             ScopedLifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
-            this.lifestyleSelector = lifestyleSelector;
+            this.selector = lifestyleSelector;
             this.trueLifestyle = trueLifestyle;
             this.falseLifestyle = falseLifestyle;
         }
 
-        private ScopedLifestyle CurrentLifestyle
-        {
-            get { return this.lifestyleSelector() ? this.trueLifestyle : this.falseLifestyle; }
-        }
+        private ScopedLifestyle CurrentLifestyle => this.selector() ? this.trueLifestyle : this.falseLifestyle;
 
-        internal override int ComponentLength(Container container)
-        {
-            return Math.Max(
-                this.trueLifestyle.ComponentLength(container), 
+        internal override int ComponentLength(Container container) => 
+            Math.Max(
+                this.trueLifestyle.ComponentLength(container),
                 this.falseLifestyle.ComponentLength(container));
-        }
 
-        internal override int DependencyLength(Container container)
-        {
-            return Math.Min(
-                this.trueLifestyle.DependencyLength(container), 
+        internal override int DependencyLength(Container container) => 
+            Math.Min(
+                this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
-        }
 
-        internal string GetHybridName()
-        {
-            return GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
-        }
+        internal string GetHybridName() => 
+            GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
 
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
         {
+            var selector = this.selector;
             var trueProvider = this.trueLifestyle.CreateCurrentScopeProvider(container);
             var falseProvider = this.falseLifestyle.CreateCurrentScopeProvider(container);
 
@@ -74,17 +66,12 @@ namespace SimpleInjector.Lifestyles
             // falseProvider. That behavior would be completely flawed, because that would burn the lifestyle
             // that is active during the compilation of the InstanceProducer's delegate right into that
             // delegate making the other lifestyle unavailable.
-            return () => this.lifestyleSelector() ? trueProvider() : falseProvider();
+            return () => selector() ? trueProvider() : falseProvider();
         }
 
-        protected override Scope GetCurrentScopeCore(Container container)
-        {
-            return this.CurrentLifestyle.GetCurrentScope(container);
-        }
+        protected override Scope GetCurrentScopeCore(Container container) =>
+            this.CurrentLifestyle.GetCurrentScope(container);
 
-        private static string GetHybridName(Lifestyle lifestyle)
-        {
-            return HybridLifestyle.GetHybridName(lifestyle);
-        }
+        private static string GetHybridName(Lifestyle lifestyle) => HybridLifestyle.GetHybridName(lifestyle);
     }
 }

@@ -232,9 +232,6 @@ namespace SimpleInjector.Extensions
                 "Please use one of the Container.RegisterCollection() overloads instead.");
         }
 
-        private static bool Fallback(PredicateContext context)
-        {
-            return !context.Handled;
-        }
+        private static bool Fallback(PredicateContext context) => !context.Handled;
     }
 }

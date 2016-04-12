@@ -31,7 +31,7 @@
 
             container.Options.DependencyInjectionBehavior = new FakeDependencyInjectionBehavior
             {
-                ExpressionToReturnFromBuildExpression = null
+                ExpressionToReturn = null
             };
 
             container.Register<IUserRepository, SqlUserRepository>();
@@ -116,10 +116,7 @@
             }
         }
 
-        private static ContainerOptions GetContainerOptions()
-        {
-            return new Container().Options;
-        }
+        private static ContainerOptions GetContainerOptions() => new Container().Options;
 
         private class TypeWithSinglePublicConstructorWithValueTypeParameter
         {
@@ -137,12 +134,9 @@
 
         private sealed class FakeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public Expression ExpressionToReturnFromBuildExpression { get; set; }
+            public Expression ExpressionToReturn { get; set; }
 
-            public Expression BuildExpression(InjectionConsumerInfo consumer)
-            {
-                return this.ExpressionToReturnFromBuildExpression;
-            }
+            public Expression BuildExpression(InjectionConsumerInfo consumer) => this.ExpressionToReturn;
 
             public void Verify(InjectionConsumerInfo consumer)
             {

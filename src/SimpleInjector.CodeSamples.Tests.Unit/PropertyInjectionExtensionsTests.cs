@@ -225,7 +225,7 @@
                 this.Context = context;
             }
 
-            public DependencyContext Context { get; private set; }
+            public DependencyContext Context { get; }
         }
 
         public class ServiceWithoutAttributedProperties : IService

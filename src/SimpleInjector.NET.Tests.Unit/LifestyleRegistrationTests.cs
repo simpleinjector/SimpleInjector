@@ -249,10 +249,7 @@
         {
             public Predicate<PropertyInfo> Predicate { get; set; }
 
-            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
-            {
-                return this.Predicate(propertyInfo);
-            }
+            public bool SelectProperty(Type serviceType, PropertyInfo property) => this.Predicate(property);
         }
     }
 
@@ -264,11 +261,8 @@
 
         public Registration RegistrationToReturn { get; set; }
 
-        protected override int Length
-        {
-            // Wha evaaahhh
-            get { return 1; }
-        }
+        // Wha evaaahhh
+        protected override int Length => 1;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
             Container container)
@@ -293,16 +287,10 @@
             this.implementationType = implementationType;
         }
 
-        public override Type ImplementationType
-        {
-            get { return this.implementationType; }
-        }
+        public override Type ImplementationType => this.implementationType;
 
         public Expression ExpressionToReturn { get; set; }
 
-        public override Expression BuildExpression()
-        {
-            return this.ExpressionToReturn;
-        }
+        public override Expression BuildExpression() => this.ExpressionToReturn;
     }
 }

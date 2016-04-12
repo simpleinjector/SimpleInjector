@@ -89,10 +89,8 @@ namespace SimpleInjector.Internals
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static Func<TService> CompileLambda<TService>(Expression expression)
-        {
-            return Expression.Lambda<Func<TService>>(expression).Compile();
-        }
+        internal static Func<TService> CompileLambda<TService>(Expression expression) => 
+            Expression.Lambda<Func<TService>>(expression).Compile();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static Delegate CompileLambda(Type resultType, Expression expression)

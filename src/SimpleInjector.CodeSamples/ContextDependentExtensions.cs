@@ -26,9 +26,9 @@ namespace SimpleInjector.CodeSamples
 
         private DependencyContext() { }
 
-        public Type ServiceType { get; private set; }
-        public Type ImplementationType { get; private set; }
-        public ParameterInfo Parameter { get; private set; }
+        public Type ServiceType { get; }
+        public Type ImplementationType { get; }
+        public ParameterInfo Parameter { get; }
     }
 
     public static class ContextDependentExtensions

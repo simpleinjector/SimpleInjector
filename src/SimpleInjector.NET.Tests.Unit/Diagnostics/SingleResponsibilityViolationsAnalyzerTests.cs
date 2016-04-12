@@ -366,9 +366,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             }
         }
 
-        private static string Actual(SingleResponsibilityViolationDiagnosticResult[] results)
-        {
-            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(SingleResponsibilityViolationDiagnosticResult[] results) => 
+            "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

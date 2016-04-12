@@ -457,18 +457,16 @@ namespace SimpleInjector.Internals
             private bool MatchesPredicate(PredicateContext context) =>
                 this.Predicate != null ? this.Predicate(context) : true;
 
-            private bool RegistrationAppliesToAllClosedServiceTypes()
-            {
-                // This is nice, if we pass the open generic service type to the GenericTypeBuilder, it
-                // can check for us whether the implementation adds extra type constraints that the service
-                // type doesn't have. This works, because if it doesn't add any type constraints, it will be
-                // able to construct a new open service type, based on the generic type arguments of the
-                // implementation. If it can't, it means that the implementionType applies to a subset.
-                return this.Predicate == null
-                    && this.ImplementationType.Info().IsGenericType
-                    && !this.ImplementationType.IsPartiallyClosed()
-                    && this.IsImplementationApplicableToEveryGenericType();
-            }
+            // This is nice, if we pass the open generic service type to the GenericTypeBuilder, it
+            // can check for us whether the implementation adds extra type constraints that the service
+            // type doesn't have. This works, because if it doesn't add any type constraints, it will be
+            // able to construct a new open service type, based on the generic type arguments of the
+            // implementation. If it can't, it means that the implementionType applies to a subset.
+            private bool RegistrationAppliesToAllClosedServiceTypes() => 
+                this.Predicate == null
+                && this.ImplementationType.Info().IsGenericType
+                && !this.ImplementationType.IsPartiallyClosed()
+                && this.IsImplementationApplicableToEveryGenericType();
 
             private bool IsImplementationApplicableToEveryGenericType() =>
                 GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(

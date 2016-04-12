@@ -266,11 +266,9 @@
             }
 
             protected override int Length => this.length;
-     
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
-            {
-                return () => this.scope;
-            }
+
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
+                () => this.scope;
         }
     }
 }

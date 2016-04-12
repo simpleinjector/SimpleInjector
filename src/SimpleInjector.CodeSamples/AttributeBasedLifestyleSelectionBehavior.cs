@@ -20,7 +20,7 @@
             this.Policy = policy;
         }
 
-        public CreationPolicy Policy { get; private set; }
+        public CreationPolicy Policy { get; }
     }
 
     public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior

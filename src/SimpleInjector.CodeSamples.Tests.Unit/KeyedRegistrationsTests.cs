@@ -110,7 +110,7 @@
                 this.Name = name;
             }
 
-            public string Name { get; private set; }
+            public string Name { get; }
         }
 
         public class NamedPluginConsumer
@@ -127,13 +127,13 @@
                 this.Plugin4 = plugin4;
             }
 
-            public IPlugin Plugin1 { get; private set; }
+            public IPlugin Plugin1 { get; }
 
-            public IPlugin Plugin2 { get; private set; }
+            public IPlugin Plugin2 { get; }
 
-            public IPlugin Plugin3 { get; private set; }
+            public IPlugin Plugin3 { get; }
 
-            public IPlugin Plugin4 { get; private set; }
+            public IPlugin Plugin4 { get; }
         }
 
         public class NamedDependencyInjectionBehavior : IDependencyInjectionBehavior

@@ -33,10 +33,7 @@
 
         private class NullReturningConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
-            {
-                return null;
-            }
+            public ConstructorInfo GetConstructor(Type serviceType, Type implementationType) => null;
         }
     }
 }

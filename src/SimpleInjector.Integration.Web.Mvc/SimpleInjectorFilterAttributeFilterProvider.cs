@@ -46,7 +46,7 @@ namespace SimpleInjector.Integration.Web.Mvc
                 concreteType => Lifestyle.Transient.CreateRegistration(concreteType, container);
         }
 
-        internal Container Container { get; private set; }
+        internal Container Container { get; }
 
         public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext,
             ActionDescriptor actionDescriptor)

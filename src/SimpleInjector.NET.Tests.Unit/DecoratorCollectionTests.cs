@@ -2058,7 +2058,7 @@
                 this.DecoratedService = decorated;
             }
 
-            public INonGenericService DecoratedService { get; private set; }
+            public INonGenericService DecoratedService { get; }
 
             public void DoSomething()
             {

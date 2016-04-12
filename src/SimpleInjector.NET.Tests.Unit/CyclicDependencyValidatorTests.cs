@@ -722,10 +722,7 @@
                 });
             }
 
-            public static ThreadWrapper StartNew<T>(Func<T> action)
-            {
-                return StartNew(() => { action(); });
-            }
+            public static ThreadWrapper StartNew<T>(Func<T> action) => StartNew(() => { action(); });
 
             public static ThreadWrapper StartNew(Action action)
             {

@@ -35,15 +35,9 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
-        internal override int ComponentLength(Container container)
-        {
-            return Lifestyle.Singleton.ComponentLength(container);
-        }
+        internal override int ComponentLength(Container container) => Singleton.ComponentLength(container);
 
-        internal override int DependencyLength(Container container)
-        {
-            return Lifestyle.Transient.DependencyLength(container);
-        }
+        internal override int DependencyLength(Container container) => Transient.DependencyLength(container);
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {

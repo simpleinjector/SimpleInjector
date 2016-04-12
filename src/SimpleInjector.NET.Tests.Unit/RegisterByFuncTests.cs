@@ -157,10 +157,7 @@
 
         private sealed class InjectPropertyOfType<T> : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo)
-            {
-                return propertyInfo.PropertyType == typeof(T);
-            }
+            public bool SelectProperty(Type type, PropertyInfo prop) => prop.PropertyType == typeof(T);
         }
 
         [TestMethod]

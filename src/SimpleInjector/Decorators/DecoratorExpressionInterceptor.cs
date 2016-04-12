@@ -98,10 +98,8 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        protected bool SatisfiesPredicate(DecoratorPredicateContext context)
-        {
-            return this.Predicate == null || this.Predicate(context);
-        }
+        protected bool SatisfiesPredicate(DecoratorPredicateContext context) => 
+            this.Predicate == null || this.Predicate(context);
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
         {

@@ -585,12 +585,9 @@
             
             public int CurrentScopeProviderCallCount { get; private set; }
 
-            public bool ScopeUsed
-            {
-                get { return this.GetCurrentScopeCoreCallCount + this.CurrentScopeProviderCallCount > 0; }
-            }
+            public bool ScopeUsed => this.GetCurrentScopeCoreCallCount + this.CurrentScopeProviderCallCount > 0;
 
-            public Scope Scope { get; private set; }
+            public Scope Scope { get; }
 
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
             {
@@ -612,7 +609,8 @@
                 return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, Container container)
+            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+                Container container)
             {
                 return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
             }

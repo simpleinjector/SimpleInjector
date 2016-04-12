@@ -13,11 +13,8 @@
     {
         private const string ReadOnlyMessage = "Collection is read-only.";
 
-        private static string NotSupportedMessage
-        {
-            get { return new NotSupportedException().Message; }
-        }        
-       
+        private static string NotSupportedMessage => new NotSupportedException().Message;
+
         [TestMethod]
         public void GetAllInstances_OnContainerControlledCollection_ReturnsAGenericIList()
         {

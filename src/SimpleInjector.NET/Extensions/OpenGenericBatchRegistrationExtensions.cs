@@ -801,21 +801,11 @@ namespace SimpleInjector.Extensions
                 .Where(GetAccessibilityFilter(accessibility));
         }
 
-        private static Func<Type, bool> GetAccessibilityFilter(AccessibilityOption accessibility)
-        {
-            return accessibility == AccessibilityOption.AllTypes
-                ? (Func<Type, bool>)AllTypes
-                : (Func<Type, bool>)PublicTypes;
-        }
+        private static Func<Type, bool> GetAccessibilityFilter(AccessibilityOption accessibility) => 
+            accessibility == AccessibilityOption.AllTypes ? AllTypes : (Func<Type, bool>)PublicTypes;
 
-        private static bool AllTypes(Type type)
-        {
-            return true;
-        }
+        private static bool AllTypes(Type type) => true;
 
-        private static bool PublicTypes(Type type)
-        {
-            return type.IsPublic;
-        }
+        private static bool PublicTypes(Type type) => type.IsPublic;
     }
 }

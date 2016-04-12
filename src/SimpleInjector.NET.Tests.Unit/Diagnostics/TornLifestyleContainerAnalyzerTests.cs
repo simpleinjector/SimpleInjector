@@ -538,9 +538,7 @@
             Assert.IsTrue(matchingResult.Any(), Actual(results));
         }
 
-        private static string Actual(IEnumerable<DiagnosticResult> results)
-        {
-            return "Actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(IEnumerable<DiagnosticResult> results) => 
+            "Actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

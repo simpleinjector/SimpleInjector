@@ -56,15 +56,9 @@
         {
         }
 
-        public override int GetHashCode()
-        {
-            return this.HashCode;
-        }
+        public override int GetHashCode() => this.HashCode;
 
-        public override bool Equals(object obj)
-        {
-            return this.GetHashCode() == obj.GetHashCode();
-        }
+        public override bool Equals(object obj) => this.GetHashCode() == obj.GetHashCode();
     }
 
     public class CommandDecorator : ICommand
@@ -74,7 +68,7 @@
             this.DecoratedInstance = decorated;
         }
 
-        public ICommand DecoratedInstance { get; private set; }
+        public ICommand DecoratedInstance { get; }
 
         public void Execute()
         {

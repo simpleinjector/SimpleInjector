@@ -417,10 +417,7 @@ namespace SimpleInjector
             }
         }
 
-        private static Lifestyle GetLifestyle(bool dispose)
-        {
-            return dispose ? LifestyleWithDisposal : LifestyleNoDisposal;
-        }
+        private static Lifestyle GetLifestyle(bool dispose) => dispose ? LifestyleWithDisposal : LifestyleNoDisposal;
 
         private sealed class AssembliesResolver : IAssembliesResolver
         {
@@ -431,10 +428,7 @@ namespace SimpleInjector
                 this.assemblies = assemblies.ToList().AsReadOnly();
             }
 
-            public ICollection<Assembly> GetAssemblies()
-            {
-                return this.assemblies;
-            }
+            public ICollection<Assembly> GetAssemblies() => this.assemblies;
         }
     }
 }

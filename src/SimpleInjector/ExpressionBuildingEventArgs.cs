@@ -54,7 +54,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
-        public Type RegisteredServiceType { get; private set; }
+        public Type RegisteredServiceType { get; }
 
         /// <summary>
         /// Gets the type that is known to be returned by the 

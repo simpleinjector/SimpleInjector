@@ -66,18 +66,15 @@ namespace SimpleInjector.Internals
                     collection, this.Container));
         }
 
-        protected override Type[] GetAllKnownClosedServiceTypes()
-        {
-            var closedServiceTypes =
-                from registrationGroup in this.RegistrationGroups
-                from item in registrationGroup.ControlledItems
-                let implementation = item.ImplementationType
-                where !implementation.Info().ContainsGenericParameters
-                from service in implementation.GetBaseTypesAndInterfacesFor(this.ServiceType)
-                select service;
-
-            return closedServiceTypes.Distinct().ToArray();
-        }
+        protected override Type[] GetAllKnownClosedServiceTypes() => (
+            from registrationGroup in this.RegistrationGroups
+            from item in registrationGroup.ControlledItems
+            let implementation = item.ImplementationType
+            where !implementation.Info().ContainsGenericParameters
+            from service in implementation.GetBaseTypesAndInterfacesFor(this.ServiceType)
+            select service)
+            .Distinct()
+            .ToArray();
 
         private ContainerControlledItem[] GetClosedContainerControlledItemsFor(Type serviceType)
         {
@@ -88,14 +85,11 @@ namespace SimpleInjector.Internals
                 : items.ToArray();
         }
 
-        private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType)
-        {
-            return
-                from registrationGroup in this.RegistrationGroups
-                where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
-                    closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
-                from item in registrationGroup.ControlledItems
-                select item;
-        }
+        private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType) => 
+            from registrationGroup in this.RegistrationGroups
+            where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
+                closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
+            from item in registrationGroup.ControlledItems
+            select item;
     }
 }

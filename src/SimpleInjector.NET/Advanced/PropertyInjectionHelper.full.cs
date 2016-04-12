@@ -66,9 +66,6 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private static long GetNextInjectorClassId()
-        {
-            return Interlocked.Increment(ref injectorClassCounter);
-        }
+        private static long GetNextInjectorClassId() => Interlocked.Increment(ref injectorClassCounter);
     }
 }

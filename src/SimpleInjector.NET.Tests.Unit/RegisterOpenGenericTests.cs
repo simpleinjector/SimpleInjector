@@ -1287,7 +1287,7 @@
             this.Service = service;
         }
 
-        public IService<T, int> Service { get; private set; }
+        public IService<T, int> Service { get; }
     }
 
     public class SpecialEntity

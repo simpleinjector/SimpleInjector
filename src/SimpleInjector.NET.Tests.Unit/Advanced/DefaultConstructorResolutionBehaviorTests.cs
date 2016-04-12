@@ -87,10 +87,7 @@
                 action);
         }
 
-        private static ContainerOptions GetContainerOptions()
-        {
-            return new Container().Options;
-        }
+        private static ContainerOptions GetContainerOptions() => new Container().Options;
 
         private class TypeWithSinglePublicDefaultConstructor
         {

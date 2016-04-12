@@ -530,9 +530,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
-        private static Registration CreateRegistration(Container container)
-        {
-            return Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
-        }
+        private static Registration CreateRegistration(Container container) =>
+            Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
     }
 }

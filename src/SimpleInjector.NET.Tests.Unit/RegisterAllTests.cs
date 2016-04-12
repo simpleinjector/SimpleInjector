@@ -1919,10 +1919,7 @@
                 yield break;
             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
         }
 
         private sealed class RightEnumerable<T> : IEnumerable<T>
@@ -1932,10 +1929,7 @@
                 yield break;
             }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
         }
 
         private sealed class PluginContainer
@@ -1945,7 +1939,7 @@
                 this.Plugins = plugins;
             }
 
-            public IEnumerable<IPlugin> Plugins { get; private set; }
+            public IEnumerable<IPlugin> Plugins { get; }
         }
 
         private class ClassDependingOn<TDependency>
@@ -1955,7 +1949,7 @@
                 this.Dependency = dependency;
             }
 
-            public TDependency Dependency { get; private set; }
+            public TDependency Dependency { get; }
         }
 
         private sealed class CompositeCommand
@@ -1965,7 +1959,7 @@
                 this.Commands = commands;
             }
 
-            public ICommand[] Commands { get; private set; }
+            public ICommand[] Commands { get; }
         }
     }
 }

@@ -237,11 +237,11 @@
                 this.Name = name;
             }
 
-            public string SomeValue { get; private set; }
+            public string SomeValue { get; }
 
-            public DateTime Now { get; private set; }
+            public DateTime Now { get; }
 
-            public string Name { get; private set; }
+            public string Name { get; }
         }
 
         public class ClassWithAPrimitiveConstructorParam
@@ -252,9 +252,9 @@
                 this.SomeDecimal = someDecimal;
             }
 
-            public IDependency Dependency { get; private set; }
+            public IDependency Dependency { get; }
 
-            public decimal SomeDecimal { get; private set; }
+            public decimal SomeDecimal { get; }
         }
 
         public class Dependency : IDependency

@@ -108,15 +108,11 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private IEnumerable<Registration> GetDecorateeFactoryDependencies(
-            KnownRelationship[] relationships)
-        {
-            return 
-                from relationship in relationships
-                where DecoratorHelpers.IsDecorateeFactoryDependencyParameter(
-                    relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
-                select relationship.Dependency.Registration;
-        }
+        private IEnumerable<Registration> GetDecorateeFactoryDependencies(KnownRelationship[] relationships) => 
+            from relationship in relationships
+            where DecoratorHelpers.IsDecorateeFactoryDependencyParameter(
+                relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
+            select relationship.Dependency.Registration;
 
         private Registration CreateRegistrationForDecorator()
         {

@@ -44,19 +44,15 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }
 
-        internal override int ComponentLength(Container container)
-        {
-            return Math.Max(
+        internal override int ComponentLength(Container container) => 
+            Math.Max(
                 this.trueLifestyle.ComponentLength(container),
                 this.falseLifestyle.ComponentLength(container));
-        }
 
-        internal override int DependencyLength(Container container)
-        {
-            return Math.Min(
+        internal override int DependencyLength(Container container) => 
+            Math.Min(
                 this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
-        }
 
         internal static string GetHybridName(Lifestyle lifestyle)
         {
@@ -94,9 +90,7 @@ namespace SimpleInjector.Lifestyles
                 this, container);
         }
 
-        private string GetHybridName()
-        {
-            return GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
-        }
+        private string GetHybridName() => 
+            GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
     }
 }

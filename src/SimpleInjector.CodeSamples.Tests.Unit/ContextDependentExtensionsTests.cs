@@ -345,7 +345,7 @@
                 this.Service = service;
             }
 
-            public IService Service { get; private set; }
+            public IService Service { get; }
         }
 
         public sealed class ServiceDecoratorWithLoggerDependency : IService
@@ -356,9 +356,9 @@
                 this.Logger = logger;
             }
 
-            public IService Decorated { get; private set; }
+            public IService Decorated { get; }
 
-            public IContextualLogger Logger { get; private set; }
+            public IContextualLogger Logger { get; }
         }
 
         public sealed class ServiceThatDependsOnRepository : IService
@@ -369,9 +369,9 @@
                 this.InjectedLogger = (ContextualLogger)logger;
             }
 
-            public RepositoryThatDependsOnLogger InjectedRepository { get; private set; }
+            public RepositoryThatDependsOnLogger InjectedRepository { get; }
 
-            public ContextualLogger InjectedLogger { get; private set; }
+            public ContextualLogger InjectedLogger { get; }
         }
 
         public sealed class ServiceThatDependsOnRepositoryAndCommand : IService
@@ -383,9 +383,9 @@
                 this.InjectedLogger = (ContextualLogger)logger;
             }
 
-            public RepositoryThatDependsOnLogger InjectedRepository { get; private set; }
+            public RepositoryThatDependsOnLogger InjectedRepository { get; }
 
-            public ContextualLogger InjectedLogger { get; private set; }
+            public ContextualLogger InjectedLogger { get; }
         }
 
         public sealed class RepositoryThatDependsOnLogger : IRepository
@@ -395,7 +395,7 @@
                 this.Logger = logger;
             }
 
-            public IContextualLogger Logger { get; private set; }
+            public IContextualLogger Logger { get; }
         }
 
         public sealed class ContextualLogger : IContextualLogger
@@ -407,7 +407,7 @@
                 this.Context = context;
             }
 
-            public DependencyContext Context { get; private set; }
+            public DependencyContext Context { get; }
         }
 
         public sealed class FakeInterceptor : IInterceptor

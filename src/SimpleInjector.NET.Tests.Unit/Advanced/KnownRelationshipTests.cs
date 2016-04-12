@@ -129,28 +129,22 @@
             Assert.IsTrue(result);
         }
 
-        private static KnownRelationship CreateValidKnownRelationship()
-        {
-            return CreateKnownRelationship(ValidKnownRelationshipParameters());
-        }
+        private static KnownRelationship CreateValidKnownRelationship() => 
+            CreateKnownRelationship(ValidKnownRelationshipParameters());
 
-        private static KnownRelationship CreateKnownRelationship(KnownDependencyConstructorParameters paramaters)
-        {
-            return new KnownRelationship(
+        private static KnownRelationship CreateKnownRelationship(KnownDependencyConstructorParameters paramaters) => 
+            new KnownRelationship(
                 implementationType: paramaters.ImplementationType,
                 lifestyle: paramaters.Lifestyle,
                 dependency: paramaters.Dependency);
-        }
 
-        private static KnownDependencyConstructorParameters ValidKnownRelationshipParameters()
-        {
-            return new KnownDependencyConstructorParameters
+        private static KnownDependencyConstructorParameters ValidKnownRelationshipParameters() => 
+            new KnownDependencyConstructorParameters
             {
                 Lifestyle = Lifestyle.Transient,
                 ImplementationType = typeof(RealTimeProvider),
                 Dependency = ContainerFactory.New().GetRegistration(typeof(Container))
             };
-        }
 
         private class KnownDependencyConstructorParameters
         {

@@ -51,37 +51,23 @@ namespace SimpleInjector
         internal static Type Info(this Type type) => type;
 #endif
 
-        internal static bool ContainsGenericParameter(this Type type)
-        {
-            return type.IsGenericParameter ||
-                (type.Info().IsGenericType && type.GetGenericArguments().Any(ContainsGenericParameter));
-        }
+        internal static bool ContainsGenericParameter(this Type type) => 
+            type.IsGenericParameter ||
+            (type.Info().IsGenericType && type.GetGenericArguments().Any(ContainsGenericParameter));
 
-        internal static bool IsGenericArgument(this Type type)
-        {
-            return type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
-        }
+        internal static bool IsGenericArgument(this Type type) => 
+            type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
 
-        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck)
-        {
-            return typeToCheck.Info().IsGenericType && 
-                typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
-        }
+        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck) => 
+            typeToCheck.Info().IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
 
-        internal static bool IsAmbiguousOrValueType(Type type)
-        {
-            return IsAmbiguousType(type) || type.Info().IsValueType;
-        }
+        internal static bool IsAmbiguousOrValueType(Type type) => 
+            IsAmbiguousType(type) || type.Info().IsValueType;
 
-        internal static bool IsAmbiguousType(Type type)
-        {
-            return AmbiguousTypes.Contains(type);
-        }
+        internal static bool IsAmbiguousType(Type type) => AmbiguousTypes.Contains(type);
 
-        internal static Lazy<T> ToLazy<T>(T value)
-        {
-            return new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
-        }
+        internal static Lazy<T> ToLazy<T>(T value) => 
+            new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
 
         internal static T AddReturn<T>(this HashSet<T> set, T value)
         {
@@ -101,11 +87,10 @@ namespace SimpleInjector
             return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
         }
 
-        internal static bool IsPartiallyClosed(this Type type)
-        {
-            return type.Info().IsGenericType && type.Info().ContainsGenericParameters && 
-                type.GetGenericTypeDefinition() != type;
-        }
+        internal static bool IsPartiallyClosed(this Type type) => 
+            type.Info().IsGenericType 
+            && type.Info().ContainsGenericParameters 
+            && type.GetGenericTypeDefinition() != type;
 
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
@@ -180,32 +165,24 @@ namespace SimpleInjector
             ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
 
-        internal static bool IsConcreteConstructableType(Type serviceType)
-        {
-            // While array types are in fact concrete, we can not create them and creating them would be
-            // pretty useless.
-            return !serviceType.Info().ContainsGenericParameters && IsConcreteType(serviceType);
-        }
+        // While array types are in fact concrete, we can not create them and creating them would be
+        // pretty useless.
+        internal static bool IsConcreteConstructableType(Type serviceType) => 
+            !serviceType.Info().ContainsGenericParameters && IsConcreteType(serviceType);
 
-        internal static bool IsConcreteType(Type serviceType)
-        {
-            // While array types are in fact concrete, we can not create them and creating them would be
-            // pretty useless.
-            return !serviceType.Info().IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
-                !typeof(Delegate).IsAssignableFrom(serviceType);
-        }
+        // While array types are in fact concrete, we can not create them and creating them would be
+        // pretty useless.
+        internal static bool IsConcreteType(Type serviceType) => 
+            !serviceType.Info().IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
+            !typeof(Delegate).IsAssignableFrom(serviceType);
 
-        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor)
-        {
-            // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
-            return DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor) &&
-                DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
-        }
+        // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
+        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) => 
+            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor) &&
+            DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
 
-        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor)
-        {
-            return CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
-        }
+        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) => 
+            CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
 
         internal static bool IsGenericCollectionType(Type serviceType)
         {
@@ -254,15 +231,12 @@ namespace SimpleInjector
         /// <param name="serviceType">The (open generic) service type to match.</param>
         /// <param name="implementationType">The implementationType to search.</param>
         /// <returns>A list of types.</returns>
-        internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType)
-        {
-            return
-                from baseType in implementationType.GetBaseTypesAndInterfaces()
-                where baseType == serviceType || (
-                    baseType.Info().IsGenericType && serviceType.Info().IsGenericType &&
-                    baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
-                select baseType;
-        }
+        internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType) => 
+            from baseType in implementationType.GetBaseTypesAndInterfaces()
+            where baseType == serviceType || (
+                baseType.Info().IsGenericType && serviceType.Info().IsGenericType &&
+                baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
+            select baseType;
 
         internal static Action<T> CreateAction<T>(object action)
         {
@@ -345,20 +319,14 @@ namespace SimpleInjector
         // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
         // return typeof(IComparable<int>) and typeof(IComparable<double>) when serviceType is
         // typeof(IComparable<>).
-        internal static IEnumerable<Type> GetBaseTypesAndInterfacesFor(this Type type, Type serviceType)
-        {
-            return GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
-        }
+        internal static IEnumerable<Type> GetBaseTypesAndInterfacesFor(this Type type, Type serviceType) =>
+            GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
 
-        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType)
-        {
-            return GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
-        }
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType) => 
+            GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
 
-        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
-        {
-            return type.GetInterfaces().Concat(type.GetBaseTypes());
-        }
+        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type) => 
+            type.GetInterfaces().Concat(type.GetBaseTypes());
 
         internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
         {
@@ -410,29 +378,22 @@ namespace SimpleInjector
                 baseType = baseType.Info().BaseType;
             }
         }
-        
-        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType)
-        {
-            return
-                from type in types
-                where IsGenericImplementationOf(type, serviceType)
-                select type;
-        }
 
-        private static bool IsGenericImplementationOf(Type type, Type serviceType)
-        {
-            return type == serviceType || serviceType.IsVariantVersionOf(type) ||
-                (type.Info().IsGenericType && type.GetGenericTypeDefinition() == serviceType);
-        }
+        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType) => 
+            from type in types
+            where IsGenericImplementationOf(type, serviceType)
+            select type;
 
-        private static bool IsVariantVersionOf(this Type type, Type otherType)
-        {
-            return
-                type.Info().IsGenericType &&
-                otherType.Info().IsGenericType &&
-                type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() &&
-                type.IsAssignableFrom(otherType);
-        }
+        private static bool IsGenericImplementationOf(Type type, Type serviceType) => 
+            type == serviceType 
+            || serviceType.IsVariantVersionOf(type) 
+            || (type.Info().IsGenericType && type.GetGenericTypeDefinition() == serviceType);
+
+        private static bool IsVariantVersionOf(this Type type, Type otherType) => 
+            type.Info().IsGenericType 
+            && otherType.Info().IsGenericType 
+            && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() 
+            && type.IsAssignableFrom(otherType);
 
         private static string ToFriendlyName(this Type type, Func<Type[], string> argumentsFormatter)
         {
@@ -460,10 +421,8 @@ namespace SimpleInjector
             return name + "<" + argumentsFormatter(genericArguments.ToArray()) + ">";
         }
 
-        private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection)
-        {
-            return RegisterCollectionEnumerable(collection);
-        }
+        private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection) => 
+            RegisterCollectionEnumerable(collection);
 
         // This method name does not describe what it does, but since the C# compiler will create a iterator
         // type named after this method, it allows us to return a type that has a nice name that will show up

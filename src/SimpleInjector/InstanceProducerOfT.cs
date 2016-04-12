@@ -45,9 +45,6 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
             "A property is not appropriate, because get instance could possibly be a heavy operation.")]
-        public new TService GetInstance()
-        {
-            return (TService)base.GetInstance();
-        }
+        public new TService GetInstance() => (TService)base.GetInstance();
     }
 }

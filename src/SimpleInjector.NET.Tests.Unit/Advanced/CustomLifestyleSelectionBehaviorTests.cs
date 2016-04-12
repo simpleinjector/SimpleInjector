@@ -471,32 +471,26 @@
 
         public class CustomLifestyleSelectionBehavior : ILifestyleSelectionBehavior
         {
-            private readonly Func<Type, Lifestyle> lifestyleSelector;
+            private readonly Func<Type, Lifestyle> selector;
 
             public CustomLifestyleSelectionBehavior(Lifestyle lifestyle)
             {
-                this.lifestyleSelector = type => lifestyle;
+                this.selector = type => lifestyle;
             }
 
             public CustomLifestyleSelectionBehavior(Func<Type, Lifestyle> lifestyleSelector)
             {
-                this.lifestyleSelector = lifestyleSelector;
+                this.selector = lifestyleSelector;
             }
 
-            public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
-            {
-                return this.lifestyleSelector(implementationType);
-            }
+            public Lifestyle SelectLifestyle(Type service, Type impl) => this.selector(impl);
         }
 
         public class FakeLifestyleSelectionBehavior : ILifestyleSelectionBehavior
         {
             private List<LifestyleArguments> suppliedArgumentCollection = new List<LifestyleArguments>();
 
-            public LifestyleArguments SuppliedArguments
-            {
-                get { return this.suppliedArgumentCollection.Single(); }
-            }
+            public LifestyleArguments SuppliedArguments => this.suppliedArgumentCollection.Single();
 
             public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
             {

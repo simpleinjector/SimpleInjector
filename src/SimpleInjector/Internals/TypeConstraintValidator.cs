@@ -33,13 +33,11 @@ namespace SimpleInjector.Internals
     {
         internal ArgumentMapping Mapping { get; set; }
 
-        internal bool AreTypeConstraintsSatisfied()
-        {
-            return this.ParameterSatisfiesNotNullableValueTypeConstraint() &&
-                this.ParameterSatisfiesDefaultConstructorConstraint() &&
-                this.ParameterSatisfiesReferenceTypeConstraint() &&
-                this.ParameterSatisfiesGenericParameterConstraints();
-        }
+        internal bool AreTypeConstraintsSatisfied() => 
+            this.ParameterSatisfiesNotNullableValueTypeConstraint() 
+            && this.ParameterSatisfiesDefaultConstructorConstraint() 
+            && this.ParameterSatisfiesReferenceTypeConstraint() 
+            && this.ParameterSatisfiesGenericParameterConstraints();
 
         private bool ParameterSatisfiesDefaultConstructorConstraint()
         {

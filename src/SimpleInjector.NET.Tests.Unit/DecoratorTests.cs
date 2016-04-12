@@ -2409,9 +2409,9 @@
             this.Lifestyle = lifestyle;
         }
 
-        public Type ServiceType { get; private set; }
+        public Type ServiceType { get; }
 
-        public Lifestyle Lifestyle { get; private set; }
+        public Lifestyle Lifestyle { get; }
     }
 
     public sealed class FakeLogger : ILogger
@@ -2507,7 +2507,7 @@
             this.DecoratedService = decorated;
         }
 
-        public INonGenericService DecoratedService { get; private set; }
+        public INonGenericService DecoratedService { get; }
 
         public void DoSomething()
         {
@@ -2522,7 +2522,7 @@
             this.DecoratedService = decorated;
         }
 
-        public INonGenericService DecoratedService { get; private set; }
+        public INonGenericService DecoratedService { get; }
 
         public void DoSomething()
         {
@@ -2537,7 +2537,7 @@
             this.DecoratedServiceCreator = decoratedCreator;
         }
 
-        public Func<INonGenericService> DecoratedServiceCreator { get; private set; }
+        public Func<INonGenericService> DecoratedServiceCreator { get; }
 
         public void DoSomething()
         {
@@ -2566,16 +2566,10 @@
             this.decoratedCollection = decoratedCollection;
         }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            // Scenario: do some filtering here, based on the user's role.
-            return this.decoratedCollection.GetEnumerator();
-        }
+        // Scenario: do some filtering here, based on the user's role.
+        public IEnumerator<T> GetEnumerator() => this.decoratedCollection.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 
     public class InvalidCommandHandlerDecoratorWithDecorateeAndFactory<T> : ICommandHandler<T>
@@ -2638,28 +2632,20 @@
 
         public DependencyInfo Dependency { get; set; }
 
-        internal static bool EqualsTo(RelationshipInfo info, KnownRelationship other)
-        {
-            return
-                info.ImplementationType == other.ImplementationType &&
-                info.Lifestyle == other.Lifestyle &&
-                info.Dependency.ServiceType == other.Dependency.ServiceType &&
-                info.Dependency.Lifestyle == other.Dependency.Lifestyle;
-        }
+        internal static bool EqualsTo(RelationshipInfo info, KnownRelationship other) => 
+            info.ImplementationType == other.ImplementationType 
+            && info.Lifestyle == other.Lifestyle 
+            && info.Dependency.ServiceType == other.Dependency.ServiceType 
+            && info.Dependency.Lifestyle == other.Dependency.Lifestyle;
 
-        internal bool Equals(KnownRelationship other)
-        {
-            return EqualsTo(this, other);
-        }
+        internal bool Equals(KnownRelationship other) => EqualsTo(this, other);
 
-        internal static string ToString(KnownRelationship relationship)
-        {
-            return string.Format("ImplementationType: {0}, Lifestyle: {1}, Dependency: {2}",
+        internal static string ToString(KnownRelationship relationship) => 
+            string.Format("ImplementationType: {0}, Lifestyle: {1}, Dependency: {2}",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Lifestyle.Name,
                 string.Format("{{ ServiceType: {0}, Lifestyle: {1} }}",
                     relationship.Dependency.ServiceType.ToFriendlyName(),
                     relationship.Dependency.Lifestyle.Name));
-        }
     }
 }

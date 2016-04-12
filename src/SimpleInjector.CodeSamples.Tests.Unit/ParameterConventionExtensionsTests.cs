@@ -394,7 +394,7 @@
                 this.Cs1ConnectionString = cs1ConnectionString;
             }
 
-            public string Cs1ConnectionString { get; private set; }
+            public string Cs1ConnectionString { get; }
         }
 
         public class TypeWithConnectionStringProperty
@@ -424,7 +424,7 @@
                 this.AppSetting = as1AppSetting;
             }
 
-            public string AppSetting { get; private set; }
+            public string AppSetting { get; }
         }
 
         public class TypeWithAppSettingsGuidConstructorArgument
@@ -435,7 +435,7 @@
                 this.AppSetting = as2AppSetting;
             }
 
-            public Guid AppSetting { get; private set; }
+            public Guid AppSetting { get; }
         }
 
         public class TypeWithAppSettingConstructorArgumentOfReferenceType
@@ -463,9 +463,9 @@
                 this.AppSetting = as2AppSetting;
             }
 
-            public string ConnectionString { get; private set; }
+            public string ConnectionString { get; }
 
-            public string AppSetting { get; private set; }
+            public string AppSetting { get; }
         }
 
         public class TypeWithRequiredDependency<T>
@@ -475,7 +475,7 @@
                 this.Dependency = dependency;
             }
 
-            public T Dependency { get; private set; }
+            public T Dependency { get; }
         }
 
         public class TypeWithOptionalDependency<T> where T : class
@@ -485,7 +485,7 @@
                 this.Dependency = dependency;
             }
 
-            public T Dependency { get; private set; }
+            public T Dependency { get; }
         }
 
         public class TypeWithOptionalIntDependencyWithDefaultValueOfFive
@@ -495,7 +495,7 @@
                 this.Value = value;
             }
 
-            public int Value { get; private set; }
+            public int Value { get; }
         }
     }
 }

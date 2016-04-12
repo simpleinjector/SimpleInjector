@@ -38,16 +38,16 @@ namespace SimpleInjector.Diagnostics.Debugger
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string Description { get; private set; }
-        
+        public string Description { get; }
+
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", 
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string Name { get; private set; }
+        public string Name { get; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public object Value { get; private set; }
+        public object Value { get; }
     }
 }

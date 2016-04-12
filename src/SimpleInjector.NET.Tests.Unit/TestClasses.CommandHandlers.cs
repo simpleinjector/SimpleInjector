@@ -69,7 +69,7 @@
             this.Decoratee = decoratee;
         }
 
-        public ICommandHandler<TCommand> Decoratee { get; private set; }
+        public ICommandHandler<TCommand> Decoratee { get; }
     }
 
     public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
@@ -79,7 +79,7 @@
             this.DecorateeFactory = decorateeFactory;
         }
 
-        public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+        public Func<ICommandHandler<T>> DecorateeFactory { get; }
     }
 
     public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
@@ -89,7 +89,7 @@
             this.DecorateeFactory = decorateeFactory;
         }
 
-        public Func<ICommandHandler<T>> DecorateeFactory { get; private set; }
+        public Func<ICommandHandler<T>> DecorateeFactory { get; }
     }
 
     public class TransactionalCommandHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -99,7 +99,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -110,7 +110,7 @@
             this.Decorated = wrapped;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     // This is not a decorator, the class implements ICommandHandler<int> but wraps ICommandHandler<byte>
@@ -152,7 +152,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<RealCommand> Decorated { get; private set; }
+        public ICommandHandler<RealCommand> Decorated { get; }
     }
 
     public class TransactionHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -162,7 +162,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     public class ContextualHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -173,9 +173,9 @@
             this.Context = context;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
 
-        public DecoratorContext Context { get; private set; }
+        public DecoratorContext Context { get; }
     }
 
     public class SpecialCommandHandlerDecorator<T> : ICommandHandler<T> where T : ISpecialCommand
@@ -196,7 +196,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     public class LoggingHandlerDecorator1<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -209,6 +209,6 @@
             this.logger = logger;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 }

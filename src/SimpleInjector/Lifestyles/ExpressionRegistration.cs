@@ -23,7 +23,6 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
 
     internal sealed class ExpressionRegistration : Registration
@@ -47,15 +46,9 @@ namespace SimpleInjector.Lifestyles
             this.implementationType = implementationType;
         }
 
-        public override Type ImplementationType
-        {
-            get { return this.implementationType; }
-        }
+        public override Type ImplementationType => this.implementationType;
 
-        public override Expression BuildExpression()
-        {
-            return this.expression;
-        }
+        public override Expression BuildExpression() => this.expression;
 
         private static Lifestyle GetLifestyleFor(Expression expression)
         {

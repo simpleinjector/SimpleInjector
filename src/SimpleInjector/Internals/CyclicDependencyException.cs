@@ -46,10 +46,7 @@ namespace SimpleInjector.Internals
         }
 #endif
 
-        internal IEnumerable<Type> DependencyCycle
-        {
-            get { return this.types; }
-        }
+        internal IEnumerable<Type> DependencyCycle => this.types;
 
         internal void AddTypeToCycle(Type type)
         {

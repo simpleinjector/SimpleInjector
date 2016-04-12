@@ -121,9 +121,9 @@
                 this.Type = parameterType;
             }
 
-            internal ParameterConvention Convention { get; private set; }
+            internal ParameterConvention Convention { get; }
 
-            internal Type Type { get; private set; }
+            internal Type Type { get; }
 
             internal string Name { get; set; }
 

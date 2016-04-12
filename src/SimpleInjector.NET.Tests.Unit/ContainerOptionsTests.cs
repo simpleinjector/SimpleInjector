@@ -837,7 +837,7 @@
                 this.Container = container;
             }
 
-            public Container Container { get; private set; }
+            public Container Container { get; }
         }
 
         public class ClassWithLoggerProperty
@@ -847,10 +847,7 @@
 
         private sealed class AlternativeConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
-            {
-                return implementationType.GetConstructors()[0];
-            }
+            public ConstructorInfo GetConstructor(Type service, Type impl) => impl.GetConstructors()[0];
         }
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior

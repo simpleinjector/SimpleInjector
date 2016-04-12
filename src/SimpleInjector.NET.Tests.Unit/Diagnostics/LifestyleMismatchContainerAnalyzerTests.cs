@@ -316,9 +316,7 @@
                 action);
         }
 
-        private static string Actual(LifestyleMismatchDiagnosticResult[] results)
-        {
-            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(LifestyleMismatchDiagnosticResult[] results) => 
+            "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

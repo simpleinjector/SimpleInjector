@@ -157,10 +157,8 @@
                 .Value as DebuggerViewItem[];
         }
 
-        private static string Actual(ShortCircuitedDependencyDiagnosticResult[] results)
-        {
-            return "actual: " + string.Join(" - ", results.Select(r => r.Description));
-        }
+        private static string Actual(ShortCircuitedDependencyDiagnosticResult[] results) => 
+            "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
         
     public class ImplementsBothInterfaces : IService1, IService2

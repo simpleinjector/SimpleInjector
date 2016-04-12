@@ -48,15 +48,11 @@ namespace SimpleInjector.Internals
             Requires.IsNotNull(implementationType, nameof(implementationType));
             this.ImplementationType = implementationType;
         }
-        
-        public static ContainerControlledItem CreateFromRegistration(Registration registration)
-        {
-            return new ContainerControlledItem(registration);
-        }
 
-        public static ContainerControlledItem CreateFromType(Type implementationType)
-        {
-            return new ContainerControlledItem(implementationType);
-        }
+        public static ContainerControlledItem CreateFromRegistration(Registration registration) => 
+            new ContainerControlledItem(registration);
+
+        public static ContainerControlledItem CreateFromType(Type implementationType) => 
+            new ContainerControlledItem(implementationType);
     }
 }

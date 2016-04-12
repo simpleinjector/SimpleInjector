@@ -114,10 +114,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container)
-        {
-            return container.GetLifetimeScopeManager().CurrentScope;
-        }
+        protected override Scope GetCurrentScopeCore(Container container) => 
+            container.GetLifetimeScopeManager().CurrentScope;
 
         /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this

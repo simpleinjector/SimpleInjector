@@ -894,10 +894,7 @@
 
             public int DisposeCount { get; private set; }
 
-            public bool IsDisposedOnce
-            {
-                get { return this.DisposeCount == 1; }
-            }
+            public bool IsDisposedOnce => this.DisposeCount == 1;
 
             public void Dispose()
             {
@@ -928,14 +925,11 @@
                 this.ExceptionToThrow = exceptionToThrow;
             }
 
-            public Exception ExceptionToThrow { get; private set; }
+            public Exception ExceptionToThrow { get; }
 
             public int DisposeCount { get; private set; }
 
-            public bool IsDisposedOnce
-            {
-                get { return this.DisposeCount == 1; }
-            }
+            public bool IsDisposedOnce => this.DisposeCount == 1;
 
             public void Dispose()
             {
@@ -963,10 +957,7 @@
                 this.scope = scope;
             }
 
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
-            {
-                return () => this.scope;
-            }
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => this.scope;
         }
     }
 }

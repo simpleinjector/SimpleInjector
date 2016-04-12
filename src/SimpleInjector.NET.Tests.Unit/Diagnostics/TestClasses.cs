@@ -45,10 +45,7 @@
 
     public class RealTimeProvider : ITimeProvider
     {
-        public DateTime Now
-        {
-            get { return DateTime.Now; }
-        }
+        public DateTime Now => DateTime.Now;
     }
 
     public class FakeTimeProvider : ITimeProvider
@@ -77,7 +74,7 @@
             this.Repository = repository;
         }
 
-        public IUserRepository Repository { get; private set; }
+        public IUserRepository Repository { get; }
     }
 
     public class RealUserService : UserServiceBase
@@ -103,7 +100,7 @@
 
         public int UserKarmaOffset { get; set; }
 
-        public UserServiceBase UserService { get; private set; }
+        public UserServiceBase UserService { get; }
     }
 
     public class ConcreteTypeWithConcreteTypeConstructorArgument
@@ -153,7 +150,7 @@
             this.Decoratee = decoratee;
         }
 
-        public IPlugin Decoratee { get; private set; }
+        public IPlugin Decoratee { get; }
     }
 
     public class PluginProxy : IPlugin
@@ -163,7 +160,7 @@
             this.DecorateeFactory = decorateeFactory;
         }
 
-        public Func<IPlugin> DecorateeFactory { get; private set; }
+        public Func<IPlugin> DecorateeFactory { get; }
     }
 
     public class PluginWithDependencyOfType<TDependency> : IPlugin
@@ -178,7 +175,7 @@
             this.Plugins = plugins.ToArray();
         }
 
-        public IPlugin[] Plugins { get; private set; }
+        public IPlugin[] Plugins { get; }
     }
 
     public class ConcreteTypeWithValueTypeConstructorArgument

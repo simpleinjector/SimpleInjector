@@ -50,10 +50,7 @@ namespace SimpleInjector.Lifestyles
             this.falseRegistration = falseRegistration;
         }
 
-        public override Type ImplementationType
-        {
-            get { return this.implementationType; }
-        }
+        public override Type ImplementationType => this.implementationType;
 
         public override Expression BuildExpression()
         {
@@ -87,20 +84,15 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private IEnumerable<KnownRelationship> GetRelationshipsThisLifestyle(Registration registration)
-        {
-            return
-                from relationship in registration.GetRelationships()
-                let mustReplace = object.ReferenceEquals(relationship.Lifestyle, registration.Lifestyle)
-                select mustReplace ? this.ReplaceLifestyle(relationship) : relationship;
-        }
+        private IEnumerable<KnownRelationship> GetRelationshipsThisLifestyle(Registration registration) => 
+            from relationship in registration.GetRelationships()
+            let mustReplace = object.ReferenceEquals(relationship.Lifestyle, registration.Lifestyle)
+            select mustReplace ? this.ReplaceLifestyle(relationship) : relationship;
 
-        private KnownRelationship ReplaceLifestyle(KnownRelationship relationship)
-        {
-            return new KnownRelationship(
+        private KnownRelationship ReplaceLifestyle(KnownRelationship relationship) => 
+            new KnownRelationship(
                 relationship.ImplementationType,
                 this.Lifestyle,
                 relationship.Dependency);
-        }
     }
 }

@@ -108,10 +108,7 @@ namespace SimpleInjector.Integration.Web
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container)
-        {
-            return GetCurrentScope(HttpContext.Current);
-        }
+        protected override Scope GetCurrentScopeCore(Container container) => GetCurrentScope(HttpContext.Current);
 
         /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this

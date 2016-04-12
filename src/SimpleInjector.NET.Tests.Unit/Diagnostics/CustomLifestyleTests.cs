@@ -158,15 +158,10 @@
                 this.length = length;
             }
 
-            protected override int Length
-            {
-                get { return this.length; }
-            }
+            protected override int Length => this.length;
 
-            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-            {
-                return new FakeRegistration<TService, TImplementation>(this, container);
-            }
+            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
+                new FakeRegistration<TService, TImplementation>(this, c);
 
             protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
@@ -183,15 +178,10 @@
                 {
                 }
 
-                public override Type ImplementationType
-                {
-                    get { return typeof(TImplementation); }
-                }
+                public override Type ImplementationType => typeof(TImplementation);
 
-                public override Expression BuildExpression()
-                {
-                    return this.BuildTransientExpression<TService, TImplementation>();
-                }
+                public override Expression BuildExpression() => 
+                    this.BuildTransientExpression<TService, TImplementation>();
             }
         }
     }
