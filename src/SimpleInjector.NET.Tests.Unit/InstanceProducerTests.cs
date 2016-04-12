@@ -99,9 +99,9 @@
 
             // Act
             KnownRelationship[] relationships = twoProducer.GetRelationships();
-                        
+
             // Assert
-            Assert.IsFalse(relationships.Any(), 
+            Assert.IsFalse(relationships.Any(),
                 "The InstanceProducer for ITwo was expected to have no relationships. Current: " +
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
         }
@@ -122,7 +122,7 @@
 
             container.Register<IPlugin, PluginWithDependencyOfType<RealTimeProvider>>();
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator<int>));
-            container.RegisterDecorator(typeof(IPlugin), 
+            container.RegisterDecorator(typeof(IPlugin),
                 typeof(PluginDecoratorWithDependencyOfType<FakeTimeProvider>));
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -156,7 +156,7 @@
                 "enough information to visualize the object graph. Instead of returning an incorrect result " +
                 "we expect the library to throw an exception here.");
         }
-        
+
         [TestMethod]
         public void VisualizeObjectGraph_DelayedCyclicReference_VisualizesTheExpectedObjectGraph()
         {
@@ -185,7 +185,7 @@
             // Assert
             Assert.AreEqual(expectedGraph, actualGraph);
         }
-        
+
         [TestMethod]
         public void VisualizeObjectGraph_DependenciesAppearingMultipleTimesInObjectGraph_BuildsTheExpectedGraph()
         {
@@ -214,7 +214,7 @@
             Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
         }
 
-        public class OneAndTwo : IOne, ITwo 
+        public class OneAndTwo : IOne, ITwo
         {
         }
 
