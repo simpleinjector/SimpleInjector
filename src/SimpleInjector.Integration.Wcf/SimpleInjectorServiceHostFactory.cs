@@ -84,10 +84,15 @@ namespace SimpleInjector.Integration.Wcf
                     "documentation: https://simpleinjector.org/wcf.");
             }
 
-            return HasInstanceContextModeSingle(serviceType)
+            Type implementationType = GetImplementationType(serviceType);
+
+            return HasInstanceContextModeSingle(implementationType)
                 ? new SimpleInjectorServiceHost(container, GetSingletonInstance(serviceType), baseAddresses)
-                : new SimpleInjectorServiceHost(container, serviceType, baseAddresses);
+                : new SimpleInjectorServiceHost(container, serviceType, implementationType, baseAddresses);
         }
+
+        private static Type GetImplementationType(Type serviceType) => 
+            container.GetRegistration(serviceType, throwOnFailure: true).Registration.ImplementationType;
 
         private static object GetSingletonInstance(Type serviceType)
         {

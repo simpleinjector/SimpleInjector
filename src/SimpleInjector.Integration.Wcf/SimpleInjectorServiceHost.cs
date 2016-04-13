@@ -35,6 +35,7 @@ namespace SimpleInjector.Integration.Wcf
     public class SimpleInjectorServiceHost : ServiceHost
     {
         private readonly Container container;
+        private readonly Type serviceAbstraction;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorServiceHost"/> class.
@@ -70,20 +71,31 @@ namespace SimpleInjector.Integration.Wcf
             this.container = container;
         }
 
+        internal SimpleInjectorServiceHost(Container container, Type serviceAbstraction, Type implementationType,
+            params Uri[] baseAddresses)
+            : base(implementationType, baseAddresses)
+        {
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceAbstraction, nameof(serviceAbstraction));
+
+            this.container = container;
+            this.serviceAbstraction = serviceAbstraction;
+        }
+
         /// <summary>Gets the contracts implemented by the service hosted.</summary>
         /// <returns>The collection of <see cref="ContractDescription"/>s.</returns>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
             Justification = "The base class already has a protected ImplementedContracts property, " +
                 "so that name was already taken.")]
-        public IEnumerable<ContractDescription> GetImplementedContracts()
-        {
-            return this.ImplementedContracts.Values;
-        }
+        public IEnumerable<ContractDescription> GetImplementedContracts() => this.ImplementedContracts.Values;
 
         /// <summary>Opens the channel dispatchers.</summary>
         protected override void OnOpening()
         {
-            this.Description.Behaviors.Add(new SimpleInjectorServiceBehavior(this.container));
+            this.Description.Behaviors.Add(new SimpleInjectorServiceBehavior(this.container)
+            {
+                ServiceType = this.serviceAbstraction
+            });
 
             base.OnOpening();
         }

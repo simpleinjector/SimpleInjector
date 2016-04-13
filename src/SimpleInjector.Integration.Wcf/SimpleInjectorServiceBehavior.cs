@@ -1,7 +1,7 @@
 #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -36,7 +36,7 @@ namespace SimpleInjector.Integration.Wcf
     /// </summary>
     public class SimpleInjectorServiceBehavior : IServiceBehavior
     {
-        private readonly Container container;
+        private readonly Container container;        
 
         /// <summary>Initializes a new instance of the <see cref="SimpleInjectorServiceBehavior"/> class.</summary>
         /// <param name="container">The container instance.</param>
@@ -48,6 +48,8 @@ namespace SimpleInjector.Integration.Wcf
 
             this.container = container;
         }
+
+        internal Type ServiceType { get; set; }
 
         /// <summary>
         /// Provides the ability to pass custom data to binding elements to support the contract implementation.
@@ -75,10 +77,10 @@ namespace SimpleInjector.Integration.Wcf
             Requires.IsNotNull(serviceDescription, nameof(serviceDescription));
             Requires.IsNotNull(serviceHostBase, nameof(serviceHostBase));
 
-            var instanceProvider =
-                new SimpleInjectorInstanceProvider(this.container, serviceDescription.ServiceType);
+            var instanceProvider = new SimpleInjectorInstanceProvider(this.container, 
+                this.ServiceType ?? serviceDescription.ServiceType);
 
-            var endpointDispatchers = 
+            var endpointDispatchers =
                 GetEndpointDispatchersForImplementedContracts(serviceDescription, serviceHostBase);
 
             foreach (var endpointDispatcher in endpointDispatchers)
