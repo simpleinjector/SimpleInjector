@@ -179,7 +179,6 @@
             var registration = container.GetRegistration(typeof(INodeFactory));
 
             // Act
-            // Since the dependency is delayed,
             string actualGraph = registration.VisualizeObjectGraph();
 
             // Assert
