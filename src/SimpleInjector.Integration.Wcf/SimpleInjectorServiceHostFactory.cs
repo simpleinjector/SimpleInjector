@@ -84,24 +84,21 @@ namespace SimpleInjector.Integration.Wcf
                     "documentation: https://simpleinjector.org/wcf.");
             }
 
-            Type implementationType = GetImplementationType(serviceType);
+            InstanceProducer producer = container.GetRegistration(serviceType, true);
+
+            // Force building the expression tree. Decorators and interceptors might be applied at this point, 
+            // causing the lifestyle and registration properties to change.
+            producer.BuildExpression();
+
+            Type implementationType = producer.Registration.ImplementationType;
 
             return HasInstanceContextModeSingle(implementationType)
-                ? new SimpleInjectorServiceHost(container, GetSingletonInstance(serviceType), baseAddresses)
+                ? new SimpleInjectorServiceHost(container, GetSingletonInstance(producer), baseAddresses)
                 : new SimpleInjectorServiceHost(container, serviceType, implementationType, baseAddresses);
         }
 
-        private static Type GetImplementationType(Type serviceType) => 
-            container.GetRegistration(serviceType, throwOnFailure: true).Registration.ImplementationType;
-
-        private static object GetSingletonInstance(Type serviceType)
+        private static object GetSingletonInstance(InstanceProducer registration)
         {
-            InstanceProducer registration = container.GetRegistration(serviceType);
-
-            // Call GetInstance BEFORE checking the Lifestyle property; decorators might be applied at this
-            // point, causing the lifestyle and registration properties to change.
-            object singletonInstance = registration.GetInstance();
-
             if (registration.Lifestyle != Lifestyle.Singleton)
             {
                 throw new InvalidOperationException(string.Format(
@@ -110,12 +107,12 @@ namespace SimpleInjector.Integration.Wcf
                     "with the {2} lifestyle in the container. Please make sure that {1} is registered " +
                     "as Singleton as well, or mark {0} with " +
                     "[ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)] instead.",
-                    serviceType.FullName,
+                    registration.ServiceType.FullName,
                     registration.Registration.ImplementationType.FullName,
                     registration.Lifestyle.Name));
             }
 
-            return singletonInstance;
+            return registration.GetInstance();
         }
     }
 }
