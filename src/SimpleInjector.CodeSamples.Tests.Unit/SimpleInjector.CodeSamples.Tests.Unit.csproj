@@ -81,6 +81,7 @@
     <Compile Include="ContextDependentExtensionsTests.cs" />
     <Compile Include="ContextualDecoratorExtensionsTests.cs" />
     <Compile Include="DisposableTransientLifestyleTests.cs" />
+    <Compile Include="InstancePerDependencyLifestyleTests.cs" />
     <Compile Include="KeyedFactoryTests.cs" />
     <Compile Include="KeyedRegistrationsTests.cs" />
     <Compile Include="PerResolveLifestyleTests.cs" />

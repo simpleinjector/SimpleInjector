@@ -27,10 +27,13 @@
     {
     }
 
-    public class CommandWithDependency : ICommand
+    public class CommandWithILoggerDependency : ICommand
     {
-        public CommandWithDependency(ILogger logger)
+        public readonly ILogger Logger;
+
+        public CommandWithILoggerDependency(ILogger logger)
         {
+            this.Logger = logger;
         }
 
         public void Execute()
