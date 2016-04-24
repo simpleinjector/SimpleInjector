@@ -133,7 +133,7 @@ namespace SimpleInjector
 
             lock (scope.syncRoot)
             {
-                return scope.GetInstance(registration);
+                return scope.GetInstanceInternal(registration);
             }
         }
 
@@ -258,8 +258,10 @@ namespace SimpleInjector
         {
             if (registration.Container.IsVerifying())
             {
-                return registration.Container.VerificationScope
-                    .GetInstance<TService, TImplementation>(registration);
+                lock (registration.Container.VerificationScope.syncRoot)
+                {
+                    return registration.Container.VerificationScope.GetInstanceInternal(registration);
+                }
             }
 
             throw new ActivationException(
@@ -268,7 +270,7 @@ namespace SimpleInjector
                     registration.Lifestyle));
         }
 
-        private TService GetInstance<TService, TImplementation>(
+        private TService GetInstanceInternal<TService, TImplementation>(
             ScopedRegistration<TService, TImplementation> registration)
             where TService : class
             where TImplementation : class, TService
