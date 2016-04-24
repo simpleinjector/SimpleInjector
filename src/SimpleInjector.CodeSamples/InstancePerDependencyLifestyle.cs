@@ -11,8 +11,9 @@
     {
         public InstancePerDependencyLifestyle() : base("Instance Per Dependency") { }
 
-        // MaxValue prevents lifestyle mismatches
-        protected override int Length => int.MaxValue;
+        // MaxValue prevents lifestyle mismatches when injected into a component, while allowing instances
+        // to depend on singletons.
+        protected override int Length => 1000;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
             new InstancePerDependencyRegistration<TService, TImplementation>(this, c);
