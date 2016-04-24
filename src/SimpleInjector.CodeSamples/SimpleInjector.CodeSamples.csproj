@@ -80,7 +80,7 @@
     <Compile Include="KeyedRegistrations.cs" />
     <Compile Include="NamedContainer.cs" />
     <Compile Include="OptionalArgumentsBehaviorExtensions.cs" />
-    <Compile Include="PerResolveLifestyle.cs" />
+    <Compile Include="PerGraphLifestyle.cs" />
     <Compile Include="RuntimeDecoratorExtensions.cs" />
     <Compile Include="MethodInjectionExtensions.cs" />
     <Compile Include="PropertyInjectionExtensions.cs" />

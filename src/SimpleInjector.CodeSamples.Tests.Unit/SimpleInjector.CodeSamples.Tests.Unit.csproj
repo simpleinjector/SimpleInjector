@@ -84,7 +84,7 @@
     <Compile Include="InstancePerDependencyLifestyleTests.cs" />
     <Compile Include="KeyedFactoryTests.cs" />
     <Compile Include="KeyedRegistrationsTests.cs" />
-    <Compile Include="PerResolveLifestyleTests.cs" />
+    <Compile Include="PerGraphLifestyleTests.cs" />
     <Compile Include="RuntimeDecoratorExtensionsTests.cs" />
     <Compile Include="ExpirationExtensionsTests.cs" />
     <Compile Include="MethodInjectionExtensionsTests.cs" />
