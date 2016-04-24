@@ -5,7 +5,7 @@
      using SimpleInjector.Tests.Unit;
 
      [TestClass]
-     public class PerResolveLifestyleTests
+     public class PerGraphLifestyleTests
      {
          [TestMethod]
          public void GetInstance_WithPerResolveInstanceInGraph_ReusesSameInstanceThroughoutGraph()
@@ -15,7 +15,7 @@
 
              container.Options.EnablePerResolveLifestyle();
 
-             container.Register<C>(new PerResolveLifestyle());
+             container.Register<C>(new PerGraphLifestyle());
 
              // Act
              var a = container.GetInstance<A>();
@@ -32,7 +32,7 @@
 
              container.Options.EnablePerResolveLifestyle();
 
-             container.Register<C>(new PerResolveLifestyle());
+             container.Register<C>(new PerGraphLifestyle());
 
              // Act
              var a1 = container.GetInstance<A>();
@@ -50,7 +50,7 @@
 
              container.Options.EnablePerResolveLifestyle();
 
-             container.Register<C>(new PerResolveLifestyle());
+             container.Register<C>(new PerGraphLifestyle());
              container.Register<B>(() => new B(container.GetInstance<C>()));
 
              // Act
@@ -66,7 +66,7 @@
              // Arrange
              var container = new Container();
 
-             container.Register<C>(new PerResolveLifestyle());
+             container.Register<C>(new PerGraphLifestyle());
 
              // Act
              Action action = () => container.GetInstance<A>();
