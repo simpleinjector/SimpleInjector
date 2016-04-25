@@ -4,14 +4,6 @@
     using System.Threading;
     using SimpleInjector.Advanced;
 
-    public static class PerGraphLifestyleExtensions
-    {
-        public static void EnablePerResolveLifestyle(this ContainerOptions options)
-        {
-            PerGraphLifestyle.EnablePerResolveLifestyle(options.Container);
-        }
-    }
-
     public class PerGraphLifestyle : ScopedLifestyle
     {
         private static readonly object Key = new object();
@@ -21,7 +13,7 @@
 
         protected override int Length => 2;
 
-        internal static void EnablePerResolveLifestyle(Container container)
+        public static void EnableFor(Container container)
         {
             if (container.GetItem(Key) == null)
             {
