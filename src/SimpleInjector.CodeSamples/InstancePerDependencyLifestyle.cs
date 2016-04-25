@@ -4,42 +4,47 @@
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Injects a new instance for each dependency. Behaves the same as Transient but prevents any lifestyle
-    /// mismatches from being reported. Use with care!!!
+    /// Injects a new instance for each dependency. Behaves the same as Transient but 
+    /// prevents any lifestyle mismatches from being reported. Use with care!!!
     /// </summary>
     public class InstancePerDependencyLifestyle : Lifestyle
     {
         public InstancePerDependencyLifestyle() : base("Instance Per Dependency") { }
 
-        // MaxValue prevents lifestyle mismatches when injected into a component, while allowing instances
-        // to depend on singletons.
+        // MaxValue prevents lifestyle mismatches when injected into a component, while 
+        // allowing instances to depend on singletons.
         protected override int Length => 1000;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
-            new InstancePerDependencyRegistration<TService, TImplementation>(this, c);
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(
+            Container container) => 
+            new InstancePerDependencyRegistration<TService, TImplementation>(this, container);
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> ic, Container c) => 
-            new InstancePerDependencyRegistration<TService>(this, c, ic);
+        protected override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container) => 
+            new InstancePerDependencyRegistration<TService>(this, container, instanceCreator);
 
-        private sealed class InstancePerDependencyRegistration<TService> : Registration where TService : class
+        private class InstancePerDependencyRegistration<T> : Registration where T : class
         {
-            private readonly Func<TService> ic;
+            private readonly Func<T> creator;
 
-            public InstancePerDependencyRegistration(Lifestyle l, Container c, Func<TService> ic) : base(l, c)
+            public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container, 
+                Func<T> creator) : base(lifestyle, container)
             {
-                this.ic = ic;
+                this.creator = creator;
             }
 
-            public override Type ImplementationType => typeof(TService);
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.ic);
+            public override Type ImplementationType => typeof(T);
+            public override Expression BuildExpression() => BuildTransientExpression(creator);
         }
 
-        private class InstancePerDependencyRegistration<TService, TImpl> : Registration
-            where TImpl : class, TService where TService : class
+        private class InstancePerDependencyRegistration<T, TImpl> : Registration
+            where T : class where TImpl : class, T
         {
-            public InstancePerDependencyRegistration(Lifestyle l, Container c) : base(l, c) { }
+            public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container)
+                : base(lifestyle, container) { }
             public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImpl>();
+            public override Expression BuildExpression() => 
+                BuildTransientExpression<T, TImpl>();
         }
     }
 }
