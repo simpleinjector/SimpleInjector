@@ -99,7 +99,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -196,7 +196,7 @@
             this.Decorated = decorated;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 
     public class LoggingHandlerDecorator1<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
@@ -209,6 +209,6 @@
             this.logger = logger;
         }
 
-        public ICommandHandler<T> Decorated { get; private set; }
+        public ICommandHandler<T> Decorated { get; }
     }
 }
