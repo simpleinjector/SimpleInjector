@@ -506,6 +506,28 @@
             container.Verify();
         }
 
+        // See issue #228
+        [TestMethod]
+        public void Verify_TwoUniqueComponentsForTheSameAbstractionWithATwoDecorators_DoesNotResultInDiagnosticWarnings()
+        {
+            // Arrange
+            var container = new Container();
+
+            var p1 = Lifestyle.Singleton.CreateProducer<ICommandHandler<RealCommand>, RealCommandHandler>(container);
+            var p2 = Lifestyle.Singleton.CreateProducer<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>(container);
+
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionalCommandHandlerDecorator<>), Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>();
+
+            // Assert
+            Assert.IsFalse(results.Any(), Actual(results));
+        }
+
         // See issue #131
         [TestMethod]
         public void Verify_MultipleProxyDecorators_DoesNotCauseAnyDiagnosticWarnings()
