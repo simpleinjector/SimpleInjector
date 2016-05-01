@@ -60,6 +60,8 @@ namespace SimpleInjector.Decorators
 
             var producer = new InstanceProducer(serviceType, registration);
 
+            producer.IsDecorated = true;
+
             this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));
         }
     }
