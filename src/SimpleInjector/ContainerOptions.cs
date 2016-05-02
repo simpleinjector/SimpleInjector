@@ -130,6 +130,18 @@ namespace SimpleInjector
         public bool ResolveUnregisteredCollections { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether all the containers in the current AppDomain should throw
+        /// exceptions that contain fully qualified type name. The default is <c>false</c> which means
+        /// the type's namespace is omitted.
+        /// </summary>
+        /// <value>The value indicating whether exception message should emit full type names.</value>
+        public bool UseFullyQualifiedTypeNames
+        {
+            get { return StringResources.UseFullyQualifiedTypeNames; }
+            set { StringResources.UseFullyQualifiedTypeNames = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the constructor resolution behavior. By default, the container only supports types
         /// that have a single public constructor.
         /// </summary>

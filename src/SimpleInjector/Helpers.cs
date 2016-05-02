@@ -93,20 +93,27 @@ namespace SimpleInjector
             && type.GetGenericTypeDefinition() != type;
 
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
-        internal static string ToCSharpFriendlyName(Type genericTypeDefinition)
+        internal static string ToCSharpFriendlyName(Type genericTypeDefinition) =>
+            ToCSharpFriendlyName(genericTypeDefinition, fullyQualifiedName: false);
+
+        internal static string ToCSharpFriendlyName(Type genericTypeDefinition, bool fullyQualifiedName)
         {
             Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
 
-            return genericTypeDefinition.ToFriendlyName(arguments =>
-                string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
+            return genericTypeDefinition.ToFriendlyName(
+                fullyQualifiedName,
+                arguments => string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
         }
 
-        internal static string ToFriendlyName(this Type type)
+        internal static string ToFriendlyName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
+
+        internal static string ToFriendlyName(this Type type, bool fullyQualifiedName)
         {
             Requires.IsNotNull(type, nameof(type));
 
-            return type.ToFriendlyName(arguments =>
-                string.Join(", ", arguments.Select(argument => argument.ToFriendlyName()).ToArray()));
+            return type.ToFriendlyName(
+                fullyQualifiedName,
+                args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName)).ToArray()));
         }
 
         // This makes the collection immutable for the consumer. The creator might still be able to change
@@ -395,18 +402,19 @@ namespace SimpleInjector
             && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() 
             && type.IsAssignableFrom(otherType);
 
-        private static string ToFriendlyName(this Type type, Func<Type[], string> argumentsFormatter)
+        private static string ToFriendlyName(this Type type, bool fullyQualifiedName, 
+            Func<Type[], string> argumentsFormatter)
         {
             if (type.IsArray)
             {
-                return type.GetElementType().ToFriendlyName(argumentsFormatter) + "[]";
+                return type.GetElementType().ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "[]";
             }
 
-            string name = type.Name;
+            string name = fullyQualifiedName ? (type.FullName ?? type.Name) : type.Name;
 
             if (type.IsNested && !type.IsGenericParameter)
             {
-                name = type.DeclaringType.ToFriendlyName(argumentsFormatter) + "." + type.Name;
+                name = type.DeclaringType.ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "." + name;
             }
 
             var genericArguments = GetGenericArguments(type);

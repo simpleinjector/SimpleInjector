@@ -78,7 +78,7 @@ namespace SimpleInjector.Diagnostics
         }
 
         private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) => 
-            producers.Select(r => r.ServiceType).Distinct().Select(Helpers.ToFriendlyName)
+            producers.Select(r => r.ServiceType).Distinct().Select(t => Helpers.ToFriendlyName(t))
                 .ToCommaSeparatedText();
     }
 }
