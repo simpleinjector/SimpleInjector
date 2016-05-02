@@ -151,4 +151,30 @@
         {
         }
     }
+
+    public interface IFluentServiceFactory<T> where T : IFluentService<T>
+    {
+        T Create();
+    }
+
+    public class FluentServiceFactory<T> : IFluentServiceFactory<T> where T : IFluentService<T>
+    {
+        public T Create()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public interface IFluentService<T> where T : IFluentService<T>
+    {
+        T DoSomething();
+    }
+
+    public class FluentService : IFluentService<FluentService>
+    {
+        public FluentService DoSomething()
+        {
+            return this;
+        }
+    }
 }

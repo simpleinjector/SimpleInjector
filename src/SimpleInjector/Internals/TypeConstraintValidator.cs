@@ -87,6 +87,11 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesGenericParameterConstraints()
         {
+            if (this.Mapping.Argument.Info().IsGenericParameter == false)
+            {
+                return true;
+            }
+
             var unsatisfiedConstraints =
                 from constraint in this.Mapping.Argument.Info().GetGenericParameterConstraints()
                 where !this.MappingMightBeCompatibleWithTypeConstraint(constraint)
@@ -130,6 +135,10 @@ namespace SimpleInjector.Internals
 
         private bool MappingHasConstraint(GenericParameterAttributes constraint)
         {
+            if (this.Mapping.Argument.IsGenericParameter == false)
+            {
+                return false;
+            }
             var constraints = this.Mapping.Argument.Info().GenericParameterAttributes;
             return (constraints & constraint) != GenericParameterAttributes.None;
         }

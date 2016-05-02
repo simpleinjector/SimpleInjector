@@ -1,4 +1,6 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿using SimpleInjector.Internals;
+
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -23,6 +25,20 @@
             var impl = container.GetInstance<IService<int, string>>();
 
             AssertThat.IsInstanceOfType(typeof(ServiceImpl<int, string>), impl);
+        }
+
+        [TestMethod]
+        public void BuildClosedGenericImplementationForFluentOpenGeneric_WithValidArguments_ReturnsInvalidResult()
+        {
+            // Assert
+            var genericTypeBuilder = new GenericTypeBuilder(typeof (IFluentServiceFactory<>),
+                typeof (FluentServiceFactory<>));
+
+            // Act
+            var result = genericTypeBuilder.BuildClosedGenericImplementation();
+
+            // Assert
+            Assert.IsFalse(result.ClosedServiceTypeSatisfiesAllTypeConstraints);
         }
 
         [TestMethod]
