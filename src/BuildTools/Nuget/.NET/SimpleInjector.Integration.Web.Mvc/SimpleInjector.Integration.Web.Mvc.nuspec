@@ -10,6 +10,7 @@
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
       <dependency id="SimpleInjector.Integration.Web" version="{version_Integration_Web}" />
+      <dependency id="Microsoft.AspNet.Mvc" version="3.0.20105.1" />
     </dependencies>
     <id>SimpleInjector.Integration.Web.Mvc</id>
     <title>Simple Injector ASP.NET MVC Integration</title>
