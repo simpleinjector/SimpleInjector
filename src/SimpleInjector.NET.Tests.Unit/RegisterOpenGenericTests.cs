@@ -28,20 +28,6 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void BuildClosedGenericImplementationForFluentOpenGeneric_WithValidArguments_ReturnsInvalidResult()
-        {
-            // Assert
-            var genericTypeBuilder = new GenericTypeBuilder(typeof (IFluentServiceFactory<>),
-                typeof (FluentServiceFactory<>));
-
-            // Act
-            var result = genericTypeBuilder.BuildClosedGenericImplementation();
-
-            // Assert
-            Assert.IsFalse(result.ClosedServiceTypeSatisfiesAllTypeConstraints);
-        }
-
-        [TestMethod]
         public void RegisterOpenGeneric_WithConcreteType_ReturnsExpectedTypeOnGetInstance()
         {
             // Arrange
