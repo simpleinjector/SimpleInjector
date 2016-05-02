@@ -34,7 +34,8 @@
             }
 
             public override Type ImplementationType => typeof(T);
-            public override Expression BuildExpression() => BuildTransientExpression(creator);
+            public override Expression BuildExpression() => 
+                this.BuildTransientExpression(this.creator);
         }
 
         private class InstancePerDependencyRegistration<T, TImpl> : Registration
@@ -43,8 +44,8 @@
             public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container) { }
             public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression() => 
-                BuildTransientExpression<T, TImpl>();
+            public override Expression BuildExpression() =>
+                this.BuildTransientExpression<T, TImpl>();
         }
     }
 }
