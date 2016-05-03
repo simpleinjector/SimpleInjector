@@ -5,6 +5,7 @@ Version 3.2.0 (v3.2.0 RTM)
 	Improvements/Changes:
 		-[WCF] WCF services can now be resolved as interfaces by specifying them in the Service attribute
 		 of the	ServiceHost tag of the SVC file. (fixes #220)
+		-[Core] GetOrSetItem extension method added. (fixes #231)
 
 
 Version 3.1.4 (v3.1.4 RTM) 2016-05-01

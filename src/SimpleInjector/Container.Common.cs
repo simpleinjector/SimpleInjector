@@ -313,8 +313,6 @@ namespace SimpleInjector
 
         internal object GetItem(object key)
         {
-            Requires.IsNotNull(key, nameof(key));
-
             lock (this.items)
             {
                 return this.items[key];
@@ -323,8 +321,6 @@ namespace SimpleInjector
 
         internal void SetItem(object key, object item)
         {
-            Requires.IsNotNull(key, nameof(key));
-
             lock (this.items)
             {
                 if (item == null)
@@ -335,6 +331,21 @@ namespace SimpleInjector
                 {
                     this.items[key] = item;
                 }
+            }
+        }
+
+        internal T GetOrSetItem<T>(object key, Func<object, T> valueFactory)
+        {
+            lock (this.items)
+            {
+                object item = this.items[key];
+
+                if (item == null)
+                {
+                    this.items[key] = item = valueFactory(key);
+                }
+
+                return (T)item;
             }
         }
 

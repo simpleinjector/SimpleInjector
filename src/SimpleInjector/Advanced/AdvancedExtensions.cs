@@ -120,6 +120,27 @@ namespace SimpleInjector.Advanced
         }
 
         /// <summary>
+        /// Adds an item by the given <paramref name="key"/> in the container by using the specified function,
+        /// if the key does not already exist. This operation is atomic.
+        /// </summary>
+        /// <typeparam name="T">The Type of the item to create.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <param name="key">The key of the item to insert or override.</param>
+        /// <param name="valueFactory">The function used to generate a value for the given key. The supplied
+        /// value of <paramref name="key"/> will be supplied to the function when called.</param>
+        /// <returns>The stored item or the item from the <paramref name="valueFactory"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
+        /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference (Nothing in VB).</exception>
+        public static T GetOrSetItem<T>(this Container container, object key, Func<object, T> valueFactory)
+        {
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(key, nameof(key));
+            Requires.IsNotNull(valueFactory, nameof(valueFactory));
+
+            return container.GetOrSetItem(key, valueFactory);
+        }
+
+        /// <summary>
         /// Allows appending new registrations to existing registrations made using one of the
         /// <b>RegisterCollection</b> overloads.
         /// </summary>

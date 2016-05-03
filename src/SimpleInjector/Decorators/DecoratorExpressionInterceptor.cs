@@ -37,6 +37,10 @@ namespace SimpleInjector.Decorators
     /// </summary>
     internal abstract class DecoratorExpressionInterceptor
     {
+        private static readonly Func<object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
+            _ => new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
+                () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
+
         private readonly DecoratorExpressionInterceptorData data;
 
         protected DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
@@ -80,32 +84,15 @@ namespace SimpleInjector.Decorators
                 "We have no mechanism to dispose them, but this isn't a big problem, because the container " +
                 "will typically live for the duration of the AppDomain and we will only created a limited " +
                 "amount of ThreadLocal<T> instances.")]
-        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(
-            object key)
-        {
-            lock (key)
-            {
-                var threadLocal =
-                    (ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>)this.Container.GetItem(key);
+        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(object key) => 
+            this.Container.GetOrSetItem(key, ThreadLocalDictionaryFactory).Value;
 
-                if (threadLocal == null)
-                {
-                    threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>();
-                    this.Container.SetItem(key, threadLocal);
-                }
-
-                return threadLocal.Value ?? (threadLocal.Value = new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
-            }
-        }
-
-        protected bool SatisfiesPredicate(DecoratorPredicateContext context) => 
+        protected bool SatisfiesPredicate(DecoratorPredicateContext context) =>
             this.Predicate == null || this.Predicate(context);
 
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e)
-        {
-            return this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.ReplacedRegistration,
+        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e) =>
+            this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.ReplacedRegistration,
                 e.RegisteredServiceType);
-        }
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             InstanceProducer registeredProducer, Registration originalRegistration,
@@ -121,7 +108,7 @@ namespace SimpleInjector.Decorators
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
                 return new InstanceProducer(registeredServiceType, originalRegistration,
-                    registerExternalProducer: false); 
+                    registerExternalProducer: false);
             };
 
             return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
@@ -171,15 +158,15 @@ namespace SimpleInjector.Decorators
 
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
-            return this.CreatePredicateContext(e.InstanceProducer, e.ReplacedRegistration, 
-                e.RegisteredServiceType, e.Expression); 
+            return this.CreatePredicateContext(e.InstanceProducer, e.ReplacedRegistration,
+                e.RegisteredServiceType, e.Expression);
         }
 
         protected DecoratorPredicateContext CreatePredicateContext(InstanceProducer registeredProducer,
-            Registration originalRegistration, Type registeredServiceType, Expression expression) 
+            Registration originalRegistration, Type registeredServiceType, Expression expression)
         {
             var info = this.GetServiceTypeInfo(expression, registeredProducer, originalRegistration,
-                registeredServiceType); 
+                registeredServiceType);
 
             // NOTE: registeredServiceType can be different from registeredProducer.ServiceType.
             // This is the case for container uncontrolled collections where producer.ServiceType is the

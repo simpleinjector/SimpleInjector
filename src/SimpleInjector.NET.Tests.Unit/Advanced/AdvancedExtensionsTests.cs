@@ -511,7 +511,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.GetItem(null);
+            Action action = () => AdvancedExtensions.GetItem(container, null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -524,10 +524,65 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => container.SetItem(null, new object());
+            Action action = () => AdvancedExtensions.SetItem(container, null, new object());
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void GetOrSetItem_WithNullKey_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => AdvancedExtensions.GetOrSetItem<object>(container, null, _ => null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void GetOrSetItem_WithNullFactory_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => AdvancedExtensions.GetOrSetItem<object>(container, new object(), null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void GetOrSetItem_WithValueArguments_DoesNotReturnNull()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            var instance = container.GetOrSetItem(new object(), _ => new object());
+
+            // Assert
+            Assert.IsNotNull(instance);
+        }
+
+        [TestMethod]
+        public void GetOrSetItem_CalledTwiceForSameKey_ReturnsTheSameValue()
+        {
+            // Arrange
+            var key = new object();
+
+            var container = ContainerFactory.New();
+
+            // Act
+            var instance1 = container.GetOrSetItem(key, _ => new object());
+            var instance2 = container.GetOrSetItem(key, _ => new object());
+
+            // Assert
+            Assert.AreSame(instance1, instance2);
         }
 
         private static Registration CreateRegistration(Container container) =>
