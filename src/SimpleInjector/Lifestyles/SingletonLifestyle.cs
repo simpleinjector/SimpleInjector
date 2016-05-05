@@ -26,9 +26,6 @@ namespace SimpleInjector.Lifestyles
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Threading;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
 
     internal sealed class SingletonLifestyle : Lifestyle
@@ -68,24 +65,18 @@ namespace SimpleInjector.Lifestyles
         {
             Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
-            var registration =
-                SingletonLifestyle.CreateSingleInstanceRegistration(enumerableType, collection, container);
+            var registration = CreateSingleInstanceRegistration(enumerableType, collection, container);
 
             registration.IsCollection = true;
 
             return registration;
         }
 
-        internal static bool IsSingletonInstanceRegistration(Registration registration)
-        {
-            return registration is SingletonInstanceLifestyleRegistration;
-        }
+        internal static bool IsSingletonInstanceRegistration(Registration registration) => 
+            registration is SingletonInstanceLifestyleRegistration;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(
-            Container container)
-        {
-            return new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
-        }
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container) => 
+            new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
@@ -112,15 +103,10 @@ namespace SimpleInjector.Lifestyles
                 this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
             }
 
-            public override Type ImplementationType
-            {
-                get { return this.implementationType; }
-            }
+            public override Type ImplementationType => this.implementationType;
 
-            public override Expression BuildExpression()
-            {
-                return Expression.Constant(this.initializedInstance.Value, this.serviceType);
-            }
+            public override Expression BuildExpression() => 
+                Expression.Constant(this.initializedInstance.Value, this.serviceType);
 
             private object GetInjectedInterceptedAndInitializedInstance()
             {
@@ -140,9 +126,7 @@ namespace SimpleInjector.Lifestyles
                 Expression expression = Expression.Constant(this.originalInstance, this.serviceType);
 
                 expression = this.WrapWithPropertyInjector(this.serviceType, this.serviceType, expression);
-
                 expression = this.InterceptInstanceCreation(this.serviceType, this.serviceType, expression);
-
                 expression = this.WrapWithInitializer(this.serviceType, this.serviceType, expression);
 
                 var initializer = Expression.Lambda(expression).Compile();
@@ -166,15 +150,10 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TService); }
-            }
+            public override Type ImplementationType => typeof(TService);
 
-            protected override Expression BuildTransientExpression()
-            {
-                return this.BuildTransientExpression<TService>(this.instanceCreator);
-            }
+            protected override Expression BuildTransientExpression() => 
+                this.BuildTransientExpression(this.instanceCreator);
         }
 
         private class SingletonLifestyleRegistration<TService, TImplementation>
@@ -187,15 +166,10 @@ namespace SimpleInjector.Lifestyles
             {
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
+            public override Type ImplementationType => typeof(TImplementation);
 
-            protected override Expression BuildTransientExpression()
-            {
-                return this.BuildTransientExpression<TService, TImplementation>();
-            }
+            protected override Expression BuildTransientExpression() => 
+                this.BuildTransientExpression<TService, TImplementation>();
         }
 
         private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
@@ -213,10 +187,8 @@ namespace SimpleInjector.Lifestyles
                 this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck);
             }
 
-            public override Expression BuildExpression()
-            {
-                return Expression.Constant(this.lazyInstance.Value, typeof(TService));
-            }
+            public override Expression BuildExpression() => 
+                Expression.Constant(this.lazyInstance.Value, typeof(TService));
 
             protected abstract Expression BuildTransientExpression();
 
