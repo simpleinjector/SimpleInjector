@@ -31,7 +31,7 @@ namespace SimpleInjector.Internals
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal class ContainerControlledCollection<TService> 
+    internal class ContainerControlledCollection<TService>
 #if NET45
         : IList<TService>, IContainerControlledCollection, IReadOnlyList<TService>
 #else
@@ -133,15 +133,12 @@ namespace SimpleInjector.Internals
             this.producers.Add(this.ToLazyInstanceProducer(registration));
         }
 
-        KnownRelationship[] IContainerControlledCollection.GetRelationships()
-        {
-            return (
-                from producer in this.producers.Select(p => p.Value)
-                from relationship in producer.GetRelationships()
-                select relationship)
-                .Distinct()
-                .ToArray();
-        }
+        KnownRelationship[] IContainerControlledCollection.GetRelationships() => (
+            from producer in this.producers.Select(p => p.Value)
+            from relationship in producer.GetRelationships()
+            select relationship)
+            .Distinct()
+            .ToArray();
 
         public IEnumerator<TService> GetEnumerator()
         {
@@ -168,75 +165,68 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration)
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) => 
+            registration.Registration != null
+                ? ToLazyInstanceProducer(registration.Registration)
+                : this.ToLazyInstanceProducer(registration.ImplementationType);
+
+        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) => 
+            Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
+
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType) => 
+            new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(implementationType));
+
+        // Note that the 'implementationType' could in fact be a service type as well and it is allowed
+        // for the implementationType to equal TService. This will happen when someone does the following:
+        // container.RegisterCollection<ILogger>(typeof(ILogger));
+        private InstanceProducer GetOrCreateInstanceProducer(Type implementationType)
         {
-            if (registration.Registration != null)
+            // If the implementationType is explicitly registered (using a Register call) we select this 
+            // producer (but we skip any implicit registrations or anything that is assignable, since 
+            // there could be more than one and it would be unclear which one to pick).
+            var instanceProducer = this.GetExplicitRegisteredInstanceProducer(implementationType);
+
+            // If that doesn't result in a producer, we request a registration using unregistered type
+            // resolution, were we prevent concrete types from being created by the container, since
+            // the creation of concrete type would 'pollute' the list of registrations, and might result
+            // in two registrations (since below we need to create a new instance producer out of it),
+            // and that might cause duplicate diagnostic warnings.
+            if (instanceProducer == null)
             {
-                return ToLazyInstanceProducer(registration.Registration);
+                instanceProducer =
+                    this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
             }
-            else
+
+            // If that still hasn't resulted in a producer, we create a new producer and return (or throw
+            // an exception in case the implementation type is not a concrete type).
+            if (instanceProducer == null)
             {
-                return this.ToLazyInstanceProducer(registration.ImplementationType);
+                return this.CreateNewExternalProducer(implementationType);
             }
-        }
 
-        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration)
-        {
-            return Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
-        }
-
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType)
-        {
-            // Note that the 'implementationType' could in fact be a service type as well and it is allowed
-            // for the implementationType to equal TService. This will happen when someone does the following:
-            // container.RegisterCollection<ILogger>(typeof(ILogger));
-            return new Lazy<InstanceProducer>(() =>
+            // If there is such a producer registered we return a new one with the service type.
+            // This producer will be automatically registered as external producer.
+            if (instanceProducer.ServiceType == typeof(TService))
             {
-                // If the implementationType is explicitly registered (using a Register call) we select this 
-                // producer (but we skip any implicit registrations or anything that is assignable, since 
-                // there could be more than one and it would be unclear which one to pick).
-                var instanceProducer = this.GetExplicitRegisteredInstanceProducer(implementationType);
+                return instanceProducer;
+            }
 
-                // If that doesn't result in a producer, we request a registration using unregistered type
-                // resolution, were we prevent concrete types from being created by the container, since
-                // the creation of concrete type would 'pollute' the list of registrations, and might result
-                // in two registrations (since below we need to create a new instance producer out of it),
-                // and that might cause duplicate diagnostic warnings.
-                if (instanceProducer == null)
-                {
-                    instanceProducer = 
-                        this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
-                }
-
-                // If that still hasn't resulted in a producer, we create a new producer and return (or throw
-                // an exception in case the implementation type is not a concrete type).
-                if (instanceProducer == null)
-                {
-                    return this.CreateNewExternalProducer(implementationType);
-                }
-
-                // If there is such a producer registered we return a new one with the service type.
-                // This producer will be automatically registered as external producer.
-                if (instanceProducer.ServiceType == typeof(TService))
-                {
-                    return instanceProducer;
-                }
-
-                return new InstanceProducer(typeof(TService),
-                    new ExpressionRegistration(instanceProducer.BuildExpression(), this.container));
-            });
+            return new InstanceProducer(typeof(TService),
+                new ExpressionRegistration(instanceProducer.BuildExpression(), this.container));
         }
 
         private InstanceProducer GetExplicitRegisteredInstanceProducer(Type implementationType)
         {
-            return this.container.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true, 
-                includeExternalProducers: false)
-                .FirstOrDefault(p => p.ServiceType == implementationType);
+            var registrations = this.container.GetCurrentRegistrations(
+                includeInvalidContainerRegisteredTypes: true,
+                includeExternalProducers: false);
+
+            return registrations.FirstOrDefault(p => p.ServiceType == implementationType);
         }
 
         private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
         {
-            var producer = this.container.GetRegistrationEvenIfInvalid(implementationType, 
+            var producer = this.container.GetRegistrationEvenIfInvalid(implementationType,
                 InjectionConsumerInfo.Root, autoCreateConcreteTypes: false);
 
             bool producerIsValid = producer != null && producer.IsValid;
@@ -259,7 +249,7 @@ namespace SimpleInjector.Internals
             return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
         }
 
-        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException() => 
+        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException() =>
             new NotSupportedException("Collection is read-only.");
 
         private static NotSupportedException GetNotSupportedException() => new NotSupportedException();
