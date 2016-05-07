@@ -318,8 +318,7 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private InstanceProducer BuildInstanceProducerForType<TService>()
-            where TService : class
+        private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
         {
             return this.BuildInstanceProducerForType(typeof(TService),
                 this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>);
@@ -345,14 +344,12 @@ namespace SimpleInjector
                 tryBuildInstanceProducerForConcreteType();
         }
 
-        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType)
-        {
-            // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
-            // don't want to hold a lock while calling back into user code, because who knows what the user 
-            // is doing there. We don't want a dead lock.
-            return this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
-                ?? this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
-        }
+        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
+        // don't want to hold a lock while calling back into user code, because who knows what the user 
+        // is doing there. We don't want a dead lock.
+        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) => 
+            this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
+            ?? this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
 
         private InstanceProducer TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(Type serviceType)
         {
@@ -383,24 +380,22 @@ namespace SimpleInjector
         private InstanceProducer TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(
             UnregisteredTypeEventArgs e)
         {
-            Type serviceType = e.UnregisteredServiceType;
-
-            var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
-
             lock (this.resolveUnregisteredTypeRegistrations)
             {
-                if (this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType))
+                if (this.resolveUnregisteredTypeRegistrations.ContainsKey(e.UnregisteredServiceType))
                 {
                     // This line will only get hit, in case a different thread came here first.
-                    return this.resolveUnregisteredTypeRegistrations[serviceType];
+                    return this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType];
                 }
+
+                var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
 
                 // By creating the InstanceProducer after checking the dictionary, we prevent the producer
                 // from being created twice when multiple threads are running. Having the same duplicate
                 // producer can cause a torn lifestyle warning in the container.
-                var producer = new InstanceProducer(serviceType, registration);
+                var producer = new InstanceProducer(e.UnregisteredServiceType, registration);
 
-                this.resolveUnregisteredTypeRegistrations[serviceType] = producer;
+                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] = producer;
 
                 return producer;
             }
