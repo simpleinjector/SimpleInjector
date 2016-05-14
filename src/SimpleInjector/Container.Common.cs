@@ -73,7 +73,7 @@ namespace SimpleInjector
         private readonly List<ContextualResolveInterceptor> resolveInterceptors = new List<ContextualResolveInterceptor>();
         private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
-        private readonly Scope disposableSingletonsScope = new Scope();
+        private readonly Scope disposableSingletonsScope;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
         // registered by the user and implicitly registered through unregistered type resolution.
@@ -104,6 +104,8 @@ namespace SimpleInjector
         public Container()
         {
             this.containerId = Interlocked.Increment(ref counter);
+
+            this.disposableSingletonsScope = new Scope(this);
 
             this.Options = new ContainerOptions(this)
             {
@@ -334,7 +336,7 @@ namespace SimpleInjector
             }
         }
 
-        internal T GetOrSetItem<T>(object key, Func<object, T> valueFactory)
+        internal T GetOrSetItem<T>(object key, Func<Container, object, T> valueFactory)
         {
             lock (this.items)
             {
@@ -342,7 +344,7 @@ namespace SimpleInjector
 
                 if (item == null)
                 {
-                    this.items[key] = item = valueFactory(key);
+                    this.items[key] = item = valueFactory(this, key);
                 }
 
                 return (T)item;

@@ -99,7 +99,7 @@
 
             var expectedLifestyle = Lifestyle.CreateHybrid(
                 () => true,
-                new CustomScopedLifestyle(new Scope()),
+                new CustomScopedLifestyle(new Scope(container)),
                 container.Options.DefaultScopedLifestyle);
 
             container.Options.DefaultScopedLifestyle = expectedLifestyle;
@@ -222,9 +222,9 @@
         public void ScopedProxyLifestyleCreateCurrentScopeProvider_Always_ReturnsScopeOfDefaultScopedLifestyle()
         {
             // Arrange
-            Scope expectedScope = new Scope();
-
             var container = new Container();
+
+            Scope expectedScope = new Scope(container);
 
             container.Options.DefaultScopedLifestyle = new CustomScopedLifestyle(scope: expectedScope);
 

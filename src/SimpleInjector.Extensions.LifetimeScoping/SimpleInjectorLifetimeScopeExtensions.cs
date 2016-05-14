@@ -283,6 +283,6 @@ namespace SimpleInjector
 
         // This method will never return null.
         internal static LifetimeScopeManager GetLifetimeScopeManager(this Container container) => 
-            container.GetOrSetItem(ManagerKey, _ => new LifetimeScopeManager());
+            container.GetOrSetItem(ManagerKey, (c, key) => new LifetimeScopeManager(c));
     }
 }

@@ -390,8 +390,9 @@
         public void RegisterForDisposal_CalledOnCreatedScopedHybridWithFalseSelector_ForwardsCallToFalseLifestyleScope()
         {
             // Arrange
-            Scope trueScope = new Scope();
-            Scope falseScope = new Scope();
+            var container = new Container();
+            Scope trueScope = new Scope(container);
+            Scope falseScope = new Scope(container);
 
             var trueLifestyle = new CustomScopedLifestyle(trueScope);
             var falseLifestyle = new CustomScopedLifestyle(falseScope);
@@ -399,7 +400,7 @@
             ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => false, trueLifestyle, falseLifestyle);
 
             // Act
-            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+            hybrid.RegisterForDisposal(container, new DisposableObject());
 
             // Assert
             Assert.IsFalse(trueScope.GetDisposables().Any(), "TrueLifestyle was NOT expected to be called.");
@@ -410,8 +411,9 @@
         public void RegisterForDisposal_CalledOnCreatedScopedHybridWithTrueSelector_ForwardsCallToTrueLifestyleScope()
         {
             // Arrange
-            Scope trueScope = new Scope();
-            Scope falseScope = new Scope();
+            Container container = new Container();
+            Scope trueScope = new Scope(container);
+            Scope falseScope = new Scope(container);
 
             var trueLifestyle = new CustomScopedLifestyle(trueScope);
             var falseLifestyle = new CustomScopedLifestyle(falseScope);
@@ -419,7 +421,7 @@
             ScopedLifestyle hybrid = Lifestyle.CreateHybrid(() => true, trueLifestyle, falseLifestyle);
 
             // Act
-            hybrid.RegisterForDisposal(new Container(), new DisposableObject());
+            hybrid.RegisterForDisposal(container, new DisposableObject());
 
             // Assert
             Assert.AreEqual(1, trueScope.GetDisposables().Length, "TrueLifestyle was expected to be called.");
@@ -434,8 +436,8 @@
 
             bool selectTrueLifestyle = true;
 
-            Scope trueScope = new Scope();
-            Scope falseScope = new Scope();
+            Scope trueScope = new Scope(container);
+            Scope falseScope = new Scope(container);
 
             var trueLifestyle = new CustomScopedLifestyle(trueScope);
             var falseLifestyle = new CustomScopedLifestyle(falseScope);
@@ -594,7 +596,7 @@
                 return () =>
                 {
                     this.CurrentScopeProviderCallCount++;
-                    return this.Scope ?? new Scope();
+                    return this.Scope ?? new Scope(container);
                 };
             }
 

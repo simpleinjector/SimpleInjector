@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Extensions.LifetimeScoping;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -30,7 +31,7 @@
         public void Dispose_ListWithOneItem_DisposesItem()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var disposable = new DisposableObject();
 
@@ -51,7 +52,7 @@
         public void Dispose_MultipleItems_DisposesAllItems()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var disposables = new List<DisposableObject> 
             { 
@@ -73,7 +74,7 @@
         public void Dispose_MultipleItems_DisposesAllItemsInReversedOrder()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var disposedItems = new List<DisposableObject>();
 
@@ -99,7 +100,7 @@
         public void Dispose_WithMultipleItemsThatThrow_StillDisposesAllItems()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var disposables = new List<DisposableObject> 
             { 
@@ -128,7 +129,7 @@
         public void Dispose_WithMultipleItemsThatThrow_WillBubbleUpTheLastThrownException()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             Exception lastThrownException = new Exception();
 
@@ -167,7 +168,7 @@
             int actionCount = 0;
             int disposeCount = 0;
 
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             scope.RegisterForDisposal(new DisposableObject(_ =>
             {
@@ -207,7 +208,7 @@
             // Arrange
             bool disposed = false;
 
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             scope.WhenScopeEnds(() =>
             {
@@ -239,7 +240,7 @@
             // Arrange
             var disposable = new DisposableObject();
 
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var container = new Container();
 
@@ -262,7 +263,7 @@
 
             var disposable = new DisposableObject();
 
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             var container = new Container();
 
@@ -285,7 +286,7 @@
         public void RegisterForDisposal_CalledOnDisposedScope_ThrowsObjectDisposedException()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             scope.Dispose();
 
@@ -301,7 +302,7 @@
         public void WhenScopeEnds_CalledOnDisposedScope_ThrowsObjectDisposedException()
         {
             // Arrange
-            var scope = new Scope();
+            var scope = new Scope(new Container());
 
             scope.Dispose();
 
@@ -320,11 +321,11 @@
             IPlugin plugin1 = null;
             IPlugin plugin2 = null;
 
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() => new DisposablePlugin(), scopedLifestyle);
 
@@ -350,11 +351,11 @@
             // Arrange
             var disposedObjects = new List<object>();
 
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() => new DisposablePlugin(disposedObjects.Add), scopedLifestyle);
             container.Register<IDisposable>(() => new DisposableObject(disposedObjects.Add), scopedLifestyle);
@@ -382,11 +383,11 @@
             // Arrange
             bool actionCalled = false;
 
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<DisposableObject>(() => new DisposableObject(_ =>
             {
@@ -414,11 +415,11 @@
             // Arrange
             bool newlyResolvedInstanceDisposed = false;
 
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(
                 () => new DisposablePlugin(disposing: _ => newlyResolvedInstanceDisposed = true),
@@ -452,11 +453,11 @@
             // Arrange
             bool scopeEndActionCalled = false;
 
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() => new DisposablePlugin());
             container.RegisterInitializer<IPlugin>(
@@ -488,11 +489,11 @@
         public void Dispose_RecursiveResolveTriggeredInDispose_ThrowsDescriptiveException()
         {
             // Arrange
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() =>
             {
@@ -526,11 +527,11 @@
         public void Dispose_RecursiveResolveTriggeredDuringEndScopeAction_ThrowsDescriptiveException()
         {
             // Arrange
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() =>
             {
@@ -560,11 +561,11 @@
         public void Dispose_RecursiveResolveTriggeredDuringEndScopeAction_StillDisposesRegisteredDisposables()
         {
             // Arrange
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             var disposable = new DisposableObject();
 
@@ -602,11 +603,11 @@
         public void GetInstance_CalledOnADisposedScope_ThrowsObjectDisposedException()
         {
             // Arrange
-            var scope = new Scope();
+            var container = new Container();
+
+            var scope = new Scope(container);
 
             var scopedLifestyle = new FakeScopedLifestyle(scope);
-
-            var container = new Container();
 
             container.Register<IPlugin>(() => new DisposablePlugin(), scopedLifestyle);
 
@@ -737,7 +738,7 @@
 
             var container = new Container();
 
-            var scopedLifestyle = new FakeScopedLifestyle(new Scope());
+            var scopedLifestyle = new FakeScopedLifestyle(new Scope(container));
 
             container.Register<ServiceDependingOn<IPlugin>>();
             container.Register<IPlugin, DisposablePlugin>(scopedLifestyle);
@@ -763,7 +764,7 @@
 
             var container = new Container();
 
-            var scope = new Scope();
+            var scope = new Scope(container);
             var scopedLifestyle = new FakeScopedLifestyle(scope);
 
             container.Register<IPlugin, DisposablePlugin>(scopedLifestyle);
@@ -789,7 +790,7 @@
 
             var container = new Container();
 
-            var lifestyle = new FakeScopedLifestyle(new Scope());
+            var lifestyle = new FakeScopedLifestyle(new Scope(container));
 
             container.Register<IPlugin, DisposablePlugin>(lifestyle);
             container.RegisterInitializer<DisposablePlugin>(p => plugin = p);
@@ -812,7 +813,7 @@
 
             var container = new Container();
 
-            var scope = new Scope();
+            var scope = new Scope(container);
             var lifestyle = new FakeScopedLifestyle(scope);
 
             container.Register<IPlugin, DisposablePlugin>(lifestyle);
@@ -853,7 +854,7 @@
 
             var container = new Container();
 
-            var scope = new Scope();
+            var scope = new Scope(container);
             var lifestyle = new FakeScopedLifestyle(scope);
 
             container.Register<IPlugin, DisposablePlugin>(lifestyle);

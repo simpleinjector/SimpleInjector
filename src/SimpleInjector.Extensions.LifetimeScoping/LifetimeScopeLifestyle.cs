@@ -103,10 +103,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             WithDisposal.WhenScopeEnds(container, action);
         }
 
-        internal static LifetimeScopeLifestyle Get(bool withDisposal)
-        {
-            return withDisposal ? WithDisposal : NoDisposal;
-        }
+        internal static LifetimeScopeLifestyle Get(bool dispose) => dispose ? WithDisposal : NoDisposal;
 
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 

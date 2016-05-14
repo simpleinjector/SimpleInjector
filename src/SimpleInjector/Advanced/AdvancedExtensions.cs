@@ -131,7 +131,7 @@ namespace SimpleInjector.Advanced
         /// <returns>The stored item or the item from the <paramref name="valueFactory"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference (Nothing in VB).</exception>
-        public static T GetOrSetItem<T>(this Container container, object key, Func<object, T> valueFactory)
+        public static T GetOrSetItem<T>(this Container container, object key, Func<Container, object, T> valueFactory)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));

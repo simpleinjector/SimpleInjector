@@ -92,6 +92,6 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
         // This method will never return null.
         internal static ExecutionContextScopeManager GetExecutionContextScopeManager(this Container container) => 
-            container.GetOrSetItem(ManagerKey, _ => new ExecutionContextScopeManager());
+            container.GetOrSetItem(ManagerKey, (c, key) => new ExecutionContextScopeManager(c));
     }
 }

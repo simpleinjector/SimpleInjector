@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -40,10 +40,29 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration is currently being verified.
         private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
 
+        private readonly ThreadLocal<Scope> resolveScope = new ThreadLocal<Scope>();
+
+        private bool usingCurrentThreadResolveScope;
+
         // Flag to signal that the container's configuration has been verified (at least once).
         internal bool SuccesfullyVerified { get; private set; }
 
         internal Scope VerificationScope { get; private set; }
+
+        // Allows to resolve directly from a scope instead of relying on an ambient context.
+        // TODO: Optimize performance for the common scenario where the resolveScope is never used.
+        internal Scope CurrentThreadResolveScope
+        {
+            get { return this.resolveScope.Value; }
+            set
+            {
+                // PERF: We flag the use of the current-thread-resolve-scope to optimize getting the right
+                // scope. Most application's won't resolve directly from the scope, but from the container.
+                this.usingCurrentThreadResolveScope = true;
+
+                this.resolveScope.Value = value;
+            }
+        }
 
         /// <summary>
         /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered 
@@ -81,14 +100,16 @@ namespace SimpleInjector
         }
 
 #if NET45
+        // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
+        // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        internal Scope GetVerificationScopeForCurrentThread()
-        {
-            // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
-            // different thread.
-            return this.VerificationScope != null && this.IsVerifying ? this.VerificationScope : null;
-        }
+        internal Scope GetVerificationOrResolveScopeForCurrentThread() => 
+            this.VerificationScope != null && this.IsVerifying
+                ? this.VerificationScope
+                : this.usingCurrentThreadResolveScope
+                    ? this.resolveScope.Value
+                    : null;
 
         private void VerifyInternal(bool suppressLifestyleMismatchVerification)
         {
@@ -98,7 +119,7 @@ namespace SimpleInjector
             {
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
                 this.IsVerifying = true;
-                this.VerificationScope = new ContainerVerificationScope();
+                this.VerificationScope = new ContainerVerificationScope(this);
 
                 try
                 {

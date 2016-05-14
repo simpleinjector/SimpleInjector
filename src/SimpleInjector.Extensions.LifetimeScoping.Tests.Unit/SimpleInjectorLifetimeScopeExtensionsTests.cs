@@ -806,8 +806,10 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             }
         }
 
+        // This behavior has changed; we used to disallow this and throw an exception. Disposing a lifetime
+        // scope on a different thread however is not necessarily a problem, so we removed this limitation.
         [TestMethod]
-        public void LifetimeScopeDispose_ExecutedOnDifferentThreadThanItWasStarted_ThrowsExceptionException()
+        public void LifetimeScopeDispose_ExecutedOnDifferentThreadThanItWasStarted_DoesNotThrowExceptionException()
         {
             // Arrange
             var container = new Container();
@@ -815,22 +817,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             var scope = container.BeginLifetimeScope();
 
             // Act
-            Action action = () =>
-            {
-                try
-                {
-                    Task.Factory.StartNew(() => scope.Dispose()).Wait();
-                }
-                catch (AggregateException ex)
-                {
-                    throw ex.InnerException;
-                }
-            };
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "It is not safe to use a LifetimeScope instance across threads.",
-                action);
+            Task.Factory.StartNew(() => scope.Dispose()).Wait();
         }
         
         [TestMethod]
@@ -1221,7 +1208,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                     "other";
 
                 // Assert
-                Assert.AreSame(outerScope, actualScope, "Actual: " + scopeName + " scope.");
+                Assert.AreSame(outerScope, actualScope, "Expected: outer. Actual: " + scopeName + " scope.");
             }
         }
 
@@ -1267,10 +1254,10 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
                 var innerScope = container.BeginLifetimeScope();
 
-                // This will cause GetCurrentExecutionContextScope to become outerScope.
+                // This will cause GetCurrentLifetimeScope to become outerScope.
                 outerMiddleScope.Dispose();
 
-                // This should not cause BeginExecutionContextScope to change
+                // This should not cause BeginLifetimeScope to change
                 innerScope.Dispose();
 
                 // Act

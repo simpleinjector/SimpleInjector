@@ -37,8 +37,8 @@ namespace SimpleInjector.Decorators
     /// </summary>
     internal abstract class DecoratorExpressionInterceptor
     {
-        private static readonly Func<object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
-            _ => new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
+        private static readonly Func<Container, object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
+            (container, key) => new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
                 () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
 
         private readonly DecoratorExpressionInterceptorData data;

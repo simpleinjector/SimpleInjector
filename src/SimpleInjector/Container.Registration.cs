@@ -1211,6 +1211,10 @@ namespace SimpleInjector
         
         private sealed class ContainerVerificationScope : Scope
         {
+            public ContainerVerificationScope(Container container) : base(container)
+            {
+            }
+
             public override void WhenScopeEnds(Action action)
             {
                 // No-op.

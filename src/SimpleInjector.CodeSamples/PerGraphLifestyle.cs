@@ -46,7 +46,7 @@
 
             try
             {
-                threadLocal.Value = new Scope();
+                threadLocal.Value = new Scope(context.Registration.Container);
                 return getInstance();
             }
             finally
