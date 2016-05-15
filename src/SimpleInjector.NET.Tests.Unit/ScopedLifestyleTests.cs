@@ -879,6 +879,175 @@
                 "Since the background thread does not run verify, the returned scope should not be the " +
                 "verification scope.");
         }
+        
+        [TestMethod]
+        public void Verify_TransientServiceDependingOnScope_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ServiceDependingOn<Scope>>(Lifestyle.Transient);
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_ScopedServiceDependingOnScope_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ServiceDependingOn<Scope>>(new LifetimeScopeLifestyle());
+
+            // Act
+            container.Verify();
+        }
+        
+        [TestMethod]
+        public void Verify_SingletonServiceDependingOnScope_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ServiceDependingOn<Scope>>(Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "ServiceDependingOn<Scope> (Singleton) depends on Scope (Scoped)", action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithAnActiveLifetimeScopeAndDefaultScopedLifestyleSet_InjectsTheActiveScope()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            Scope activeScope = container.BeginLifetimeScope();
+
+            // Act
+            Scope injectedScope = container.GetInstance<ServiceDependingOn<Scope>>().Dependency;
+
+            // Assert
+            Assert.AreSame(activeScope, injectedScope);
+        }
+
+        [TestMethod]
+        public void GetInstance_RequestingScopeWithActiveLifetimeScopeAndDefaultScopedLifestyleSet_ResolvesTheActiveScope()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            Scope activeScope = container.BeginLifetimeScope();
+
+            // Act
+            var resolvedScope = container.GetInstance<Scope>();
+
+            // Assert
+            Assert.AreSame(activeScope, resolvedScope);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithAnActiveLifetimeScopeButNoDefaultScopedLifestyleSet_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Scope activeScope = container.BeginLifetimeScope();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                you need to either resolve instances directly from the Scope using a Scope.GetInstance
+                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property with
+                the required scoped lifestyle"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_RequestingScopeWithActiveLifetimeScopeButNoDefaultScopedLifestyleSet_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Scope activeScope = container.BeginLifetimeScope();
+
+            // Act
+            Action action = () => container.GetInstance<Scope>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                resolve instances directly from the Scope using a Scope.GetInstance
+                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithoutAnActiveScopeAndWithoutDefaultScopedLifestyleSet_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
+
+            // Act
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "you will have to set the Container.Options.DefaultScopedLifestyle property",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithoutAnActiveScopeAndDefaultScopedLifestyleSet_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
+
+            // Act
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("There is no active scope",
+                action);
+        }
+
+        [TestMethod]
+        public void MethodUnderTest_Scenario_Behavior()
+        {
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+
+            container.Register<ServiceDependingOn<Scope>>();
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ResolvingAnInstanceDependingOnScope_InjectsThatActiveScope()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var activeScope = new Scope(container);
+
+            // Act
+            var service = activeScope.GetInstance<ServiceDependingOn<Scope>>();
+            Scope injectedScope = service.Dependency;
+
+            // Assert
+            Assert.AreSame(activeScope, injectedScope);
+        }
 
         private class DisposablePlugin : IPlugin, IDisposable
         {
@@ -901,10 +1070,7 @@
             {
                 this.DisposeCount++;
 
-                if (this.disposing != null)
-                {
-                    this.disposing(this);
-                }
+                this.disposing?.Invoke(this);
             }
         }
 
@@ -936,10 +1102,7 @@
             {
                 this.DisposeCount++;
 
-                if (this.disposing != null)
-                {
-                    this.disposing(this);
-                }
+                this.disposing?.Invoke(this);
 
                 if (this.ExceptionToThrow != null)
                 {

@@ -116,6 +116,8 @@ namespace SimpleInjector
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
             this.RegisterSingleton(this);
+
+            this.AddContainerRegistrations();
         }
 
         // Wrapper for instance initializer delegates
@@ -633,6 +635,16 @@ namespace SimpleInjector
             return serviceType.Info().IsGenericType
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
+        }
+
+        private void AddContainerRegistrations()
+        {
+            // Add the default registrations. This adds them as registration, but only in case some component
+            // starts depending on them.
+            var scopeLifestyle = new ScopedScopeLifestyle();
+
+            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
+                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
         }
 
         private sealed class ContextualResolveInterceptor

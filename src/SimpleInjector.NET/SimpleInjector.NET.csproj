@@ -405,6 +405,9 @@
     <Compile Include="..\SimpleInjector\Lifestyles\ScopedRegistration.cs">
       <Link>Lifestyles\ScopedRegistration.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector\Lifestyles\ScopedScopeLifestyle.cs">
+      <Link>Lifestyles\ScopedScopeLifestyle.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector\Lifestyles\SingletonLifestyle.cs">
       <Link>Lifestyles\SingletonLifestyle.cs</Link>
     </Compile>

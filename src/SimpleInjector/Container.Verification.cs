@@ -53,12 +53,19 @@ namespace SimpleInjector
         // TODO: Optimize performance for the common scenario where the resolveScope is never used.
         internal Scope CurrentThreadResolveScope
         {
-            get { return this.resolveScope.Value; }
+            get
+            {
+                return this.resolveScope.Value;
+            }
+
             set
             {
                 // PERF: We flag the use of the current-thread-resolve-scope to optimize getting the right
                 // scope. Most application's won't resolve directly from the scope, but from the container.
-                this.usingCurrentThreadResolveScope = true;
+                if (!this.usingCurrentThreadResolveScope)
+                {
+                    this.usingCurrentThreadResolveScope = true;
+                }
 
                 this.resolveScope.Value = value;
             }
