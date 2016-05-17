@@ -537,7 +537,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => AdvancedExtensions.GetOrSetItem<object>(container, null, _ => null);
+            Action action = () => AdvancedExtensions.GetOrSetItem<object>(container, null, (c, k) => null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -563,7 +563,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var container = ContainerFactory.New();
 
             // Act
-            var instance = container.GetOrSetItem(new object(), _ => new object());
+            var instance = container.GetOrSetItem(new object(), (c, k) => new object());
 
             // Assert
             Assert.IsNotNull(instance);
@@ -578,8 +578,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var container = ContainerFactory.New();
 
             // Act
-            var instance1 = container.GetOrSetItem(key, _ => new object());
-            var instance2 = container.GetOrSetItem(key, _ => new object());
+            var instance1 = container.GetOrSetItem(key, (c, k) => new object());
+            var instance2 = container.GetOrSetItem(key, (c, k) => new object());
 
             // Assert
             Assert.AreSame(instance1, instance2);

@@ -134,7 +134,8 @@ namespace SimpleInjector
 
             // If we are running verification in the current thread, we prefer returning a verification scope
             // over a real active scope (issue #95).
-            return container.GetVerificationScopeForCurrentThread() ?? this.GetCurrentScopeCore(container);
+            return container.GetVerificationOrResolveScopeForCurrentThread()
+                ?? this.GetCurrentScopeCore(container);
         }
 
         /// <summary>

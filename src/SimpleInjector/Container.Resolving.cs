@@ -39,8 +39,8 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
-        private readonly Dictionary<Type, InstanceProducer> resolveUnregisteredTypeRegistrations =
-            new Dictionary<Type, InstanceProducer>();
+        private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
+            new Dictionary<Type, Lazy<InstanceProducer>>();
 
         private readonly Dictionary<Type, InstanceProducer> emptyAndRedirectedCollectionRegistrationCache =
             new Dictionary<Type, InstanceProducer>();
@@ -356,7 +356,7 @@ namespace SimpleInjector
             lock (this.resolveUnregisteredTypeRegistrations)
             {
                 return this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType)
-                    ? this.resolveUnregisteredTypeRegistrations[serviceType]
+                    ? this.resolveUnregisteredTypeRegistrations[serviceType].Value
                     : null;
             }
         }
@@ -385,7 +385,7 @@ namespace SimpleInjector
                 if (this.resolveUnregisteredTypeRegistrations.ContainsKey(e.UnregisteredServiceType))
                 {
                     // This line will only get hit, in case a different thread came here first.
-                    return this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType];
+                    return this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType].Value;
                 }
 
                 var registration = e.Registration ?? new ExpressionRegistration(e.Expression, this);
@@ -395,7 +395,7 @@ namespace SimpleInjector
                 // producer can cause a torn lifestyle warning in the container.
                 var producer = new InstanceProducer(e.UnregisteredServiceType, registration);
 
-                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] = producer;
+                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] = Helpers.ToLazy(producer);
 
                 return producer;
             }

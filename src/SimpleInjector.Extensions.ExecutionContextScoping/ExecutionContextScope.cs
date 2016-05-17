@@ -31,6 +31,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         private readonly ExecutionContextScopeManager manager;
 
         internal ExecutionContextScope(ExecutionContextScopeManager manager, ExecutionContextScope parentScope)
+            : base(manager.Container)
         {
             this.manager = manager;
             this.ParentScope = parentScope;

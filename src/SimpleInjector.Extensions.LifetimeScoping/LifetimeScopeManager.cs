@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -40,9 +40,14 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         // to have it's own set of scopes.
         private readonly ThreadLocal<LifetimeScope> threadLocalScopes = new ThreadLocal<LifetimeScope>();
 
-        internal LifetimeScopeManager()
+        internal LifetimeScopeManager(Container container)
         {
+            Requires.IsNotNull(container, nameof(container));
+
+            this.Container = container;
         }
+
+        internal Container Container { get; }
 
         internal LifetimeScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 

@@ -22,10 +22,7 @@
 
 namespace SimpleInjector.Integration.Wcf
 {
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.ServiceModel;
-    using System.Threading;
 
     internal static class InstanceContextExtensions
     {

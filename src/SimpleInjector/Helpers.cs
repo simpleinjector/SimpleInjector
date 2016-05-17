@@ -40,7 +40,7 @@ namespace SimpleInjector
     /// </summary>
     internal static partial class Helpers
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string) };
+        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
 
 #if DNXCORE50
         internal static TypeInfo Info(this Type type) => IntrospectionExtensions.GetTypeInfo(type);

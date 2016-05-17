@@ -45,11 +45,81 @@ namespace SimpleInjector
         private DisposeState state = DisposeState.Alive;
         private int recursionDuringDisposalCounter;
 
+        /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
+        public Scope()
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
+        /// <param name="container">The container instance that the scope belongs to.</param>
+        public Scope(Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            this.Container = container;
+        }
+
         private enum DisposeState
         {
             Alive,
             Disposing,
             Disposed
+        }
+
+        /// <summary>Gets the container instance that this scope belongs to.</summary>
+        /// <value>The <see cref="Container"/> instance.</value>
+        public Container Container { get; }
+        
+        /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
+        /// <typeparam name="TService">The type of the service to resolve.</typeparam>
+        /// <returns>An instance of the given service type.</returns>
+        public TService GetInstance<TService>() where TService : class
+        {
+            if (this.Container == null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called on Scope instances that are related to a Container. " +
+                    "Please use the overloaded constructor of Scope create an instance with a Container.");
+            }
+
+            Scope originalScope = this.Container.CurrentThreadResolveScope;
+
+            try
+            {
+                this.Container.CurrentThreadResolveScope = this;
+                return this.Container.GetInstance<TService>();
+            }
+            finally
+            {
+                this.Container.CurrentThreadResolveScope = originalScope;
+            }
+        }
+
+        /// <summary>Gets an instance of the given <paramref name="serviceType" /> for the current scope.</summary>
+        /// <param name="serviceType">The type of the service to resolve.</param>
+        /// <returns>An instance of the given service type.</returns>
+        public object GetInstance(Type serviceType)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
+            if (this.Container == null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called on Scope instances that are related to a Container. " +
+                    "Please use the overloaded constructor of Scope create an instance with a Container.");
+            }
+
+            Scope originalScope = this.Container.CurrentThreadResolveScope;
+
+            try
+            {
+                this.Container.CurrentThreadResolveScope = this;
+                return this.Container.GetInstance(serviceType);
+            }
+            finally
+            {
+                this.Container.CurrentThreadResolveScope = originalScope;
+            }
         }
 
         /// <summary>
@@ -131,10 +201,7 @@ namespace SimpleInjector
                 return GetScopelessInstance(registration);
             }
 
-            lock (scope.syncRoot)
-            {
-                return scope.GetInstanceInternal(registration);
-            }
+            return scope.GetInstanceInternal(registration);
         }
 
         // This method is called from within the test suite.
@@ -258,10 +325,7 @@ namespace SimpleInjector
         {
             if (registration.Container.IsVerifying())
             {
-                lock (registration.Container.VerificationScope.syncRoot)
-                {
-                    return registration.Container.VerificationScope.GetInstanceInternal(registration);
-                }
+                return registration.Container.VerificationScope.GetInstanceInternal(registration);
             }
 
             throw new ActivationException(
@@ -275,21 +339,24 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            this.RequiresInstanceNotDisposed();
-
-            bool cacheIsEmpty = this.cachedInstances == null;
-
-            if (this.cachedInstances == null)
+            lock (this.syncRoot)
             {
-                this.cachedInstances =
-                    new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+                this.RequiresInstanceNotDisposed();
+
+                bool cacheIsEmpty = this.cachedInstances == null;
+
+                if (this.cachedInstances == null)
+                {
+                    this.cachedInstances =
+                        new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
+                }
+
+                object instance;
+
+                return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
+                    ? (TService)instance
+                    : this.CreateAndCacheInstance(registration);
             }
-
-            object instance;
-
-            return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
-                ? (TService)instance
-                : this.CreateAndCacheInstance(registration);
         }
 
         private TService CreateAndCacheInstance<TService, TImplementation>(

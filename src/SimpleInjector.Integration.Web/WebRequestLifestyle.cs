@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -45,7 +45,7 @@ namespace SimpleInjector.Integration.Web
 
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
 
-        private static readonly object ScopeKey = new object();
+        private static readonly object ScopeCacheKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -79,26 +79,23 @@ namespace SimpleInjector.Integration.Web
             WithDisposal.WhenScopeEnds(container, action);
         }
 
-        internal static Lifestyle Get(bool disposeInstanceWhenWebRequestEnds)
-        {
-            return disposeInstanceWhenWebRequestEnds ? WithDisposal : Disposeless;
-        }
+        internal static Lifestyle Get(bool withDisposal) => withDisposal ? WithDisposal : Disposeless;
 
         internal static void CleanUpWebRequest(HttpContext context)
         {
             Requires.IsNotNull(context, nameof(context));
 
-            Scope scope = (Scope)context.Items[ScopeKey];
+            var scopeCache = (HttpContextScopeCache)context.Items[ScopeCacheKey];
 
-            if (scope != null)
+            if (scopeCache != null)
             {
-                // NOTE: We explicitly don't remove the scope from the items dictionary, because if anything
+                // NOTE: We explicitly don't remove the object from the items dictionary, because if anything
                 // is resolved from the container after this point during the request, that would cause the
-                // creation of a new Scope, while will never be disposed. This would make it seem like the
-                // application is working, while instead we are failing silently. By not removing the scope,
+                // creation of a new Scope, that will never be disposed. This would make it seem like the
+                // application is working, while instead we are failing silently. By not removing the object,
                 // this will cause the Scope to throw an ObjectDisposedException once it is accessed after
                 // this point; effectively making the application to fail fast.
-                scope.Dispose();
+                scopeCache.Dispose();
             }
         }
 
@@ -108,7 +105,7 @@ namespace SimpleInjector.Integration.Web
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container) => GetCurrentScope(HttpContext.Current);
+        protected override Scope GetCurrentScopeCore(Container container) => GetOrCreateScope(container);
 
         /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
@@ -121,29 +118,70 @@ namespace SimpleInjector.Integration.Web
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return () => GetCurrentScope(HttpContext.Current);
+            return () => GetOrCreateScope(container);
         }
 
-        private static Scope GetCurrentScope(HttpContext context)
+        private static Scope GetOrCreateScope(Container container)
         {
+            HttpContext context = HttpContext.Current;
+
             if (context == null)
             {
                 return null;
             }
 
-            Scope scope = (Scope)context.Items[ScopeKey];
+            var scopeCache = (HttpContextScopeCache)context.Items[ScopeCacheKey];
 
-            if (scope == null)
+            if (scopeCache == null)
             {
-                // If there are multiple container instances that run on the same request (which is a
-                // strange but valid scenario), all containers will get the same Scope instance for that
-                // request. This behavior is correct and even allows all instances that are registered for
-                // disposal to be disposed in reversed order of creation, independent of the container that
-                // created them.
-                context.Items[ScopeKey] = scope = new Scope();
+                context.Items[ScopeCacheKey] = scopeCache = new HttpContextScopeCache();
             }
 
-            return scope;
+            return scopeCache.GetOrCreateScopeForContainer(container);
+        }
+
+        private sealed class HttpContextScopeCache
+        {
+            private readonly List<Scope> scopes = new List<Scope>(1);
+
+            public Scope GetOrCreateScopeForContainer(Container container)
+            {
+                foreach (var existingScope in this.scopes)
+                {
+                    // We match by reference; since users might have overridden equality.
+                    if (object.ReferenceEquals(existingScope.Container, container))
+                    {
+                        return existingScope;
+                    }
+                }
+
+                var newScope = new Scope(container);
+
+                this.scopes.Add(newScope);
+
+                return newScope;
+            }
+
+            public void Dispose()
+            {
+                if (this.scopes.Count == 1)
+                {
+                    this.scopes[0].Dispose();
+                }
+                else
+                {
+                    // We add all scopes to a 'master scope'. This master scope will ensure that created scopes
+                    // will be disposed in reverse order of creation and will ensure that all scopes are
+                    // disposed, even when one scope throws an exception during disposal.
+                    using (var masterScope = new Scope())
+                    {
+                        foreach (var scope in this.scopes)
+                        {
+                            masterScope.RegisterForDisposal(scope);
+                        }
+                    }
+                }
+            }
         }
     }
 }
