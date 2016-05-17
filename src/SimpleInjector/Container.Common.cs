@@ -115,8 +115,6 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
-            this.RegisterSingleton(this);
-
             this.AddContainerRegistrations();
         }
 
@@ -167,7 +165,7 @@ namespace SimpleInjector
             }
         }
 
-        internal bool HasRegistrations => this.explicitRegistrations.Count > 1 || this.collectionResolvers.Any();
+        internal bool HasRegistrations => this.explicitRegistrations.Any() || this.collectionResolvers.Any();
 
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
@@ -645,6 +643,9 @@ namespace SimpleInjector
 
             this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
                 () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
+
+            this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
+                () => Lifestyle.Singleton.CreateProducer(() => this, this));
         }
 
         private sealed class ContextualResolveInterceptor

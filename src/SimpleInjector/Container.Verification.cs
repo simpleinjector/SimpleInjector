@@ -124,6 +124,7 @@ namespace SimpleInjector
             // the first thread could dispose the verification scope, while the other thread is still using it.
             lock (this.isVerifying)
             {
+                this.LockContainer();
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
                 this.IsVerifying = true;
                 this.VerificationScope = new ContainerVerificationScope(this);
