@@ -90,8 +90,8 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
             "{0} = {1}, {2} = {3}",
-            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(ImplementationType), this.ImplementationType.ToFriendlyName());
+            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(this.ImplementationType), this.ImplementationType.ToFriendlyName());
 
         internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
             ServiceTypeDecoratorInfo info)
