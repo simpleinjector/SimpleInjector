@@ -172,17 +172,17 @@ namespace SimpleInjector.Internals
 
         private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container) =>
             Expression.New(
-                typeof(LazyScope).GetConstructor(new[] { typeof(Func<Scope>), typeof(Container) }),
+                typeof(LazyScope).Info().GetConstructor(new[] { typeof(Func<Scope>), typeof(Container) }),
                 Expression.Constant(scopeFactory, typeof(Func<Scope>)),
                 Expression.Constant(container, typeof(Container)));
 
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)
         {
             var type = typeof(LazyScopedRegistration<,>)
-                .MakeGenericType(registration.GetType().GetGenericArguments());
+                .MakeGenericType(registration.GetType().Info().GetGenericArguments());
 
             return Expression.New(
-                type.GetConstructor(new[] { typeof(Registration) }),
+                type.Info().GetConstructor(new[] { typeof(Registration) }),
                 Expression.Constant(registration, typeof(Registration)));
         }
 
@@ -395,7 +395,7 @@ namespace SimpleInjector.Internals
                 this.OriginalExpression = originalExpression;
 
                 this.lazyScopeRegistrationType = typeof(LazyScopedRegistration<,>)
-                    .MakeGenericType(this.Registration.GetType().GetGenericArguments());
+                    .MakeGenericType(this.Registration.GetType().Info().GetGenericArguments());
             }
 
             internal ParameterExpression Variable
@@ -416,7 +416,7 @@ namespace SimpleInjector.Internals
             internal Expression LazyScopeRegistrationGetInstanceExpression => 
                 Expression.Call(
                     this.Variable,
-                    this.lazyScopeRegistrationType.GetMethod("GetInstance"),
+                    this.lazyScopeRegistrationType.Info().GetMethod("GetInstance"),
                     Expression.Property(this.LifestyleInfo.Variable, "Value"));
         }
 

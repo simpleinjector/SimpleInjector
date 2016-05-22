@@ -24,9 +24,10 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
 #if !PCL
+    using System.Runtime.Serialization;
+
     [Serializable]
 #endif
     internal class CyclicDependencyException : ActivationException

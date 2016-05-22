@@ -51,7 +51,7 @@ namespace SimpleInjector.Decorators
 
         internal static IEnumerable MakeReadOnly(Type elementType, Array collection)
         {
-            var readOnlyCollection = typeof(DecoratorHelpers).GetMethod("ReadOnlyCollection")
+            var readOnlyCollection = typeof(DecoratorHelpers).Info().GetMethod("ReadOnlyCollection")
                 .MakeGenericMethod(elementType)
                 .Invoke(null, new object[] { collection });
 
@@ -234,7 +234,7 @@ namespace SimpleInjector.Decorators
                 return false;
             }
 
-            Type funcArgumentType = parameterType.GetGenericArguments()[0];
+            Type funcArgumentType = parameterType.Info().GetGenericArguments()[0];
 
             return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
         }

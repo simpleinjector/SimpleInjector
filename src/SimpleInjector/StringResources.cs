@@ -807,7 +807,7 @@ namespace SimpleInjector
                     " There is, however, a registration for {0}; Did you mean to call GetInstance<{0}>() " +
                     "or depend on {0}? Or did you mean to register a collection of types using " +
                     "RegisterCollection?",
-                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
+                    collectionServiceType.Info().GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
         private static string DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
@@ -815,7 +815,7 @@ namespace SimpleInjector
             hasRelatedOneToOneMapping
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to depend on {0}?",
-                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
+                    collectionServiceType.Info().GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
         private static string DidYouMeanToCallGetAllInstancesInstead(bool hasCollection, Type serviceType) =>

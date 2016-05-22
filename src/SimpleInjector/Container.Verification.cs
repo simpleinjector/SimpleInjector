@@ -223,7 +223,7 @@ namespace SimpleInjector
             if (isContainerUncontrolledCollection)
             {
                 Type collectionType = producer.ServiceType;
-                Type serviceType = collectionType.GetGenericArguments()[0];
+                Type serviceType = collectionType.Info().GetGenericArguments()[0];
 
                 Helpers.VerifyCollection((IEnumerable)instance, serviceType);
             }

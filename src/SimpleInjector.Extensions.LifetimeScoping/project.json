@@ -1,23 +1,22 @@
 {
-  "version": "3.1.2.0 ",
-  "compilationOptions": { "keyFile": "../SimpleInjector.snk" },
+  "version": "3.1.5.0 ",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk",
+    "xmlDoc": true,
+    "define": [ "DNXCORE50", "PCL" ]
+  },
   "supports": {
     "net46.app": { },
     "uwp.10.0.app": { },
     "dnxcore50.app": { }
   },
   "dependencies": {
-    "Microsoft.NETCore": "5.0.0",
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
-    "NuSpec.ReferenceGenerator": "1.0.0",
-    "SimpleInjector": "3.0.0.0"
+    "NuSpec.ReferenceGenerator": "1.4.2",
+    "SimpleInjector": "3.1.5"
   },
   "frameworks": {
-    "dotnet": {
-      "imports": "portable-net452+win81",
-      "compilationOptions": {
-        "define": [ "DNXCORE50", "PCL" ]
-      }
+    "netstandard1.5": {
+      "imports": "portable-net452+win81"
     }
   }
 }

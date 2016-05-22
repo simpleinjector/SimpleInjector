@@ -115,7 +115,7 @@ namespace SimpleInjector.Diagnostics
 
         internal static DocumentationAttribute GetDocumentationAttribute(DiagnosticType value)
         {
-            var members = typeof(DiagnosticType).GetMember(value.ToString());
+            var members = typeof(DiagnosticType).Info().GetMember(value.ToString());
 
             var attributes =
                 from member in members

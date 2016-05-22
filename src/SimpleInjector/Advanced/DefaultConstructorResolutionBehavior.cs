@@ -62,7 +62,7 @@ namespace SimpleInjector.Advanced
 
         private static ConstructorInfo GetSinglePublicConstructor(Type implementationType)
         {
-            var constructors = implementationType.GetConstructors();
+            var constructors = implementationType.Info().GetConstructors();
 
             if (!constructors.Any())
             {

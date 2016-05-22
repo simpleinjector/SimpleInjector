@@ -62,7 +62,7 @@ namespace SimpleInjector.Diagnostics
         private static Type MakeTypePartiallyGeneric(Type type, int nestingLevel)
         {
             var arguments = (
-                from argument in type.GetGenericArguments()
+                from argument in type.Info().GetGenericArguments()
                 select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1))
                 .ToArray();
 

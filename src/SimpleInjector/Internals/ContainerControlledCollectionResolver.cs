@@ -93,7 +93,7 @@ namespace SimpleInjector.Internals
             return
                 from registrationGroup in this.RegistrationGroups
                 where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
-                    closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
+                    closedGenericServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType)
                 from item in registrationGroup.ControlledItems
                 select item;
         }

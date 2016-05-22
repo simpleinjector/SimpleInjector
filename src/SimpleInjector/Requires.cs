@@ -80,7 +80,7 @@ namespace SimpleInjector
         internal static void ServiceIsAssignableFromExpression(Type service, Expression expression,
             string paramName)
         {
-            if (!service.IsAssignableFrom(expression.Type))
+            if (!service.Info().IsAssignableFrom(expression.Type))
             {
                 ThrowSuppliedElementDoesNotInheritFromOrImplement(service, expression.Type, "expression", 
                     paramName);
@@ -91,7 +91,7 @@ namespace SimpleInjector
         internal static void ServiceIsAssignableFromRegistration(Type service, Registration registration,
             string paramName)
         {
-            if (!service.IsAssignableFrom(registration.ImplementationType))
+            if (!service.Info().IsAssignableFrom(registration.ImplementationType))
             {
                 ThrowSuppliedElementDoesNotInheritFromOrImplement(service, registration.ImplementationType, 
                     "registration", paramName);
@@ -102,7 +102,7 @@ namespace SimpleInjector
         internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
             string paramName)
         {
-            if (!service.IsAssignableFrom(implementation))
+            if (!service.Info().IsAssignableFrom(implementation))
             {
                 ThrowSuppliedTypeDoesNotInheritFromOrImplement(service, implementation, paramName);
             }
@@ -305,7 +305,7 @@ namespace SimpleInjector
         internal static void FactoryReturnsATypeThatIsAssignableFromServiceType(Type serviceType,
             Type implementationType)
         {
-            if (!serviceType.IsAssignableFrom(implementationType))
+            if (!serviceType.Info().IsAssignableFrom(implementationType))
             {
                 throw new ActivationException(StringResources.TypeFactoryReturnedIncompatibleType(
                     serviceType, implementationType));

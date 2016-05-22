@@ -124,7 +124,7 @@ namespace SimpleInjector.Internals
         {
             return
                 (type.IsNested ? type.Info().IsNestedPublic : type.Info().IsPublic) &&
-                (!type.Info().IsGenericType || type.GetGenericArguments().All(IsPublic));
+                (!type.Info().IsGenericType || type.Info().GetGenericArguments().All(IsPublic));
         }
 
         private static IEnumerable<Type> GetTypeAndDeclaringTypes(Type type)
