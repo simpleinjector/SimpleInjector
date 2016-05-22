@@ -22,6 +22,7 @@
 
 namespace SimpleInjector.Integration.AspNet
 {
+    using System;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>

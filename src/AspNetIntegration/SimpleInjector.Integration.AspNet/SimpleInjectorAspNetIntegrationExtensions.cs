@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -27,9 +27,9 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using Diagnostics;
-    using Microsoft.AspNet.Builder;
-    using Microsoft.AspNet.Mvc.Controllers;
-    using Microsoft.AspNet.Mvc.ViewComponents;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.ViewComponents;
     using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
@@ -152,7 +152,7 @@ namespace SimpleInjector
 
             var componentTypes = viewComponentDescriptorProvider
                 .GetViewComponents()
-                .Select(description => description.Type);
+                .Select(description => description.TypeInfo.AsType());
 
             RegisterViewComponentTypes(container, componentTypes);
         }
@@ -169,6 +169,8 @@ namespace SimpleInjector
                         DiagnosticType.DisposableTransientComponent, "ASP.NET disposes controllers.");
                 }
 
+                // TODO: Ensure disposal of controllers; Since we override IControllerActivator, nothing is
+                // disposed anymore.
                 container.AddRegistration(type, registration);
             }
         }
