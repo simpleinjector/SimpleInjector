@@ -57,6 +57,8 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.Register<ILogger, NullLogger>();
+
             container.GetCurrentRegistrations().First().BuildExpression();
 
             // Act

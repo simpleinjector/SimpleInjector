@@ -488,14 +488,13 @@
         public void ConstructorInjectionBehavior_ChangedAfterFirstRegistration_Fails()
         {
             // Arrange
-            var expectedBehavior = new AlternativeDependencyInjectionBehavior();
-
             var container = new Container();
 
             container.RegisterSingleton<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.DependencyInjectionBehavior = expectedBehavior;
+            Action action = () => container.Options.DependencyInjectionBehavior = 
+                new AlternativeDependencyInjectionBehavior();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(

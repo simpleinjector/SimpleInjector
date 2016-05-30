@@ -161,7 +161,7 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations(nameof(ConstructorResolutionBehavior));
+                this.ThrowWhenContainerHasRegistrations(nameof(this.ConstructorResolutionBehavior));
 
                 this.resolutionBehavior = value;
             }
@@ -212,7 +212,7 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations(nameof(DependencyInjectionBehavior));
+                this.ThrowWhenContainerHasRegistrations(nameof(this.DependencyInjectionBehavior));
 
                 this.injectionBehavior = value;
             }
@@ -238,7 +238,7 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations(nameof(PropertySelectionBehavior));
+                this.ThrowWhenContainerHasRegistrations(nameof(this.PropertySelectionBehavior));
 
                 this.propertyBehavior = value;
             }
@@ -263,7 +263,7 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
-                this.ThrowWhenContainerHasRegistrations(nameof(LifestyleSelectionBehavior));
+                this.ThrowWhenContainerHasRegistrations(nameof(this.LifestyleSelectionBehavior));
 
                 this.lifestyleBehavior = value;
             }
@@ -295,7 +295,7 @@ namespace SimpleInjector
                         nameof(value));
                 }
 
-                this.ThrowWhenContainerHasRegistrations(nameof(DefaultScopedLifestyle));
+                this.ThrowWhenContainerHasRegistrations(nameof(this.DefaultScopedLifestyle));
 
                 this.defaultScopedLifestyle = value;
             }

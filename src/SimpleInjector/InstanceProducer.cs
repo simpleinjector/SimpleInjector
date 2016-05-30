@@ -207,8 +207,8 @@ namespace SimpleInjector
 
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
             "{0} = {1}, {2} = {3}",
-            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(Lifestyle), this.Lifestyle.Name);
+            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(this.Lifestyle), this.Lifestyle.Name);
 
         internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
             this.wrappedProducers == null

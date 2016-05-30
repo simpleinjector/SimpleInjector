@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,7 +23,6 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Runtime.CompilerServices;
 
     internal sealed class ScopedProxyLifestyle : ScopedLifestyle
     {
@@ -31,61 +30,31 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        internal override int ComponentLength(Container container)
-        {
-            return GetDefaultScopedLifestyle(container).ComponentLength(container);
-        }
+        internal override int ComponentLength(Container container) => 
+            GetDefaultScopedLifestyle(container).ComponentLength(container);
 
-        internal override int DependencyLength(Container container)
-        {
-            return GetDefaultScopedLifestyle(container).DependencyLength(container);
-        }
+        internal override int DependencyLength(Container container) =>
+            GetDefaultScopedLifestyle(container).DependencyLength(container);
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
-        {
-            ScopedLifestyle lifestyle = GetDefaultScopedLifestyle(container);
+        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
+            GetDefaultScopedLifestyle(container).CreateCurrentScopeProvider(container);
 
-            return lifestyle.CreateCurrentScopeProvider(container);
-        }
+        protected override Scope GetCurrentScopeCore(Container container) => 
+            GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
-        protected override Scope GetCurrentScopeCore(Container container)
-        {
-            ScopedLifestyle lifestyle = GetDefaultScopedLifestyle(container);
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container) =>
+            GetDefaultScopedLifestyle(container).CreateRegistration<TService, TImplementation>(container);
 
-            return lifestyle.GetCurrentScope(container);
-        }
-
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-        {
-            ScopedLifestyle lifestyle = GetDefaultScopedLifestyle(container);
-
-            return lifestyle.CreateRegistration<TService, TImplementation>(container);
-        }
-
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
-        {
-            ScopedLifestyle lifestyle = GetDefaultScopedLifestyle(container);
-
-            return lifestyle.CreateRegistration<TService>(instanceCreator, container);
-        }
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+            GetDefaultScopedLifestyle(c).CreateRegistration<TService>(creator, c);
 
 #if NET45
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        private static ScopedLifestyle GetDefaultScopedLifestyle(Container container)
-        {
-            var lifestyle = container.Options.DefaultScopedLifestyle;
+        private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) => 
+            container.Options.DefaultScopedLifestyle ?? ThrowDefaultScopeLifestyleIsNotSet();
 
-            if (lifestyle == null)
-            {
-                ThrowDefaultScopeLifestyleIsNotSet();
-            }
-
-            return lifestyle;
-        }
-
-        private static void ThrowDefaultScopeLifestyleIsNotSet()
+        private static ScopedLifestyle ThrowDefaultScopeLifestyleIsNotSet()
         {
             throw new InvalidOperationException(
                 "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +

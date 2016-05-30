@@ -60,7 +60,7 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
             "{0}: {1}, {2}: {3}",
-            nameof(ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(Consumer), this.Consumer);
+            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
+            nameof(this.Consumer), this.Consumer);
     }
 }
