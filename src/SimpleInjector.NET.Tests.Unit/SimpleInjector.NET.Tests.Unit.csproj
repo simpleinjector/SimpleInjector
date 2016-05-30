@@ -165,6 +165,7 @@
     <Compile Include="RegisterSingletonTests.cs" />
     <Compile Include="ResolveUnregisteredTypeEventTests.cs" />
     <Compile Include="ScopedLifestyleTests.cs" />
+    <Compile Include="ScopeTests.cs" />
     <Compile Include="TestClasses.CommandHandlers.cs" />
     <Compile Include="TestClasses.EventHandlers.cs" />
     <Compile Include="TestClasses.OpenGenerics.cs" />

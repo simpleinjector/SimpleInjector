@@ -325,7 +325,7 @@ namespace SimpleInjector
         {
             lock (this.items)
             {
-                if (item == null)
+                if (object.ReferenceEquals(item, null))
                 {
                     this.items.Remove(key);
                 }

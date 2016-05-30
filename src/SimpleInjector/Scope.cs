@@ -39,6 +39,7 @@ namespace SimpleInjector
 
         private readonly object syncRoot = new object();
 
+        private Dictionary<object, object> items;
         private Dictionary<Registration, object> cachedInstances;
         private List<Action> scopeEndActions;
         private List<IDisposable> disposables;
@@ -69,7 +70,7 @@ namespace SimpleInjector
         /// <summary>Gets the container instance that this scope belongs to.</summary>
         /// <value>The <see cref="Container"/> instance.</value>
         public Container Container { get; }
-        
+
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
         /// <returns>An instance of the given service type.</returns>
@@ -181,6 +182,62 @@ namespace SimpleInjector
                 this.PreventCyclicDependenciesDuringDisposal();
 
                 this.RegisterForDisposalInternal(disposable);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves an item from the scope stored by the given <paramref name="key"/> or null when no
+        /// item is stored by that key.
+        /// </summary>
+        /// <remarks>
+        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
+        /// </remarks>
+        /// <param name="key">The key of the item to retrieve.</param>
+        /// <returns>The stored item or null (Nothing in VB).</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        public object GetItem(object key)
+        {
+            Requires.IsNotNull(key, nameof(key));
+
+            lock (this.syncRoot)
+            {
+                object value;
+                return this.items != null && this.items.TryGetValue(key, out value) 
+                    ? value 
+                    : null;
+            }
+        }
+
+        /// <summary>Stores an item by the given <paramref name="key"/> in the scope.</summary>
+        /// <remarks>
+        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// percussions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
+        /// </remarks>
+        /// <param name="key">The key of the item to insert or override.</param>
+        /// <param name="item">The actual item. May be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference 
+        /// (Nothing in VB).</exception>
+        public void SetItem(object key, object item)
+        {
+            Requires.IsNotNull(key, nameof(key));
+
+            lock (this.syncRoot)
+            {
+                if (this.items == null)
+                {
+                    this.items = new Dictionary<object, object>(capacity: 1);
+                }
+
+                if (object.ReferenceEquals(item, null))
+                {
+                    this.items.Remove(key);
+                }
+                else
+                {
+                    this.items[key] = item;
+                }
             }
         }
 
