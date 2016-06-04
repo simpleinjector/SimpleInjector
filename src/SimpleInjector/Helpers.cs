@@ -53,10 +53,10 @@ namespace SimpleInjector
 
         internal static bool ContainsGenericParameter(this Type type) => 
             type.IsGenericParameter ||
-            (type.Info().IsGenericType && type.GetGenericArguments().Any(ContainsGenericParameter));
+                (type.Info().IsGenericType && type.Info().GetGenericArguments().Any(ContainsGenericParameter));
 
         internal static bool IsGenericArgument(this Type type) => 
-            type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
+            type.IsGenericParameter || type.Info().GetGenericArguments().Any(arg => arg.IsGenericArgument());
 
         internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck) => 
             typeToCheck.Info().IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
@@ -181,7 +181,7 @@ namespace SimpleInjector
         // pretty useless.
         internal static bool IsConcreteType(Type serviceType) => 
             !serviceType.Info().IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
-            !typeof(Delegate).IsAssignableFrom(serviceType);
+            !typeof(Delegate).Info().IsAssignableFrom(serviceType);
 
         // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
         internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) => 
@@ -217,7 +217,7 @@ namespace SimpleInjector
 
             types.Add(type);
             types.AddRange(GetBaseTypes(type));
-            types.AddRange(type.GetInterfaces());
+            types.AddRange(type.Info().GetInterfaces());
 
             return types.ToArray();
         }
@@ -247,9 +247,9 @@ namespace SimpleInjector
 
         internal static Action<T> CreateAction<T>(object action)
         {
-            Type actionArgumentType = action.GetType().GetGenericArguments()[0];
+            Type actionArgumentType = action.GetType().Info().GetGenericArguments()[0];
 
-            if (actionArgumentType.IsAssignableFrom(typeof(T)))
+            if (actionArgumentType.Info().IsAssignableFrom(typeof(T)))
             {
                 // In most cases, the given T is a concrete type such as ServiceImpl, and supplied action
                 // object can be everything from Action<ServiceImpl>, to Action<IService>, to Action<object>.
@@ -276,7 +276,7 @@ namespace SimpleInjector
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
             // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterCollection<T> method.
-            var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
+            var castMethod = typeof(Enumerable).Info().GetMethod("Cast").MakeGenericMethod(resultType);
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
@@ -289,7 +289,7 @@ namespace SimpleInjector
         {
             if (!service.Info().IsGenericType)
             {
-                return service.IsAssignableFrom(implementation);
+                return service.Info().IsAssignableFrom(implementation);
             }
 
             if (implementation.Info().IsGenericType && implementation.GetGenericTypeDefinition() == service)
@@ -299,7 +299,7 @@ namespace SimpleInjector
 
             // PERF: We don't use LINQ to prevent unneeded memory allocations.
             // Unfortunately we can't prevent memory allocations while calling GetInstances() :-(
-            foreach (Type interfaceType in implementation.GetInterfaces())
+            foreach (Type interfaceType in implementation.Info().GetInterfaces())
             {
                 if (IsGenericImplementationOf(interfaceType, service))
                 {
@@ -333,7 +333,7 @@ namespace SimpleInjector
             GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
 
         internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type) => 
-            type.GetInterfaces().Concat(type.GetBaseTypes());
+            type.Info().GetInterfaces().Concat(type.GetBaseTypes());
 
         internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
         {
@@ -351,7 +351,7 @@ namespace SimpleInjector
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
                 where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
-                    includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
+                    includeVariantTypes && closedGenericServiceType.Info().IsAssignableFrom(openGenericImplementation))
                 let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
                     ? result.ClosedGenericImplementation
                     : openGenericImplementation
@@ -400,7 +400,7 @@ namespace SimpleInjector
             type.Info().IsGenericType 
             && otherType.Info().IsGenericType 
             && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() 
-            && type.IsAssignableFrom(otherType);
+            && type.Info().IsAssignableFrom(otherType);
 
         private static string ToFriendlyName(this Type type, bool fullyQualifiedName, 
             Func<Type[], string> argumentsFormatter)
@@ -453,7 +453,7 @@ namespace SimpleInjector
             int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1),
                  CultureInfo.InvariantCulture);
 
-            var argumentOfTypeAndOuterType = type.GetGenericArguments();
+            var argumentOfTypeAndOuterType = type.Info().GetGenericArguments();
 
             return argumentOfTypeAndOuterType
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)

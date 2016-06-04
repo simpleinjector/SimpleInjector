@@ -71,6 +71,6 @@ namespace SimpleInjector.Decorators
 
         private static bool IsCompositeParameter(ParameterInfo parameter, Type serviceType) =>
             Helpers.IsGenericCollectionType(parameter.ParameterType) &&
-                parameter.ParameterType.GetGenericArguments()[0] == serviceType;
+                parameter.ParameterType.Info().GetGenericArguments()[0] == serviceType;
     }
 }

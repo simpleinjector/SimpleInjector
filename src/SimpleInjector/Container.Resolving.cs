@@ -431,7 +431,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildArrayProducerFromControlledCollection(Type serviceType, Type elementType)
         {
-            var arrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+            var arrayMethod = typeof(Enumerable).Info().GetMethod("ToArray").MakeGenericMethod(elementType);
 
             IEnumerable<object> singletonCollection = this.GetAllInstances(elementType);
 
@@ -462,7 +462,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildArrayProducerFromUncontrolledCollection(Type serviceType, Type elementType)
         {
-            var arrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+            var arrayMethod = typeof(Enumerable).Info().GetMethod("ToArray").MakeGenericMethod(elementType);
 
             var enumerableProducer = this.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType));
             var enumerableExpression = enumerableProducer.BuildExpression();
@@ -487,7 +487,7 @@ namespace SimpleInjector
             }
 
             // We don't auto-register collections for ambiguous types.
-            if (Helpers.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
+            if (Helpers.IsAmbiguousOrValueType(serviceType.Info().GetGenericArguments()[0]))
             {
                 return null;
             }
@@ -516,7 +516,7 @@ namespace SimpleInjector
 
             if (serviceTypeDefinition != typeof(IEnumerable<>))
             {
-                Type elementType = collectionType.GetGenericArguments()[0];
+                Type elementType = collectionType.Info().GetGenericArguments()[0];
 
                 var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
 
@@ -563,7 +563,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildEmptyCollectionInstanceProducerForEnumerable(Type enumerableType)
         {
-            Type elementType = enumerableType.GetGenericArguments()[0];
+            Type elementType = enumerableType.Info().GetGenericArguments()[0];
 
             var collection = DecoratorHelpers.CreateContainerControlledCollection(elementType, this);
 
@@ -713,7 +713,7 @@ namespace SimpleInjector
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
             Helpers.IsGenericCollectionType(collectionServiceType) && 
-                this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
+                this.ContainsExplicitRegistrationFor(collectionServiceType.Info().GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>

@@ -83,7 +83,7 @@ namespace SimpleInjector.Advanced
                 BindingFlags.Instance | BindingFlags.Static |
                 BindingFlags.NonPublic | BindingFlags.Public;
 
-            return implementationType.GetProperties(all);
+            return implementationType.Info().GetProperties(all);
         }
 
         internal static void VerifyProperties(PropertyInfo[] properties)

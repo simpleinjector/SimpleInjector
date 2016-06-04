@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,14 +22,13 @@
 
 namespace SimpleInjector.Integration.AspNet
 {
-    using System;
-    using Microsoft.AspNet.Mvc;
-    using Microsoft.AspNet.Mvc.Controllers;
-
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    
     /// <summary>
     /// Controller activator for Simple Injector.
     /// </summary>
-    public class SimpleInjectorControllerActivator : IControllerActivator
+    public sealed class SimpleInjectorControllerActivator : IControllerActivator
     {
         private readonly Container container;
 
@@ -46,9 +45,17 @@ namespace SimpleInjector.Integration.AspNet
 
         /// <summary>Creates a controller.</summary>
         /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
-        /// <param name="controllerType">The controller type to create.</param>
         /// <returns>A new controller instance.</returns>
-        public object Create(ActionContext context, Type controllerType) => 
-            this.container.GetInstance(controllerType);
+        public object Create(ControllerContext context) =>
+            this.container.GetInstance(context.ActionDescriptor.ControllerTypeInfo.AsType());
+
+        /// <summary>
+        /// Releases the controller.
+        /// </summary>
+        /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
+        /// <param name="controller">The controller instance.</param>
+        public void Release(ControllerContext context, object controller)
+        {
+        }
     }
 }

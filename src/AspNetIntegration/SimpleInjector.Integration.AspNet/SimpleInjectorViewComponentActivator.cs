@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,28 +22,38 @@
 
 namespace SimpleInjector.Integration.AspNet
 {
-    using System.Diagnostics;
-    using Microsoft.AspNet.Mvc.ViewComponents;
-    using Microsoft.Extensions.Logging;
+    using Microsoft.AspNetCore.Mvc.ViewComponents;
 
-    internal class SimpleInjectorViewComponentInvoker : _DefaultViewComponentInvoker
+    /// <summary>
+    /// View component activator for Simple Injector.
+    /// </summary>
+    public sealed class SimpleInjectorViewComponentActivator : IViewComponentActivator
     {
-        private readonly IViewComponentActivator viewComponentActivator;
         private readonly Container container;
 
-        public SimpleInjectorViewComponentInvoker(DiagnosticSource source, ILogger logger,
-            IViewComponentActivator viewComponentActivator, Container container)
-            : base(source, logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleInjectorViewComponentActivator"/> class.
+        /// </summary>
+        /// <param name="container">The container instance.</param>
+        public SimpleInjectorViewComponentActivator(Container container)
         {
-            this.viewComponentActivator = viewComponentActivator;
+            Requires.IsNotNull(container, nameof(container));
+
             this.container = container;
         }
 
-        protected override object CreateComponent(ViewComponentContext context)
+        /// <summary>Creates a view component.</summary>
+        /// <param name="context"></param>
+        /// <returns>A view component instance.</returns>
+        public object Create(ViewComponentContext context) =>
+            this.container.GetInstance(context.ViewComponentDescriptor.TypeInfo.AsType());
+
+        /// <summary>Releases the view component.</summary>
+        /// <param name="context">The <see cref="ViewComponentContext"/> associated with the viewComponent.</param>
+        /// <param name="viewComponent">The view component to release.</param>
+        public void Release(ViewComponentContext context, object viewComponent)
         {
-            var component = this.container.GetInstance(context.ViewComponentDescriptor.Type);
-            this.viewComponentActivator.Activate(component, context);
-            return component;
+            // No-op.
         }
     }
 }

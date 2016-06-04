@@ -85,8 +85,8 @@ namespace SimpleInjector.Internals
                 return false;
             }
 
-            return this.Argument.GetGenericArguments()
-                .Zip(this.ConcreteType.GetGenericArguments(), ArgumentMapping.Create)
+            return this.Argument.Info().GetGenericArguments()
+                .Zip(this.ConcreteType.Info().GetGenericArguments(), ArgumentMapping.Create)
                 .All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
         }
     }

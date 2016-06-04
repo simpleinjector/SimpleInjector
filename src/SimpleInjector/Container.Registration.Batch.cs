@@ -394,7 +394,7 @@ namespace SimpleInjector
                 if (this.skippedNonGenericDecorators.ContainsKey(typeDef))
                 {
                     return this.skippedNonGenericDecorators[typeDef]
-                        .Where(serviceType.IsAssignableFrom)
+                        .Where(serviceType.Info().IsAssignableFrom)
                         .ToArray();
                 }
             }

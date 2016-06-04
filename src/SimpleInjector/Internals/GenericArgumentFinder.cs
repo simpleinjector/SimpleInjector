@@ -42,11 +42,11 @@ namespace SimpleInjector.Internals
         public GenericArgumentFinder(Type serviceTypeDefinition, Type serviceTypeToResolve,
             Type implementationTypeDefinition, Type partialOpenGenericImplementation)
         {
-            this.serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
-            this.serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();
-            this.implementationTypeDefinitionArguments = implementationTypeDefinition.GetGenericArguments();
+            this.serviceTypeDefinitionArguments = serviceTypeDefinition.Info().GetGenericArguments();
+            this.serviceTypeToResolveArguments = serviceTypeToResolve.Info().GetGenericArguments();
+            this.implementationTypeDefinitionArguments = implementationTypeDefinition.Info().GetGenericArguments();
             this.partialImplementationArguments =
-                (partialOpenGenericImplementation ?? implementationTypeDefinition).GetGenericArguments();
+                (partialOpenGenericImplementation ?? implementationTypeDefinition).Info().GetGenericArguments();
         }
 
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation()
@@ -190,8 +190,8 @@ namespace SimpleInjector.Internals
         private ArgumentMapping[] ConvertToOpenImplementationArgumentMappingsForType(
            ArgumentMapping mapping, Type type, IList<Type> processedTypes)
         {
-            var arguments = mapping.Argument.GetGenericArguments();
-            var concreteTypes = type.GetGenericArguments();
+            var arguments = mapping.Argument.Info().GetGenericArguments();
+            var concreteTypes = type.Info().GetGenericArguments();
 
             if (concreteTypes.Length != arguments.Length)
             {

@@ -65,7 +65,7 @@ namespace SimpleInjector.Internals
         {
             if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
             {
-                Type closedServiceType = e.UnregisteredServiceType.GetGenericArguments().Single();
+                Type closedServiceType = e.UnregisteredServiceType.Info().GetGenericArguments().Single();
 
                 if (this.ServiceType.IsGenericTypeDefinitionOf(closedServiceType))
                 {

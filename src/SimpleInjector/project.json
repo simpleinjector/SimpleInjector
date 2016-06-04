@@ -1,21 +1,30 @@
 {
-  "version": "3.1.2-beta5",
-  "compilationOptions": { "keyFile": "../SimpleInjector.snk" },
-  "supports": {
-    "net46.app": { },
-    "uwp.10.0.app": { },
-    "dnxcore50.app": { }
+  "version": "3.1.5",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk",
+    "define": [ "PCL", "DNXCORE50" ],
+    "xmlDoc": true
   },
   "dependencies": {
-    "Microsoft.NETCore": "5.0.0",
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
-    "NuSpec.ReferenceGenerator": "1.0.0"
   },
   "frameworks": {
-    "dotnet": {
-      "imports": "portable-net452+win81",
-      "compilationOptions": {
-        "define": [ "DNXCORE50", "PCL" ]
+    "netstandard1.5": {
+      "dependencies": {
+        "System.ComponentModel": "4.0.1-rc2-*",
+        "System.Diagnostics.Debug": "4.0.11-rc2-*",
+        "System.Diagnostics.Tools": "4.0.1-rc2-*",
+        "System.Globalization": "4.0.11-rc2-*",
+        "System.Linq": "4.1.0-rc2-*",
+        "System.Linq.Expressions": "4.0.11-rc2-*",
+        "System.Reflection": "4.1.0-rc2-*",
+        "System.Reflection.Extensions": "4.0.1-rc2-*",
+        "System.Runtime": "4.1.0-rc2-*",
+        "System.Runtime.Extensions": "4.1.0-rc2-*",
+        "System.Threading": "4.0.11-rc2-*"
+      },
+      "imports": [ "dotnet5.2" ],
+      "buildOptions": {
+        "defines": [ "PCL", "DNXCORE50" ]
       }
     }
   }
