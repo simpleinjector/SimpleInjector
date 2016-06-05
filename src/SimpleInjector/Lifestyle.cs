@@ -567,7 +567,6 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
             var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceFuncMethod

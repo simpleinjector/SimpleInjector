@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
@@ -1415,9 +1416,121 @@
             AssertThat.IsInstanceOfType(typeof(GenericType<int>), instance);
         }
 
+        [TestMethod]
+        public void GetInstance_ResolvingRegisteredTypeWithStringDependencyRegisteredAsConditional_InjectsStringDependency()
+        {
+            // Arrange
+            string expectedValue = "Some Value";
+
+            var container = ContainerFactory.New();
+
+            container.Options.DependencyInjectionBehavior =
+                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
+
+            // Type to resolve is explicitly registered
+            container.Register<ServiceDependingOn<string>>();
+
+            RegisterConditionalConstant(container, expectedValue, c => true);
+
+            // Act
+            var service = container.GetInstance<ServiceDependingOn<string>>();
+
+            // Assert
+            Assert.AreEqual(expectedValue, service.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingUnregisteredTypeWithStringDependencyRegisteredAsConditional_InjectsStringDependency()
+        {
+            // Arrange
+            string expectedValue = "Some Value";
+
+            var container = ContainerFactory.New();
+
+            container.Options.DependencyInjectionBehavior =
+                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
+
+            RegisterConditionalConstant(container, expectedValue, c => true);
+
+            // Act
+            // ServiceDependingOn<T> is not registered here. This causes a different code path.
+            var service = container.GetInstance<ServiceDependingOn<string>>();
+
+            // Assert
+            Assert.AreEqual(expectedValue, service.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingRegisteredTypeWithIntDependencyRegisteredAsConditional_InjectsIntDependency()
+        {
+            // Arrange
+            int expectedValue = 13;
+
+            var container = ContainerFactory.New();
+
+            container.Options.DependencyInjectionBehavior =
+                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
+
+            // Type to resolve is explicitly registered
+            container.Register<ServiceDependingOn<int>>();
+
+            RegisterConditionalConstant(container, expectedValue, c => true);
+
+            // Act
+            var service = container.GetInstance<ServiceDependingOn<int>>();
+
+            // Assert
+            Assert.AreEqual(expectedValue, service.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingUnregisteredTypeWithIntDependencyRegisteredAsConditional_InjectsIntDependency()
+        {
+            // Arrange
+            int expectedValue = 13;
+
+            var container = ContainerFactory.New();
+
+            container.Options.DependencyInjectionBehavior =
+                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
+
+            RegisterConditionalConstant(container, expectedValue, c => true);
+
+            // Act
+            var service = container.GetInstance<ServiceDependingOn<int>>();
+
+            // Assert
+            Assert.AreEqual(expectedValue, service.Dependency);
+        }
+
+        private static void RegisterConditionalConstant<T>(Container container, T constant,
+            Predicate<PredicateContext> predicate)
+        {
+            container.RegisterConditional(typeof(T),
+                Lifestyle.Singleton.CreateRegistration(typeof(T), () => constant, container),
+                predicate);
+        }
+
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
             public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) => true;
+        }
+
+        private sealed class VerficationlessInjectionBehavior : IDependencyInjectionBehavior
+        {
+            private readonly IDependencyInjectionBehavior real;
+
+            public VerficationlessInjectionBehavior(IDependencyInjectionBehavior real)
+            {
+                this.real = real;
+            }
+
+            public Expression BuildExpression(InjectionConsumerInfo c) => this.real.BuildExpression(c);
+
+            public void Verify(InjectionConsumerInfo consumer)
+            {
+                // Suppress verification.
+            }
         }
     }
 }
