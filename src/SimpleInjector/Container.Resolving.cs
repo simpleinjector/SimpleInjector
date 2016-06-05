@@ -327,7 +327,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType, 
             bool autoCreateConcreteTypes = true)
         {
-            Func<InstanceProducer> tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes
+            var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.Info().IsAbstract
                 ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
                 : (Func<InstanceProducer>)(() => null);
 
@@ -591,21 +591,22 @@ namespace SimpleInjector
             return null;
         }
 
-        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type concreteType)
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type)
         {
-            if (!concreteType.Info().IsValueType && !concreteType.Info().ContainsGenericParameters &&
-                this.IsConcreteConstructableType(concreteType))
-            {
-                return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(concreteType, () =>
-                {
-                    var registration =
-                        this.SelectionBasedLifestyle.CreateRegistration(concreteType, concreteType, this);
+            var info = type.Info();
 
-                    return BuildInstanceProducerForConcreteUnregisteredType(concreteType, registration);
-                });
+            if (info.IsAbstract || info.IsValueType || info.ContainsGenericParameters || 
+                !this.IsConcreteConstructableType(type))
+            {
+                return null;
             }
 
-            return null;
+            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, () =>
+            {
+                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, type, this);
+
+                return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
+            });
         }
 
         private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(Type concreteType,
