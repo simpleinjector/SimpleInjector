@@ -43,6 +43,7 @@ namespace SimpleInjector
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
 
 #if DNXCORE50
+        [DebuggerStepThrough]
         internal static TypeInfo Info(this Type type) => IntrospectionExtensions.GetTypeInfo(type);
 #else
 #if NET45
