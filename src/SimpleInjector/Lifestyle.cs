@@ -398,11 +398,10 @@ namespace SimpleInjector
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
         /// <paramref name="container"/> are null references (Nothing in VB).</exception>
-        public InstanceProducer CreateProducer<TService>(Func<TService> instanceCreator,
-            Container container)
-            where TService : class
+        public InstanceProducer<TService> CreateProducer<TService>(Func<TService> instanceCreator,
+            Container container) where TService : class
         {
-            return new InstanceProducer<TService>(this.CreateRegistration<TService>(instanceCreator, container));
+            return new InstanceProducer<TService>(this.CreateRegistration(instanceCreator, container));
         }
 
         /// <summary>
