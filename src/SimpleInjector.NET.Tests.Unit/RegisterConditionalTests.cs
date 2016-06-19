@@ -1459,50 +1459,7 @@
             // Assert
             Assert.AreEqual(expectedValue, service.Dependency);
         }
-
-        [TestMethod]
-        public void GetInstance_ResolvingRegisteredTypeWithIntDependencyRegisteredAsConditional_InjectsIntDependency()
-        {
-            // Arrange
-            int expectedValue = 13;
-
-            var container = ContainerFactory.New();
-
-            container.Options.DependencyInjectionBehavior =
-                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
-
-            // Type to resolve is explicitly registered
-            container.Register<ServiceDependingOn<int>>();
-
-            RegisterConditionalConstant(container, expectedValue, c => true);
-
-            // Act
-            var service = container.GetInstance<ServiceDependingOn<int>>();
-
-            // Assert
-            Assert.AreEqual(expectedValue, service.Dependency);
-        }
-
-        [TestMethod]
-        public void GetInstance_ResolvingUnregisteredTypeWithIntDependencyRegisteredAsConditional_InjectsIntDependency()
-        {
-            // Arrange
-            int expectedValue = 13;
-
-            var container = ContainerFactory.New();
-
-            container.Options.DependencyInjectionBehavior =
-                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
-
-            RegisterConditionalConstant(container, expectedValue, c => true);
-
-            // Act
-            var service = container.GetInstance<ServiceDependingOn<int>>();
-
-            // Assert
-            Assert.AreEqual(expectedValue, service.Dependency);
-        }
-
+        
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {
