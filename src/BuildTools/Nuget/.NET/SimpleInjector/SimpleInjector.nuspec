@@ -16,18 +16,21 @@
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC silverlight mono wp8 pcl</tags>
     <dependencies>
-      <group targetFramework=".NETStandard1.5">
-        <dependency id="System.ComponentModel" version="4.0.1-rc2-24027" />
-        <dependency id="System.Diagnostics.Debug" version="4.0.11-rc2-24027" />
-        <dependency id="System.Diagnostics.Tools" version="4.0.1-rc2-24027" />
-        <dependency id="System.Globalization" version="4.0.11-rc2-24027" />
-        <dependency id="System.Linq" version="4.1.0-rc2-24027" />
-        <dependency id="System.Linq.Expressions" version="4.0.11-rc2-24027" />
-        <dependency id="System.Reflection" version="4.1.0-rc2-24027" />
-        <dependency id="System.Reflection.Extensions" version="4.0.1-rc2-24027" />
-        <dependency id="System.Runtime" version="4.1.0-rc2-24027" />
-        <dependency id="System.Runtime.Extensions" version="4.1.0-rc2-24027" />
-        <dependency id="System.Threading" version="4.0.11-rc2-24027" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETFramework4.0" />
+      <group targetFramework=".NETPortable4.5-Profile136" />
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="System.ComponentModel" version="4.0.1" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11" />
+        <dependency id="System.Diagnostics.Tools" version="4.0.1" />
+        <dependency id="System.Globalization" version="4.0.11" />
+        <dependency id="System.Linq" version="4.1.0" />
+        <dependency id="System.Linq.Expressions" version="4.1.0" />
+        <dependency id="System.Reflection" version="4.1.0" />
+        <dependency id="System.Reflection.Extensions" version="4.0.1" />
+        <dependency id="System.Runtime" version="4.1.0" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0" />
+        <dependency id="System.Threading" version="4.0.11" />
       </group>
     </dependencies>
   </metadata>

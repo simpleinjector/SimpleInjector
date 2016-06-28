@@ -1,21 +1,22 @@
 {
-  "version": "3.1.5.0 ",
+  "version": "3.2.0.0 ",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true,
     "define": [ "DNXCORE50", "PCL" ]
   },
   "supports": {
-    "net46.app": { },
-    "uwp.10.0.app": { },
-    "dnxcore50.app": { }
+    "net46.app": {},
+    "uwp.10.0.app": {},
+    "dnxcore50.app": {}
   },
+
   "dependencies": {
     "NuSpec.ReferenceGenerator": "1.4.2",
-    "SimpleInjector": "3.1.5"
+    "SimpleInjector": "3.2"
   },
   "frameworks": {
-    "netstandard1.5": {
+    "netstandard1.6": {
       "imports": "portable-net452+win81"
     }
   }

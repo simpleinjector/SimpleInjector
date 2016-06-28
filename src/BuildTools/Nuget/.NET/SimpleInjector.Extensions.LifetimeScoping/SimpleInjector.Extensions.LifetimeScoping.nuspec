@@ -11,13 +11,13 @@
       <group targetFramework=".NETFramework4.0">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
-      <group targetFramework="WindowsPhone8.0">
+      <group targetFramework=".NETFramework4.5">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
-      <group targetFramework="Windows8.0">
+      <group targetFramework=".NETPortable4.0-Profile136">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
-      <group targetFramework=".NETStandard1.5">
+      <group targetFramework=".NETStandard1.6">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
     </dependencies>
