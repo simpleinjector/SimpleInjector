@@ -1,0 +1,36 @@
+﻿{
+  "version": "3.2.1",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk",
+    "xmlDoc": true
+  },
+  "title": "Simple Injector ASP.NET Core Integration",
+  "description": "Integration library for ASP.NET Core for Simple Injector.",
+  "authors": [ "Simple Injector Contributors" ],
+  "language": "en-US",
+  "packOptions": {
+    "owners": [ "Simple Injector Contributors" ],
+    "tags": [ "simpleinjector", "dependency-injection", "DI", "ASP.NET", "ASP.NET Core", "asp.net-core" ],
+    "projectUrl": "https://simpleinjector.org/aspnetcore",
+    "licenseUrl": "https://simpleinjector.org/license",
+    "iconUrl": "https://simpleinjector.org/simpleinjector.ico",
+    "requireLicenseAcceptance": false
+  },
+  "frameworks": {
+    "net451": {
+    },
+    "netstandard1.6": {
+    }
+  },
+  "dependencies": {
+    "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
+    "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
+    "SimpleInjector": "3.2.0",
+    "SimpleInjector.Extensions.ExecutionContextScoping": "3.2.0"
+  },
+  "scripts": {
+    "postcompile": [
+      "dotnet pack --no-build --configuration %compile:Configuration%"
+    ]
+  }
+}

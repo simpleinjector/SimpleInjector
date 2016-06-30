@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNet
+namespace SimpleInjector.Integration.AspNetCore
 {
     using System;
     using SimpleInjector.Extensions.ExecutionContextScoping;
@@ -29,7 +29,7 @@ namespace SimpleInjector.Integration.AspNet
     /// Defines a lifestyle that caches instances during the execution of a single ASP.NET Request.
     /// Unless explicitly stated otherwise, instances created by this lifestyle will be disposed at the end
     /// of the request. Do note that this lifestyle requires the 
-    /// <see cref="SimpleInjectorAspNetIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping">UseSimpleInjectorAspNetRequestScoping.</see>
+    /// <see cref="SimpleInjectorAspNetCoreIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping">UseSimpleInjectorAspNetRequestScoping.</see>
     /// to be registered in the Web API configuration.
     /// </summary>
     /// <example>
@@ -47,8 +47,7 @@ namespace SimpleInjector.Integration.AspNet
         /// The created and cached instance will be disposed when the Web API request ends, and when the 
         /// created object implements <see cref="IDisposable"/>.
         /// </summary>
-        public AspNetRequestLifestyle()
-            : this(disposeInstanceWhenScopeEnds: true)
+        public AspNetRequestLifestyle() : this(disposeInstanceWhenScopeEnds: true)
         {
         }
 

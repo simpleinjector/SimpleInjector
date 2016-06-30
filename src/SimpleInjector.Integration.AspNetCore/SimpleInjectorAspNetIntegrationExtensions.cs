@@ -20,11 +20,9 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNet
+namespace SimpleInjector
 {
-    using Diagnostics;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>
@@ -49,31 +47,6 @@ namespace SimpleInjector.Integration.AspNet
                     await next();
                 }
             });
-        }
-
-        /// <summary>
-        /// Cross-wires a registration made in the ASP.NET configuration into Simple Injector with the
-        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle, to allow that instance to be injected 
-        /// into application components.
-        /// </summary>
-        /// <typeparam name="TService">The type of the ASP.NET abstraction to cross-wire.</typeparam>
-        /// <param name="container">The container to cross-wire that registration in.</param>
-        /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
-        /// framework components.</param>
-        public static void CrossWire<TService>(this Container container, IApplicationBuilder applicationBuilder)
-            where TService : class
-        {
-            // Always use the transient lifestyle, because we have no clue what the lifestyle in ASP.NET is,
-            // and scoped and singleton lifestyles will dispose instances, while ASP.NET controls them.
-            var registration = Lifestyle.Transient.CreateRegistration(
-                applicationBuilder.ApplicationServices.GetRequiredService<TService>,
-                container);
-
-            // Prevent Simple Injector from throwing exceptions when the service type is disposable (yuck!).
-            // Implementing IDisposable on abstractions is a serious design flaw, but ASP.NET does it anyway :-(
-            registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "Owned by ASP.NET");
-
-            container.AddRegistration(typeof(TService), registration);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="applicationBuilder">The ASP.NET object that holds the 
-        /// <see cref="IControllerTypeProvider"/> that allows retrieving the application's controller types.
+        /// <see cref="IViewComponentDescriptorProvider"/> that allows retrieving the application's controller types.
         /// </param>
         public static void RegisterMvcViewComponents(this Container container,
             IApplicationBuilder applicationBuilder)

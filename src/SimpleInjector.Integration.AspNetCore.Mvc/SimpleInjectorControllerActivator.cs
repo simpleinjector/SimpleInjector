@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2016 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -20,40 +20,38 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNet
+namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
-    using Microsoft.AspNetCore.Mvc.ViewComponents;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
 
-    /// <summary>
-    /// View component activator for Simple Injector.
-    /// </summary>
-    public sealed class SimpleInjectorViewComponentActivator : IViewComponentActivator
+    /// <summary>Controller activator for Simple Injector.</summary>
+    public sealed class SimpleInjectorControllerActivator : IControllerActivator
     {
         private readonly Container container;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleInjectorViewComponentActivator"/> class.
+        /// Initializes a new instance of the <see cref="SimpleInjectorControllerActivator"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
-        public SimpleInjectorViewComponentActivator(Container container)
+        public SimpleInjectorControllerActivator(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
             this.container = container;
         }
 
-        /// <summary>Creates a view component.</summary>
-        /// <param name="context"></param>
-        /// <returns>A view component instance.</returns>
-        public object Create(ViewComponentContext context) =>
-            this.container.GetInstance(context.ViewComponentDescriptor.TypeInfo.AsType());
+        /// <summary>Creates a controller.</summary>
+        /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
+        /// <returns>A new controller instance.</returns>
+        public object Create(ControllerContext context) =>
+            this.container.GetInstance(context.ActionDescriptor.ControllerTypeInfo.AsType());
 
-        /// <summary>Releases the view component.</summary>
-        /// <param name="context">The <see cref="ViewComponentContext"/> associated with the viewComponent.</param>
-        /// <param name="viewComponent">The view component to release.</param>
-        public void Release(ViewComponentContext context, object viewComponent)
+        /// <summary>Releases the controller.</summary>
+        /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
+        /// <param name="controller">The controller instance.</param>
+        public void Release(ControllerContext context, object controller)
         {
-            // No-op.
         }
     }
 }
