@@ -59,7 +59,7 @@ namespace SimpleInjector
     {
         /// <summary>
         /// The lifestyle instance that doesn't cache instances. A new instance of the specified
-        /// component is created every time the registered service it is requested or injected.
+        /// component is created every time the registered service is requested or injected.
         /// </summary>
         /// <example>
         /// The following example registers the <c>SomeServiceImpl</c> implementation for the
