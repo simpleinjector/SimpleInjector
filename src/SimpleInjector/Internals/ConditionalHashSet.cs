@@ -24,80 +24,79 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
 
     internal sealed class ConditionalHashSet<T> where T : class
     {
-        private readonly object locker = new object();
-        private readonly List<WeakReference> weakList = new List<WeakReference>();
-        private readonly ConditionalWeakTable<T, WeakReference> weakDictionary =
-            new ConditionalWeakTable<T, WeakReference>();
+        private readonly List<WeakReference> list = new List<WeakReference>();
 
-        public T[] Keys
+        public IEnumerable<T> Keys
         {
             get
             {
-                lock (this.locker)
+                lock (this.list)
                 {
-                    return (
-                        from weakReference in this.weakList
-                        let item = (T)weakReference.Target
-                        where item != null
-                        select item)
-                        .ToArray();
+                    var keys = new HashSet<T>(ReferenceEqualityComparer<T>.Instance);
+
+                    foreach (var weakReference in this.list)
+                    {
+                        var item = (T)weakReference.Target;
+
+                        if (!object.ReferenceEquals(null, item))
+                        {
+                            keys.Add(item);
+                        }
+                    }
+
+                    return keys;
                 }
             }
         }
 
+        // Add is O(1)
         public void Add(T item)
         {
             Requires.IsNotNull(item, nameof(item));
 
-            lock (this.locker)
+            lock (this.list)
             {
-                var reference = new WeakReference(item);
-
-                this.weakDictionary.Add(item, reference);
-
-                this.weakList.Add(reference);
-
-                this.Shrink();
+                // NOTE: item can exist multiple times in the list
+                this.list.Add(new WeakReference(item));
             }
         }
 
+        // Remove is O(n^2)
         public void Remove(T item)
         {
             Requires.IsNotNull(item, nameof(item));
 
-            lock (this.locker)
+            lock (this.list)
             {
-                WeakReference reference;
+                RemoveItem(item);
+                Shrink();
+            }
+        }
 
-                if (this.weakDictionary.TryGetValue(item, out reference))
+        private void RemoveItem(T item)
+        {
+            // Always loop the complete list: item can exist multiple times.
+            for (int index = this.list.Count - 1; index >= 0; index--)
+            {
+                if (object.ReferenceEquals(item, this.list[index].Target))
                 {
-                    reference.Target = null;
-
-                    this.weakDictionary.Remove(item);
+                    this.list.RemoveAt(index);
                 }
             }
         }
 
         private void Shrink()
         {
-            if (this.weakList.Capacity == this.weakList.Count)
+            for (int index = this.list.Count - 1; index >= 0; index--)
             {
-                this.RemoveAll(weak => !weak.IsAlive);
+                if (!this.list[index].IsAlive)
+                {
+                    this.list.RemoveAt(index);
+                }
             }
-        }
-
-        private void RemoveAll(Predicate<WeakReference> match)
-        {
-            var items = this.weakList.Where(item => !match(item)).ToArray();
-
-            this.weakList.Clear();
-
-            this.weakList.AddRange(items);
         }
     }
 }
