@@ -3,6 +3,7 @@ os: Visual Studio 2015
 before_build:
 - cd src
 - nuget restore SimpleInjector.sln
+- nuget restore SimpleInjector.Integration.AspNetCore.sln
 skip_tags: true
 configuration: Debug
 assembly_info:
