@@ -329,7 +329,7 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} is an open generic type. This type cannot be used for registration " +
                 "using this method.",
-                type.TypeName(),);
+                type.TypeName());
 
         internal static string SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
