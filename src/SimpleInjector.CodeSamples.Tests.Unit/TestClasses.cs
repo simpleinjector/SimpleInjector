@@ -66,6 +66,39 @@
         }
     }
 
+    public class LoggingValidator<T> : IValidator<T>
+    {
+        private readonly ILogger logger;
+        public LoggingValidator(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
+        public void Validate(T instance)
+        {
+            this.logger.Log("Validating ");
+        }
+    }
+
+    public class LoggingValidatorDecorator<T> : IValidator<T>
+    {
+        private readonly ILogger logger;
+        private readonly IValidator<T> decoratee;
+
+        public LoggingValidatorDecorator(ILogger logger, IValidator<T> decoratee)
+        {
+            this.logger = logger;
+            this.decoratee = decoratee;
+        }
+
+        public void Validate(T instance)
+        {
+            this.logger.Log("Decorating ");
+            this.decoratee.Validate(instance);
+            this.logger.Log("Decorated ");
+        }
+    }
+
     public sealed class ListLogger : List<string>, ILogger
     {
         public void Log(string message)

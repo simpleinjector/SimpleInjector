@@ -1,6 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
+    using System.Linq;
+    using Extensions.LifetimeScoping;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
@@ -39,6 +41,84 @@
 
             // Assert
             Assert.AreEqual("Start Executing Done", logger.Message);
+        }
+
+        [TestMethod]
+        public void Intercept_Collection_InterceptsTheInstances()
+        {
+            var logger = new FakeLogger();
+
+            var container = new Container();
+
+            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterCollection<ICommand>(new[] { typeof(ConcreteCommand) , typeof(ConcreteCommand) });
+
+            container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
+
+            container.RegisterInitializer<InterceptorThatLogsBeforeAndAfter>(i => i.BeforeText = "Log ");
+
+            // Act
+            var commands = container.GetAllInstances<ICommand>().ToList();
+
+            commands.ForEach(Execute);
+
+            // Assert
+            Assert.AreEqual("Log Log ", logger.Message);
+        }
+
+        [TestMethod]
+        public void Intercept_CollectionWithRegistrationInstances_InterceptsTheInstances()
+        {
+            var logger = new FakeLogger();
+
+            var container = new Container();
+
+            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterCollection<ICommand>(new[] 
+            {
+                Lifestyle.Transient.CreateRegistration(typeof(ICommand), typeof(ConcreteCommand), container),
+                Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
+            });
+
+            container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
+
+            container.RegisterInitializer<InterceptorThatLogsBeforeAndAfter>(i => i.BeforeText = "Log ");
+
+            // Act
+            var commands = container.GetAllInstances<ICommand>().ToList();
+
+            commands.ForEach(Execute);
+
+            // Assert
+            Assert.AreEqual("Log Log ", logger.Message);
+        }
+
+        [TestMethod]
+        public void Intercept_DecoratedGenericRegistrations_WorksLikeACharm()
+        {
+            // Arrange
+            var logger = new FakeLogger();
+
+            var container = new Container();
+
+            container.RegisterSingleton<ILogger>(logger);
+            container.Register<ICommand, CommandThatLogsOnExecute>();
+
+            container.Register(typeof(IValidator<>), typeof(LoggingValidator<>));
+
+            container.RegisterDecorator(typeof(IValidator<>), typeof(LoggingValidatorDecorator<>));
+
+            container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(
+                t => t.IsInterface && t.Name.StartsWith("IValidator"));
+
+            container.RegisterInitializer<InterceptorThatLogsBeforeAndAfter>(i => i.BeforeText = "Inercepting ");
+            container.RegisterInitializer<InterceptorThatLogsBeforeAndAfter>(i => i.AfterText = "Intercepted ");
+
+            // Act
+            container.GetInstance<IValidator<RealCommand>>().Validate(new RealCommand());
+
+            // Assert
+            Assert.AreEqual("Inercepting Decorating Validating Decorated Intercepted ", logger.Message);
         }
 
         [TestMethod]
@@ -605,6 +685,8 @@
             // Assert
             Assert.AreEqual(expectedOutValue, actualOutValue);
         }
+
+        private static void Execute(ICommand command) => command.Execute();
 
         // Example interceptor
         private class InterceptorThatLogsBeforeAndAfter : IInterceptor
