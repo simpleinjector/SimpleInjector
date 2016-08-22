@@ -112,7 +112,7 @@ namespace SimpleInjector.Internals
             // Performance optimization: In case the user registers a very large set with mainly non-generic
             // types, we see a considerable performance improvement by adding this simple check.
             if (this.openGenericImplementation.Info().IsGenericType ||
-                this.closedGenericBaseType.Info().IsAssignableFrom(this.openGenericImplementation))
+                this.closedGenericBaseType.Info().IsAssignableFrom(this.openGenericImplementation.Info()))
             {
                 var serviceType = this.FindMatchingOpenGenericServiceType();
 
@@ -123,7 +123,7 @@ namespace SimpleInjector.Internals
 
                     // closedGenericImplementation will be null when there was a mismatch on type constraints.
                     if (closedGenericImplementation != null &&
-                        this.closedGenericBaseType.Info().IsAssignableFrom(closedGenericImplementation))
+                        this.closedGenericBaseType.Info().IsAssignableFrom(closedGenericImplementation.Info()))
                     {
                         return BuildResult.Valid(closedGenericImplementation);
                     }

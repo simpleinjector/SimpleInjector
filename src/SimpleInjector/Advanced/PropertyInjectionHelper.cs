@@ -69,7 +69,7 @@ namespace SimpleInjector.Advanced
         }
 
         internal static Expression BuildPropertyInjectionExpression(Container container,
-            Type serviceType, Type implementationType, PropertyInfo[] properties, 
+            Type serviceType, Type implementationType, PropertyInfo[] properties,
             Expression expressionToWrap)
         {
             var helper = new PropertyInjectionHelper(container, serviceType, implementationType);
@@ -79,11 +79,7 @@ namespace SimpleInjector.Advanced
 
         internal static PropertyInfo[] GetCandidateInjectionPropertiesFor(Type implementationType)
         {
-            var all = BindingFlags.FlattenHierarchy |
-                BindingFlags.Instance | BindingFlags.Static |
-                BindingFlags.NonPublic | BindingFlags.Public;
-
-            return implementationType.Info().GetProperties(all);
+            return implementationType.GetRuntimeProperties().ToArray();
         }
 
         internal static void VerifyProperties(PropertyInfo[] properties)

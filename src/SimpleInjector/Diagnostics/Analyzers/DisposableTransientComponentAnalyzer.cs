@@ -58,7 +58,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from producer in producers
                 let registration = producer.Registration
                 where registration.Lifestyle == Lifestyle.Transient
-                where typeof(IDisposable).Info().IsAssignableFrom(registration.ImplementationType)
+                where typeof(IDisposable).Info().IsAssignableFrom(registration.ImplementationType.Info())
                 where registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 select producer;
 

@@ -83,7 +83,7 @@ namespace SimpleInjector.Internals
         {
             var producers =
                 from registrationGroup in this.RegistrationGroups
-                where closedServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType)
+                where closedServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType.Info())
                 select registrationGroup.UncontrolledProducer;
 
             return producers.ToArray();

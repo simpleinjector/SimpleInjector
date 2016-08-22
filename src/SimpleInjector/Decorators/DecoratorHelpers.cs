@@ -36,9 +36,12 @@ namespace SimpleInjector.Decorators
     internal static partial class DecoratorHelpers
     {
         private static readonly MethodInfo EnumerableSelectMethod =
-            GetGenericMethod(() => Enumerable.Select<int, int>(null, (Func<int, int>)null));
+            Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null, (Func<int, int>)null));
 
-        // This method name does not describe what it does, but since the C# compiler will create a iterator
+        private static readonly MethodInfo DecoratorHelpersReadOnlyCollectionMethod =
+            Helpers.GetGenericMethodDefinition(() => ReadOnlyCollection<int>(null));
+
+        // This method name does not describe what it does, but since the C# compiler will create an iterator
         // type named after this method, it allows us to return a type that has a nice name that will show up
         // during debugging.
         public static IEnumerable<T> ReadOnlyCollection<T>(T[] collection)
@@ -51,7 +54,8 @@ namespace SimpleInjector.Decorators
 
         internal static IEnumerable MakeReadOnly(Type elementType, Array collection)
         {
-            var readOnlyCollection = typeof(DecoratorHelpers).Info().GetMethod("ReadOnlyCollection")
+            var readOnlyCollection =
+                DecoratorHelpersReadOnlyCollectionMethod
                 .MakeGenericMethod(elementType)
                 .Invoke(null, new object[] { collection });
 
@@ -72,13 +76,6 @@ namespace SimpleInjector.Decorators
             }
 
             return registeredProducer.Registration.ImplementationType;
-        }
-
-        internal static MethodInfo GetGenericMethod(Expression<Action> methodCall)
-        {
-            var body = methodCall.Body as MethodCallExpression;
-
-            return body.Method.GetGenericMethodDefinition();
         }
 
         internal static void AddRange<T>(this Collection<T> collection, IEnumerable<T> range)

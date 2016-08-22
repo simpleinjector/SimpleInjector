@@ -371,7 +371,10 @@ namespace SimpleInjector
 
                 this.scopeEndActions = null;
 
-                actions.ForEach(action => action.Invoke());
+                foreach (var action in actions)
+                {
+                    action.Invoke();
+                }
             }
         }
 

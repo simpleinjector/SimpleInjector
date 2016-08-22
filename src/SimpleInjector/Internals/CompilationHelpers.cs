@@ -168,9 +168,12 @@ namespace SimpleInjector.Internals
                         .Concat(new[] { optimizedExpression })));
         }
 
+        private static readonly ConstructorInfo LazyScopeConstructor =
+            Helpers.GetConstructor(() => new LazyScope(null, null));
+
         private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container) =>
             Expression.New(
-                typeof(LazyScope).Info().GetConstructor(new[] { typeof(Func<Scope>), typeof(Container) }),
+                LazyScopeConstructor,
                 Expression.Constant(scopeFactory, typeof(Func<Scope>)),
                 Expression.Constant(container, typeof(Container)));
 

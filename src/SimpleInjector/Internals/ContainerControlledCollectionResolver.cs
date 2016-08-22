@@ -88,7 +88,7 @@ namespace SimpleInjector.Internals
         private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType) => 
             from registrationGroup in this.RegistrationGroups
             where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
-                closedGenericServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType)
+                closedGenericServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType.Info())
             from item in registrationGroup.ControlledItems
             select item;
     }

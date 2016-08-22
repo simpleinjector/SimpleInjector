@@ -7,11 +7,12 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.0": {
       "buildOptions": {
         "defines": [ "PCL", "DNXCORE50" ]
       },
       "dependencies": {
+        "NETStandard.Library": "1.6.0",
         "System.ComponentModel": "4.0.1",
         "System.Diagnostics.Debug": "4.0.11",
         "System.Diagnostics.Tools": "4.0.1",

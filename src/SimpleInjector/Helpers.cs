@@ -182,7 +182,7 @@ namespace SimpleInjector
         // pretty useless.
         internal static bool IsConcreteType(Type serviceType) => 
             !serviceType.Info().IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
-            !typeof(Delegate).Info().IsAssignableFrom(serviceType);
+            !typeof(Delegate).Info().IsAssignableFrom(serviceType.Info());
 
         // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
         internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) => 
@@ -202,7 +202,7 @@ namespace SimpleInjector
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 
             return
-#if NET45
+#if NET45 || DNXCORE50
                 serviceTypeDefinition == typeof(IReadOnlyList<>) ||
                 serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
 #endif
@@ -250,7 +250,7 @@ namespace SimpleInjector
         {
             Type actionArgumentType = action.GetType().Info().GetGenericArguments()[0];
 
-            if (actionArgumentType.Info().IsAssignableFrom(typeof(T)))
+            if (actionArgumentType.Info().IsAssignableFrom(typeof(T).Info()))
             {
                 // In most cases, the given T is a concrete type such as ServiceImpl, and supplied action
                 // object can be everything from Action<ServiceImpl>, to Action<IService>, to Action<object>.
@@ -290,7 +290,7 @@ namespace SimpleInjector
         {
             if (!service.Info().IsGenericType)
             {
-                return service.Info().IsAssignableFrom(implementation);
+                return service.Info().IsAssignableFrom(implementation.Info());
             }
 
             if (implementation.Info().IsGenericType && implementation.GetGenericTypeDefinition() == service)
@@ -352,7 +352,7 @@ namespace SimpleInjector
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
                 where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
-                    includeVariantTypes && closedGenericServiceType.Info().IsAssignableFrom(openGenericImplementation))
+                    includeVariantTypes && closedGenericServiceType.Info().IsAssignableFrom(openGenericImplementation.Info()))
                 let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
                     ? result.ClosedGenericImplementation
                     : openGenericImplementation
@@ -374,6 +374,15 @@ namespace SimpleInjector
 
             return Tuple.Create(trueList.ToArray(), falseList.ToArray());
         }
+
+        internal static MethodInfo GetMethod(Expression<Action> methodCall) => 
+            ((MethodCallExpression)methodCall.Body).Method;
+
+        internal static MethodInfo GetGenericMethodDefinition(Expression<Action> methodCall) => 
+            GetMethod(methodCall).GetGenericMethodDefinition();
+
+        internal static ConstructorInfo GetConstructor<T>(Expression<Func<T>> constructorCall) =>
+            ((NewExpression)constructorCall.Body).Constructor;
 
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
@@ -401,7 +410,7 @@ namespace SimpleInjector
             type.Info().IsGenericType 
             && otherType.Info().IsGenericType 
             && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() 
-            && type.Info().IsAssignableFrom(otherType);
+            && type.Info().IsAssignableFrom(otherType.Info());
 
         private static string ToFriendlyName(this Type type, bool fullyQualifiedName, 
             Func<Type[], string> argumentsFormatter)
