@@ -6,7 +6,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -15,7 +15,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -24,7 +24,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -382,7 +382,7 @@
           "lib/portable-net45+win8+wp8+wpa81/_._": {}
         }
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.6",
         "dependencies": {
@@ -410,7 +410,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -419,7 +419,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -428,7 +428,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -437,7 +437,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -446,7 +446,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -455,7 +455,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -464,7 +464,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -473,7 +473,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -482,7 +482,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -491,7 +491,7 @@
       "NuSpec.ReferenceGenerator/1.4.2": {
         "type": "package"
       },
-      "SimpleInjector/3.2.0-beta2": {
+      "SimpleInjector/3.2.0": {
         "type": "project",
         "framework": "Unsupported,Version=v0.0"
       }
@@ -1904,7 +1904,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "SimpleInjector/3.2.0-beta2": {
+    "SimpleInjector/3.2.0": {
       "type": "project",
       "path": "../SimpleInjector/project.json",
       "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
