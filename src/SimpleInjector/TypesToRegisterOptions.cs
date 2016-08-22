@@ -57,12 +57,21 @@ namespace SimpleInjector
         /// <value>A boolean.</value>
         public bool IncludeDecorators { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether generic type definitions (types that have
-        /// <see cref="System.Type.IsGenericTypeDefinition">Type.IsGenericTypeDefinition</see> set to true) 
+#if DNXCORE50
+        /// <see cref="TypeInfo.IsGenericTypeDefinition">Type.IsGenericTypeDefinition</see>
+        /// set to true) 
         /// should be included in the result. The default value for this property is <b>false</b>.
         /// </summary>
         /// <value>A boolean.</value>
+#else
+        /// <summary>
+        /// Gets or sets a value indicating whether generic type definitions (types that have
+        /// <see cref="System.Type.IsGenericTypeDefinition">Type.IsGenericTypeDefinition</see>
+        /// set to true) 
+        /// should be included in the result. The default value for this property is <b>false</b>.
+        /// </summary>
+        /// <value>A boolean.</value>
+#endif
         public bool IncludeGenericTypeDefinitions { get; set; }
 
         /// <summary>

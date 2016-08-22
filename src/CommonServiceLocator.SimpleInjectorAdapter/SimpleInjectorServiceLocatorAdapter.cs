@@ -25,6 +25,7 @@ namespace CommonServiceLocator.SimpleInjectorAdapter
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.Practices.ServiceLocation;
     using SimpleInjector;
 
     /// <summary>
