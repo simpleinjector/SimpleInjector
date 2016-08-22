@@ -84,7 +84,7 @@ namespace SimpleInjector
             new Dictionary<Type, CollectionResolver>();
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
-        private readonly ConditionalHashSet<InstanceProducer> externalProducers =
+        private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
             new ConditionalHashSet<InstanceProducer>();
 
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
@@ -300,7 +300,7 @@ namespace SimpleInjector
 
             if (includeExternalProducers)
             {
-                producers = producers.Concat(this.externalProducers.Keys);
+                producers = producers.Concat(this.externalProducers.GetLivingItems());
             }
 
             // Filter out the invalid registrations (see the IsValid property for more information).

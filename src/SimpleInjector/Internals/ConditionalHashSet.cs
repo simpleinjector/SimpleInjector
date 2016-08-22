@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,79 +25,109 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.CompilerServices;
 
     internal sealed class ConditionalHashSet<T> where T : class
     {
-        private readonly object locker = new object();
-        private readonly List<WeakReference> weakList = new List<WeakReference>();
-        private readonly ConditionalWeakTable<T, WeakReference> weakDictionary =
-            new ConditionalWeakTable<T, WeakReference>();
+        private const int ShrinkStepCount = 100;
 
-        public T[] Keys
+        private static readonly Predicate<WeakReference> IsDead = reference => !reference.IsAlive;
+
+        private readonly Dictionary<int, List<WeakReference>> dictionary = 
+            new Dictionary<int, List<WeakReference>>();
+
+        private int shrinkCount = 0;
+
+        internal void Add(T item)
         {
-            get
+            Requires.IsNotNull(item, nameof(item));
+
+            lock (this.dictionary)
             {
-                lock (this.locker)
+                if (this.GetWeakReferenceOrNull(item) == null)
                 {
-                    return (
-                        from weakReference in this.weakList
-                        let item = (T)weakReference.Target
-                        where item != null
-                        select item)
-                        .ToArray();
+                    var weakReference = new WeakReference(item);
+
+                    int key = weakReference.Target.GetHashCode();
+
+                    List<WeakReference> bucket;
+
+                    if (!this.dictionary.TryGetValue(key, out bucket))
+                    {
+                        this.dictionary[key] = bucket = new List<WeakReference>(capacity: 1);
+                    }
+
+                    bucket.Add(weakReference);
                 }
             }
         }
 
-        public void Add(T item)
+        internal void Remove(T item)
         {
             Requires.IsNotNull(item, nameof(item));
 
-            lock (this.locker)
+            lock (this.dictionary)
             {
-                var reference = new WeakReference(item);
+                WeakReference reference = this.GetWeakReferenceOrNull(item);
 
-                this.weakDictionary.Add(item, reference);
-
-                this.weakList.Add(reference);
-
-                this.Shrink();
-            }
-        }
-
-        public void Remove(T item)
-        {
-            Requires.IsNotNull(item, nameof(item));
-
-            lock (this.locker)
-            {
-                WeakReference reference;
-
-                if (this.weakDictionary.TryGetValue(item, out reference))
+                if (reference != null)
                 {
                     reference.Target = null;
+                }
 
-                    this.weakDictionary.Remove(item);
+                if ((++this.shrinkCount % ShrinkStepCount) == 0)
+                {
+                    this.RemoveDeadItems();
                 }
             }
         }
 
-        private void Shrink()
+        internal T[] GetLivingItems()
         {
-            if (this.weakList.Capacity == this.weakList.Count)
+            lock (this.dictionary)
             {
-                this.RemoveAll(weak => !weak.IsAlive);
+                var producers =
+                    from pair in this.dictionary
+                    from reference in pair.Value
+                    let target = reference.Target
+                    where !object.ReferenceEquals(target, null)
+                    select (T)target;
+
+                return producers.ToArray();
             }
         }
 
-        private void RemoveAll(Predicate<WeakReference> match)
+        private WeakReference GetWeakReferenceOrNull(T item)
         {
-            var items = this.weakList.Where(item => !match(item)).ToArray();
+            List<WeakReference> bucket;
 
-            this.weakList.Clear();
+            if (this.dictionary.TryGetValue(item.GetHashCode(), out bucket))
+            {
+                foreach (var reference in bucket)
+                {
+                    if (object.ReferenceEquals(item, reference.Target))
+                    {
+                        return reference;
+                    }
+                }
+            }
 
-            this.weakList.AddRange(items);
+            return null;
+        }
+
+        private void RemoveDeadItems()
+        {
+            foreach (int key in this.dictionary.Keys.ToArray())
+            {
+                var bucket = this.dictionary[key];
+
+                bucket.RemoveAll(IsDead);
+
+                // Remove empty buckets.
+                if (bucket.Count == 0)
+                {
+                    this.dictionary.Remove(key);
+                }
+            }
         }
     }
 }
