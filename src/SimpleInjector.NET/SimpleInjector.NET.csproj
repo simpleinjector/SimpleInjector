@@ -456,6 +456,7 @@
     <Compile Include="Extensions\OpenGenericBatchRegistrationExtensions.cs" />
     <Compile Include="Extensions\OpenGenericRegistrationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NetSpecific\NetReflectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

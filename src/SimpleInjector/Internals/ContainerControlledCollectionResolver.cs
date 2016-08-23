@@ -70,7 +70,7 @@ namespace SimpleInjector.Internals
             from registrationGroup in this.RegistrationGroups
             from item in registrationGroup.ControlledItems
             let implementation = item.ImplementationType
-            where !implementation.Info().ContainsGenericParameters
+            where !implementation.ContainsGenericParameters()
             from service in implementation.GetBaseTypesAndInterfacesFor(this.ServiceType)
             select service)
             .Distinct()
@@ -80,15 +80,15 @@ namespace SimpleInjector.Internals
         {
             var items = this.GetItemsFor(serviceType);
 
-            return serviceType.Info().IsGenericType
+            return serviceType.IsGenericType()
                 ? Helpers.GetClosedGenericImplementationsFor(serviceType, items)
                 : items.ToArray();
         }
 
         private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType) => 
             from registrationGroup in this.RegistrationGroups
-            where registrationGroup.ServiceType.Info().ContainsGenericParameters ||
-                closedGenericServiceType.Info().IsAssignableFrom(registrationGroup.ServiceType.Info())
+            where registrationGroup.ServiceType.ContainsGenericParameters() ||
+                closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
             from item in registrationGroup.ControlledItems
             select item;
     }

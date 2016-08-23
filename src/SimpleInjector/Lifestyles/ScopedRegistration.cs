@@ -66,7 +66,7 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator = this.BuildInstanceCreator();
             }
 
-            return Expression.Call(Expression.Constant(this), this.GetType().Info().GetMethod("GetInstance"));
+            return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
         }
 
         // This method needs to be public, because the BuildExpression methods build a

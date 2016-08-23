@@ -206,7 +206,7 @@ namespace SimpleInjector
         {
             string reason = string.Empty;
 
-            if (invalidTarget.TargetType.Info().IsValueType)
+            if (invalidTarget.TargetType.IsValueType())
             {
                 reason = " because it is a value type";
             }
@@ -343,14 +343,14 @@ namespace SimpleInjector
                 "The supplied {0} of type {1} does not {2} {3}.",
                 elementDescription,
                 elementType.TypeName(),
-                serviceType.Info().IsInterface ? "implement" : "inherit from",
+                serviceType.IsInterface() ? "implement" : "inherit from",
                 serviceType.TypeName());
 
         internal static string SuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type {0} does not {1} {2}.",
                 implementation.TypeName(),
-                service.Info().IsInterface ? "implement" : "inherit from",
+                service.IsInterface() ? "implement" : "inherit from",
                 service.TypeName());
 
         internal static string TheInitializersCouldNotBeApplied(Type type, Exception innerException) =>
@@ -613,7 +613,7 @@ namespace SimpleInjector
                 "overloads that registers container-{1} collections, while this method registers container-" +
                 "{2} collections. Mixing calls is not supported. Consider merging those calls or make both " +
                 "calls either as controlled or uncontrolled registration.",
-                (serviceType.Info().IsGenericType ? serviceType.GetGenericTypeDefinition() : serviceType).TypeName(),
+                (serviceType.IsGenericType() ? serviceType.GetGenericTypeDefinition() : serviceType).TypeName(),
                 controlled ? "uncontrolled" : "controlled",
                 controlled ? "controlled" : "uncontrolled",
                 nameof(Container.RegisterCollection));
@@ -720,9 +720,9 @@ namespace SimpleInjector
                 "({0}) the {1} {2}registration for {3} using {4}",
                 index + 1,
                 producer.IsConditional ? "conditional" : "unconditional",
-                serviceType.Info().IsGenericTypeDefinition
+                serviceType.IsGenericTypeDefinition()
                     ? "open generic "
-                    : serviceType.Info().IsGenericType ? "closed generic " : string.Empty,
+                    : serviceType.IsGenericType() ? "closed generic " : string.Empty,
                 serviceType.TypeName(),
                 implementationType.TypeName());
         }
@@ -742,7 +742,7 @@ namespace SimpleInjector
         {
             string serviceTypeName = target.TargetType.TypeName();
 
-            bool isGenericType = target.TargetType.Info().IsGenericType;
+            bool isGenericType = target.TargetType.IsGenericType();
 
             string openServiceTypeName = isGenericType
                 ? target.TargetType.GetGenericTypeDefinition().TypeName()
@@ -809,7 +809,7 @@ namespace SimpleInjector
                     " There is, however, a registration for {0}; Did you mean to call GetInstance<{0}>() " +
                     "or depend on {0}? Or did you mean to register a collection of types using " +
                     "RegisterCollection?",
-                    collectionServiceType.Info().GetGenericArguments()[0].ToFriendlyName())
+                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
         private static string DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
@@ -817,7 +817,7 @@ namespace SimpleInjector
             hasRelatedOneToOneMapping
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to depend on {0}?",
-                    collectionServiceType.Info().GetGenericArguments()[0].ToFriendlyName())
+                    collectionServiceType.GetGenericArguments()[0].ToFriendlyName())
                 : string.Empty;
 
         private static string DidYouMeanToCallGetAllInstancesInstead(bool hasCollection, Type serviceType) =>

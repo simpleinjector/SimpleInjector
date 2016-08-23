@@ -42,11 +42,11 @@ namespace SimpleInjector.Internals
         public GenericArgumentFinder(Type serviceTypeDefinition, Type serviceTypeToResolve,
             Type implementationTypeDefinition, Type partialOpenGenericImplementation)
         {
-            this.serviceTypeDefinitionArguments = serviceTypeDefinition.Info().GetGenericArguments();
-            this.serviceTypeToResolveArguments = serviceTypeToResolve.Info().GetGenericArguments();
-            this.implementationTypeDefinitionArguments = implementationTypeDefinition.Info().GetGenericArguments();
+            this.serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
+            this.serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();
+            this.implementationTypeDefinitionArguments = implementationTypeDefinition.GetGenericArguments();
             this.partialImplementationArguments =
-                (partialOpenGenericImplementation ?? implementationTypeDefinition).Info().GetGenericArguments();
+                (partialOpenGenericImplementation ?? implementationTypeDefinition).GetGenericArguments();
         }
 
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation()
@@ -147,7 +147,7 @@ namespace SimpleInjector.Internals
                 //// If the type itself is a generic parameter such as TKey (and not for instance IBar<TValue>)
                 //// We must skip it, since there is no mappings we can extract from it (while IBar<TValue> could).
                 constraints =
-                    from constraint in mapping.Argument.Info().GetGenericParameterConstraints()
+                    from constraint in mapping.Argument.GetGenericParameterConstraints()
                     where !constraint.IsGenericParameter
                     select constraint;
             }
@@ -190,8 +190,8 @@ namespace SimpleInjector.Internals
         private ArgumentMapping[] ConvertToOpenImplementationArgumentMappingsForType(
            ArgumentMapping mapping, Type type, IList<Type> processedTypes)
         {
-            var arguments = mapping.Argument.Info().GetGenericArguments();
-            var concreteTypes = type.Info().GetGenericArguments();
+            var arguments = mapping.Argument.GetGenericArguments();
+            var concreteTypes = type.GetGenericArguments();
 
             if (concreteTypes.Length != arguments.Length)
             {

@@ -51,8 +51,8 @@ namespace SimpleInjector.Internals
 
             this.openGenericImplementation = openGenericImplementation;
 
-            if (openGenericImplementation.Info().IsGenericType && 
-                !openGenericImplementation.Info().IsGenericTypeDefinition)
+            if (openGenericImplementation.IsGenericType() && 
+                !openGenericImplementation.IsGenericTypeDefinition())
             {
                 this.openGenericImplementation = openGenericImplementation.GetGenericTypeDefinition();
                 this.partialOpenGenericImplementation = openGenericImplementation;
@@ -101,7 +101,7 @@ namespace SimpleInjector.Internals
                 var partialOpenImplementation =
                     this.partialOpenGenericImplementation ?? this.openGenericImplementation;
 
-                var unmappedArguments = partialOpenImplementation.Info().GetGenericArguments().Except(typeArguments);
+                var unmappedArguments = partialOpenImplementation.GetGenericArguments().Except(typeArguments);
 
                 return unmappedArguments.All(argument => !argument.IsGenericParameter);
             });
@@ -111,8 +111,8 @@ namespace SimpleInjector.Internals
         {
             // Performance optimization: In case the user registers a very large set with mainly non-generic
             // types, we see a considerable performance improvement by adding this simple check.
-            if (this.openGenericImplementation.Info().IsGenericType ||
-                this.closedGenericBaseType.Info().IsAssignableFrom(this.openGenericImplementation.Info()))
+            if (this.openGenericImplementation.IsGenericType() ||
+                this.closedGenericBaseType.IsAssignableFrom(this.openGenericImplementation))
             {
                 var serviceType = this.FindMatchingOpenGenericServiceType();
 
@@ -123,7 +123,7 @@ namespace SimpleInjector.Internals
 
                     // closedGenericImplementation will be null when there was a mismatch on type constraints.
                     if (closedGenericImplementation != null &&
-                        this.closedGenericBaseType.Info().IsAssignableFrom(closedGenericImplementation.Info()))
+                        this.closedGenericBaseType.IsAssignableFrom(closedGenericImplementation))
                     {
                         return BuildResult.Valid(closedGenericImplementation);
                     }
@@ -147,7 +147,7 @@ namespace SimpleInjector.Internals
         private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(
             CandicateServiceType candicateServiceType)
         {
-            if (this.openGenericImplementation.Info().IsGenericType)
+            if (this.openGenericImplementation.IsGenericType())
             {
                 try
                 {
@@ -187,7 +187,7 @@ namespace SimpleInjector.Internals
 
         private CandicateServiceType ToCandicateServiceType(Type openCandidateServiceType)
         {
-            if (openCandidateServiceType.Info().IsGenericType)
+            if (openCandidateServiceType.IsGenericType())
             {
                 return new CandicateServiceType(openCandidateServiceType,
                     this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
@@ -198,7 +198,7 @@ namespace SimpleInjector.Internals
 
         private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)
         {
-            if (this.openGenericImplementation.Info().IsGenericType)
+            if (this.openGenericImplementation.IsGenericType())
             {
                 return this.SatisfiesGenericTypeConstraints(openCandidateServiceType);
             }
@@ -217,7 +217,7 @@ namespace SimpleInjector.Internals
             // type constraints don't match and the given service type does not satisfy the generic type 
             // constraints.
             return openCandidateServiceType.Arguments.Count() ==
-                this.openGenericImplementation.Info().GetGenericArguments().Length;
+                this.openGenericImplementation.GetGenericArguments().Length;
         }
 
         private bool SafisfiesPartialTypeArguments(CandicateServiceType candicateServiceType)
@@ -234,7 +234,7 @@ namespace SimpleInjector.Internals
         {
             // Map the partial open generic type arguments to the concrete arguments.
             var mappings =
-                this.partialOpenGenericImplementation.Info().GetGenericArguments()
+                this.partialOpenGenericImplementation.GetGenericArguments()
                 .Zip(arguments, ArgumentMapping.Create);
 
             return mappings.All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
@@ -249,7 +249,7 @@ namespace SimpleInjector.Internals
         }
 
         private static IEnumerable<Type> GetNestedTypeArgumentsForType(Type type) => (
-            from argument in type.Info().GetGenericArguments()
+            from argument in type.GetGenericArguments()
             from nestedArgument in GetNestedTypeArgumentsForTypeArgument(argument, new List<Type>())
             select nestedArgument)
             .Distinct()
@@ -262,20 +262,20 @@ namespace SimpleInjector.Internals
             if (argument.IsGenericParameter)
             {
                 var nestedArguments =
-                    from constraint in argument.Info().GetGenericParameterConstraints()
+                    from constraint in argument.GetGenericParameterConstraints()
                     from arg in GetNestedTypeArgumentsForTypeArgument(constraint, processedArguments)
                     select arg;
 
                 return nestedArguments.Concat(new[] { argument });
             }
 
-            if (!argument.Info().IsGenericType)
+            if (!argument.IsGenericType())
             {
                 return Enumerable.Empty<Type>();
             }
 
             return
-                from genericArgument in argument.Info().GetGenericArguments().Except(processedArguments)
+                from genericArgument in argument.GetGenericArguments().Except(processedArguments)
                 from arg in GetNestedTypeArgumentsForTypeArgument(genericArgument, processedArguments)
                 select arg;
         }

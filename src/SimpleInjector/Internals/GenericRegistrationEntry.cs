@@ -144,7 +144,7 @@ namespace SimpleInjector.Internals
                 {
                     var overlappingProvider = overlappingProviders.First();
 
-                    if (overlappingProvider.ServiceType.Info().IsGenericTypeDefinition)
+                    if (overlappingProvider.ServiceType.IsGenericTypeDefinition())
                     {
                         throw new InvalidOperationException(
                             StringResources.RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
@@ -392,7 +392,7 @@ namespace SimpleInjector.Internals
                     throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.ServiceType));
                 }
 
-                if (implementationType.Info().ContainsGenericParameters)
+                if (implementationType.ContainsGenericParameters())
                 {
                     Requires.TypeFactoryReturnedTypeThatDoesNotContainUnresolvableTypeArguments(
                         serviceType, implementationType);
@@ -464,7 +464,7 @@ namespace SimpleInjector.Internals
             // implementation. If it can't, it means that the implementionType applies to a subset.
             private bool RegistrationAppliesToAllClosedServiceTypes() => 
                 this.Predicate == null
-                && this.ImplementationType.Info().IsGenericType
+                && this.ImplementationType.IsGenericType()
                 && !this.ImplementationType.IsPartiallyClosed()
                 && this.IsImplementationApplicableToEveryGenericType();
 

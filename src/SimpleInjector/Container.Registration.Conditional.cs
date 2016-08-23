@@ -160,7 +160,7 @@ namespace SimpleInjector
             Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
 
-            if (serviceType.Info().ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters())
             {
                 this.RegisterOpenGeneric(serviceType, implementationType, lifestyle, predicate);
             }

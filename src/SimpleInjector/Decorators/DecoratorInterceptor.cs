@@ -96,7 +96,7 @@ namespace SimpleInjector.Decorators
                 return;
             }
 
-            var serviceType = e.RegisteredServiceType.Info().GetGenericArguments()[0];
+            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
 
             Type decoratorType;
 
@@ -109,7 +109,7 @@ namespace SimpleInjector.Decorators
         private void ApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e,
             Type decoratorType)
         {
-            var serviceType = e.RegisteredServiceType.Info().GetGenericArguments()[0];
+            var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
 
             var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(this.data,
                 this.singletonDecoratedCollectionsCache, e, serviceType);
@@ -174,9 +174,9 @@ namespace SimpleInjector.Decorators
         {
             Type decoratorType = this.data.DecoratorTypeFactory(context);
 
-            if (decoratorType.Info().ContainsGenericParameters)
+            if (decoratorType.ContainsGenericParameters())
             {
-                if (!requestedServiceType.Info().IsGenericType)
+                if (!requestedServiceType.IsGenericType())
                 {
                     throw new ActivationException(
                         StringResources.TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(

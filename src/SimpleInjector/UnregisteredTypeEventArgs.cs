@@ -77,7 +77,7 @@ namespace SimpleInjector
 
             this.Expression =
                 Expression.Call(
-                    typeof(UnregisteredTypeEventArgsCallHelper).Info().GetMethod("GetInstance")
+                    typeof(UnregisteredTypeEventArgsCallHelper).GetMethod("GetInstance")
                         .MakeGenericMethod(this.UnregisteredServiceType),
                     Expression.Constant(instanceCreator));
         }

@@ -75,7 +75,7 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (!this.ConcreteType.Info().IsGenericType || !this.Argument.Info().IsGenericType)
+            if (!this.ConcreteType.IsGenericType() || !this.Argument.IsGenericType())
             {
                 return false;
             }
@@ -85,8 +85,8 @@ namespace SimpleInjector.Internals
                 return false;
             }
 
-            return this.Argument.Info().GetGenericArguments()
-                .Zip(this.ConcreteType.Info().GetGenericArguments(), ArgumentMapping.Create)
+            return this.Argument.GetGenericArguments()
+                .Zip(this.ConcreteType.GetGenericArguments(), ArgumentMapping.Create)
                 .All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
         }
     }

@@ -39,6 +39,8 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
+        private static readonly MethodInfo EnumerableToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
+
         private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, Lazy<InstanceProducer>>();
 
@@ -238,7 +240,7 @@ namespace SimpleInjector
         {
             this.LockContainer();
 
-            if (serviceType.Info().ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters())
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
                     nameof(serviceType));
@@ -294,7 +296,7 @@ namespace SimpleInjector
 
         private object GetInstanceForRootType(Type serviceType)
         {
-            if (serviceType.Info().ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters())
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
                     nameof(serviceType));
@@ -327,7 +329,7 @@ namespace SimpleInjector
         private InstanceProducer BuildInstanceProducerForType(Type serviceType, 
             bool autoCreateConcreteTypes = true)
         {
-            var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.Info().IsAbstract
+            var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
                 ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
                 : (Func<InstanceProducer>)(() => null);
 
@@ -408,7 +410,7 @@ namespace SimpleInjector
                 Type elementType = serviceType.GetElementType();
 
                 // We don't auto-register collections for ambiguous types.
-                if (elementType.Info().IsValueType || Helpers.IsAmbiguousType(elementType))
+                if (elementType.IsValueType() || Helpers.IsAmbiguousType(elementType))
                 {
                     return null;
                 }
@@ -431,7 +433,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildArrayProducerFromControlledCollection(Type serviceType, Type elementType)
         {
-            var arrayMethod = typeof(Enumerable).Info().GetMethod("ToArray").MakeGenericMethod(elementType);
+            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
 
             IEnumerable<object> singletonCollection = this.GetAllInstances(elementType);
 
@@ -462,7 +464,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildArrayProducerFromUncontrolledCollection(Type serviceType, Type elementType)
         {
-            var arrayMethod = typeof(Enumerable).Info().GetMethod("ToArray").MakeGenericMethod(elementType);
+            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
 
             var enumerableProducer = this.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType));
             var enumerableExpression = enumerableProducer.BuildExpression();
@@ -487,7 +489,7 @@ namespace SimpleInjector
             }
 
             // We don't auto-register collections for ambiguous types.
-            if (Helpers.IsAmbiguousOrValueType(serviceType.Info().GetGenericArguments()[0]))
+            if (Helpers.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
             {
                 return null;
             }
@@ -516,7 +518,7 @@ namespace SimpleInjector
 
             if (serviceTypeDefinition != typeof(IEnumerable<>))
             {
-                Type elementType = collectionType.Info().GetGenericArguments()[0];
+                Type elementType = collectionType.GetGenericArguments()[0];
 
                 var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
 
@@ -563,7 +565,7 @@ namespace SimpleInjector
 
         private InstanceProducer BuildEmptyCollectionInstanceProducerForEnumerable(Type enumerableType)
         {
-            Type elementType = enumerableType.Info().GetGenericArguments()[0];
+            Type elementType = enumerableType.GetGenericArguments()[0];
 
             var collection = DecoratorHelpers.CreateContainerControlledCollection(elementType, this);
 
@@ -593,9 +595,7 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type)
         {
-            var info = type.Info();
-
-            if (info.IsAbstract || info.IsValueType || info.ContainsGenericParameters || 
+            if (type.IsAbstract() || type.IsValueType() || type.ContainsGenericParameters() || 
                 !this.IsConcreteConstructableType(type))
             {
                 return null;
@@ -714,7 +714,7 @@ namespace SimpleInjector
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
             Helpers.IsGenericCollectionType(collectionServiceType) && 
-                this.ContainsExplicitRegistrationFor(collectionServiceType.Info().GetGenericArguments()[0]);
+                this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>

@@ -42,32 +42,32 @@ namespace SimpleInjector
     {
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
 
-#if DNXCORE50
-        [DebuggerStepThrough]
-        internal static TypeInfo Info(this Type type) => IntrospectionExtensions.GetTypeInfo(type);
-#else
-#if NET45
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static Type Info(this Type type) => type;
-#endif
+        //#if DNXCORE50
+        //        [DebuggerStepThrough]
+        //        internal static TypeInfo Info(this Type type) => IntrospectionExtensions.GetTypeInfo(type);
+        //#else
+        //#if NET45
+        //        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        //#endif
+        //        internal static Type Info(this Type type) => type;
+        //#endif
 
-        internal static bool ContainsGenericParameter(this Type type) => 
+        internal static bool ContainsGenericParameter(this Type type) =>
             type.IsGenericParameter ||
-                (type.Info().IsGenericType && type.Info().GetGenericArguments().Any(ContainsGenericParameter));
+                (type.IsGenericType() && type.GetGenericArguments().Any(ContainsGenericParameter));
 
-        internal static bool IsGenericArgument(this Type type) => 
-            type.IsGenericParameter || type.Info().GetGenericArguments().Any(arg => arg.IsGenericArgument());
+        internal static bool IsGenericArgument(this Type type) =>
+            type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
 
-        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck) => 
-            typeToCheck.Info().IsGenericType && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
+        internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck) =>
+            typeToCheck.IsGenericType() && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
 
-        internal static bool IsAmbiguousOrValueType(Type type) => 
-            IsAmbiguousType(type) || type.Info().IsValueType;
+        internal static bool IsAmbiguousOrValueType(Type type) =>
+            IsAmbiguousType(type) || type.IsValueType();
 
         internal static bool IsAmbiguousType(Type type) => AmbiguousTypes.Contains(type);
 
-        internal static Lazy<T> ToLazy<T>(T value) => 
+        internal static Lazy<T> ToLazy<T>(T value) =>
             new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
 
         internal static T AddReturn<T>(this HashSet<T> set, T value)
@@ -88,9 +88,9 @@ namespace SimpleInjector
             return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
         }
 
-        internal static bool IsPartiallyClosed(this Type type) => 
-            type.Info().IsGenericType 
-            && type.Info().ContainsGenericParameters 
+        internal static bool IsPartiallyClosed(this Type type) =>
+            type.IsGenericType()
+            && type.ContainsGenericParameters()
             && type.GetGenericTypeDefinition() != type;
 
         // This method returns IQueryHandler<,> while ToFriendlyName returns IQueryHandler<TQuery, TResult>
@@ -175,26 +175,26 @@ namespace SimpleInjector
 
         // While array types are in fact concrete, we can not create them and creating them would be
         // pretty useless.
-        internal static bool IsConcreteConstructableType(Type serviceType) => 
-            !serviceType.Info().ContainsGenericParameters && IsConcreteType(serviceType);
+        internal static bool IsConcreteConstructableType(Type serviceType) =>
+            !serviceType.ContainsGenericParameters() && IsConcreteType(serviceType);
 
         // While array types are in fact concrete, we can not create them and creating them would be
         // pretty useless.
-        internal static bool IsConcreteType(Type serviceType) => 
-            !serviceType.Info().IsAbstract && !serviceType.IsArray && serviceType != typeof(object) &&
-            !typeof(Delegate).Info().IsAssignableFrom(serviceType.Info());
+        internal static bool IsConcreteType(Type serviceType) =>
+            !serviceType.IsAbstract() && !serviceType.IsArray && serviceType != typeof(object) &&
+            !typeof(Delegate).IsAssignableFrom(serviceType);
 
         // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
-        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) => 
+        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) =>
             DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor) &&
             DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
 
-        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) => 
+        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) =>
             CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
 
         internal static bool IsGenericCollectionType(Type serviceType)
         {
-            if (!serviceType.Info().IsGenericType)
+            if (!serviceType.IsGenericType())
             {
                 return false;
             }
@@ -218,7 +218,7 @@ namespace SimpleInjector
 
             types.Add(type);
             types.AddRange(GetBaseTypes(type));
-            types.AddRange(type.Info().GetInterfaces());
+            types.AddRange(type.GetInterfaces());
 
             return types.ToArray();
         }
@@ -239,18 +239,18 @@ namespace SimpleInjector
         /// <param name="serviceType">The (open generic) service type to match.</param>
         /// <param name="implementationType">The implementationType to search.</param>
         /// <returns>A list of types.</returns>
-        internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType) => 
+        internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType) =>
             from baseType in implementationType.GetBaseTypesAndInterfaces()
             where baseType == serviceType || (
-                baseType.Info().IsGenericType && serviceType.Info().IsGenericType &&
+                baseType.IsGenericType() && serviceType.IsGenericType() &&
                 baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
             select baseType;
 
         internal static Action<T> CreateAction<T>(object action)
         {
-            Type actionArgumentType = action.GetType().Info().GetGenericArguments()[0];
+            Type actionArgumentType = action.GetType().GetGenericArguments()[0];
 
-            if (actionArgumentType.Info().IsAssignableFrom(typeof(T).Info()))
+            if (actionArgumentType.IsAssignableFrom(typeof(T)))
             {
                 // In most cases, the given T is a concrete type such as ServiceImpl, and supplied action
                 // object can be everything from Action<ServiceImpl>, to Action<IService>, to Action<object>.
@@ -277,7 +277,7 @@ namespace SimpleInjector
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
             // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterCollection<T> method.
-            var castMethod = typeof(Enumerable).Info().GetMethod("Cast").MakeGenericMethod(resultType);
+            var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
         }
@@ -288,19 +288,19 @@ namespace SimpleInjector
         // and GetTypesToRegister is called by overloads of Register and RegisterCollection.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            if (!service.Info().IsGenericType)
+            if (!service.IsGenericType())
             {
-                return service.Info().IsAssignableFrom(implementation.Info());
+                return service.IsAssignableFrom(implementation);
             }
 
-            if (implementation.Info().IsGenericType && implementation.GetGenericTypeDefinition() == service)
+            if (implementation.IsGenericType() && implementation.GetGenericTypeDefinition() == service)
             {
                 return true;
             }
 
             // PERF: We don't use LINQ to prevent unneeded memory allocations.
             // Unfortunately we can't prevent memory allocations while calling GetInstances() :-(
-            foreach (Type interfaceType in implementation.Info().GetInterfaces())
+            foreach (Type interfaceType in implementation.GetInterfaces())
             {
                 if (IsGenericImplementationOf(interfaceType, service))
                 {
@@ -309,7 +309,7 @@ namespace SimpleInjector
             }
 
             // PERF: We don't call GetBaseTypes(), to prevent memory allocations.
-            Type baseType = implementation.Info().BaseType ?? (implementation != typeof(object) ? typeof(object) : null);
+            Type baseType = implementation.BaseType() ?? (implementation != typeof(object) ? typeof(object) : null);
 
             while (baseType != null)
             {
@@ -318,7 +318,7 @@ namespace SimpleInjector
                     return true;
                 }
 
-                baseType = baseType.Info().BaseType;
+                baseType = baseType.BaseType();
             }
 
             return false;
@@ -330,11 +330,11 @@ namespace SimpleInjector
         internal static IEnumerable<Type> GetBaseTypesAndInterfacesFor(this Type type, Type serviceType) =>
             GetGenericImplementationsOf(type.GetBaseTypesAndInterfaces(), serviceType);
 
-        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType) => 
+        internal static IEnumerable<Type> GetTypeBaseTypesAndInterfacesFor(this Type type, Type serviceType) =>
             GetGenericImplementationsOf(type.GetTypeBaseTypesAndInterfaces(), serviceType);
 
-        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type) => 
-            type.Info().GetInterfaces().Concat(type.GetBaseTypes());
+        internal static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type) =>
+            type.GetInterfaces().Concat(type.GetBaseTypes());
 
         internal static IEnumerable<Type> GetTypeBaseTypesAndInterfaces(this Type type)
         {
@@ -352,7 +352,7 @@ namespace SimpleInjector
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
                 where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
-                    includeVariantTypes && closedGenericServiceType.Info().IsAssignableFrom(openGenericImplementation.Info()))
+                    includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
                 let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
                     ? result.ClosedGenericImplementation
                     : openGenericImplementation
@@ -375,10 +375,10 @@ namespace SimpleInjector
             return Tuple.Create(trueList.ToArray(), falseList.ToArray());
         }
 
-        internal static MethodInfo GetMethod(Expression<Action> methodCall) => 
+        internal static MethodInfo GetMethod(Expression<Action> methodCall) =>
             ((MethodCallExpression)methodCall.Body).Method;
 
-        internal static MethodInfo GetGenericMethodDefinition(Expression<Action> methodCall) => 
+        internal static MethodInfo GetGenericMethodDefinition(Expression<Action> methodCall) =>
             GetMethod(methodCall).GetGenericMethodDefinition();
 
         internal static ConstructorInfo GetConstructor<T>(Expression<Func<T>> constructorCall) =>
@@ -386,33 +386,33 @@ namespace SimpleInjector
 
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
-            Type baseType = type.Info().BaseType ?? (type != typeof(object) ? typeof(object) : null);
+            Type baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
 
             while (baseType != null)
             {
                 yield return baseType;
 
-                baseType = baseType.Info().BaseType;
+                baseType = baseType.BaseType();
             }
         }
 
-        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType) => 
+        private static IEnumerable<Type> GetGenericImplementationsOf(IEnumerable<Type> types, Type serviceType) =>
             from type in types
             where IsGenericImplementationOf(type, serviceType)
             select type;
 
-        private static bool IsGenericImplementationOf(Type type, Type serviceType) => 
-            type == serviceType 
-            || serviceType.IsVariantVersionOf(type) 
-            || (type.Info().IsGenericType && type.GetGenericTypeDefinition() == serviceType);
+        private static bool IsGenericImplementationOf(Type type, Type serviceType) =>
+            type == serviceType
+            || serviceType.IsVariantVersionOf(type)
+            || (type.IsGenericType() && type.GetGenericTypeDefinition() == serviceType);
 
-        private static bool IsVariantVersionOf(this Type type, Type otherType) => 
-            type.Info().IsGenericType 
-            && otherType.Info().IsGenericType 
-            && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition() 
-            && type.Info().IsAssignableFrom(otherType.Info());
+        private static bool IsVariantVersionOf(this Type type, Type otherType) =>
+            type.IsGenericType()
+            && otherType.IsGenericType()
+            && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition()
+            && type.IsAssignableFrom(otherType);
 
-        private static string ToFriendlyName(this Type type, bool fullyQualifiedName, 
+        private static string ToFriendlyName(this Type type, bool fullyQualifiedName,
             Func<Type[], string> argumentsFormatter)
         {
             if (type.IsArray)
@@ -439,7 +439,7 @@ namespace SimpleInjector
             return name + "<" + argumentsFormatter(genericArguments.ToArray()) + ">";
         }
 
-        private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection) => 
+        private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection) =>
             RegisterCollectionEnumerable(collection);
 
         // This method name does not describe what it does, but since the C# compiler will create a iterator
@@ -463,7 +463,7 @@ namespace SimpleInjector
             int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1),
                  CultureInfo.InvariantCulture);
 
-            var argumentOfTypeAndOuterType = type.Info().GetGenericArguments();
+            var argumentOfTypeAndOuterType = type.GetGenericArguments();
 
             return argumentOfTypeAndOuterType
                 .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
@@ -512,7 +512,7 @@ namespace SimpleInjector
         }
 
         // .NET 4.6 adds System.Array.Empty<T>, but we don't have that yet in .NET 4.0 and 4.5.
-        internal static class Array<T> 
+        internal static class Array<T>
         {
             internal static readonly T[] Empty = new T[0];
         }

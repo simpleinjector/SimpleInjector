@@ -66,7 +66,7 @@ namespace SimpleInjector.Diagnostics
 
         private DiagnosticGroup BuildDiagnosticGroup(Type groupType, IEnumerable<DiagnosticResult> results, 
             int level) => 
-            groupType.Info().ContainsGenericParameters
+            groupType.ContainsGenericParameters()
                 ? this.BuildGenericGroup(groupType, results, level)
                 : this.BuildNonGenericGroup(groupType, results);
 

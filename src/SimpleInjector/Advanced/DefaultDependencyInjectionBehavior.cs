@@ -52,7 +52,7 @@ namespace SimpleInjector.Advanced
 
             var target = consumer.Target;
 
-            if (target.TargetType.Info().IsValueType || target.TargetType == typeof(string))
+            if (target.TargetType.IsValueType() || target.TargetType == typeof(string))
             {
                 throw new ActivationException(StringResources.TypeMustNotContainInvalidInjectionTarget(target));
             }

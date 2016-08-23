@@ -151,7 +151,7 @@ namespace SimpleInjector.Decorators
 
         protected static bool IsDecorateeFactoryDependencyParameter(ParameterInfo parameter, Type serviceType)
         {
-            return parameter.ParameterType.Info().IsGenericType &&
+            return parameter.ParameterType.IsGenericType() &&
                 parameter.ParameterType.GetGenericTypeDefinition() == typeof(Func<>) &&
                 parameter.ParameterType == typeof(Func<>).MakeGenericType(serviceType);
         }

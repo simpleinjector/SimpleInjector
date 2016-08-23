@@ -226,12 +226,12 @@ namespace SimpleInjector.Decorators
         // Checks if the given parameterType can function as the decorated instance of the given service type.
         internal static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
         {
-            if (!parameterType.Info().IsGenericType || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
+            if (!parameterType.IsGenericType() || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
             {
                 return false;
             }
 
-            Type funcArgumentType = parameterType.Info().GetGenericArguments()[0];
+            Type funcArgumentType = parameterType.GetGenericArguments()[0];
 
             return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
         }

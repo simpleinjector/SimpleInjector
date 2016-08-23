@@ -1176,7 +1176,7 @@ namespace SimpleInjector
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(serviceType, implementationType,
                 implementationTypeParamName);
 
-            if (serviceType.Info().ContainsGenericParameters)
+            if (serviceType.ContainsGenericParameters())
             {
                 this.RegisterOpenGeneric(serviceType, implementationType, lifestyle);
             }

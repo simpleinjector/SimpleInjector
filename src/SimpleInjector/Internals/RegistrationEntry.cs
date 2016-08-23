@@ -28,7 +28,7 @@ namespace SimpleInjector.Internals
     internal static class RegistrationEntry
     {
         internal static IRegistrationEntry Create(Type serviceType, Container container) =>
-            serviceType.Info().IsGenericType
+            serviceType.IsGenericType()
                 ? (IRegistrationEntry)new GenericRegistrationEntry(container)
                 : (IRegistrationEntry)new NonGenericRegistrationEntry(serviceType, container);
     }

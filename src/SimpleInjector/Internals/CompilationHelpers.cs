@@ -180,10 +180,10 @@ namespace SimpleInjector.Internals
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)
         {
             var type = typeof(LazyScopedRegistration<,>)
-                .MakeGenericType(registration.GetType().Info().GetGenericArguments());
+                .MakeGenericType(registration.GetType().GetGenericArguments());
 
             return Expression.New(
-                type.Info().GetConstructor(new[] { typeof(Registration) }),
+                type.GetConstructor(new[] { typeof(Registration) }),
                 Expression.Constant(registration, typeof(Registration)));
         }
 
@@ -318,7 +318,7 @@ namespace SimpleInjector.Internals
                 {
                     Type type = registration.GetType();
 
-                    if (type.Info().IsGenericType && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<,>))
+                    if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<,>))
                     {
                         return registration;
                     }
@@ -396,7 +396,7 @@ namespace SimpleInjector.Internals
                 this.OriginalExpression = originalExpression;
 
                 this.lazyScopeRegistrationType = typeof(LazyScopedRegistration<,>)
-                    .MakeGenericType(this.Registration.GetType().Info().GetGenericArguments());
+                    .MakeGenericType(this.Registration.GetType().GetGenericArguments());
             }
 
             internal ParameterExpression Variable
@@ -417,7 +417,7 @@ namespace SimpleInjector.Internals
             internal Expression LazyScopeRegistrationGetInstanceExpression => 
                 Expression.Call(
                     this.Variable,
-                    this.lazyScopeRegistrationType.Info().GetMethod("GetInstance"),
+                    this.lazyScopeRegistrationType.GetMethod("GetInstance"),
                     Expression.Property(this.LifestyleInfo.Variable, "Value"));
         }
 

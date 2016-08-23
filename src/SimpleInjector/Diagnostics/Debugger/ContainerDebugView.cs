@@ -133,7 +133,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                     value: producersForGroup[0]);
             }
 
-            if (groupType.Info().ContainsGenericParameters)
+            if (groupType.ContainsGenericParameters())
             {
                 return this.BuildGenericGroup(groupType, producersForGroup, level);
             }

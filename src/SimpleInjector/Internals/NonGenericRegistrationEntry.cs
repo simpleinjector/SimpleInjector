@@ -285,7 +285,7 @@ namespace SimpleInjector.Internals
                     throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.serviceType));
                 }
 
-                if (implementationType.Info().ContainsGenericParameters)
+                if (implementationType.ContainsGenericParameters())
                 {
                     throw new ActivationException(
                         StringResources.TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(

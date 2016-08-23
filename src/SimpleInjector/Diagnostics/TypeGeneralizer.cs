@@ -46,7 +46,7 @@ namespace SimpleInjector.Diagnostics
             // nestingLevel 2 returns: IEnumerable<IQueryHandler<MyQuery<T>, int[]>
             // nestingLevel 1 returns: IEnumerable<IQueryHandler<TQuery, TResult>>
             // nestingLevel 0 returns: IEnumerable<T>
-            if (!type.Info().IsGenericType)
+            if (!type.IsGenericType())
             {
                 return type;
             }
@@ -62,7 +62,7 @@ namespace SimpleInjector.Diagnostics
         private static Type MakeTypePartiallyGeneric(Type type, int nestingLevel)
         {
             var arguments = (
-                from argument in type.Info().GetGenericArguments()
+                from argument in type.GetGenericArguments()
                 select MakeTypePartiallyGenericUpToLevel(argument, nestingLevel - 1))
                 .ToArray();
 

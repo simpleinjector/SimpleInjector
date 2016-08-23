@@ -557,7 +557,7 @@ namespace SimpleInjector
 
         private void AddCollectionInstanceProducer(InstanceProducer producer)
         {
-            Type itemType = producer.ServiceType.Info().GetGenericArguments()[0];
+            Type itemType = producer.ServiceType.GetGenericArguments()[0];
 
             var resolver = this.GetContainerUncontrolledResolver(itemType);
 
@@ -596,7 +596,7 @@ namespace SimpleInjector
         private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
             typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
                 ? this.GetInstanceProducerForRegisteredCollection(
-                    enumerableServiceType.Info().GetGenericArguments()[0])
+                    enumerableServiceType.GetGenericArguments()[0])
                 : null;
 
         private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType)
@@ -630,7 +630,7 @@ namespace SimpleInjector
 
         private static Type GetRegistrationKey(Type serviceType)
         {
-            return serviceType.Info().IsGenericType
+            return serviceType.IsGenericType()
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
         }

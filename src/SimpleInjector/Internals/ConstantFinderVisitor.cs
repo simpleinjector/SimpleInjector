@@ -43,7 +43,7 @@ namespace SimpleInjector.Internals
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (!node.Type.Info().IsPrimitive)
+            if (!node.Type.IsPrimitive())
             {
                 this.constants.Add(node);
             }

@@ -46,13 +46,13 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (this.Mapping.ConcreteType.Info().IsValueType)
+            if (this.Mapping.ConcreteType.IsValueType())
             {
                 // Value types always have a default constructor.
                 return true;
             }
 
-            bool typeHasDefaultCtor = this.Mapping.ConcreteType.Info().GetConstructor(Helpers.Array<Type>.Empty) != null;
+            bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(Helpers.Array<Type>.Empty) != null;
 
             return typeHasDefaultCtor;
         }
@@ -64,7 +64,7 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            return !this.Mapping.ConcreteType.Info().IsValueType;
+            return !this.Mapping.ConcreteType.IsValueType();
         }
 
         private bool ParameterSatisfiesNotNullableValueTypeConstraint()
@@ -74,12 +74,12 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            if (!this.Mapping.ConcreteType.Info().IsValueType)
+            if (!this.Mapping.ConcreteType.IsValueType())
             {
                 return false;
             }
 
-            bool isNullable = this.Mapping.ConcreteType.Info().IsGenericType &&
+            bool isNullable = this.Mapping.ConcreteType.IsGenericType() &&
                 this.Mapping.ConcreteType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             return !isNullable;
@@ -87,13 +87,13 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesGenericParameterConstraints()
         {
-            if (!this.Mapping.Argument.Info().IsGenericParameter)
+            if (!this.Mapping.Argument.IsGenericParameter())
             {
                 return true;
             }
 
             var unsatisfiedConstraints =
-                from constraint in this.Mapping.Argument.Info().GetGenericParameterConstraints()
+                from constraint in this.Mapping.Argument.GetGenericParameterConstraints()
                 where !this.MappingMightBeCompatibleWithTypeConstraint(constraint)
                 select constraint;
 
@@ -140,7 +140,7 @@ namespace SimpleInjector.Internals
                 return false;
             }
 
-            var constraints = this.Mapping.Argument.Info().GenericParameterAttributes;
+            var constraints = this.Mapping.Argument.GetGenericParameterAttributes();
             return (constraints & constraint) != GenericParameterAttributes.None;
         }
     }

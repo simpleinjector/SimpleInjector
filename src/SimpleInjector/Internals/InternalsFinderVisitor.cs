@@ -114,9 +114,9 @@ namespace SimpleInjector.Internals
 
         private static bool IsPublic(Type type) => GetTypeAndDeclaringTypes(type).All(IsPublicInternal);
 
-        private static bool IsPublicInternal(Type type) => 
-            (type.IsNested ? type.Info().IsNestedPublic : type.Info().IsPublic) 
-            && (!type.Info().IsGenericType || type.Info().GetGenericArguments().All(IsPublic));
+        private static bool IsPublicInternal(Type type) =>
+            (type.IsNested ? type.IsNestedPublic() : type.IsPublic())
+            && (!type.IsGenericType() || type.GetGenericArguments().All(IsPublic));
 
         private static IEnumerable<Type> GetTypeAndDeclaringTypes(Type type)
         {

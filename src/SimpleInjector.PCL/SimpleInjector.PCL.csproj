@@ -50,6 +50,9 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SimpleInjector.NET\NetSpecific\NetReflectionExtensions.cs">
+      <Link>NetSpecific\NetReflectionExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector\ActivationException.cs">
       <Link>ActivationException.cs</Link>
     </Compile>
