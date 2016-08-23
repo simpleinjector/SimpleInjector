@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
     /// <summary>
@@ -45,5 +46,9 @@ namespace SimpleInjector
         public static bool IsInterface(this Type type) => type.IsInterface;
         public static bool IsGenericParameter(this Type type) => type.IsGenericParameter;
         public static GenericParameterAttributes GetGenericParameterAttributes(this Type type) => type.GenericParameterAttributes;
+        public static IEnumerable<PropertyInfo> GetRuntimeProperties(this Type type) => 
+            type.GetProperties(BindingFlags.FlattenHierarchy |
+                BindingFlags.Instance | BindingFlags.Static |
+                BindingFlags.NonPublic | BindingFlags.Public);
     }
 }
