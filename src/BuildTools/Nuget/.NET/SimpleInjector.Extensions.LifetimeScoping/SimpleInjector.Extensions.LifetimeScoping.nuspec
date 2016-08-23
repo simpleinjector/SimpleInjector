@@ -17,7 +17,7 @@
       <group targetFramework=".NETPortable4.0-Profile136">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
-      <group targetFramework=".NETStandard1.6">
+      <group targetFramework=".NETStandard1.0">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
     </dependencies>
