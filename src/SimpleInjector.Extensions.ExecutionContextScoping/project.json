@@ -16,7 +16,7 @@
     "SimpleInjector": "3.2"
   },
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.3": {
       "imports": "portable-net452+win81"
     }
   }
