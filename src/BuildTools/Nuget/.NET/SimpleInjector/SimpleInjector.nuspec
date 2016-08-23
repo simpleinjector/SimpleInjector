@@ -20,6 +20,7 @@
       <group targetFramework=".NETFramework4.0" />
       <group targetFramework=".NETPortable4.5-Profile136" />
       <group targetFramework=".NETStandard1.0">
+        <dependency id="NETStandard.Library" version="1.6.0" />
         <dependency id="System.ComponentModel" version="4.0.1" />
         <dependency id="System.Diagnostics.Debug" version="4.0.11" />
         <dependency id="System.Diagnostics.Tools" version="4.0.1" />

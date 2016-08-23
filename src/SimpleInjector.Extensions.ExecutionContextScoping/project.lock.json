@@ -74,9 +74,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "System.AppContext/4.1.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -744,9 +741,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "System.AppContext/4.1.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -1365,9 +1359,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "System.AppContext/4.1.0": {
         "type": "package",
@@ -1994,9 +1985,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.native.System/4.0.0": {
         "type": "package",
@@ -2888,9 +2876,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "runtime.native.System/4.0.0": {
         "type": "package",
         "dependencies": {
@@ -3712,9 +3697,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
@@ -4946,9 +4928,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -6178,9 +6157,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "runtime.native.System.Security.Cryptography/4.0.0": {
         "type": "package",
         "dependencies": {
@@ -7237,9 +7213,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
@@ -8570,9 +8543,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.aot.System.Collections/4.0.10": {
         "type": "package",
@@ -9949,9 +9919,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -11281,9 +11248,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.aot.System.Collections/4.0.10": {
         "type": "package",
@@ -12660,9 +12624,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -13992,9 +13953,6 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
-      },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
       },
       "runtime.aot.System.Collections/4.0.10": {
         "type": "package",
@@ -15364,19 +15322,6 @@
         "NETStandard.Library.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt"
-      ]
-    },
-    "NuSpec.ReferenceGenerator/1.4.2": {
-      "sha512": "Ede6MV1IFitgCg+D1Z4ruiLyv+chR4BMjzxLm0qp0IFZHsri4m4IYD4LGwyUnb9LdADsdaWxn12BonXGyQdejA==",
-      "type": "package",
-      "files": [
-        "NuSpec.ReferenceGenerator.1.4.2.nupkg.sha512",
-        "NuSpec.ReferenceGenerator.nuspec",
-        "build/dotnet/NuSpec.ReferenceGenerator.targets",
-        "build/portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10/NuSpec.ReferenceGenerator.targets",
-        "tools/RefGen.exe",
-        "tools/RefGen.exe.config",
-        "tools/RefGen.pdb"
       ]
     },
     "runtime.any.System.Collections/4.0.11": {
@@ -19298,7 +19243,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "NuSpec.ReferenceGenerator >= 1.4.2",
+      "NETStandard.Library >= 1.6.0",
       "SimpleInjector >= 3.2.0"
     ],
     ".NETStandard,Version=v1.3": []

@@ -49,9 +49,6 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "NuSpec.ReferenceGenerator/1.4.2": {
-        "type": "package"
-      },
       "System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -435,20 +432,6 @@
         "NETStandard.Library.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt"
-      ]
-    },
-    "NuSpec.ReferenceGenerator/1.4.2": {
-      "sha512": "Ede6MV1IFitgCg+D1Z4ruiLyv+chR4BMjzxLm0qp0IFZHsri4m4IYD4LGwyUnb9LdADsdaWxn12BonXGyQdejA==",
-      "type": "package",
-      "path": "NuSpec.ReferenceGenerator/1.4.2",
-      "files": [
-        "NuSpec.ReferenceGenerator.1.4.2.nupkg.sha512",
-        "NuSpec.ReferenceGenerator.nuspec",
-        "build/dotnet/NuSpec.ReferenceGenerator.targets",
-        "build/portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10/NuSpec.ReferenceGenerator.targets",
-        "tools/RefGen.exe",
-        "tools/RefGen.exe.config",
-        "tools/RefGen.pdb"
       ]
     },
     "System.Collections/4.0.11": {
@@ -2042,7 +2025,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "NuSpec.ReferenceGenerator >= 1.4.2",
+      "NETStandard.Library >= 1.6.0",
       "SimpleInjector >= 3.2.0"
     ],
     ".NETStandard,Version=v1.0": []
