@@ -31,7 +31,8 @@
         {
         }
         
-        private static readonly IEnumerable<Assembly> assemblies = new[] { typeof(RegisterBatchTests).Assembly };
+        private static readonly IEnumerable<Assembly> assemblies = 
+            new[] { typeof(RegisterBatchTests).GetTypeInfo().Assembly };
 
         [TestMethod]
         public void RegisterAssemblies_WithNonGenericType_Fails()
@@ -468,7 +469,7 @@
             var container = new Container();
 
             // Just registers RequestGroup in three groups.
-            container.Register(typeof(IHandler<,>), new[] { typeof(RequestGroup).Assembly }, Lifestyle.Singleton);
+            container.Register(typeof(IHandler<,>), assemblies, Lifestyle.Singleton);
 
             container.RegisterDecorator(typeof(IHandler<,>), typeof(RequestDecorator<,>));
 

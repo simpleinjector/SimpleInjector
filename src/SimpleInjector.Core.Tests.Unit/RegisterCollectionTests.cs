@@ -4,7 +4,9 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
 
     [TestClass]
@@ -14,13 +16,15 @@
         {
         }
 
+        private static readonly Assembly CurrentAssembly = typeof(RegisterCollectionTests).GetTypeInfo().Assembly;
+
         [TestMethod]
         public void RegisterCollectionTServiceAssemblyArray_RegisteringNonGenericServiceAndAssemblyWithMultipleImplementations_RegistersThoseImplementations()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<ILogStuf>(new[] { this.GetType().Assembly });
+            container.RegisterCollection<ILogStuf>(new[] { CurrentAssembly });
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -35,7 +39,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var assemblies = Enumerable.Repeat(this.GetType().Assembly, 2);
+            var assemblies = Enumerable.Repeat(CurrentAssembly, 2);
 
             container.RegisterCollection<ILogStuf>(assemblies);
 
@@ -52,7 +56,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ILogStuf), new[] { this.GetType().Assembly });
+            container.RegisterCollection(typeof(ILogStuf), new[] { CurrentAssembly });
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();
@@ -67,7 +71,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ILogStuf), Enumerable.Repeat(this.GetType().Assembly, 1));
+            container.RegisterCollection(typeof(ILogStuf), Enumerable.Repeat(CurrentAssembly, 1));
 
             // Act
             var loggers = container.GetAllInstances<ILogStuf>();

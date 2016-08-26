@@ -33,7 +33,7 @@
             // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
             container.ExpressionBuilt += (sender, e) =>
             {
-                if (e.RegisteredServiceType.IsGenericType &&
+                if (e.RegisteredServiceType.IsGenericType() &&
                     e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
                 {
                     var decoratorType = typeof(MonitoringValidator<>)

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -180,7 +181,8 @@
         private static Type[] GetTypesToRegister(Type serviceType, TypesToRegisterOptions options)
         {
             var container = new Container();
-            return container.GetTypesToRegister(serviceType, new[] { serviceType.Assembly }, options).ToArray();
+            var serviceTypeAssembly = new[] { serviceType.GetTypeInfo().Assembly };
+            return container.GetTypesToRegister(serviceType, serviceTypeAssembly, options).ToArray();
         }
 
         private static void Assert_CollectionsContainExactSameTypes(Type[] expected, Type[] actual, string message)

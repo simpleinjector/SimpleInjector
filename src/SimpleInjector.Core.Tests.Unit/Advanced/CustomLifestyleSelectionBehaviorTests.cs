@@ -10,6 +10,9 @@
     [TestClass]
     public class CustomLifestyleSelectionBehaviorTests
     {
+        private static readonly Assembly CurrentAssembly =
+            typeof(CustomLifestyleSelectionBehaviorTests).GetTypeInfo().Assembly;
+
         public interface ILog
         {
         }
@@ -241,7 +244,7 @@
         {
             RegisterWithoutLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                container => container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }));
+                container => container.Register(typeof(IService<,>), new[] { CurrentAssembly }));
         }
 
         [TestMethod]
@@ -313,7 +316,7 @@
         {
             RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
                 typeof(IService<double, decimal>),
-                (container, lifestyle) => container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, lifestyle));
+                (container, lifestyle) => container.Register(typeof(IService<,>), new[] { CurrentAssembly }, lifestyle));
         }
 
         [TestMethod]

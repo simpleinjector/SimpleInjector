@@ -1,0 +1,27 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk"
+  },
+
+  "dependencies": {
+    "NUnit": "3.4.1",
+    "dotnet-test-nunit": "3.4.0-beta-2",
+    "SimpleInjector": { "target": "project" },
+    "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" }
+  },
+  "runtimes": {
+    "win10-x86": {}
+  },
+  "frameworks": {
+    "netcoreapp1.6": {
+      "imports": "portable-net45+win8",
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        }
+      }
+    }
+  }
+}

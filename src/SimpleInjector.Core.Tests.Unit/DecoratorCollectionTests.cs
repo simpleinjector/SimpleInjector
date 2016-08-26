@@ -2031,7 +2031,7 @@
         {
             Type type = collection.GetType();
 
-            Type genericTypeDefinition = type.IsGenericType ? type.GetGenericTypeDefinition() : null;
+            Type genericTypeDefinition = type.IsGenericType() ? type.GetGenericTypeDefinition() : null;
 
             if (genericTypeDefinition == typeof(ReadOnlyCollection<>))
             {
