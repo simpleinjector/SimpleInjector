@@ -35,7 +35,10 @@ namespace SimpleInjector
         public static MethodInfo GetGetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.GetMethod?.IsPublic == true ? property.GetMethod : null;
 
-        public static Type[] GetGenericArguments(this Type type) => type.GetTypeInfo().GenericTypeArguments;
+        public static Type[] GetGenericArguments(this Type type) => type.GetTypeInfo().IsGenericTypeDefinition
+            ? type.GetTypeInfo().GenericTypeParameters
+            : type.GetTypeInfo().GenericTypeArguments;
+
         public static MethodInfo GetMethod(this Type type, string name) => type.GetTypeInfo().DeclaredMethods.Single(m => m.Name == name);
         public static Type[] GetTypes(this Assembly assembly) => assembly.DefinedTypes.Select(i => i.AsType()).ToArray();
         public static MemberInfo[] GetMember(this Type type, string name) => type.GetTypeInfo().DeclaredMembers.Where(m => m.Name == name).ToArray();
