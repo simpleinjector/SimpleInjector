@@ -48,7 +48,7 @@ namespace SimpleInjector.Lifestyles
         protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
             GetDefaultScopedLifestyle(c).CreateRegistration<TService>(creator, c);
 
-#if NET45
+#if NET45 || DNXCORE50
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) => 

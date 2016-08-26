@@ -441,7 +441,7 @@ namespace SimpleInjector
             return service;
         }
 
-#if NET45
+#if NET45 || DNXCORE50
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RegisterForDisposalInternal(IDisposable disposable)
@@ -466,7 +466,7 @@ namespace SimpleInjector
             }
         }
 
-#if NET45
+#if NET45 || DNXCORE50
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RequiresInstanceNotDisposed()
@@ -482,7 +482,7 @@ namespace SimpleInjector
             throw new ObjectDisposedException(this.GetType().FullName);
         }
 
-#if NET45
+#if NET45 || DNXCORE50
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void PreventCyclicDependenciesDuringDisposal()

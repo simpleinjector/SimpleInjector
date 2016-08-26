@@ -106,7 +106,7 @@ namespace SimpleInjector
             }
         }
 
-#if NET45
+#if NET45 || DNXCORE50
         // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
         // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

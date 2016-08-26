@@ -42,16 +42,6 @@ namespace SimpleInjector
     {
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
 
-        //#if DNXCORE50
-        //        [DebuggerStepThrough]
-        //        internal static TypeInfo Info(this Type type) => IntrospectionExtensions.GetTypeInfo(type);
-        //#else
-        //#if NET45
-        //        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        //#endif
-        //        internal static Type Info(this Type type) => type;
-        //#endif
-
         internal static bool ContainsGenericParameter(this Type type) =>
             type.IsGenericParameter ||
                 (type.IsGenericType() && type.GetGenericArguments().Any(ContainsGenericParameter));

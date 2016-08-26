@@ -33,7 +33,7 @@ namespace SimpleInjector
 
     internal static class Requires
     {
-#if NET45
+#if NET45 || DNXCORE50
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         [DebuggerStepThrough]
