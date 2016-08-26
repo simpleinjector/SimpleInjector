@@ -10,6 +10,7 @@
     "SimpleInjector": { "target": "project" },
     "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" }
   },
+  "testRunner": "nunit",
   "runtimes": {
     "win10-x86": {}
   },
