@@ -30,14 +30,14 @@
         public interface ISkipDecorator<T>
         {
         }
+        
+        private static readonly IEnumerable<Assembly> assemblies = new[] { typeof(RegisterBatchTests).Assembly };
 
         [TestMethod]
         public void RegisterAssemblies_WithNonGenericType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
-
-            var assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
             Action action = () => container.Register(typeof(ILogger), assemblies);
@@ -55,8 +55,6 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-
-            var assemblies = new[] { Assembly.GetExecutingAssembly() };
 
             // Act
             Action action = () => container.Register(typeof(IService<int, int>), assemblies);
@@ -116,7 +114,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
         }
 
         [TestMethod]
@@ -126,7 +124,7 @@
             var container = ContainerFactory.New();
 
             // We've got these concrete public implementations: Concrete1, Concrete2, Concrete3
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
 
             // Act
             var impl = container.GetInstance<IService<string, object>>();
@@ -141,7 +139,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
 
             // Act
             var impl = container.GetInstance<IService<int, string>>();
@@ -156,7 +154,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -172,7 +170,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Transient);
+            container.Register(typeof(IService<,>), assemblies, Lifestyle.Transient);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -188,7 +186,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
+            container.Register(typeof(IService<,>), assemblies, Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -202,8 +200,6 @@
         public void Register_WithValidTypeDefinitions_RespectsTheSuppliedLifestyle5()
         {
             // Arrange
-            IEnumerable<Assembly> assemblies = new[] { Assembly.GetExecutingAssembly() };
-
             var container = ContainerFactory.New();
 
             container.Register(typeof(IService<,>), assemblies, Lifestyle.Singleton);
@@ -222,7 +218,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
 
             // Act
             var impl = container.GetInstance<IService<float, double>>();
@@ -238,7 +234,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IService<,>), assemblies);
 
             // Act
             var impl = container.GetInstance<IService<Type, Type>>();
@@ -256,7 +252,7 @@
             // Act
             // This call should fail, because both Invalid1 and Invalid2 implement the same closed generic
             // interface IInvalid<int, double>
-            Action action = () => container.Register(typeof(IInvalid<,>), new[] { Assembly.GetExecutingAssembly() });
+            Action action = () => container.Register(typeof(IInvalid<,>), assemblies);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
@@ -385,7 +381,7 @@
             var container = ContainerFactory.New();
 
             // MultiInterfaceHandler implements two interfaces.
-            container.Register(typeof(IBatchCommandHandler<>), new[] { Assembly.GetExecutingAssembly() });
+            container.Register(typeof(IBatchCommandHandler<>), assemblies);
 
             // Act
             var instance1 = container.GetInstance<IBatchCommandHandler<int>>();
@@ -403,7 +399,7 @@
             var container = ContainerFactory.New();
 
             // MultiInterfaceHandler implements ICommandHandler<int> and ICommandHandler<double>.
-            container.Register(typeof(IBatchCommandHandler<>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
+            container.Register(typeof(IBatchCommandHandler<>), assemblies, Lifestyle.Singleton);
 
             // Act
             var instance1 = container.GetInstance<IBatchCommandHandler<int>>();
@@ -439,7 +435,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Transient);
+            container.Register(typeof(IService<,>), assemblies, Lifestyle.Transient);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -454,7 +450,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Register(typeof(IService<,>), new[] { Assembly.GetExecutingAssembly() }, Lifestyle.Singleton);
+            container.Register(typeof(IService<,>), assemblies, Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -516,7 +512,7 @@
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(ISkipDecorator<>), new[] { typeof(ISkipDecorator<>).Assembly });
+            container.Register(typeof(ISkipDecorator<>), assemblies);
 
             // Act
             Action action = () => container.GetInstance<SkippedDecoratorController>();
@@ -533,7 +529,7 @@
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(ISkipDecorator<>), new[] { typeof(ISkipDecorator<>).Assembly });
+            container.Register(typeof(ISkipDecorator<>), assemblies);
 
             // Act
             Action action = () => container.GetInstance<ISkipDecorator<int>>();
