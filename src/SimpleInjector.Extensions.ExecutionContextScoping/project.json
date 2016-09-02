@@ -3,7 +3,7 @@
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true,
-    "define": [ "DNXCORE50", "PCL" ]
+    "define": [ "NETSTANDARD", "PCL" ]
   },
   "supports": {
     "net46.app": {},
@@ -13,7 +13,7 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "SimpleInjector": "3.2"
+    "SimpleInjector": { "target": "project" }
   },
   "frameworks": {
     "net46": {},

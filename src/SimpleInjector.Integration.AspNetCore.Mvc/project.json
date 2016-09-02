@@ -27,7 +27,7 @@
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0",
     "Microsoft.AspNetCore.Mvc.Razor": "1.0.0",
     "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
-    "SimpleInjector.Integration.AspNetCore": "3.2.1"
+    "SimpleInjector.Integration.AspNetCore": { "target": "project" }
   },
   "scripts": {
     "postcompile": [
