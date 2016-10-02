@@ -54,8 +54,8 @@
             // Arrange
             var scope = new Scope(new Container());
 
-            var disposables = new List<DisposableObject> 
-            { 
+            var disposables = new List<DisposableObject>
+            {
                 new DisposableObject(),
                 new DisposableObject(),
                 new DisposableObject()
@@ -78,8 +78,8 @@
 
             var disposedItems = new List<DisposableObject>();
 
-            var disposables = new List<DisposableObject> 
-            { 
+            var disposables = new List<DisposableObject>
+            {
                 new DisposableObject(disposedItems.Add),
                 new DisposableObject(disposedItems.Add),
                 new DisposableObject(disposedItems.Add)
@@ -102,8 +102,8 @@
             // Arrange
             var scope = new Scope(new Container());
 
-            var disposables = new List<DisposableObject> 
-            { 
+            var disposables = new List<DisposableObject>
+            {
                 new DisposableObject(new Exception()),
                 new DisposableObject(new Exception()),
                 new DisposableObject(new Exception())
@@ -133,7 +133,7 @@
 
             Exception lastThrownException = new Exception();
 
-            var disposables = new List<DisposableObject> 
+            var disposables = new List<DisposableObject>
             { 
                 // Since the objects are disposed in reverse order, the first object is disposed last, and
                 // this exception is expected to bubble up.
@@ -875,11 +875,11 @@
             task.Wait();
 
             // Assert
-            Assert.AreSame(scope, backgroundRequestedScope, 
+            Assert.AreSame(scope, backgroundRequestedScope,
                 "Since the background thread does not run verify, the returned scope should not be the " +
                 "verification scope.");
         }
-        
+
         [TestMethod]
         public void Verify_TransientServiceDependingOnScope_Succeeds()
         {
@@ -903,7 +903,7 @@
             // Act
             container.Verify();
         }
-        
+
         [TestMethod]
         public void Verify_SingletonServiceDependingOnScope_Throws()
         {
@@ -917,6 +917,23 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "ServiceDependingOn<Scope> (Singleton) depends on Scope (Scoped)", action);
+        }
+
+        [TestMethod]
+        public void GetInstance_SingletonServiceDependingOnScope_Throws()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new FakeScopedLifestyle(new Scope(container));
+
+            container.Register<ServiceDependingOn<Scope>>(Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 "ServiceDependingOn<Scope> (Singleton) depends on Scope (Scoped)", action);
         }
 

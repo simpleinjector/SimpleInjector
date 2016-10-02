@@ -138,7 +138,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
         public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
-#if DNXCORE50 || NET45
+#if NETSTANDARD || NET45
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property.GetCustomAttribute<T>(inherit);
@@ -163,7 +163,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
-#if DNXCORE50 || NET45
+#if NETSTANDARD || NET45
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property.GetCustomAttribute(attributeType, inherit);

@@ -2,14 +2,14 @@
   "version": "3.2.0",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
-    "define": [ "PCL", "DNXCORE50" ],
+    "define": [ "PCL", "NETSTANDARD" ],
     "xmlDoc": true
   },
 
   "frameworks": {
     "netstandard1.0": {
       "buildOptions": {
-        "defines": [ "PCL", "DNXCORE50" ]
+        "defines": [ "PCL", "NETSTANDARD" ]
       },
       "dependencies": {
         "NETStandard.Library": "1.6.0",

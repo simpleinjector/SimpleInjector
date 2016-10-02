@@ -670,7 +670,7 @@ namespace SimpleInjector
             // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
             // producer from being added after the snapshot has been made accessible to other threads.
             // This is important on architectures with a weak memory model (such as ARM).
-#if DNXCORE50
+#if NETSTANDARD
             Interlocked.MemoryBarrier();
 #else
             Thread.MemoryBarrier();

@@ -192,7 +192,7 @@ namespace SimpleInjector
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 
             return
-#if NET45 || DNXCORE50
+#if NET45 || NETSTANDARD
                 serviceTypeDefinition == typeof(IReadOnlyList<>) ||
                 serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
 #endif
