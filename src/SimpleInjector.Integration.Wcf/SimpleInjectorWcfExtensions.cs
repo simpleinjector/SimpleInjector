@@ -111,6 +111,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf",
+            error: false)]
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -136,6 +140,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf",
+            error: false)]
         public static void RegisterPerWcfOperation<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -161,6 +169,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf",
+            error: false)]
         public static void RegisterPerWcfOperation<TService>(this Container container,
             Func<TService> instanceCreator)
             where TService : class
@@ -189,6 +201,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new WcfOperationLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterPerWcfOperation<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
@@ -225,6 +241,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
         /// has both no <b>LifetimeScope</b> registrations.
         /// </exception>
+        [Obsolete("GetCurrentWcfOperationScope has been deprecated and will be removed in a future release. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: false)]
         public static Scope GetCurrentWcfOperationScope(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));

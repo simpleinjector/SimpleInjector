@@ -74,6 +74,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
+            error: false)]
         public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -101,6 +105,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
+            error: false)]
         public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -127,13 +135,17 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
+            error: false)]
         public static void RegisterLifetimeScope<TService>(this Container container,
             Func<TService> instanceCreator)
             where TService : class
         {
             RegisterLifetimeScope<TService>(container, instanceCreator, disposeWhenLifetimeScopeEnds: true);
         }
-        
+
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
         /// each lifetime scope that has been started using 
@@ -154,6 +166,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterLifetimeScope<TConcrete>(this Container container, 
             bool disposeWhenLifetimeScopeEnds)
             where TConcrete : class, IDisposable
@@ -184,6 +200,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(new LifetimeScopeLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container, bool disposeWhenLifetimeScopeEnds)
             where TImplementation : class, TService, IDisposable
@@ -213,6 +233,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterLifetimeScope<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeWhenLifetimeScopeEnds)
             where TService : class
@@ -274,6 +298,9 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [Obsolete("GetCurrentLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: false)]
         public static Scope GetCurrentLifetimeScope(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));
