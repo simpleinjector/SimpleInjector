@@ -127,6 +127,9 @@ namespace SimpleInjector
         /// old behavior of Simple Injector v1.x and v2.x.
         /// </summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
+        [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
+            "release. Please register collections explicitly instead.",
+            error: false)]
         public bool ResolveUnregisteredCollections { get; set; }
 
         /// <summary>
