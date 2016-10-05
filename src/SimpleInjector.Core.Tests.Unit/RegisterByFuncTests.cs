@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Linq;
