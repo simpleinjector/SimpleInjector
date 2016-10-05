@@ -62,10 +62,6 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
-        // NOTE: This number should be low to prevent memory leaks, since dynamically created assemblies can't
-        // be unloaded.
-        private const int MaximumNumberOfContainersWithDynamicallyCreatedAssemblies = 5;
-
         private static long counter;
 
         private readonly object locker = new object();
@@ -107,11 +103,7 @@ namespace SimpleInjector
 
             this.disposableSingletonsScope = new Scope(this);
 
-            this.Options = new ContainerOptions(this)
-            {
-                EnableDynamicAssemblyCompilation =
-                    this.containerId < MaximumNumberOfContainersWithDynamicallyCreatedAssemblies
-            };
+            this.Options = new ContainerOptions(this);
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
