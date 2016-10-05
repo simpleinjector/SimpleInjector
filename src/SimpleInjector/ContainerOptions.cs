@@ -188,6 +188,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when the container already contains registrations.
         /// </exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
             "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
             "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",
