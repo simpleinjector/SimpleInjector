@@ -32,7 +32,7 @@
 
             if (currentScope == null)
             {
-                throw new InvalidOperationException("Call Container.Options.EnablePerResolveLifestyle() first.");
+                throw new InvalidOperationException("Call PerGraphLifestyle.EnableFor(Container) first.");
             }
 
             return currentScope.Value;

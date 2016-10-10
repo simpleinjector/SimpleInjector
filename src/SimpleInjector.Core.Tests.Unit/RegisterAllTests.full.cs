@@ -1,9 +1,9 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Tests.Unit
 {
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
 
     /// <summary>Tests for RegisterAll for the full .NET version.</summary>
     public partial class RegisterAllTests

@@ -542,10 +542,12 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
         {
+#pragma warning disable 0618
             if (!this.Options.ResolveUnregisteredCollections)
             {
                 return null;
             }
+#pragma warning restore 0618
 
             if (serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {

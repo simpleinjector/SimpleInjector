@@ -127,6 +127,9 @@ namespace SimpleInjector
         /// old behavior of Simple Injector v1.x and v2.x.
         /// </summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
+        [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
+            "release. Please register collections explicitly instead.",
+            error: false)]
         public bool ResolveUnregisteredCollections { get; set; }
 
         /// <summary>
@@ -188,6 +191,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when the container already contains registrations.
         /// </exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
             "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
             "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",

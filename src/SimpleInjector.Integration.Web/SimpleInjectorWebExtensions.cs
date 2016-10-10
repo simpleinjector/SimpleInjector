@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -50,6 +50,10 @@ namespace SimpleInjector
         /// that can not be created by the container.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
+        [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/mvc",
+            error: false)]
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -76,6 +80,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
+        [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/mvc",
+            error: false)]
         public static void RegisterPerWebRequest<TService, TImplementation>(this Container container)
             where TService : class
             where TImplementation : class, TService
@@ -100,6 +108,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
+        [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/mvc",
+            error: false)]
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
@@ -127,6 +139,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
+        [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(new WebRequestLifestyle(false)) instead to suppress disposal.",
+            error: false)]
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {

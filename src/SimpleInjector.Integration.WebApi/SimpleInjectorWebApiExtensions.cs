@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014-2015 Simple Injector Contributors
+ * Copyright (c) 2014-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -63,6 +63,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi",
+            error: false)]
         public static void RegisterWebApiRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -88,6 +92,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi",
+            error: false)]
         public static void RegisterWebApiRequest<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
@@ -113,6 +121,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi",
+            error: false)]
         public static void RegisterWebApiRequest<TService>(this Container container,
             Func<TService> instanceCreator)
             where TService : class
@@ -138,6 +150,10 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TConcrete>(new WebApiRequesstLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterWebApiRequest<TConcrete>(this Container container,
             bool disposeWhenScopeEnds)
             where TConcrete : class, IDisposable
@@ -166,6 +182,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(new WebApiRequesstLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterWebApiRequest<TService, TImplementation>(
             this Container container, bool disposeWhenScopeEnds)
             where TImplementation : class, TService, IDisposable
@@ -193,6 +213,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
+        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new WebApiRequesstLifestyle(false)) instead " +
+            "to suppress disposal.",
+            error: false)]
         public static void RegisterWebApiRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeWhenScopeEnds)
             where TService : class
