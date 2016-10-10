@@ -3,9 +3,8 @@
     using System;
     using System.Linq.Expressions;
     using System.Threading;
-    using SimpleInjector.Extensions;
 
-    // https://simpleinjector.readthedocs.org/en/latest/RuntimeDecorators.html
+    // https://simpleinjector.readthedocs.io/en/2.8/RuntimeDecorators.html
     public static class RuntimeDecoratorExtensions
     {
         public static void RegisterRuntimeDecorator(

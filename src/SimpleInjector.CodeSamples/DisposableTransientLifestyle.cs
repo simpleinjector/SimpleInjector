@@ -34,12 +34,6 @@
 
             if (!alreadyInitialized)
             {
-                if (container.IsLocked())
-                {
-                    // By calling into the container a nice expressive exception about locking is thrown.
-                    container.GetInstance<Container>();
-                }
-
                 AddGlobalDisposableInitializer(container);
 
                 container.SetItem(ItemKey, ItemKey);
