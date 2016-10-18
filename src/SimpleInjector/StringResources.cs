@@ -108,10 +108,11 @@ namespace SimpleInjector
                 select string.Format(CultureInfo.InvariantCulture, "-[{0}] {1}", error.Name, error.Description);
 
             return string.Format(CultureInfo.InvariantCulture,
-                "The configuration is invalid. The following diagnostic warnings were reported:\n{0}\n" +
+                "The configuration is invalid. The following diagnostic warnings were reported:{0}{1}{0}" +
                 "See the Error property for detailed information about the warnings. " +
                 "Please see https://simpleinjector.org/diagnostics how to fix problems and how to suppress " +
                 "individual warnings.",
+                Environment.NewLine,
                 string.Join(Environment.NewLine, descriptions.Distinct()));
         }
 
