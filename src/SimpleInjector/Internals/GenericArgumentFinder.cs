@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -34,7 +34,7 @@ namespace SimpleInjector.Internals
     /// </summary>
     internal sealed class GenericArgumentFinder
     {
-        private readonly Type[] serviceTypeDefinitionArguments;
+        private readonly IList<Type> serviceTypeDefinitionArguments;
         private readonly Type[] serviceTypeToResolveArguments;
         private readonly IList<Type> implementationTypeDefinitionArguments;
         private readonly Type[] partialImplementationArguments;
@@ -68,7 +68,7 @@ namespace SimpleInjector.Internals
 
             this.ConvertToOpenImplementationArgumentMappings(ref argumentMappings);
 
-            RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
+            this.RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref argumentMappings);
 
             return argumentMappings.ToArray();
         }
@@ -97,14 +97,28 @@ namespace SimpleInjector.Internals
             mappings = mappings.Distinct().ToArray();
         }
 
-        private static void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
+        private void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
             ref IEnumerable<ArgumentMapping> mappings)
         {
             mappings = (
                 from mapping in mappings
                 where mapping.TypeConstraintsAreSatisfied
+                where this.CanBeMappedToSuppliedConcreteTypes(mapping)
                 select mapping)
                 .ToArray();
+        }
+
+        private bool CanBeMappedToSuppliedConcreteTypes(ArgumentMapping mapping)
+        {
+            var index = this.serviceTypeDefinitionArguments.IndexOf(mapping.Argument);
+
+            // In case the mapping's concrete type is a generic parameter, it means this method is called
+            // using an open-generic type and we can't verify whether a mapping is possible; we will return
+            // true. Same holds when we can't find the mapping in the service type definition; we will assume
+            // it can be mapped. This will be caught higher up the stack.
+            return index < 0 || mapping.ConcreteType.IsGenericParameter
+                ? true
+                : mapping.ConcreteType == this.serviceTypeToResolveArguments[index];
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(

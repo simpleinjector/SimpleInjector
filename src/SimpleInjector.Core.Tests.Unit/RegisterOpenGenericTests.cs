@@ -1265,21 +1265,52 @@
                 action);
         }
 
-        public class CyclicDependencyCommandHandler<TCommand> : ICommandHandler<TCommand>
+        // This verifies a bug in v3.2.2 reported here: https://github.com/simpleinjector/SimpleInjector/issues/316
+        [TestMethod]
+        public void GetInstance_TypeArgumentWithConstraintThatCanResultInMultipleVersionsOfOtherArguments_Succeeds()
         {
-            private readonly ICommandHandler<TCommand> recursive;
+            // Arrange
+            var container = new Container();
 
-            public CyclicDependencyCommandHandler(ICommandHandler<TCommand> recursive)
-            {
-                this.recursive = recursive;
-            }
+            
+            container.Register(typeof(IQueryDispatcher<,>), typeof(QueryDispatcher<,>));
+            container.RegisterCollection(typeof(IQueryHandler<,>), new[] {
+                typeof(MultipleResultsIntQueryHandler),
+                typeof(MultipleResultsBoolQueryHandler)
+            });
 
-            public void Handle(TCommand command)
-            {
-            }
+            // Act
+            // NOTE: MultipleResultsQuery implements both IQuery<bool> and IQuery<int>.
+            container.GetInstance<IQueryDispatcher<MultipleResultsQuery, int>>();
+            container.GetInstance<IQueryDispatcher<MultipleResultsQuery, bool>>();
         }
     }
 
+    public interface IQueryDispatcher<TQuery, TResult> { }
+
+    public class QueryDispatcher<TQuery, TResult> : IQueryDispatcher<TQuery, TResult> where TQuery : IQuery<TResult>
+    {
+        public QueryDispatcher(IEnumerable<IQueryHandler<TQuery, TResult>> collection) { }
+    }
+
+    public class MultipleResultsQuery : IQuery<bool>, IQuery<int> { }
+
+    public class MultipleResultsIntQueryHandler : IQueryHandler<MultipleResultsQuery, int> { }
+    public class MultipleResultsBoolQueryHandler : IQueryHandler<MultipleResultsQuery, bool> { }
+
+    public class CyclicDependencyCommandHandler<TCommand> : ICommandHandler<TCommand>
+    {
+        private readonly ICommandHandler<TCommand> recursive;
+
+        public CyclicDependencyCommandHandler(ICommandHandler<TCommand> recursive)
+        {
+            this.recursive = recursive;
+        }
+
+        public void Handle(TCommand command)
+        {
+        }
+    }
     public sealed class DefaultStuffDoer<T> : IDoStuff<T>
     {
         public DefaultStuffDoer(IService<T, int> service)

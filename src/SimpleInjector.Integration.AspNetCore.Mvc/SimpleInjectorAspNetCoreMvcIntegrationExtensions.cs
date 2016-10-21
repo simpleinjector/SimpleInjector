@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using Diagnostics;
@@ -74,7 +75,22 @@ namespace SimpleInjector
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
 
             IServiceProvider serviceProvider = applicationBuilder.ApplicationServices;
-            var componentProvider = serviceProvider.GetRequiredService<IViewComponentDescriptorProvider>();
+            var componentProvider = serviceProvider.GetService<IViewComponentDescriptorProvider>();
+
+            if (componentProvider == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "A registration for the {0} is missing from the ASP.NET Core configuration " +
+                        "system. Make sure it is registered or pass it in using the " +
+                        "RegisterMvcViewComponents overload that accepts {1}. You can ensure that {1} is " +
+                        "registered by either calling .AddMvc() or .AddViews() on the IServiceCollection " +
+                        "class in the ConfigureServices method. Do note that calling .AddMvcCore() will " +
+                        "not result in a registered {1}.",
+                    typeof(IViewComponentDescriptorProvider).FullName,
+                    typeof(IViewComponentDescriptorProvider).Name));
+            }
 
             RegisterMvcViewComponents(container, componentProvider);
         }
