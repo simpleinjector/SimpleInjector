@@ -660,7 +660,7 @@ namespace SimpleInjector
             // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
             return new ArgumentException(
                 StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException) +
-                "\nparamName: " + paramName, innerException);
+                Environment.NewLine + "paramName: " + paramName, innerException);
         }
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)
