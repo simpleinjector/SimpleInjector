@@ -72,6 +72,9 @@ namespace SimpleInjector
         private ILifestyleSelectionBehavior lifestyleBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Lifestyle defaultLifestyle = Lifestyle.Transient;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
 
         /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
@@ -94,7 +97,7 @@ namespace SimpleInjector
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
             this.injectionBehavior = new DefaultDependencyInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
-            this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(Lifestyle.Transient);
+            this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(this);
         }
 
         /// <summary>
@@ -270,6 +273,31 @@ namespace SimpleInjector
                 this.ThrowWhenContainerHasRegistrations(nameof(this.LifestyleSelectionBehavior));
 
                 this.lifestyleBehavior = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the default lifestyle that the container will use when a registration is
+        /// made when no lifestyle is supplied.</summary>
+        /// <value>The default lifestyle.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public Lifestyle DefaultLifestyle
+        {
+            get
+            {
+                return this.defaultLifestyle;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, nameof(value));
+
+                this.ThrowWhenContainerHasRegistrations(nameof(this.DefaultLifestyle));
+
+                this.defaultLifestyle = value;
             }
         }
 

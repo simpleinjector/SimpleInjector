@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,22 +25,24 @@ namespace SimpleInjector.Advanced
     using System;
     using System.Diagnostics;
 
-    [DebuggerDisplay("{lifestyle.Name,nq}LifestyleSelectionBehavior")]
+    [DebuggerDisplay("{Lifestyle.Name,nq}LifestyleSelectionBehavior")]
     internal sealed class DefaultLifestyleSelectionBehavior : ILifestyleSelectionBehavior
     {
-        private readonly Lifestyle lifestyle;
+        private readonly ContainerOptions options;
 
-        internal DefaultLifestyleSelectionBehavior(Lifestyle lifestyle)
+        internal DefaultLifestyleSelectionBehavior(ContainerOptions options)
         {
-            this.lifestyle = lifestyle;
+            this.options = options;
         }
+
+        private Lifestyle Lifestyle => this.options.DefaultLifestyle;
 
         public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
-            return this.lifestyle;
+            return this.Lifestyle;
         }
     }
 }

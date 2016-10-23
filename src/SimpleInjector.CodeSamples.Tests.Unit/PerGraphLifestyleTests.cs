@@ -73,9 +73,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Options.EnablePerResolveLifestyle",
+                "PerGraphLifestyle.EnableFor",
                 action,
-                "Should warn about calling Options.EnablePerResolveLifestyle first");
+                "Should warn about calling PerGraphLifestyle.EnableFor first");
         }
 
         public class A

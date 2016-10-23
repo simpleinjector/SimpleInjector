@@ -569,6 +569,97 @@
         }
 
         [TestMethod]
+        public void DefaultLifestyle_ByDefault_ReturnsTheTransientLifestyle()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+
+            // Act
+            Lifestyle lifestyle = options.DefaultLifestyle;
+
+            // Assert
+            Assert.AreSame(lifestyle, Lifestyle.Transient);
+        }
+
+        [TestMethod]
+        public void DefaultLifestyle_SetWithNullValue_ThrowsException()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+
+            // Act
+            Action action = () => options.DefaultLifestyle = null;
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void DefaultLifestyle_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+
+            // Act
+            options.DefaultLifestyle = Lifestyle.Singleton;
+
+            // Assert
+            Assert.AreSame(Lifestyle.Singleton, options.DefaultLifestyle,
+                "The set_DefaultLifestyle did not work.");
+        }
+
+        [TestMethod]
+        public void DefaultLifestyle_ChangedMultipleTimesBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
+        {
+            // Arrange
+            var expectedLifestyle = new LifetimeScopeLifestyle();
+
+            var options = GetContainerOptions();
+
+            // Act
+            options.DefaultLifestyle = Lifestyle.Singleton;
+            options.DefaultLifestyle = Lifestyle.Transient;
+
+            // Assert
+            Assert.AreSame(Lifestyle.Transient, options.DefaultLifestyle,
+                "The set_DefaultLifestyle did not work.");
+        }
+
+        [TestMethod]
+        public void DefaultLifestyle_ChangedAfterFirstRegistration_Fails()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterSingleton<object>("The first registration.");
+
+            // Act
+            Action action = () => container.Options.DefaultLifestyle = Lifestyle.Singleton;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "DefaultLifestyle property cannot be changed after the first registration",
+                action);
+        }
+        
+        [TestMethod]
+        public void DefaultLifestyle_WithCustomLifestyle_MakesARegistrationUsingThatLifestyle()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultLifestyle = Lifestyle.Singleton;
+
+            container.Register<ConcreteCommand>();
+
+            // Act
+            var command1 = container.GetInstance<ConcreteCommand>();
+            var command2 = container.GetInstance<ConcreteCommand>();
+
+            // Assert
+            Assert.AreSame(command1, command2, "Same instance was expected");
+        }
+
+        [TestMethod]
         public void DefaultScopedLifestyle_SetWithNullValue_ThrowsException()
         {
             // Arrange
@@ -818,6 +909,33 @@
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void LifestyleSelectionBehavior_DefaultImplementation_RedirectsToDefaultLifestyleProperty1()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+
+            // Act
+            var lifestyle = options.LifestyleSelectionBehavior.SelectLifestyle(typeof(object), typeof(object));
+
+            // Assert
+            Assert.AreSame(options.DefaultLifestyle, lifestyle);
+        }
+
+        [TestMethod]
+        public void LifestyleSelectionBehavior_DefaultImplementation_RedirectsToDefaultLifestyleProperty2()
+        {
+            // Arrange
+            var options = GetContainerOptions();
+            options.DefaultLifestyle = Lifestyle.Singleton;
+
+            // Act
+            var lifestyle = options.LifestyleSelectionBehavior.SelectLifestyle(typeof(object), typeof(object));
+
+            // Assert
+            Assert.AreSame(Lifestyle.Singleton, lifestyle);
         }
 
         private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
