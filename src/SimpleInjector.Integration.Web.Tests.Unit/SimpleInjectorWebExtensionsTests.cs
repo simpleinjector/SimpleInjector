@@ -1,11 +1,10 @@
-﻿namespace SimpleInjector.Integration.Web.Tests.Unit
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Integration.Web.Tests.Unit
 {
     using System;
     using System.Web;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -192,7 +191,7 @@
             // Assert
             Assert.IsFalse(singleton.HasBeenDisposed, "Singletons should not be disposed.");
         }
-        
+
         [TestMethod]
         public void GetInstance_CalledMultipleTimesOnAPerWebRequestServiceWithinASingleScope_DisposesThatInstanceOnce()
         {
@@ -215,7 +214,7 @@
             // Assert
             Assert.AreEqual(1, command.DisposeCount, "Dispose should be called exactly once.");
         }
-        
+
         [TestMethod]
         public void GetInstance_ResolveMultipleWebRequestServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
         {
@@ -489,3 +488,4 @@
         }
     }
 }
+#pragma warning restore 0618

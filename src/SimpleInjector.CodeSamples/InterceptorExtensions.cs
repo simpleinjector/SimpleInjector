@@ -29,7 +29,7 @@ namespace SimpleInjector.CodeSamples
     );
     */
 
-    // https://simpleinjector.readthedocs.org/en/latest/InterceptionExtensions.html
+    // https://simpleinjector.readthedocs.io/en/latest/InterceptionExtensions.html
     using System;
     using System.Diagnostics;
     using System.Linq;

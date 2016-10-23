@@ -1,6 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    // https://simpleinjector.readthedocs.org/en/latest/extensibility.html#overriding-constructor-resolution-behavior
+    // https://simpleinjector.readthedocs.io/en/latest/extensibility.html#overriding-constructor-resolution-behavior
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit.Diagnostics
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Tests.Unit.Diagnostics
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -102,3 +103,4 @@
         }
     }
 }
+#pragma warning restore 0618

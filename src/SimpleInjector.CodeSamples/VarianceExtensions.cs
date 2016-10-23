@@ -5,7 +5,7 @@
     using System.Linq;
     using SimpleInjector;
 
-    // https://simpleinjector.readthedocs.org/en/latest/varianceextensions.html
+    // https://simpleinjector.readthedocs.io/en/latest/varianceextensions.html
     public static class VarianceExtensions
     {
         /// <summary>

@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +7,6 @@
     using System.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
 
     [TestClass]
     public class VerifyTests
