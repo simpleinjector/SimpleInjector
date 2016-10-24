@@ -126,7 +126,7 @@
         {
             // Arrange
             const string ExpectedExceptionMessage =
-                "the instance is requested outside the context of a Lifetime Scope";
+                "This method can only be called within the context of an active Lifetime Scope";
 
             var container = new Container();
 
