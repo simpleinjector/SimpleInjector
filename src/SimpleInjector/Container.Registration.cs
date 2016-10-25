@@ -138,14 +138,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.resolveUnregisteredType += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.resolveUnregisteredType -= value;
             }
@@ -266,14 +266,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.expressionBuilt += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.expressionBuilt -= value;
             }
@@ -370,14 +370,14 @@ namespace SimpleInjector
         {
             add
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.expressionBuilding += value;
             }
 
             remove
             {
-                this.ThrowWhenContainerIsLocked();
+                this.ThrowWhenContainerIsLockedOrDisposed();
 
                 this.expressionBuilding -= value;
             }
@@ -963,7 +963,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
 
-            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenContainerIsLockedOrDisposed();
 
             this.instanceInitializers.Add(TypedInstanceInitializer.Create(instanceInitializer));
         }
@@ -1001,7 +1001,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
             Requires.IsNotNull(predicate, nameof(predicate));
 
-            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenContainerIsLockedOrDisposed();
 
             this.instanceInitializers.Add(ContextualInstanceInitializer.Create(instanceInitializer, predicate));
         }
@@ -1115,7 +1115,7 @@ namespace SimpleInjector
             Requires.IsRegistrationForThisContainer(this, registration, nameof(registration));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
-            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenContainerIsLockedOrDisposed();
 
             var producer = new InstanceProducer(serviceType, registration);
 

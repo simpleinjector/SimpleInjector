@@ -60,7 +60,7 @@ namespace SimpleInjector.Internals
 
         public void Add(InstanceProducer producer)
         {
-            this.container.ThrowWhenContainerIsLocked();
+            this.container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
             this.ThrowWhenOverlappingRegistrationsExist(producer);
@@ -76,7 +76,7 @@ namespace SimpleInjector.Internals
         public void AddGeneric(Type serviceType, Type implementationType,
             Lifestyle lifestyle, Predicate<PredicateContext> predicate)
         {
-            this.container.ThrowWhenContainerIsLocked();
+            this.container.ThrowWhenContainerIsLockedOrDisposed();
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationType, lifestyle, predicate, this.container);
@@ -96,7 +96,7 @@ namespace SimpleInjector.Internals
         public void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
             Lifestyle lifestyle, Predicate<PredicateContext> predicate)
         {
-            this.container.ThrowWhenContainerIsLocked();
+            this.container.ThrowWhenContainerIsLockedOrDisposed();
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationTypeFactory, lifestyle, predicate, this.container);
