@@ -71,8 +71,6 @@ namespace SimpleInjector
         private readonly long containerId;
         private readonly Scope disposableSingletonsScope;
 
-        private bool disposed;
-
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
         // registered by the user and implicitly registered through unregistered type resolution.
         private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations =
@@ -90,8 +88,8 @@ namespace SimpleInjector
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
-
         private string stackTraceThatLockedTheContainer;
+        private bool disposed;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
@@ -403,7 +401,6 @@ namespace SimpleInjector
                 this.FlagContainerAsLocked();
             }
         }
-
 
 #if NET45 || NETSTANDARD
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

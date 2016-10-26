@@ -1271,10 +1271,10 @@
         {
             // Arrange
             var container = new Container();
-
-            
+                        
             container.Register(typeof(IQueryDispatcher<,>), typeof(QueryDispatcher<,>));
-            container.RegisterCollection(typeof(IQueryHandler<,>), new[] {
+            container.RegisterCollection(typeof(IQueryHandler<,>), new[] 
+            {
                 typeof(MultipleResultsIntQueryHandler),
                 typeof(MultipleResultsBoolQueryHandler)
             });
@@ -1311,6 +1311,7 @@
         {
         }
     }
+
     public sealed class DefaultStuffDoer<T> : IDoStuff<T>
     {
         public DefaultStuffDoer(IService<T, int> service)

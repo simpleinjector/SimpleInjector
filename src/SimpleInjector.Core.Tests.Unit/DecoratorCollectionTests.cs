@@ -1009,7 +1009,7 @@
                     {
                         predicateCallCount++;
 
-                        Assert.AreEqual(0, context.AppliedDecorators.Count(),
+                        Assert.AreEqual(0, context.AppliedDecorators.Count,
                             "No decorators have been applied to the NullCommandHandler and the " +
                             "AppliedDecorators collection is expected to be empty.");
                     }

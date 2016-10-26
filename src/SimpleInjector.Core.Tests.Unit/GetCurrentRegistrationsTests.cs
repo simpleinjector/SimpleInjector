@@ -178,7 +178,7 @@
                 .ToArray();
 
             // Assert
-            Assert.AreEqual(1, registrations.Count());
+            Assert.AreEqual(1, registrations.Length);
         }
 
         [TestMethod]
