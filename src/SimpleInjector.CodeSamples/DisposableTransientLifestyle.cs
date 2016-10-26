@@ -1,14 +1,12 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
 
     /// <summary>
     /// Allows registering instances with a <see cref="Lifestyle.Transient">Transient</see> lifestyle, while
-    /// allowing them to get disposed on the boundary of a supplied <see cref="ScopedLifestyle"/>
+    /// allowing them to get disposed on the boundary of a supplied <see cref="ScopedLifestyle"/>.
     /// </summary>
     public class DisposableTransientLifestyle : Lifestyle
     {
@@ -21,13 +19,9 @@
             this.scopedLifestyle = scopedLifestyle;
         }
 
-        protected override int Length
-        {
-            // Same length as Transient.
-            get { return 1; }
-        }
+        // Same length as Transient.
+        protected override int Length => 1;
 
-        [DebuggerStepThrough]
         public static void EnableForContainer(Container container)
         {
             bool alreadyInitialized = container.GetItem(ItemKey) != null;
@@ -40,34 +34,12 @@
             }
         }
 
-        [DebuggerStepThrough]
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-        {
-            TryEnableTransientDisposalOrThrow(container);
+        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) =>
+            new DisposableRegistration<TService, TImplementation>(this.scopedLifestyle, this, c);
 
-            var registration = 
-                new DisposableTransientLifestyleRegistration<TService, TImplementation>(this, container);
+        protected override Registration CreateRegistrationCore<TService>(Func<TService> ic, Container c) =>
+            new DisposableRegistration<TService>(this.scopedLifestyle, this, c, ic);
 
-            registration.ScopedLifestyle = this.scopedLifestyle;
-
-            return registration;
-        }
-
-        [DebuggerStepThrough]
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
-        {
-            TryEnableTransientDisposalOrThrow(container);
-
-            var registration =
-                new DisposableTransientLifestyleRegistration<TService>(this, container, instanceCreator);
-
-            registration.ScopedLifestyle = this.scopedLifestyle;
-
-            return registration;
-        }
-
-        [DebuggerStepThrough]
         private static void TryEnableTransientDisposalOrThrow(Container container)
         {
             bool alreadyInitialized = container.GetItem(ItemKey) != null;
@@ -85,96 +57,55 @@
             }
         }
 
-        private static void AddGlobalDisposableInitializer(Container container)
-        {
-            Predicate<InitializationContext> shouldRunInstanceInitializer =
-                context => context.Registration is DisposableTransientRegistration;
+        private static void AddGlobalDisposableInitializer(Container container) =>
+            container.RegisterInitializer(RegisterForDisposal, ShouldApplyInitializer);
 
-            Action<InstanceInitializationData> instanceInitializer = data =>
+        private static bool ShouldApplyInitializer(InitializationContext context) => 
+            context.Registration is DisposableRegistration;
+
+        private static void RegisterForDisposal(InstanceInitializationData data)
+        {
+            IDisposable instance = data.Instance as IDisposable;
+
+            if (instance != null)
             {
-                IDisposable instance = data.Instance as IDisposable;
-
-                if (instance != null)
-                {
-                    var registation = (DisposableTransientRegistration)data.Context.Registration;
-
-                    var scope = registation.ScopedLifestyle.GetCurrentScope(container);
-
-                    if (scope == null)
-                    {
-                        ThrowOutsideScopeException(data.Context.Producer.ServiceType, registation);
-                    }
-
-                    scope.RegisterForDisposal(instance);
-                }
-            };
-
-            container.RegisterInitializer(instanceInitializer, shouldRunInstanceInitializer);
-        }
-
-        private static void ThrowOutsideScopeException(Type serviceType,
-            DisposableTransientRegistration registation)
-        {
-            throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                "The {0} is registered as '{1}' lifestyle, but the instance is requested " +
-                "outside the context of a {2}.",
-                serviceType.FullName,
-                registation.Lifestyle.Name,
-                registation.ScopedLifestyle.Name));
-        }
-        
-        private abstract class DisposableTransientRegistration : Registration
-        {
-            protected DisposableTransientRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
+                var registation = (DisposableRegistration)data.Context.Registration;
+                registation.ScopedLifestyle.RegisterForDisposal(registation.Container, instance);
             }
-
-            internal ScopedLifestyle ScopedLifestyle { get; set; }
         }
 
-        private sealed class DisposableTransientLifestyleRegistration<TService> 
-            : DisposableTransientRegistration
-            where TService : class
+        private sealed class DisposableRegistration<TService> : DisposableRegistration where TService : class
         {
             private readonly Func<TService> instanceCreator;
 
-            internal DisposableTransientLifestyleRegistration(Lifestyle lifestyle, Container container, 
-                Func<TService> instanceCreator)
-                : base(lifestyle, container)
+            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c, Func<TService> ic) : base(s, l, c)
             {
-                this.instanceCreator = instanceCreator;
+                this.instanceCreator = ic;
             }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TService); }
-            }
-
-            public override Expression BuildExpression()
-            {
-                return this.BuildTransientExpression<TService>(this.instanceCreator);
-            }
+            public override Type ImplementationType => typeof(TService);
+            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
         }
 
-        private class DisposableTransientLifestyleRegistration<TService, TImplementation> 
-            : DisposableTransientRegistration
-            where TImplementation : class, TService
+        private class DisposableRegistration<TService, TImpl> : DisposableRegistration
+            where TImpl : class, TService
             where TService : class
         {
-            internal DisposableTransientLifestyleRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
+            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c) : base(s, l, c) { }
 
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
+            public override Type ImplementationType => typeof(TImpl);
+            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImpl>();
+        }
 
-            public override Expression BuildExpression()
+        private abstract class DisposableRegistration : Registration
+        {
+            internal readonly ScopedLifestyle ScopedLifestyle;
+
+            protected DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c) : base(l, c)
             {
-                return this.BuildTransientExpression<TService, TImplementation>();
+                this.ScopedLifestyle = s;
+
+                TryEnableTransientDisposalOrThrow(c);
             }
         }
     }

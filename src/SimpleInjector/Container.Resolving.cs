@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -83,6 +83,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public object GetInstance(Type serviceType)
         {
+            this.ThrowWhenDisposed();
             this.LockContainer();
 
             InstanceProducer instanceProducer;
@@ -133,6 +134,7 @@ namespace SimpleInjector
             Justification = "Users are not expected to inherit from this class and override this implementation.")]
         object IServiceProvider.GetService(Type serviceType)
         {
+            this.ThrowWhenDisposed();
             this.LockContainer();
 
             InstanceProducer instanceProducer;
@@ -202,6 +204,7 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
+            this.ThrowWhenDisposed();
             this.LockContainer();
 
             InstanceProducer producer;

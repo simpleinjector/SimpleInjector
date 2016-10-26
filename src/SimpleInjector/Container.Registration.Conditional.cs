@@ -241,7 +241,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
                 nameof(serviceType));
 
-            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenContainerIsLockedOrDisposed();
             
             var producer = new InstanceProducer(serviceType, registration, predicate);
 

@@ -96,6 +96,8 @@ namespace SimpleInjector
         {
             Requires.IsValidEnum(option, nameof(option));
 
+            this.ThrowWhenDisposed();
+
             bool diagnose = option == VerificationOption.VerifyAndDiagnose;
 
             this.VerifyInternal(suppressLifestyleMismatchVerification: diagnose);

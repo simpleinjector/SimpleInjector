@@ -411,7 +411,7 @@ namespace SimpleInjector
             Requires.IsNotNull(interceptor, nameof(interceptor));
             Requires.IsNotNull(predicate, nameof(predicate));
 
-            this.Container.ThrowWhenContainerIsLocked();
+            this.Container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.Container.RegisterResolveInterceptor(interceptor, predicate);
         }
