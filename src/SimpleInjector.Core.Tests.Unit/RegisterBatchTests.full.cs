@@ -9,7 +9,7 @@
     /// <summary>Tests for full .NET framework version.</summary>
     public partial class RegisterBatchTestsFull
     {
-        private static readonly Assembly[] assemblies = 
+        private static readonly Assembly[] Assemblies =
             new[] { typeof(RegisterBatchTestsFull).GetTypeInfo().Assembly };
 
         // This is the open generic interface that will be used as service type.
@@ -22,7 +22,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Register(typeof(IServiceFull<,>), assemblies);
+            container.Register(typeof(IServiceFull<,>), Assemblies);
 
             // Act
             var impl = container.GetInstance<IServiceFull<decimal, decimal>>();
@@ -37,7 +37,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IServiceFull<,>), assemblies);
+            container.Register(typeof(IServiceFull<,>), Assemblies);
 
             // Act
             var impl = container.GetInstance<IServiceFull<decimal, decimal>>();
@@ -52,7 +52,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IServiceFull<,>), assemblies);
+            container.Register(typeof(IServiceFull<,>), Assemblies);
 
             // Act
             var impl = container.GetInstance<IServiceFull<decimal, decimal>>();
@@ -67,7 +67,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IServiceFull<,>), assemblies, Lifestyle.Transient);
+            container.Register(typeof(IServiceFull<,>), Assemblies, Lifestyle.Transient);
 
             // Act
             var impl = container.GetInstance<IServiceFull<decimal, decimal>>();
@@ -82,7 +82,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IServiceFull<,>), assemblies, Lifestyle.Transient);
+            container.Register(typeof(IServiceFull<,>), Assemblies, Lifestyle.Transient);
 
             // Act
             var impl = container.GetInstance<IServiceFull<decimal, decimal>>();
@@ -98,7 +98,7 @@
             var container = new Container();
 
             // Act
-            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), assemblies);
+            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), Assemblies);
 
             // Assert
             Assert.IsTrue(result.Contains(typeof(InternalConcrete4Full)));
@@ -111,7 +111,7 @@
             var container = new Container();
 
             // Act
-            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), assemblies);
+            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), Assemblies);
 
             // Assert
             Assert.IsTrue(result.Contains(typeof(InternalConcrete4Full)));

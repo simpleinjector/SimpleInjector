@@ -34,6 +34,9 @@ namespace SimpleInjector.Internals
 
     internal static partial class CompilationHelpers
     {
+        private static readonly ConstructorInfo LazyScopeConstructor =
+            Helpers.GetConstructor(() => new LazyScope(null, null));
+
         // Compile the expression. If the expression is compiled in a dynamic assembly, the compiled delegate
         // is called (to ensure that it will run, because it tends to fail now and then) and the created
         // instance is returned through the out parameter. Note that NO created instance will be returned when
@@ -75,7 +78,7 @@ namespace SimpleInjector.Internals
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static Expression OptimizeScopedRegistrationsInObjectGraph(Container container, 
+        internal static Expression OptimizeScopedRegistrationsInObjectGraph(Container container,
             Expression expression)
         {
             var lifestyleInfos = PerObjectGraphOptimizableRegistrationFinder.Find(expression, container);
@@ -89,7 +92,7 @@ namespace SimpleInjector.Internals
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static Func<TService> CompileLambda<TService>(Expression expression) => 
+        internal static Func<TService> CompileLambda<TService>(Expression expression) =>
             Expression.Lambda<Func<TService>>(expression).Compile();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -99,7 +102,7 @@ namespace SimpleInjector.Internals
             return Expression.Lambda(delegateType, expression).Compile();
         }
 
-        static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression, 
+        static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
             ref Delegate compiledLambda);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -151,7 +154,7 @@ namespace SimpleInjector.Internals
                 from registrationInfo in lifestyleInfo.Registrations
                 select registrationInfo)
                 .ToArray();
-            
+
             var registrationAssignmentExpressions = (
                 from registrationInfo in registrationInfos
                 let newExpression = CreateNewLazyScopedRegistration(registrationInfo.Registration)
@@ -167,9 +170,6 @@ namespace SimpleInjector.Internals
                     .Concat(registrationAssignmentExpressions
                         .Concat(new[] { optimizedExpression })));
         }
-
-        private static readonly ConstructorInfo LazyScopeConstructor =
-            Helpers.GetConstructor(() => new LazyScope(null, null));
 
         private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container) =>
             Expression.New(
@@ -235,7 +235,7 @@ namespace SimpleInjector.Internals
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }
 
-        private static Expression FindMostReductiveNodeOrNull(NodeSizes results, 
+        private static Expression FindMostReductiveNodeOrNull(NodeSizes results,
             int maximumNumberOfNodesPerDelegate)
         {
             // By setting a maximum size, we prevent that the one of the root nodes will be selected as most
@@ -367,7 +367,7 @@ namespace SimpleInjector.Internals
                 this.Lifestyle = lifestyle;
                 this.Registrations = registrations.ToArray();
                 this.Variable = Expression.Variable(typeof(LazyScope));
-                
+
                 this.InitializeRegistrations();
             }
 
@@ -389,7 +389,7 @@ namespace SimpleInjector.Internals
 
             private ParameterExpression variable;
 
-            internal OptimizableRegistrationInfo(Registration registration, 
+            internal OptimizableRegistrationInfo(Registration registration,
                 MethodCallExpression originalExpression)
             {
                 this.Registration = registration;
@@ -414,7 +414,7 @@ namespace SimpleInjector.Internals
 
             internal OptimizableLifestyleInfo LifestyleInfo { get; set; }
 
-            internal Expression LazyScopeRegistrationGetInstanceExpression => 
+            internal Expression LazyScopeRegistrationGetInstanceExpression =>
                 Expression.Call(
                     this.Variable,
                     this.lazyScopeRegistrationType.GetMethod("GetInstance"),
@@ -429,7 +429,7 @@ namespace SimpleInjector.Internals
             public int TreeSize { get; set; }
             public int TotalCost => this.Count * this.TreeSize;
         }
-        
+
         private sealed class NodeSizes
         {
             public int TotalSize { get; set; }

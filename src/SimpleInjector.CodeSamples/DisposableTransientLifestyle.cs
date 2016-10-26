@@ -105,7 +105,7 @@
             {
                 this.ScopedLifestyle = s;
 
-                TryEnableTransientDisposalOrThrow(c);
+                DisposableTransientLifestyle.TryEnableTransientDisposalOrThrow(c);
             }
         }
     }
