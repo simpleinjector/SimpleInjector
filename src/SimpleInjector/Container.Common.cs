@@ -71,6 +71,8 @@ namespace SimpleInjector
         private readonly long containerId;
         private readonly Scope disposableSingletonsScope;
 
+        private bool disposed;
+
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
         // registered by the user and implicitly registered through unregistered type resolution.
         private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations =
@@ -265,6 +267,7 @@ namespace SimpleInjector
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+            this.disposed = true;
         }
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
@@ -401,6 +404,18 @@ namespace SimpleInjector
             }
         }
 
+
+#if NET45 || NETSTANDARD
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        internal void ThrowWhenDisposed()
+        {
+            if (this.disposed)
+            {
+                this.ThrowContainerDisposedException();
+            }
+        }
+
         internal Func<object> WrapWithResolveInterceptor(InitializationContext context, Func<object> producer)
         {
             ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
@@ -418,8 +433,10 @@ namespace SimpleInjector
             this.disposableSingletonsScope.RegisterForDisposal(disposable);
         }
 
-        internal void ThrowWhenContainerIsLocked()
+        internal void ThrowWhenContainerIsLockedOrDisposed()
         {
+            this.ThrowWhenDisposed();
+
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
             // immediately.
             lock (this.locker)
@@ -482,6 +499,11 @@ namespace SimpleInjector
 
                 this.locked = true;
             }
+        }
+
+        private void ThrowContainerDisposedException()
+        {
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object instance)
