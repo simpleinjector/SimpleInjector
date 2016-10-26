@@ -56,6 +56,9 @@ namespace SimpleInjector.Advanced
         {
             Requires.IsNotNull(container, nameof(container));
 
+            // Need to check, because IsVerifying will throw when its ThreadLocal<T> is disposed.
+            container.ThrowWhenDisposed();
+
             return container.IsVerifying;
         }
 

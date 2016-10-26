@@ -123,7 +123,7 @@ namespace SimpleInjector.Internals
 
         void IContainerControlledCollection.Clear()
         {
-            this.container.ThrowWhenContainerIsLocked();
+            this.container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.producers.Clear();
         }

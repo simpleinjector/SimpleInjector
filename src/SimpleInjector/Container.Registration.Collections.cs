@@ -289,7 +289,7 @@ namespace SimpleInjector
         private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] controlledItems, 
             bool appending = false)
         {
-            this.ThrowWhenContainerIsLocked();
+            this.ThrowWhenContainerIsLockedOrDisposed();
 
             this.RegisterGenericContainerControlledCollection(itemType, controlledItems, appending);
         }
