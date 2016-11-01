@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -70,8 +70,9 @@ namespace SimpleInjector
         private readonly ThreadLocal<InstanceProducer> currentProducer = new ThreadLocal<InstanceProducer>();
 
         private HashSet<DiagnosticType> suppressions;
-        private Dictionary<ParameterInfo, OverriddenParameter> overriddenParameters;
+        private Dictionary<object, OverriddenParameter> overriddenParameters;
         private Action<object> instanceInitializer;
+        private static object p;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Registration"/> class.
@@ -235,7 +236,7 @@ namespace SimpleInjector
         // This method should only be called by the Lifestyle base class and the HybridRegistration.
         internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> parameters)
         {
-            this.overriddenParameters = parameters.ToDictionary(p => p.Parameter);
+            this.overriddenParameters = parameters.ToDictionary(p => GetParameterKey(p.Parameter));
         }
 
         // Wraps the expression with a delegate that injects the properties.
@@ -481,9 +482,14 @@ namespace SimpleInjector
 
         private OverriddenParameter GetOverriddenParameterFor(ParameterInfo parameter)
         {
-            if (this.overriddenParameters != null && this.overriddenParameters.ContainsKey(parameter))
+            if (this.overriddenParameters != null)
             {
-                return this.overriddenParameters[parameter];
+                object key = GetParameterKey(parameter);
+                
+                if (this.overriddenParameters.ContainsKey(key))
+                {
+                    return this.overriddenParameters[key];
+                }
             }
 
             return new OverriddenParameter();
@@ -613,5 +619,10 @@ namespace SimpleInjector
         {
             this.currentProducer.Value = null;
         }
+
+        // HACK: ParameterInfo is not guaranteed to be unique (while Type and MemberBase are). This caused 
+        // the bug described in #323. By creating this key, we can match multiple PatereterInfo objects that
+        // reference the same parameter.
+        private static object GetParameterKey(ParameterInfo param) => new { param.Name, param.Member };
     }
 }
