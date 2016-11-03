@@ -242,8 +242,8 @@ namespace SimpleInjector
 
                 if (ex is CyclicDependencyException)
                 {
-                    throw new ActivationException(
-                        StringResources.CyclicDependencyGraphMessage(ex as CyclicDependencyException), ex);
+                    var cex = ex as CyclicDependencyException;
+                    throw new ActivationException(cex.Message, ex);
                 }
 
                 if (this.MustWrapThrownException(ex))
