@@ -77,18 +77,6 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
 
-        /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method is not supported anymore. Please use Container.Options to configure the container.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public ContainerOptions()
-        {
-            throw new InvalidOperationException(
-                "This method is not supported anymore. Please use Container.Options to configure the container.");
-        }
-
         internal ContainerOptions(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -172,35 +160,6 @@ namespace SimpleInjector
                 this.resolutionBehavior = value;
             }
         }
-
-        /// <summary>
-        /// Gets or sets the constructor verification behavior. The container's default behavior is to
-        /// disallow constructors with value types and strings.
-        /// <b>NOTE:</b> This property has been removed. Please use the <see cref="ConstructorInjectionBehavior"/> 
-        /// property to override Simple Injector's verification behavior.
-        /// </summary>
-        /// <value>The constructor resolution behavior.</value>
-        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
-            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
-            "DependencyInjectionBehavior property to override Simple Injector's verification behavior.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
-
-        /// <summary>Gets or sets the constructor injection behavior.</summary>
-        /// <value>The constructor injection behavior.</value>
-        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the container already contains registrations.
-        /// </exception>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
-            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
-            "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public IConstructorInjectionBehavior ConstructorInjectionBehavior { get; set; }
 
         /// <summary>Gets or sets the dependency injection behavior.</summary>
         /// <value>The constructor injection behavior.</value>

@@ -62,25 +62,6 @@ namespace SimpleInjector.Advanced
             return container.IsVerifying;
         }
 
-        /// <summary>This method has been removed.</summary>
-        /// <param name="container">The container.</param>
-        /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
-        /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method has been removed. Use Container.GetRegistration().Registration." +
-            "InitializeInstance instead to initialize an existing instance.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public static Action<TService> GetInitializer<TService>(this Container container)
-        {
-            Requires.IsNotNull(container, nameof(container));
-
-            throw new InvalidOperationException(
-                "This method has been removed. Use Container.GetRegistration().Registration." +
-                "InitializeInstance instead to initialize an existing instance.");
-        }
-
         /// <summary>
         /// Retrieves an item from the container stored by the given <paramref name="key"/> or null when no
         /// item is stored by that key.

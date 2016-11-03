@@ -6,7 +6,6 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
 
     public static class ContextualDecoratorExtensions
     {

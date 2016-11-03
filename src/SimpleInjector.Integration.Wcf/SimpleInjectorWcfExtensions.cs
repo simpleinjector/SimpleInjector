@@ -79,22 +79,6 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>This method is obsolete. Do not call this method.</summary>
-        /// <param name="container">The container.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "We can't remove the 'container' parameter. That would break the API.")]
-        [Obsolete("The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
-            "This method has therefore become a no-op and the call to this method can be removed safely.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void EnablePerWcfOperationLifestyle(this Container container)
-        {
-            throw new InvalidOperationException(
-                "The WcfOperationLifestyle is enabled implicitly by Simple Injector. " +
-                "This method has therefore become a no-op and the call to this method can be removed safely.");
-        }
-
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned during
         /// the WCF configured lifetime of the WCF service class. When the WCF service class is released by

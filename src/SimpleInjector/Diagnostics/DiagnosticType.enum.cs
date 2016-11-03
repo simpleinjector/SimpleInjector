@@ -53,12 +53,6 @@ namespace SimpleInjector.Diagnostics
         LifestyleMismatch,
 
         /// <summary>
-        /// This enum options has been replaced with <see cref="LifestyleMismatch"/>.
-        /// </summary>
-        [Obsolete("Please use DiagnosticType.LifestyleMismatch instead.", error: true)]
-        PotentialLifestyleMismatch,
-
-        /// <summary>
         /// Diagnostic type that warns when a
         /// component depends on an unregistered concrete type and this concrete type has a lifestyle that is 
         /// different than the lifestyle of an explicitly registered type that uses this concrete type as its 

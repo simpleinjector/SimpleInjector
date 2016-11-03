@@ -71,14 +71,8 @@
     <Compile Include="..\SimpleInjector\Advanced\DefaultPropertySelectionBehavior.cs">
       <Link>Advanced\DefaultPropertySelectionBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\SimpleInjector\Advanced\IConstructorInjectionBehavior.cs">
-      <Link>Advanced\IConstructorInjectionBehavior.cs</Link>
-    </Compile>
     <Compile Include="..\SimpleInjector\Advanced\IConstructorResolutionBehavior.cs">
       <Link>Advanced\IConstructorResolutionBehavior.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector\Advanced\IConstructorVerificationBehavior.cs">
-      <Link>Advanced\IConstructorVerificationBehavior.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector\Advanced\IDependencyInjectionBehavior.cs">
       <Link>Advanced\IDependencyInjectionBehavior.cs</Link>
@@ -109,9 +103,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector\Container.Common.cs">
       <Link>Container.Common.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector\Container.Obsolete.cs">
-      <Link>Container.Obsolete.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector\Container.Registration.Batch.cs">
       <Link>Container.Registration.Batch.cs</Link>
@@ -241,9 +232,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector\Diagnostics\LifestyleMismatchDiagnosticResult.cs">
       <Link>Diagnostics\LifestyleMismatchDiagnosticResult.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector\Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs">
-      <Link>Diagnostics\PotentialLifestyleMismatchDiagnosticResult.cs</Link>
     </Compile>
     <Compile Include="..\SimpleInjector\Diagnostics\ShortCircuitedDependencyDiagnosticResult.cs">
       <Link>Diagnostics\ShortCircuitedDependencyDiagnosticResult.cs</Link>
@@ -424,15 +412,6 @@
     </Compile>
     <Compile Include="..\SimpleInjector\VerificationOption.enum.cs">
       <Link>VerificationOption.enum.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\DecoratorExtensions.cs">
-      <Link>Extensions\DecoratorExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericBatchRegistrationExtensions.cs">
-      <Link>Extensions\OpenGenericBatchRegistrationExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\SimpleInjector.NET\Extensions\OpenGenericRegistrationExtensions.cs">
-      <Link>Extensions\OpenGenericRegistrationExtensions.cs</Link>
     </Compile>
     <Compile Include="PclSpecific\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="PclSpecific\Helpers.cs" />
