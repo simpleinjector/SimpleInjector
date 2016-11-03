@@ -52,7 +52,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
+            container.RegisterCollection<IPlugin>();
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
@@ -106,7 +106,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
+            container.RegisterCollection<IPlugin>();
 
             // Act
             IReadOnlyList<IPlugin> list = 

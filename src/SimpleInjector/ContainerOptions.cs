@@ -113,14 +113,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets or sets a value indicating whether the container will return an empty collection when
-        /// a collection is requested that hasn't been explicitly registered. The default value is <b>false</b>,
-        /// which means that the container will throw an exception. Set the value to <b>true</b> to get the
-        /// old behavior of Simple Injector v1.x and v2.x.
+        /// a collection is requested that hasn't been explicitly registered. This method is obsolete.
         /// </summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
         [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
             "release. Please register collections explicitly instead.",
-            error: false)]
+            error:  true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ResolveUnregisteredCollections { get; set; }
 
         /// <summary>

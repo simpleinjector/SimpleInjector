@@ -302,8 +302,11 @@
 
     public class Consumer<TDependency>
     {
+        public readonly TDependency Dependency;
+
         public Consumer(TDependency dependency)
         {
+            this.Dependency = dependency;
         }
     }
 

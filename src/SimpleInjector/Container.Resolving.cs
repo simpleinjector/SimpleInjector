@@ -505,8 +505,7 @@ namespace SimpleInjector
                 // will cause (incorrect) diagnostic warnings.
                 if (!this.emptyAndRedirectedCollectionRegistrationCache.TryGetValue(serviceType, out producer))
                 {
-                    producer = this.TryBuildCollectionInstanceProducer(serviceType)
-                        ?? this.TryBuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
+                    producer = this.TryBuildCollectionInstanceProducer(serviceType);
 
                     this.emptyAndRedirectedCollectionRegistrationCache[serviceType] = producer;
                 }
@@ -538,31 +537,6 @@ namespace SimpleInjector
 
                     return producer;
                 }
-            }
-
-            return null;
-        }
-
-        private InstanceProducer TryBuildEmptyCollectionInstanceProducerForEnumerable(Type serviceType)
-        {
-#pragma warning disable 0618
-            if (!this.Options.ResolveUnregisteredCollections)
-            {
-                return null;
-            }
-#pragma warning restore 0618
-
-            if (serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            {
-                // During the time that this method is called we are after the registration phase and there is
-                // no registration for this IEnumerable<T> type (and unregistered type resolution didn't pick
-                // it up). This means that we will must always return an empty set and we will do this by
-                // registering a SingletonInstanceProducer with an empty array of that type.
-                var producer = this.BuildEmptyCollectionInstanceProducerForEnumerable(serviceType);
-
-                producer.IsContainerAutoRegistered = true;
-
-                return producer;
             }
 
             return null;

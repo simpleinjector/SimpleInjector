@@ -84,12 +84,12 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_ConcreteTypeWithEnumerableArgumentOfUnregisteredTypeWithResolveMissingCollectionRegistrationAsEmptyCollectionTrue_InjectsZeroInstances()
+        public void GetInstance_ConcreteTypeWithEnumerableArgumentForRegisteredCollectionWithoutElements_InjectsZeroInstances()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
+            container.RegisterCollection<IPlugin>();
 
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
@@ -220,24 +220,6 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetAllInstances_NoInstancesRegisteredAndResolveMissingCollectionRegistrationAsEmptyCollectionTrue_ReturnsEmptyCollection()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Options.ResolveUnregisteredCollections = true;
-
-            // Act
-            var repositories = container.GetAllInstances<IUserRepository>();
-
-            // Assert
-            Assert.IsNotNull(repositories, "This method MUST NOT return null.");
-            Assert.AreEqual(0, repositories.Count(),
-                "If no instances of the requested type are available, this method MUST return an " +
-                "enumerator of length 0 instead of throwing an exception.");
-        }
-
-        [TestMethod]
         public void RegisterCollection_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
@@ -258,7 +240,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.ResolveUnregisteredCollections = true;
+            container.RegisterCollection<IUserRepository>();
             var repositories = container.GetAllInstances<IUserRepository>();
             var count = repositories.Count();
 
@@ -544,25 +526,6 @@ namespace SimpleInjector.Tests.Unit
             Assert.AreEqual(secondContainer.Plugins, right,
                 "When using Register<T> to register collections, the collection should not be treated as a " +
                 "singleton.");
-        }
-
-        [TestMethod]
-        public void GetInstance_OnATypeThatDependsOnACollectionThatIsNotRegistered_SameInstanceInjectedEachTime()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Options.ResolveUnregisteredCollections = true;
-
-            // Act
-            // PluginContainer depends on IEnumerable<IPlugin>
-            var firstContainer = container.GetInstance<PluginContainer>();
-            var secondContainer = container.GetInstance<PluginContainer>();
-
-            // Assert
-            Assert.AreEqual(firstContainer.Plugins, secondContainer.Plugins, "When a collection is not " +
-                "registered, the container should register a single empty instance that can be returned " +
-                "every time. This saves performance.");
         }
 
         [TestMethod]
@@ -1374,7 +1337,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
+            container.RegisterCollection<IPlugin>();
 
             // Act
             IList<IPlugin> list =

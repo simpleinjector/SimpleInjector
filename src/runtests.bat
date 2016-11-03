@@ -1,0 +1,1 @@
+packages\NUnit.ConsoleRunner.3.4.0\tools\nunit3-console.exe SimpleInjector.NET.Tests.Unit\bin\Debug\SimpleInjector.Tests.Unit.dll

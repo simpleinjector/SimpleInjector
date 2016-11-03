@@ -525,13 +525,12 @@ namespace SimpleInjector.Tests.Unit
 
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
-
             container.ResolveUnregisteredType += (s, e) =>
             {
                 if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
                 {
                     resolveUnregisteredTypeWasTriggered = true;
+                    e.Register(() => Enumerable.Empty<Exception>());
                 }
             };
 
@@ -550,8 +549,6 @@ namespace SimpleInjector.Tests.Unit
 
             var container = ContainerFactory.New();
 
-            container.Options.ResolveUnregisteredCollections = true;
-
             container.ResolveUnregisteredType += (s, e) =>
             {
                 if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
@@ -561,10 +558,12 @@ namespace SimpleInjector.Tests.Unit
             };
 
             // Act
-            container.GetInstance<Wrapper<Exception>>();
+            container.GetInstance<ServiceDependingOn<IEnumerable<Exception>>>();
 
             // Assert
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
+
+            Assert.Fail("Test not run do?");
         }
 
         // This test verifies the bug reported in work item 19847.
