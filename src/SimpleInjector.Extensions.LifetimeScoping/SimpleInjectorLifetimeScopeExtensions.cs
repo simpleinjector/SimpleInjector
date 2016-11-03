@@ -37,25 +37,6 @@ namespace SimpleInjector
     {
         private static readonly object ManagerKey = new object();
 
-        /// <summary>This method is obsolete.</summary>
-        /// <param name="container">The container.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "We can't remove the 'container' parameter. That would break the API.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
-            "Remove the call to this method.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public static void EnableLifetimeScoping(this Container container)
-        {
-            throw new InvalidOperationException(
-                "LifetimeScoping is automatically enabled and there's no need to call this method anymore. " +
-                "Remove the call to this method.");
-        }
-
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
         /// each lifetime scope that has been started using 
@@ -259,8 +240,6 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when <see cref="EnableLifetimeScoping"/> has
-        /// not been called previously.</exception>
         /// <example>
         /// <code lang="cs"><![CDATA[
         /// using (container.BeginLifetimeScope())
