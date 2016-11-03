@@ -51,7 +51,7 @@ namespace SimpleInjector.Internals
         /// Gets a message that describes the current exception.
         /// </summary>
         /// <value>The error message that explains the reason for the exception, or an empty string("").</value>
-        public override string Message => base.Message + " " + StringResources.CyclicDependencyGraphMessage(this);
+        public override string Message => base.Message + " " + StringResources.CyclicDependencyGraphMessage(this.types);
 
         internal IEnumerable<Type> DependencyCycle => this.types;
 

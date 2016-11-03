@@ -267,11 +267,10 @@ namespace SimpleInjector
                 "The configuration is invalid. The type {0} is directly or indirectly depending on itself.",
                 serviceType.TypeName());
 
-        internal static string CyclicDependencyGraphMessage(CyclicDependencyException exception) =>
+        internal static string CyclicDependencyGraphMessage(IEnumerable<Type> dependencyCycle) =>
             string.Format(CultureInfo.InvariantCulture,
-                "{0} The cyclic graph contains the following types: {1}.",
-                exception.Message,
-                string.Join(" -> ", exception.DependencyCycle.Select(TypeName)));
+                "The cyclic graph contains the following types: {0}.",
+                string.Join(" -> ", dependencyCycle.Select(TypeName)));
 
         internal static string UnableToResolveTypeDueToSecurityConfiguration(Type serviceType,
             Exception innerException) =>
@@ -853,7 +852,7 @@ namespace SimpleInjector
 
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
 
-        private static string CSharpFriendlyName(Type type) => 
+        private static string CSharpFriendlyName(Type type) =>
             Helpers.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
     }
 }
