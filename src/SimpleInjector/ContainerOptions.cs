@@ -111,10 +111,7 @@ namespace SimpleInjector
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the container will return an empty collection when
-        /// a collection is requested that hasn't been explicitly registered. This method is obsolete.
-        /// </summary>
+        /// <summary>This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
         [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
             "release. Please register collections explicitly instead.",
