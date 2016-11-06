@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstanceContextExtensions.cs" />
+    <Compile Include="SimpleInjectorWcfExtensions.Obsolete.cs" />
     <Compile Include="WcfOperationLifestyle.cs" />
     <Compile Include="Requires.cs" />
     <Compile Include="WcfOperationScope.cs" />
