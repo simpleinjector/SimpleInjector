@@ -2,11 +2,7 @@
 {
     using System;
     using System.Linq;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Tests.Unit;
 
     [TestClass]
     public class ExternalProducerCreationAnalysisTests
@@ -15,7 +11,7 @@
         public void Analyze_ProducerGenericWithLifestyleMismatch_ProducesALifestyleMismatchWarning()
         {
             // Arrange
-            Action<Container> createLifestyleMismatch = container =>
+            Func<Container, InstanceProducer> createLifestyleMismatch = container =>
                 Lifestyle.Singleton.CreateProducer<RealUserService, RealUserService>(container);
 
             // Assert
@@ -26,7 +22,7 @@
         public void Analyze_ProducerNonGenericWithLifestyleMismatch_ProducesALifestyleMismatchWarning()
         {
             // Arrange
-            Action<Container> createLifestyleMismatch = container =>
+            Func<Container, InstanceProducer> createLifestyleMismatch = container =>
                 Lifestyle.Singleton.CreateProducer(typeof(RealUserService), typeof(RealUserService), container);
 
             // Assert
@@ -101,7 +97,7 @@
         }
         
         private static void Assert_CreatingARegistrationWithMismatchTriggersAWarning(
-            Action<Container> createLifestyleMismatch)
+            Func<Container, InstanceProducer> createLifestyleMismatch)
         {
             // Arrange
             var container = new Container();
@@ -110,13 +106,12 @@
             container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
 
             // RealUserService (Singleton) depends on InMemoryUserRepository (Transient).
-            createLifestyleMismatch(container);
+            var producer = createLifestyleMismatch(container);
 
             container.Verify(VerificationOption.VerifyOnly);
 
             // Act
-            var results =
-                Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
+            var results = Analyzer.Analyze(container).OfType<LifestyleMismatchDiagnosticResult>().ToArray();
 
             // Assert
             Assert.AreEqual(1, results.Length,
@@ -125,6 +120,8 @@
                 "Warnings: " +
                 string.Join(" ", results.Select(result => result.Description)) +
                 (results.Any() ? string.Empty : "[No warnings]"));
+
+            GC.KeepAlive(producer);
         }
    }
 }
