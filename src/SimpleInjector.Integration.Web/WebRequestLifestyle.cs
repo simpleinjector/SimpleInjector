@@ -74,6 +74,10 @@ namespace SimpleInjector.Integration.Web
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
         /// in the context of a web request.</exception>
+        [Obsolete("WhenCurrentRequestEnds has been deprecated. " +
+            "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentRequestEnds(Container container, Action action)
         {
             WithDisposal.WhenScopeEnds(container, action);

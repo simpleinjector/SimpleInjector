@@ -88,6 +88,25 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         {
         }
 
+        /// <summary>
+        /// Allows registering an <paramref name="action"/> delegate that will be called when the current
+        /// lifetime scope ends, but before the scope disposes any instances.
+        /// </summary>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="action">The delegate to run when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
+        /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
+        [Obsolete("WhenCurrentScopeEnds has been deprecated. " +
+            "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static void WhenCurrentScopeEnds(Container container, Action action)
+        {
+            WithDisposal.WhenScopeEnds(container, action);
+        }
+
         internal static LifetimeScopeLifestyle Get(bool dispose) => dispose ? WithDisposal : NoDisposal;
 
         /// <summary>

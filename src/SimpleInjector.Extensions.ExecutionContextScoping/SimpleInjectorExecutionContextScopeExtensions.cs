@@ -63,6 +63,20 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
             return container.GetExecutionContextScopeManager().BeginExecutionContextScope();
         }
 
+        /// <summary>
+        /// GetCurrentExecutionContextScope has been deprecated.
+        /// </summary>
+        [Obsolete("GetCurrentExecutionContextScope has been deprecated. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static Scope GetCurrentExecutionContextScope(this Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            return container.GetExecutionContextScopeManager().CurrentScope;
+        }
+
         // This method will never return null.
         internal static ExecutionContextScopeManager GetExecutionContextScopeManager(this Container container) => 
             container.GetOrSetItem(ManagerKey, (c, key) => new ExecutionContextScopeManager(c));

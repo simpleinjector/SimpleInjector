@@ -64,6 +64,37 @@ namespace SimpleInjector
             return container.GetLifetimeScopeManager().BeginLifetimeScope();
         }
 
+        /// <summary>
+        /// Gets the <see cref="Scope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="Scope"/> is currently in scope.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
+        /// returned every time) and registers an initializer for that type that will register that instance
+        /// for disposal in the <see cref="Scope"/> in which context it is created:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(instance =>
+        /// {
+        ///     container.GetCurrentLifetimeScope().RegisterForDisposal(instance);
+        /// });
+        /// ]]></code>
+        /// </example>
+        /// <param name="container">The container.</param>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [Obsolete("GetCurrentLifetimeScope has been deprecated. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static Scope GetCurrentLifetimeScope(this Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            return container.GetLifetimeScopeManager().CurrentScope;
+        }
+
         // This method will never return null.
         internal static LifetimeScopeManager GetLifetimeScopeManager(this Container container) => 
             container.GetOrSetItem(ManagerKey, (c, key) => new LifetimeScopeManager(c));
