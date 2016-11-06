@@ -301,6 +301,7 @@ namespace SimpleInjector
         [Obsolete("GetCurrentLifetimeScope has been deprecated and will be removed in a future release. " +
             "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
             error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentLifetimeScope(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));

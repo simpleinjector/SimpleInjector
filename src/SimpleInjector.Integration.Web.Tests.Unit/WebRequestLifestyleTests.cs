@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Integration.Web.Tests.Unit
+﻿#pragma warning disable 0618
+namespace SimpleInjector.Integration.Web.Tests.Unit
 {
     using System;
     using System.Collections.Generic;

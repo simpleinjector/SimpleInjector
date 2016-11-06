@@ -152,8 +152,10 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The dependency scope.</returns>
         IDependencyScope IDependencyResolver.BeginScope()
         {
+#pragma warning disable 0618
             bool beginScope = this.scopeOption == DependencyResolverScopeOption.RequiresNew ||
                 this.container.GetCurrentExecutionContextScope() == null;
+#pragma warning restore 0618
 
             return new SimpleInjectorWebApiDependencyResolver(this.container, beginScope);
         }

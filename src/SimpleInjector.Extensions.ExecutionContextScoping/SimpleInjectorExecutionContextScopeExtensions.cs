@@ -83,6 +83,10 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [Obsolete("GetCurrentExecutionContextScope has been deprecated and will be removed in a future release. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentExecutionContextScope(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));
