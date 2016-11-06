@@ -364,40 +364,6 @@ namespace SimpleInjector.Tests.Unit
             AssertThat.Throws<InvalidOperationException>(action,
                 "The call to BuildExpression should not trigger the verification of IPlugin to be skipped.");
         }
-        
-        [TestMethod]
-        public void Verify_WithCollectionsResolvedThroughUnregisteredTypeResolution_StillVerifiesThoseCollections()
-        {
-            // Arrange
-            // All these collection are resolved through unregistered type resolution.
-            var expectedTypes = new[]
-            {
-                typeof(IEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>>),
-                typeof(IEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>),
-                typeof(IEnumerable<ServiceWithEnumerable<IDisposable>>),
-                typeof(IEnumerable<IDisposable>),
-            };
-
-            var container = ContainerFactory.New();
-
-            // Service<T> depends on IEnumerable<T>
-            container.RegisterCollection(typeof(ServiceWithEnumerable<>), new[] { typeof(ServiceWithEnumerable<>) });
-
-            container.Register<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<ServiceWithEnumerable<IDisposable>>>>>();
-
-            container.Verify();
-
-            // Act
-            InstanceProducer[] registrations = container.GetCurrentRegistrations();
-            var actualTypes = registrations.Select(p => p.ServiceType);
-
-            // Assert
-            var missingTypes = expectedTypes.Except(actualTypes);
-
-            // When the missingTypes list is empty, this means that the container kept looking for new 
-            // registrations at the end of the verification process.
-            Assert.IsFalse(missingTypes.Any(), "Missing registrations: " + missingTypes.ToFriendlyNamesText());
-        }
 
         [TestMethod]
         public void Verify_DecoratorWithDecorateeFactoryWithFailingDecorateeOfNonRootType_ThrowsExpectedException()

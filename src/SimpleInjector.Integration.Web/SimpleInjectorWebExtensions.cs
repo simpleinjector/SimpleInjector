@@ -151,22 +151,5 @@ namespace SimpleInjector
             container.Register<TService>(instanceCreator, 
                 WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));
         }
-
-        /// <summary>This method is obsolete.</summary>
-        /// <param name="disposable">The disposable.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposable",
-            Justification = "We can't remove the 'disposable' parameter. That would break the API.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +
-            "request's current scope instance.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public static void RegisterForDisposal(IDisposable disposable)
-        {
-            throw new InvalidOperationException(
-                "This method is not supported anymore. Please call Scope.RegisterForDisposal on the " +
-                "request's current scope instance.");
-        }
     }
 }

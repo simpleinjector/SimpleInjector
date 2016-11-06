@@ -554,6 +554,8 @@ namespace SimpleInjector.Tests.Unit
                 if (e.UnregisteredServiceType == typeof(IEnumerable<Exception>))
                 {
                     resolveUnregisteredTypeWasTriggered = true;
+
+                    e.Register(() => Enumerable.Empty<Exception>());
                 }
             };
 
@@ -562,8 +564,6 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.IsTrue(resolveUnregisteredTypeWasTriggered);
-
-            Assert.Fail("Test not run do?");
         }
 
         // This test verifies the bug reported in work item 19847.
