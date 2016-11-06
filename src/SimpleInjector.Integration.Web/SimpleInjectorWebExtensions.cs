@@ -26,13 +26,15 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Web;
     using SimpleInjector.Integration.Web;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET web applications.
     /// </summary>
+    [Obsolete("SimpleInjectorWebExtensions has been deprecated and will be removed in a future release. " +
+        "See: https://simpleinjector.org/mvc",
+        error: true)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SimpleInjectorWebExtensions
     {
         /// <summary>
@@ -53,7 +55,8 @@ namespace SimpleInjector
         [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
             "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/mvc",
-            error: false)]
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
@@ -83,7 +86,8 @@ namespace SimpleInjector
         [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
             "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/mvc",
-            error: false)]
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService, TImplementation>(this Container container)
             where TService : class
             where TImplementation : class, TService
@@ -111,7 +115,8 @@ namespace SimpleInjector
         [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
             "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/mvc",
-            error: false)]
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
@@ -141,7 +146,8 @@ namespace SimpleInjector
         /// references.</exception>
         [Obsolete("RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
             "Please use Register<TService>(new WebRequestLifestyle(false)) instead to suppress disposal.",
-            error: false)]
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {
