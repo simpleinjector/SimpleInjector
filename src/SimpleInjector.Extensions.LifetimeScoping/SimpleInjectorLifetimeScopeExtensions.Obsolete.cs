@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014-2016 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -20,23 +20,26 @@
 */
 #endregion
 
+// This class is placed in the root namespace to allow users to start using these extension methods after
+// adding the assembly reference, without find and add the correct namespace.
 namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using SimpleInjector.Integration.WebApi;
+    using SimpleInjector.Extensions.LifetimeScoping;
 
-    /// <content>Deprecated methods.</content>>
-    public static partial class SimpleInjectorWebApiExtensions
+    /// <summary>
+    /// Extension methods for enabling lifetime scoping for the Simple Injector.
+    /// </summary>
+    public static partial class SimpleInjectorLifetimeScopeExtensions
     {
-        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle(true);
-        private static readonly Lifestyle LifestyleNoDisposal = new WebApiRequestLifestyle(false);
-
         /// <summary>
-        /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned within the
-        /// Web API request. When the Web API request ends and 
-        /// <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, the cached instance will be 
-        /// disposed.
+        /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
+        /// each lifetime scope that has been started using 
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>. When the 
+        /// lifetime scope is disposed and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,
+        /// the cached instance will be disposed as well.
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -48,24 +51,26 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
             "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TConcrete>(this Container container)
+        public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Register<TConcrete, TConcrete>(LifestyleWithDisposal);
+            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);
         }
 
         /// <summary>
-        /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned  will 
-        /// be returned within the Web API request. When the Web API request ends and 
-        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached instance 
-        /// will be disposed.
+        /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned for
+        /// each lifetime scope that has been started using 
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>. When the 
+        /// lifetime scope is disposed and <typeparamref name="TImplementation"/> implements 
+        /// <see cref="IDisposable"/>, the cached instance will be disposed as well.
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
@@ -78,26 +83,27 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
             "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TService, TImplementation>(
+        public static void RegisterLifetimeScope<TService, TImplementation>(
             this Container container)
             where TImplementation : class, TService
             where TService : class
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Register<TService, TImplementation>(LifestyleWithDisposal);
+            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.WithDisposal);
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
-        /// and returned instances are cached during the lifetime of a Web API request. When the Web API
-        /// request ends, and the cached instance implements <see cref="IDisposable"/>, that cached instance 
-        /// will be disposed.
+        /// and returned instances are cached during the lifetime of a given scope that has been started using
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>. When the lifetime scope is disposed, and 
+        /// the cached instance implements <see cref="IDisposable"/>, that cached instance will be disposed as
+        /// well. Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
@@ -108,27 +114,29 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
             "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+            "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TService>(this Container container,
+        public static void RegisterLifetimeScope<TService>(this Container container,
             Func<TService> instanceCreator)
             where TService : class
         {
-            RegisterWebApiRequest<TService>(container, instanceCreator, disposeWhenScopeEnds: true);
+            RegisterLifetimeScope<TService>(container, instanceCreator, disposeWhenLifetimeScopeEnds: true);
         }
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
-        /// each Web API request. When the Web API request ends, and <typeparamref name="TConcrete"/> 
-        /// implements <see cref="IDisposable"/>, the cached instance will be disposed.
+        /// each lifetime scope that has been started using 
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>. When the 
+        /// lifetime scope is disposed and <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>,
+        /// the cached instance will be disposed as well.
         /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="disposeWhenScopeEnds">If set to <c>true</c> the cached instance will be
+        /// <param name="disposeWhenLifetimeScopeEnds">If set to <c>true</c> the cached instance will be
         /// disposed at the end of its lifetime.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
@@ -138,30 +146,32 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
-            "Please use Register<TConcrete>(new WebApiRequesstLifestyle(false)) instead " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
             "to suppress disposal.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TConcrete>(this Container container,
-            bool disposeWhenScopeEnds)
+        public static void RegisterLifetimeScope<TConcrete>(this Container container,
+            bool disposeWhenLifetimeScopeEnds)
             where TConcrete : class, IDisposable
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Register<TConcrete, TConcrete>(GetLifestyle(disposeWhenScopeEnds));
+            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
         }
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned for
-        /// the duration of a single Web API request. When the Web API request ends, 
-        /// <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached instance
-        /// implements <see cref="IDisposable"/>, that cached instance will be disposed.
+        /// each lifetime scope that has been started using 
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>.  When the lifetime scope is disposed, 
+        /// <paramref name="disposeWhenLifetimeScopeEnds"/> is set to <b>true</b>, and the cached instance
+        /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
-        /// <param name="disposeWhenScopeEnds">If set to <c>true</c> the cached instance will be
+        /// <param name="disposeWhenLifetimeScopeEnds">If set to <c>true</c> the cached instance will be
         /// disposed at the end of its lifetime.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
@@ -171,31 +181,33 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService, TImplementation>(new WebApiRequesstLifestyle(false)) instead " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService, TImplementation>(new LifetimeScopeLifestyle(false)) instead " +
             "to suppress disposal.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TService, TImplementation>(
-            this Container container, bool disposeWhenScopeEnds)
+        public static void RegisterLifetimeScope<TService, TImplementation>(
+            this Container container, bool disposeWhenLifetimeScopeEnds)
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Register<TService, TImplementation>(GetLifestyle(disposeWhenScopeEnds));
+            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
         }
 
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
-        /// and returned instances are cached during the lifetime of single Web API request. When the Web API
-        /// request ends, <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached 
-        /// instance implements <see cref="IDisposable"/>, that cached instance will be disposed.
+        /// and returned instances are cached during the lifetime of a given scope that has been started using
+        /// <see cref="BeginLifetimeScope">BeginLifetimeScope</see>. When the lifetime scope is disposed, 
+        /// <paramref name="disposeWhenLifetimeScopeEnds"/> is set to <b>true</b>, and the cached instance
+        /// implements <see cref="IDisposable"/>, that cached instance will be disposed as well.
+        /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="disposeWhenScopeEnds">If set to <c>true</c> the cached instance will be
+        /// <param name="disposeWhenLifetimeScopeEnds">If set to <c>true</c> the cached instance will be
         /// disposed at the end of its lifetime.</param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when either the <paramref name="container"/>, or <paramref name="instanceCreator"/> are
@@ -203,21 +215,50 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService>(Func<TService>, new WebApiRequesstLifestyle(false)) instead " +
+        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
             "to suppress disposal.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenScopeEnds)
+        public static void RegisterLifetimeScope<TService>(this Container container,
+            Func<TService> instanceCreator, bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            container.Register<TService>(instanceCreator, GetLifestyle(disposeWhenScopeEnds));
+            container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
         }
 
-        private static Lifestyle GetLifestyle(bool dispose) => dispose ? LifestyleWithDisposal : LifestyleNoDisposal;
+        /// <summary>
+        /// Gets the <see cref="Scope"/> that is currently in scope or <b>null</b> when no
+        /// <see cref="Scope"/> is currently in scope.
+        /// </summary>
+        /// <example>
+        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
+        /// returned every time) and registers an initializer for that type that will register that instance
+        /// for disposal in the <see cref="Scope"/> in which context it is created:
+        /// <code lang="cs"><![CDATA[
+        /// container.Register<IService, ServiceImpl>();
+        /// container.RegisterInitializer<ServiceImpl>(instance =>
+        /// {
+        ///     container.GetCurrentLifetimeScope().RegisterForDisposal(instance);
+        /// });
+        /// ]]></code>
+        /// </example>
+        /// <param name="container">The container.</param>
+        /// <returns>A new <see cref="Scope"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
+        [Obsolete("GetCurrentLifetimeScope has been deprecated and will be removed in a future release. " +
+            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Scope GetCurrentLifetimeScope(this Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            return container.GetLifetimeScopeManager().CurrentScope;
+        }
     }
 }

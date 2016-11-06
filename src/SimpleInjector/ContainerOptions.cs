@@ -111,11 +111,12 @@ namespace SimpleInjector
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
-        /// <summary>This method is deprecated. Changing its value will have no effect.</summary>
+        /// <summary>Gets or sets a value indicating whether. 
+        /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
         [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
             "release. Please register collections explicitly instead.",
-            error:  true)]
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ResolveUnregisteredCollections { get; set; }
 
@@ -179,7 +180,7 @@ namespace SimpleInjector
                 this.injectionBehavior = value;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the property selection behavior. The container's default behavior is to do no
         /// property injection.
@@ -441,7 +442,7 @@ namespace SimpleInjector
             return constructor;
         }
 
-        internal Expression BuildParameterExpression(Type serviceType, Type implementationType, 
+        internal Expression BuildParameterExpression(Type serviceType, Type implementationType,
             ParameterInfo parameter)
         {
             var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);

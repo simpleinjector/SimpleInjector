@@ -1,5 +1,4 @@
-﻿#pragma warning disable 618
-namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+﻿namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -98,89 +97,14 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Act
             container.Verify();
         }
-        
-        [TestMethod]
-        public void RegisterLifetimeScope_CalledASingleTime_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.RegisterLifetimeScope<ConcreteCommand>();
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScope_CalledMultipleTimes_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.RegisterLifetimeScope<ConcreteCommand>();
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_WithNullContainerArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            Container container = null;
-
-            // Act
-            Action action = () => container.GetCurrentLifetimeScope();
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_OutsideTheContextOfALifetimeScope_ReturnsNull()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            var currentScope = container.GetCurrentLifetimeScope();
-
-            // Assert
-            Assert.IsNull(currentScope);
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_OutsideTheContextOfALifetimeScopeWithoutScopingEnabled_ReturnsNull()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            var scope = container.GetCurrentLifetimeScope();
-
-            // Assert
-            Assert.IsNull(scope);
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_InsideTheContextOfALifetimeScope_ReturnsThatScope()
-        {
-            // Arrange
-            var container = new Container();
-
-            using (var scope = container.BeginLifetimeScope())
-            {
-                // Act
-                var currentScope = container.GetCurrentLifetimeScope();
-
-                // Assert
-                Assert.IsNotNull(currentScope);
-                Assert.IsTrue(object.ReferenceEquals(scope, currentScope));
-            }
-        }
 
         [TestMethod]
         public void GetCurrentLifetimeScope_InsideANestedLifetimeScope_ReturnsTheInnerMostScope()
         {
             // Arrange
             var container = new Container();
+
+            var lifestyle = new LifetimeScopeLifestyle();
 
             using (var outerScope = container.BeginLifetimeScope())
             {
@@ -189,7 +113,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                     Assert.IsFalse(object.ReferenceEquals(outerScope, innerScope), "Test setup failed.");
 
                     // Act
-                    var currentScope = container.GetCurrentLifetimeScope();
+                    var currentScope = lifestyle.GetCurrentScope(container);
 
                     // Assert
                     Assert.IsTrue(object.ReferenceEquals(innerScope, currentScope));
@@ -203,7 +127,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
             try
             {
@@ -221,18 +145,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                     "Actual message: " + ex.Message);
             }
         }
-        
-        [TestMethod]
-        public void Verify_WithoutLifetimeScope_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            // Act
-            container.Verify();
-        }
 
         [TestMethod]
         public void GetInstance_WithinLifetimeScope_ReturnsInstanceOfExpectedType()
@@ -240,7 +152,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
             using (container.BeginLifetimeScope())
             {
@@ -258,7 +170,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
             using (container.BeginLifetimeScope())
             {
@@ -277,7 +189,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
             using (container.BeginLifetimeScope())
             {
@@ -300,7 +212,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
             using (container.BeginLifetimeScope())
             {
@@ -325,7 +237,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand command;
 
@@ -368,12 +280,14 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
+            var lifestyle = new LifetimeScopeLifestyle();
+
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
-                var scope = container.GetCurrentLifetimeScope();
+                Scope scope = lifestyle.GetCurrentScope(container);
 
                 // The following line explictly registers the transient DisposableCommand for disposal when
                 // the lifetime scope ends.
@@ -415,7 +329,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand command;
 
@@ -435,7 +349,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
 
             // Act
             using (container.BeginLifetimeScope())
@@ -455,7 +369,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
 
-            container.RegisterLifetimeScope<IDisposable, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand singleton;
 
@@ -475,7 +389,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<DisposableCommand>(disposeWhenLifetimeScopeEnds: true);
+            container.Register<DisposableCommand>(
+                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: true));
 
             DisposableCommand instanceToDispose;
 
@@ -495,7 +410,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<DisposableCommand>(disposeWhenLifetimeScopeEnds: false);
+            container.Register<DisposableCommand>(
+                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: false));
 
             DisposableCommand instanceToDispose;
 
@@ -515,7 +431,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<IDisposable, DisposableCommand>(disposeWhenLifetimeScopeEnds: true);
+            container.Register<IDisposable, DisposableCommand>(
+                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: true));
 
             DisposableCommand instanceToDispose;
 
@@ -535,7 +452,8 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<IDisposable, DisposableCommand>(disposeWhenLifetimeScopeEnds: false);
+            container.Register<IDisposable, DisposableCommand>(
+                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: false));
 
             DisposableCommand instanceToDispose;
 
@@ -555,7 +473,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<DisposableCommand>();
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand command;
 
@@ -577,9 +495,10 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
-            container.RegisterLifetimeScope<DisposableCommandWithOverriddenEquality1>();
-            container.RegisterLifetimeScope<DisposableCommandWithOverriddenEquality2>();
+            container.Register<DisposableCommandWithOverriddenEquality1>(Lifestyle.Scoped);
+            container.Register<DisposableCommandWithOverriddenEquality2>(Lifestyle.Scoped);
 
             // Act
             DisposableCommandWithOverriddenEquality1 command1;
@@ -619,7 +538,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             try
             {
                 // Act
-                container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
+                container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -639,171 +558,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScopeTConcrete_WithNullArgument_ThrowsExpectedException()
-        {
-            // Act
-            Action action = () => 
-            SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ConcreteCommand>(null);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScopeTServiceTImplementation_WithNullArgument_ThrowsExpectedException()
-        {
-            // Act
-            Action action = () =>
-                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand, ConcreteCommand>(null);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScopeTServiceFunc_WithNullContainerArgument_ThrowsExpectedException()
-        {
-            // Act
-            Action action = () =>
-                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(null, () => null);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void RegisterLifetimeScopeTServiceFunc_WithNullFuncArgument_ThrowsExpectedException()
-        {
-            // Act
-            Action action = () =>
-                SimpleInjectorLifetimeScopeExtensions.RegisterLifetimeScope<ICommand>(new Container(), null);
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-        
-        [TestMethod]
-        public void GetInstance_LifetimeScopedInstanceWithInitializer_CallsInitializerOncePerLifetimeScope()
-        {
-            // Arrange
-            int initializerCallCount = 0;
-
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                container.GetInstance<ICommand>();
-                container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
-        }
-
-        [TestMethod]
-        public void GetInstance_LifetimeScopedFuncInstanceWithInitializer_CallsInitializerOncePerLifetimeScope()
-        {
-            // Arrange
-            int initializerCallCount = 0;
-
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand>(() => new ConcreteCommand());
-
-            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                container.GetInstance<ICommand>();
-                container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
-        }
-
-        [TestMethod]
-        public void GetInstance_OnDecoratedLifetimeScopedInstance_WrapsTheInstanceWithTheDecorator()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                ICommand instance = container.GetInstance<ICommand>();
-
-                // Assert
-                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
-
-                var decorator = (CommandDecorator)instance;
-
-                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_CalledTwiceInOneScopeForDecoratedLifetimeScopedInstance_WrapsATransientDecoratorAroundALifetimeScopedInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
-                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
-                    "The decorator should be transient.");
-
-                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_CalledTwiceInOneScopeForDecoratedLifetimeScopedInstance2_WrapsATransientDecoratorAroundALifetimeScopedInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Same as previous test, but now with RegisterDecorator called first.
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            container.RegisterLifetimeScope<ICommand, ConcreteCommand>();
-
-            using (container.BeginLifetimeScope())
-            {
-                // Act
-                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
-                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
-                    "The decorator should be transient but seems to have a scoped lifetime.");
-
-                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per lifetime. It seems to be transient.");
-            }
         }
 
         // This behavior has changed; we used to disallow this and throw an exception. Disposing a lifetime
@@ -983,7 +737,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
 
             var container = new Container();
 
-            container.RegisterLifetimeScope<ConcreteCommand>();
+            container.Register<ConcreteCommand>(lifestyle);
 
             try
             {
@@ -1015,6 +769,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
@@ -1023,11 +778,11 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Outer depends on Middle that depends on Inner. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.RegisterLifetimeScope<Middle>();
-            container.RegisterLifetimeScope<Inner>();
-            container.RegisterLifetimeScope<Outer>();
+            container.Register<Middle>(Lifestyle.Scoped);
+            container.Register<Inner>(Lifestyle.Scoped);
+            container.Register<Outer>(Lifestyle.Scoped);
 
-            var scope = container.BeginLifetimeScope();
+            Scope scope = container.BeginLifetimeScope();
 
             try
             {
@@ -1065,6 +820,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             // Allow PropertyDependency to be injected as property on Inner 
             container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
@@ -1076,12 +832,12 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Middle depends on Inner that depends on property PropertyDependency. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.RegisterLifetimeScope<PropertyDependency>();
-            container.RegisterLifetimeScope<Middle>();
-            container.RegisterLifetimeScope<Inner>();
+            container.Register<PropertyDependency>(Lifestyle.Scoped);
+            container.Register<Middle>(Lifestyle.Scoped);
+            container.Register<Inner>(Lifestyle.Scoped);
 
             // Act
-            var scope = container.BeginLifetimeScope();
+            Scope scope = container.BeginLifetimeScope();
 
             try
             {
@@ -1111,7 +867,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Arrange
             var container = new Container();
 
-            container.RegisterLifetimeScope<ICommand, DisposableCommand>();
+            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
 
             container.Register<ClassDependingOn<ICommand>>();
 
@@ -1151,6 +907,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
@@ -1163,7 +920,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                 middleScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentLifetimeScope();
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                 string scopeName =
                     object.ReferenceEquals(actualScope, null) ? "null" :
@@ -1182,20 +939,21 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            using (var outerScope = container.BeginLifetimeScope())
+            using (Scope outerScope = container.BeginLifetimeScope())
             {
-                var middleScope = container.BeginLifetimeScope();
+                Scope middleScope = container.BeginLifetimeScope();
 
-                var innerScope = container.BeginLifetimeScope();
+                Scope innerScope = container.BeginLifetimeScope();
 
                 middleScope.Dispose();
                 innerScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentLifetimeScope();
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                 // Assert
                 Assert.AreSame(outerScope, actualScope,
@@ -1208,6 +966,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
@@ -1226,7 +985,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
                 innerScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentLifetimeScope();
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                 // Assert
                 Assert.AreSame(outerScope, actualScope,
@@ -1240,6 +999,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
@@ -1249,10 +1009,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             {
                 var command = container.GetInstance<DisposableCommand>();
 
-                command.Disposing += s =>
-                {
-                    container.GetCurrentLifetimeScope().RegisterForDisposal(instanceToDispose);
-                };
+                command.Disposing += s => Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
 
                 // Act
             }
@@ -1439,4 +1196,3 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
         }
     }
 }
-#pragma warning restore 618

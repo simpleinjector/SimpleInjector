@@ -65,6 +65,9 @@
     <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.cs">
       <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.Obsolete.cs">
+      <Link>SimpleInjectorLifetimeScopeExtensions.Obsolete.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

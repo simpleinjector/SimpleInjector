@@ -53,6 +53,9 @@
     <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.cs">
       <Link>SimpleInjectorLifetimeScopeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Extensions.LifetimeScoping\SimpleInjectorLifetimeScopeExtensions.Obsolete.cs">
+      <Link>SimpleInjectorLifetimeScopeExtensions.Obsolete.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.PCL\PclSpecific\ThreadLocal.cs">
       <Link>PclSpecific\ThreadLocal.cs</Link>
     </Compile>
