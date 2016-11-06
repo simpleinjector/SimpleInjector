@@ -87,8 +87,7 @@ namespace SimpleInjector.Integration.WebApi
     /// }
     /// ]]></code>
     /// The previous example show the use of the 
-    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiControllers(Container, HttpConfiguration)">RegisterWebApiControllers</see> and
-    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider">RegisterWebApiFilterProvider</see>
+    /// <see cref="SimpleInjectorWebApiExtensions.RegisterWebApiControllers(Container, HttpConfiguration)">RegisterWebApiControllers</see> 
     /// extension methods and how the <b>SimpleInjectorWebApiDependencyResolver</b> can be used to set the created
     /// <see cref="Container"/> instance as default dependency resolver in Web API.
     /// </example>

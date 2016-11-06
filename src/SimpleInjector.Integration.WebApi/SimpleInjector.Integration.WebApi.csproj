@@ -107,6 +107,7 @@
     <Compile Include="SimpleInjectorHttpRequestMessageProvider.cs" />
     <Compile Include="SimpleInjectorWebApiExtensions.cs" />
     <Compile Include="SimpleInjectorWebApiDependencyResolver.cs" />
+    <Compile Include="SimpleInjectorWebApiExtensions.Obsolete.cs" />
     <Compile Include="WebApiRequestLifestyle.cs" />
   </ItemGroup>
   <ItemGroup>
