@@ -226,25 +226,6 @@ namespace SimpleInjector
 
             container.Register<TService>(instanceCreator, GetLifestyle(disposeWhenScopeEnds));
         }
-
-        /// <summary>This method has been removed. Please see https://simpleinjector.org/webapi for more
-        /// information.</summary>
-        /// <param name="container">The container that should be used.</param>
-        /// <param name="configuration">The <see cref="HttpConfiguration"/>.</param>
-        [Obsolete("SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " + 
-            "consult the Web API integration guide on how to inject dependencies into Web API filter " + 
-            "attributes. See https://simpleinjector.org/webapi.", error: true)]
-        [ExcludeFromCodeCoverage]
-        public static void RegisterWebApiFilterProvider(this Container container, HttpConfiguration configuration)
-        {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(configuration, nameof(configuration));
-
-            throw new InvalidOperationException(
-                "SimpleInjectorWebApiExtensions.RegisterWebApiFilterProvider has been removed. Please " +
-                "consult the Web API integration guide on how to inject dependencies into Web API filter " +
-                "attributes. See https://simpleinjector.org/webapi.");
-        }
         
         /// <summary>
         /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
