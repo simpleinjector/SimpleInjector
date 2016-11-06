@@ -1,6 +1,20 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 3.3.0 (v3.3.0 RTM)
+
+	Improvements/Changes:
+		-[Core] Marked ContainerOptions.ResolveUnregisteredCollections obsolete. (fixes #303)
+		-[Core] Removed unneeded dependencies in .NETStandard NuGet release. (fixes #312)
+		-[Core] Disabled Dynamic Assembly Compilation by default. (fixes #274)
+		-[Core] Added ContainerOptions.DefaultLifestyle property to make it easier to override the default
+		 (transient) lifestyle. (fixes #313)
+		-[LifetimeScoping] Marked RegisterLifetimeScope and GetCurrentLifetimeScope obsolete. (fixes #303)
+		-[WCF] Marked RegisterPerWcfOperation and GetCurrentWcfOperationScope obsolete. (fixes #303)
+		-[Web] Marked RegisterPerWebRequest obsolete. (fixes #303)
+		-[WebApi] Marked RegisterWebApiRequest obsolete. (fixes #303)
+
+
 Version 3.2.7 (v3.2.7 RTM) 2016-11-03
 
 	Bug fixes:
