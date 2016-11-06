@@ -98,6 +98,10 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// lifetime scope in the supplied <paramref name="container"/> instance.</exception>
+        [Obsolete("WhenCurrentScopeEnds has been deprecated and will be removed in a future release. " +
+            "Please use Lifestyle.Scoped.WhenScopeEnds(Container) instead.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentScopeEnds(Container container, Action action)
         {
             WithDisposal.WhenScopeEnds(container, action);
