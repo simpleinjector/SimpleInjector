@@ -1,7 +1,7 @@
 @ECHO OFF
 
-set version=3.2.0
-set prereleasePostfix=
+set version=4.0.0
+set prereleasePostfix=-alpha1
 set buildNumber=0 
 set copyrightYear=2016
 
@@ -122,20 +122,14 @@ mkdir Releases\v%named_version%\.NET\Documentation
 
 copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
 copy Help\SimpleInjector.chm Releases\v%named_version%\.NET\Documentation\SimpleInjector.chm
-copy Help\SimpleInjector.chm Releases\v%named_version%\Portable\Documentation\SimpleInjector.chm
 
 copy %targetPathNet%\SimpleInjector.dll Releases\v%named_version%\.NET\SimpleInjector.dll
 copy %targetPathNet%\SimpleInjector.xml Releases\v%named_version%\.NET\SimpleInjector.xml
-
-echo %named_version% >> Releases\v%named_version%\version.txt 
-
-rmdir Releases\temp /s /q
 
 
 echo CREATING GITHUB DOWNLOAD
 
 mkdir Releases\temp
-copy licence.txt Releases\temp\licence.txt
 mkdir Releases\temp\Documentation
 copy Help\SimpleInjector.chm Releases\temp\Documentation\SimpleInjector.chm
 
