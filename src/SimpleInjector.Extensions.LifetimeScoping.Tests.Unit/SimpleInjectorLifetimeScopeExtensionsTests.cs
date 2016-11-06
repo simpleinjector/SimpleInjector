@@ -922,42 +922,7 @@ namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
             // Assert
             Assert.AreEqual(1, actionCallCount, "Delegate is expected to be called exactly once.");            
         }
-        
-        [TestMethod]
-        public void LifetimeScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredActionBeforeCallingDispose()
-        {
-            // Arrange
-            bool delegateHasBeenCalled = false;
-            DisposableCommand instanceToDispose = null;
-
-            var container = new Container();
-
-            var lifestyle = new LifetimeScopeLifestyle();
-
-            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
-
-            container.RegisterInitializer<DisposableCommand>(command =>
-            {
-                LifetimeScopeLifestyle.WhenCurrentScopeEnds(container, () => 
-                {
-                    Assert.IsFalse(command.HasBeenDisposed, 
-                        "The action should be called before disposing the instance, because users are " +
-                        "to use those instances.");
-                    delegateHasBeenCalled = true;
-                });
-            });
-
-            using (container.BeginLifetimeScope())
-            {
-                instanceToDispose = container.GetInstance<DisposableCommand>();
-
-                // Act
-            }
-
-            // Assert
-            Assert.IsTrue(delegateHasBeenCalled, "Delegate is expected to be called.");
-        }
-
+     
         [TestMethod]
         public void LifetimeScopeDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
         {
