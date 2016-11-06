@@ -18,7 +18,20 @@
     <OutputPath>..\Help\</OutputPath>
     <HtmlHelpName>SimpleInjector</HtmlHelpName>
     <Language>en-US</Language>
-    <ApiFilter />
+    <ApiFilter>
+      <Filter entryType="Namespace" fullName="SimpleInjector" isExposed="True">
+  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions" filterName="SimpleInjectorLifetimeScopeExtensions" isExposed="False">
+    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope" filterName="BeginLifetimeScope" isExposed="True" />
+  </Filter>
+  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWcfExtensions" filterName="SimpleInjectorWcfExtensions" isExposed="False">
+    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWcfExtensions.RegisterWcfServices" filterName="RegisterWcfServices" isExposed="True" />
+  </Filter>
+  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebApiExtensions" filterName="SimpleInjectorWebApiExtensions" isExposed="True">
+    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWebApiExtensions.RegisterWebApiRequest" filterName="RegisterWebApiRequest" isExposed="False" />
+  </Filter>
+  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebExtensions" filterName="SimpleInjectorWebExtensions" isExposed="False" />
+</Filter>
+<Filter entryType="Namespace" fullName="SimpleInjector.Advanced.Internal" isExposed="False" /></ApiFilter>
     <ComponentConfigurations />
     <DocumentationSources>
       <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Packaging.dll" />
@@ -41,20 +54,21 @@
     <HelpAttributes />
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;LifetimeScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope on a single thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace contains diagnostic features for Simple Injector.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.WebApi" isDocumented="True">The SimpleInjector.Integration.WebApi namespace is part of the &lt;b&gt;SimpleInjector.Integration.WebApi.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web API web applications.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="False" />
+      <NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;LifetimeScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope on a single thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace contains diagnostic features for Simple Injector.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.WebApi" isDocumented="True">The SimpleInjector.Integration.WebApi namespace is part of the &lt;b&gt;SimpleInjector.Integration.WebApi.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web API web applications.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
@@ -86,7 +100,7 @@
     <HtmlSdkLinkType>None</HtmlSdkLinkType>
     <IncludeFavorites>False</IncludeFavorites>
     <BinaryTOC>True</BinaryTOC>
-    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, ProtectedInternalAsProtected, SealedProtected</VisibleItems>
+    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, SealedProtected, ProtectedInternalAsProtected</VisibleItems>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
     <ComponentPath />
     <MaximumGroupParts>2</MaximumGroupParts>
