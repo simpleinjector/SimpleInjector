@@ -119,79 +119,22 @@
             // Act
             container.Verify();
         }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_WithNullContainerArgument_ThrowsExpectedException()
-        {
-            // Arrange
-            Container container = null;
-
-            // Act
-            Action action = () => container.GetCurrentExecutionContextScope();
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_OutsideTheContextOfAExecutionContextScope_ReturnsNull()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            using (var currentScope = container.GetCurrentExecutionContextScope())
-            {
-                // Assert
-                Assert.IsNull(currentScope);
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_OutsideTheContextOfAExecutionContextScopeWithoutScopingEnabled_ReturnsNull()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            using (var scope = container.GetCurrentExecutionContextScope())
-            {
-                // Assert
-                Assert.IsNull(scope);
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_InsideTheContextOfAExecutionContextScope_ReturnsThatScope()
-        {
-            // Arrange
-            var container = new Container();
-
-            using (var scope = container.BeginExecutionContextScope())
-            {
-                // Act
-                var currentScope = container.GetCurrentExecutionContextScope();
-
-                // Assert
-                Assert.IsNotNull(currentScope);
-                Assert.IsTrue(object.ReferenceEquals(scope, currentScope));
-            }
-        }
-
+        
         [TestMethod]
         public void GetCurrentExecutionContextScope_InsideANestedExecutionContextScope_ReturnsTheInnerMostScope()
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
 
-            using (var outerScope = container.BeginExecutionContextScope())
+            using (Scope outerScope = container.BeginExecutionContextScope())
             {
-                using (var innerScope = container.BeginExecutionContextScope())
+                using (Scope innerScope = container.BeginExecutionContextScope())
                 {
                     Assert.IsFalse(object.ReferenceEquals(outerScope, innerScope), "Test setup failed.");
 
                     // Act
-                    var currentScope = container.GetCurrentExecutionContextScope();
+                    Scope currentScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                     // Assert
                     Assert.IsTrue(object.ReferenceEquals(innerScope, currentScope));
@@ -369,13 +312,14 @@
         {
             // Arrange
             var container = new Container();
+            var scopedLifestyle = new ExecutionContextScopeLifestyle();
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
-                var scope = container.GetCurrentExecutionContextScope();
+                Scope scope = scopedLifestyle.GetCurrentScope(container);
 
                 // The following line explicitly registers the transient DisposableCommand for disposal when
                 // the execution context scope ends.
@@ -1121,21 +1065,22 @@
         {
             // Arrange
             var container = new Container();
+            var lifestyle = new ExecutionContextScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(lifestyle);
 
-            using (var outerScope = container.BeginExecutionContextScope())
+            using (Scope outerScope = container.BeginExecutionContextScope())
             {
-                var middleScope = container.BeginExecutionContextScope();
+                Scope middleScope = container.BeginExecutionContextScope();
 
-                var innerScope = container.BeginExecutionContextScope();
+                Scope innerScope = container.BeginExecutionContextScope();
 
                 middleScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentExecutionContextScope();
+                Scope actualScope = lifestyle.GetCurrentScope(container);
 
                 // Assert
                 Assert.AreSame(outerScope, actualScope);
@@ -1147,22 +1092,23 @@
         {
             // Arrange
             var container = new Container();
+            var lifestyle = new ExecutionContextScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(lifestyle);
 
-            using (var outerScope = container.BeginExecutionContextScope())
+            using (Scope outerScope = container.BeginExecutionContextScope())
             {
-                var middleScope = container.BeginExecutionContextScope();
+                Scope middleScope = container.BeginExecutionContextScope();
 
-                var innerScope = container.BeginExecutionContextScope();
+                Scope innerScope = container.BeginExecutionContextScope();
 
                 middleScope.Dispose();
                 innerScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentExecutionContextScope();
+                Scope actualScope = lifestyle.GetCurrentScope(container);
 
                 // Assert
                 Assert.AreSame(outerScope, actualScope,
@@ -1175,18 +1121,19 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(Lifestyle.Scoped);
 
-            using (var outerScope = container.BeginExecutionContextScope())
+            using (Scope outerScope = container.BeginExecutionContextScope())
             {
-                var outerMiddleScope = container.BeginExecutionContextScope();
+                Scope outerMiddleScope = container.BeginExecutionContextScope();
 
-                var innerMiddleScope = container.BeginExecutionContextScope();
+                Scope innerMiddleScope = container.BeginExecutionContextScope();
 
-                var innerScope = container.BeginExecutionContextScope();
+                Scope innerScope = container.BeginExecutionContextScope();
 
                 // This will cause GetCurrentExecutionContextScope to become outerScope.
                 outerMiddleScope.Dispose();
@@ -1195,7 +1142,7 @@
                 innerScope.Dispose();
 
                 // Act
-                var actualScope = container.GetCurrentExecutionContextScope();
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                 // Assert
                 Assert.AreSame(outerScope, actualScope,
@@ -1250,10 +1197,11 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(Lifestyle.Scoped);
 
             using (container.BeginExecutionContextScope())
             {
@@ -1261,7 +1209,7 @@
 
                 command.Disposing += s =>
                 {
-                    container.GetCurrentExecutionContextScope().RegisterForDisposal(instanceToDispose);
+                    Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
                 };
 
                 // Act

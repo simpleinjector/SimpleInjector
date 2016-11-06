@@ -93,6 +93,7 @@ namespace SimpleInjector.Integration.WebApi
     /// </example>
     public sealed class SimpleInjectorWebApiDependencyResolver : IDependencyResolver
     {
+        private readonly ExecutionContextScopeLifestyle scopedLifestyle = new ExecutionContextScopeLifestyle();
         private readonly Container container;
         private readonly DependencyResolverScopeOption scopeOption;
         private readonly Scope scope;
@@ -152,7 +153,7 @@ namespace SimpleInjector.Integration.WebApi
         IDependencyScope IDependencyResolver.BeginScope()
         {
             bool beginScope = this.scopeOption == DependencyResolverScopeOption.RequiresNew ||
-                this.container.GetCurrentExecutionContextScope() == null;
+                this.scopedLifestyle.GetCurrentScope(this.container) == null;
 
             return new SimpleInjectorWebApiDependencyResolver(this.container, beginScope);
         }
