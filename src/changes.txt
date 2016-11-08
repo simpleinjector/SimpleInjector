@@ -1,6 +1,15 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
 
+Version 4.0.0 (v4.0 RTM)
+
+	Improvements/Changes:
+		-[Core] Marked deprecated integration extension methods with Obsolete(true) causing them to trigger
+		 a compile error. This includes methods like RegisterPerWebRequest, RegisterWebApiRequest,
+		 RegisterPerWcfOperation, GetCurrentWcfOperationScope, RegisterLifetimeScope, GetCurrentLifetimeScope
+		 and GetCurrentExecutionContextScope. (fixes #304)
+
+
 Version 3.3.0 (v3.3.0 RTM)
 
 	Improvements/Changes:
