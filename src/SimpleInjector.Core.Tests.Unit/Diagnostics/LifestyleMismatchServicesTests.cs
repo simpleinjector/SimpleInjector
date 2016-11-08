@@ -440,7 +440,7 @@
                 throw new NotImplementedException();
             }
 
-            protected override int Length => this.realLifestyle.ComponentLength(null);
+            public override int Length => this.realLifestyle.ComponentLength(null);
 
             protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
             {
@@ -457,14 +457,12 @@
     
     internal class FakeLifestyle : Lifestyle
     {
-        private readonly int length;
-
         public FakeLifestyle(string name, int length) : base("Fake " + name)
         {
-            this.length = length;
+            this.Length = length;
         }
 
-        protected override int Length => this.length;
+        public override int Length { get; }
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
             Transient.CreateRegistration<TService, TImplementation>(c);

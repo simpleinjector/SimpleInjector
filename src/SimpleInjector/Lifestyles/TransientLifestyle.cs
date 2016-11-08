@@ -31,7 +31,7 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length => 1;
+        public override int Length => 1;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {

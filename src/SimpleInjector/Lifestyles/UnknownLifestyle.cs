@@ -30,7 +30,7 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length
+        public override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }

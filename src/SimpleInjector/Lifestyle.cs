@@ -165,7 +165,7 @@ namespace SimpleInjector
         /// misconfigurations.
         /// </summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
-        protected abstract int Length { get; }
+        public abstract int Length { get; }
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied

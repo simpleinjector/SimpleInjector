@@ -261,8 +261,7 @@
 
         public Registration RegistrationToReturn { get; set; }
 
-        // Wha evaaahhh
-        protected override int Length => 1;
+        public override int Length => Transient.Length;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
             Container container)

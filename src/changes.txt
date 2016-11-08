@@ -3,11 +3,14 @@
 
 Version 4.0.0 (v4.0 RTM)
 
-	Improvements/Changes:
+	Breaking Changes:
 		-[Core] Marked deprecated integration extension methods with Obsolete(true) causing them to trigger
 		 a compile error. This includes methods like RegisterPerWebRequest, RegisterWebApiRequest,
 		 RegisterPerWcfOperation, GetCurrentWcfOperationScope, RegisterLifetimeScope, GetCurrentLifetimeScope
 		 and GetCurrentExecutionContextScope. (fixes #304)
+		-[Core] Lifestyle.Length property made public. (fixes #245)
+
+	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
 
 

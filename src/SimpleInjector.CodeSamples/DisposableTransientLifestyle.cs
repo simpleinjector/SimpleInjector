@@ -19,8 +19,7 @@
             this.scopedLifestyle = scopedLifestyle;
         }
 
-        // Same length as Transient.
-        protected override int Length => 1;
+        public override int Length => Transient.Length;
 
         public static void EnableForContainer(Container container)
         {

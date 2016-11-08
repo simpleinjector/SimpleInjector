@@ -34,7 +34,7 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length => 1000;
+        public override int Length => 1000;
 
         // This method seems somewhat redundant, since the exact same can be achieved by calling
         // Lifetime.Singleton.CreateRegistration(serviceType, () => instance, container). Calling that method

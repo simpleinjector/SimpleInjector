@@ -35,7 +35,7 @@ namespace SimpleInjector.Lifestyles
             this.lifestyleApplierFactory = lifestyleApplierFactory;
         }
 
-        protected override int Length
+        public override int Length
         {
             get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
         }

@@ -39,7 +39,7 @@ namespace SimpleInjector.Lifestyles
             this.options = options;
         }
 
-        protected override int Length
+        public override int Length
         {
             get { throw new NotImplementedException(); }
         }

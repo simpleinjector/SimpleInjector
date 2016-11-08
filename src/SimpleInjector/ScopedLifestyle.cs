@@ -59,7 +59,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the length of the lifestyle.</summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
-        protected override int Length => 500;
+        public override int Length => 500;
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,

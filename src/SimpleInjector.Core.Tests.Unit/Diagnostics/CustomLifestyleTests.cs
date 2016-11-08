@@ -150,15 +150,13 @@
         
         private sealed class FakeLifestyle : Lifestyle
         {
-            private readonly int length;
-
             public FakeLifestyle(int length)
                 : base("Fake")
             {
-                this.length = length;
+                this.Length = length;
             }
 
-            protected override int Length => this.length;
+            public override int Length { get; }
 
             protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
                 new FakeRegistration<TService, TImplementation>(this, c);

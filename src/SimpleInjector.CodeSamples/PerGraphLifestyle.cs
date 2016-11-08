@@ -11,7 +11,7 @@
         // This lifestyle should not dispose instances, because they outlive their scope.
         public PerGraphLifestyle() : base("Per Graph", disposeInstances: false) { }
 
-        protected override int Length => 2;
+        public override int Length => Lifestyle.Transient.Length + 1;
 
         public static void EnableFor(Container container)
         {

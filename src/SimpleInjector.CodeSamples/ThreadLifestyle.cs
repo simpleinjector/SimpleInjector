@@ -4,7 +4,6 @@
     using System.Linq.Expressions;
     using System.Threading;
     using SimpleInjector;
-    using SimpleInjector.Lifestyles;
 
     // There is no support for a Thread lifestyle in the core library, because this lifestyle is considered
     // harmful. It should not be used in web applications, because ASP.NET can finish a request on a different
@@ -21,11 +20,8 @@
         {
         }
 
-        protected override int Length
-        {
-            // Greater than Lifetime Scope, and WCF operation, but smaller than Singleton.
-            get { return 500; }
-        }
+        // Greater than Lifetime Scope, and WCF operation, but smaller than Singleton.
+        public override int Length => Lifestyle.Singleton.Length - 1;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {

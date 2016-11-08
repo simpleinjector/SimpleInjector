@@ -5,15 +5,16 @@
 
     /// <summary>
     /// Injects a new instance for each dependency. Behaves the same as Transient but 
-    /// prevents any lifestyle mismatches from being reported. Use with care!!!
+    /// prevents any lifestyle mismatches from being reported. Instances will not be disposed! 
+    /// Use with care -or rather- don't use AT ALL!!!
     /// </summary>
     public class InstancePerDependencyLifestyle : Lifestyle
     {
         public InstancePerDependencyLifestyle() : base("Instance Per Dependency") { }
 
-        // MaxValue prevents lifestyle mismatches when injected into a component, while 
-        // allowing instances to depend on singletons.
-        protected override int Length => 1000;
+        // Returning Singleton.Length prevents lifestyle mismatches when injected into a 
+        // component, while allowing instances to depend on singletons.
+        public override int Length => Singleton.Length;
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(
             Container container) => 

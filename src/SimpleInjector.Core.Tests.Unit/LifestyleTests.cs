@@ -400,7 +400,7 @@
             {
             }
 
-            protected override int Length
+            public override int Length
             {
                 get { throw new NotImplementedException(); }
             }

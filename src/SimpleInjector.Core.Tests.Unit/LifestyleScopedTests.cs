@@ -257,15 +257,14 @@
         private sealed class CustomScopedLifestyle : ScopedLifestyle
         {
             private readonly Scope scope;
-            private readonly int length;
 
             public CustomScopedLifestyle(Scope scope = null, int? length = null) : base("Custom Scope")
             {
                 this.scope = scope;
-                this.length = length ?? base.Length;
+                this.Length = length ?? base.Length;
             }
 
-            protected override int Length => this.length;
+            public override int Length { get; }
 
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
                 () => this.scope;
