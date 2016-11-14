@@ -42,6 +42,15 @@ namespace SimpleInjector
     {
         private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
 
+        private static readonly Func<Type[], string> FullyQualifiedNameArgumentsFormatter =
+            args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: true)).ToArray());
+
+        private static readonly Func<Type[], string> SimpleNameArgumentsFormatter =
+            args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: false)).ToArray());
+
+        private static readonly Func<Type[], string> CSharpFriendlyNameArgumentFormatter =
+            args => string.Join(",", args.Select(argument => string.Empty).ToArray());
+
         internal static bool ContainsGenericParameter(this Type type) =>
             type.IsGenericParameter ||
                 (type.IsGenericType() && type.GetGenericArguments().Any(ContainsGenericParameter));
@@ -91,9 +100,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
 
-            return genericTypeDefinition.ToFriendlyName(
-                fullyQualifiedName,
-                arguments => string.Join(",", arguments.Select(argument => string.Empty).ToArray()));
+            return genericTypeDefinition.ToFriendlyName(fullyQualifiedName, CSharpFriendlyNameArgumentFormatter);
         }
 
         internal static string ToFriendlyName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
@@ -104,7 +111,7 @@ namespace SimpleInjector
 
             return type.ToFriendlyName(
                 fullyQualifiedName,
-                args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName)).ToArray()));
+                fullyQualifiedName ? FullyQualifiedNameArgumentsFormatter : SimpleNameArgumentsFormatter);
         }
 
         // This makes the collection immutable for the consumer. The creator might still be able to change

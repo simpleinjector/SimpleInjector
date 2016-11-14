@@ -276,6 +276,9 @@
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.cs">
       <Link>TestClasses.cs</Link>
     </Compile>
+    <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.Duplicates.cs">
+      <Link>TestClasses.Duplicates.cs</Link>
+    </Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.EventHandlers.cs">
       <Link>TestClasses.EventHandlers.cs</Link>
     </Compile>

@@ -175,7 +175,7 @@ namespace SimpleInjector
             this.suppressions.Add(type);
         }
 
-        internal bool ShouldNotBeSuppressed(DiagnosticType type) => 
+        internal bool ShouldNotBeSuppressed(DiagnosticType type) =>
             this.suppressions == null || !this.suppressions.Contains(type);
 
         internal Expression BuildExpression(InstanceProducer producer)
@@ -402,7 +402,7 @@ namespace SimpleInjector
             ConstructorInfo constructor =
                 this.Container.Options.SelectConstructor(serviceType, implementationType);
 
-            var expression = Expression.New(constructor, 
+            var expression = Expression.New(constructor,
                 this.BuildConstructorParameters(serviceType, implementationType, constructor));
 
             this.AddConstructorParametersAsKnownRelationship(serviceType, implementationType, constructor);
@@ -419,18 +419,21 @@ namespace SimpleInjector
             // makes it easier for developers (and maintainers) to read the stack trace.
             var parameters = new List<Expression>();
 
-            foreach (var parameter in constructor.GetParameters())
+            foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                var overriddenExpression = this.GetOverriddenParameterFor(parameter).PlaceHolder;
-
-                var parameterExpression = overriddenExpression ?? 
-                    this.Container.Options.BuildParameterExpression(serviceType, implementationType, parameter);
-
-                parameters.Add(parameterExpression);
+                var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
+                Expression constructorParameter = this.BuildConstructorParameterFor(consumer);
+                parameters.Add(constructorParameter);
             }
 
             return parameters.ToArray();
         }
+
+        private Expression BuildConstructorParameterFor(InjectionConsumerInfo consumer) =>
+            this.GetPlaceHolderFor(consumer) ?? this.Container.Options.BuildParameterExpression(consumer);
+
+        private ConstantExpression GetPlaceHolderFor(InjectionConsumerInfo consumer) => 
+            this.GetOverriddenParameterFor(consumer.Target.Parameter).PlaceHolder;
 
         private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType,
             Expression expression)
@@ -485,7 +488,7 @@ namespace SimpleInjector
             if (this.overriddenParameters != null)
             {
                 object key = GetParameterKey(parameter);
-                
+
                 if (this.overriddenParameters.ContainsKey(key))
                 {
                     return this.overriddenParameters[key];
@@ -504,7 +507,7 @@ namespace SimpleInjector
                 let type = parameter.ParameterType
                 let overriddenProducer = this.GetOverriddenParameterFor(parameter).Producer
                 let context = new InjectionConsumerInfo(serviceType, implementationType, parameter)
-                let instanceProducer = 
+                let instanceProducer =
                     overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(type, context)
                 where instanceProducer != null
                 select instanceProducer;
@@ -512,7 +515,7 @@ namespace SimpleInjector
             this.AddRelationships(constructor.DeclaringType, dependencyTypes);
         }
 
-        private void AddPropertiesAsKnownRelationships(Type serviceType, Type implementationType, 
+        private void AddPropertiesAsKnownRelationships(Type serviceType, Type implementationType,
             IEnumerable<PropertyInfo> properties)
         {
             var dependencies =

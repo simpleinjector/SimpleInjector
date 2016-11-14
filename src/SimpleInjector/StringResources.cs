@@ -30,12 +30,17 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Internals;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
         internal static bool UseFullyQualifiedTypeNames { get; set; } = false;
+
+        // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
+        // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
+        // for the Location property.
+        private static readonly PropertyInfo AssemblyLocationProperty =
+            typeof(Assembly).GetProperties().SingleOrDefault(p => p.Name == "Location");
 
         internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
         {
@@ -77,14 +82,15 @@ namespace SimpleInjector
 
         internal static string NoRegistrationForTypeFound(Type serviceType, bool containerHasRegistrations,
             bool containerHasRelatedOneToOneMapping, bool containerHasRelatedCollectionMapping,
-            Type[] skippedDecorators) =>
+            Type[] skippedDecorators, Type[] lookalikes) =>
             string.Format(CultureInfo.InvariantCulture,
-                "No registration for type {0} could be found.{1}{2}{3}{4}",
+                "No registration for type {0} could be found.{1}{2}{3}{4}{5}",
                 serviceType.TypeName(),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations),
                 DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
                 DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType),
-                NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators));
+                NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
+                NoteThatTypeLookalikesAreFound(serviceType, lookalikes));
 
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -167,28 +173,31 @@ namespace SimpleInjector
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
-            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators) =>
+            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators,
+            Type[] lookalikes) =>
             target.Parameter != null
                 ? string.Format(CultureInfo.InvariantCulture,
                     "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
-                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}{6}",
+                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}{6}{7}",
                     target.Member.DeclaringType.TypeName(),
                     target.Name,
                     target.TargetType.TypeName(),
                     GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
                     DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
-                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators))
+                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
+                    NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals))
                 : string.Format(CultureInfo.InvariantCulture,
                     "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}",
+                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}{7}",
                     target.Member.DeclaringType.TypeName(),
                     target.Name,
                     target.TargetType.TypeName(),
                     GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
                     DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
-                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators));
+                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
+                    NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals));
 
         internal static string TypeMustHaveASinglePublicConstructorButItHasNone(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -849,6 +858,75 @@ namespace SimpleInjector
                     decorators.Length == 1 ? "it contains" : "they contain",
                     decorators.Length == 1 ? "itself" : "themselves")
                 : string.Empty;
+
+        private static string NoteThatTypeLookalikesAreFound(Type serviceType, Type[] lookalikes,
+            int numberOfConditionals = 0)
+        {
+            if (!lookalikes.Any() || numberOfConditionals > 0)
+            {
+                return string.Empty;
+            }
+
+            Type duplicateAssemblyLookalike = GetDuplicateLoadedAssemblyLookalikeTypeOrNull(serviceType, lookalikes);
+
+            if (duplicateAssemblyLookalike != null)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    " Type {0} is a member of the assembly {1} which seems to have been loaded more than " +
+                    "once. The CLR believes the second instance of the assembly is a different assembly " +
+                    "to the first. It is this multiple loading of assemblies that is causing this issue. " +
+                    "The most likely cause is that the same assembly has been loaded from different " +
+                    "locations within different contexts. " +
+                    "{2}" +
+                    "Please see https://simpleinjector.org/asmld for more information about this " +
+                    "problem and how to solve it.",
+                    Helpers.ToCSharpFriendlyName(duplicateAssemblyLookalike, fullyQualifiedName: true),
+                    serviceType.GetAssembly().FullName,
+                    BuildAssemblyLocationMessage(serviceType, duplicateAssemblyLookalike));
+            }
+            else
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    " Note that there exists a registration for a different type {0} while " +
+                    "the requested type is {1}.",
+                    lookalikes.First().ToFriendlyName(fullyQualifiedName: true),
+                    serviceType.ToFriendlyName(fullyQualifiedName: true));
+            }
+        }
+
+        private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)
+        {
+            string serviceTypeLocation = GetAssemblyLocationOrNull(serviceType);
+            string lookalikeLocation = GetAssemblyLocationOrNull(duplicateAssemblyLookalike);
+
+            if (serviceTypeLocation != lookalikeLocation
+                && (lookalikeLocation != null || serviceTypeLocation != null))
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "The assembly of the requested type is located at {0}, while the " +
+                    "assembly of the registered type is located at {1}. ",
+                    serviceTypeLocation,
+                    lookalikeLocation);
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetAssemblyLocationOrNull(Type type) =>
+            AssemblyLocationProperty != null && !type.GetAssembly().IsDynamic
+                ? (string)AssemblyLocationProperty.GetValue(type.GetAssembly(), null)
+                : null;
+
+        private static Type GetDuplicateLoadedAssemblyLookalikeTypeOrNull(Type serviceType, Type[] lookalikes) => (
+            from lookalike in lookalikes
+            where !object.ReferenceEquals(serviceType.GetAssembly(), lookalike.GetAssembly())
+            where serviceType.GetAssembly().FullName == lookalike.GetAssembly().FullName
+            let lookalikeName = lookalike.ToFriendlyName(fullyQualifiedName: true)
+            let serviceTypeFullName = serviceType.ToFriendlyName(fullyQualifiedName: true)
+            where lookalikeName == serviceTypeFullName || (serviceType.IsGenericType()
+                && serviceType.GetGenericTypeDefinition().ToFriendlyName(fullyQualifiedName: true) == lookalikeName)
+            select lookalike)
+            .FirstOrDefault();
 
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
 

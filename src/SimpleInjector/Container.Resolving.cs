@@ -688,7 +688,8 @@ namespace SimpleInjector
                 this.HasRegistrations,
                 this.ContainsOneToOneRegistrationForCollectionType(serviceType),
                 this.ContainsCollectionRegistrationFor(serviceType),
-                this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(serviceType)));
+                this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(serviceType),
+                this.GetLookalikesForMissingType(serviceType)));
         }
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
