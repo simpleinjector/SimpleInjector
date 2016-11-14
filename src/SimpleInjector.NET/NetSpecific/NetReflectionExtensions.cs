@@ -31,7 +31,7 @@ namespace SimpleInjector
     /// methods that map to properties with the same name. The Simple Injector library for .NETStandard
     /// contains these extension methods as well, but are differently maps.
     /// </summary>
-    internal static partial class NetReflectionExtensions
+    internal static class NetReflectionExtensions
     {
         public static bool IsGenericType(this Type type) => type.IsGenericType;
         public static bool IsValueType(this Type type) => type.IsValueType;
@@ -46,9 +46,10 @@ namespace SimpleInjector
         public static bool IsInterface(this Type type) => type.IsInterface;
         public static bool IsGenericParameter(this Type type) => type.IsGenericParameter;
         public static GenericParameterAttributes GetGenericParameterAttributes(this Type type) => type.GenericParameterAttributes;
-        public static IEnumerable<PropertyInfo> GetRuntimeProperties(this Type type) => 
+        public static IEnumerable<PropertyInfo> GetRuntimeProperties(this Type type) =>
             type.GetProperties(BindingFlags.FlattenHierarchy |
                 BindingFlags.Instance | BindingFlags.Static |
                 BindingFlags.NonPublic | BindingFlags.Public);
+        public static Assembly GetAssembly(this Type type) => type.Assembly;
     }
 }

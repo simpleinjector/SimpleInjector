@@ -3,6 +3,14 @@
     using System;
     using System.Collections.Generic;
 
+    public interface IDuplicate
+    {
+    }
+
+    public interface IDuplicate<T>
+    {
+    }
+
     public interface ILogger
     {
         void Log(string message);
@@ -63,6 +71,14 @@
     }
 
     public interface IUserRepository
+    {
+    }
+
+    public class Duplicate : IDuplicate
+    {
+    }
+
+    public class Duplicate<T> : IDuplicate<T>
     {
     }
 
