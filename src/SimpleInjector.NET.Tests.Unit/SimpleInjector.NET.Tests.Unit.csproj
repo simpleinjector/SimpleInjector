@@ -167,6 +167,7 @@
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\ScopedLifestyleTests.cs"><Link>ScopedLifestyleTests.cs</Link></Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\ScopeTests.cs"><Link>ScopeTests.cs</Link></Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.CommandHandlers.cs"><Link>TestClasses.CommandHandlers.cs</Link></Compile>
+    <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.Duplicates.cs"><Link>TestClasses.Duplicates.cs</Link></Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.EventHandlers.cs"><Link>TestClasses.EventHandlers.cs</Link></Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.OpenGenerics.cs"><Link>TestClasses.OpenGenerics.cs</Link></Compile>
     <Compile Include="..\SimpleInjector.Core.Tests.Unit\TestClasses.Plugins.cs"><Link>TestClasses.Plugins.cs</Link></Compile>

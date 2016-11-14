@@ -454,7 +454,8 @@ namespace SimpleInjector
                     this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
                     this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),
                     this.ContainsCollectionRegistrationFor(target.TargetType),
-                    this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(target.TargetType)));
+                    this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(target.TargetType),
+                    this.GetLookalikesForMissingType(target.TargetType)));
         }
 
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
@@ -658,6 +659,31 @@ namespace SimpleInjector
             this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
                 () => Lifestyle.Singleton.CreateProducer(() => this, this));
         }
+
+        private Type[] GetLookalikesForMissingType(Type missingServiceType) =>
+            this.GetLookalikesForMissingNonGenericType(missingServiceType.ToFriendlyName())
+                .Concat(missingServiceType.IsGenericType()
+                    ? this.GetLookalikesForMissingGeneritTypeDefinitions(
+                        missingServiceType.GetGenericTypeDefinition().ToFriendlyName())
+                    : Enumerable.Empty<Type>())
+                .ToArray();
+
+        // A lookalike type is a registered type that shares the same type name (where casing is ignored
+        // and the parent type name of a nested type is included) as the missing type. Nested types are
+        // mostly excluded from this list, because it would be quite common for developers to have lots
+        // of nested types with the same name.
+        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) => 
+            from registration in this.GetCurrentRegistrations(false, includeExternalProducers: false)
+            let typeName = registration.ServiceType.ToFriendlyName()
+            where StringComparer.OrdinalIgnoreCase.Equals(typeName, missingServiceTypeName)
+            select registration.ServiceType;
+
+        private IEnumerable<Type> GetLookalikesForMissingGeneritTypeDefinitions(string missingTypeDefName) =>
+            from type in this.explicitRegistrations.Keys
+            where type.IsGenericTypeDefinition()
+            let friendlyName = type.GetGenericTypeDefinition().ToFriendlyName()
+            where StringComparer.OrdinalIgnoreCase.Equals(friendlyName, missingTypeDefName)
+            select type;
 
         private sealed class ContextualResolveInterceptor
         {
