@@ -9,6 +9,8 @@ Version 3.3.0 (v3.3.0 RTM)
 		-[Core] Disabled Dynamic Assembly Compilation by default. (fixes #274)
 		-[Core] Added ContainerOptions.DefaultLifestyle property to make it easier to override the default
 		 (transient) lifestyle. (fixes #313)
+		-[Core] Improved error message in case a registration couldn't be resolved caused by incorrect
+		 dynamic assembly loading. (fixes #325)
 		-[LifetimeScoping] Marked RegisterLifetimeScope and GetCurrentLifetimeScope obsolete. (fixes #303)
 		-[WCF] Marked RegisterPerWcfOperation and GetCurrentWcfOperationScope obsolete. (fixes #303)
 		-[Web] Marked RegisterPerWebRequest obsolete. (fixes #303)
