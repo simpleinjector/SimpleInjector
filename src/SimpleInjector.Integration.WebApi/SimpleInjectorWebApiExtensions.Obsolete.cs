@@ -29,12 +29,6 @@ namespace SimpleInjector
     /// <content>Deprecated methods.</content>>
     public static partial class SimpleInjectorWebApiExtensions
     {
-        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle();
-
-#pragma warning disable 0618
-        private static readonly Lifestyle LifestyleNoDisposal = new WebApiRequestLifestyle(false);
-#pragma warning restore 0618
-
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned within the
         /// Web API request. When the Web API request ends and 
@@ -59,9 +53,10 @@ namespace SimpleInjector
         public static void RegisterWebApiRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(LifestyleWithDisposal);
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/webapi");
         }
 
         /// <summary>
@@ -91,9 +86,10 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(LifestyleWithDisposal);
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/webapi");
         }
 
         /// <summary>
@@ -120,7 +116,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            RegisterWebApiRequest<TService>(container, instanceCreator, disposeWhenScopeEnds: true);
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/webapi");
         }
 
         /// <summary>
@@ -150,9 +149,10 @@ namespace SimpleInjector
             bool disposeWhenScopeEnds)
             where TConcrete : class, IDisposable
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(GetLifestyle(disposeWhenScopeEnds));
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TConcrete>(new WebApiRequesstLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
 
         /// <summary>
@@ -184,9 +184,10 @@ namespace SimpleInjector
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(GetLifestyle(disposeWhenScopeEnds));
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(new WebApiRequesstLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
 
         /// <summary>
@@ -215,12 +216,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenScopeEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            container.Register<TService>(instanceCreator, GetLifestyle(disposeWhenScopeEnds));
+            throw new NotSupportedException(
+                "RegisterWebApiRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, new WebApiRequesstLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
-
-        private static Lifestyle GetLifestyle(bool dispose) => dispose ? LifestyleWithDisposal : LifestyleNoDisposal;
     }
 }

@@ -60,9 +60,10 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(WebRequestLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/mvc");
         }
 
         /// <summary>
@@ -92,9 +93,10 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(WebRequestLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/mvc");
         }
 
         /// <summary>
@@ -120,10 +122,10 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            RegisterPerWebRequest(container, instanceCreator, disposeInstanceWhenWebRequestEnds: true);
+            throw new NotSupportedException(
+                "RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/mvc");
         }
 
         /// <summary>
@@ -151,11 +153,9 @@ namespace SimpleInjector
         public static void RegisterPerWebRequest<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            
-            container.Register<TService>(instanceCreator, 
-                WebRequestLifestyle.Get(disposeInstanceWhenWebRequestEnds));
+            throw new NotSupportedException(
+                "RegisterPerWebRequest has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(new WebRequestLifestyle(false)) instead to suppress disposal.");
         }
     }
 }

@@ -89,9 +89,10 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(WcfOperationLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/wcf");
         }
 
         /// <summary>
@@ -118,10 +119,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            container.Register<TService>(instanceCreator, WcfOperationLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/wcf");
         }
 
         /// <summary>
@@ -151,13 +152,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            var lifestyle =
-                disposeWhenRequestEnds ? WcfOperationLifestyle.WithDisposal : WcfOperationLifestyle.NoDisposal;
-
-            container.Register<TService>(instanceCreator, lifestyle);
+            throw new NotSupportedException(
+                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, new WcfOperationLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
 
         /// <summary>
@@ -189,9 +187,9 @@ namespace SimpleInjector
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Scope GetCurrentWcfOperationScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return WcfOperationLifestyle.GetCurrentScopeCore();
+            throw new NotSupportedException(
+                "GetCurrentWcfOperationScope has been deprecated and will be removed in a future release. " +
+                "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.");
         }
     }
 }

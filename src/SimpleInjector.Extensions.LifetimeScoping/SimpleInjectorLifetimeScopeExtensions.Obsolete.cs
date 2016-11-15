@@ -59,9 +59,10 @@ namespace SimpleInjector
         public static void RegisterLifetimeScope<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
 
         /// <summary>
@@ -93,9 +94,10 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.WithDisposal);
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
 
         /// <summary>
@@ -123,7 +125,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator)
             where TService : class
         {
-            RegisterLifetimeScope<TService>(container, instanceCreator, disposeWhenLifetimeScopeEnds: true);
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+                "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
 
         /// <summary>
@@ -155,9 +160,10 @@ namespace SimpleInjector
             bool disposeWhenLifetimeScopeEnds)
             where TConcrete : class, IDisposable
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
 
         /// <summary>
@@ -191,9 +197,10 @@ namespace SimpleInjector
             where TImplementation : class, TService, IDisposable
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TService, TImplementation>(LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService, TImplementation>(new LifetimeScopeLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
 
         /// <summary>
@@ -224,10 +231,10 @@ namespace SimpleInjector
             Func<TService> instanceCreator, bool disposeWhenLifetimeScopeEnds)
             where TService : class
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            container.Register<TService>(instanceCreator, LifetimeScopeLifestyle.Get(disposeWhenLifetimeScopeEnds));
+            throw new NotSupportedException(
+                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
+                "to suppress disposal.");
         }
     }
 }
