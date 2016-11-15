@@ -25,9 +25,16 @@ Version 3.3.0 (v3.3.0 RTM)
 		-[Core] Improved error message in case a registration couldn't be resolved caused by incorrect
 		 dynamic assembly loading. (fixes #325)
 		-[LifetimeScoping] Marked RegisterLifetimeScope and GetCurrentLifetimeScope obsolete. (fixes #303)
+		-[LifetimeScoping] Marked LifetimeScopeLifestyle ctor overloads that allow controlling disposal
+		 obsolete. (fixes #307)
 		-[WCF] Marked RegisterPerWcfOperation and GetCurrentWcfOperationScope obsolete. (fixes #303)
+		-[WCF] Marked WcfOperationLifestyle ctor overloads that allow controlling disposal obsolete. (fixes #307)
 		-[Web] Marked RegisterPerWebRequest obsolete. (fixes #303)
+		-[WCF] Marked WebRequestLifestyle ctor overloads that allow controlling disposal obsolete. (fixes #307)
 		-[WebApi] Marked RegisterWebApiRequest obsolete. (fixes #303)
+		-[WebApi] Marked WebApiRequestLifestyle ctor overloads that allow controlling disposal obsolete. (fixes #307)
+		-[ExecutionContextScoping] Marked ExecutionContextScopingLifestyle ctor overloads that allow 
+		 controlling disposal obsolete. (fixes #307)
 
 
 Version 3.2.7 (v3.2.7 RTM) 2016-11-03

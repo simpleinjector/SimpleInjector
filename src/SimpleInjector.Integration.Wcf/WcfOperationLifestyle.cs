@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -36,21 +36,22 @@ namespace SimpleInjector.Integration.Wcf
     /// The following example shows the usage of the <b>WcfOperationLifestyle</b> class:
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
-    /// 
-    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new WcfOperationLifestyle());
+    /// container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
+    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
     public class WcfOperationLifestyle : ScopedLifestyle
     {
-        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle(true);
+        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle();
 
+#pragma warning disable 0618
         internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
+#pragma warning restore 0618
 
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
-        public WcfOperationLifestyle() 
-            : this(disposeInstanceWhenOperationEnds: true)
+        public WcfOperationLifestyle() : base("WCF Operation")
         {
         }
 
@@ -59,6 +60,9 @@ namespace SimpleInjector.Integration.Wcf
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
         /// operation ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
+        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
+            "Please use WcfOperationLifestyle() instead.",
+            error: false)]
         public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds)
             : base("WCF Operation", disposeInstanceWhenOperationEnds)
         {

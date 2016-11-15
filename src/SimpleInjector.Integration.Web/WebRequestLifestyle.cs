@@ -35,22 +35,24 @@ namespace SimpleInjector.Integration.Web
     /// The following example shows the usage of the <b>WebRequestLifestyle</b> class:
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
-    /// 
-    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new WebRequestLifestyle());
+    /// container.Options.DefaultScopedLifestyle = new WebRequestLifestyle();
+    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
     public sealed class WebRequestLifestyle : ScopedLifestyle
     {
         internal static readonly WebRequestLifestyle WithDisposal = new WebRequestLifestyle();
 
+#pragma warning disable 0618
         internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
+#pragma warning restore 0618
 
         private static readonly object ScopeCacheKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
-        public WebRequestLifestyle() : this(disposeInstanceWhenWebRequestEnds: true)
+        public WebRequestLifestyle() : base("Web Request")
         {
         }
 
@@ -59,6 +61,9 @@ namespace SimpleInjector.Integration.Web
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
+        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
+            "Please use WebRequestLifestyle() instead.",
+            error: false)]
         public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds)
             : base("Web Request", disposeInstanceWhenWebRequestEnds)
         {

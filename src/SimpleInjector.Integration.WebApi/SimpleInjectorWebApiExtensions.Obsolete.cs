@@ -29,8 +29,11 @@ namespace SimpleInjector
     /// <content>Deprecated methods.</content>>
     public static partial class SimpleInjectorWebApiExtensions
     {
-        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle(true);
+        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle();
+
+#pragma warning disable 0618
         private static readonly Lifestyle LifestyleNoDisposal = new WebApiRequestLifestyle(false);
+#pragma warning restore 0618
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned within the

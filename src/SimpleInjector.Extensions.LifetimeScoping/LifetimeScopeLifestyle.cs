@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -35,8 +35,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// The following example shows the usage of the <b>LifetimeScopeLifestyle</b> class:
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
+    /// container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
     /// 
-    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(new LifetimeScopeLifestyle());
+    /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// 
     /// using (container.BeginLifetimeScope())
     /// {
@@ -65,15 +66,16 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </example>
     public sealed class LifetimeScopeLifestyle : ScopedLifestyle
     {
-        internal static readonly LifetimeScopeLifestyle WithDisposal = new LifetimeScopeLifestyle(true);
+        internal static readonly LifetimeScopeLifestyle WithDisposal = new LifetimeScopeLifestyle();
 
+#pragma warning disable 0618
         internal static readonly LifetimeScopeLifestyle NoDisposal = new LifetimeScopeLifestyle(false);
+#pragma warning restore 0618
 
         /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
-        public LifetimeScopeLifestyle()
-            : this(disposeInstanceWhenLifetimeScopeEnds: true)
+        public LifetimeScopeLifestyle() : base("Lifetime Scope")
         {
         }
 
@@ -83,6 +85,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
+        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
+            "Please use LifetimeScopeLifestyle() instead.",
+            error: false)]
         public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds)
             : base("Lifetime Scope", disposeInstanceWhenLifetimeScopeEnds)
         {
