@@ -52,8 +52,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>.
         /// </summary>
-        public ExecutionContextScopeLifestyle()
-            : this(disposeInstanceWhenScopeEnds: true)
+        public ExecutionContextScopeLifestyle() : base("Execution Context Scope")
         {
         }
 
@@ -63,6 +62,9 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
+        [Obsolete("This constructor overload has been deprecated and will be removed in a future release. " +
+            "Please use ExecutionContextScopeLifestyle() instead.",
+            error: false)]
         public ExecutionContextScopeLifestyle(bool disposeInstanceWhenScopeEnds)
             : this("Execution Context Scope", disposeInstanceWhenScopeEnds)
         {
@@ -72,8 +74,19 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
         /// </summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
+        protected ExecutionContextScopeLifestyle(string name) : base(name)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
+        /// </summary>
+        /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <param name="disposeInstanceWhenScopeEnds">
         /// Specifies whether the created and cached instance will be disposed when the created.</param>
+        [Obsolete("This constructor overload has been deprecated and will be removed in a future release. " +
+            "Please use ExecutionContextScopeLifestyle(string) instead.",
+            error: false)]
         protected ExecutionContextScopeLifestyle(string name, bool disposeInstanceWhenScopeEnds)
             : base(name, disposeInstanceWhenScopeEnds)
         {

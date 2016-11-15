@@ -42,8 +42,11 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorWebApiExtensions
     {
-        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle(true);
+        private static readonly Lifestyle LifestyleWithDisposal = new WebApiRequestLifestyle();
+
+#pragma warning disable 0618
         private static readonly Lifestyle LifestyleNoDisposal = new WebApiRequestLifestyle(false);
+#pragma warning restore 0618
 
         private static bool httpRequestMessageTrackingEnabled;
 
