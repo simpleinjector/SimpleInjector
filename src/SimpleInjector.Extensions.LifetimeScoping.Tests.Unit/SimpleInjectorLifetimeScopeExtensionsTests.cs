@@ -384,13 +384,12 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_RegisteredConcereteWithExplicitDisposal_DisposesThatInstance()
+        public void LifetimeScopeDispose_RegisteredConcerete_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(
-                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: true));
+            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand instanceToDispose;
 
@@ -403,36 +402,14 @@
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
         }
-
+        
         [TestMethod]
-        public void LifetimeScopeDispose_RegisteredConcereteWithoutDisposal_DoesNotDisposesThatInstance()
+        public void LifetimeScopeDispose_Registered_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(
-                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: false));
-
-            DisposableCommand instanceToDispose;
-
-            // Act
-            using (container.BeginLifetimeScope())
-            {
-                instanceToDispose = container.GetInstance<DisposableCommand>();
-            }
-
-            // Assert
-            Assert.IsFalse(instanceToDispose.HasBeenDisposed);
-        }
-
-        [TestMethod]
-        public void LifetimeScopeDispose_RegisteredWithExplicitDisposal_DisposesThatInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<IDisposable, DisposableCommand>(
-                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: true));
+            container.Register<IDisposable, DisposableCommand>(new LifetimeScopeLifestyle());
 
             DisposableCommand instanceToDispose;
 
@@ -444,27 +421,6 @@
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
-        }
-
-        [TestMethod]
-        public void LifetimeScopeDispose_RegisteredWithoutDisposal_DoesNotDisposesThatInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<IDisposable, DisposableCommand>(
-                new LifetimeScopeLifestyle(disposeInstanceWhenLifetimeScopeEnds: false));
-
-            DisposableCommand instanceToDispose;
-
-            // Act
-            using (container.BeginLifetimeScope())
-            {
-                instanceToDispose = container.GetInstance<IDisposable>() as DisposableCommand;
-            }
-
-            // Assert
-            Assert.IsFalse(instanceToDispose.HasBeenDisposed);
         }
 
         [TestMethod]

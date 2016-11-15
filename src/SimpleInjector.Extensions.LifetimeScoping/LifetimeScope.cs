@@ -22,9 +22,6 @@
 
 namespace SimpleInjector.Extensions.LifetimeScoping
 {
-    using System;
-    using SimpleInjector.Advanced;
-
     /// <summary>
     /// Thread and container specific cache for services that are registered with one of the 
     /// <see cref="SimpleInjectorLifetimeScopeExtensions">RegisterLifetimeScope</see> extension method overloads.

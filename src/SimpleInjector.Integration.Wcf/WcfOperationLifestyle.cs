@@ -42,12 +42,6 @@ namespace SimpleInjector.Integration.Wcf
     /// </example>
     public class WcfOperationLifestyle : ScopedLifestyle
     {
-        internal static readonly WcfOperationLifestyle WithDisposal = new WcfOperationLifestyle();
-
-#pragma warning disable 0618
-        internal static readonly WcfOperationLifestyle NoDisposal = new WcfOperationLifestyle(false);
-#pragma warning restore 0618
-
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
@@ -60,12 +54,13 @@ namespace SimpleInjector.Integration.Wcf
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
         /// operation ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
-            "Please use WcfOperationLifestyle() instead.",
-            error: false)]
-        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds)
-            : base("WCF Operation", disposeInstanceWhenOperationEnds)
+        [Obsolete("This constructor has been deprecated. Please use WcfOperationLifestyle() instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds) : this()
         {
+            throw new NotSupportedException(
+                "This constructor has been deprecated. Please use WcfOperationLifestyle() instead.");
         }
 
         /// <summary>
@@ -84,7 +79,9 @@ namespace SimpleInjector.Integration.Wcf
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenWcfOperationEnds(Container container, Action action)
         {
-            WithDisposal.WhenScopeEnds(container, action);
+            throw new NotSupportedException(
+                "WhenWcfOperationEnds has been deprecated. " +
+                "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.");
         }
         
         internal static Scope GetCurrentScopeCore()

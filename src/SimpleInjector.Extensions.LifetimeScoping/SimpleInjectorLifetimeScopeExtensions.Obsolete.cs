@@ -51,7 +51,7 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
             "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
@@ -60,7 +60,7 @@ namespace SimpleInjector
             where TConcrete : class
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "RegisterLifetimeScope has been deprecated. " +
                 "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
                 "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
@@ -84,7 +84,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
             "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
@@ -95,7 +95,7 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "RegisterLifetimeScope has been deprecated. " +
                 "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
                 "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
@@ -116,7 +116,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
             "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/lifetimes#perlifetimescope",
             error: true)]
@@ -126,7 +126,7 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
+                "RegisterLifetimeScope has been deprecated. " +
                 "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
                 "See: https://simpleinjector.org/lifetimes#perlifetimescope");
         }
@@ -151,9 +151,8 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
-            "to suppress disposal.",
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterLifetimeScope<TConcrete>(this Container container,
@@ -161,9 +160,8 @@ namespace SimpleInjector
             where TConcrete : class, IDisposable
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-                "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
-                "to suppress disposal.");
+                "RegisterLifetimeScope has been deprecated. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead.");
         }
 
         /// <summary>
@@ -187,9 +185,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService, TImplementation>(new LifetimeScopeLifestyle(false)) instead " +
-            "to suppress disposal.",
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
+            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterLifetimeScope<TService, TImplementation>(
@@ -198,9 +195,8 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-                "Please use Register<TService, TImplementation>(new LifetimeScopeLifestyle(false)) instead " +
-                "to suppress disposal.");
+                "RegisterLifetimeScope has been deprecated. " +
+                "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead.");
         }
 
         /// <summary>
@@ -222,9 +218,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
-            "to suppress disposal.",
+        [Obsolete("RegisterLifetimeScope has been deprecated. " +
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterLifetimeScope<TService>(this Container container,
@@ -232,9 +227,8 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterLifetimeScope has been deprecated and will be removed in a future release. " +
-                "Please use Register<TService>(Func<TService>, new LifetimeScopeLifestyle(false)) instead " +
-                "to suppress disposal.");
+                "RegisterLifetimeScope has been deprecated. " +
+                "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead.");
         }
     }
 }

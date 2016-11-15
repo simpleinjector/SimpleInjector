@@ -41,12 +41,6 @@ namespace SimpleInjector.Integration.Web
     /// </example>
     public sealed class WebRequestLifestyle : ScopedLifestyle
     {
-        internal static readonly WebRequestLifestyle WithDisposal = new WebRequestLifestyle();
-
-#pragma warning disable 0618
-        internal static readonly WebRequestLifestyle Disposeless = new WebRequestLifestyle(false);
-#pragma warning restore 0618
-
         private static readonly object ScopeCacheKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
@@ -61,12 +55,13 @@ namespace SimpleInjector.Integration.Web
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
-            "Please use WebRequestLifestyle() instead.",
-            error: false)]
-        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds)
-            : base("Web Request", disposeInstanceWhenWebRequestEnds)
+        [Obsolete("This constructor has been deprecated. Please use WebRequestLifestyle() instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : this()
         {
+            throw new NotSupportedException(
+                "This constructor has been deprecated. Please use WebRequestLifestyle() instead.");
         }
 
         /// <summary>
@@ -85,10 +80,10 @@ namespace SimpleInjector.Integration.Web
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentRequestEnds(Container container, Action action)
         {
-            WithDisposal.WhenScopeEnds(container, action);
+            throw new NotSupportedException(
+                "WhenCurrentRequestEnds has been deprecated. " +
+                "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.");
         }
-
-        internal static Lifestyle Get(bool withDisposal) => withDisposal ? WithDisposal : Disposeless;
 
         internal static void CleanUpWebRequest(HttpContext context)
         {

@@ -66,12 +66,6 @@ namespace SimpleInjector.Extensions.LifetimeScoping
     /// </example>
     public sealed class LifetimeScopeLifestyle : ScopedLifestyle
     {
-        internal static readonly LifetimeScopeLifestyle WithDisposal = new LifetimeScopeLifestyle();
-
-#pragma warning disable 0618
-        internal static readonly LifetimeScopeLifestyle NoDisposal = new LifetimeScopeLifestyle(false);
-#pragma warning restore 0618
-
         /// <summary>Initializes a new instance of the <see cref="LifetimeScopeLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>.</summary>
@@ -85,12 +79,13 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated and will be removed in a future release. " +
-            "Please use LifetimeScopeLifestyle() instead.",
-            error: false)]
-        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds)
-            : base("Lifetime Scope", disposeInstanceWhenLifetimeScopeEnds)
+        [Obsolete("This constructor has been deprecated. Please use LifetimeScopeLifestyle() instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public LifetimeScopeLifestyle(bool disposeInstanceWhenLifetimeScopeEnds) : this()
         {
+            throw new NotSupportedException(
+                "This constructor overload has been deprecated. Please use LifetimeScopeLifestyle() instead.");
         }
 
         /// <summary>
@@ -109,10 +104,9 @@ namespace SimpleInjector.Extensions.LifetimeScoping
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentScopeEnds(Container container, Action action)
         {
-            WithDisposal.WhenScopeEnds(container, action);
+            throw new NotSupportedException("WhenCurrentScopeEnds has been deprecated. " +
+                "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.");
         }
-
-        internal static LifetimeScopeLifestyle Get(bool dispose) => dispose ? WithDisposal : NoDisposal;
 
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 

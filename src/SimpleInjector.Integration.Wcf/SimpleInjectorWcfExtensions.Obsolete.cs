@@ -26,7 +26,6 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using SimpleInjector.Integration.Wcf;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with WCF services.
@@ -49,7 +48,7 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
             "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/wcf",
             error: true)]
@@ -57,9 +56,7 @@ namespace SimpleInjector
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            container.Register<TConcrete, TConcrete>(WcfOperationLifestyle.WithDisposal);
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
             "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/wcf",
             error: true)]
@@ -90,7 +87,7 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+                "RegisterPerWcfOperation has been deprecated. " +
                 "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
                 "See: https://simpleinjector.org/wcf");
         }
@@ -110,7 +107,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
             "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
             "See: https://simpleinjector.org/wcf",
             error: true)]
@@ -120,7 +117,7 @@ namespace SimpleInjector
             where TService : class
         {
             throw new NotSupportedException(
-                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
+                "RegisterPerWcfOperation has been deprecated. " +
                 "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
                 "See: https://simpleinjector.org/wcf");
         }
@@ -143,19 +140,13 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
-            "Please use Register<TService>(Func<TService>, new WcfOperationLifestyle(false)) instead " +
-            "to suppress disposal.",
-            error: true)]
+        [Obsolete("RegisterPerWcfOperation has been deprecated. ", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWcfOperation<TService>(this Container container,
             Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
         {
-            throw new NotSupportedException(
-                "RegisterPerWcfOperation has been deprecated and will be removed in a future release. " +
-                "Please use Register<TService>(Func<TService>, new WcfOperationLifestyle(false)) instead " +
-                "to suppress disposal.");
+            throw new NotSupportedException("RegisterPerWcfOperation has been deprecated.");
         }
 
         /// <summary>
@@ -181,14 +172,14 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
         /// has both no <b>LifetimeScope</b> registrations.
         /// </exception>
-        [Obsolete("GetCurrentWcfOperationScope has been deprecated and will be removed in a future release. " +
+        [Obsolete("GetCurrentWcfOperationScope has been deprecated. " +
             "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Scope GetCurrentWcfOperationScope(this Container container)
         {
             throw new NotSupportedException(
-                "GetCurrentWcfOperationScope has been deprecated and will be removed in a future release. " +
+                "GetCurrentWcfOperationScope has been deprecated. " +
                 "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.");
         }
     }

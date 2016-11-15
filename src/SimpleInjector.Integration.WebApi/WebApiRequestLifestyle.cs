@@ -54,14 +54,14 @@ namespace SimpleInjector.Integration.WebApi
         /// Specifies whether the created and cached instance will be disposed when the Web API request ends,
         /// and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-#pragma warning disable 0618
-        [Obsolete("This constructor overload has been deprecated and will be removed in a future release. " +
+        [Obsolete("This constructor overload has been deprecated. " +
             "Please use WebApiRequestLifestyle() instead.",
-            error: false)]
-        public WebApiRequestLifestyle(bool disposeInstanceWhenScopeEnds)
-            : base("Web API Request", disposeInstanceWhenScopeEnds)
+            error: true)]
+        public WebApiRequestLifestyle(bool disposeInstanceWhenScopeEnds) : this()
         {
+            throw new NotSupportedException(
+                "This constructor overload has been deprecated. " +
+                "Please use WebApiRequestLifestyle() instead.");
         }
-#pragma warning restore 0618
     }
 }

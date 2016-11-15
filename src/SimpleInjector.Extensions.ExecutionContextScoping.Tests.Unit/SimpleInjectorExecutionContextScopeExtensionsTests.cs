@@ -427,7 +427,7 @@
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle(true));
+            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand instanceToDispose;
 
@@ -439,26 +439,6 @@
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
-        }
-
-        [TestMethod]
-        public void ExecutionContextScopeDispose_RegisteredConcereteWithoutDisposal_DoesNotDisposesThatInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle(false));
-
-            DisposableCommand instanceToDispose;
-
-            // Act
-            using (container.BeginExecutionContextScope())
-            {
-                instanceToDispose = container.GetInstance<DisposableCommand>();
-            }
-
-            // Assert
-            Assert.IsFalse(instanceToDispose.HasBeenDisposed);
         }
 
         [TestMethod]
@@ -467,7 +447,7 @@
             // Arrange
             var container = new Container();
 
-            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle(true));
+            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle());
 
             DisposableCommand instanceToDispose;
 
@@ -479,26 +459,6 @@
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
-        }
-
-        [TestMethod]
-        public void ExecutionContextScopeDispose_RegisteredWithoutDisposal_DoesNotDisposesThatInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle(false));
-
-            DisposableCommand instanceToDispose;
-
-            // Act
-            using (container.BeginExecutionContextScope())
-            {
-                instanceToDispose = container.GetInstance<IDisposable>() as DisposableCommand;
-            }
-
-            // Assert
-            Assert.IsFalse(instanceToDispose.HasBeenDisposed);
         }
 
         [TestMethod]
