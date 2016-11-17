@@ -110,15 +110,12 @@ namespace SimpleInjector.Internals
             // we've seen a call to Verify() take up to 6 times as long (from 8.5 seconds to 55 seconds), when 
             // we don't do these checks here (and simply return true). 
             // That's why we need to have these checks in the full version.
-#if PCL
-            return true;
-#else
             if (constraint.IsAssignableFrom(this.Mapping.ConcreteType))
             {
                 return true;
             }
 
-            if (constraint.ContainsGenericParameters)
+            if (constraint.ContainsGenericParameters())
             {
                 // The constraint is one of the other generic parameters, but this class checks a single
                 // mapping, so we cannot check whether this constraint holds. We just return true and
@@ -129,8 +126,7 @@ namespace SimpleInjector.Internals
             var baseTypes = this.Mapping.ConcreteType.GetBaseTypesAndInterfaces();
 
             // This doesn't feel right, but have no idea how to reliably do this check without the GUID.
-            return baseTypes.Any(type => type.GUID == constraint.GUID);
-#endif
+            return baseTypes.Any(type => type.GetGuid() == constraint.GetGuid());
         }
 
         private bool MappingHasConstraint(GenericParameterAttributes constraint)

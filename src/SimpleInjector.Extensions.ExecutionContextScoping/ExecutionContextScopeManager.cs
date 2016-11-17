@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014-2015 Simple Injector Contributors
+ * Copyright (c) 2014-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,13 +23,21 @@
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
     using System.Security;
+    using System.Threading;
 
     // This class will be registered as singleton within a container, allowing each container (if the
-    // application -for some reason- has multiple containers) to have it's own set of execution context scopes, 
+    // application has multiple containers) to have it's own set of execution context scopes, 
     // without influencing other scopes from other containers.
     [SecuritySafeCritical]
-    internal sealed partial class ExecutionContextScopeManager
+    internal sealed class ExecutionContextScopeManager
     {
+#if NETSTANDARD1_3
+        private readonly AsyncLocal<ExecutionContextScope> asyncLocalScope =
+            new AsyncLocal<ExecutionContextScope>();
+#else
+        private readonly string key = System.Guid.NewGuid().ToString("N").Substring(0, 12);
+#endif
+
         internal ExecutionContextScopeManager(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -88,5 +96,45 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
 
             return scope;
         }
+
+#if NETSTANDARD1_3
+        private ExecutionContextScope CurrentScopeInternal
+        {
+            get { return this.asyncLocalScope.Value; }
+            set { this.asyncLocalScope.Value = value; }
+        }
+#endif
+
+#if NET45
+        private ExecutionContextScope CurrentScopeInternal
+        {
+            get
+            {
+                var wrapper = (ExecutionContextScopeWrapper)
+                    System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(this.key);
+
+                return wrapper != null ? wrapper.Scope : null;
+            }
+
+            set
+            {
+                var wrapper = value == null ? null : new ExecutionContextScopeWrapper(value);
+
+                System.Runtime.Remoting.Messaging.CallContext.LogicalSetData(this.key, wrapper);
+            }
+        }
+        
+        [System.Serializable]
+        internal sealed class ExecutionContextScopeWrapper : System.MarshalByRefObject
+        {
+            [System.NonSerialized]
+            internal readonly ExecutionContextScope Scope;
+
+            internal ExecutionContextScopeWrapper(ExecutionContextScope scope)
+            {
+                this.Scope = scope;
+            }
+        }
+#endif
     }
 }

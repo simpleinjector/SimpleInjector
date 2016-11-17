@@ -4,13 +4,14 @@
     "keyFile": "../SimpleInjector.snk"
   },
 
+  "testRunner": "nunit",
+
   "dependencies": {
     "NUnit": "3.4.1",
     "dotnet-test-nunit": "3.4.0-beta-2",
     "SimpleInjector": { "target": "project" },
     "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" }
   },
-  "testRunner": "nunit",
   "runtimes": {
     "win10-x86": {}
   },
@@ -23,6 +24,7 @@
           "type": "platform"
         }
       }
-    }
+    },
+    "net451": {}
   }
 }

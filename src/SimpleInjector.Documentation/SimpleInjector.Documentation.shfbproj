@@ -20,36 +20,33 @@
     <Language>en-US</Language>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="SimpleInjector" isExposed="True">
-  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions" filterName="SimpleInjectorLifetimeScopeExtensions" isExposed="False">
-    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope" filterName="BeginLifetimeScope" isExposed="True" />
-  </Filter>
-  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWcfExtensions" filterName="SimpleInjectorWcfExtensions" isExposed="False">
-    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWcfExtensions.RegisterWcfServices" filterName="RegisterWcfServices" isExposed="True" />
-  </Filter>
-  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebApiExtensions" filterName="SimpleInjectorWebApiExtensions" isExposed="True">
-    <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWebApiExtensions.RegisterWebApiRequest" filterName="RegisterWebApiRequest" isExposed="False" />
-  </Filter>
-  <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebExtensions" filterName="SimpleInjectorWebExtensions" isExposed="False" />
-</Filter>
-<Filter entryType="Namespace" fullName="SimpleInjector.Advanced.Internal" isExposed="False" /></ApiFilter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions" filterName="SimpleInjectorLifetimeScopeExtensions" isExposed="False">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope" filterName="BeginLifetimeScope" isExposed="True" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWcfExtensions" filterName="SimpleInjectorWcfExtensions" isExposed="False">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWcfExtensions.RegisterWcfServices" filterName="RegisterWcfServices" isExposed="True" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebApiExtensions" filterName="SimpleInjectorWebApiExtensions" isExposed="True">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWebApiExtensions.RegisterWebApiRequest" filterName="RegisterWebApiRequest" isExposed="False" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebExtensions" filterName="SimpleInjectorWebExtensions" isExposed="False" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="SimpleInjector.Advanced.Internal" isExposed="False" />
+    </ApiFilter>
     <ComponentConfigurations />
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Packaging.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Packaging.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Mvc.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Mvc.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Wcf.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Wcf.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector\bin\Release\net45\SimpleInjector.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector\bin\Release\net45\SimpleInjector.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>

@@ -25,7 +25,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
 
-#if !PCL
+#if NET40 || NET45
     using System.Runtime.Serialization;
 
     [Serializable]
@@ -40,7 +40,7 @@ namespace SimpleInjector.Internals
             this.types.Add(typeToValidate);
         }
 
-#if !PCL
+#if NET40 || NET45
         protected CyclicDependencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

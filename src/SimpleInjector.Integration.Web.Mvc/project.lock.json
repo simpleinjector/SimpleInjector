@@ -1,0 +1,153 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.0": {
+      "Microsoft.AspNet.Mvc/3.0.20105.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNet.Razor": "1.0.20105.408",
+          "Microsoft.AspNet.WebPages": "1.0.20105.408"
+        },
+        "compile": {
+          "lib/net40/System.Web.Mvc.dll": {}
+        },
+        "runtime": {
+          "lib/net40/System.Web.Mvc.dll": {}
+        }
+      },
+      "Microsoft.AspNet.Razor/1.0.20105.408": {
+        "type": "package",
+        "compile": {
+          "lib/net40/System.Web.Razor.dll": {}
+        },
+        "runtime": {
+          "lib/net40/System.Web.Razor.dll": {}
+        }
+      },
+      "Microsoft.AspNet.WebPages/1.0.20105.408": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNet.Razor": "1.0.20105.408",
+          "Microsoft.Web.Infrastructure": "1.0.0"
+        },
+        "compile": {
+          "lib/net40/System.Web.Helpers.dll": {},
+          "lib/net40/System.Web.WebPages.Deployment.dll": {},
+          "lib/net40/System.Web.WebPages.Razor.dll": {},
+          "lib/net40/System.Web.WebPages.dll": {}
+        },
+        "runtime": {
+          "lib/net40/System.Web.Helpers.dll": {},
+          "lib/net40/System.Web.WebPages.Deployment.dll": {},
+          "lib/net40/System.Web.WebPages.Razor.dll": {},
+          "lib/net40/System.Web.WebPages.dll": {}
+        }
+      },
+      "Microsoft.Web.Infrastructure/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Microsoft.Web.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Microsoft.Web.Infrastructure.dll": {}
+        }
+      },
+      "SimpleInjector/4.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "compile": {
+          "net40/SimpleInjector.dll": {}
+        },
+        "runtime": {
+          "net40/SimpleInjector.dll": {}
+        }
+      },
+      "SimpleInjector.Integration.Web/4.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "dependencies": {
+          "Microsoft.Web.Infrastructure": "1.0.0",
+          "SimpleInjector": "1.0.0"
+        },
+        "frameworkAssemblies": [
+          "System.Web"
+        ],
+        "compile": {
+          "net40/SimpleInjector.Integration.Web.dll": {}
+        },
+        "runtime": {
+          "net40/SimpleInjector.Integration.Web.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Microsoft.AspNet.Mvc/3.0.20105.1": {
+      "sha512": "CjEb1ExBqe3DceDCg4EhdimdoDTMuBOmA490lRKgl3EN8L4G8+lBRHDF7Ho8QkFsY7C5Y4pTfqhD7Zl8VPOtWQ==",
+      "type": "package",
+      "path": "Microsoft.AspNet.Mvc/3.0.20105.1",
+      "files": [
+        "Microsoft.AspNet.Mvc.3.0.20105.1.nupkg.sha512",
+        "Microsoft.AspNet.Mvc.nuspec",
+        "lib/net40/System.Web.Mvc.dll"
+      ]
+    },
+    "Microsoft.AspNet.Razor/1.0.20105.408": {
+      "sha512": "vRmwL/G31Xc9DusVQUJXmDpTYEVB7xUoIjKqCyuOHrCyG9kzM66MadNjdPLzplSsDoWqiae35US8XiiI3e6SBw==",
+      "type": "package",
+      "path": "Microsoft.AspNet.Razor/1.0.20105.408",
+      "files": [
+        "Microsoft.AspNet.Razor.1.0.20105.408.nupkg.sha512",
+        "Microsoft.AspNet.Razor.nuspec",
+        "lib/net40/System.Web.Razor.dll"
+      ]
+    },
+    "Microsoft.AspNet.WebPages/1.0.20105.408": {
+      "sha512": "da1//kx0b6GXJG6V8vGl7PmvhPJE/aNs2mK0QJ9bojgy059BDdYhmAwpTT1ucDgbImbFDdmNGi/XJj2SU0QJeA==",
+      "type": "package",
+      "path": "Microsoft.AspNet.WebPages/1.0.20105.408",
+      "files": [
+        "Microsoft.AspNet.WebPages.1.0.20105.408.nupkg.sha512",
+        "Microsoft.AspNet.WebPages.nuspec",
+        "lib/net40/System.Web.Helpers.dll",
+        "lib/net40/System.Web.WebPages.Deployment.dll",
+        "lib/net40/System.Web.WebPages.Razor.dll",
+        "lib/net40/System.Web.WebPages.dll"
+      ]
+    },
+    "Microsoft.Web.Infrastructure/1.0.0": {
+      "sha512": "FNmvLn5m2LTU/Rs2KWVo0SIIh9Ek+U0ojex7xeDaSHw/zgEP77A8vY5cVWgUtBGS8MJfDGNn8rpXJWEIQaPwTg==",
+      "type": "package",
+      "path": "Microsoft.Web.Infrastructure/1.0.0",
+      "files": [
+        "Microsoft.Web.Infrastructure.1.0.0.nupkg.sha512",
+        "Microsoft.Web.Infrastructure.nuspec",
+        "lib/net40/Microsoft.Web.Infrastructure.dll"
+      ]
+    },
+    "SimpleInjector/4.0.0": {
+      "type": "project",
+      "path": "../SimpleInjector/project.json",
+      "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
+    },
+    "SimpleInjector.Integration.Web/4.0.0": {
+      "type": "project",
+      "path": "../SimpleInjector.Integration.Web/project.json",
+      "msbuildProject": "../SimpleInjector.Integration.Web/SimpleInjector.Integration.Web.xproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "SimpleInjector",
+      "SimpleInjector.Integration.Web"
+    ],
+    ".NETFramework,Version=v4.0": [
+      "Microsoft.AspNet.Mvc >= 3.0.20105.1",
+      "Microsoft.Web.Infrastructure >= 1.0.0",
+      "System.Web >= 4.0.0"
+    ]
+  },
+  "tools": {},
+  "projectFileToolGroups": {}
+}

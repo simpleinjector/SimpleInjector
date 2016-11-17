@@ -2,7 +2,6 @@
 {
     using System;
     using System.Configuration;
-    using System.Data.SqlClient;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
@@ -320,17 +319,17 @@
         public void OptionalParameterConvention_TypeWithOptionalDependencyAndDependencyRegistered_InjectsDependency()
         {
             // Arrange
-            var dependency = new SqlConnection();
+            var dependency = new NullLogger();
 
             var container = new Container();
 
             AddConventions(container,
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
-            container.RegisterSingleton<IDisposable>(dependency);
+            container.RegisterSingleton<ILogger>(dependency);
 
             // Act
-            var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();
+            var instance = container.GetInstance<TypeWithOptionalDependency<ILogger>>();
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(dependency, instance.Dependency));

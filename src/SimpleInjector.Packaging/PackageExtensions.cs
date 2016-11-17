@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -36,6 +36,7 @@ namespace SimpleInjector
     /// </summary>
     public static class PackageExtensions
     {
+#if NET40
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the 
         /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
@@ -49,12 +50,13 @@ namespace SimpleInjector
         /// reference.</exception>
         public static void RegisterPackages(this Container container)
         {
-            var assemblies = 
+            var assemblies =
                 AppDomain.CurrentDomain.GetAssemblies()
                 .Where(assembly => !assembly.IsDynamic);
 
             RegisterPackages(container, assemblies);
         }
+#endif
 
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from the given set of 
@@ -80,14 +82,14 @@ namespace SimpleInjector
             var packageTypes = (
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
-                where typeof(IPackage).IsAssignableFrom(type)
-                where !type.IsAbstract
-                where !type.IsGenericTypeDefinition
+                where typeof(IPackage).Info().IsAssignableFrom(type.Info())
+                where !type.Info().IsAbstract
+                where !type.Info().IsGenericTypeDefinition
                 select type)
                 .ToArray();
 
             RequiresPackageTypesHaveDefaultConstructor(packageTypes);
-            
+
             var packages = (
                 from type in packageTypes
                 select CreatePackage(type))
@@ -103,7 +105,11 @@ namespace SimpleInjector
         {
             try
             {
+#if NET40
                 return assembly.GetExportedTypes();
+#else
+                return assembly.DefinedTypes.Select(info => info.AsType());
+#endif
             }
             catch (NotSupportedException)
             {
@@ -116,7 +122,7 @@ namespace SimpleInjector
         private static void RequiresPackageTypesHaveDefaultConstructor(Type[] packageTypes)
         {
             var invalidPackageType =
-                packageTypes.FirstOrDefault(type => type.GetConstructor(Type.EmptyTypes) == null);
+                packageTypes.FirstOrDefault(type => !type.HasDefaultConstructor());
 
             if (invalidPackageType != null)
             {
@@ -140,5 +146,21 @@ namespace SimpleInjector
                 throw new InvalidOperationException(message, ex);
             }
         }
+
+        private static bool HasDefaultConstructor(this Type type) =>
+            type.GetConstructors().Any(ctor => !ctor.GetParameters().Any());
+
+        private static ConstructorInfo[] GetConstructors(this Type type) =>
+#if NET40
+            type.GetConstructors();
+#else
+            type.GetTypeInfo().DeclaredConstructors.ToArray();
+#endif
+
+#if NET40
+        private static Type Info(this Type type) => type;
+#else
+        private static TypeInfo Info(this Type type) => type.GetTypeInfo();
+#endif
     }
 }

@@ -1,0 +1,80 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.5": {
+      "System.Linq/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "SimpleInjector/4.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5",
+        "compile": {
+          "net45/SimpleInjector.dll": {}
+        },
+        "runtime": {
+          "net45/SimpleInjector.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "System.Linq/4.0.0": {
+      "sha512": "r6Hlc+ytE6m/9UBr+nNRRdoJEWjoeQiT3L3lXYFDHoXk3VYsRBCDNXrawcexw7KPLaH0zamQLiAb6avhZ50cGg==",
+      "type": "package",
+      "path": "System.Linq/4.0.0",
+      "files": [
+        "System.Linq.4.0.0.nupkg.sha512",
+        "System.Linq.nuspec",
+        "lib/dotnet/System.Linq.dll",
+        "lib/net45/_._",
+        "lib/netcore50/System.Linq.dll",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "ref/dotnet/System.Linq.dll",
+        "ref/dotnet/System.Linq.xml",
+        "ref/dotnet/de/System.Linq.xml",
+        "ref/dotnet/es/System.Linq.xml",
+        "ref/dotnet/fr/System.Linq.xml",
+        "ref/dotnet/it/System.Linq.xml",
+        "ref/dotnet/ja/System.Linq.xml",
+        "ref/dotnet/ko/System.Linq.xml",
+        "ref/dotnet/ru/System.Linq.xml",
+        "ref/dotnet/zh-hans/System.Linq.xml",
+        "ref/dotnet/zh-hant/System.Linq.xml",
+        "ref/net45/_._",
+        "ref/netcore50/System.Linq.dll",
+        "ref/netcore50/System.Linq.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._"
+      ]
+    },
+    "SimpleInjector/4.0.0": {
+      "type": "project",
+      "path": "../SimpleInjector/project.json",
+      "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "SimpleInjector",
+      "System.Linq >= 4.0.0"
+    ],
+    ".NETFramework,Version=v4.5": [
+      "System.Configuration >= 4.0.0",
+      "System.Linq.Expressions >= 4.0.0",
+      "System.Reflection >= 4.0.0",
+      "System.Runtime >= 4.0.0"
+    ]
+  },
+  "tools": {},
+  "projectFileToolGroups": {}
+}

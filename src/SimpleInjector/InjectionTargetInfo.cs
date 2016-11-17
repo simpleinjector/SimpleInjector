@@ -35,9 +35,6 @@ namespace SimpleInjector
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public sealed class InjectionTargetInfo
-#if !PCL
- : ICustomAttributeProvider
-#endif
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
@@ -138,7 +135,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
         public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
-#if NETSTANDARD || NET45
+#if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property.GetCustomAttribute<T>(inherit);
@@ -163,7 +160,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
-#if NETSTANDARD || NET45
+#if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property.GetCustomAttribute(attributeType, inherit);

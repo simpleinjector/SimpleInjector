@@ -1,0 +1,36 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.0": {
+      "SimpleInjector/4.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "compile": {
+          "net40/SimpleInjector.dll": {}
+        },
+        "runtime": {
+          "net40/SimpleInjector.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SimpleInjector/4.0.0": {
+      "type": "project",
+      "path": "../SimpleInjector/project.json",
+      "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "SimpleInjector"
+    ],
+    ".NETFramework,Version=v4.0": [
+      "System.ServiceModel >= 4.0.0",
+      "System.ServiceModel.Activation >= 4.0.0"
+    ]
+  },
+  "tools": {},
+  "projectFileToolGroups": {}
+}

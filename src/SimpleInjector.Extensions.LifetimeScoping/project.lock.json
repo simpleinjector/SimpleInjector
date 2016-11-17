@@ -2,6 +2,18 @@
   "locked": false,
   "version": 2,
   "targets": {
+    ".NETFramework,Version=v4.0": {
+      "SimpleInjector/4.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "compile": {
+          "net40/SimpleInjector.dll": {}
+        },
+        "runtime": {
+          "net40/SimpleInjector.dll": {}
+        }
+      }
+    },
     ".NETStandard,Version=v1.0": {
       "Microsoft.NETCore.Platforms/1.0.1": {
         "type": "package",
@@ -370,22 +382,12 @@
           "lib/portable-net45+win8+wp8+wpa81/_._": {}
         }
       },
-      "SimpleInjector/3.2.0": {
+      "SimpleInjector/4.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.0",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
-          "System.ComponentModel": "4.0.1",
-          "System.Diagnostics.Debug": "4.0.11",
-          "System.Diagnostics.Tools": "4.0.1",
-          "System.Globalization": "4.0.11",
-          "System.Linq": "4.1.0",
-          "System.Linq.Expressions": "4.1.0",
-          "System.Reflection": "4.1.0",
-          "System.Reflection.Extensions": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0",
-          "System.Threading": "4.0.11"
+          "System.ComponentModel": "4.0.1"
         },
         "compile": {
           "netstandard1.0/SimpleInjector.dll": {}
@@ -2017,7 +2019,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "SimpleInjector/3.2.0": {
+    "SimpleInjector/4.0.0": {
       "type": "project",
       "path": "../SimpleInjector/project.json",
       "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
@@ -2025,10 +2027,12 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "NETStandard.Library >= 1.6.0",
-      "SimpleInjector >= 3.2.0"
+      "SimpleInjector"
     ],
-    ".NETStandard,Version=v1.0": []
+    ".NETFramework,Version=v4.0": [],
+    ".NETStandard,Version=v1.0": [
+      "NETStandard.Library >= 1.6.0"
+    ]
   },
   "tools": {},
   "projectFileToolGroups": {}

@@ -14,7 +14,7 @@ IF "%2"=="" (
 
 set version=%1
 set superSecretApiKey=%2
-set packageDirectory=Releases\v%version%\.NET
+set packageDirectory=Releases\v%version%
 set options=-Verbosity detailed
 set nugetexe=..\..\nuget.exe
 

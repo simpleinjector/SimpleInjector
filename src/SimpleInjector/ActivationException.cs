@@ -23,10 +23,16 @@
 namespace SimpleInjector
 {
     using System;
+#if NET40 || NET45
+    using System.Runtime.Serialization;
+#endif
 
     /// <summary>
     /// The standard exception thrown when a container has an error in resolving an object.
     /// </summary>
+#if NET40 || NET45
+    [Serializable]
+#endif
     public partial class ActivationException : Exception
     {
         /// <summary>
@@ -59,5 +65,29 @@ namespace SimpleInjector
         public ActivationException(string message, Exception innerException) : base(message, innerException) 
         {
         }
+
+#if NET40 || NET45
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ActivationException" /> class with serialized data.
+        /// </summary>
+        /// <param name="info">
+        /// The <see cref="System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception 
+        /// being thrown. 
+        /// </param>
+        /// <param name="context">
+        /// The <see cref="System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or 
+        /// destination. 
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// The <paramref name="info" /> parameter is null. 
+        /// </exception>
+        /// <exception cref="System.Runtime.Serialization.SerializationException">
+        /// The class name is null or hresult is zero (0). 
+        /// </exception>
+        protected ActivationException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
     }
 }

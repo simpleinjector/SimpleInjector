@@ -8,4 +8,8 @@
     public interface IGeneric<T>
     {
     }
+    
+    public sealed class ImportAttribute : System.Attribute
+    {
+    }
 }
