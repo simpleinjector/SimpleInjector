@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
+[assembly: AssemblyTitle("SimpleInjector.Integration.Web.Mvc")]
+[assembly: AssemblyDescription("Integration library for ASP.NET MVC3 and up for the Simple Injector Inversion of Control library.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SimpleInjector.Integration.Web.Mvc2")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Simple Injector Contributors")]
+[assembly: AssemblyProduct("SimpleInjector.Integration.Web.Mvc")]
+[assembly: AssemblyCopyright("Copyright © 2013 Simple Injector Contributors")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
